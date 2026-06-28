@@ -130,6 +130,8 @@ export const processedChannels: Channel[] = rawChannels.map((ch: any) => {
     logoImg = "https://static.wikia.nocookie.net/ep-deo/images/2/25/9_HD.png/revision/latest/scale-to-width-down/180?cb=20260625105022";
   } else if (ch.id === "vtv10") {
     logoImg = "https://static.wikia.nocookie.net/ep-deo/images/3/38/CHD.png/revision/latest/scale-to-width-down/180?cb=20260625105355";
+  } else if (ch.id === "vn_today") {
+    logoImg = "https://static.wikia.nocookie.net/logos/images/f/f2/Logo_Vietnam_Today_07-2025_v2.png/revision/latest?cb=20260228060318&path-prefix=uk";
   }
 
   return {

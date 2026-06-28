@@ -41,12 +41,99 @@ import {
   Layers,
   Download
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
 import ChannelPlayer from "./components/ChannelPlayer";
 
+const TRANSLATIONS: Record<string, string> = {
+  // Categories
+  "home.categories.Special.name": "Đặc Biệt",
+  "home.categories.VTV.name": "Kênh VTV",
+  "home.categories.VTVCab.name": "Kênh VTVCab",
+  "home.categories.HTV.name": "Kênh HTV & HTVC",
+  "home.categories.SCTV.name": "Kênh SCTV",
+  "home.categories.Local.name": "Kênh Địa Phương",
+  "home.categories.International.name": "Kênh Quốc Tế",
+  "home.categories.Radio.name": "Phát Thanh (Radio)",
+  "home.categories.Experimental.name": "Kênh Thử Nghiệm",
+  "home.categories.SuggestForYou.name": "Gợi Ý Cho Bạn",
+  "home.categories.Favorited.name": "Kênh Yêu Thích",
+
+  // Search
+  "home.search.placeholder": "Tìm kiếm kênh...",
+
+  // Special event / VTVGo Locked modal
+  "title.special_event.banner_top.name": "Bản Tin Trực Tiếp",
+  "title.special_event.banner_bottom.name": "Sóng Thử Nghiệm VTVgo",
+  "title.special_event.banner_desc.name": "Luồng phát thử nghiệm kỹ thuật. Chỉ hoạt động trong khung giờ quy định.",
+  "title.special_event.title.name": "Sóng VTVgo Chưa Phát",
+  "title.special_event.desc.name": "Kênh truyền hình VTVgo chỉ hoạt động trực tiếp từ 12h30 đến 14h30 hàng ngày để phát luồng đặc biệt. Xin vui lòng quay lại sau.",
+  "modal.close_button.name": "Đóng",
+
+  // Settings section titles & subtitles
+  "settings.section.developeroptions.title": "Tùy chọn Nhà Phát Triển",
+  "settings.sections.Profile.title": "Hồ Sơ Cá Nhân",
+  "settings.sections.Profile.subtitle": "Quản lý dữ liệu yêu thích, kênh tùy chỉnh và tài khoản",
+  "settings.sections.Appearance.title": "Giao Diện & Hiển Thị",
+  "settings.sections.Appearance.subtitle": "Tùy chỉnh chủ đề tối màu, Liquid Glass và hiệu ứng di chuyển",
+  "settings.sections.Accessibility.title": "Hỗ Trợ & Khả Dụng",
+  "settings.sections.Accessibility.subtitle": "Bật/tắt tự động cuộn trình chiếu và cấu hình chuyển động mượt mà",
+  "settings.sections.Broadcast.title": "Luồng Phát Kỹ Thuật",
+  "settings.sections.Broadcast.subtitle": "Cấu hình độ trễ thấp, tăng bộ đệm và tối ưu hóa luồng video",
+  "settings.sections.Experimental.title": "Tính Năng Thực Nghiệm",
+  "settings.sections.Experimental.subtitle": "Bật các chức năng thử nghiệm nâng cao của hệ thống",
+
+  // Profile keys
+  "settings.profile.TotalFavorites.title": "Danh sách Yêu thích",
+  "settings.profile.DeleteAllFavorites.button": "Xóa tất cả Yêu thích",
+  "settings.profile.CustomChannels.title": "Kênh tự thiết lập",
+  "settings.profile.DeleteCustomChannels.button": "Xóa toàn bộ Kênh tự thêm",
+  "settings.profile.OnlineAccountNotice.title": "Lưu trữ Đám mây",
+  "settings.profile.OnlineAccountNotice.description": "Hệ thống đang lưu trữ tùy chỉnh của bạn trên trình duyệt nội bộ. Hãy đăng ký tài khoản để đồng bộ hóa đám mây trong tương lai.",
+
+  // Accessibility keys
+  "settings.accessibility.AutoSlide.title": "Tự động trình chiếu",
+  "settings.accessibility.AutoSlide.subtitle": "Bật tính năng tự động chuyển đổi giữa các biểu ngữ nổi bật trang chủ",
+
+  // Menu keys
+  "menu.ExportChannels.label": "Xuất Danh Sách Kênh (M3U8)",
+
+  // Channel Creation Popup Keys
+  "modal.ChannelCreate.title": "Tạo kênh",
+  "modal.ChannelCreate.desc": "Thêm luồng kênh mới vào danh sách kênh bằng cách nhập đường dẫn URL của luồng kênh đó",
+  "modal.ChannelCreate.nameLabel": "Nhập tên kênh",
+  "modal.ChannelCreate.urlLabel": "Nhập đường dẫn",
+  "modal.ChannelCreate.groupLabel": "Chọn nhóm kênh",
+  "modal.ChannelCreate.cancel": "Hủy",
+  "modal.ChannelCreate.create": "Tạo"
+};
+
+const t = (key: string): string => {
+  if (!key) return "";
+  if (TRANSLATIONS[key]) {
+    return TRANSLATIONS[key];
+  }
+  if (key.startsWith("live_feed.") && key.endsWith(".name")) {
+    const core = key.substring(10, key.length - 5);
+    if (core.startsWith("VTV") && core !== "VTV6Test" && !core.startsWith("VTVgo")) {
+      return core;
+    }
+    if (core === "VTV6Test") {
+      return "VTV6 Thử Nghiệm";
+    }
+    if (core.startsWith("VTVgo")) {
+      return "VTVgo " + core.substring(5);
+    }
+    if (core === "VietnamWildLive") {
+      return "Dã Ngoại Hoang Dã";
+    }
+    return core.replace(/([A-Z])/g, ' $1').trim();
+  }
+  return key;
+};
+
 const getLogoImgClass = (ch: any, layoutType?: "carousel" | "grid") => {
-  const isVtv1to9 = ["vtv1", "vtv2", "vtv3", "vtv4", "vtv5", "vtv6", "vtv7", "vtv8", "vtv9"].includes(ch.id);
+  const isVtv1to9 = ["vtv1", "vtv2", "vtv3", "vtv4", "vtv5", "vtv6", "vtv7", "vtv8", "vtv9", "vtv10", "vtv6_test", "vn_today"].includes(ch.id);
   const baseStretch = "scale-x-[1.35] transform";
   
   if (isVtv1to9) {
@@ -82,7 +169,7 @@ const getLogoImgClass = (ch: any, layoutType?: "carousel" | "grid") => {
 };
 
 const getLogoTextClass = (ch: any) => {
-  const isVtv1to9 = ["vtv1", "vtv2", "vtv3", "vtv4", "vtv5", "vtv6", "vtv7", "vtv8", "vtv9"].includes(ch.id);
+  const isVtv1to9 = ["vtv1", "vtv2", "vtv3", "vtv4", "vtv5", "vtv6", "vtv7", "vtv8", "vtv9", "vtv10", "vtv6_test", "vn_today"].includes(ch.id);
   const baseStretch = "scale-x-[1.35] transform";
   const bg = ch.logoBg || "bg-indigo-600";
   
@@ -178,7 +265,7 @@ const homeSlides = [
     vignetteLeft: "from-black/90 via-black/55 to-transparent",
     vignetteBottom: "from-[#07050f] via-[#07050f]/85 to-transparent",
     vignetteTop: "from-black/45 via-transparent to-transparent",
-    logo: "https://static.wikia.nocookie.net/logos/images/c/c7/Vietnam_Today_vertical_v2.png/revision/latest?cb=20250813041048&path-prefix=vi",
+    logo: "https://static.wikia.nocookie.net/logos/images/f/f2/Logo_Vietnam_Today_07-2025_v2.png/revision/latest?cb=20260228060318&path-prefix=uk",
     description: "Kể từ 28/06/2026, trang web xem truyền hình Vplay sẽ được chuyển đến tên miền mới **https://vplay-refresh.vercel.app**. Đối với miền trang web này sẽ trở thành **test-vplay.vercel.app**, là trang web thử nghiệm của Vplay để test trước, test sớm các tính năng mới cho web chính trong tương lai (app function, app features, luồng kênh, logo v.v). Chắc chắn web thử nghiệm sẽ nảy sinh cực kỳ nhiều lỗi, đội ngũ Vplay chỉ xin phép tiếp nhận các lỗi được báo cáo từ trang web chính, trang web thử nghiệm có thể không được sửa lỗi. Trân trọng.",
     btnText: "Xem ngay",
     btnIcon: "play"
@@ -519,6 +606,24 @@ export default function App() {
     localStorage.setItem("glass_tv_amoled_dark", amoledDark ? "true" : "false");
   }, [amoledDark]);
 
+  const [liquidGlass, setLiquidGlass] = useState<boolean>(() => {
+    const saved = localStorage.getItem("vplay_liquid_glass");
+    return saved !== null ? saved === "true" : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_liquid_glass", liquidGlass ? "true" : "false");
+  }, [liquidGlass]);
+
+  const [dynamicMotion, setDynamicMotion] = useState<boolean>(() => {
+    const saved = localStorage.getItem("vplay_dynamic_motion");
+    return saved !== null ? saved === "true" : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_dynamic_motion", dynamicMotion ? "true" : "false");
+  }, [dynamicMotion]);
+
   // Experimental states
   const [expLowLatency, setExpLowLatency] = useState<boolean>(() => localStorage.getItem("vplay_exp_lowlatency") === "true");
   const [expCache, setExpCache] = useState<boolean>(() => localStorage.getItem("vplay_exp_cache") === "true");
@@ -818,6 +923,9 @@ export default function App() {
 
   // Ambient backgrounds options config
   const getBgGradient = () => {
+    if (!liquidGlass) {
+      return "bg-[#121214]";
+    }
     if (amoledDark) {
       return "bg-black";
     }
@@ -854,10 +962,11 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen text-white/95 pb-32 transition-colors duration-1000 overflow-x-clip ${getBgGradient()}`}>
+    <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
+      <div className={`min-h-screen text-white/95 pb-32 transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass ? "no-liquid-glass" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
       
       {/* Decorative ambient glowing circles */}
-      {!amoledDark && (
+      {liquidGlass && !amoledDark && (
         <>
           <div className="absolute top-24 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
           <div className="absolute top-1/2 right-10 w-[600px] h-[600px] bg-pink-600/10 rounded-full blur-[130px] pointer-events-none"></div>
@@ -2131,13 +2240,65 @@ export default function App() {
                             >
                               <motion.div
                                 animate={{ x: autoSlide ? 20 : 0 }}
-                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
                                 className="relative w-6 h-5 flex items-center justify-center group"
                               >
                                 {/* Outer hover halo/bubble (capsule-shaped matching the pill, expanding on hover) */}
                                 <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
                                 
                                 {/* Knob - horizontal pill shape */}
+                                <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                              </motion.div>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Option: Liquid Glass */}
+                        <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-semibold text-white">Liquid Glass</h4>
+                            <p className="text-xs text-white/60 leading-relaxed">Tắt hiệu ứng kính, toàn bộ blur về 0, opacity về 0 và mọi màu UI chuyển thành solid dark gray</p>
+                          </div>
+                          
+                          <div className="flex items-center">
+                            <button
+                              onClick={() => setLiquidGlass(!liquidGlass)}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                liquidGlass ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                              }`}
+                            >
+                              <motion.div
+                                animate={{ x: liquidGlass ? 20 : 0 }}
+                                transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
+                                className="relative w-6 h-5 flex items-center justify-center group"
+                              >
+                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                              </motion.div>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Option: Dynamic Motion */}
+                        <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-semibold text-white">Dynamic Motion</h4>
+                            <p className="text-xs text-white/60 leading-relaxed">Nếu tắt thì sẽ bỏ toàn bộ hiệu ứng, animation vào ra, hiển thị, di chuyển, tất cả về dạng instant transition</p>
+                          </div>
+                          
+                          <div className="flex items-center">
+                            <button
+                              onClick={() => setDynamicMotion(!dynamicMotion)}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                dynamicMotion ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                              }`}
+                            >
+                              <motion.div
+                                animate={{ x: dynamicMotion ? 20 : 0 }}
+                                transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
+                                className="relative w-6 h-5 flex items-center justify-center group"
+                              >
+                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
                                 <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
                               </motion.div>
                             </button>
@@ -3972,5 +4133,6 @@ export default function App() {
       </AnimatePresence>
 
     </div>
+    </MotionConfig>
   );
 }

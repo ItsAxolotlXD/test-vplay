@@ -164,3 +164,49 @@
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
+
+/* Accessibility: Liquid Glass Disabled Overrides */
+.no-liquid-glass * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.no-liquid-glass .progressive-blur-header,
+.no-liquid-glass .progressive-blur-dock,
+.no-liquid-glass .progressive-blur-player {
+  opacity: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.no-liquid-glass .glass-panel,
+.no-liquid-glass .glass-panel-deep,
+.no-liquid-glass .glass-pill,
+.no-liquid-glass .glass-input,
+.no-liquid-glass .bg-white\/10,
+.no-liquid-glass .bg-white\/5,
+.no-liquid-glass .bg-white\/12,
+.no-liquid-glass .bg-white\/15,
+.no-liquid-glass .bg-black\/25,
+.no-liquid-glass .bg-black\/50,
+.no-liquid-glass .bg-black\/55,
+.no-liquid-glass .bg-black\/60,
+.no-liquid-glass .bg-black\/75,
+.no-liquid-glass .bg-black\/95,
+.no-liquid-glass .bg-[#07050f],
+.no-liquid-glass .bg-[#07050f]\/80 {
+  background-color: #1a1a1c !important;
+  background-image: none !important;
+  border-color: #2c2c2e !important;
+  box-shadow: none !important;
+}
+
+/* Accessibility: Dynamic Motion Disabled Overrides */
+.no-dynamic-motion * {
+  transition: none !important;
+  transition-duration: 0s !important;
+  animation: none !important;
+  animation-duration: 0s !important;
+}
+
