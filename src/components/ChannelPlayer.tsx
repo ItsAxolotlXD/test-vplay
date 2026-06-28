@@ -416,31 +416,7 @@ export default function ChannelPlayer({
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent opacity-10 pointer-events-none z-10" />
 
             {/* If it's a regular testcard channel */}
-            {isTestcard && !hasError && (
-              <div className="absolute inset-0 flex flex-col justify-end z-10">
-                {/* Overlay box resembling high-end generator status banner */}
-                <div className="w-full bg-black/75 backdrop-blur-md border-t border-white/10 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono">
-                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                      <span className="text-white text-sm sm:text-base font-bold tracking-widest uppercase">
-                        {channel.id === "vtv6_test" ? "VTV6 THỬ NGHIỆM" : `VTVgo Kênh ${channel.id.replace("vtvgo_", "")}`}
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-white/55 mt-1 tracking-wider uppercase">
-                      HỆ THỐNG THỬ NGHIỆM TRUYỀN HÌNH QUỐC GIA • 1kHz TONE
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-center sm:items-end font-mono">
-                    <div className="text-[10px] text-white/40 tracking-widest">REAL-TIME CLOCK (UTC+7)</div>
-                    <div className="text-amber-400 text-lg sm:text-xl font-bold tracking-widest tabular-nums mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                      {testcardTime}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {isTestcard && !hasError && null}
 
             {/* If it's an active stream loading error */}
             {hasError && (

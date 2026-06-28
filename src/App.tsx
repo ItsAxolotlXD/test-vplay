@@ -45,6 +45,54 @@ import { motion, AnimatePresence } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
 import ChannelPlayer from "./components/ChannelPlayer";
 
+const getLogoImgClass = (ch: any, layoutType?: "carousel" | "grid") => {
+  const isVtv1to9 = ["vtv1", "vtv2", "vtv3", "vtv4", "vtv5", "vtv6", "vtv7", "vtv8", "vtv9"].includes(ch.id);
+  const baseStretch = "scale-x-[1.35] transform";
+  
+  if (isVtv1to9) {
+    return `w-[45%] h-[45%] ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+  }
+  
+  if (layoutType === "carousel") {
+    if (ch.id.startsWith("vinh_long")) {
+      return `w-[58%] h-[58%] p-1 ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+    }
+    if (ch.group === "SCTV") {
+      return `w-4/5 h-4/5 p-1.5 ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+    }
+    if (ch.group === "VTVcab") {
+      return `w-[82%] h-[82%] p-0.5 ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+    }
+    return `w-full h-full ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+  } else {
+    if (ch.id === "vietnam-wild-live") {
+      return `w-[84%] h-[84%] p-0.5 ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+    }
+    if (ch.id.startsWith("vinh_long")) {
+      return `w-[55%] h-[55%] p-1 ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+    }
+    if (ch.group === "SCTV") {
+      return `w-[60%] h-[60%] p-1 ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+    }
+    if (ch.group === "VTVcab") {
+      return `w-[82%] h-[82%] p-0.5 ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+    }
+    return `w-full h-full ${baseStretch} object-contain filter drop-shadow-md select-none pointer-events-none`;
+  }
+};
+
+const getLogoTextClass = (ch: any) => {
+  const isVtv1to9 = ["vtv1", "vtv2", "vtv3", "vtv4", "vtv5", "vtv6", "vtv7", "vtv8", "vtv9"].includes(ch.id);
+  const baseStretch = "scale-x-[1.35] transform";
+  const bg = ch.logoBg || "bg-indigo-600";
+  
+  if (isVtv1to9) {
+    return `w-[55%] h-[55%] ${baseStretch} flex items-center justify-center rounded-lg ${bg} shadow-inner border border-white/10 font-bold text-white text-[7px] sm:text-[9px] tracking-wider text-center px-0.5`;
+  }
+  
+  return `w-full h-full ${baseStretch} flex items-center justify-center rounded-lg ${bg} shadow-inner border border-white/10 font-bold text-white text-[9px] sm:text-xs tracking-wider text-center px-1`;
+};
+
 const ICON_REGISTRY: Record<string, React.ComponentType<any>> = {
   Sparkles,
   Info,
@@ -1303,12 +1351,10 @@ export default function App() {
                                   src={ch.logoImg}
                                   alt={ch.name}
                                   referrerPolicy="no-referrer"
-                                  className={`object-contain filter drop-shadow-md select-none pointer-events-none ${
-                                    ch.id === "vietnam-wild-live" ? "w-[84%] h-[84%] p-0.5" : ch.id.startsWith("vinh_long") ? "w-[55%] h-[55%] p-1" : ch.group === "SCTV" ? "w-[60%] h-[60%] p-1" : ch.group === "VTVcab" ? "w-[82%] h-[82%] p-0.5" : "w-full h-full"
-                                  }`}
+                                  className={getLogoImgClass(ch, "grid")}
                                 />
                               ) : (
-                                <div className={`w-full h-full flex items-center justify-center rounded-lg ${ch.logoBg} shadow-inner border border-white/10 font-bold text-white text-[9px] sm:text-xs tracking-wider text-center px-1`}>
+                                <div className={getLogoTextClass(ch)}>
                                    {ch.logoText}
                                 </div>
                               )}
@@ -1556,12 +1602,10 @@ export default function App() {
                                 src={ch.logoImg}
                                 alt={ch.name}
                                 referrerPolicy="no-referrer"
-                                className={`object-contain filter drop-shadow-md select-none pointer-events-none ${
-                                  ch.id.startsWith("vinh_long") ? "w-[58%] h-[58%] p-1" : ch.group === "SCTV" ? "w-4/5 h-4/5 p-1.5" : ch.group === "VTVcab" ? "w-[82%] h-[82%] p-0.5" : "w-full h-full"
-                                }`}
+                                className={getLogoImgClass(ch, "carousel")}
                               />
                             ) : (
-                              <div className={`w-full h-full flex items-center justify-center rounded-lg ${ch.logoBg || "bg-emerald-600"} shadow-inner border border-white/10 font-bold text-white text-[9px] sm:text-xs tracking-wider text-center px-1`}>
+                              <div className={getLogoTextClass(ch)}>
                                 {ch.logoText}
                               </div>
                             )}
@@ -1647,12 +1691,10 @@ export default function App() {
                                 src={ch.logoImg}
                                 alt={ch.name}
                                 referrerPolicy="no-referrer"
-                                className={`object-contain filter drop-shadow-md select-none pointer-events-none ${
-                                  ch.id.startsWith("vinh_long") ? "w-[58%] h-[58%] p-1" : ch.group === "SCTV" ? "w-4/5 h-4/5 p-1.5" : ch.group === "VTVcab" ? "w-[82%] h-[82%] p-0.5" : "w-full h-full"
-                                }`}
+                                className={getLogoImgClass(ch, "carousel")}
                               />
                             ) : (
-                              <div className={`w-full h-full flex items-center justify-center rounded-lg ${ch.logoBg || "bg-emerald-600"} shadow-inner border border-white/10 font-bold text-white text-[9px] sm:text-xs tracking-wider text-center px-1`}>
+                              <div className={getLogoTextClass(ch)}>
                                 {ch.logoText}
                               </div>
                             )}
@@ -3850,12 +3892,10 @@ export default function App() {
                                     src={ch.logoImg}
                                     alt={ch.name}
                                     referrerPolicy="no-referrer"
-                                    className={`object-contain filter drop-shadow-md select-none pointer-events-none ${
-                                      ch.id === "vietnam-wild-live" ? "w-[84%] h-[84%] p-0.5" : ch.id.startsWith("vinh_long") ? "w-[55%] h-[55%] p-1" : ch.group === "SCTV" ? "w-[60%] h-[60%] p-1" : ch.group === "VTVcab" ? "w-[82%] h-[82%] p-0.5" : "w-full h-full"
-                                    }`}
+                                    className={getLogoImgClass(ch, "grid")}
                                   />
                                 ) : (
-                                  <div className={`w-full h-full flex items-center justify-center rounded-lg ${ch.logoBg || "bg-indigo-600"} shadow-inner border border-white/10 font-bold text-white text-[9px] sm:text-[10px] tracking-wider text-center px-1`}>
+                                  <div className={getLogoTextClass(ch)}>
                                      {ch.logoText}
                                   </div>
                                 )}
