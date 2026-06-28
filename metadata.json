@@ -1,0 +1,8 @@
+{
+  "name": "Test Tivi",
+  "description": "Vplay - Ứng dụng xem truyền hình mượt mà chất lượng cao trên nền tảng kính mờ, hỗ trợ 120+ kênh sóng VTV, HTV, VTVCab và Radio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

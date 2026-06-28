@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-google: "Inter", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+}
+
+/* Custom gorgeous scrollbar for glassmorphic style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-deep {
+  background: rgba(15, 10, 25, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Progressive blur styles for high-fidelity vintage glass appearance */
+.progressive-blur-header {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(7, 5, 15, 0.95) 0%, rgba(7, 5, 15, 0.8) 35%, rgba(7, 5, 15, 0.4) 75%, rgba(7, 5, 15, 0) 100%);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progressive-blur-dock {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7, 5, 15, 0.95) 0%, rgba(7, 5, 15, 0.8) 35%, rgba(7, 5, 15, 0.4) 75%, rgba(7, 5, 15, 0) 100%);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.progressive-blur-player {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7, 5, 15, 0.95) 0%, rgba(7, 5, 15, 0.75) 40%, rgba(7, 5, 15, 0) 100%);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0) 100%);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* Range slider custom pill shape values (Horizontal Pill) */
+.range-slider-pill::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #ffffff;
+  cursor: default;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.4s cubic-bezier(0.175, 1.85, 0.35, 1.45), background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.range-slider-pill::-moz-range-thumb {
+  width: 32px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #ffffff;
+  cursor: default;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.4s cubic-bezier(0.175, 1.85, 0.35, 1.45), background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.range-slider-pill:hover::-webkit-slider-thumb {
+  transform: scale(1.35);
+  background: rgba(255, 255, 255, 0) !important;
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+.range-slider-pill:hover::-moz-range-thumb {
+  transform: scale(1.35);
+  background: rgba(255, 255, 255, 0) !important;
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+.range-slider-pill:active::-webkit-slider-thumb {
+  transform: scale(1.6);
+  background: rgba(255, 255, 255, 0) !important;
+  border-color: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+.range-slider-pill:active::-moz-range-thumb {
+  transform: scale(1.6);
+  background: rgba(255, 255, 255, 0) !important;
+  border-color: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.bouncy-btn {
+  transition: transform 0.45s cubic-bezier(0.175, 2.1, 0.32, 1.35), background-color 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.bouncy-btn:hover {
+  transform: scale(1.18);
+}
+
+.bouncy-btn:active {
+  transform: scale(1.28);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-pill-active {
+  background: rgb(255, 255, 255);
+  color: rgb(15, 10, 25);
+  box-shadow: 0 4px 14px 0 rgba(255, 255, 255, 0.25);
+}
+
+.glass-input {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.glass-input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
