@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { 
   Search, 
+  Mic,
   Heart, 
+  ThumbsUp,
   Sliders, 
   Sparkles, 
   Info, 
@@ -39,7 +41,8 @@ import {
   Pizza,
   Cpu,
   Layers,
-  Download
+  Download,
+  ShoppingBag
 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
@@ -47,65 +50,87 @@ import ChannelPlayer from "./components/ChannelPlayer";
 
 const TRANSLATIONS: Record<string, string> = {
   // Categories
-  "home.categories.Special.name": "Đặc Biệt",
-  "home.categories.VTV.name": "Kênh VTV",
-  "home.categories.VTVCab.name": "Kênh VTVCab",
-  "home.categories.HTV.name": "Kênh HTV & HTVC",
-  "home.categories.SCTV.name": "Kênh SCTV",
-  "home.categories.Local.name": "Kênh Địa Phương",
-  "home.categories.International.name": "Kênh Quốc Tế",
-  "home.categories.Radio.name": "Phát Thanh (Radio)",
-  "home.categories.Experimental.name": "Kênh Thử Nghiệm",
-  "home.categories.SuggestForYou.name": "Gợi Ý Cho Bạn",
-  "home.categories.Favorited.name": "Kênh Yêu Thích",
+  "home.categories.Special.name": "Special",
+  "home.categories.VTV.name": "VTV Channels",
+  "home.categories.VTVCab.name": "VTVCab Channels",
+  "home.categories.HTV.name": "HTV & HTVC",
+  "home.categories.SCTV.name": "SCTV Channels",
+  "home.categories.Local.name": "Local Channels",
+  "home.categories.International.name": "International Channels",
+  "home.categories.Radio.name": "Radio Broadcasts",
+  "home.categories.Experimental.name": "Experimental Channels",
+  "home.categories.SuggestForYou.name": "Suggested for You",
+  "home.categories.Favorited.name": "Favorites",
 
   // Search
-  "home.search.placeholder": "Tìm kiếm kênh...",
+  "home.search.placeholder": "Search channels...",
 
   // Special event / VTVGo Locked modal
-  "title.special_event.banner_top.name": "Bản Tin Trực Tiếp",
-  "title.special_event.banner_bottom.name": "Sóng Thử Nghiệm VTVgo",
-  "title.special_event.banner_desc.name": "Luồng phát thử nghiệm kỹ thuật. Chỉ hoạt động trong khung giờ quy định.",
-  "title.special_event.title.name": "Sóng VTVgo Chưa Phát",
-  "title.special_event.desc.name": "Kênh truyền hình VTVgo chỉ hoạt động trực tiếp từ 12h30 đến 14h30 hàng ngày để phát luồng đặc biệt. Xin vui lòng quay lại sau.",
-  "modal.close_button.name": "Đóng",
+  "title.special_event.banner_top.name": "Live Broadcast",
+  "title.special_event.banner_bottom.name": "VTVgo Experimental Stream",
+  "title.special_event.banner_desc.name": "Technical test stream. Only active during specified hours.",
+  "title.special_event.title.name": "VTVgo Not Broadcasting Yet",
+  "title.special_event.desc.name": "VTVgo channels are only live from 12:30 PM to 2:30 PM daily for special streams. Please try again later.",
+  "modal.close_button.name": "Close",
 
   // Settings section titles & subtitles
-  "settings.section.developeroptions.title": "Tùy chọn Nhà Phát Triển",
-  "settings.sections.Profile.title": "Hồ Sơ Cá Nhân",
-  "settings.sections.Profile.subtitle": "Quản lý dữ liệu yêu thích, kênh tùy chỉnh và tài khoản",
-  "settings.sections.Appearance.title": "Giao Diện & Hiển Thị",
-  "settings.sections.Appearance.subtitle": "Tùy chỉnh chủ đề tối màu, Liquid Glass và hiệu ứng di chuyển",
-  "settings.sections.Accessibility.title": "Hỗ Trợ & Khả Dụng",
-  "settings.sections.Accessibility.subtitle": "Bật/tắt tự động cuộn trình chiếu và cấu hình chuyển động mượt mà",
-  "settings.sections.Broadcast.title": "Luồng Phát Kỹ Thuật",
-  "settings.sections.Broadcast.subtitle": "Cấu hình độ trễ thấp, tăng bộ đệm và tối ưu hóa luồng video",
-  "settings.sections.Experimental.title": "Tính Năng Thực Nghiệm",
-  "settings.sections.Experimental.subtitle": "Bật các chức năng thử nghiệm nâng cao của hệ thống",
+  "settings.section.developeroptions.title": "Developer Options",
+  "settings.sections.Profile.title": "User Profile",
+  "settings.sections.Profile.subtitle": "Manage your favorite channels, custom URLs, and storage settings",
+  "settings.sections.Profile.description": "Manage your favorite channels, custom URLs, and storage settings",
+  "settings.sections.Appearance.title": "Appearance & Theme",
+  "settings.sections.Appearance.subtitle": "Customize themes, Liquid Glass, and visual motion settings",
+  "settings.sections.Appearance.description": "Customize themes, Liquid Glass, and visual motion settings",
+  "settings.sections.Accessibility.title": "Accessibility & Motion",
+  "settings.sections.Accessibility.subtitle": "Control slideshow auto-advance and transition animation speeds",
+  "settings.sections.Accessibility.description": "Control slideshow auto-advance and transition animation speeds",
+  "settings.sections.Broadcast.title": "Technical Streaming",
+  "settings.sections.Broadcast.subtitle": "Configure latency modes, cache sizes, and video stream performance",
+  "settings.sections.Experimental.title": "Experimental Features",
+  "settings.sections.Experimental.subtitle": "Enable advanced, developer-only experimental system capabilities",
+  "settings.sections.Experimental.description": "Enable advanced, developer-only experimental system capabilities",
+  "settings.sections.PluginStore.title": "Plugin Marketplace",
+  "settings.sections.PluginStore.subtitle": "Discover and install optional modules to extend your experience",
 
   // Profile keys
-  "settings.profile.TotalFavorites.title": "Danh sách Yêu thích",
-  "settings.profile.DeleteAllFavorites.button": "Xóa tất cả Yêu thích",
-  "settings.profile.CustomChannels.title": "Kênh tự thiết lập",
-  "settings.profile.DeleteCustomChannels.button": "Xóa toàn bộ Kênh tự thêm",
-  "settings.profile.OnlineAccountNotice.title": "Lưu trữ Đám mây",
-  "settings.profile.OnlineAccountNotice.description": "Hệ thống đang lưu trữ tùy chỉnh của bạn trên trình duyệt nội bộ. Hãy đăng ký tài khoản để đồng bộ hóa đám mây trong tương lai.",
+  "settings.profile.TotalFavorites.title": "My Saved Favorites",
+  "settings.profile.DeleteAllFavorites.button": "Clear All Favorites",
+  "settings.profile.CustomChannels.title": "Sourced Custom Channels",
+  "settings.profile.DeleteCustomChannels.button": "Remove All Custom Channels",
+  "settings.profile.OnlineAccountNotice.title": "Cloud-Native Storage",
+  "settings.profile.OnlineAccountNotice.description": "Your current layout and configurations are persisted locally. Register for a cloud account to synchronize across multiple devices.",
+
+  // Appearance keys
+  "settings.appearance.BackdropGlow.label": "Ambient Backdrop Glow Strength",
+  "settings.appearance.AmoledDark.title": "AMOLED Pitch Black Theme",
+  "settings.appearance.AmoledDark.subtitle": "Switches the canvas to absolute dark background, saving energy on OLED displays",
 
   // Accessibility keys
-  "settings.accessibility.AutoSlide.title": "Tự động trình chiếu",
-  "settings.accessibility.AutoSlide.subtitle": "Bật tính năng tự động chuyển đổi giữa các biểu ngữ nổi bật trang chủ",
+  "settings.accessibility.AutoSlide.title": "Auto-Cycle Spotlight Banners",
+  "settings.accessibility.AutoSlide.subtitle": "Enables automatic cycling of the curated featured slideshow on the home screen",
+
+  // Experimental keys
+  "settings.experimental.LowLatency.title": "Ultra Low Latency Mode",
+  "settings.experimental.LowLatency.subtitle": "Optimizes network ingestion to prioritize real-time broadcast and reduce delay",
+  "settings.experimental.StreamCache.title": "Enhanced Streaming Cache",
+  "settings.experimental.StreamCache.subtitle": "Allocates extra buffer memory for smoother playback on intermittent connections",
+  "settings.experimental.AmbientGlow.title": "Dynamic Ambient Glow Effects",
+  "settings.experimental.AmbientGlow.subtitle": "Extracts real-time colors from the video element to paint the page background",
+  "settings.experimental.StreamPlayground.title": "Direct Link Launcher (M3U8)",
+  "settings.experimental.StreamPlayground.subtitle": "Launch any stream instantly by pasting its direct source address",
+  "settings.experimental.StreamPlayground.placeholder": "E.g., https://example.com/stream.m3u8",
 
   // Menu keys
-  "menu.ExportChannels.label": "Xuất Danh Sách Kênh (M3U8)",
+  "menu.ExportChannels.label": "Export Custom Channel List (M3U)",
 
   // Channel Creation Popup Keys
-  "modal.ChannelCreate.title": "Tạo kênh",
-  "modal.ChannelCreate.desc": "Thêm luồng kênh mới vào danh sách kênh bằng cách nhập đường dẫn URL của luồng kênh đó",
-  "modal.ChannelCreate.nameLabel": "Nhập tên kênh",
-  "modal.ChannelCreate.urlLabel": "Nhập đường dẫn",
-  "modal.ChannelCreate.groupLabel": "Chọn nhóm kênh",
-  "modal.ChannelCreate.cancel": "Hủy",
-  "modal.ChannelCreate.create": "Tạo"
+  "modal.ChannelCreate.title": "Add New Channel",
+  "modal.ChannelCreate.desc": "Incorporate custom streaming nodes by assigning a name and entering a valid stream feed address",
+  "modal.ChannelCreate.nameLabel": "Enter Channel Name",
+  "modal.ChannelCreate.urlLabel": "Stream Feed Address",
+  "modal.ChannelCreate.groupLabel": "Destination Category",
+  "modal.ChannelCreate.cancel": "Cancel",
+  "modal.ChannelCreate.create": "Add Channel"
 };
 
 const t = (key: string): string => {
@@ -119,13 +144,13 @@ const t = (key: string): string => {
       return core;
     }
     if (core === "VTV6Test") {
-      return "VTV6 Thử Nghiệm";
+      return "VTV6 Test Stream";
     }
     if (core.startsWith("VTVgo")) {
       return "VTVgo " + core.substring(5);
     }
     if (core === "VietnamWildLive") {
-      return "Dã Ngoại Hoang Dã";
+      return "Vietnam Wild Live";
     }
     return core.replace(/([A-Z])/g, ' $1').trim();
   }
@@ -212,62 +237,62 @@ const homeSlides = [
   {
     id: 0,
     titleTop: "title.special_event.banner_top.name",
-    titleMain: "title:special_event.banner_bottom.name",
+    titleMain: "title.special_event.banner_bottom.name",
     titleSub: "",
-    genreText: "SỰ KIỆN TRỰC TIẾP ĐẶC BIỆT",
-    subSlogan: "BẢO TỒN ĐA DẠNG SINH HỌC QUỐC GIA",
+    genreText: "SPECIAL LIVE EVENT",
+    subSlogan: "NATIONAL BIODIVERSITY CONSERVATION",
     thumbnail: "https://cdn-images.vtv.vn/66349b6076cb4dee98746cf1/2026/06/20/cover-91667111629561629180275.png",
     channelId: "vietnam-wild-live",
     channelPlayName: "Vietnam Wild LIVE",
-    ageRating: "Tất cả",
-    ratingText: "Chất lượng HD | Trực tiếp VTVgo",
+    ageRating: "G",
+    ratingText: "HD Quality | Live on VTVgo",
     vignetteLeft: "from-black/90 via-black/55 to-transparent",
     vignetteBottom: "from-[#07050f] via-[#07050f]/85 to-transparent",
     vignetteTop: "from-black/45 via-transparent to-transparent",
-    description: "title:special_event.banner_desc.name",
+    description: "title.special_event.banner_desc.name",
     showCountdown: false,
     logo: "https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest?cb=20260625120702",
-    btnText: "title:banner_button.name",
+    btnText: "Watch Now",
     btnIcon: "play"
   },
   {
     id: 1,
     titleTop: "VTV6",
-    titleMain: "Vì một Việt Nam khỏe mạnh!",
+    titleMain: "For a Healthy Vietnam!",
     titleSub: "",
-    genreText: "THỂ THAO & SỨC KHỎE QUỐC GIA",
-    subSlogan: "ĐỒNG HÀNH KHÁT VỌNG, LAN TỎA SỨC TRẺ VIỆT NAM",
+    genreText: "NATIONAL SPORTS & HEALTH",
+    subSlogan: "EMPOWERING ASPIRATION, SPREADING VIETNAMESE YOUTH ENERGY",
     thumbnail: "https://i.ytimg.com/vi/cXv_D6qIy0s/maxresdefault.jpg",
     channelId: "vtv3",
-    channelPlayName: "VTV6 - Vì một Việt Nam khỏe mạnh! (FHD)",
-    ageRating: "Tất cả",
-    ratingText: "Trực tiếp Thể thao | Bản quyền",
+    channelPlayName: "VTV6 - For a Healthy Vietnam! (FHD)",
+    ageRating: "G",
+    ratingText: "Live Sports | Copyrighted",
     vignetteLeft: "from-black/90 via-black/55 to-transparent",
     vignetteBottom: "from-[#07050f] via-[#07050f]/85 to-transparent",
     vignetteTop: "from-black/45 via-transparent to-transparent",
     logo: "https://static.wikia.nocookie.net/logos/images/5/56/VTV6_logo_07.06.2026.png/revision/latest?cb=20260608073805&path-prefix=uk",
-    description: "Các bản tin, chuyên mục, tường thuật về thể thao trong nước và quốc tế do Trung tâm Truyền hình Thể thao sản xuất, với mục tiêu thúc đẩy phong trào thể thao quần chúng, thể thao học đường, thể thao chuyên nghiệp phát triển tại Việt Nam cũng như hướng đến rèn luyện, nâng cao sức khỏe cộng đồng và phát triển toàn diện.",
-    btnText: "Xem ngay",
+    description: "News, features, and reports on domestic and international sports produced by the Sports Television Center, aiming to promote mass sports, school sports, and professional sports development in Vietnam, as well as community health and comprehensive development.",
+    btnText: "Watch Now",
     btnIcon: "play"
   },
   {
     id: 3,
-    titleTop: "Chào mừng đến",
+    titleTop: "Welcome to",
     titleMain: "Vplay Test Web!",
     titleSub: "",
-    genreText: "ĐỐI NGOẠI & QUỐC TẾ",
-    subSlogan: "CỬA SỔ THÔNG TIN RA THẾ GIỚI",
+    genreText: "FOREIGN AFFAIRS & INTERNATIONAL",
+    subSlogan: "WINDOW TO THE WORLD",
     thumbnail: "https://vtv4.vtv.vn/upload/news/3HOPA0OIS_vntoday1-79180073137201066112112-72441177075135673357555.jpg",
     channelId: "vn_today",
     channelPlayName: "Vietnam Today HD",
-    ageRating: "Tất cả",
-    ratingText: "Chất lượng HD | Đối ngoại quốc gia",
+    ageRating: "G",
+    ratingText: "HD Quality | National Foreign Affairs",
     vignetteLeft: "from-black/90 via-black/55 to-transparent",
     vignetteBottom: "from-[#07050f] via-[#07050f]/85 to-transparent",
     vignetteTop: "from-black/45 via-transparent to-transparent",
     logo: "https://static.wikia.nocookie.net/logos/images/f/f2/Logo_Vietnam_Today_07-2025_v2.png/revision/latest?cb=20260228060318&path-prefix=uk",
-    description: "Kể từ 28/06/2026, trang web xem truyền hình Vplay sẽ được chuyển đến tên miền mới **https://vplay-refresh.vercel.app**. Đối với miền trang web này sẽ trở thành **test-vplay.vercel.app**, là trang web thử nghiệm của Vplay để test trước, test sớm các tính năng mới cho web chính trong tương lai (app function, app features, luồng kênh, logo v.v). Chắc chắn web thử nghiệm sẽ nảy sinh cực kỳ nhiều lỗi, đội ngũ Vplay chỉ xin phép tiếp nhận các lỗi được báo cáo từ trang web chính, trang web thử nghiệm có thể không được sửa lỗi. Trân trọng.",
-    btnText: "Xem ngay",
+    description: "As of June 28, 2026, the Vplay television streaming website has moved to a new domain **https://vplay-refresh.vercel.app**. This website domain will become **test-vplay.vercel.app**, serving as an experimental staging environment to test new features (app functions, features, streams, logos, etc.) before they roll out to the main site. Staging environments will inevitably contain bugs, and the Vplay team will only accept bug reports from the official site. Staging bugs may remain unresolved. Sincerely.",
+    btnText: "Watch Now",
     btnIcon: "play"
   }
 ];
@@ -384,16 +409,12 @@ export default function App() {
 
   const formatDateVietnamese = (date: Date) => {
     const dayOfWeek = date.getDay(); // 0: Sunday, 1: Monday, ...
-    let dayStr = "";
-    if (dayOfWeek === 0) {
-      dayStr = "Chủ Nhật";
-    } else {
-      dayStr = `Thứ ${dayOfWeek + 1}`;
-    }
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayStr = days[dayOfWeek];
     const dd = String(date.getDate()).padStart(2, '0');
     const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const yy = String(date.getFullYear()).slice(-2);
-    return `${dayStr} - ${dd}/${mm}/${yy}`;
+    const yy = String(date.getFullYear());
+    return `${dayStr}, ${mm}/${dd}/${yy}`;
   };
 
   // Selected Channel State (Defaults to VTV1 HD)
@@ -449,9 +470,9 @@ export default function App() {
     const v5Tn = processedChannels.find(ch => ch.id === "vtv5_tn");
     
     return [
-      { ...(v5 || { id: "vtv5", name: "VTV5", url: "", group: "VTV", logoText: "VTV5", logoBg: "bg-gradient-to-br from-emerald-600 to-emerald-800" }), name: "VTV5 Quốc gia" },
-      { ...(v5Tnb || { id: "vtv5_tnb", name: "VTV5 Tây Nam Bộ", url: "", group: "VTV", logoText: "VTV5 TNB", logoBg: "bg-gradient-to-br from-emerald-600 to-emerald-800" }), name: "VTV5 Tây Nam Bộ" },
-      { ...(v5Tn || { id: "vtv5_tn", name: "VTV5 Tây Nguyên", url: "", group: "VTV", logoText: "VTV5 TN", logoBg: "bg-gradient-to-br from-emerald-600 to-emerald-800" }), name: "VTV5 Tây Nguyên" }
+      { ...(v5 || { id: "vtv5", name: "VTV5", url: "", group: "VTV", logoText: "VTV5", logoBg: "bg-gradient-to-br from-emerald-600 to-emerald-800" }), name: "VTV5 National" },
+      { ...(v5Tnb || { id: "vtv5_tnb", name: "VTV5 Tây Nam Bộ", url: "", group: "VTV", logoText: "VTV5 TNB", logoBg: "bg-gradient-to-br from-emerald-600 to-emerald-800" }), name: "VTV5 South West" },
+      { ...(v5Tn || { id: "vtv5_tn", name: "VTV5 Tây Nguyên", url: "", group: "VTV", logoText: "VTV5 TN", logoBg: "bg-gradient-to-br from-emerald-600 to-emerald-800" }), name: "VTV5 Central Highlands" }
     ];
   }, []);
   const [isHeaderSearchExpanded, setIsHeaderSearchExpanded] = useState<boolean>(false);
@@ -589,7 +610,7 @@ export default function App() {
   const [customChannelName, setCustomChannelName] = useState<string>("");
   const [customChannelUrl, setCustomChannelUrl] = useState<string>("");
   const [customChannelGroup, setCustomChannelGroup] = useState<string>("VTV");
-  const [customGroupInput, setCustomGroupInput] = useState<string>("Nhóm Kênh Mới");
+  const [customGroupInput, setCustomGroupInput] = useState<string>("New Channel Group");
   const [customChannels, setCustomChannels] = useState<Channel[]>(() => {
     const saved = localStorage.getItem("glass_tv_custom_list");
     return saved ? JSON.parse(saved) : [];
@@ -630,6 +651,120 @@ export default function App() {
   const [expAmbientGlow, setExpAmbientGlow] = useState<boolean>(() => localStorage.getItem("vplay_exp_glow") === "true");
   const [testStreamUrl, setTestStreamUrl] = useState<string>("");
 
+  // Plugin Store States
+  const [plugins, setPlugins] = useState<{
+    id: string;
+    name: string;
+    desc: string;
+    status: "idle" | "installing" | "installed";
+    progress: number;
+    isActive: boolean;
+  }[]>(() => {
+    const defaultPlugins = [
+      {
+        id: "material_design",
+        name: "Material Design 3 Theme",
+        desc: "Replaces the Apple-inspired Liquid Glass UI with Google's Material Design 3 language, featuring warm color palettes, generous container rounding, and flat, modern, highly interactive components.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      },
+      {
+        id: "remove_shiny_border",
+        name: "Minimalist Borderless Flat Mode",
+        desc: "Completely strips all shiny reflections, glass highlights, and reflective outer borders surrounding cards and buttons to provide a pristine, ultra-minimalist flat interface.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      }
+    ];
+
+    const saved = localStorage.getItem("vplay_plugins");
+    let loaded: any[] = [];
+    if (saved) {
+      try {
+        loaded = JSON.parse(saved);
+        loaded = loaded.map((p: any) => p.status === "installing" ? { ...p, status: "idle", progress: 0 } : p);
+      } catch (e) {
+        loaded = [];
+      }
+    }
+
+    // Merge loaded settings with default plugins to ensure new plugins are listed
+    const merged = [...defaultPlugins];
+    loaded.forEach((loadedPlugin: any) => {
+      const idx = merged.findIndex(d => d.id === loadedPlugin.id);
+      if (idx !== -1) {
+        merged[idx] = { ...merged[idx], ...loadedPlugin };
+      } else {
+        merged.push(loadedPlugin);
+      }
+    });
+
+    return merged;
+  });
+
+  useEffect(() => {
+    const toSave = plugins.map(p => ({
+      id: p.id,
+      name: p.name,
+      desc: p.desc,
+      status: p.status === "installing" ? "idle" : p.status,
+      progress: p.status === "installing" ? 0 : p.progress,
+      isActive: p.isActive
+    }));
+    localStorage.setItem("vplay_plugins", JSON.stringify(toSave));
+  }, [plugins]);
+
+  const installPlugin = (id: string) => {
+    setPlugins(prev => prev.map(p => {
+      if (p.id === id) {
+        return { ...p, status: "installing", progress: 0 };
+      }
+      return p;
+    }));
+
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += 100 / 30; // 30 seconds total
+      if (currentProgress >= 100) {
+        currentProgress = 100;
+        clearInterval(interval);
+        setPlugins(prev => prev.map(p => {
+          if (p.id === id) {
+            return { ...p, status: "installed", progress: 100, isActive: true };
+          }
+          return p;
+        }));
+      } else {
+        setPlugins(prev => prev.map(p => {
+          if (p.id === id) {
+            return { ...p, progress: Math.min(Math.round(currentProgress), 100) };
+          }
+          return p;
+        }));
+      }
+    }, 1000);
+  };
+
+  const isMaterialDesignActive = useMemo(() => {
+    const md = plugins.find(p => p.id === "material_design");
+    return md ? (md.status === "installed" && md.isActive) : false;
+  }, [plugins]);
+
+  useEffect(() => {
+    if (isMaterialDesignActive) {
+      document.body.classList.add("material-design-active");
+    } else {
+      document.body.classList.remove("material-design-active");
+    }
+  }, [isMaterialDesignActive]);
+
+  const isRemoveShinyBorderActive = useMemo(() => {
+    const rsb = plugins.find(p => p.id === "remove_shiny_border");
+    return rsb ? (rsb.status === "installed" && rsb.isActive) : false;
+  }, [plugins]);
+
   // Custom Tab and Modal builder states
   const [customTabs, setCustomTabs] = useState<any[]>(() => {
     const saved = localStorage.getItem("vplay_custom_tabs");
@@ -653,19 +788,19 @@ export default function App() {
   const [tabNameInput, setTabNameInput] = useState<string>("");
   const [tabIconInput, setTabIconInput] = useState<string>("Sparkles");
   const [tabCodeInput, setTabCodeInput] = useState<string>(
-    "// Nhập mã xử lý JavaScript tại đây\n" +
+    "// Enter JavaScript handler code here\n" +
     "setSelectedChannel({\n" +
     "  id: 'custom-live',\n" +
     "  name: 'My Custom Stream',\n" +
     "  url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',\n" +
-    "  group: 'Cá nhân'\n" +
+    "  group: 'Personal'\n" +
     "});\n" +
     "setActiveTab('live');"
   );
   const [tabHtmlInput, setTabHtmlInput] = useState<string>(
     "<div class='p-4 text-center'>\n" +
-    "  <h3 class='text-sm font-bold text-indigo-400'>Kênh Truyền Hình Cá Nhân</h3>\n" +
-    "  <p class='text-xs text-white/70 mt-1'>Chào mừng bạn đến với tab do bạn tự thiết kế!</p>\n" +
+    "  <h3 class='text-sm font-bold text-indigo-400'>Personal TV Channels</h3>\n" +
+    "  <p class='text-xs text-white/70 mt-1'>Welcome to your custom designed tab!</p>\n" +
     "</div>"
   );
 
@@ -674,13 +809,13 @@ export default function App() {
   const [modalNameInput, setModalNameInput] = useState<string>("");
   const [modalIconInput, setModalIconInput] = useState<string>("Sparkles");
   const [modalCodeInput, setModalCodeInput] = useState<string>(
-    "// Nhập mã xử lý khi click nút 'Chạy chức năng'\n" +
-    "alert('Nút chức năng trong modal của bạn đã được nhấn!');"
+    "// Code to execute when the 'Run Function' button is clicked\n" +
+    "alert('Custom modal action button clicked!');"
   );
   const [modalHtmlInput, setModalHtmlInput] = useState<string>(
     "<div class='p-4 text-center space-y-2'>\n" +
-    "  <h4 class='text-xs font-semibold text-amber-400'>CẢNH BÁO HỆ THỐNG</h4>\n" +
-    "  <p class='text-xs text-white/70'>Đây là một hộp thoại pop-up thông báo tùy chỉnh.</p>\n" +
+    "  <h4 class='text-xs font-semibold text-amber-400'>SYSTEM WARNING</h4>\n" +
+    "  <p class='text-xs text-white/70'>This is a custom pop-up notification modal.</p>\n" +
     "</div>"
   );
 
@@ -740,8 +875,8 @@ export default function App() {
     // Add custom category dynamically if there are custom channels
     const customCategory: Category = {
       id: "custom",
-      name: "Kênh Tự Thêm (Cá Nhân)",
-      description: "Danh sách luồng phát m3u8 tự liên kết",
+      name: "Custom Channels (Personal)",
+      description: "List of custom imported m3u8 stream links",
       channels: customChannels
     };
     return [...CATEGORIES, customCategory];
@@ -842,7 +977,7 @@ export default function App() {
     if (!customChannelName || !customChannelUrl) return;
 
     const finalGroup = customChannelGroup === "NEW_GROUP" 
-      ? (customGroupInput.trim() || "Kênh Riêng") 
+      ? (customGroupInput.trim() || "Private Channel") 
       : customChannelGroup;
 
     const newChannel: Channel = {
@@ -858,7 +993,7 @@ export default function App() {
     setSelectedChannel(newChannel);
     setCustomChannelName("");
     setCustomChannelUrl("");
-    setCustomGroupInput("Nhóm Kênh Mới");
+    setCustomGroupInput("New Channel Group");
     setCustomChannelGroup("VTV");
     setShowCustomModal(false);
   };
@@ -923,6 +1058,9 @@ export default function App() {
 
   // Ambient backgrounds options config
   const getBgGradient = () => {
+    if (isMaterialDesignActive) {
+      return "bg-[#1b0323]";
+    }
     if (!liquidGlass) {
       return "bg-[#121214]";
     }
@@ -963,10 +1101,10 @@ export default function App() {
 
   return (
     <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
-      <div className={`min-h-screen text-white/95 pb-32 transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass ? "no-liquid-glass" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+      <div className={`min-h-screen text-white/95 pb-32 transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
       
       {/* Decorative ambient glowing circles */}
-      {liquidGlass && !amoledDark && (
+      {liquidGlass && !isMaterialDesignActive && !amoledDark && (
         <>
           <div className="absolute top-24 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
           <div className="absolute top-1/2 right-10 w-[600px] h-[600px] bg-pink-600/10 rounded-full blur-[130px] pointer-events-none"></div>
@@ -996,12 +1134,20 @@ export default function App() {
 
             {/* Real-time Ticking Digital Clock */}
             {showClock && (
-              <div className="flex items-center gap-2 sm:gap-3 bg-white/5 border border-white/10 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-md shadow-inner select-none transition-all duration-300 hover:scale-105 font-google">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse animate-duration-1000" />
-                <span className="text-xs sm:text-sm md:text-base font-bold tracking-wide text-white font-google drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+              <div className={`flex items-center gap-2 sm:gap-3 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full select-none transition-all duration-300 hover:scale-105 font-google ${
+                isMaterialDesignActive
+                  ? "bg-[#e8def8] text-[#21005d] shadow-md border-0"
+                  : "bg-white/5 border border-white/10 backdrop-blur-md shadow-inner text-white"
+              }`}>
+                <span className={`w-2 h-2 rounded-full animate-pulse animate-duration-1000 ${isMaterialDesignActive ? "bg-[#21005d]" : "bg-emerald-500"}`} />
+                <span className={`text-xs sm:text-sm md:text-base font-bold tracking-wide font-google ${
+                  isMaterialDesignActive ? "text-[#21005d]" : "text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]"
+                }`}>
                   {formatTime(time)}
                 </span>
-                <span className="hidden md:inline-block text-white text-xs sm:text-sm md:text-base font-bold pl-2.5 border-l border-white/10 font-google">
+                <span className={`hidden md:inline-block text-xs sm:text-sm md:text-base font-bold pl-2.5 font-google ${
+                  isMaterialDesignActive ? "text-[#21005d] border-l border-[#21005d]/20" : "text-white border-l border-white/10"
+                }`}>
                   {formatDateVietnamese(time)}
                 </span>
               </div>
@@ -1010,6 +1156,19 @@ export default function App() {
 
           {/* Right Side: notifications and profile card and Menu Dropdown */}
           <div className="relative z-10 flex items-center gap-3 sm:gap-4 md:gap-5">
+            {/* Vplay Plugin Store ShoppingBag icon */}
+            <button
+              onClick={() => {
+                setActiveTab("settings");
+                setActiveSettingSection("plugin_store");
+              }}
+              className="relative p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer"
+              title="Vplay Plugin Store (PREVIEW)"
+            >
+              <ShoppingBag className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-indigo-500 ring-2 ring-transparent" />
+            </button>
+
             {/* Notification bell icon */}
             <button className="relative p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer">
               <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
@@ -1025,7 +1184,7 @@ export default function App() {
               </div>
               {/* Floating tooltip */}
               <div className="absolute right-0 top-10 pointer-events-none opacity-0 group-hover/avatar:opacity-100 group-hover/avatar:pointer-events-auto transition-all duration-300 bg-black/95 backdrop-blur-md border border-white/10 rounded-xl px-3 py-1.5 shadow-xl text-[10px] sm:text-xs text-white/90 whitespace-nowrap z-50">
-                Tài khoản: <span className="font-extrabold text-pink-300">Thành viên Premium</span>
+                Account: <span className="font-extrabold text-pink-300">Premium Member</span>
               </div>
             </div>
 
@@ -1033,7 +1192,11 @@ export default function App() {
             <div className="relative">
               <button
                 onClick={() => setShowDropdownMenu(prev => !prev)}
-                className="p-1.5 sm:p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white transition-all cursor-pointer flex items-center justify-center active:scale-95 duration-200"
+                className={`transition-all cursor-pointer flex items-center justify-center active:scale-95 duration-200 ${
+                  isMaterialDesignActive
+                    ? "p-2 sm:p-2.5 rounded-[20px] bg-[#c9b2fa] hover:bg-[#dcd0ff] text-black border-0 shadow-lg"
+                    : "p-1.5 sm:p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white"
+                }`}
                 title="Menu"
               >
                 <Menu className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
@@ -1045,121 +1208,214 @@ export default function App() {
                     {/* Invisible Backdrop for click-away */}
                     <div className="fixed inset-0 z-40 cursor-default" onClick={() => setShowDropdownMenu(false)} />
                     
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.85 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.85 }}
-                      style={{ originX: 1, originY: 0 }}
-                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      className="absolute right-0 mt-3 w-56 rounded-[30px] bg-white/70 backdrop-blur-[15px] border border-white/40 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.35),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.1),0_12px_40px_rgba(0,0,0,0.1)] z-50 py-3.5 text-black overflow-hidden"
-                    >
-                      {/* Clock & Calendar toggle with checkmark */}
-                      <button
-                        onClick={() => {
-                          toggleShowClock();
-                        }}
-                        className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center justify-between font-sans font-normal text-black"
+                    {isMaterialDesignActive ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        style={{ originX: 1, originY: 0 }}
+                        transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+                        className="absolute right-0 mt-3 w-64 rounded-[28px] bg-[#1d1b20] border border-[#313033] shadow-[0_8px_30px_rgb(0,0,0,0.5)] z-50 p-2 text-[#e6e1e5] overflow-hidden animate-fade-in"
                       >
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          <span>menu.ClockAndCalendar.label</span>
-                        </div>
-                        {showClock && <Check className="w-4 h-4 text-black stroke-[3.5]" />}
-                      </button>
- 
-                      {/* Divider */}
-                      <div className="border-t border-black/10 my-2" />
- 
-                      {/* About this version */}
-                      <button
-                        onClick={() => {
-                          setShowDropdownMenu(false);
-                          setShowAboutModal(true);
-                        }}
-                        className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
+                        {[
+                          {
+                            label: "Refresh & Reload",
+                            icon: RefreshCw,
+                            onClick: () => {
+                              setShowDropdownMenu(false);
+                              window.location.reload();
+                            }
+                          },
+                          {
+                            label: "Clock & Calendar",
+                            icon: Clock,
+                            active: showClock,
+                            onClick: () => {
+                              toggleShowClock();
+                            }
+                          },
+                          {
+                            label: "About Vplay",
+                            icon: Info,
+                            onClick: () => {
+                              setShowDropdownMenu(false);
+                              setShowAboutModal(true);
+                            }
+                          },
+                          {
+                            label: "Experimental Features",
+                            icon: Pizza,
+                            onClick: () => {
+                              setShowDropdownMenu(false);
+                              setActiveTab("settings");
+                              setActiveSettingSection("experimental");
+                            }
+                          },
+                          ...(activeTab === "live" || activeTab === "vtvgo" ? [
+                            {
+                              label: "Export Channels (M3U)",
+                              icon: Download,
+                              onClick: () => {
+                                setShowDropdownMenu(false);
+                                exportChannelsToM3u8();
+                              }
+                            }
+                          ] : []),
+                          ...(activeTab === "live" ? [
+                            {
+                              label: "Multiview Mode",
+                              icon: Grid,
+                              onClick: () => {
+                                setShowDropdownMenu(false);
+                                handleOpenMultiviewSelector();
+                              }
+                            },
+                            {
+                              label: "Picture in Picture",
+                              icon: Layers,
+                              onClick: () => {
+                                setShowDropdownMenu(false);
+                                handleTogglePictureInPicture();
+                              }
+                            }
+                          ] : []),
+                          {
+                            label: "Settings",
+                            icon: Settings,
+                            onClick: () => {
+                              setShowDropdownMenu(false);
+                              setActiveTab("settings");
+                              setActiveSettingSection(null);
+                            }
+                          }
+                        ].map((item, idx) => {
+                          const IconComp = item.icon;
+                          const isToggledActive = "active" in item ? item.active : false;
+                          return (
+                            <button
+                              key={idx}
+                              onClick={item.onClick}
+                              className="w-full px-4.5 py-3 text-left text-sm font-normal flex items-center gap-3.5 hover:bg-[#313033]/80 active:bg-[#313033] rounded-[18px] transition-colors cursor-pointer text-[#e6e1e5]"
+                            >
+                              <IconComp className="w-[18px] h-[18px] text-[#cac4d0] shrink-0" />
+                              <span className="flex-1 text-[#e6e1e5] font-sans text-[14px]">{item.label}</span>
+                              {isToggledActive && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#d0bcff] shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.85 }}
+                        style={{ originX: 1, originY: 0 }}
+                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute right-0 mt-3 w-56 rounded-[30px] bg-white/70 backdrop-blur-[15px] border border-white/40 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.35),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.1),0_12px_40px_rgba(0,0,0,0.1)] z-50 py-3.5 text-black overflow-hidden"
                       >
-                        <Info className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                        menu.AboutThisVersion.label
-                      </button>
- 
-                      {/* Reload app */}
-                      <button
-                        onClick={() => {
-                          setShowDropdownMenu(false);
-                          window.location.reload();
-                        }}
-                        className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                      >
-                        <RefreshCw className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                        menu.ReloadApp.label
-                      </button>
- 
-                      {/* Thử nghiệm */}
-                      <button
-                        onClick={() => {
-                          setShowDropdownMenu(false);
-                          setActiveTab("settings");
-                          setActiveSettingSection("experimental");
-                        }}
-                        className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                      >
-                        <Pizza className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                        menu.Experimental.label
-                      </button>
- 
-                      {/* Xuất luồng kênh (Only visible on Live or VTVgo tab) */}
-                      {(activeTab === "live" || activeTab === "vtvgo") && (
+                        {/* Clock & Calendar toggle with checkmark */}
+                        <button
+                          onClick={() => {
+                            toggleShowClock();
+                          }}
+                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center justify-between font-sans font-normal text-black"
+                        >
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                            <span>menu.ClockAndCalendar.label</span>
+                          </div>
+                          {showClock && <Check className="w-4 h-4 text-black stroke-[3.5]" />}
+                        </button>
+                        
+                        <div className="border-t border-black/10 my-2" />
+                        
                         <button
                           onClick={() => {
                             setShowDropdownMenu(false);
-                            exportChannelsToM3u8();
+                            setShowAboutModal(true);
                           }}
                           className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
                         >
-                          <Download className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          menu.ExportChannels.label
+                          <Info className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                          menu.AboutThisVersion.label
                         </button>
-                      )}
- 
-                      {/* Multiview & Picture-in-Picture (Only visible on Live tab) */}
-                      {activeTab === "live" && (
-                        <>
+                        
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            window.location.reload();
+                          }}
+                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                          menu.ReloadApp.label
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            setActiveTab("settings");
+                            setActiveSettingSection("experimental");
+                          }}
+                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
+                        >
+                          <Pizza className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                          menu.Experimental.label
+                        </button>
+                        
+                        {(activeTab === "live" || activeTab === "vtvgo") && (
                           <button
                             onClick={() => {
                               setShowDropdownMenu(false);
-                              handleOpenMultiviewSelector();
-                            }}
-                            className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal border-t border-black/5"
-                          >
-                            <Grid className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                            menu.ViewMultiview.label
-                          </button>
-                          <button
-                            onClick={() => {
-                              setShowDropdownMenu(false);
-                              handleTogglePictureInPicture();
+                              exportChannelsToM3u8();
                             }}
                             className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
                           >
-                            <Layers className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                            menu.PictureInPicture.label
+                            <Download className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                            menu.ExportChannels.label
                           </button>
-                        </>
-                      )}
- 
-                      {/* Open Settings */}
-                      <button
-                        onClick={() => {
-                          setShowDropdownMenu(false);
-                          setActiveTab("settings");
-                          setActiveSettingSection(null);
-                        }}
-                        className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                      >
-                        <Settings className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                        menu.OpenSettings.label
-                      </button>
-                    </motion.div>
+                        )}
+                        
+                        {activeTab === "live" && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setShowDropdownMenu(false);
+                                handleOpenMultiviewSelector();
+                              }}
+                              className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal border-t border-black/5"
+                            >
+                              <Grid className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                              menu.ViewMultiview.label
+                            </button>
+                            <button
+                              onClick={() => {
+                                setShowDropdownMenu(false);
+                                handleTogglePictureInPicture();
+                              }}
+                              className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
+                            >
+                              <Layers className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                              menu.PictureInPicture.label
+                            </button>
+                          </>
+                        )}
+                        
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            setActiveTab("settings");
+                            setActiveSettingSection(null);
+                          }}
+                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
+                        >
+                          <Settings className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                          menu.OpenSettings.label
+                        </button>
+                      </motion.div>
+                    )}
                   </>
                 )}
               </AnimatePresence>
@@ -1177,18 +1433,25 @@ export default function App() {
           <div className="relative z-10 flex items-center gap-4">
             <button
               onClick={() => setActiveSettingSection(null)}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/95 hover:text-white border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-pointer bouncy-btn"
-              title="Quay lại"
+              className={`flex items-center justify-center w-10 h-10 bouncy-btn cursor-pointer transition-all ${
+                isMaterialDesignActive
+                  ? "rounded-[20px] bg-[#381e72] hover:bg-[#4f378b] text-[#d0bcff] border-0 shadow-lg"
+                  : "rounded-full bg-white/10 hover:bg-white/20 text-white/95 hover:text-white border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)]"
+              }`}
+              title="Back"
             >
               <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
             </button>
             <span className="text-white font-semibold text-base sm:text-lg tracking-tight">
-              {activeSettingSection === "appearance" && "Giao diện"}
-              {activeSettingSection === "profile" && "Tài khoản & Dữ liệu"}
-              {activeSettingSection === "accessibility" && "Trợ năng"}
-              {activeSettingSection === "broadcast" && "Phát sóng"}
-              {activeSettingSection === "experimental" && "Thử nghiệm & Tính năng mới"}
+              {activeSettingSection === "plugin_store" && "Vplay Plugin Store (PREVIEW)"}
+              {activeSettingSection === "appearance" && "Appearance"}
+              {activeSettingSection === "profile" && "Account & Data"}
+              {activeSettingSection === "accessibility" && "Accessibility"}
+              {activeSettingSection === "broadcast" && "Broadcast"}
+              {activeSettingSection === "experimental" && "Experimental & New Features"}
               {activeSettingSection === "design_system" && "Vplay Design System"}
+              {activeSettingSection === "custom_tab" && "Create Custom Tab"}
+              {activeSettingSection === "custom_modal" && "Create Custom Modal"}
             </span>
           </div>
         </header>
@@ -1211,13 +1474,13 @@ export default function App() {
                   <div className="w-full max-w-5xl mx-auto aspect-video rounded-3xl bg-[#120e24]/40 border border-white/10 flex flex-col items-center justify-center text-white/60 p-6 shadow-2xl relative overflow-hidden backdrop-blur-md">
                     <div className="absolute inset-0 bg-cover bg-center opacity-10 filter blur-xl" style={{ backgroundImage: `url(${selectedChannel.logoImg || ""})` }} />
                     <Tv className="w-12 h-12 mb-4 text-indigo-400 animate-pulse" />
-                    <p className="text-sm font-semibold text-white/90 mb-1">Đang phát ở chế độ Picture in Picture</p>
+                    <p className="text-sm font-semibold text-white/90 mb-1">Playing in Picture-in-Picture mode</p>
                     <p className="text-xs text-white/50 mb-4 font-mono">{selectedChannel.name}</p>
                     <button
                       onClick={() => setIsPiPActive(false)}
                       className="px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-all bouncy-btn shadow-lg cursor-pointer"
                     >
-                      Quay lại trình phát chính
+                      Back to main player
                     </button>
                   </div>
                 ) : isMultiviewMode ? (
@@ -1226,14 +1489,14 @@ export default function App() {
                     <div className="flex items-center justify-between mb-3 text-white">
                       <div className="flex items-center gap-2">
                         <Grid className="w-4 h-4 text-indigo-400" />
-                        <span className="text-xs sm:text-sm font-medium">Chế độ xem Multiview ({multiviewCount} khung)</span>
+                        <span className="text-xs sm:text-sm font-medium">Multiview mode ({multiviewCount} screens)</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setShowMultiviewSelectorPopup(true)}
                           className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-[11px] font-normal transition-colors cursor-pointer"
                         >
-                          Đổi số khung
+                          Change Layout
                         </button>
                         <button
                           onClick={() => {
@@ -1242,7 +1505,7 @@ export default function App() {
                           }}
                           className="px-3 py-1.5 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[11px] font-normal border border-red-500/30 transition-colors cursor-pointer"
                         >
-                          Thoát Multiview
+                          Exit Multiview
                         </button>
                       </div>
                     </div>
@@ -1259,7 +1522,7 @@ export default function App() {
                             {ch ? (
                               <div className="w-full h-full relative">
                                 <div className="absolute top-2 left-2 z-30 bg-black/70 px-2 py-0.5 rounded text-[10px] text-white/90 truncate max-w-[60%] font-mono">
-                                  Khung {idx + 1}: {ch.name}
+                                  Frame {idx + 1}: {ch.name}
                                 </div>
                                 <div className="absolute top-2 right-2 z-30 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <button
@@ -1268,7 +1531,7 @@ export default function App() {
                                       handleOpenChannelPickerForSlot(idx);
                                     }}
                                     className="p-1 bg-black/70 hover:bg-black/95 text-white rounded text-[10px]"
-                                    title="Đổi kênh"
+                                    title="Change Channel"
                                   >
                                     <RefreshCw className="w-3 h-3" />
                                   </button>
@@ -1278,7 +1541,7 @@ export default function App() {
                                       handleRemoveChannelFromSlot(idx);
                                     }}
                                     className="p-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px]"
-                                    title="Xóa kênh"
+                                    title="Delete Channel"
                                   >
                                     <X className="w-3 h-3" />
                                   </button>
@@ -1299,8 +1562,8 @@ export default function App() {
                                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
                                   <Plus className="w-5 h-5 text-white/60 group-hover:text-white" />
                                 </div>
-                                <span className="text-xs font-normal">Khung {idx + 1} trống</span>
-                                <span className="text-[10px] text-white/40">Bấm để chọn kênh</span>
+                                <span className="text-xs font-normal">Frame {idx + 1} empty</span>
+                                <span className="text-[10px] text-white/40">Click to select channel</span>
                               </button>
                             )}
                           </div>
@@ -1319,6 +1582,7 @@ export default function App() {
                     onPrevChannel={handlePrevChannel}
                     isFavorite={favorites.includes(selectedChannel.id)}
                     onToggleFavorite={() => toggleFavorite(selectedChannel.id)}
+                    isMaterialDesignActive={isMaterialDesignActive}
                     onPlaybackError={(err, isTimeout) => {
                       setPlaybackError(err);
                       if (err) {
@@ -1336,7 +1600,7 @@ export default function App() {
                   <button
                     onClick={handleShareChannel}
                     className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white flex items-center gap-1 sm:gap-1.5 shrink-0 shadow-lg cursor-default bouncy-btn text-[10.5px] sm:text-xs font-normal"
-                    title="Chia sẻ kênh này"
+                    title="Share this channel"
                   >
                     <img 
                       src="https://static.wikia.nocookie.net/ep-deo/images/1/10/Share.png/revision/latest?cb=20260625011333" 
@@ -1344,7 +1608,7 @@ export default function App() {
                       referrerPolicy="no-referrer"
                       alt="Share"
                     />
-                    <span>Chia sẻ</span>
+                    <span>Share</span>
                   </button>
 
                   {/* TV button */}
@@ -1353,20 +1617,20 @@ export default function App() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white flex items-center gap-1 sm:gap-1.5 shrink-0 shadow-lg cursor-default bouncy-btn animate-fade-in text-[10.5px] sm:text-xs font-normal"
-                    title="Mở luồng phát gốc"
+                    title="Open Original Stream"
                   >
                     <Tv className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-white opacity-90" />
-                    <span>Mở luồng gốc</span>
+                    <span>Open Stream</span>
                   </a>
 
                   {/* Add custom channel button */}
                   <button
                     onClick={() => setShowCustomModal(true)}
                     className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-[#ff9502] hover:bg-[#ffa31a] active:bg-[#e08300] text-white border-none text-[10.5px] sm:text-xs font-normal flex items-center gap-1 sm:gap-1.5 shrink-0 shadow-lg shadow-orange-500/15 cursor-default bouncy-btn"
-                    title="Thêm link m3u8 của riêng bạn"
+                    title="Add your own m3u8 link"
                   >
                     <Plus className="w-3 sm:w-3.5 h-3 sm:h-3.5 transition-transform duration-300 hover:rotate-90" />
-                    <span>Thêm kênh</span>
+                    <span>Add Channel</span>
                   </button>
                 </div>
 
@@ -1378,7 +1642,7 @@ export default function App() {
                       selectedCategory === "all" ? "glass-pill-active" : "glass-pill text-white/60 hover:text-white"
                     }`}
                   >
-                    Tất cả ({flattenedChannels.length})
+                    All ({flattenedChannels.length})
                   </button>
                   
                   {allAvailableCategoryList.map((cat) => (
@@ -1401,8 +1665,8 @@ export default function App() {
               {filteredCategories.length === 0 ? (
                 <div className="py-20 text-center glass-panel rounded-2xl border border-white/10 max-w-xl mx-auto">
                   <HelpCircle className="w-12 h-12 text-white/30 mx-auto mb-3" />
-                  <p className="text-white/80 font-medium">Không tìm thấy kênh phù hợp</p>
-                  <p className="text-white/40 text-xs mt-1">Hãy thử tìm với từ khoá khác hoặc thêm liên kết m3u8 mới.</p>
+                  <p className="text-white/80 font-medium">No matching channels found</p>
+                  <p className="text-white/40 text-xs mt-1">Try searching with another keyword or add a new m3u8 stream link.</p>
                 </div>
               ) : (
                 filteredCategories.map((category) => (
@@ -1427,7 +1691,7 @@ export default function App() {
                       
                       {/* Count badge in gray glass pill like in image */}
                       <span className="text-xs bg-white/5 border border-white/10 text-white/50 px-3 py-1 rounded-full font-mono">
-                        {category.channels.length} Kênh
+                        {category.channels.length} Channels
                       </span>
                     </div>
 
@@ -1443,13 +1707,18 @@ export default function App() {
                             id={`card-${ch.id}`}
                             onClick={() => handleSelectChannel(ch)}
                             className={`group relative rounded-xl p-0.5 sm:p-1 cursor-pointer flex items-center justify-center h-[72px] xs:h-[88px] sm:h-[112px] md:h-[128px] select-none ${
-                              isPlaying 
-                                ? isDacBiet
-                                  ? "bg-amber-400/10 backdrop-blur-lg border-[3.5px] border-amber-400"
-                                  : "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
-                                : isDacBiet
-                                  ? "bg-amber-500/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-amber-400"
-                                  : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
+                              isMaterialDesignActive
+                                ? isPlaying
+                                  ? "bg-[#c9b2fa]/20 border-0 shadow-lg"
+                                  : "bg-[#36343b] hover:bg-[#49454f] border-0"
+                                : (isPlaying 
+                                    ? isDacBiet
+                                      ? "bg-amber-400/10 backdrop-blur-lg border-[3.5px] border-amber-400"
+                                      : "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
+                                    : isDacBiet
+                                      ? "bg-amber-500/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-amber-400"
+                                      : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
+                                  )
                             }`}
                             title={ch.name}
                           >
@@ -1558,7 +1827,7 @@ export default function App() {
 
                     {homeSlides[currentSlide].showCountdown && (
                       <div className="flex flex-col gap-1.5 mt-4 bg-black/40 backdrop-blur-md border border-white/10 px-4 py-3 rounded-2xl select-none max-w-xs shadow-lg">
-                        <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Thời gian còn lại của sự kiện</span>
+                        <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Time remaining for the event</span>
                         <div className="flex items-center gap-1.5 font-mono text-base sm:text-lg font-extrabold text-teal-400">
                           <span className="bg-white/5 border border-white/10 px-2 py-1 rounded-lg shadow-inner">{countdown.days}d</span>
                           <span className="text-white/40">:</span>
@@ -1596,27 +1865,37 @@ export default function App() {
                       }
                       setActiveTab("live");
                     }}
-                     className="px-8 sm:px-10 py-3 sm:py-4 rounded-full bg-red-600 hover:bg-red-700 text-white font-normal shadow-xl hover:shadow-red-600/30 flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer border border-red-500/10 bouncy-btn"
+                     className={`px-8 sm:px-10 py-3 sm:py-4 rounded-full font-normal shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer border transition-all duration-200 ${
+                       isMaterialDesignActive
+                         ? "bg-[#d0bcff] hover:bg-[#ebdfff] border-0 shadow-lg text-black"
+                         : "bg-red-600 hover:bg-red-700 border-red-500/10 shadow-red-600/30 text-white bouncy-btn"
+                     }`}
                   >
                     {homeSlides[currentSlide].btnIcon === "compass" ? (
-                      <Compass className="w-4.5 h-4.5 text-white" />
+                      <Compass className={`w-4.5 h-4.5 ${isMaterialDesignActive ? "text-black" : "text-white"}`} />
                     ) : (
-                      <Play className="w-4.5 h-4.5 fill-white text-white" />
+                      <Play className={`w-4.5 h-4.5 ${isMaterialDesignActive ? "fill-black text-black" : "fill-white text-white"}`} />
                     )}
-                    {homeSlides[currentSlide].btnText || "Thử ngay"}
+                    {homeSlides[currentSlide].btnText || "Watch now"}
                   </button>
 
                   {/* Slider indicator arrows and paging inside the banner */}
                   <div className="flex items-center gap-1.5 ml-2">
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev - 1 + homeSlides.length) % homeSlides.length)}
-                      className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      className={isMaterialDesignActive
+                        ? "w-9 h-9 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-black flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
+                        : "w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      }
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev + 1) % homeSlides.length)}
-                      className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      className={isMaterialDesignActive
+                        ? "w-9 h-9 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-black flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
+                        : "w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      }
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -1656,21 +1935,30 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setRecoRefreshTrigger(prev => prev + 1)}
-                      className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] mr-1 group/refresh-btn bouncy-btn"
+                      className={isMaterialDesignActive
+                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center mr-1 group/refresh-btn bouncy-btn border-0 shadow-lg"
+                        : "w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] mr-1 group/refresh-btn bouncy-btn"
+                      }
                       title="Làm mới gợi ý"
                     >
                       <RefreshCw className="w-3.5 h-3.5 group-hover/refresh-btn:rotate-180 transition-transform duration-500" />
                     </button>
                     <button 
                       onClick={() => scrollRecommendations("left")}
-                      className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      className={isMaterialDesignActive
+                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
+                        : "w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      }
                       title="Quay lại"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => scrollRecommendations("right")}
-                      className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      className={isMaterialDesignActive
+                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
+                        : "w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
+                      }
                       title="Xem tiếp theo"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -1698,9 +1986,14 @@ export default function App() {
                             setActiveTab("live");
                           }}
                           className={`group relative rounded-xl p-0.5 sm:p-1 cursor-pointer flex items-center justify-center w-28 xs:w-34 sm:w-42 md:w-48 h-[56px] xs:h-[68px] sm:h-[84px] md:h-[96px] select-none ${
-                            isPlaying 
-                              ? "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
-                              : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
+                            isMaterialDesignActive
+                              ? isPlaying
+                                ? "bg-[#c9b2fa]/20 border-0 shadow-lg"
+                                : "bg-[#36343b] hover:bg-[#49454f] border-0"
+                              : (isPlaying 
+                                  ? "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
+                                  : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
+                                )
                           }`}
                           title={ch.name}
                         >
@@ -1729,7 +2022,11 @@ export default function App() {
                             className="absolute top-1 right-1 p-1 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/90 hover:scale-110 active:scale-120 duration-200"
                             title={isFav ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
                           >
-                            <Heart className={`w-3.5 h-3.5 ${isFav ? "text-red-500 fill-red-500" : "text-white/70 hover:text-white"}`} />
+                            {isMaterialDesignActive ? (
+                              <ThumbsUp className={`w-3.5 h-3.5 ${isFav ? "text-[#d0bcff] fill-[#d0bcff]" : "text-white/70 hover:text-white"}`} />
+                            ) : (
+                              <Heart className={`w-3.5 h-3.5 ${isFav ? "text-red-500 fill-red-500" : "text-white/70 hover:text-white"}`} />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -1753,14 +2050,20 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => scrollFavorites("left")}
-                      className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-120 shadow"
+                      className={isMaterialDesignActive
+                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center transition-all cursor-pointer border-0 shadow-lg"
+                        : "w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-120 shadow"
+                      }
                       title="Quay lại"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => scrollFavorites("right")}
-                      className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-120 shadow"
+                      className={isMaterialDesignActive
+                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center transition-all cursor-pointer border-0 shadow-lg"
+                        : "w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-120 shadow"
+                      }
                       title="Xem tiếp theo"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -1787,9 +2090,14 @@ export default function App() {
                             setActiveTab("live");
                           }}
                           className={`group relative rounded-xl p-0.5 sm:p-1 cursor-pointer flex items-center justify-center w-28 xs:w-34 sm:w-42 md:w-48 h-[56px] xs:h-[68px] sm:h-[84px] md:h-[96px] select-none ${
-                            isPlaying 
-                              ? "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
-                              : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
+                            isMaterialDesignActive
+                              ? isPlaying
+                                ? "bg-[#c9b2fa]/20 border-0 shadow-lg"
+                                : "bg-[#36343b] hover:bg-[#49454f] border-0"
+                              : (isPlaying 
+                                  ? "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
+                                  : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
+                                )
                           }`}
                           title={ch.name}
                         >
@@ -1818,7 +2126,11 @@ export default function App() {
                             className="absolute top-1 right-1 p-1 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/90 hover:scale-110 active:scale-120 duration-200"
                             title="Xóa khỏi yêu thích"
                           >
-                            <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+                            {isMaterialDesignActive ? (
+                              <ThumbsUp className="w-3.5 h-3.5 text-[#d0bcff] fill-[#d0bcff]" />
+                            ) : (
+                              <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -1833,10 +2145,10 @@ export default function App() {
             {/* Quick stats grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center pt-2">
               {[
-                { label: "Kênh Quốc Gia", value: "13 VTV HD", color: "text-cyan-400" },
-                { label: "Tin Tức & Giải Trí", value: "19 VTVCab", color: "text-fuchsia-400" },
-                { label: "Kênh TP.HCM & Độc Quyền", value: "15 HTV HD", color: "text-orange-400" },
-                { label: "Kênh Địa Phương & Radio", value: "Gần 70+", color: "text-teal-400" },
+                { label: "National Channels", value: "13 VTV HD", color: "text-cyan-400" },
+                { label: "News & Entertainment", value: "19 VTVCab", color: "text-fuchsia-400" },
+                { label: "HCM City & Premium", value: "15 HTV HD", color: "text-orange-400" },
+                { label: "Local & Radio", value: "Almost 70+", color: "text-teal-400" },
               ].map((stat, i) => (
                 <div key={i} className="p-4 rounded-2xl glass-panel border border-white/10 flex flex-col justify-center">
                   <span className="text-xs text-white/50">{stat.label}</span>
@@ -1848,20 +2160,20 @@ export default function App() {
             {/* Feature guides */}
             <div className="p-6 rounded-2xl glass-panel border border-white/12">
               <h3 className="text-base font-bold mb-4 flex items-center gap-2">
-                <Compass className="w-5 h-5 text-pink-400" /> Hướng Dẫn Sử Dụng Linh Hoạt
+                <Compass className="w-5 h-5 text-pink-400" /> User Guide & Tips
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-white/70">
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-white">1. Chọn kênh trực tiếp</h4>
-                  <p className="leading-relaxed text-xs text-white/60">Nhấp vào bất kỳ thẻ kênh nào để tải chương trình phát trực tiếp ở mục 'Truyền hình'.</p>
+                  <h4 className="font-semibold text-white">1. Select a live channel</h4>
+                  <p className="leading-relaxed text-xs text-white/60">Click on any channel card to tune into its live stream under the 'Live' tab.</p>
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-white">2. Thư viện Yêu Thích</h4>
-                  <p className="leading-relaxed text-xs text-white/60">Nhấp biểu tượng hình ngôi sao trên mỗi ô kênh để lưu kênh vào mục Yêu Thích, hiển thị tức thì trên Trang Chủ này.</p>
+                  <h4 className="font-semibold text-white">2. Favorites Library</h4>
+                  <p className="leading-relaxed text-xs text-white/60">Click the star icon on any channel card to save it to your Favorites, displaying instantly on this Home page.</p>
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-white">3. Tùy biến phát luồng m3u8</h4>
-                  <p className="leading-relaxed text-xs text-white/60">Nhấn nút 'Thêm kênh' ở góc phải ô tìm kiếm để dán luồng ngoài m3u8 của riêng bạn cực kì thuận tiện.</p>
+                  <h4 className="font-semibold text-white">3. Custom m3u8 Playlist</h4>
+                  <p className="leading-relaxed text-xs text-white/60">Click the 'Add Channel' button next to search to seamlessly import your own custom m3u8 playlists.</p>
                 </div>
               </div>
             </div>
@@ -1886,7 +2198,7 @@ export default function App() {
                       </div>
                       <div>
                         <h2 className="text-xl font-bold">{currentCustomTab.name}</h2>
-                        <p className="text-xs text-white/50">Giao diện hiển thị của Tab tự thiết kế</p>
+                        <p className="text-xs text-white/50">Visual interface of your custom-designed Tab</p>
                       </div>
                     </div>
                     <button
@@ -1910,12 +2222,12 @@ export default function App() {
                             setPlaybackError
                           );
                         } catch (err: any) {
-                          alert(`Lỗi thực thi script: ${err.message}`);
+                          alert(`Script execution error: ${err.message}`);
                         }
                       }}
                       className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-xs transition-colors shadow-lg flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Play className="w-3.5 h-3.5 fill-white" /> Chạy chức năng
+                      <Play className="w-3.5 h-3.5 fill-white" /> Run Function
                     </button>
                   </div>
 
@@ -1926,12 +2238,12 @@ export default function App() {
                     />
                   ) : (
                     <div className="p-6 rounded-2xl bg-black/20 border border-white/5 text-center text-sm text-white/40">
-                      Chưa định nghĩa giao diện HTML. Nhấp nút 'Chạy chức năng' ở góc trên để khởi chạy script xử lý của bạn.
+                      No HTML content defined. Click the 'Run Function' button above to initialize your logic script.
                     </div>
                   )}
 
                   <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-                    <div className="text-[10px] text-white/40 font-mono font-bold tracking-wider uppercase">Script đã lưu</div>
+                    <div className="text-[10px] text-white/40 font-mono font-bold tracking-wider uppercase">Saved Script</div>
                     <pre className="text-xs font-mono text-emerald-400 overflow-x-auto bg-black/40 p-3 rounded-lg max-h-48 scrollbar-thin">
                       {currentCustomTab.code}
                     </pre>
@@ -1983,6 +2295,12 @@ export default function App() {
 
                   {[
                     {
+                      id: "plugin_store",
+                      title: "settings.sections.PluginStore.title",
+                      subtitle: "settings.sections.PluginStore.subtitle",
+                      icon: ShoppingBag,
+                    },
+                    {
                       id: "profile",
                       title: "settings.sections.Profile.title",
                       subtitle: "settings.sections.Profile.subtitle",
@@ -2018,8 +2336,8 @@ export default function App() {
                           <IconComp className="w-6 h-6 stroke-[1.8]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-semibold text-white tracking-tight">{sec.title}</h3>
-                          <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{sec.subtitle}</p>
+                          <h3 className="text-base font-semibold text-white tracking-tight">{t(sec.title)}</h3>
+                          <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{t(sec.subtitle)}</p>
                         </div>
                         <ChevronRight className="w-5 h-5 text-white/45 shrink-0" />
                       </button>
@@ -2029,7 +2347,7 @@ export default function App() {
                   {/* Developer Options Heading */}
                   <div className="pt-4 pb-1.5 px-2 flex items-center gap-2 text-white/50 text-[11px] font-bold tracking-wider uppercase select-none font-sans">
                     <Cpu className="w-3.5 h-3.5 stroke-[2.5]" />
-                    <span>settings.section.developeroptions.title</span>
+                    <span>{t("settings.section.developeroptions.title")}</span>
                   </div>
 
                   {[
@@ -2042,13 +2360,13 @@ export default function App() {
                     {
                       id: "custom_tab",
                       title: "Create custom tab",
-                      subtitle: "Tự tạo Tab cá nhân hóa với Icon, Tên, HTML và Script tùy chỉnh",
+                      subtitle: "Design a custom personalized navigation tab with custom icons, layout, and logic",
                       icon: Plus,
                     },
                     {
                       id: "custom_modal",
                       title: "Create custom modal",
-                      subtitle: "Tự tạo hộp thoại Pop-up với Giao diện và Logic chức năng riêng",
+                      subtitle: "Build custom pop-up alert dialog boxes with tailored HTML structures and functional logic",
                       icon: Sparkles,
                     },
                     {
@@ -2069,8 +2387,8 @@ export default function App() {
                           <IconComp className="w-6 h-6 stroke-[1.8]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-semibold text-white tracking-tight">{sec.title}</h3>
-                          <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{sec.subtitle}</p>
+                          <h3 className="text-base font-semibold text-white tracking-tight">{t(sec.title)}</h3>
+                          <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{t(sec.subtitle)}</p>
                         </div>
                         <ChevronRight className="w-5 h-5 text-white/45 shrink-0" />
                       </button>
@@ -2085,6 +2403,100 @@ export default function App() {
                   exit={{ opacity: 0, x: -20 }}
                   className="mt-16 sm:mt-20 bg-white/10 backdrop-blur-[10px] rounded-[15px] p-6 sm:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/10 text-white"
                 >
+                  {activeSettingSection === "plugin_store" && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-indigo-400">
+                          <ShoppingBag className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-white">{t("settings.sections.PluginStore.title")}</h3>
+                          <p className="text-xs text-white/60">{t("settings.sections.PluginStore.subtitle")}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4">
+                        {plugins.map((plugin) => {
+                          return (
+                            <div
+                              key={plugin.id}
+                              className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-white/10"
+                            >
+                              <div className="flex-1 space-y-1.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-base text-white">{plugin.name}</span>
+                                  {plugin.status === "installed" && (
+                                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-400 text-[10px] font-semibold uppercase tracking-wider">
+                                      Installed
+                                    </span>
+                                  )}
+                                  {plugin.status === "installing" && (
+                                    <span className="px-2 py-0.5 rounded-full bg-amber-500/25 text-amber-400 text-[10px] font-semibold uppercase tracking-wider animate-pulse">
+                                      Installing... {plugin.progress}%
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-white/60 leading-relaxed max-w-xl font-normal">
+                                  {plugin.desc}
+                                </p>
+                                {plugin.status === "installing" && (
+                                  <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mt-3">
+                                    <div
+                                      className="h-full bg-indigo-500 transition-all duration-1000 ease-out"
+                                      style={{ width: `${plugin.progress}%` }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="shrink-0 flex items-center gap-3 self-end sm:self-center">
+                                {plugin.status === "idle" && (
+                                  <button
+                                    onClick={() => installPlugin(plugin.id)}
+                                    className="px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                                  >
+                                    Install (30s)
+                                  </button>
+                                )}
+
+                                {plugin.status === "installed" && (
+                                  <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs text-white/50 font-medium font-sans">Activate:</span>
+                                      <button
+                                        onClick={() => {
+                                          setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, isActive: !p.isActive } : p));
+                                        }}
+                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                          plugin.isActive ? "bg-[#34c759]" : "bg-white/20"
+                                        }`}
+                                      >
+                                        <motion.div
+                                          animate={{ x: plugin.isActive ? 20 : 0 }}
+                                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                          className="w-5 h-5 rounded-full bg-white shadow-md"
+                                        />
+                                      </button>
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, status: "idle", progress: 0, isActive: false } : p));
+                                      }}
+                                      className="p-2 rounded-full bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer"
+                                      title="Uninstall plugin"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {activeSettingSection === "appearance" && (
                     <div className="space-y-6">
                       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
@@ -2102,8 +2514,8 @@ export default function App() {
                         <div className="grid grid-cols-2 gap-2.5">
                           {[
                             { id: "cosmic", name: "Cosmic Glow", color: "from-pink-600 to-indigo-800" },
-                            { id: "deep", name: "Tối giản", color: "from-neutral-800 to-slate-900" },
-                            { id: "aurora", name: "Cực quang", color: "from-teal-600 to-lime-900" },
+                            { id: "deep", name: "Minimalist", color: "from-neutral-800 to-slate-900" },
+                            { id: "aurora", name: "Aurora Borealis", color: "from-teal-600 to-lime-900" },
                             { id: "sunset", name: "Sunset View", color: "from-rose-600 to-amber-900" },
                           ].map((item) => (
                             <button
@@ -2166,12 +2578,12 @@ export default function App() {
                         <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3.5 text-xs text-white/80">
                           <div className="flex items-center justify-between">
                             <span className="font-semibold text-white/90">settings.profile.TotalFavorites.title</span>
-                            <span className="font-mono text-amber-300 font-bold bg-white/5 px-2 py-0.5 rounded">{favorites.length} kênh</span>
+                            <span className="font-mono text-amber-300 font-bold bg-white/5 px-2 py-0.5 rounded">{favorites.length} channels</span>
                           </div>
                           {favorites.length > 0 && (
                             <button 
                               onClick={() => {
-                                if (confirm("Bạn có đồng ý xóa toàn bộ danh mục yêu thích?")) {
+                                if (confirm("Are you sure you want to clear your entire favorites list?")) {
                                   setFavorites([]);
                                 }
                               }}
@@ -2185,12 +2597,12 @@ export default function App() {
 
                           <div className="flex items-center justify-between">
                             <span className="font-semibold text-white/90">settings.profile.CustomChannels.title</span>
-                            <span className="font-mono text-indigo-300 font-bold bg-white/5 px-2 py-0.5 rounded">{customChannels.length} kênh</span>
+                            <span className="font-mono text-indigo-300 font-bold bg-white/5 px-2 py-0.5 rounded">{customChannels.length} channels</span>
                           </div>
                           {customChannels.length > 0 && (
                             <button 
                               onClick={() => {
-                                if (confirm("Bạn có đồng ý xóa tất cả các kênh tự thêm?")) {
+                                if (confirm("Are you sure you want to delete all custom channels?")) {
                                   setCustomChannels([]);
                                 }
                               }}
@@ -2224,7 +2636,7 @@ export default function App() {
                       </div>
 
                       <div className="space-y-4">
-                        {/* Option: Tự động trượt hình */}
+                        {/* Option: Auto slide banner */}
                         <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
                           <div className="space-y-1">
                             <h4 className="text-sm font-semibold text-white">settings.accessibility.AutoSlide.title</h4>
@@ -2257,7 +2669,7 @@ export default function App() {
                         <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
                           <div className="space-y-1">
                             <h4 className="text-sm font-semibold text-white">Liquid Glass</h4>
-                            <p className="text-xs text-white/60 leading-relaxed">Tắt hiệu ứng kính, toàn bộ blur về 0, opacity về 0 và mọi màu UI chuyển thành solid dark gray</p>
+                            <p className="text-xs text-white/60 leading-relaxed">Disable glass-morphism effects. All blurs and opacities are removed, and UI colors fallback to solid dark gray.</p>
                           </div>
                           
                           <div className="flex items-center">
@@ -2283,7 +2695,7 @@ export default function App() {
                         <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
                           <div className="space-y-1">
                             <h4 className="text-sm font-semibold text-white">Dynamic Motion</h4>
-                            <p className="text-xs text-white/60 leading-relaxed">Nếu tắt thì sẽ bỏ toàn bộ hiệu ứng, animation vào ra, hiển thị, di chuyển, tất cả về dạng instant transition</p>
+                            <p className="text-xs text-white/60 leading-relaxed">Disables all transitions, entry animations, translations, and scaling. Everything will use instant transitions.</p>
                           </div>
                           
                           <div className="flex items-center">
@@ -2438,17 +2850,17 @@ export default function App() {
                         </div>
                         <div>
                           <h3 className="text-lg font-semibold text-white">Create custom tab</h3>
-                          <p className="text-xs text-white/60">Tự tạo Tab cá nhân hóa với Icon, Tên, Giao diện HTML và Script xử lý JavaScript tùy chỉnh.</p>
+                          <p className="text-xs text-white/60">Create personalized tabs with custom Icons, Names, HTML interfaces, and JavaScript event handlers.</p>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         {/* Left: Saved Tabs List */}
                         <div className="lg:col-span-5 space-y-4">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">Danh sách Tab đã tạo ({customTabs.length})</h4>
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">Created Tabs List ({customTabs.length})</h4>
                           {customTabs.length === 0 ? (
                             <div className="p-6 rounded-[15px] bg-white/5 border border-dashed border-white/10 text-center text-xs text-white/40">
-                              Chưa có tab tùy chỉnh nào được tạo. Sử dụng biểu mẫu bên phải để bắt đầu sáng tạo!
+                              No custom tabs created yet. Use the form on the right to start creating!
                             </div>
                           ) : (
                             <div className="space-y-2 max-h-[480px] overflow-y-auto scrollbar-thin">
@@ -2475,13 +2887,13 @@ export default function App() {
                                           setTabHtmlInput(t.htmlContent || "");
                                         }}
                                         className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"
-                                        title="Chỉnh sửa"
+                                        title="Edit"
                                       >
                                         <Pen className="w-3.5 h-3.5" />
                                       </button>
                                       <button
                                         onClick={() => {
-                                          if (confirm(`Bạn có chắc chắn muốn xóa tab "${t.name}"?`)) {
+                                          if (confirm(`Are you sure you want to delete the tab "${t.name}"?`)) {
                                             setCustomTabs(prev => prev.filter(item => item.id !== t.id));
                                             if (tabEditId === t.id) {
                                               setTabEditId(null);
@@ -2493,7 +2905,7 @@ export default function App() {
                                           }
                                         }}
                                         className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/15 transition-colors"
-                                        title="Xóa"
+                                        title="Delete"
                                       >
                                         <Trash2 className="w-3.5 h-3.5" />
                                       </button>
@@ -2508,24 +2920,24 @@ export default function App() {
                         {/* Right: Form Builder */}
                         <div className="lg:col-span-7 p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4">
                           <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">
-                            {tabEditId ? "Chỉnh sửa Tab tùy chỉnh" : "Thiết kế Tab mới"}
+                            {tabEditId ? "Edit Custom Tab" : "Design New Tab"}
                           </h4>
 
                           {/* Tab Name */}
                           <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-white/80 block">Tên Tab hiển thị</label>
+                            <label className="text-xs font-semibold text-white/80 block">Tab Display Name</label>
                             <input
                               type="text"
                               value={tabNameInput}
                               onChange={(e) => setTabNameInput(e.target.value)}
-                              placeholder="Ví dụ: My Live channels, TV Cá Nhân..."
+                              placeholder="e.g. My Live channels, Private TV..."
                               className="w-full px-4 py-2.5 rounded-[12px] bg-white/10 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                             />
                           </div>
 
                           {/* Icon Selection */}
                           <div className="space-y-2">
-                            <label className="text-xs font-semibold text-white/80 block">Chọn biểu tượng (Icon)</label>
+                            <label className="text-xs font-semibold text-white/80 block">Select Icon</label>
                             <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-2.5 rounded-xl bg-black/25 border border-white/5 max-h-36 overflow-y-auto scrollbar-thin">
                               {Object.keys(ICON_REGISTRY).map((iconKey) => {
                                 const IconTemp = ICON_REGISTRY[iconKey];
@@ -2552,13 +2964,13 @@ export default function App() {
                           {/* HTML View Content */}
                           <div className="space-y-1.5">
                             <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">Giao diện Tab (HTML Tùy chọn)</label>
-                              <span className="text-[10px] text-white/40">Hỗ trợ các thẻ HTML cơ bản</span>
+                              <label className="text-xs font-semibold text-white/80 block">Tab UI Layout (Optional HTML)</label>
+                              <span className="text-[10px] text-white/40">Supports basic HTML tags</span>
                             </div>
                             <textarea
                               value={tabHtmlInput}
                               onChange={(e) => setTabHtmlInput(e.target.value)}
-                              placeholder="Nhập mã HTML tùy biến..."
+                              placeholder="Enter custom HTML layout..."
                               className="w-full h-24 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30 resize-none"
                             />
                           </div>
@@ -2566,13 +2978,13 @@ export default function App() {
                           {/* Script Logic */}
                           <div className="space-y-1.5">
                             <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">Mã Function xử lý (JavaScript)</label>
-                              <span className="text-[10px] text-amber-300 font-semibold">Chạy khi mở Tab hoặc click nút kích hoạt</span>
+                              <label className="text-xs font-semibold text-white/80 block">JavaScript Handler Code</label>
+                              <span className="text-[10px] text-amber-300 font-semibold">Runs on opening Tab or on action trigger</span>
                             </div>
                             <textarea
                               value={tabCodeInput}
                               onChange={(e) => setTabCodeInput(e.target.value)}
-                              placeholder="Nhập mã JavaScript..."
+                              placeholder="Enter JavaScript code..."
                               className="w-full h-36 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                             />
                           </div>
@@ -2585,18 +2997,18 @@ export default function App() {
                                 setTabEditId(null);
                                 setTabNameInput("");
                                 setTabIconInput("Sparkles");
-                                setTabCodeInput("// Nhập mã xử lý JavaScript tại đây\n");
+                                setTabCodeInput("// Enter JavaScript code logic here\n");
                                 setTabHtmlInput("");
                               }}
                               className="px-4 py-2.5 rounded-[12px] bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-colors"
                             >
-                              Làm mới
+                              Reset
                             </button>
                             <button
                               type="button"
                               onClick={() => {
                                 if (!tabNameInput.trim()) {
-                                  alert("Vui lòng nhập tên Tab hiển thị!");
+                                  alert("Please enter a Tab display name!");
                                   return;
                                 }
                                 if (tabEditId) {
@@ -2623,13 +3035,13 @@ export default function App() {
                                 setTabEditId(null);
                                 setTabNameInput("");
                                 setTabIconInput("Sparkles");
-                                setTabCodeInput("// Nhập mã xử lý JavaScript tại đây\n");
+                                setTabCodeInput("// Enter JavaScript code logic here\n");
                                 setTabHtmlInput("");
                               }}
                               className="px-5 py-2.5 rounded-[12px] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-lg shadow-indigo-600/25 flex items-center gap-1.5"
                             >
                               <Check className="w-3.5 h-3.5" />
-                              Lưu Tab
+                              Save Tab
                             </button>
                           </div>
                         </div>
@@ -2645,17 +3057,17 @@ export default function App() {
                         </div>
                         <div>
                           <h3 className="text-lg font-semibold text-white">Create custom modal</h3>
-                          <p className="text-xs text-white/60">Tự tạo hộp thoại Pop-up với Giao diện, Biểu tượng và Logic chức năng JavaScript riêng biệt.</p>
+                          <p className="text-xs text-white/60">Build custom pop-up alert dialog boxes with custom Icons, HTML layouts, and tailored JavaScript event logic.</p>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         {/* Left: Saved Modals List */}
                         <div className="lg:col-span-5 space-y-4">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">Danh sách Modal đã tạo ({customModals.length})</h4>
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">Created Modals List ({customModals.length})</h4>
                           {customModals.length === 0 ? (
                             <div className="p-6 rounded-[15px] bg-white/5 border border-dashed border-white/10 text-center text-xs text-white/40">
-                              Chưa có modal tùy chỉnh nào được tạo. Hãy thiết kế ngay ở biểu mẫu bên phải!
+                              No custom modals created yet. Design one using the form on the right!
                             </div>
                           ) : (
                             <div className="space-y-2 max-h-[480px] overflow-y-auto scrollbar-thin">
@@ -2678,7 +3090,7 @@ export default function App() {
                                           setCustomModals(prev => prev.map(item => item.id === m.id ? { ...item, isOpen: true } : item));
                                         }}
                                         className="p-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/15 transition-colors"
-                                        title="Kích hoạt/Mở thử"
+                                        title="Trigger/Preview"
                                       >
                                         <Play className="w-3.5 h-3.5 fill-indigo-300" />
                                       </button>
@@ -2691,13 +3103,13 @@ export default function App() {
                                           setModalHtmlInput(m.htmlContent || "");
                                         }}
                                         className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"
-                                        title="Chỉnh sửa"
+                                        title="Edit"
                                       >
                                         <Pen className="w-3.5 h-3.5" />
                                       </button>
                                       <button
                                         onClick={() => {
-                                          if (confirm(`Bạn có chắc chắn muốn xóa modal "${m.name}"?`)) {
+                                          if (confirm(`Are you sure you want to delete the modal "${m.name}"?`)) {
                                             setCustomModals(prev => prev.filter(item => item.id !== m.id));
                                             if (modalEditId === m.id) {
                                               setModalEditId(null);
@@ -2709,7 +3121,7 @@ export default function App() {
                                           }
                                         }}
                                         className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/15 transition-colors"
-                                        title="Xóa"
+                                        title="Delete"
                                       >
                                         <Trash2 className="w-3.5 h-3.5" />
                                       </button>
@@ -2724,24 +3136,24 @@ export default function App() {
                         {/* Right: Form Builder */}
                         <div className="lg:col-span-7 p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4">
                           <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">
-                            {modalEditId ? "Chỉnh sửa Modal tùy chỉnh" : "Thiết kế Modal mới"}
+                            {modalEditId ? "Edit Custom Modal" : "Design New Modal"}
                           </h4>
 
                           {/* Modal Name */}
                           <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-white/80 block">Tiêu đề Modal (Title)</label>
+                            <label className="text-xs font-semibold text-white/80 block">Modal Title</label>
                             <input
                               type="text"
                               value={modalNameInput}
                               onChange={(e) => setModalNameInput(e.target.value)}
-                              placeholder="Ví dụ: Lưu ý xem tivi, Thông báo chung..."
+                              placeholder="e.g. TV Notice, Public Announcement..."
                               className="w-full px-4 py-2.5 rounded-[12px] bg-white/10 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                             />
                           </div>
 
                           {/* Icon Selection */}
                           <div className="space-y-2">
-                            <label className="text-xs font-semibold text-white/80 block">Chọn biểu tượng (Icon)</label>
+                            <label className="text-xs font-semibold text-white/80 block">Select Icon</label>
                             <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-2.5 rounded-xl bg-black/25 border border-white/5 max-h-36 overflow-y-auto scrollbar-thin">
                               {Object.keys(ICON_REGISTRY).map((iconKey) => {
                                 const IconTemp = ICON_REGISTRY[iconKey];
@@ -2768,13 +3180,13 @@ export default function App() {
                           {/* HTML View Content */}
                           <div className="space-y-1.5">
                             <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">Giao diện bên trong Modal (HTML Tùy chọn)</label>
-                              <span className="text-[10px] text-white/40">Giao diện nội dung hộp thoại</span>
+                              <label className="text-xs font-semibold text-white/80 block">Modal Inner UI (Optional HTML)</label>
+                              <span className="text-[10px] text-white/40">Inner layout content</span>
                             </div>
                             <textarea
                               value={modalHtmlInput}
                               onChange={(e) => setModalHtmlInput(e.target.value)}
-                              placeholder="Nhập mã HTML..."
+                              placeholder="Enter HTML layout..."
                               className="w-full h-24 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30 resize-none"
                             />
                           </div>
@@ -2782,13 +3194,13 @@ export default function App() {
                           {/* Script Logic */}
                           <div className="space-y-1.5">
                             <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">Script xử lý khi click nút chính (JavaScript)</label>
-                              <span className="text-[10px] text-amber-300 font-semibold font-mono">Chạy khi click 'Chạy chức năng'</span>
+                              <label className="text-xs font-semibold text-white/80 block">JavaScript Main Button Event Handler</label>
+                              <span className="text-[10px] text-amber-300 font-semibold font-mono">Runs on 'Run Function' click</span>
                             </div>
                             <textarea
                               value={modalCodeInput}
                               onChange={(e) => setModalCodeInput(e.target.value)}
-                              placeholder="Nhập mã JavaScript..."
+                              placeholder="Enter JavaScript code..."
                               className="w-full h-36 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                             />
                           </div>
@@ -2801,18 +3213,18 @@ export default function App() {
                                 setModalEditId(null);
                                 setModalNameInput("");
                                 setModalIconInput("Sparkles");
-                                setModalCodeInput("// Nhập mã xử lý JavaScript tại đây\n");
+                                setModalCodeInput("// Enter JavaScript code logic here\n");
                                 setModalHtmlInput("");
                               }}
                               className="px-4 py-2.5 rounded-[12px] bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-colors"
                             >
-                              Làm mới
+                              Reset
                             </button>
                             <button
                               type="button"
                               onClick={() => {
                                 if (!modalNameInput.trim()) {
-                                  alert("Vui lòng nhập tên tiêu đề Modal!");
+                                  alert("Please enter a Modal title!");
                                   return;
                                 }
                                 if (modalEditId) {
@@ -2840,13 +3252,13 @@ export default function App() {
                                 setModalEditId(null);
                                 setModalNameInput("");
                                 setModalIconInput("Sparkles");
-                                setModalCodeInput("// Nhập mã xử lý JavaScript tại đây\n");
+                                setModalCodeInput("// Enter JavaScript code logic here\n");
                                 setModalHtmlInput("");
                               }}
                               className="px-5 py-2.5 rounded-[12px] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-lg shadow-indigo-600/25 flex items-center gap-1.5"
                             >
                               <Check className="w-3.5 h-3.5" />
-                              Lưu Modal
+                              Save Modal
                             </button>
                           </div>
                         </div>
@@ -2870,18 +3282,36 @@ export default function App() {
                       <div className="space-y-8">
                         
                         {/* 1. BUTTONS */}
-                        <div className="relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-                          <div className="rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4">
+                        <div className={isMaterialDesignActive
+                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
+                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+                        }>
+                          <div className={isMaterialDesignActive
+                            ? "space-y-4 text-[#e6e1e5]"
+                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
+                          }>
                             <div className="text-left">
-                              <h4 className="text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2">Button</h4>
+                              <h4 className={isMaterialDesignActive
+                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
+                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
+                              }>Button</h4>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                               {/* State: Default */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <span className="px-5 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)]">
+                                    <span className={isMaterialDesignActive 
+                                      ? "px-5 py-2.5 rounded-[20px] bg-[#381e72] border-0 text-xs font-semibold text-[#d0bcff] select-none shadow-md"
+                                      : "px-5 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)]"
+                                    }>
                                       Placeholder
                                     </span>
                                   </div>
@@ -2889,11 +3319,20 @@ export default function App() {
                               </div>
 
                               {/* State: Hover */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <span className="px-5 py-2.5 rounded-full bg-white/20 border border-white/20 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.85),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.4),0_8px_20px_rgba(255,255,255,0.15)] scale-[1.18] transition-all duration-300">
+                                    <span className={isMaterialDesignActive
+                                      ? "px-5 py-2.5 rounded-[20px] bg-[#4f378b] border-0 text-xs font-semibold text-[#d0bcff] select-none shadow-lg scale-[1.18] transition-all duration-300"
+                                      : "px-5 py-2.5 rounded-full bg-white/20 border border-white/20 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.85),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.4),0_8px_20px_rgba(255,255,255,0.15)] scale-[1.18] transition-all duration-300"
+                                    }>
                                       Placeholder
                                     </span>
                                   </div>
@@ -2901,11 +3340,20 @@ export default function App() {
                               </div>
 
                               {/* State: Pressed */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <span className="px-5 py-2.5 rounded-full bg-white/30 border border-white/30 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.9),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.5)] scale-[1.28] transition-all duration-300">
+                                    <span className={isMaterialDesignActive
+                                      ? "px-5 py-2.5 rounded-[20px] bg-[#6750a4] border-0 text-xs font-semibold text-[#e6e1e5] select-none shadow-lg scale-[1.28] transition-all duration-300"
+                                      : "px-5 py-2.5 rounded-full bg-white/30 border border-white/30 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.9),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.5)] scale-[1.28] transition-all duration-300"
+                                    }>
                                       Placeholder
                                     </span>
                                   </div>
@@ -2913,11 +3361,20 @@ export default function App() {
                               </div>
 
                               {/* Live Playground */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
+                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <button className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/15 text-xs font-semibold text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-pointer bouncy-btn">
+                                    <button className={isMaterialDesignActive
+                                      ? "px-5 py-2.5 rounded-[20px] bg-[#381e72] hover:bg-[#4f378b] active:bg-[#6750a4] border-0 text-xs font-semibold text-[#d0bcff] shadow-md cursor-pointer bouncy-btn transition-all duration-150"
+                                      : "px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/15 text-xs font-semibold text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-pointer bouncy-btn"
+                                    }>
                                       Interact me
                                     </button>
                                   </div>
@@ -2928,19 +3385,34 @@ export default function App() {
                         </div>
 
                         {/* 2. SLIDER */}
-                        <div className="relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-                          <div className="rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4">
+                        <div className={isMaterialDesignActive
+                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
+                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+                        }>
+                          <div className={isMaterialDesignActive
+                            ? "space-y-4 text-[#e6e1e5]"
+                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
+                          }>
                             <div className="text-left">
-                              <h4 className="text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2">Slider</h4>
+                              <h4 className={isMaterialDesignActive
+                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
+                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
+                              }>Slider</h4>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                               {/* State: Default */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
                                   <div className="flex items-center justify-center h-full px-2">
                                     <div className="relative w-full h-1 bg-white/10 rounded-full">
-                                      <div className="bg-[#0084ff] h-full w-[45%] rounded-full" />
+                                      <div className={isMaterialDesignActive ? "bg-[#d0bcff] h-full w-[45%] rounded-full" : "bg-[#0084ff] h-full w-[45%] rounded-full"} />
                                       <div className="absolute top-1/2 left-[45%] -translate-y-1/2 -translate-x-1/2 w-6 h-2 rounded-full bg-white shadow-md border border-white/70" />
                                     </div>
                                   </div>
@@ -2948,12 +3420,18 @@ export default function App() {
                               </div>
 
                               {/* State: Hover */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
                                   <div className="flex items-center justify-center h-full px-2">
                                     <div className="relative w-full h-1 bg-white/15 rounded-full">
-                                      <div className="bg-[#0084ff] h-full w-[45%] rounded-full" />
+                                      <div className={isMaterialDesignActive ? "bg-[#d0bcff] h-full w-[45%] rounded-full" : "bg-[#0084ff] h-full w-[45%] rounded-full"} />
                                       <div className="absolute top-1/2 left-[45%] -translate-y-1/2 -translate-x-1/2 w-7 h-2.5 rounded-full bg-white shadow-lg scale-110 transition-all" />
                                     </div>
                                   </div>
@@ -2961,12 +3439,18 @@ export default function App() {
                               </div>
 
                               {/* State: Pressed */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
                                   <div className="flex items-center justify-center h-full px-2">
                                     <div className="relative w-full h-1 bg-white/20 rounded-full">
-                                      <div className="bg-[#0084ff] h-full w-[45%] rounded-full" />
+                                      <div className={isMaterialDesignActive ? "bg-[#d0bcff] h-full w-[45%] rounded-full" : "bg-[#0084ff] h-full w-[45%] rounded-full"} />
                                       <div className="absolute top-1/2 left-[45%] -translate-y-1/2 -translate-x-1/2 w-8 h-3 rounded-full bg-white shadow-2xl scale-120 transition-all" />
                                     </div>
                                   </div>
@@ -2974,8 +3458,14 @@ export default function App() {
                               </div>
 
                               {/* Live Playground */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
+                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
                                   <div className="flex items-center justify-center h-full">
                                     <div className="flex items-center w-full justify-center px-2">
@@ -2988,7 +3478,9 @@ export default function App() {
                                         onChange={(e) => setDemoSliderVal(Number(e.target.value))}
                                         className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
                                         style={{
-                                          background: `linear-gradient(to right, #0084ff ${demoSliderVal * 100}%, rgba(255, 255, 255, 0.2) ${demoSliderVal * 100}%)`
+                                          background: isMaterialDesignActive
+                                            ? `linear-gradient(to right, #d0bcff ${demoSliderVal * 100}%, rgba(255, 255, 255, 0.2) ${demoSliderVal * 100}%)`
+                                            : `linear-gradient(to right, #0084ff ${demoSliderVal * 100}%, rgba(255, 255, 255, 0.2) ${demoSliderVal * 100}%)`
                                         }}
                                       />
                                     </div>
@@ -3000,18 +3492,36 @@ export default function App() {
                         </div>
 
                         {/* 3. TOGGLE SWITCH */}
-                        <div className="relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-                          <div className="rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4">
+                        <div className={isMaterialDesignActive
+                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
+                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+                        }>
+                          <div className={isMaterialDesignActive
+                            ? "space-y-4 text-[#e6e1e5]"
+                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
+                          }>
                             <div className="text-left">
-                              <h4 className="text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2">Toggle Switch</h4>
+                              <h4 className={isMaterialDesignActive
+                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
+                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
+                              }>Toggle Switch</h4>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                               {/* State: Default / Off */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <div className="w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center">
+                                    <div className={isMaterialDesignActive
+                                      ? "w-12 h-6 rounded-full p-0.5 bg-[#49454f] flex items-center"
+                                      : "w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center"
+                                    }>
                                       <div className="relative w-6 h-5 flex items-center justify-center">
                                         <div className="w-full h-full rounded-full bg-white shadow-md" />
                                       </div>
@@ -3021,13 +3531,25 @@ export default function App() {
                               </div>
 
                               {/* State: Hover */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <div className="w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center">
+                                    <div className={isMaterialDesignActive
+                                      ? "w-12 h-6 rounded-full p-0.5 bg-[#49454f] flex items-center"
+                                      : "w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center"
+                                    }>
                                       <div className="relative w-6 h-5 flex items-center justify-center scale-110 transition-all">
-                                        <div className="absolute -inset-2 rounded-full bg-white/15 scale-100 transition-all pointer-events-none" />
+                                        <div className={isMaterialDesignActive
+                                          ? "absolute -inset-2 rounded-full bg-[#d0bcff]/15 scale-100 transition-all pointer-events-none"
+                                          : "absolute -inset-2 rounded-full bg-white/15 scale-100 transition-all pointer-events-none"
+                                        } />
                                         <div className="w-full h-full rounded-full bg-transparent border-white border backdrop-blur-md shadow-md" />
                                       </div>
                                     </div>
@@ -3036,11 +3558,20 @@ export default function App() {
                               </div>
 
                               {/* State: Pressed / On */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <div className="w-12 h-6 rounded-full p-0.5 bg-[#34c759] flex items-center justify-end">
+                                    <div className={isMaterialDesignActive
+                                      ? "w-12 h-6 rounded-full p-0.5 bg-[#6750a4] flex items-center justify-end"
+                                      : "w-12 h-6 rounded-full p-0.5 bg-[#34c759] flex items-center justify-end"
+                                    }>
                                       <div className="relative w-6 h-5 flex items-center justify-center">
                                         <div className="w-full h-full rounded-full bg-white shadow-md" />
                                       </div>
@@ -3050,20 +3581,28 @@ export default function App() {
                               </div>
 
                               {/* Live Playground */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
+                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
                                   <div className="flex items-center justify-center h-full">
                                     <button
                                       onClick={() => setDemoToggleState(!demoToggleState)}
                                       className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                        demoToggleState ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                                        demoToggleState 
+                                          ? isMaterialDesignActive ? "bg-[#6750a4]" : "bg-[#34c759]"
+                                          : isMaterialDesignActive ? "bg-[#49454f]" : "bg-[#3a3a3c]"
                                       }`}
                                     >
                                       <motion.div
-                                        animate={{ x: demoToggleState ? 20 : 0 }}
+                                        animate={{ x: demoToggleState ? 24 : 0 }}
                                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                        className="relative w-6 h-5 flex items-center justify-center group"
+                                        className="relative w-5 h-5 flex items-center justify-center group"
                                       >
                                         <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
                                         <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
@@ -3077,59 +3616,107 @@ export default function App() {
                         </div>
 
                         {/* 4. DROPDOWN MENU */}
-                        <div className="relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-                          <div className="rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4">
+                        <div className={isMaterialDesignActive
+                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
+                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+                        }>
+                          <div className={isMaterialDesignActive
+                            ? "space-y-4 text-[#e6e1e5]"
+                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
+                          }>
                             <div className="text-left">
-                              <h4 className="text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2">Dropdown Menu</h4>
+                              <h4 className={isMaterialDesignActive
+                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
+                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
+                              }>Dropdown Menu</h4>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                               {/* State: Default */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
-                                  <div className="py-2.5 px-4 rounded-xl bg-white/5 text-xs text-white/80 flex items-center gap-2.5 select-none text-left mt-2">
-                                    <Clock className="w-4 h-4 text-white/60" />
+                                  <div className={isMaterialDesignActive
+                                    ? "py-2.5 px-4 rounded-xl bg-[#313033]/40 text-xs text-[#e6e1e5] flex items-center gap-3.5 select-none text-left mt-2"
+                                    : "py-2.5 px-4 rounded-xl bg-white/5 text-xs text-white/80 flex items-center gap-2.5 select-none text-left mt-2"
+                                  }>
+                                    <Clock className="w-4 h-4 text-[#cac4d0]" />
                                     <span>Placeholder Item</span>
                                   </div>
                                 </div>
                               </div>
 
                               {/* State: Hover */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
-                                  <div className="py-2.5 px-4 rounded-xl bg-white/15 text-xs text-white flex items-center justify-between gap-2.5 select-none shadow-sm text-left mt-2">
-                                    <div className="flex items-center gap-2.5">
-                                      <Clock className="w-4 h-4 text-white" />
+                                  <div className={isMaterialDesignActive
+                                    ? "py-2.5 px-4 rounded-xl bg-[#313033] text-xs text-[#e6e1e5] flex items-center justify-between gap-3.5 select-none text-left mt-2"
+                                    : "py-2.5 px-4 rounded-xl bg-white/15 text-xs text-white flex items-center justify-between gap-2.5 select-none shadow-sm text-left mt-2"
+                                  }>
+                                    <div className="flex items-center gap-3.5">
+                                      <Clock className="w-4 h-4 text-[#cac4d0]" />
                                       <span>Placeholder Item</span>
                                     </div>
-                                    <Check className="w-4 h-4 text-teal-400 stroke-[3]" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#d0bcff]" />
                                   </div>
                                 </div>
                               </div>
 
                               {/* State: Pressed */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
-                                  <div className="py-2.5 px-4 rounded-xl bg-white/25 text-xs text-white/70 flex items-center gap-2.5 scale-97 select-none text-left mt-2">
-                                    <Clock className="w-4 h-4 text-white/40" />
+                                  <div className={isMaterialDesignActive
+                                    ? "py-2.5 px-4 rounded-xl bg-[#49454f]/60 text-xs text-[#e6e1e5]/70 flex items-center gap-3.5 select-none text-left mt-2"
+                                    : "py-2.5 px-4 rounded-xl bg-white/25 text-xs text-white/70 flex items-center gap-2.5 scale-97 select-none text-left mt-2"
+                                  }>
+                                    <Clock className="w-4 h-4 text-[#cac4d0]/60" />
                                     <span>Placeholder Item</span>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Live Playground */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
+                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
                                   <div className="relative group mt-2">
-                                    <button className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/15 active:bg-white/25 text-xs text-white/95 hover:text-white flex items-center justify-between gap-2.5 transition-all duration-150 active:scale-97 cursor-pointer text-left">
-                                      <span className="flex items-center gap-2.5">
-                                        <Clock className="w-4 h-4 text-indigo-300" />
+                                    <button className={isMaterialDesignActive
+                                      ? "w-full py-2.5 px-4 rounded-xl bg-[#313033]/60 hover:bg-[#313033] active:bg-[#49454f] text-xs text-[#e6e1e5] flex items-center justify-between gap-3.5 transition-all duration-150 active:scale-97 cursor-pointer text-left border-0"
+                                      : "w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/15 active:bg-white/25 text-xs text-white/95 hover:text-white flex items-center justify-between gap-2.5 transition-all duration-150 active:scale-97 cursor-pointer text-left"
+                                    }>
+                                      <span className="flex items-center gap-3.5">
+                                        <Clock className={isMaterialDesignActive ? "w-4 h-4 text-[#cac4d0]" : "w-4 h-4 text-indigo-300"} />
                                         <span>Placeholder Item</span>
                                       </span>
-                                      <Check className="w-4 h-4 text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                      <span className={isMaterialDesignActive
+                                        ? "w-1.5 h-1.5 rounded-full bg-[#d0bcff] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                                        : "w-4 h-4 text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                                      } />
                                     </button>
                                   </div>
                                 </div>
@@ -3139,18 +3726,33 @@ export default function App() {
                         </div>
 
                         {/* 5. DOCK */}
-                        <div className="relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-                          <div className="rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4">
+                        <div className={isMaterialDesignActive
+                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
+                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+                        }>
+                          <div className={isMaterialDesignActive
+                            ? "space-y-4 text-[#e6e1e5]"
+                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
+                          }>
                             <div className="text-left">
-                              <h4 className="text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2">Dock</h4>
+                              <h4 className={isMaterialDesignActive
+                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
+                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
+                              }>Dock</h4>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                               {/* State: Default */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
                                   <div className="flex items-center justify-center py-2 h-full">
-                                    <div className="relative flex flex-col items-center justify-center h-12 w-20 text-white/65">
+                                    <div className="relative flex flex-col items-center justify-center h-12 w-20 text-[#cac4d0]">
                                       <Home className="w-6 h-6 stroke-[1.8]" />
                                     </div>
                                   </div>
@@ -3158,8 +3760,14 @@ export default function App() {
                               </div>
 
                               {/* State: Hover */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
                                   <div className="flex items-center justify-center py-2 h-full">
                                     <div className="relative flex flex-col items-center justify-center h-12 w-20 text-white scale-[1.18] transition-transform duration-300">
@@ -3170,27 +3778,46 @@ export default function App() {
                               </div>
 
                               {/* State: Pressed */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
                                   <div className="flex items-center justify-center py-2 h-full">
-                                    <div className="relative flex flex-col items-center justify-center h-12 w-20 text-indigo-950 font-medium z-10 scale-[1.05] transition-all">
-                                      <div className="absolute inset-0 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10" />
-                                      <Home className="w-6 h-6 stroke-[2.2] text-indigo-950" />
+                                    <div className={`relative flex flex-col items-center justify-center h-12 w-20 z-10 scale-[1.05] transition-all ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-indigo-950 font-medium"}`}>
+                                      <div className={isMaterialDesignActive
+                                        ? "absolute w-14 h-8 bg-[#381e72] rounded-[20px] -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-none border-0"
+                                        : "absolute inset-0 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
+                                      } />
+                                      <Home className="w-6 h-6 stroke-[2.2]" />
                                     </div>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Live Playground */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
+                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <div className="h-14 rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_10px_30px_rgba(0,0,0,0.3)] flex items-center justify-around px-2 py-1 relative w-full max-w-[200px]">
+                                    <div className={`h-14 flex items-center justify-around px-2 py-1 relative w-full max-w-[200px] ${
+                                      isMaterialDesignActive
+                                        ? "rounded-[28px] bg-[#211f26] border border-[#313033] shadow-lg"
+                                        : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_10px_30px_rgba(0,0,0,0.3)]"
+                                    }`}>
                                       {[
                                         { id: "home", icon: Home, label: "Home" },
-                                        { id: "live", icon: Compass, label: "Trực tiếp" }
+                                        { id: "live", icon: Radio, label: "Live" }
                                       ].map((tab) => {
                                         const isActive = activeDockDemoTab === tab.id;
                                         const Icon = tab.icon;
@@ -3199,14 +3826,19 @@ export default function App() {
                                             key={tab.id}
                                             onClick={() => setActiveDockDemoTab(tab.id)}
                                             className={`relative flex flex-col items-center justify-center flex-1 h-full cursor-pointer z-10 bouncy-btn px-2 transition-all duration-300 ${
-                                              isActive ? "text-indigo-950 font-normal" : "text-white/65 hover:text-white"
+                                              isActive 
+                                                ? (isMaterialDesignActive ? "text-[#e6e1e5] font-normal" : "text-indigo-950 font-normal") 
+                                                : (isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/65 hover:text-white")
                                             }`}
                                           >
                                             {isActive && (
                                               <motion.div
                                                 layoutId="demoActiveTabPill"
                                                 transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                                                className="absolute inset-y-1 inset-x-1 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
+                                                className={isMaterialDesignActive
+                                                  ? "absolute w-14 h-8 bg-[#381e72] rounded-[20px] -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-none border-0"
+                                                  : "absolute inset-y-1 inset-x-1 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
+                                                }
                                               />
                                             )}
                                             <Icon className="w-5.5 h-5.5" />
@@ -3222,72 +3854,134 @@ export default function App() {
                         </div>
 
                         {/* 6. CHECKBOX */}
-                        <div className="relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl">
-                          <div className="rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4">
+                        <div className={isMaterialDesignActive
+                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
+                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
+                        }>
+                          <div className={isMaterialDesignActive
+                            ? "space-y-4 text-[#e6e1e5]"
+                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
+                          }>
                             <div className="text-left">
-                              <h4 className="text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2">Checkbox</h4>
+                              <h4 className={isMaterialDesignActive
+                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
+                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
+                              }>Checkbox</h4>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                               {/* State: Default */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-white/40 to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)]">
-                                      <div className="w-full h-full rounded-[5px] bg-[#07050f]/40" />
-                                    </div>
+                                    {isMaterialDesignActive ? (
+                                      <div className="relative w-[18px] h-[18px] rounded-[4px] border-2 border-[#c4c6cf]" />
+                                    ) : (
+                                      <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-white/40 to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)]">
+                                        <div className="w-full h-full rounded-[5px] bg-[#07050f]/40" />
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
 
                               {/* State: Hover */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-teal-400/50 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] scale-110 transition-all">
-                                      <div className="w-full h-full rounded-[5px] bg-[#07050f]/20" />
-                                    </div>
+                                    {isMaterialDesignActive ? (
+                                      <div className="relative w-[18px] h-[18px] rounded-[4px] border-2 border-[#d0bcff] bg-[#d0bcff]/10 scale-110 transition-all" />
+                                    ) : (
+                                      <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-teal-400/50 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] scale-110 transition-all">
+                                        <div className="w-full h-full rounded-[5px] bg-[#07050f]/20" />
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
 
                               {/* State: Pressed */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between"
+                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)]">
-                                      <div className="w-full h-full rounded-[5px] bg-indigo-500 flex items-center justify-center">
-                                        <Check className="w-3.5 h-3.5 text-white stroke-[3.5]" />
+                                    {isMaterialDesignActive ? (
+                                      <div className="relative w-[18px] h-[18px] rounded-[4px] bg-[#d0bcff] flex items-center justify-center border-0">
+                                        <Check className="w-3 h-3 text-[#381e72] stroke-[4]" />
                                       </div>
-                                    </div>
+                                    ) : (
+                                      <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)]">
+                                        <div className="w-full h-full rounded-[5px] bg-indigo-500 flex items-center justify-center">
+                                          <Check className="w-3.5 h-3.5 text-white stroke-[3.5]" />
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
 
                               {/* Live Playground */}
-                              <div className="relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md">
-                                <div className="p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between">
+                              <div className={isMaterialDesignActive
+                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
+                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                              }>
+                                <div className={isMaterialDesignActive
+                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
+                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
+                                }>
                                   <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
                                   <div className="flex items-center justify-center h-full">
                                     <button 
                                       onClick={() => setExpCache(!expCache)}
                                       className="focus:outline-none transition-all flex items-center justify-center cursor-pointer relative"
                                     >
-                                      <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)]">
-                                        <div className="w-full h-full rounded-[5px] bg-[#07050f]/40 flex items-center justify-center">
+                                      {isMaterialDesignActive ? (
+                                        <div className={`relative w-[18px] h-[18px] rounded-[4px] border-2 transition-all flex items-center justify-center ${
+                                          expCache ? "border-[#d0bcff] bg-[#d0bcff]" : "border-[#c4c6cf]"
+                                        }`}>
                                           {expCache && (
                                             <motion.div
                                               initial={{ scale: 0.5, opacity: 0 }}
                                               animate={{ scale: 1, opacity: 1 }}
-                                              className="absolute inset-0 bg-indigo-500 rounded-[3px] flex items-center justify-center"
                                             >
-                                              <Check className="w-3.5 h-3.5 text-white stroke-[3.5]" />
+                                              <Check className="w-3 h-3 text-[#381e72] stroke-[4]" />
                                             </motion.div>
                                           )}
                                         </div>
-                                      </div>
+                                      ) : (
+                                        <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)]">
+                                          <div className="w-full h-full rounded-[5px] bg-[#07050f]/40 flex items-center justify-center">
+                                            {expCache && (
+                                              <motion.div
+                                                initial={{ scale: 0.5, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                className="absolute inset-0 bg-indigo-500 rounded-[3px] flex items-center justify-center"
+                                              >
+                                                <Check className="w-3.5 h-3.5 text-white stroke-[3.5]" />
+                                              </motion.div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
                                     </button>
                                   </div>
                                 </div>
@@ -3300,14 +3994,14 @@ export default function App() {
                     </div>
                   )}
 
-                  {activeSettingSection !== "appearance" && activeSettingSection !== "profile" && activeSettingSection !== "accessibility" && activeSettingSection !== "experimental" && activeSettingSection !== "design_system" && (
+                  {activeSettingSection !== "appearance" && activeSettingSection !== "profile" && activeSettingSection !== "accessibility" && activeSettingSection !== "experimental" && activeSettingSection !== "design_system" && activeSettingSection !== "plugin_store" && activeSettingSection !== "custom_tab" && activeSettingSection !== "custom_modal" && (
                     <div className="text-center py-12">
                       <div className="w-16 h-16 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4 animate-pulse">
                         <Sparkles className="w-8 h-8" />
                       </div>
                       <h3 className="text-lg font-black text-white uppercase tracking-widest mb-2">Coming Soon</h3>
                       <p className="text-xs text-white/60 max-w-xs mx-auto leading-relaxed">
-                        Tính năng này đang được phát triển tích cực và sẽ sớm ra mắt trong phiên bản tiếp theo của Vplay.
+                        This feature is actively being developed and will be released in the upcoming version of Vplay.
                       </p>
                     </div>
                   )}
@@ -3332,27 +4026,44 @@ export default function App() {
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full h-16 rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] flex items-center px-4 gap-2 relative transform-gpu"
+              transition={dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 }}
+              className={`w-full h-16 flex items-center px-4 gap-2 relative transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-full bg-[#ece6f0] border-0 text-[#1c1b1f] shadow-lg"
+                  : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)]"
+              }`}
             >
-              <img 
-                src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
-                className="w-5.5 h-5.5 brightness-0 invert opacity-95 z-20 pointer-events-none object-contain ml-1" 
-                referrerPolicy="no-referrer"
-                alt="Search"
-              />
+              {isMaterialDesignActive ? (
+                <img
+                  src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
+                  className="w-5.5 h-5.5 transition-transform duration-300 pointer-events-none object-contain ml-1"
+                  style={{ filter: "invert(27%) sepia(8%) saturate(1008%) hue-rotate(216deg) brightness(97%) contrast(88%)" }}
+                  referrerPolicy="no-referrer"
+                  alt="Search"
+                />
+              ) : (
+                <img 
+                  src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
+                  className="w-5.5 h-5.5 brightness-0 invert opacity-95 z-20 pointer-events-none object-contain ml-1" 
+                  referrerPolicy="no-referrer"
+                  alt="Search"
+                />
+              )}
               <input
                 type="text"
-                placeholder="home.search.placeholder"
+                placeholder="Search Vplay"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent border-none text-white text-sm focus:outline-none placeholder-white/40 px-1 font-sans"
+                className={`flex-1 bg-transparent border-none text-white text-sm focus:outline-none placeholder-white/40 px-1 font-sans ${isMaterialDesignActive ? "text-[#1c1b1f] placeholder-[#49454f] text-base font-normal" : ""}`}
                 autoFocus
               />
+              {isMaterialDesignActive && (
+                <Mic className="w-5.5 h-5.5 text-[#49454f] z-20 mr-1 shrink-0 cursor-pointer hover:scale-110 transition-all duration-200" />
+              )}
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="p-1 text-white/40 hover:text-white"
+                  className={`p-1 ${isMaterialDesignActive ? "text-[#49454f] hover:text-[#1c1b1f]" : "text-white/40 hover:text-white"}`}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -3362,8 +4073,14 @@ export default function App() {
                   setSearchQuery("");
                   setActiveTab(prevTab);
                 }}
-                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] flex items-center justify-center text-white cursor-default shrink-0 bouncy-btn"
-                title="Hủy"
+                className={`w-8 h-8 flex items-center justify-center text-white cursor-default shrink-0 ${
+                  isMaterialDesignActive ? "duration-200" : "bouncy-btn"
+                } ${
+                  isMaterialDesignActive
+                    ? "rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] border-0 text-white shadow-md"
+                    : "rounded-full bg-white/15 hover:bg-white/25 border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)]"
+                }`}
+                title="Cancel"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -3373,11 +4090,15 @@ export default function App() {
               key="main-bar-dock"
               initial={{ y: 0, opacity: 1 }}
               exit={{ y: 25, opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={dynamicMotion ? { duration: 0.25 } : { duration: 0 }}
               className="flex items-center gap-2.5 w-full h-16 transform-gpu"
             >
               {/* Main Tab Dock (Pill) */}
-              <div className="flex-1 h-full rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] flex items-center justify-around px-2 py-1 relative transform-gpu">
+              <div className={`flex-1 h-full flex items-center justify-around px-2 py-1 relative transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-full bg-[#290a36] border border-white/5 shadow-[0_12px_32px_rgba(0,0,0,0.15)]"
+                  : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)]"
+              }`}>
                 {showCopiedNotify ? (
                   <div
                     className="flex items-center justify-center gap-2.5 text-white font-normal text-sm tracking-wide select-none animate-fade-in"
@@ -3389,7 +4110,7 @@ export default function App() {
                   <div className="flex items-center justify-around w-full h-full">
                     {[
                       { id: "home", icon: Home, label: "Home", isVtvGo: false },
-                      { id: "live", icon: Compass, label: "Trực tiếp", isVtvGo: false },
+                      { id: "live", icon: Radio, label: "Live", isVtvGo: false },
                       ...customTabs.map((t: any) => ({
                         id: t.id,
                         icon: ICON_REGISTRY[t.iconName] || Sparkles,
@@ -3398,13 +4119,18 @@ export default function App() {
                         isCustom: true,
                         code: t.code
                       })),
-                      { id: "settings", icon: Settings, label: "Cài đặt", isVtvGo: false },
+                      { id: "settings", icon: Settings, label: "Settings", isVtvGo: false },
                       { id: "vtvgo", icon: Star, label: "VTVgo", isVtvGo: true },
                     ].map((tab) => {
                       const isActive = tab.isVtvGo 
                         ? (activeTab === "live" && selectedChannel?.id === "vietnam-wild-live")
                         : (activeTab === tab.id && !(activeTab === "live" && selectedChannel?.id === "vietnam-wild-live"));
                       const Icon = tab.icon;
+                      const materialIconUrl = isMaterialDesignActive ? {
+                        home: "https://static.wikia.nocookie.net/ep-deo/images/7/79/Home_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081313",
+                        live: "https://static.wikia.nocookie.net/ep-deo/images/9/96/Sensors_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081313",
+                        settings: "https://static.wikia.nocookie.net/ep-deo/images/2/26/Settings_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081312"
+                      }[tab.id] : undefined;
                       
                       return (
                         <button 
@@ -3416,7 +4142,7 @@ export default function App() {
                               const startVal = 12 * 60 + 30;
                               const endVal = 14 * 60 + 30;
                               const isUnlocked = timeVal >= startVal && timeVal <= endVal;
-
+ 
                               if (isUnlocked) {
                                 const wildChannel = flattenedChannels.find(ch => ch.id === "vietnam-wild-live");
                                 if (wildChannel) {
@@ -3424,7 +4150,7 @@ export default function App() {
                                   setActiveTab("live");
                                 }
                               } else {
-                                setShowVtvGoLockedModal(true);
+                                  setShowVtvGoLockedModal(true);
                               }
                             } else {
                               setActiveTab(tab.id as any);
@@ -3453,21 +4179,45 @@ export default function App() {
                               }
                             }
                           }}
-                          className={`relative flex flex-col items-center justify-center flex-1 h-full cursor-default z-10 bouncy-btn px-2 transition-all transform-gpu ${
+                          className={`relative flex flex-col items-center justify-center flex-1 h-full cursor-default z-10 px-2 transition-all transform-gpu ${
+                            isMaterialDesignActive ? "duration-200" : "bouncy-btn"
+                          } ${
                             isActive 
-                              ? "text-indigo-950 font-normal" 
-                              : "text-white/65 hover:text-white"
+                              ? (isMaterialDesignActive ? "text-white font-medium" : "text-indigo-950 font-normal") 
+                              : (isMaterialDesignActive ? "text-white/60 hover:text-white" : "text-white/65 hover:text-white")
                           }`}
                           title={tab.label}
                         >
                           {isActive && (
                             <motion.div
                               layoutId="activeTabPill"
-                              transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                              className="absolute inset-y-1 inset-x-1 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
+                              transition={isMaterialDesignActive
+                                ? { type: "tween", duration: 0.18, ease: "easeInOut" }
+                                : (dynamicMotion ? { type: "spring", stiffness: 350, damping: 25 } : { type: "tween", duration: 0 })
+                              }
+                              className={isMaterialDesignActive 
+                                ? "absolute w-14 h-8 bg-[#c9b2fa] rounded-full -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-none border-0"
+                                : "absolute inset-y-1 inset-x-1 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
+                              }
                             />
                           )}
-                          <Icon className={`w-7 h-7 transition-transform duration-300 ${isActive ? "scale-105" : ""}`} />
+                          {materialIconUrl ? (
+                            <img
+                              src={materialIconUrl}
+                              className={`w-6 h-6 transition-transform duration-300 ${isActive && !isMaterialDesignActive ? "scale-105" : ""}`}
+                              style={isMaterialDesignActive
+                                ? { filter: isActive ? "brightness(0)" : "brightness(0) invert(1)", opacity: isActive ? 1.0 : 0.6 }
+                                : (isActive 
+                                  ? { filter: "invert(85%) sepia(21%) saturate(1021%) hue-rotate(217deg) brightness(101%) contrast(102%)" } 
+                                  : { filter: "invert(27%) sepia(8%) saturate(1008%) hue-rotate(216deg) brightness(97%) contrast(88%)" }
+                                )
+                              }
+                              referrerPolicy="no-referrer"
+                              alt={tab.label}
+                            />
+                          ) : (
+                            <Icon className={`w-6 h-6 transition-transform duration-300 ${isActive && !isMaterialDesignActive ? "scale-105" : ""} ${isActive && isMaterialDesignActive ? "text-white opacity-100" : (isMaterialDesignActive ? "text-white opacity-60" : "")}`} />
+                          )}
                         </button>
                       );
                     })}
@@ -3481,15 +4231,29 @@ export default function App() {
                   setPrevTab(activeTab as any);
                   setActiveTab("search");
                 }}
-                className="w-16 h-16 rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] flex items-center justify-center text-white/70 hover:text-white bouncy-btn hover:border-white/40 group shrink-0 transform-gpu"
-                title="Tìm kiếm"
+                className={`w-16 h-16 flex items-center justify-center group shrink-0 transform-gpu transition-all ${
+                  isMaterialDesignActive
+                    ? "bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white shadow-lg border-0 rounded-[20px] duration-200"
+                    : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
+                }`}
+                title="Search"
               >
-                <img 
-                  src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
-                  className="w-6.5 h-6.5 brightness-0 invert opacity-95 transition-all duration-300 group-hover:scale-110 pointer-events-none object-contain" 
-                  referrerPolicy="no-referrer"
-                  alt="Search"
-                />
+                {isMaterialDesignActive ? (
+                  <img
+                    src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
+                    className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
+                    style={{ filter: "brightness(0)" }}
+                    referrerPolicy="no-referrer"
+                    alt="Search"
+                  />
+                ) : (
+                  <img 
+                    src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
+                    className="w-6.5 h-6.5 brightness-0 invert opacity-95 transition-all duration-300 group-hover:scale-110 pointer-events-none object-contain" 
+                    referrerPolicy="no-referrer"
+                    alt="Search"
+                  />
+                )}
               </button>
             </motion.div>
           )}
@@ -3536,54 +4300,70 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
             className="fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 1.15 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.15 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-[350px] rounded-[30px] bg-[#e5e5ea]/85 p-5 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.2),0_24px_48px_rgba(0,0,0,0.12)] relative border border-white/20 text-black text-left transform-gpu"
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+              className={`w-full max-w-[350px] relative text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#e5e5ea]/85 p-5 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.2),0_24px_48px_rgba(0,0,0,0.12)] relative border border-white/20 text-black"
+              }`}
             >
-              <h3 className="text-[18px] font-semibold text-black tracking-tight leading-snug">
-                Tạo kênh
+              <h3 className={`text-[18px] font-semibold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-black"}`}>
+                {t("modal.ChannelCreate.title")}
               </h3>
-              <p className="text-[12px] text-black/60 mb-4 leading-relaxed px-1 mt-1">
-                Thêm luồng kênh mới vào danh sách kênh bằng cách nhập đường dẫn URL của luồng kênh đó
+              <p className={`text-[12px] mb-4 leading-relaxed px-1 mt-1 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-black/60"}`}>
+                {t("modal.ChannelCreate.desc")}
               </p>
 
               <form onSubmit={handleAddCustomChannel} className="space-y-3.5 text-sm">
                 <div className="space-y-1 text-left">
-                  <label className="text-[11.5px] font-semibold text-black/60 block px-1">Nhập tên kênh</label>
+                  <label className={`text-[11.5px] font-semibold block px-1 ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-black/60"}`}>{t("modal.ChannelCreate.nameLabel")}</label>
                   <input
                     required
                     type="text"
-                    placeholder="Kênh của tôi"
+                    placeholder="My Custom Channel"
                     value={customChannelName}
                     onChange={(e) => setCustomChannelName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-full bg-white/75 text-black placeholder-black/40 border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-xs font-normal"
+                    className={`w-full px-4 text-xs font-normal ${
+                      isMaterialDesignActive
+                        ? "py-3 rounded-xl bg-[#36343b] text-white placeholder-white/30 border-b-2 border-[#79747e] focus:border-[#d0bcff] focus:outline-none transition-all"
+                        : "py-2.5 rounded-full bg-white/75 text-black placeholder-black/40 border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    }`}
                   />
                 </div>
 
                 <div className="space-y-1 text-left">
-                  <label className="text-[11.5px] font-semibold text-black/60 block px-1">Nhập đường dẫn</label>
+                  <label className={`text-[11.5px] font-semibold block px-1 ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-black/60"}`}>{t("modal.ChannelCreate.urlLabel")}</label>
                   <input
                     required
                     type="url"
                     placeholder="https://example.com/live/stream.m3u8"
                     value={customChannelUrl}
                     onChange={(e) => setCustomChannelUrl(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-full bg-white/75 text-black placeholder-black/40 border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-xs font-normal font-mono"
+                    className={`w-full px-4 text-xs font-normal font-mono ${
+                      isMaterialDesignActive
+                        ? "py-3 rounded-xl bg-[#36343b] text-white placeholder-white/30 border-b-2 border-[#79747e] focus:border-[#d0bcff] focus:outline-none transition-all"
+                        : "py-2.5 rounded-full bg-white/75 text-black placeholder-black/40 border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    }`}
                   />
                 </div>
 
                 <div className="space-y-1 text-left">
-                  <label className="text-[11.5px] font-semibold text-black/60 block px-1">Chọn nhóm kênh</label>
+                  <label className={`text-[11.5px] font-semibold block px-1 ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-black/60"}`}>{t("modal.ChannelCreate.groupLabel")}</label>
                   <select
                     value={customChannelGroup}
                     onChange={(e) => setCustomChannelGroup(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-full bg-white/75 text-black border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-xs font-normal appearance-none cursor-pointer pr-10 relative"
+                    className={`w-full px-4 text-xs font-normal appearance-none cursor-pointer pr-10 relative ${
+                      isMaterialDesignActive
+                        ? "py-3 rounded-xl bg-[#36343b] text-white border-b-2 border-[#79747e] focus:border-[#d0bcff] focus:outline-none transition-all"
+                        : "py-2.5 rounded-full bg-white/75 text-black border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    }`}
                     style={{
                       backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
                       backgroundPosition: 'right 14px center',
@@ -3591,15 +4371,15 @@ export default function App() {
                       backgroundRepeat: 'no-repeat'
                     }}
                   >
-                    <option value="VTV">Kênh VTV</option>
-                    <option value="VTVcab">Kênh VTVcab</option>
-                    <option value="HTV">Kênh HTV</option>
-                    <option value="SCTV">Kênh SCTV</option>
-                    <option value="Địa phương">Kênh địa phương & Thiết yếu</option>
-                    <option value="Quốc tế">Kênh Quốc Tế & Đặc Sắc</option>
-                    <option value="Radio">Kênh Phát Thanh (Radio)</option>
-                    <option value="Thử nghiệm">Kênh Thử Nghiệm</option>
-                    <option value="NEW_GROUP">+ Tự tạo nhóm mới...</option>
+                    <option value="VTV" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>VTV Channels</option>
+                    <option value="VTVcab" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>VTVcab Channels</option>
+                    <option value="HTV" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>HTV Channels</option>
+                    <option value="SCTV" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>SCTV Channels</option>
+                    <option value="Địa phương" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>Local & Essential Channels</option>
+                    <option value="Quốc tế" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>International & Featured Channels</option>
+                    <option value="Radio" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>Radio Channels</option>
+                    <option value="Thử nghiệm" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>Staging/Experimental Channels</option>
+                    <option value="NEW_GROUP" className={isMaterialDesignActive ? "bg-[#36343b] text-white" : ""}>+ Create custom group...</option>
                   </select>
                 </div>
 
@@ -3609,14 +4389,18 @@ export default function App() {
                     animate={{ opacity: 1, height: "auto" }}
                     className="space-y-1 text-left"
                   >
-                    <label className="text-[11.5px] font-semibold text-black/60 block px-1">Nhập tên nhóm mới</label>
+                    <label className={`text-[11.5px] font-semibold block px-1 ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-black/60"}`}>Enter new group name</label>
                     <input
                       required
                       type="text"
-                      placeholder="Ví dụ: Kênh Riêng"
+                      placeholder="e.g. My Private Channels"
                       value={customGroupInput}
                       onChange={(e) => setCustomGroupInput(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-full bg-white/75 text-black placeholder-black/40 border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-xs font-normal"
+                      className={`w-full px-4 text-xs font-normal ${
+                        isMaterialDesignActive
+                          ? "py-3 rounded-xl bg-[#36343b] text-white placeholder-white/30 border-b-2 border-[#79747e] focus:border-[#d0bcff] focus:outline-none transition-all"
+                          : "py-2.5 rounded-full bg-white/75 text-black placeholder-black/40 border border-black/5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      }`}
                     />
                   </motion.div>
                 )}
@@ -3625,15 +4409,23 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setShowCustomModal(false)}
-                    className="flex-1 py-3 px-4 rounded-full bg-black/10 hover:bg-black/15 active:scale-95 transition-all text-[#ff3b30] font-semibold text-[15px] text-center cursor-default"
+                    className={`flex-1 py-3 px-4 rounded-full font-semibold text-[15px] text-center cursor-default ${
+                      isMaterialDesignActive
+                        ? "text-[#ffb4ab] bg-transparent hover:bg-white/5 active:scale-95 transition-all"
+                        : "bg-black/10 hover:bg-black/15 active:scale-95 transition-all text-[#ff3b30]"
+                    }`}
                   >
-                    Cancel
+                    {t("modal.ChannelCreate.cancel")}
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 px-4 rounded-full bg-[#007aff] hover:bg-[#0066d6] active:scale-95 transition-all text-white font-semibold text-[15px] text-center cursor-default shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),0_2px_6px_rgba(0,122,255,0.25)]"
+                    className={`flex-1 py-3 px-4 rounded-full font-semibold text-[15px] text-center cursor-default ${
+                      isMaterialDesignActive
+                        ? "bg-[#d0bcff] hover:bg-[#bfa8eb] active:scale-95 transition-all text-[#381e72]"
+                        : "bg-[#007aff] hover:bg-[#0066d6] active:scale-95 transition-all text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),0_2px_6px_rgba(0,122,255,0.25)]"
+                    }`}
                   >
-                    Create
+                    {t("modal.ChannelCreate.create")}
                   </button>
                 </div>
               </form>
@@ -3653,14 +4445,18 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.35 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.35 }}
               className="fixed inset-0 bg-black/60 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4"
             >
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                className="w-full max-w-lg rounded-3xl bg-[#120e24]/90 border border-white/10 p-6 shadow-2xl relative text-white text-left overflow-hidden flex flex-col gap-4 font-sans"
+                initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 15 }}
+                animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+                exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 15 }}
+                className={`w-full max-w-lg p-6 shadow-2xl relative text-left overflow-hidden flex flex-col gap-4 font-sans ${
+                  isMaterialDesignActive
+                    ? "rounded-[28px] bg-[#211f26] border-0 text-[#e6e1e5]"
+                    : "rounded-3xl bg-[#120e24]/90 border border-white/10 text-white"
+                }`}
               >
                 {/* Close Button */}
                 <button
@@ -3679,7 +4475,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-white leading-tight">{modal.name}</h3>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">Hộp thoại Pop-up tùy chỉnh</p>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">Custom pop-up modal</p>
                   </div>
                 </div>
 
@@ -3691,7 +4487,7 @@ export default function App() {
                   />
                 ) : (
                   <p className="py-2 text-sm text-white/60 text-center">
-                    Giao diện hộp thoại trống. Nhấp nút 'Chạy chức năng' để khởi chạy logic script đã thiết lập.
+                    Prisline blank dialog. Click 'Run Function' to execute your custom script.
                   </p>
                 )}
 
@@ -3703,7 +4499,7 @@ export default function App() {
                     }}
                     className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium text-xs transition-colors cursor-pointer"
                   >
-                    Đóng
+                    Close
                   </button>
                   <button
                     onClick={() => {
@@ -3726,12 +4522,12 @@ export default function App() {
                           setPlaybackError
                         );
                       } catch (err: any) {
-                        alert(`Lỗi thực thi script: ${err.message}`);
+                        alert(`Script execution error: ${err.message}`);
                       }
                     }}
                     className="px-4.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white transition-colors flex items-center gap-1.5 shadow-lg shadow-indigo-600/25 cursor-pointer"
                   >
-                    <Play className="w-3 h-3 fill-white" /> Chạy chức năng
+                    <Play className="w-3 h-3 fill-white" /> Run Function
                   </button>
                 </div>
               </motion.div>
@@ -3747,28 +4543,36 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
             className="fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 1.15 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.15 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-[350px] rounded-[30px] bg-[#e5e5ea]/85 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.2),0_24px_48px_rgba(0,0,0,0.12)] relative border border-white/20 text-black text-left transform-gpu"
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+              className={`w-full max-w-[350px] relative text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#e5e5ea]/85 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.2),0_24px_48px_rgba(0,0,0,0.12)] border border-white/20 text-black"
+              }`}
             >
-              <h3 className="text-[18px] font-semibold text-black tracking-tight leading-snug">
-                title.special_event.title.name
+              <h3 className={`text-[18px] font-semibold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-black"}`}>
+                {t("title.special_event.title.name")}
               </h3>
-              <p className="text-[12px] text-black/60 mb-5 leading-relaxed mt-2">
-                title.special_event.desc.name
+              <p className={`text-[12px] mb-5 leading-relaxed mt-2 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-black/60"}`}>
+                {t("title.special_event.desc.name")}
               </p>
               
               <button
                 onClick={() => setShowVtvGoLockedModal(false)}
-                className="w-full py-3 px-4 rounded-full bg-[#007aff] hover:bg-[#0066d6] hover:scale-[1.03] active:scale-95 transition-all duration-300 text-white font-semibold text-[15px] text-center cursor-default shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),0_2px_6px_rgba(0,122,255,0.25)] transform-gpu"
+                className={`w-full py-3 px-4 rounded-full font-semibold text-[15px] text-center cursor-default transform-gpu ${
+                  isMaterialDesignActive
+                    ? "bg-[#d0bcff] hover:bg-[#bfa8eb] active:scale-95 transition-all text-[#381e72]"
+                    : "bg-[#007aff] hover:bg-[#0066d6] hover:scale-[1.03] active:scale-95 transition-all duration-300 text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),0_2px_6px_rgba(0,122,255,0.25)]"
+                }`}
               >
-                modal.close_button.name
+                {t("modal.close_button.name")}
               </button>
             </motion.div>
           </motion.div>
@@ -3782,15 +4586,19 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 bg-black/50 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 1.15 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.15 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-[350px] rounded-[30px] bg-[#120e24]/90 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.05),0_24px_48px_rgba(0,0,0,0.5)] relative border border-white/10 text-white text-left transform-gpu"
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className={`w-full max-w-[350px] p-6 text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] border-0 shadow-2xl text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#120e24]/90 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.05),0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 text-white"
+              }`}
             >
               <div className="flex items-center gap-2.5 mb-4">
                 <img 
@@ -3802,18 +4610,22 @@ export default function App() {
                 <span className="font-sans font-black text-base bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent uppercase tracking-wider select-none">360</span>
               </div>
               
-              <h3 className="text-[17px] font-semibold text-white tracking-tight leading-snug">
-                Vplay360 - Phiên bản 2.4.0
+              <h3 className={`text-[17px] font-semibold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
+                Vplay360 - Version 2.4.0
               </h3>
-              <p className="text-[12px] text-white/60 mb-5 leading-relaxed mt-2">
-                Trải nghiệm truyền hình trực tuyến chất lượng cao, độ trễ thấp với giao diện hiện đại, mượt mà và tối ưu hóa tối đa cho mọi thiết bị.
+              <p className={`text-[12px] mb-5 leading-relaxed mt-2 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/60"}`}>
+                High-quality, low-latency online television streaming experience featuring a sleek, modern UI optimized for all devices.
               </p>
               
               <button
                 onClick={() => setShowAboutModal(false)}
-                className="w-full py-3 px-4 rounded-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 hover:scale-[1.03] active:scale-95 transition-all duration-300 text-white font-semibold text-[14px] text-center cursor-default shadow-md transform-gpu"
+                className={`w-full py-3 px-4 rounded-full font-semibold text-center cursor-default transform-gpu ${
+                  isMaterialDesignActive
+                    ? "bg-[#d0bcff] hover:bg-[#bfa8eb] active:scale-95 transition-all text-[#381e72] text-[15px]"
+                    : "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 hover:scale-[1.03] active:scale-95 transition-all duration-300 text-white text-[14px] shadow-md"
+                }`}
               >
-                Đóng
+                Close
               </button>
             </motion.div>
           </motion.div>
@@ -3827,23 +4639,31 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 1.15 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.15 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-[380px] rounded-[30px] bg-[#e5e5ea]/85 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.2),0_24px_48px_rgba(0,0,0,0.12)] relative border border-white/20 text-black text-left transform-gpu"
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className={`w-full max-w-[380px] relative text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#e5e5ea]/85 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.45),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.2),0_24px_48px_rgba(0,0,0,0.12)] border border-white/20 text-black"
+              }`}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[18px] font-semibold text-black tracking-tight leading-snug">
-                  Chọn kênh
+                <h3 className={`text-[18px] font-semibold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-black"}`}>
+                  Select Channel
                 </h3>
                 <button
                   onClick={() => setShowVtv5Popup(false)}
-                  className="w-7 h-7 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-black/60 hover:text-black transition-colors bouncy-btn border border-black/5"
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors bouncy-btn ${
+                    isMaterialDesignActive
+                      ? "bg-white/10 hover:bg-white/15 text-[#e6e1e5] border-0"
+                      : "bg-black/5 hover:bg-black/10 text-black/60 hover:text-black border border-black/5"
+                  }`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -3860,28 +4680,38 @@ export default function App() {
                         setActiveTab("live");
                         setShowVtv5Popup(false);
                       }}
-                      className={`w-full flex items-center justify-between p-3.5 rounded-2xl text-left border cursor-pointer transition-colors duration-200 bouncy-btn relative group overflow-hidden ${
+                      className={`w-full flex items-center justify-between p-3.5 rounded-2xl text-left cursor-pointer transition-colors duration-200 bouncy-btn relative group overflow-hidden ${
                         isCurrentPlaying
-                          ? "bg-white border-blue-500/30 text-black shadow-sm"
-                          : "bg-white/45 hover:bg-white/75 border-black/5 hover:border-black/10"
+                          ? (isMaterialDesignActive
+                              ? "bg-[#d0bcff] text-[#381e72] border-0"
+                              : "bg-white border-blue-500/30 text-black shadow-sm")
+                          : (isMaterialDesignActive
+                              ? "bg-[#36343b] hover:bg-[#49454f] border-0 text-white"
+                              : "bg-white/45 hover:bg-white/75 border-black/5 hover:border-black/10")
                       }`}
                     >
                       {/* Content Middle */}
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <h4 className="font-semibold text-black text-[14px] tracking-tight group-hover:text-blue-600 transition-colors truncate">
+                        <h4 className={`font-semibold text-[14px] tracking-tight transition-colors truncate ${
+                          isCurrentPlaying
+                            ? (isMaterialDesignActive ? "text-[#381e72]" : "text-black group-hover:text-blue-600")
+                            : (isMaterialDesignActive ? "text-[#e6e1e5]" : "text-black group-hover:text-blue-600")
+                        }`}>
                           {opt.name}
                         </h4>
                         {isCurrentPlaying && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse shrink-0" />
+                          <span className={`w-1.5 h-1.5 rounded-full animate-pulse shrink-0 ${isMaterialDesignActive ? "bg-[#381e72]" : "bg-blue-600"}`} />
                         )}
                       </div>
 
                       {/* Right Indicator */}
-                      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-black/5 group-hover:bg-black/10 border border-black/5 transition-colors shrink-0">
+                      <div className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors shrink-0 ${
+                        isMaterialDesignActive ? "bg-white/10" : "bg-black/5 group-hover:bg-black/10 border border-black/5"
+                      }`}>
                         {isCurrentPlaying ? (
-                          <Check className="w-3.5 h-3.5 text-blue-600" />
+                          <Check className={`w-3.5 h-3.5 ${isMaterialDesignActive ? "text-[#381e72]" : "text-blue-600"}`} />
                         ) : (
-                          <Play className="w-3 h-3 fill-black text-black translate-x-0.5 opacity-60 group-hover:opacity-100 transition-opacity" />
+                          <Play className={`w-3 h-3 ${isMaterialDesignActive ? "fill-[#e6e1e5] text-[#e6e1e5]" : "fill-black text-black translate-x-0.5 opacity-60 group-hover:opacity-100"} transition-opacity`} />
                         )}
                       </div>
                     </button>
@@ -3893,9 +4723,13 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setShowVtv5Popup(false)}
-                  className="w-full py-3 px-4 rounded-full bg-black/10 hover:bg-black/15 active:scale-95 transition-all text-[#ff3b30] font-semibold text-[15px] text-center cursor-default"
+                  className={`w-full py-3 px-4 rounded-full font-semibold text-[15px] text-center cursor-default ${
+                    isMaterialDesignActive
+                      ? "text-[#ffb4ab] bg-transparent hover:bg-white/5 active:scale-95 transition-all"
+                      : "bg-black/10 hover:bg-black/15 active:scale-95 transition-all text-[#ff3b30]"
+                  }`}
                 >
-                  Đóng
+                  Close
                 </button>
               </div>
             </motion.div>
@@ -3910,33 +4744,41 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 bg-black/50 backdrop-blur-[20px] z-[110] flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 1.15 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.15 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-[420px] rounded-[30px] bg-[#120e24]/90 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.05),0_24px_48px_rgba(0,0,0,0.5)] relative border border-white/10 text-white text-left transform-gpu"
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className={`w-full max-w-[420px] p-6 text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] border-0 shadow-2xl text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#120e24]/90 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.05),0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 text-white"
+              }`}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Grid className="w-5 h-5 text-indigo-400" />
-                  <h3 className="text-[18px] font-semibold text-white tracking-tight leading-snug">
+                  <Grid className={`w-5 h-5 ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-indigo-400"}`} />
+                  <h3 className={`text-[18px] font-semibold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
                     Xem Multiview
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowMultiviewSelectorPopup(false)}
-                  className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors bouncy-btn border border-white/5"
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors bouncy-btn ${
+                    isMaterialDesignActive
+                      ? "bg-white/10 hover:bg-white/15 text-[#e6e1e5] border-0"
+                      : "bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/5"
+                  }`}
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <p className="text-[12px] text-white/60 mb-5 leading-relaxed">
-                Chọn số lượng luồng kênh bạn muốn xem cùng một lúc (từ 2 đến 9 kênh). Màn hình sẽ được chia đều tương ứng.
+              <p className={`text-[12px] mb-5 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/60"}`}>
+                Select the number of channel streams to view simultaneously (from 2 to 9). The grid splits evenly.
               </p>
 
               <div className="grid grid-cols-4 gap-3 mb-6">
@@ -3947,10 +4789,14 @@ export default function App() {
                       handleSelectMultiviewCount(num);
                       setShowMultiviewSelectorPopup(false);
                     }}
-                    className="aspect-square flex flex-col items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-400/50 hover:text-indigo-300 transition-all cursor-pointer bouncy-btn"
+                    className={`aspect-square flex flex-col items-center justify-center rounded-2xl transition-all cursor-pointer bouncy-btn ${
+                      isMaterialDesignActive
+                        ? "bg-[#36343b] hover:bg-[#49454f] text-white border-0"
+                        : "bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-400/50 hover:text-indigo-300"
+                    }`}
                   >
-                    <span className="text-xl font-bold">{num}</span>
-                    <span className="text-[10px] text-white/50 font-sans font-normal">ô kênh</span>
+                    <span className={`text-xl font-bold ${isMaterialDesignActive ? "text-[#d0bcff]" : ""}`}>{num}</span>
+                    <span className={`text-[10px] font-sans font-normal ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/50"}`}>screens</span>
                   </button>
                 ))}
               </div>
@@ -3958,9 +4804,13 @@ export default function App() {
               <div className="flex justify-end gap-2.5">
                 <button
                   onClick={() => setShowMultiviewSelectorPopup(false)}
-                  className="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-white font-medium text-[13px] text-center cursor-default transition-all"
+                  className={`px-5 py-2.5 rounded-full font-medium text-[13px] text-center cursor-default transition-all ${
+                    isMaterialDesignActive
+                      ? "text-[#ffb4ab] bg-transparent hover:bg-white/5"
+                      : "bg-white/5 hover:bg-white/10 text-white"
+                  }`}
                 >
-                  Hủy bỏ
+                  Cancel
                 </button>
               </div>
             </motion.div>
@@ -3975,27 +4825,37 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 bg-black/55 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 1.12 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.12 }}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-4xl max-h-[85vh] rounded-[30px] bg-[#120e24]/95 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.05),0_24px_48px_rgba(0,0,0,0.5)] relative border border-white/10 text-white flex flex-col text-left transform-gpu overflow-hidden"
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.12 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.12 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className={`w-full max-w-4xl max-h-[85vh] p-6 flex flex-col text-left transform-gpu overflow-hidden ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] border-0 shadow-2xl text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#120e24]/95 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.05),0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 text-white"
+              }`}
             >
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4 shrink-0">
+              <div className={`flex items-center justify-between pb-4 mb-4 shrink-0 border-b ${
+                isMaterialDesignActive ? "border-white/10" : "border-white/10"
+              }`}>
                 <div className="flex items-center gap-2">
-                  <Tv className="w-5 h-5 text-indigo-400" />
-                  <h3 className="text-[18px] font-semibold text-white tracking-tight leading-snug">
-                    Chọn kênh cho Khung {activeMultiviewSlotIndex !== null ? activeMultiviewSlotIndex + 1 : ""}
+                  <Tv className={`w-5 h-5 ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-indigo-400"}`} />
+                  <h3 className={`text-[18px] font-semibold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
+                    Select channel for Frame {activeMultiviewSlotIndex !== null ? activeMultiviewSlotIndex + 1 : ""}
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowMultiviewChannelPickerPopup(false)}
-                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors bouncy-btn border border-white/5"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors bouncy-btn ${
+                    isMaterialDesignActive
+                      ? "bg-white/10 hover:bg-white/15 text-[#e6e1e5] border-0"
+                      : "bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/5"
+                  }`}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -4003,13 +4863,17 @@ export default function App() {
 
               {/* Search bar inside picker */}
               <div className="mb-4 relative shrink-0">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/40"}`} />
                 <input
                   type="text"
-                  placeholder="Tìm kiếm kênh muốn thêm..."
+                  placeholder="Search channels to add..."
                   value={pickerSearchQuery}
                   onChange={(e) => setPickerSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 focus:outline-none text-white text-xs transition-all placeholder:text-white/30"
+                  className={`w-full pl-11 pr-4 py-2.5 text-xs transition-all ${
+                    isMaterialDesignActive
+                      ? "rounded-xl bg-[#36343b] text-white placeholder-white/30 border-b-2 border-[#79747e] focus:border-[#d0bcff] focus:outline-none"
+                      : "rounded-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 focus:outline-none text-white placeholder:text-white/30"
+                  }`}
                 />
               </div>
 
@@ -4021,11 +4885,11 @@ export default function App() {
                   return (
                     <div key={cat.id} className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs sm:text-sm font-semibold text-white/80 tracking-tight uppercase">
+                        <h4 className={`text-xs sm:text-sm font-semibold tracking-tight uppercase ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/80"}`}>
                           {cat.name}
                         </h4>
-                        <span className="text-[10px] sm:text-xs text-white/40 font-mono font-normal">
-                          {cat.channels.length} Kênh
+                        <span className={`text-[10px] sm:text-xs font-mono font-normal ${isMaterialDesignActive ? "text-[#cac4d0]/60" : "text-white/40"}`}>
+                          {cat.channels.length} Channels
                         </span>
                       </div>
 
@@ -4041,9 +4905,11 @@ export default function App() {
                                 setShowMultiviewChannelPickerPopup(false);
                               }}
                               className={`group relative rounded-xl p-0.5 sm:p-1 cursor-pointer flex items-center justify-center h-[64px] sm:h-[80px] select-none text-left w-full transition-all duration-300 transform hover:scale-[1.02] ${
-                                isDacBiet
-                                  ? "bg-amber-500/5 border border-amber-400/30 hover:border-amber-400 hover:bg-amber-500/10"
-                                  : "bg-white/5 border border-white/10 hover:border-white hover:bg-white/10"
+                                isMaterialDesignActive
+                                  ? "bg-[#36343b] hover:bg-[#49454f] border-0 text-[#e6e1e5]"
+                                  : (isDacBiet
+                                      ? "bg-amber-500/5 border border-amber-400/30 hover:border-amber-400 hover:bg-amber-500/10"
+                                      : "bg-white/5 border border-white/10 hover:border-white hover:bg-white/10")
                               }`}
                               title={ch.name}
                             >
@@ -4070,8 +4936,8 @@ export default function App() {
                 })}
 
                 {filteredCategoriesForPicker.every(c => c.channels.length === 0) && (
-                  <div className="py-12 text-center text-white/40 text-xs">
-                    Không tìm thấy kênh nào khớp với từ khóa của bạn.
+                  <div className={`py-12 text-center text-xs ${isMaterialDesignActive ? "text-[#cac4d0]/40" : "text-white/40"}`}>
+                    No channels matched your search keyword.
                   </div>
                 )}
               </div>

@@ -184,15 +184,15 @@ const vietnamWildLiveChannel: Channel = {
 
 // Category template definitions
 const categoryTemplates = [
-  { id: "dac-biet", name: "home.categories.Special.name", description: "Các sự kiện và luồng phát đặc biệt" },
-  { id: "vtv", name: "home.categories.VTV.name", description: "Các kênh sóng truyền hình quốc gia VTV" },
-  { id: "vtvcab", name: "home.categories.VTVCab.name", description: "Kênh giải trí thể thao, phim ảnh tổng hợp đặc sắc" },
-  { id: "htv", name: "home.categories.HTV.name", description: "Các kênh sóng truyền hình Đài Thành phố Hồ Chí Minh" },
-  { id: "sctv", name: "home.categories.SCTV.name", description: "Các kênh giải trí, khoa học và phim truyện SCTV cáp" },
-  { id: "dia-phuong", name: "home.categories.Local.name", description: "Truyền hình địa phương, kênh liên tỉnh bản quyền" },
-  { id: "quoc-te", name: "home.categories.International.name", description: "Kênh tin tức thời sự thế giới, phim hoạt hình nổi tiếng nước ngoài" },
-  { id: "phat-thanh-radio", name: "home.categories.Radio.name", description: "Các đài phát thanh VOV, VOH, FM Giao thông đặc sắc" },
-  { id: "thu-nghiem", name: "home.categories.Experimental.name", description: "Kênh truyền hình thử nghiệm luồng phát kỹ thuật" }
+  { id: "dac-biet", name: "home.categories.Special.name", description: "Special events and streaming feeds" },
+  { id: "vtv", name: "home.categories.VTV.name", description: "VTV National Television channels" },
+  { id: "vtvcab", name: "home.categories.VTVCab.name", description: "Specialized sports, movies, and general entertainment channels" },
+  { id: "htv", name: "home.categories.HTV.name", description: "Ho Chi Minh City Television channels" },
+  { id: "sctv", name: "home.categories.SCTV.name", description: "SCTV Cable entertainment, science, and movie channels" },
+  { id: "dia-phuong", name: "home.categories.Local.name", description: "Local television and copyrighted interprovincial channels" },
+  { id: "quoc-te", name: "home.categories.International.name", description: "World news and popular international cartoon channels" },
+  { id: "phat-thanh-radio", name: "home.categories.Radio.name", description: "Popular VOV, VOH, and FM Traffic radio stations" },
+  { id: "thu-nghiem", name: "home.categories.Experimental.name", description: "Experimental channels and technical testing streams" }
 ];
 
 // Dynamically construct and populate categories based on channel groups

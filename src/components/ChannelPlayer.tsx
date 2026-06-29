@@ -20,7 +20,8 @@ import {
   SkipBack,
   SkipForward,
   RefreshCw,
-  Heart
+  Heart,
+  ThumbsUp
 } from "lucide-react";
 import { Channel } from "../data/channels";
 
@@ -35,6 +36,7 @@ interface ChannelPlayerProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onPlaybackError?: (error: boolean, isTimeout?: boolean) => void;
+  isMaterialDesignActive?: boolean;
 }
 
 export default function ChannelPlayer({
@@ -48,6 +50,7 @@ export default function ChannelPlayer({
   isFavorite = false,
   onToggleFavorite,
   onPlaybackError,
+  isMaterialDesignActive = false,
 }: ChannelPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -585,7 +588,11 @@ export default function ChannelPlayer({
                 className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default group"
                 title={isFavorite ? "Bỏ yêu thích" : "Yêu thích kênh"}
               >
-                <Heart className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-all duration-300 ${isFavorite ? "text-red-500 fill-red-500 scale-110" : "text-white/80 group-hover:text-red-400 group-hover:scale-110"}`} />
+                {isMaterialDesignActive ? (
+                  <ThumbsUp className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-all duration-300 ${isFavorite ? "text-[#d0bcff] fill-[#d0bcff] scale-110" : "text-white/80 group-hover:text-[#d0bcff] group-hover:scale-110"}`} />
+                ) : (
+                  <Heart className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-all duration-300 ${isFavorite ? "text-red-500 fill-red-500 scale-110" : "text-white/80 group-hover:text-red-400 group-hover:scale-110"}`} />
+                )}
               </button>
 
               {/* Button 2: Skip back */}

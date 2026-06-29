@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.cdnfonts.com/css/google-sans');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-google: "Inter", sans-serif;
+  --font-google: "Google Sans", "Product Sans", "Inter", sans-serif;
   --font-montserrat: "Montserrat", sans-serif;
 }
 
@@ -193,13 +194,73 @@
 .no-liquid-glass .bg-black\/55,
 .no-liquid-glass .bg-black\/60,
 .no-liquid-glass .bg-black\/75,
-.no-liquid-glass .bg-black\/95,
 .no-liquid-glass .bg-[#07050f],
 .no-liquid-glass .bg-[#07050f]\/80 {
-  background-color: #1a1a1c !important;
+  background-color: #1a1a1c !important; /* 100% dark gray */
+  opacity: 1 !important;
   background-image: none !important;
-  border-color: #2c2c2e !important;
+  border: none !important; /* Bỏ toàn bộ shiny border */
+  border-color: transparent !important;
   box-shadow: none !important;
+}
+
+/* Plugin: Material Design 3 of Google */
+.material-design-3,
+.material-design-3 * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  font-family: 'Google Sans', 'Product Sans', 'Inter', sans-serif !important;
+}
+
+.material-design-3 .progressive-blur-header,
+.material-design-3 .progressive-blur-dock,
+.material-design-3 .progressive-blur-player {
+  opacity: 0 !important;
+}
+
+.material-design-3 .glass-panel,
+.material-design-3 .glass-panel-deep,
+.material-design-3 .bg-white\/10,
+.material-design-3 .bg-white\/5,
+.material-design-3 .bg-white\/12,
+.material-design-3 .bg-white\/15,
+.material-design-3 .bg-black\/25,
+.material-design-3 .bg-black\/50,
+.material-design-3 .bg-black\/55,
+.material-design-3 .bg-black\/60,
+.material-design-3 .bg-black\/75,
+.material-design-3 .bg-black\/95,
+.material-design-3 .bg-[#07050f],
+.material-design-3 .bg-[#07050f]\/80 {
+  background-color: #290a36 !important; /* Google M3 Dark Surface Container */
+  background-image: none !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4) !important; /* Google M3 Shadow */
+  border-radius: 24px !important; /* Google M3 generous rounded corner layout */
+}
+
+.material-design-3 button,
+.material-design-3 .glass-pill {
+  border-radius: 20px !important; /* Changed to 20px for Material Design button spec requested by user */
+}
+
+.material-design-3 input,
+.material-design-3 select {
+  border-radius: 12px !important; /* MD3 text fields generally have rounded-xl or rounded-lg */
+}
+
+.material-design-3 .bg-[#007aff] {
+  background-color: #d0bcff !important; /* M3 Lavender primary */
+  color: #381e72 !important; /* M3 text colour on purple */
+}
+
+.material-design-3 .text-[#007aff] {
+  color: #d0bcff !important;
+}
+
+.material-design-3 .border-[#007aff] {
+  border-color: #d0bcff !important;
 }
 
 /* Accessibility: Dynamic Motion Disabled Overrides */
@@ -209,4 +270,22 @@
   animation: none !important;
   animation-duration: 0s !important;
 }
+
+/* Material Design 3 Bouncy Button Hover Overrides */
+body.material-design-active .bouncy-btn,
+.material-design-active .bouncy-btn {
+  transform: none !important;
+  transition: background-color 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+body.material-design-active .bouncy-btn:hover,
+.material-design-active .bouncy-btn:hover {
+  transform: none !important;
+}
+
+body.material-design-active .bouncy-btn:active,
+.material-design-active .bouncy-btn:active {
+  transform: none !important;
+}
+
 
