@@ -39,6 +39,24 @@ interface ChannelPlayerProps {
   isMaterialDesignActive?: boolean;
 }
 
+const translateName = (key: string): string => {
+  if (!key) return "";
+  if (key.startsWith("live_feed.") && key.endsWith(".name")) {
+    const core = key.substring(10, key.length - 5);
+    if (core === "VietnamWildLive") {
+      return "Vietnam Wild Live";
+    }
+    if (core === "VTV6Test") {
+      return "VTV6 Test Stream";
+    }
+    if (core.startsWith("VTVgo")) {
+      return "VTVgo " + core.substring(5);
+    }
+    return core.replace(/([A-Z])/g, ' $1').trim();
+  }
+  return key;
+};
+
 export default function ChannelPlayer({
   channel,
   volume,
@@ -68,7 +86,7 @@ export default function ChannelPlayer({
   const gainRef = useRef<GainNode | null>(null);
   const [testcardTime, setTestcardTime] = useState<string>("");
 
-  const isTestcard = channel.url === "#testcard" || channel.id === "vtv6_test" || channel.id.startsWith("vtvgo_");
+  const isTestcard = channel.url === "#testcard" || channel.id === "vtv6_test" || channel.id.startsWith("vtvgo_") || channel.id === "vietnam-wild-live";
 
   const stopBeep = () => {
     if (oscRef.current) {
@@ -419,7 +437,23 @@ export default function ChannelPlayer({
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent opacity-10 pointer-events-none z-10" />
 
             {/* If it's a regular testcard channel */}
-            {isTestcard && !hasError && null}
+            {isTestcard && !hasError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px] z-10 p-4 font-sans">
+                <div className="w-full max-w-sm sm:max-w-md bg-black/85 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-[0_0_50px_rgba(255,255,255,0.05)] flex flex-col items-center text-center animate-fade-in">
+                  <h3 className="text-white text-base sm:text-lg font-black tracking-wider uppercase mb-1">
+                    {translateName(channel.name)}
+                  </h3>
+                  
+                  <p className="text-white/60 text-xs font-semibold mb-5 tracking-wide uppercase">
+                    NO SIGNAL
+                  </p>
+
+                  <div className="text-xl sm:text-2xl font-mono font-bold text-white bg-white/10 px-4 py-2 rounded-xl border border-white/10 shadow-inner inline-block tracking-widest">
+                    {testcardTime}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* If it's an active stream loading error */}
             {hasError && (
@@ -547,13 +581,17 @@ export default function ChannelPlayer({
                   setProgramInfo(prev => ({ ...prev, progress: pct }));
                 }}
               >
-                {/* Active slider track filled with beautiful vibrant blue */}
+                {/* Active slider track */}
                 <div 
-                  className="h-full bg-[#0084ff] rounded-full relative" 
+                  className={`h-full rounded-full relative ${isMaterialDesignActive ? "bg-[#d0bcff]" : "bg-[#0084ff]"}`}
                   style={{ width: `${programInfo.progress}%` }}
                 >
-                  {/* Thumb dot - Horizontal Pill Shape Capsule (interactive glassy spring scaling on hover/drag - transparent glassy bubble) */}
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-[32px] sm:w-[40px] h-[16px] sm:h-[20px] bg-white rounded-full shadow-lg border border-white/60 transition-all duration-300 ease-[cubic-bezier(0.175,1.85,0.35,1.45)] group-hover/slider:scale-135 group-hover/slider:bg-transparent group-hover/slider:border-white/95 group-active/slider:scale-175 group-active/slider:bg-transparent group-active/slider:border-white"></div>
+                  {/* Thumb dot */}
+                  {isMaterialDesignActive ? (
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-4 h-4 bg-[#d0bcff] rounded-full shadow-md border-0 transition-transform duration-200 group-hover/slider:scale-125" />
+                  ) : (
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-[32px] sm:w-[40px] h-[16px] sm:h-[20px] bg-white rounded-full shadow-lg border border-white/60 transition-all duration-300 ease-[cubic-bezier(0.175,1.85,0.35,1.45)] group-hover/slider:scale-135 group-hover/slider:bg-transparent group-hover/slider:border-white/95 group-active/slider:scale-175 group-active/slider:bg-transparent group-active/slider:border-white"></div>
+                  )}
                 </div>
               </div>
             </div>
@@ -561,9 +599,13 @@ export default function ChannelPlayer({
           {/* 2. Controls and Buttons row */}
           <div className="flex items-center justify-between gap-2">
             
-            {/* Left Utility: Volume Controls with 10% opacity & 10% blur */}
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-[1.5px] border border-white/10 pl-2 pr-2.5 py-1.5 rounded-full group/vol bouncy-btn shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)]">
-              <button onClick={toggleMute} className="text-white/80 hover:text-white p-0.5 transition-all duration-300 [transition-timing-function:cubic-bezier(0.175,0.885,0.32,1.275)] hover:scale-120 active:scale-135">
+            {/* Left Utility: Volume Controls */}
+            <div className={`flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-full transition-colors ${
+              isMaterialDesignActive 
+                ? "bg-[#211f26] border border-[#313033] shadow-md text-[#e6e1e5]" 
+                : "bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)]"
+            }`}>
+              <button onClick={toggleMute} className={`p-0.5 transition-all duration-300 ${isMaterialDesignActive ? "text-[#cac4d0] hover:text-[#e6e1e5]" : "text-white/80 hover:text-white [transition-timing-function:cubic-bezier(0.175,0.885,0.32,1.275)] hover:scale-120 active:scale-135"}`}>
                 {muted || volume === 0 ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
               </button>
               <input
@@ -575,21 +617,26 @@ export default function ChannelPlayer({
                 onChange={handleVolumeChangeLocal}
                 className="w-12 sm:w-16 h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
                 style={{
-                  background: `linear-gradient(to right, #0084ff ${(muted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) ${(muted ? 0 : volume) * 100}%)`
+                  background: isMaterialDesignActive
+                    ? `linear-gradient(to right, #d0bcff ${(muted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) ${(muted ? 0 : volume) * 100}%)`
+                    : `linear-gradient(to right, #0084ff ${(muted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) ${(muted ? 0 : volume) * 100}%)`
                 }}
               />
             </div>
 
-            {/* Centered 5 Glassmorphic Buttons exactly as required by mock */}
+            {/* Centered 5 buttons row */}
             <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3.5">
-              {/* Button 1: Dynamic Heart Favorite button */}
+              {/* Button 1: Dynamic Favorite/ThumbsUp */}
               <button 
                 onClick={onToggleFavorite}
-                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default group"
+                className={isMaterialDesignActive 
+                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#e6e1e5] shadow-md group"
+                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default group"
+                }
                 title={isFavorite ? "Bỏ yêu thích" : "Yêu thích kênh"}
               >
                 {isMaterialDesignActive ? (
-                  <ThumbsUp className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-all duration-300 ${isFavorite ? "text-[#d0bcff] fill-[#d0bcff] scale-110" : "text-white/80 group-hover:text-[#d0bcff] group-hover:scale-110"}`} />
+                  <ThumbsUp className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-all duration-300 ${isFavorite ? "text-[#d0bcff] fill-[#d0bcff]" : "text-[#cac4d0]"}`} />
                 ) : (
                   <Heart className={`w-4 h-4 sm:w-4.5 sm:h-4.5 transition-all duration-300 ${isFavorite ? "text-red-500 fill-red-500 scale-110" : "text-white/80 group-hover:text-red-400 group-hover:scale-110"}`} />
                 )}
@@ -598,52 +645,67 @@ export default function ChannelPlayer({
               {/* Button 2: Skip back */}
               <button 
                 onClick={onPrevChannel}
-                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
+                className={isMaterialDesignActive 
+                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#cac4d0] hover:text-[#e6e1e5] shadow-md"
+                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
+                }
                 title="Kênh trước"
               >
-                <SkipBack className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" />
+                <SkipBack className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white"}`} />
               </button>
 
-              {/* Button 3: Main center Play/Pause button (Larger size) */}
+              {/* Button 3: Play/Pause center */}
               <button 
                 onClick={togglePlay}
-                className="w-11 h-11 xs:w-12 xs:h-12 sm:w-15 sm:h-15 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_12px_24px_rgba(0,0,0,0.3)] cursor-default"
+                className={isMaterialDesignActive 
+                  ? "w-12 h-12 sm:w-15 sm:h-15 rounded-full bg-[#d0bcff] flex items-center justify-center text-[#381e72] shadow-lg"
+                  : "w-11 h-11 xs:w-12 xs:h-12 sm:w-15 sm:h-15 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_12px_24px_rgba(0,0,0,0.3)] cursor-default"
+                }
                 title={isPlaying ? "Tạm Dừng" : "Phát"}
               >
                 {isPlaying ? (
-                  <Pause className="w-4.5 h-4.5 sm:w-6 sm:h-6 fill-white text-white" />
+                  <Pause className={`w-4.5 h-4.5 sm:w-6 sm:h-6 ${isMaterialDesignActive ? "fill-[#381e72] text-[#381e72]" : "fill-white text-white"}`} />
                 ) : (
-                  <Play className="w-4.5 h-4.5 sm:w-6 sm:h-6 fill-white text-white translate-x-0.5" />
+                  <Play className={`w-4.5 h-4.5 sm:w-6 sm:h-6 translate-x-0.5 ${isMaterialDesignActive ? "fill-[#381e72] text-[#381e72]" : "fill-white text-white"}`} />
                 )}
               </button>
 
               {/* Button 4: Skip forward */}
               <button 
                 onClick={onNextChannel}
-                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
+                className={isMaterialDesignActive 
+                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#cac4d0] hover:text-[#e6e1e5] shadow-md"
+                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
+                }
                 title="Kênh sau"
               >
-                <SkipForward className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" />
+                <SkipForward className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white"}`} />
               </button>
 
-              {/* Button 5: Loop context / reload button */}
+              {/* Button 5: Reload */}
               <button 
                 onClick={() => {
                   setHasError(false);
                   setIsLoading(true);
                   if (videoRef.current) videoRef.current.load();
                 }}
-                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
+                className={isMaterialDesignActive 
+                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#cac4d0] hover:text-[#e6e1e5] shadow-md"
+                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
+                }
                 title="Tải lại luồng"
               >
-                <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white animate-once" />
+                <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 animate-once ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white"}`} />
               </button>
             </div>
 
-            {/* Right Utility: Fullscreen scale config */}
+            {/* Right Utility: Fullscreen */}
             <button 
               onClick={handleFullscreen}
-              className="p-2 sm:p-2.5 rounded-full bg-white/10 backdrop-blur-[1.5px] bouncy-btn text-white/70 hover:text-white border border-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default flex items-center justify-center shrink-0"
+              className={isMaterialDesignActive 
+                ? "p-2 sm:p-2.5 rounded-full bg-[#211f26] border border-[#313033] text-[#cac4d0] hover:text-[#e6e1e5] shadow-md flex items-center justify-center shrink-0"
+                : "p-2 sm:p-2.5 rounded-full bg-white/10 backdrop-blur-[1.5px] bouncy-btn text-white/70 hover:text-white border border-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default flex items-center justify-center shrink-0"
+              }
               title="Toàn màn hình"
             >
               <Maximize className="w-4 h-4" />

@@ -42,11 +42,16 @@ import {
   Cpu,
   Layers,
   Download,
-  ShoppingBag
+  ShoppingBag,
+  HardDrive,
+  Send,
+  MessageSquare
 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
 import ChannelPlayer from "./components/ChannelPlayer";
+import VirtualRemoteControl from "./components/VirtualRemoteControl";
+import MacMenuBar from "./components/MacMenuBar";
 
 const TRANSLATIONS: Record<string, string> = {
   // Categories
@@ -627,15 +632,6 @@ export default function App() {
     localStorage.setItem("glass_tv_amoled_dark", amoledDark ? "true" : "false");
   }, [amoledDark]);
 
-  const [liquidGlass, setLiquidGlass] = useState<boolean>(() => {
-    const saved = localStorage.getItem("vplay_liquid_glass");
-    return saved !== null ? saved === "true" : true;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("vplay_liquid_glass", liquidGlass ? "true" : "false");
-  }, [liquidGlass]);
-
   const [dynamicMotion, setDynamicMotion] = useState<boolean>(() => {
     const saved = localStorage.getItem("vplay_dynamic_motion");
     return saved !== null ? saved === "true" : true;
@@ -651,6 +647,214 @@ export default function App() {
   const [expAmbientGlow, setExpAmbientGlow] = useState<boolean>(() => localStorage.getItem("vplay_exp_glow") === "true");
   const [testStreamUrl, setTestStreamUrl] = useState<string>("");
 
+  // Reimagined Search state
+  const [reimaginedSearchOpen, setReimaginedSearchOpen] = useState<boolean>(false);
+
+  // Experimental Features list (installable like plugins)
+  const [expFeatures, setExpFeatures] = useState<{
+    id: string;
+    name: string;
+    desc: string;
+    status: "idle" | "installing" | "installed";
+    progress: number;
+    isActive: boolean;
+  }[]>(() => {
+    const defaultFeatures = [
+      {
+        id: "reimagined_search",
+        name: "Reimagined Search",
+        desc: "Cách mạng hóa trải nghiệm tìm kiếm: Hiển thị kết quả tìm kiếm tức thì ngay trong một menu popup nổi tuyệt đẹp phía trên thanh Dock thay vì chuyển hướng sang tab khác.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      },
+      {
+        id: "v_intelligence",
+        name: "Trợ lý V-Intelligence (Thử nghiệm)",
+        desc: "Mô hình trí tuệ nhân tạo (Gemini API) giúp trải nghiệm xem truyền hình trở nên sinh động và hấp dẫn, đóng vai trò trợ lý đắc lực. Khi kích hoạt, nút Tìm Kiếm trên Dock sẽ chuyển thành biểu tượng V-Intelligence.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      },
+      {
+        id: "dropdown_intelligence",
+        name: "Thử nghiệm \"Dropdown Intelligence\"",
+        desc: "Khi bật, V-Intelligence sẽ hiển thị nhỏ gọn dưới dạng dropdown menu trên menubar thay vì mở rộng dạng sidebar/drawer. Chỉ khi bạn nhấn biểu tượng expand mới hiển thị dạng sidebar/drawer.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      },
+      {
+        id: "auto_hide_menubar",
+        name: "Thử nghiệm \"Auto-hide Menu bar\"",
+        desc: "Khi bật, thanh menu bar sẽ tự động ẩn sau 5 giây không hoạt động và chỉ xuất hiện lại khi bạn di chuột lên mép trên cùng của màn hình.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      }
+    ];
+
+    const saved = localStorage.getItem("vplay_exp_features");
+    let loaded: any[] = [];
+    if (saved) {
+      try {
+        loaded = JSON.parse(saved);
+        loaded = loaded.map((p: any) => p.status === "installing" ? { ...p, status: "idle", progress: 0 } : p);
+      } catch (e) {
+        loaded = [];
+      }
+    }
+
+    const merged = [...defaultFeatures];
+    loaded.forEach((loadedFeat: any) => {
+      const idx = merged.findIndex(d => d.id === loadedFeat.id);
+      if (idx !== -1) {
+        merged[idx] = { ...merged[idx], ...loadedFeat };
+      } else {
+        merged.push(loadedFeat);
+      }
+    });
+
+    return merged;
+  });
+
+  useEffect(() => {
+    const toSave = expFeatures.map(p => ({
+      id: p.id,
+      name: p.name,
+      desc: p.desc,
+      status: p.status === "installing" ? "idle" : p.status,
+      progress: p.status === "installing" ? 0 : p.progress,
+      isActive: p.isActive
+    }));
+    localStorage.setItem("vplay_exp_features", JSON.stringify(toSave));
+  }, [expFeatures]);
+
+  const installExpFeature = (id: string) => {
+    setExpFeatures(prev => prev.map(p => {
+      if (p.id === id) {
+        return { ...p, status: "installing", progress: 0 };
+      }
+      return p;
+    }));
+
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += 10;
+      if (currentProgress >= 100) {
+        currentProgress = 100;
+        clearInterval(interval);
+        setExpFeatures(prev => prev.map(p => {
+          if (p.id === id) {
+            return { ...p, status: "installed", progress: 100, isActive: true };
+          }
+          return p;
+        }));
+      } else {
+        setExpFeatures(prev => prev.map(p => {
+          if (p.id === id) {
+            return { ...p, progress: Math.min(Math.round(currentProgress), 100) };
+          }
+          return p;
+        }));
+      }
+    }, 300);
+  };
+
+  const isReimaginedSearchActive = useMemo(() => {
+    const feat = expFeatures.find(f => f.id === "reimagined_search");
+    return feat ? feat.status === "installed" && feat.isActive : false;
+  }, [expFeatures]);
+
+  const isVIntelligenceActive = useMemo(() => {
+    const feat = expFeatures.find(f => f.id === "v_intelligence");
+    return feat ? feat.status === "installed" && feat.isActive : false;
+  }, [expFeatures]);
+
+  const isDropdownIntelligenceActive = useMemo(() => {
+    const feat = expFeatures.find(f => f.id === "dropdown_intelligence");
+    return feat ? feat.status === "installed" && feat.isActive : false;
+  }, [expFeatures]);
+
+  const isAutoHideMenuBarActive = useMemo(() => {
+    const feat = expFeatures.find(f => f.id === "auto_hide_menubar");
+    return feat ? feat.status === "installed" && feat.isActive : false;
+  }, [expFeatures]);
+
+  const [vIntelQuery, setVIntelQuery] = useState<string>("");
+  const [isVIntelLoading, setIsVIntelLoading] = useState<boolean>(false);
+  const [vIntelHistory, setVIntelHistory] = useState<{ role: "user" | "model"; text: string }[]>([]);
+  const [vIntelMode, setVIntelMode] = useState<"chat" | "search">("chat");
+  const [vIntelSpinCount, setVIntelSpinCount] = useState<number>(0);
+  const vIntelScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (vIntelScrollRef.current) {
+      vIntelScrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [vIntelHistory, isVIntelLoading]);
+
+  const handleSendVIntelMsg = async (queryText?: string) => {
+    const prompt = queryText || vIntelQuery;
+    if (!prompt.trim()) return;
+
+    const userMsg = { role: "user" as const, text: prompt };
+    const updatedHistory = [...vIntelHistory, userMsg];
+    setVIntelHistory(updatedHistory);
+    setVIntelQuery("");
+    setIsVIntelLoading(true);
+
+    try {
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompt,
+          history: vIntelHistory,
+          channels: flattenedChannels.map(ch => ({ id: ch.id, name: ch.name, group: ch.group })),
+          mode: vIntelMode
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Không thể kết nối đến máy chủ.");
+      }
+
+      const data = await response.json();
+      const aiResponse = data.text || "Xin lỗi, em không thể nhận được câu trả lời từ máy chủ.";
+
+      const commandRegex = /\[COMMAND:\s*SWITCH_CHANNEL:\s*([a-zA-Z0-9_-]+)\]/i;
+      const match = aiResponse.match(commandRegex);
+      const cleanedResponse = aiResponse.replace(commandRegex, "").trim();
+
+      setVIntelHistory(prev => [...prev, { role: "model" as const, text: cleanedResponse }]);
+
+      if (match && match[1]) {
+        const targetChannelId = match[1].toLowerCase().trim();
+        const foundCh = flattenedChannels.find(ch => ch.id.toLowerCase() === targetChannelId || ch.name.toLowerCase().includes(targetChannelId));
+        if (foundCh) {
+          handleSelectChannel(foundCh);
+          setActiveTab("live");
+          setToastMessage(`V-Intelligence đã chuyển kênh sang: ${foundCh.name}`);
+          setTimeout(() => setToastMessage(""), 4000);
+        }
+      }
+    } catch (err: any) {
+      console.error("V-Intelligence message error:", err);
+      setVIntelHistory(prev => [...prev, { role: "model" as const, text: `⚠️ Lỗi: ${err.message || "Đã xảy ra lỗi kết nối."}` }]);
+    } finally {
+      setIsVIntelLoading(false);
+    }
+  };
+
+  // Close reimagined search popup when activeTab shifts to another non-search screen
+  useEffect(() => {
+    if (activeTab !== "search") {
+      setReimaginedSearchOpen(false);
+    }
+  }, [activeTab]);
+
   // Plugin Store States
   const [plugins, setPlugins] = useState<{
     id: string;
@@ -662,9 +866,9 @@ export default function App() {
   }[]>(() => {
     const defaultPlugins = [
       {
-        id: "material_design",
-        name: "Material Design 3 Theme",
-        desc: "Replaces the Apple-inspired Liquid Glass UI with Google's Material Design 3 language, featuring warm color palettes, generous container rounding, and flat, modern, highly interactive components.",
+        id: "liquid_glass",
+        name: "Liquid Glass UI Theme",
+        desc: "Kích hoạt giao diện kính mờ Liquid Glass bóng bẩy phong cách Apple, mang lại hiệu ứng mờ sương, viền phản sáng lấp lánh và bo góc thanh thoát kiểu macOS.",
         status: "idle" as const,
         progress: 0,
         isActive: false
@@ -673,6 +877,22 @@ export default function App() {
         id: "remove_shiny_border",
         name: "Minimalist Borderless Flat Mode",
         desc: "Completely strips all shiny reflections, glass highlights, and reflective outer borders surrounding cards and buttons to provide a pristine, ultra-minimalist flat interface.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      },
+      {
+        id: "storage_feeder",
+        name: "Storage feeder",
+        desc: "Kích hoạt mô-đun giả lập nạp dữ liệu rác, kéo ngay lập tức dung lượng lưu trữ của ứng dụng Test Vplay lên mức tối đa 3.0GB để thử nghiệm phản ứng hệ thống.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      },
+      {
+        id: "remote_control",
+        name: "Use remote control",
+        desc: "Kích hoạt giả lập điều khiển từ xa vật lý. Khi bật, toàn bộ cử chỉ chạm (touch) và nhấp chuột sẽ bị vô hiệu hóa, thay thế bằng bàn phím điều khiển nổi và bàn phím mũi tên vật lý để duyệt các mục.",
         status: "idle" as const,
         progress: 0,
         isActive: false
@@ -747,10 +967,15 @@ export default function App() {
     }, 1000);
   };
 
-  const isMaterialDesignActive = useMemo(() => {
-    const md = plugins.find(p => p.id === "material_design");
-    return md ? (md.status === "installed" && md.isActive) : false;
+  // Derived theme state
+  const liquidGlass = useMemo(() => {
+    const lg = plugins.find(p => p.id === "liquid_glass");
+    return lg ? (lg.status === "installed" && lg.isActive) : false;
   }, [plugins]);
+
+  const isMaterialDesignActive = useMemo(() => {
+    return !liquidGlass;
+  }, [liquidGlass]);
 
   useEffect(() => {
     if (isMaterialDesignActive) {
@@ -764,6 +989,36 @@ export default function App() {
     const rsb = plugins.find(p => p.id === "remove_shiny_border");
     return rsb ? (rsb.status === "installed" && rsb.isActive) : false;
   }, [plugins]);
+
+  const isRemoteControlActive = useMemo(() => {
+    const rc = plugins.find(p => p.id === "remote_control");
+    return rc ? (rc.status === "installed" && rc.isActive) : false;
+  }, [plugins]);
+
+  // Vplay Data Storage Capacity Logic
+  const currentStorageUsed = useMemo(() => {
+    // If Storage feeder is installed, immediately return 3.00 GB
+    const sf = plugins.find(p => p.id === "storage_feeder");
+    if (sf && sf.status === "installed") {
+      return 3.00;
+    }
+
+    let used = 0.15; // base system usage
+    if (dynamicMotion) used += 0.55;
+    if (isMultiviewMode) used += 0.95;
+    plugins.forEach(p => {
+      if (p.status === "installed") {
+        if (p.id === "liquid_glass") {
+          used += 1.20;
+        } else if (p.id === "remove_shiny_border") {
+          used += 0.35;
+        } else {
+          used += 0.45;
+        }
+      }
+    });
+    return Math.min(used, 3.00);
+  }, [dynamicMotion, isMultiviewMode, plugins]);
 
   // Custom Tab and Modal builder states
   const [customTabs, setCustomTabs] = useState<any[]>(() => {
@@ -782,6 +1037,171 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("vplay_custom_modals", JSON.stringify(customModals));
   }, [customModals]);
+
+  const [showNearFullPopup, setShowNearFullPopup] = useState<boolean>(false);
+  const [showFullPopup, setShowFullPopup] = useState<boolean>(false);
+  const [hasDismissedNearFull, setHasDismissedNearFull] = useState<boolean>(false);
+
+  // Storage Cleanup States
+  const [showCleanModal, setShowCleanModal] = useState<boolean>(false);
+  const [cleanPlugins, setCleanPlugins] = useState<boolean>(true);
+  const [cleanMultiview, setCleanMultiview] = useState<boolean>(true);
+  const [cleanMotion, setCleanMotion] = useState<boolean>(false);
+  const [cleanCustomItems, setCleanCustomItems] = useState<boolean>(false);
+
+  // 2-minute cleaning simulation states
+  const [isCleaning, setIsCleaning] = useState<boolean>(false);
+  const [cleanProgress, setCleanProgress] = useState<number>(0);
+  const [cleanTimeRemaining, setCleanTimeRemaining] = useState<number>(120); // 120 seconds = 2 minutes
+  const [pendingCleanType, setPendingCleanType] = useState<"quick" | "custom" | "all" | null>(null);
+
+  // Dynamic estimated free space calculation
+  const estimatedFreeSpace = useMemo(() => {
+    let saved = 0;
+    const isStorageFeederInstalled = plugins.some(p => p.id === "storage_feeder" && p.status === "installed");
+    
+    if (cleanPlugins) {
+      if (isStorageFeederInstalled) {
+        let remaining = 0.15;
+        if (dynamicMotion && !cleanMotion) remaining += 0.55;
+        if (isMultiviewMode && !cleanMultiview) remaining += 0.95;
+        saved += Math.max(0, 3.00 - remaining);
+      } else {
+        plugins.forEach(p => {
+          if (p.status === "installed") {
+            if (p.id === "liquid_glass") saved += 1.20;
+            else if (p.id === "remove_shiny_border") saved += 0.35;
+            else saved += 0.45;
+          }
+        });
+      }
+    }
+
+    if (!isStorageFeederInstalled || cleanPlugins) {
+      if (cleanMultiview && isMultiviewMode) saved += 0.95;
+      if (cleanMotion && dynamicMotion) saved += 0.55;
+    }
+    
+    if (cleanCustomItems && (customTabs.length > 0 || customModals.length > 0)) {
+      saved += 0.20;
+    }
+
+    return Math.min(saved, currentStorageUsed);
+  }, [cleanPlugins, cleanMultiview, cleanMotion, cleanCustomItems, plugins, isMultiviewMode, dynamicMotion, customTabs, customModals, currentStorageUsed]);
+
+  useEffect(() => {
+    if (currentStorageUsed >= 3.00) {
+      setShowFullPopup(true);
+      setShowNearFullPopup(false);
+    } else if (currentStorageUsed >= 2.00) {
+      setShowFullPopup(false);
+      if (!hasDismissedNearFull) {
+        setShowNearFullPopup(true);
+      }
+    } else {
+      setShowFullPopup(false);
+      setShowNearFullPopup(false);
+      setHasDismissedNearFull(false);
+    }
+  }, [currentStorageUsed, hasDismissedNearFull]);
+
+  const handleCleanStorage = () => {
+    setShowCleanModal(true);
+  };
+
+  const startCleaningProcess = (type: "quick" | "custom" | "all") => {
+    setPendingCleanType(type);
+    setCleanTimeRemaining(120);
+    setCleanProgress(0);
+    setIsCleaning(true);
+    setShowCleanModal(false);
+  };
+
+  const applyPendingCleanup = (type: "quick" | "custom" | "all" | null) => {
+    const activeType = type || pendingCleanType;
+    if (activeType === "quick") {
+      setPlugins(prev => prev.map(p => p.id === "storage_feeder" ? { ...p, status: "idle", progress: 0, isActive: false } : p));
+      setIsMultiviewMode(false);
+      setMultiviewChannels([]);
+    } else if (activeType === "all") {
+      setPlugins(prev => prev.map(p => ({
+        ...p,
+        status: "idle",
+        progress: 0,
+        isActive: false
+      })));
+      setDynamicMotion(false);
+      setIsMultiviewMode(false);
+      setMultiviewChannels([]);
+      setCustomTabs([]);
+      setCustomModals([]);
+      localStorage.removeItem("vplay_custom_tabs");
+      localStorage.removeItem("vplay_custom_modals");
+    } else if (activeType === "custom") {
+      if (cleanPlugins) {
+        setPlugins(prev => prev.map(p => ({
+          ...p,
+          status: "idle",
+          progress: 0,
+          isActive: false
+        })));
+      }
+      if (cleanMultiview) {
+        setIsMultiviewMode(false);
+        setMultiviewChannels([]);
+      }
+      if (cleanMotion) {
+        setDynamicMotion(false);
+      }
+      if (cleanCustomItems) {
+        setCustomTabs([]);
+        setCustomModals([]);
+        localStorage.removeItem("vplay_custom_tabs");
+        localStorage.removeItem("vplay_custom_modals");
+      }
+    }
+
+    setShowNearFullPopup(false);
+    setShowFullPopup(false);
+    setHasDismissedNearFull(false);
+    setShowCleanModal(false);
+    setIsCleaning(false);
+    setPendingCleanType(null);
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isCleaning) {
+      interval = setInterval(() => {
+        setCleanTimeRemaining(prev => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            // Must pass correct state value or closure-bound state or use a dynamic function
+            applyPendingCleanup(pendingCleanType);
+            return 0;
+          }
+          const nextTime = prev - 1;
+          setCleanProgress(Math.round(((120 - nextTime) / 120) * 100));
+          return nextTime;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isCleaning, pendingCleanType, cleanPlugins, cleanMultiview, cleanMotion, cleanCustomItems]);
+
+  const handleQuickClean = () => {
+    startCleaningProcess("quick");
+  };
+
+  const handleExecuteCustomClean = () => {
+    startCleaningProcess("custom");
+  };
+
+  const handleCleanAllStorage = () => {
+    startCleaningProcess("all");
+  };
+
+
 
   // Tab Form States
   const [tabEditId, setTabEditId] = useState<string | null>(null);
@@ -886,6 +1306,41 @@ export default function App() {
   const flattenedChannels = useMemo(() => {
     return allAvailableCategoryList.flatMap(cat => cat.channels);
   }, [allAvailableCategoryList]);
+
+  // Create a stable numbered channels list where VTV channels are numbered 001, 002, ... and other channels follow consecutively.
+  const numberedChannels = useMemo(() => {
+    const vtvGroup = flattenedChannels.filter(c => c.group === "VTV");
+    const otherChannels = flattenedChannels.filter(c => c.group !== "VTV");
+    
+    const vtvOrder = ["vtv1", "vtv2", "vtv3", "vtv4", "vtv5", "vtv6", "vtv7", "vtv8", "vtv9", "vtv10", "vtv6_test", "vtv5_tn", "vtv5_tnb"];
+    const sortedVtv = [...vtvGroup].sort((a, b) => {
+      const idxA = vtvOrder.indexOf(a.id);
+      const idxB = vtvOrder.indexOf(b.id);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    const ordered = [...sortedVtv, ...otherChannels];
+    
+    return ordered.map((ch, index) => {
+      const numStr = String(index + 1).padStart(3, '0');
+      return {
+        ...ch,
+        channelNumber: numStr
+      };
+    });
+  }, [flattenedChannels]);
+
+  // Map to easily resolve channelNumber from channelId
+  const channelNumberMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    numberedChannels.forEach(ch => {
+      map[ch.id] = ch.channelNumber;
+    });
+    return map;
+  }, [numberedChannels]);
 
   const filteredCategoriesForPicker = useMemo(() => {
     if (!pickerSearchQuery.trim()) return allAvailableCategoryList;
@@ -1056,6 +1511,16 @@ export default function App() {
     return flattenedChannels.filter(ch => favorites.includes(ch.id));
   }, [flattenedChannels, favorites]);
 
+  // Reimagined Search Results
+  const searchResults = useMemo(() => {
+    if (!searchQuery) return [];
+    const query = searchQuery.toLowerCase();
+    return flattenedChannels.filter(ch => 
+      ch.name.toLowerCase().includes(query) || 
+      ch.group.toLowerCase().includes(query)
+    );
+  }, [flattenedChannels, searchQuery]);
+
   // Ambient backgrounds options config
   const getBgGradient = () => {
     if (isMaterialDesignActive) {
@@ -1079,29 +1544,360 @@ export default function App() {
     }
   };
 
-  if (showSplash) {
+  const renderCleanupModal = () => {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-[99999]">
-        <svg className="animate-spin h-14 w-14 text-white" viewBox="0 0 50 50">
-          <circle
-            className="opacity-100"
-            cx="25"
-            cy="25"
-            r="20"
-            stroke="currentColor"
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeDasharray="40 150"
-            fill="none"
-          />
-        </svg>
+      <AnimatePresence>
+        {showCleanModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+            className="fixed inset-0 bg-black/75 backdrop-blur-[20px] z-[200] flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={isMaterialDesignActive ? { opacity: 0, y: 15 } : { opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={isMaterialDesignActive ? { opacity: 0, y: 15 } : { opacity: 0, scale: 0.95, y: 15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+              className={`w-full max-w-[430px] relative text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] p-5 shadow-2xl border border-white/5 text-[#e6e1e5]"
+                  : "rounded-[28px] bg-[#1c1c1e]/98 p-5 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.6)] border border-white/10 text-white"
+              }`}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-indigo-500/15 text-indigo-400">
+                    <Trash2 className="w-4.5 h-4.5" />
+                  </div>
+                  <div>
+                    <h3 className={`text-[16px] font-bold tracking-tight leading-none ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
+                      Bộ dọn dẹp ổ cứng Vplay
+                    </h3>
+                    <span className="text-[10px] opacity-50 block mt-0.5">Giải phóng dung lượng nhanh chóng</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowCleanModal(false)}
+                  className={`p-1 rounded-full transition-colors ${
+                    isMaterialDesignActive ? "hover:bg-white/5 text-[#e6e1e5]" : "hover:bg-white/10 text-white/70"
+                  }`}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Storage capacity indicator */}
+              <div className={`p-3 rounded-xl mb-4 border ${
+                isMaterialDesignActive ? "bg-white/5 border-white/10" : "bg-white/[0.03] border-white/5"
+              }`}>
+                <div className="flex items-center justify-between text-[11px] mb-1.5">
+                  <span className="opacity-70">Bộ nhớ đã sử dụng:</span>
+                  <span className="font-mono font-bold">{currentStorageUsed.toFixed(2)} GB / 3.00 GB</span>
+                </div>
+                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      currentStorageUsed >= 2.8 
+                        ? "bg-red-500" 
+                        : currentStorageUsed >= 2.0 
+                          ? "bg-amber-500" 
+                          : "bg-indigo-500"
+                    }`}
+                    style={{ width: `${(currentStorageUsed / 3.00) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Options selection in 2x2 grid */}
+              <div className="mb-4">
+                <span className="text-[11px] font-bold text-indigo-400 block mb-2 uppercase tracking-wider">Tùy chọn giải phóng:</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Option 1: Plugins */}
+                  <label className={`p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
+                    cleanPlugins 
+                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
+                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
+                  }`}>
+                    <input 
+                      type="checkbox"
+                      checked={cleanPlugins}
+                      onChange={(e) => setCleanPlugins(e.target.checked)}
+                      className="mt-0.5 accent-indigo-500 rounded cursor-pointer"
+                    />
+                    <div className="text-left">
+                      <span className="font-bold text-[11px] block">Gỡ Plugins</span>
+                      <span className="text-[9px] opacity-60 block mt-0.5 leading-snug">Gỡ Liquid Glass & Storage Feeder</span>
+                    </div>
+                  </label>
+
+                  {/* Option 2: Multiview */}
+                  <label className={`p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
+                    cleanMultiview 
+                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
+                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
+                  }`}>
+                    <input 
+                      type="checkbox"
+                      checked={cleanMultiview}
+                      onChange={(e) => setCleanMultiview(e.target.checked)}
+                      className="mt-0.5 accent-indigo-500 rounded cursor-pointer"
+                    />
+                    <div className="text-left">
+                      <span className="font-bold text-[11px] block">Xóa Multiview</span>
+                      <span className="text-[9px] opacity-60 block mt-0.5 leading-snug">Đóng kênh phụ, giải phóng cache</span>
+                    </div>
+                  </label>
+
+                  {/* Option 3: Motion */}
+                  <label className={`p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
+                    cleanMotion 
+                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
+                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
+                  }`}>
+                    <input 
+                      type="checkbox"
+                      checked={cleanMotion}
+                      onChange={(e) => setCleanMotion(e.target.checked)}
+                      className="mt-0.5 accent-indigo-500 rounded cursor-pointer"
+                    />
+                    <div className="text-left">
+                      <span className="font-bold text-[11px] block">Tắt Motion</span>
+                      <span className="text-[9px] opacity-60 block mt-0.5 leading-snug">Tắt hiệu ứng chuyển cảnh mượt</span>
+                    </div>
+                  </label>
+
+                  {/* Option 4: Custom channels/tabs */}
+                  <label className={`p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
+                    cleanCustomItems 
+                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
+                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
+                  }`}>
+                    <input 
+                      type="checkbox"
+                      checked={cleanCustomItems}
+                      onChange={(e) => setCleanCustomItems(e.target.checked)}
+                      className="mt-0.5 accent-indigo-500 rounded cursor-pointer"
+                    />
+                    <div className="text-left">
+                      <span className="font-bold text-[11px] block">Xóa Custom</span>
+                      <span className="text-[9px] opacity-60 block mt-0.5 leading-snug">Xóa kênh/cửa sổ tự thiết kế</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Estimated space backplate */}
+              <div className="flex items-center justify-between px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl mb-4 text-xs">
+                <span className="text-emerald-400 font-medium flex items-center gap-1 text-[11px]">
+                  <span>🍃</span> Dung lượng ước tính giải phóng:
+                </span>
+                <span className="font-bold font-mono text-emerald-400">-{estimatedFreeSpace.toFixed(2)} GB</span>
+              </div>
+
+              {/* Combined Actions */}
+              <div className="space-y-2">
+                <button
+                  onClick={handleExecuteCustomClean}
+                  disabled={!cleanPlugins && !cleanMultiview && !cleanMotion && !cleanCustomItems}
+                  className="w-full py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[12px] font-bold transition-all active:scale-95 shadow-md cursor-default text-center"
+                >
+                  Bắt đầu dọn dẹp đã chọn (2 phút)
+                </button>
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    onClick={handleQuickClean}
+                    className="py-1.5 px-3 rounded-full bg-white/5 hover:bg-white/10 text-white text-[11px] font-semibold text-center transition-all cursor-default"
+                  >
+                    ⚡ Dọn dẹp nhanh
+                  </button>
+                  <button
+                    onClick={handleCleanAllStorage}
+                    className="py-1.5 px-3 rounded-full bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/10 hover:border-red-500/20 text-[11px] font-bold text-center transition-all cursor-default"
+                  >
+                    🚨 Khôi phục cài đặt gốc
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
+
+  if (showSplash || currentStorageUsed >= 3.00 || isCleaning) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-[99999] p-4 select-none">
+        {isCleaning ? (
+          <div className="w-full max-w-md p-6 bg-zinc-900/90 rounded-[28px] border border-white/10 text-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-24 h-24 bg-indigo-500/15 rounded-full blur-xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-emerald-500/15 rounded-full blur-xl pointer-events-none" />
+
+            <div className="relative z-10 space-y-5">
+              <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-indigo-500/10 text-indigo-400 relative">
+                <div className="absolute inset-0 rounded-full border border-indigo-500/40 animate-ping" />
+                <Trash2 className="w-8 h-8 animate-pulse" />
+              </div>
+
+              <div>
+                <h3 className="text-lg font-extrabold text-white tracking-tight">Đang tiến hành dọn dẹp hệ thống...</h3>
+                <p className="text-xs text-white/50 mt-1">Vui lòng giữ ứng dụng mở, không tải lại trang hoặc tắt trình duyệt.</p>
+              </div>
+
+              <div className="py-2.5 px-4 bg-white/5 rounded-2xl inline-block">
+                <span className="text-sm text-white/60 mr-1.5 font-medium">Thời gian còn lại:</span>
+                <span className="text-lg font-black font-mono text-emerald-400">
+                  {Math.floor(cleanTimeRemaining / 60).toString().padStart(2, "0")}
+                  :
+                  {(cleanTimeRemaining % 60).toString().padStart(2, "0")}
+                </span>
+              </div>
+
+              <div className="space-y-1.5 text-left">
+                <div className="flex justify-between text-xs text-white/70">
+                  <span className="font-semibold text-[11px] uppercase tracking-wider text-indigo-400">Tiến trình dọn dẹp</span>
+                  <span className="font-bold font-mono">{cleanProgress}%</span>
+                </div>
+                <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden p-0.5 border border-white/5">
+                  <div 
+                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 rounded-full transition-all duration-300" 
+                    style={{ width: `${cleanProgress}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="text-[12px] bg-black/40 border border-white/5 rounded-xl p-3 min-h-[48px] flex items-center justify-center font-mono text-white/80 transition-all duration-300">
+                {cleanProgress < 15 ? (
+                  <span className="animate-pulse">🔍 Đang phân tích hệ thống tệp và tệp tạm thời...</span>
+                ) : cleanProgress < 35 ? (
+                  <span className="animate-pulse">🗑️ Đang dọn dẹp phân mảnh dữ liệu rác bộ đệm...</span>
+                ) : cleanProgress < 55 ? (
+                  <span className="animate-pulse">📦 Đang tiến hành gỡ bỏ mô-đun rác Storage Feeder...</span>
+                ) : cleanProgress < 75 ? (
+                  <span className="animate-pulse">⚡ Giải phóng bộ nhớ Multiview & tối ưu hóa băng thông...</span>
+                ) : cleanProgress < 90 ? (
+                  <span className="animate-pulse">🛠️ Đang sắp xếp, tối ưu hóa lại bảng chỉ mục tệp tin...</span>
+                ) : cleanProgress < 98 ? (
+                  <span className="animate-pulse">⚡ Đang kiểm tra tính toàn vẹn hệ thống...</span>
+                ) : (
+                  <span className="text-emerald-400">✅ Dọn dẹp hoàn tất! Đang khởi động lại...</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <svg className="animate-spin h-14 w-14 text-white mb-6" viewBox="0 0 50 50">
+              <circle
+                className="opacity-100"
+                cx="25"
+                cy="25"
+                r="20"
+                stroke="currentColor"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeDasharray="40 150"
+                fill="none"
+              />
+            </svg>
+            <div className="text-white/40 text-xs tracking-widest uppercase font-mono">Đang khởi động Vplay...</div>
+          </>
+        )}
+
+        {currentStorageUsed >= 3.00 && showFullPopup && !isCleaning && (
+          <div className="fixed inset-0 bg-black/85 backdrop-blur-[25px] z-[150] flex items-center justify-center p-4">
+            <motion.div
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+              className={`w-full max-w-[420px] relative text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#1c1c1e]/95 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 text-white"
+              }`}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2.5 rounded-full bg-red-500/10 text-red-400 animate-pulse">
+                  <HardDrive className="w-6 h-6" />
+                </div>
+                <h3 className={`text-[19px] font-bold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
+                  Ổ cứng đã đầy (3.00GB)
+                </h3>
+              </div>
+              <p className={`text-[13px] mb-6 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/70"}`}>
+                Ứng dụng dùng thử nghiệm Vplay chỉ hỗ trợ lưu trữ tối đa 3GB dữ liệu rác. Do ổ cứng đã đầy hoàn toàn, Vplay sẽ bị khóa cho đến khi được giải phóng bộ nhớ.
+              </p>
+              
+              <div className="space-y-2.5">
+                <button
+                  onClick={handleCleanStorage}
+                  className={`w-full py-3 px-4 rounded-full font-bold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                    isMaterialDesignActive
+                      ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
+                      : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-lg"
+                  }`}
+                >
+                  Dọn dẹp ổ cứng ngay (Mất 2 phút)
+                </button>
+                <button
+                  onClick={() => window.location.reload()}
+                  className={`w-full py-3 px-4 rounded-full font-semibold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                    isMaterialDesignActive
+                      ? "bg-white/5 hover:bg-white/10 text-[#e6e1e5] border border-white/10"
+                      : "bg-white/10 hover:bg-white/15 text-white"
+                  }`}
+                >
+                  Thử tải lại trang
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+        {renderCleanupModal()}
       </div>
     );
   }
 
   return (
     <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
-      <div className={`min-h-screen text-white/95 pb-32 transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+      <div className={`min-h-screen text-white/95 pb-32 pt-[40px] transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+        
+        <MacMenuBar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          activeSettingSection={activeSettingSection}
+          setActiveSettingSection={setActiveSettingSection}
+          isVIntelligenceActive={isVIntelligenceActive}
+          reimaginedSearchOpen={reimaginedSearchOpen}
+          setReimaginedSearchOpen={setReimaginedSearchOpen}
+          setShowAboutModal={setShowAboutModal}
+          setShowCustomModal={setShowCustomModal}
+          exportChannelsToM3u8={exportChannelsToM3u8}
+          handleOpenMultiviewSelector={handleOpenMultiviewSelector}
+          handleTogglePictureInPicture={handleTogglePictureInPicture}
+          isMaterialDesignActive={isMaterialDesignActive}
+          showClock={showClock}
+          toggleShowClock={toggleShowClock}
+          volume={volume}
+          setVolume={setVolume}
+          muted={muted}
+          setMuted={setMuted}
+          selectedChannel={selectedChannel}
+          favorites={favorites}
+          toggleFavorite={toggleFavorite}
+          isDropdownIntelligenceActive={isDropdownIntelligenceActive}
+          vIntelQuery={vIntelQuery}
+          setVIntelQuery={setVIntelQuery}
+          isVIntelLoading={isVIntelLoading}
+          vIntelHistory={vIntelHistory}
+          handleSendVIntelMsg={handleSendVIntelMsg}
+          isAutoHideMenuBarActive={isAutoHideMenuBarActive}
+        />
       
       {/* Decorative ambient glowing circles */}
       {liquidGlass && !isMaterialDesignActive && !amoledDark && (
@@ -1114,7 +1910,7 @@ export default function App() {
 
       {/* TV360 STYLE CINEMATIC HEADER (Floating on Top - Displays on ALL tabs) */}
       {(activeTab !== "settings" || activeSettingSection === null) && (
-        <header className="fixed top-0 inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-all duration-150">
+        <header className="fixed top-[40px] inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-all duration-150">
           {/* Progressive background blurs backplate - Only visible when scrolled down or when not on home tab */}
           <div className={`progressive-blur-header z-0 pointer-events-none border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
             isScrolled || activeTab !== "home" ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
@@ -1134,10 +1930,10 @@ export default function App() {
 
             {/* Real-time Ticking Digital Clock */}
             {showClock && (
-              <div className={`flex items-center gap-2 sm:gap-3 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full select-none transition-all duration-300 hover:scale-105 font-google ${
+              <div className={`flex items-center gap-2 sm:gap-3 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full select-none transition-all duration-300 font-google ${
                 isMaterialDesignActive
-                  ? "bg-[#e8def8] text-[#21005d] shadow-md border-0"
-                  : "bg-white/5 border border-white/10 backdrop-blur-md shadow-inner text-white"
+                  ? "bg-[#ebdfff] text-[#21005d] shadow-md border-0"
+                  : "bg-white/5 border border-white/10 backdrop-blur-md shadow-inner text-white hover:scale-105"
               }`}>
                 <span className={`w-2 h-2 rounded-full animate-pulse animate-duration-1000 ${isMaterialDesignActive ? "bg-[#21005d]" : "bg-emerald-500"}`} />
                 <span className={`text-xs sm:text-sm md:text-base font-bold tracking-wide font-google ${
@@ -1162,17 +1958,22 @@ export default function App() {
                 setActiveTab("settings");
                 setActiveSettingSection("plugin_store");
               }}
-              className="relative p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer"
-              title="Vplay Plugin Store (PREVIEW)"
+              className="relative group p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-indigo-500 ring-2 ring-transparent" />
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                Cửa hàng Plugin Vplay
+              </div>
             </button>
 
             {/* Notification bell icon */}
-            <button className="relative p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer">
+            <button className="relative group p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer">
               <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 ring-2 ring-transparent animate-pulse" />
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                Thông báo
+              </div>
             </button>
 
             {/* User avatar displaying email info */}
@@ -1183,8 +1984,8 @@ export default function App() {
                 </div>
               </div>
               {/* Floating tooltip */}
-              <div className="absolute right-0 top-10 pointer-events-none opacity-0 group-hover/avatar:opacity-100 group-hover/avatar:pointer-events-auto transition-all duration-300 bg-black/95 backdrop-blur-md border border-white/10 rounded-xl px-3 py-1.5 shadow-xl text-[10px] sm:text-xs text-white/90 whitespace-nowrap z-50">
-                Account: <span className="font-extrabold text-pink-300">Premium Member</span>
+              <div className="absolute top-full right-0 mt-2 pointer-events-none opacity-0 group-hover/avatar:opacity-100 transition-all duration-150 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg px-2.5 py-1.5 shadow-xl text-[10px] sm:text-[11px] text-white/90 whitespace-nowrap z-50 scale-95 group-hover/avatar:scale-100">
+                Tài khoản: <span className="font-extrabold text-pink-300">Premium Member</span>
               </div>
             </div>
 
@@ -1192,14 +1993,16 @@ export default function App() {
             <div className="relative">
               <button
                 onClick={() => setShowDropdownMenu(prev => !prev)}
-                className={`transition-all cursor-pointer flex items-center justify-center active:scale-95 duration-200 ${
+                className={`relative group transition-all cursor-pointer flex items-center justify-center active:scale-95 duration-200 ${
                   isMaterialDesignActive
                     ? "p-2 sm:p-2.5 rounded-[20px] bg-[#c9b2fa] hover:bg-[#dcd0ff] text-black border-0 shadow-lg"
                     : "p-1.5 sm:p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white"
                 }`}
-                title="Menu"
               >
                 <Menu className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+                <div className="absolute top-full right-0 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  Menu tùy chọn
+                </div>
               </button>
               
               <AnimatePresence>
@@ -1215,7 +2018,7 @@ export default function App() {
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         style={{ originX: 1, originY: 0 }}
                         transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-                        className="absolute right-0 mt-3 w-64 rounded-[28px] bg-[#1d1b20] border border-[#313033] shadow-[0_8px_30px_rgb(0,0,0,0.5)] z-50 p-2 text-[#e6e1e5] overflow-hidden animate-fade-in"
+                        className="absolute right-0 mt-3 w-64 rounded-[28px] bg-[#2b2930] border border-[#3d3a46] shadow-[0_8px_30px_rgb(0,0,0,0.5)] z-50 p-2 text-[#e6e1e5] overflow-hidden animate-fade-in"
                       >
                         {[
                           {
@@ -1295,7 +2098,7 @@ export default function App() {
                             <button
                               key={idx}
                               onClick={item.onClick}
-                              className="w-full px-4.5 py-3 text-left text-sm font-normal flex items-center gap-3.5 hover:bg-[#313033]/80 active:bg-[#313033] rounded-[18px] transition-colors cursor-pointer text-[#e6e1e5]"
+                              className="w-full px-4.5 py-3 text-left text-sm font-normal flex items-center gap-3.5 hover:bg-[#3d3a46]/80 active:bg-[#3d3a46] rounded-[18px] transition-colors cursor-pointer text-[#e6e1e5]"
                             >
                               <IconComp className="w-[18px] h-[18px] text-[#cac4d0] shrink-0" />
                               <span className="flex-1 text-[#e6e1e5] font-sans text-[14px]">{item.label}</span>
@@ -1426,7 +2229,7 @@ export default function App() {
 
       {/* SETTINGS DETAILS HEADER (Floating on Top - Exclusively inside settings sub-sections) */}
       {activeTab === "settings" && activeSettingSection !== null && (
-        <header className="fixed top-0 inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none">
+        <header className="fixed top-[40px] inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none">
           {/* Progressive background blurs backplate */}
           <div className="progressive-blur-header z-0 pointer-events-none border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.3)] opacity-100 visible" />
 
@@ -1720,8 +2523,17 @@ export default function App() {
                                       : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
                                   )
                             }`}
-                            title={ch.name}
                           >
+                            {/* Stable Channel Number Badge */}
+                            {channelNumberMap[ch.id] && (
+                              <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/85 backdrop-blur-md text-[9px] font-mono font-bold text-[#d0bcff]/90 border border-white/10 z-20 select-none shadow-md">
+                                {channelNumberMap[ch.id]}
+                              </div>
+                            )}
+                            {/* Premium Custom Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-xl scale-95 group-hover:scale-100">
+                              {t(ch.name)}
+                            </div>
                             {/* Logo Graphic Container - fills the box completely */}
                             <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg">
                               {ch.logoImg ? (
@@ -1995,8 +2807,17 @@ export default function App() {
                                   : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
                                 )
                           }`}
-                          title={ch.name}
                         >
+                          {/* Stable Channel Number Badge */}
+                          {channelNumberMap[ch.id] && (
+                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/85 backdrop-blur-md text-[8px] font-mono font-bold text-[#d0bcff]/90 border border-white/10 z-20 select-none shadow-md">
+                              {channelNumberMap[ch.id]}
+                            </div>
+                          )}
+                          {/* Premium Custom Tooltip */}
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-xl scale-95 group-hover:scale-100">
+                            {t(ch.name)}
+                          </div>
                           {/* Logo Graphic Container - fills the box completely */}
                           <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg">
                             {ch.logoImg ? (
@@ -2099,8 +2920,17 @@ export default function App() {
                                   : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
                                 )
                           }`}
-                          title={ch.name}
                         >
+                          {/* Stable Channel Number Badge */}
+                          {channelNumberMap[ch.id] && (
+                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/85 backdrop-blur-md text-[8px] font-mono font-bold text-[#d0bcff]/90 border border-white/10 z-20 select-none shadow-md">
+                              {channelNumberMap[ch.id]}
+                            </div>
+                          )}
+                          {/* Premium Custom Tooltip */}
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-xl scale-95 group-hover:scale-100">
+                            {t(ch.name)}
+                          </div>
                           {/* Logo Graphic Container - fills the box completely */}
                           <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg">
                             {ch.logoImg ? (
@@ -2266,6 +3096,68 @@ export default function App() {
                   exit={{ opacity: 0, y: -15 }}
                   className="space-y-3"
                 >
+                  {/* Storage Info Bar */}
+                  <div className={`p-5 rounded-[15px] border ${
+                    isMaterialDesignActive 
+                      ? "bg-[#211f26] border-[#49454f] text-[#e6e1e5]" 
+                      : "bg-white/5 border-white/10 backdrop-blur-[20px] text-white"
+                  }`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <HardDrive className={`w-5 h-5 ${currentStorageUsed >= 2.8 ? "text-red-400 animate-pulse" : currentStorageUsed >= 2.0 ? "text-amber-400" : "text-indigo-400"}`} />
+                        <span className="font-semibold text-sm">Ổ cứng lưu trữ Vplay</span>
+                      </div>
+                      <span className="text-xs font-mono font-medium opacity-90">
+                        {currentStorageUsed.toFixed(2)} GB / 3.00 GB
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-4 relative">
+                      <div 
+                        className={`h-full transition-all duration-500 ease-out rounded-full ${
+                          currentStorageUsed >= 2.8 
+                            ? "bg-gradient-to-r from-red-500 to-rose-600" 
+                            : currentStorageUsed >= 2.0 
+                              ? "bg-gradient-to-r from-amber-500 to-orange-600" 
+                              : "bg-gradient-to-r from-indigo-500 to-purple-600"
+                        }`}
+                        style={{ width: `${(currentStorageUsed / 3.00) * 100}%` }}
+                      />
+                    </div>
+
+                    {/* Storage Breakdowns & Action */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-white/5">
+                      <div className="text-[11px] opacity-70 space-y-0.5">
+                        <span className="block font-medium">Chi tiết sử dụng:</span>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1">
+                          <span>Hệ thống: 0.15GB</span>
+                          {dynamicMotion && <span className="text-indigo-300">Dynamic Motion: 0.55GB</span>}
+                          {isMultiviewMode && <span className="text-purple-300">Multiview: 0.95GB</span>}
+                          {plugins.map(p => {
+                            if (p.status === "installed") {
+                              const weight = p.id === "liquid_glass" ? 1.20 : p.id === "remove_shiny_border" ? 0.35 : 0.45;
+                              return <span key={p.id} className="text-emerald-300">{p.name}: {weight}GB</span>;
+                            }
+                            return null;
+                          })}
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleCleanStorage}
+                        className={`px-4 py-2 rounded-full font-semibold text-xs transition-all active:scale-95 cursor-default flex items-center gap-1.5 shrink-0 ${
+                          isMaterialDesignActive
+                            ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
+                            : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-md"
+                        }`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Dọn dẹp ổ cứng
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Project Details Banner */}
                   <div className="bg-white/10 backdrop-blur-[20px] rounded-[15px] p-5 sm:p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] border border-white/10 flex flex-col gap-4 relative overflow-hidden mb-4">
                     <div className="space-y-3 z-10 w-full">
@@ -2463,20 +3355,45 @@ export default function App() {
                                   <div className="flex items-center gap-3">
                                     <div className="flex items-center gap-2">
                                       <span className="text-xs text-white/50 font-medium font-sans">Activate:</span>
-                                      <button
-                                        onClick={() => {
-                                          setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, isActive: !p.isActive } : p));
-                                        }}
-                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                          plugin.isActive ? "bg-[#34c759]" : "bg-white/20"
-                                        }`}
-                                      >
-                                        <motion.div
-                                          animate={{ x: plugin.isActive ? 20 : 0 }}
-                                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                          className="w-5 h-5 rounded-full bg-white shadow-md"
-                                        />
-                                      </button>
+                                      {isMaterialDesignActive ? (
+                                        <button
+                                          onClick={() => {
+                                            setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, isActive: !p.isActive } : p));
+                                          }}
+                                          className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                            plugin.isActive ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                                          }`}
+                                        >
+                                          <motion.div
+                                            animate={{ x: plugin.isActive ? 20 : 0 }}
+                                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                            className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                              plugin.isActive ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                            }`}
+                                          >
+                                            {plugin.isActive && (
+                                              <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                              </svg>
+                                            )}
+                                          </motion.div>
+                                        </button>
+                                      ) : (
+                                        <button
+                                          onClick={() => {
+                                            setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, isActive: !p.isActive } : p));
+                                          }}
+                                          className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                            plugin.isActive ? "bg-[#34c759]" : "bg-white/20"
+                                          }`}
+                                        >
+                                          <motion.div
+                                            animate={{ x: plugin.isActive ? 20 : 0 }}
+                                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                            className="w-5 h-5 rounded-full bg-white shadow-md"
+                                          />
+                                        </button>
+                                      )}
                                     </div>
                                     <button
                                       onClick={() => {
@@ -2542,21 +3459,44 @@ export default function App() {
                           <h4 className="text-sm font-semibold text-white">settings.appearance.AmoledDark.title</h4>
                           <p className="text-xs text-white/60 mt-0.5">settings.appearance.AmoledDark.subtitle</p>
                         </div>
-                        <button
-                          onClick={() => setAmoledDark(!amoledDark)}
-                          className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                            amoledDark ? "bg-[#34c759]" : "bg-white/20"
-                          }`}
-                        >
-                          <motion.div
-                            animate={{ x: amoledDark ? 20 : 0 }}
-                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                            className="relative w-6 h-5 flex items-center justify-center group"
+                        {isMaterialDesignActive ? (
+                          <button
+                            onClick={() => setAmoledDark(!amoledDark)}
+                            className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                              amoledDark ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                            }`}
                           >
-                            <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                            <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                          </motion.div>
-                        </button>
+                            <motion.div
+                              animate={{ x: amoledDark ? 20 : 0 }}
+                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                              className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                amoledDark ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                              }`}
+                            >
+                              {amoledDark && (
+                                <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </motion.div>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setAmoledDark(!amoledDark)}
+                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                              amoledDark ? "bg-[#34c759]" : "bg-white/20"
+                            }`}
+                          >
+                            <motion.div
+                              animate={{ x: amoledDark ? 20 : 0 }}
+                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                              className="relative w-6 h-5 flex items-center justify-center group"
+                            >
+                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                              <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                            </motion.div>
+                          </button>
+                        )}
                       </div>
 
                     </div>
@@ -2644,50 +3584,47 @@ export default function App() {
                           </div>
                           
                           <div className="flex items-center">
-                            <button
-                              onClick={() => setAutoSlide(!autoSlide)}
-                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                autoSlide ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                              }`}
-                            >
-                              <motion.div
-                                animate={{ x: autoSlide ? 20 : 0 }}
-                                transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
-                                className="relative w-6 h-5 flex items-center justify-center group"
+                            {isMaterialDesignActive ? (
+                              <button
+                                onClick={() => setAutoSlide(!autoSlide)}
+                                className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                  autoSlide ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                                }`}
                               >
-                                {/* Outer hover halo/bubble (capsule-shaped matching the pill, expanding on hover) */}
-                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                
-                                {/* Knob - horizontal pill shape */}
-                                <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                              </motion.div>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Option: Liquid Glass */}
-                        <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
-                          <div className="space-y-1">
-                            <h4 className="text-sm font-semibold text-white">Liquid Glass</h4>
-                            <p className="text-xs text-white/60 leading-relaxed">Disable glass-morphism effects. All blurs and opacities are removed, and UI colors fallback to solid dark gray.</p>
-                          </div>
-                          
-                          <div className="flex items-center">
-                            <button
-                              onClick={() => setLiquidGlass(!liquidGlass)}
-                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                liquidGlass ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                              }`}
-                            >
-                              <motion.div
-                                animate={{ x: liquidGlass ? 20 : 0 }}
-                                transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
-                                className="relative w-6 h-5 flex items-center justify-center group"
+                                <motion.div
+                                  animate={{ x: autoSlide ? 20 : 0 }}
+                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
+                                  className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                    autoSlide ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                  }`}
+                                >
+                                  {autoSlide && (
+                                    <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </motion.div>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setAutoSlide(!autoSlide)}
+                                className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                  autoSlide ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                                }`}
                               >
-                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                              </motion.div>
-                            </button>
+                                <motion.div
+                                  animate={{ x: autoSlide ? 20 : 0 }}
+                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
+                                  className="relative w-6 h-5 flex items-center justify-center group"
+                                >
+                                  {/* Outer hover halo/bubble (capsule-shaped matching the pill, expanding on hover) */}
+                                  <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                  
+                                  {/* Knob - horizontal pill shape */}
+                                  <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                                </motion.div>
+                              </button>
+                            )}
                           </div>
                         </div>
 
@@ -2699,21 +3636,44 @@ export default function App() {
                           </div>
                           
                           <div className="flex items-center">
-                            <button
-                              onClick={() => setDynamicMotion(!dynamicMotion)}
-                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                dynamicMotion ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                              }`}
-                            >
-                              <motion.div
-                                animate={{ x: dynamicMotion ? 20 : 0 }}
-                                transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
-                                className="relative w-6 h-5 flex items-center justify-center group"
+                            {isMaterialDesignActive ? (
+                              <button
+                                onClick={() => setDynamicMotion(!dynamicMotion)}
+                                className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                  dynamicMotion ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                                }`}
                               >
-                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                              </motion.div>
-                            </button>
+                                <motion.div
+                                  animate={{ x: dynamicMotion ? 20 : 0 }}
+                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
+                                  className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                    dynamicMotion ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                  }`}
+                                >
+                                  {dynamicMotion && (
+                                    <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </motion.div>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setDynamicMotion(!dynamicMotion)}
+                                className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                  dynamicMotion ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                                }`}
+                              >
+                                <motion.div
+                                  animate={{ x: dynamicMotion ? 20 : 0 }}
+                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
+                                  className="relative w-6 h-5 flex items-center justify-center group"
+                                >
+                                  <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                  <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                                </motion.div>
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -2733,27 +3693,169 @@ export default function App() {
                       </div>
 
                       <div className="space-y-4">
+                        {/* Section: Installable Experimental Features */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 px-1 text-indigo-400 text-xs font-bold tracking-wider uppercase">
+                            <Sparkles className="w-4 h-4 animate-pulse" />
+                            <span>Cửa hàng Tính năng Thử nghiệm</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 gap-4">
+                            {expFeatures.map((feat) => {
+                              return (
+                                <div
+                                  key={feat.id}
+                                  className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-white/10"
+                                >
+                                  <div className="flex-1 space-y-1.5">
+                                    <div className="flex items-center gap-2 text-left">
+                                      <span className="font-bold text-base text-white">{feat.name}</span>
+                                      {feat.status === "installed" && (
+                                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-400 text-[10px] font-semibold uppercase tracking-wider">
+                                          Installed
+                                        </span>
+                                      )}
+                                      {feat.status === "installing" && (
+                                        <span className="px-2 py-0.5 rounded-full bg-amber-500/25 text-amber-400 text-[10px] font-semibold uppercase tracking-wider animate-pulse">
+                                          Installing... {feat.progress}%
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-white/60 leading-relaxed max-w-xl font-normal text-left">
+                                      {feat.desc}
+                                    </p>
+                                    {feat.status === "installing" && (
+                                      <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mt-3">
+                                        <div
+                                          className="h-full bg-indigo-500 transition-all duration-300 ease-out"
+                                          style={{ width: `${feat.progress}%` }}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="shrink-0 flex items-center gap-3 self-end sm:self-center">
+                                    {feat.status === "idle" && (
+                                      <button
+                                        onClick={() => installExpFeature(feat.id)}
+                                        className="px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+                                      >
+                                        Cài đặt (3s)
+                                      </button>
+                                    )}
+
+                                    {feat.status === "installed" && (
+                                      <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs text-white/50 font-medium font-sans">Kích hoạt:</span>
+                                          {isMaterialDesignActive ? (
+                                            <button
+                                              onClick={() => {
+                                                setExpFeatures(prev => prev.map(p => p.id === feat.id ? { ...p, isActive: !p.isActive } : p));
+                                              }}
+                                              className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                                feat.isActive ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                                              }`}
+                                            >
+                                              <motion.div
+                                                animate={{ x: feat.isActive ? 20 : 0 }}
+                                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                                className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                                  feat.isActive ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                                }`}
+                                              >
+                                                {feat.isActive && (
+                                                  <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                  </svg>
+                                                )}
+                                              </motion.div>
+                                            </button>
+                                          ) : (
+                                            <button
+                                              onClick={() => {
+                                                setExpFeatures(prev => prev.map(p => p.id === feat.id ? { ...p, isActive: !p.isActive } : p));
+                                              }}
+                                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                                feat.isActive ? "bg-[#34c759]" : "bg-white/20"
+                                              }`}
+                                            >
+                                              <motion.div
+                                                animate={{ x: feat.isActive ? 20 : 0 }}
+                                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                                className="w-5 h-5 rounded-full bg-white shadow-md"
+                                              />
+                                            </button>
+                                          )}
+                                        </div>
+                                        <button
+                                          onClick={() => {
+                                            setExpFeatures(prev => prev.map(p => p.id === feat.id ? { ...p, status: "idle", progress: 0, isActive: false } : p));
+                                          }}
+                                          className="p-2 rounded-full bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer"
+                                          title="Gỡ bỏ tính năng"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <div className="h-4" />
+                          <div className="flex items-center gap-2 px-1 text-white/40 text-xs font-bold tracking-wider uppercase">
+                            <Beaker className="w-4 h-4" />
+                            <span>Cài đặt Khác</span>
+                          </div>
+                        </div>
+
                         {/* Option 1: Low Latency */}
                         <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 flex items-center justify-between">
                           <div className="space-y-1 pr-4 text-left">
                             <h4 className="text-sm font-semibold text-white">settings.experimental.LowLatency.title</h4>
                             <p className="text-xs text-white/60 leading-relaxed">settings.experimental.LowLatency.subtitle</p>
                           </div>
-                          <button
-                            onClick={() => setExpLowLatency(!expLowLatency)}
-                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
-                              expLowLatency ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                            }`}
-                          >
-                            <motion.div
-                              animate={{ x: expLowLatency ? 20 : 0 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                              className="relative w-6 h-5 flex items-center justify-center group"
+                          {isMaterialDesignActive ? (
+                            <button
+                              onClick={() => setExpLowLatency(!expLowLatency)}
+                              className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                expLowLatency ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                              }`}
                             >
-                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                              <div className="w-full h-full rounded-full bg-white shadow-md z-10" />
-                            </motion.div>
-                          </button>
+                              <motion.div
+                                animate={{ x: expLowLatency ? 20 : 0 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                  expLowLatency ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                }`}
+                              >
+                                {expLowLatency && (
+                                  <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </motion.div>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setExpLowLatency(!expLowLatency)}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
+                                expLowLatency ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                              }`}
+                            >
+                              <motion.div
+                                animate={{ x: expLowLatency ? 20 : 0 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                className="relative w-6 h-5 flex items-center justify-center group"
+                              >
+                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                <div className="w-full h-full rounded-full bg-white shadow-md z-10" />
+                              </motion.div>
+                            </button>
+                          )}
                         </div>
 
                         {/* Option 2: Stream Cache */}
@@ -2762,21 +3864,44 @@ export default function App() {
                             <h4 className="text-sm font-semibold text-white">settings.experimental.StreamCache.title</h4>
                             <p className="text-xs text-white/60 leading-relaxed">settings.experimental.StreamCache.subtitle</p>
                           </div>
-                          <button
-                            onClick={() => setExpCache(!expCache)}
-                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
-                              expCache ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                            }`}
-                          >
-                            <motion.div
-                              animate={{ x: expCache ? 20 : 0 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                              className="relative w-6 h-5 flex items-center justify-center group"
+                          {isMaterialDesignActive ? (
+                            <button
+                              onClick={() => setExpCache(!expCache)}
+                              className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                expCache ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                              }`}
                             >
-                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                              <div className="w-full h-full rounded-full bg-white shadow-md z-10" />
-                            </motion.div>
-                          </button>
+                              <motion.div
+                                animate={{ x: expCache ? 20 : 0 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                  expCache ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                }`}
+                              >
+                                {expCache && (
+                                  <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </motion.div>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setExpCache(!expCache)}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
+                                expCache ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                              }`}
+                            >
+                              <motion.div
+                                animate={{ x: expCache ? 20 : 0 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                className="relative w-6 h-5 flex items-center justify-center group"
+                              >
+                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                <div className="w-full h-full rounded-full bg-white shadow-md z-10" />
+                              </motion.div>
+                            </button>
+                          )}
                         </div>
 
                         {/* Option 3: Ambient Glow */}
@@ -2785,21 +3910,44 @@ export default function App() {
                             <h4 className="text-sm font-semibold text-white">settings.experimental.AmbientGlow.title</h4>
                             <p className="text-xs text-white/60 leading-relaxed">settings.experimental.AmbientGlow.subtitle</p>
                           </div>
-                          <button
-                            onClick={() => setExpAmbientGlow(!expAmbientGlow)}
-                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
-                              expAmbientGlow ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                            }`}
-                          >
-                            <motion.div
-                              animate={{ x: expAmbientGlow ? 20 : 0 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                              className="relative w-6 h-5 flex items-center justify-center group"
+                          {isMaterialDesignActive ? (
+                            <button
+                              onClick={() => setExpAmbientGlow(!expAmbientGlow)}
+                              className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                expAmbientGlow ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                              }`}
                             >
-                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                              <div className="w-full h-full rounded-full bg-white shadow-md z-10" />
-                            </motion.div>
-                          </button>
+                              <motion.div
+                                animate={{ x: expAmbientGlow ? 20 : 0 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                  expAmbientGlow ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                }`}
+                              >
+                                {expAmbientGlow && (
+                                  <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </motion.div>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setExpAmbientGlow(!expAmbientGlow)}
+                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
+                                expAmbientGlow ? "bg-[#34c759]" : "bg-[#3a3a3c]"
+                              }`}
+                            >
+                              <motion.div
+                                animate={{ x: expAmbientGlow ? 20 : 0 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                className="relative w-6 h-5 flex items-center justify-center group"
+                              >
+                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                <div className="w-full h-full rounded-full bg-white shadow-md z-10" />
+                              </motion.div>
+                            </button>
+                          )}
                         </div>
 
                         {/* Custom Playground */}
@@ -3519,11 +4667,14 @@ export default function App() {
                                   <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
                                   <div className="flex items-center justify-center h-full">
                                     <div className={isMaterialDesignActive
-                                      ? "w-12 h-6 rounded-full p-0.5 bg-[#49454f] flex items-center"
+                                      ? "w-12 h-7 rounded-full p-[3px] bg-[#1d1b20] border-2 border-[#938f99] flex items-center"
                                       : "w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center"
                                     }>
-                                      <div className="relative w-6 h-5 flex items-center justify-center">
-                                        <div className="w-full h-full rounded-full bg-white shadow-md" />
+                                      <div className={isMaterialDesignActive
+                                        ? "w-3.5 h-3.5 rounded-full bg-[#938f99]"
+                                        : "relative w-6 h-5 flex items-center justify-center"
+                                      }>
+                                        {!isMaterialDesignActive && <div className="w-full h-full rounded-full bg-white shadow-md" />}
                                       </div>
                                     </div>
                                   </div>
@@ -3533,7 +4684,7 @@ export default function App() {
                               {/* State: Hover */}
                               <div className={isMaterialDesignActive
                                 ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
+                               : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
                               }>
                                 <div className={isMaterialDesignActive
                                   ? "p-4 h-full flex flex-col justify-between"
@@ -3542,15 +4693,21 @@ export default function App() {
                                   <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
                                   <div className="flex items-center justify-center h-full">
                                     <div className={isMaterialDesignActive
-                                      ? "w-12 h-6 rounded-full p-0.5 bg-[#49454f] flex items-center"
+                                      ? "w-12 h-7 rounded-full p-[3px] bg-[#2a2831] border-2 border-[#ccc8d3] flex items-center"
                                       : "w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center"
                                     }>
-                                      <div className="relative w-6 h-5 flex items-center justify-center scale-110 transition-all">
-                                        <div className={isMaterialDesignActive
-                                          ? "absolute -inset-2 rounded-full bg-[#d0bcff]/15 scale-100 transition-all pointer-events-none"
-                                          : "absolute -inset-2 rounded-full bg-white/15 scale-100 transition-all pointer-events-none"
-                                        } />
-                                        <div className="w-full h-full rounded-full bg-transparent border-white border backdrop-blur-md shadow-md" />
+                                      <div className={isMaterialDesignActive
+                                        ? "w-3.5 h-3.5 rounded-full bg-[#ccc8d3] relative flex items-center justify-center"
+                                        : "relative w-6 h-5 flex items-center justify-center scale-110 transition-all"
+                                      }>
+                                        {isMaterialDesignActive ? (
+                                          <div className="absolute -inset-2 rounded-full bg-[#ccc8d3]/15 scale-110" />
+                                        ) : (
+                                          <>
+                                            <div className="absolute -inset-2 rounded-full bg-white/15 scale-100 transition-all pointer-events-none" />
+                                            <div className="w-full h-full rounded-full bg-transparent border-white border backdrop-blur-md shadow-md" />
+                                          </>
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -3569,11 +4726,20 @@ export default function App() {
                                   <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
                                   <div className="flex items-center justify-center h-full">
                                     <div className={isMaterialDesignActive
-                                      ? "w-12 h-6 rounded-full p-0.5 bg-[#6750a4] flex items-center justify-end"
+                                      ? "w-12 h-7 rounded-full p-[3px] bg-[#381e72] flex items-center justify-end"
                                       : "w-12 h-6 rounded-full p-0.5 bg-[#34c759] flex items-center justify-end"
                                     }>
-                                      <div className="relative w-6 h-5 flex items-center justify-center">
-                                        <div className="w-full h-full rounded-full bg-white shadow-md" />
+                                      <div className={isMaterialDesignActive
+                                        ? "w-4.5 h-4.5 rounded-full bg-[#d0bcff] flex items-center justify-center text-[#381e72]"
+                                        : "relative w-6 h-5 flex items-center justify-center"
+                                      }>
+                                        {isMaterialDesignActive ? (
+                                          <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                          </svg>
+                                        ) : (
+                                          <div className="w-full h-full rounded-full bg-white shadow-md" />
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -3591,23 +4757,46 @@ export default function App() {
                                 }>
                                   <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
                                   <div className="flex items-center justify-center h-full">
-                                    <button
-                                      onClick={() => setDemoToggleState(!demoToggleState)}
-                                      className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                        demoToggleState 
-                                          ? isMaterialDesignActive ? "bg-[#6750a4]" : "bg-[#34c759]"
-                                          : isMaterialDesignActive ? "bg-[#49454f]" : "bg-[#3a3a3c]"
-                                      }`}
-                                    >
-                                      <motion.div
-                                        animate={{ x: demoToggleState ? 24 : 0 }}
-                                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                        className="relative w-5 h-5 flex items-center justify-center group"
+                                    {isMaterialDesignActive ? (
+                                      <button
+                                        onClick={() => setDemoToggleState(!demoToggleState)}
+                                        className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
+                                          demoToggleState ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                                        }`}
                                       >
-                                        <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                        <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                                      </motion.div>
-                                    </button>
+                                        <motion.div
+                                          animate={{ x: demoToggleState ? 20 : 0 }}
+                                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                          className={`rounded-full flex items-center justify-center transition-all duration-300 ${
+                                            demoToggleState ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                          }`}
+                                        >
+                                          {demoToggleState && (
+                                            <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                          )}
+                                        </motion.div>
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={() => setDemoToggleState(!demoToggleState)}
+                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                          demoToggleState 
+                                            ? "bg-[#34c759]"
+                                            : "bg-[#3a3a3c]"
+                                        }`}
+                                      >
+                                        <motion.div
+                                          animate={{ x: demoToggleState ? 24 : 0 }}
+                                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                          className="relative w-5 h-5 flex items-center justify-center group"
+                                        >
+                                          <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                          <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                                        </motion.div>
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -4019,8 +5208,109 @@ export default function App() {
       </div>
 
       <nav id="bottom-dock-container" className="fixed bottom-6 inset-x-0 mx-auto w-11/12 max-w-[420px] z-50 h-16 transform-gpu">
+        {/* Reimagined Search Popover */}
+        <AnimatePresence>
+          {isReimaginedSearchActive && reimaginedSearchOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 15, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 15, scale: 0.95 }}
+              transition={dynamicMotion ? { duration: 0.25, ease: "easeOut" } : { duration: 0 }}
+              className="absolute bottom-20 left-0 right-0 max-h-[380px] rounded-[24px] border border-white/10 bg-[#161224]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col z-[100] text-left text-white"
+            >
+              {/* Header */}
+              <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between text-[11px] text-white/50 font-semibold uppercase tracking-wider bg-white/[0.02]">
+                <span>Kết quả tìm kiếm</span>
+                {searchQuery && (
+                  <span className="font-mono lowercase bg-indigo-500/25 text-indigo-400 px-2 py-0.5 rounded">
+                    {searchResults.length} tìm thấy
+                  </span>
+                )}
+              </div>
+
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2 flex flex-col justify-between">
+                {!searchQuery ? (
+                  <div className="py-8 px-4 text-center flex flex-col items-center justify-center text-white/40 my-auto">
+                    <Search className="w-8 h-8 mb-2 text-white/20" />
+                    <p className="text-xs font-medium">Nhập từ khóa để tìm nhanh...</p>
+                    <p className="text-[10px] text-white/30 mt-1 max-w-[250px]">
+                      Tìm kiếm kênh truyền hình trực tiếp, đài phát thanh địa phương hoặc quốc tế.
+                    </p>
+                  </div>
+                ) : searchResults.length === 0 ? (
+                  <div className="py-8 px-4 text-center flex flex-col items-center justify-center text-white/40 my-auto">
+                    <HelpCircle className="w-8 h-8 mb-2 text-white/20" />
+                    <p className="text-xs font-medium">Không tìm thấy kênh phù hợp</p>
+                    <p className="text-[10px] text-white/30 mt-1">
+                      Hãy thử tìm bằng từ khóa khác hoặc kiểm tra chính tả.
+                    </p>
+                  </div>
+                ) : (
+                  searchResults.slice(0, 5).map((ch) => {
+                    return (
+                      <button
+                        key={ch.id}
+                        onClick={() => {
+                          handleSelectChannel(ch);
+                          setActiveTab("live");
+                          setReimaginedSearchOpen(false);
+                          setSearchQuery("");
+                        }}
+                        className="w-full flex items-center gap-3 p-2.5 rounded-2xl hover:bg-white/10 text-left transition-all group/item duration-150 cursor-pointer"
+                      >
+                        {/* Channel Logo */}
+                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover/item:scale-105">
+                          {ch.logoImg ? (
+                            <img
+                              src={ch.logoImg}
+                              alt={ch.name}
+                              className="w-full h-full object-contain"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <span className="text-[10px] font-bold text-white/60">
+                              {ch.logoText || "TV"}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-semibold text-white/90 truncate group-hover/item:text-indigo-400 transition-colors">
+                            {ch.name}
+                          </h4>
+                          <p className="text-[11px] text-white/50 truncate mt-0.5">
+                            {ch.group}
+                          </p>
+                        </div>
+
+                        {/* Play Icon */}
+                        <div className="w-8 h-8 rounded-full bg-white/5 group-hover/item:bg-indigo-500 text-white/40 group-hover/item:text-white flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all duration-150 shrink-0 scale-90 group-hover/item:scale-100">
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+
+                {searchQuery && searchResults.length > 5 && (
+                  <button
+                    onClick={() => {
+                      setReimaginedSearchOpen(false);
+                      setActiveTab("search");
+                    }}
+                    className="w-full text-center py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-[11px] font-bold text-indigo-400 hover:text-indigo-300 transition-all cursor-pointer block"
+                  >
+                    Xem thêm kết quả ({searchResults.length - 5})
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence mode="wait">
-          {activeTab === "search" ? (
+          {(activeTab === "search" || (isReimaginedSearchActive && reimaginedSearchOpen)) ? (
             <motion.div
               key="search-bar-dock"
               initial={{ y: 50, opacity: 0 }}
@@ -4029,15 +5319,24 @@ export default function App() {
               transition={dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 }}
               className={`w-full h-16 flex items-center px-4 gap-2 relative transform-gpu ${
                 isMaterialDesignActive
-                  ? "rounded-full bg-[#ece6f0] border-0 text-[#1c1b1f] shadow-lg"
+                  ? "rounded-full bg-[#2b2930] border-0 text-[#e6e1e5] shadow-lg"
                   : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)]"
               }`}
             >
-              {isMaterialDesignActive ? (
+              {isVIntelligenceActive ? (
+                <motion.img
+                  animate={{ rotate: vIntelSpinCount * 360 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
+                  className="w-5.5 h-5.5 pointer-events-none object-contain ml-1"
+                  referrerPolicy="no-referrer"
+                  alt="V-Intelligence"
+                />
+              ) : isMaterialDesignActive ? (
                 <img
                   src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
                   className="w-5.5 h-5.5 transition-transform duration-300 pointer-events-none object-contain ml-1"
-                  style={{ filter: "invert(27%) sepia(8%) saturate(1008%) hue-rotate(216deg) brightness(97%) contrast(88%)" }}
+                  style={{ filter: "brightness(0) invert(1) opacity-80" }}
                   referrerPolicy="no-referrer"
                   alt="Search"
                 />
@@ -4051,27 +5350,68 @@ export default function App() {
               )}
               <input
                 type="text"
-                placeholder="Search Vplay"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`flex-1 bg-transparent border-none text-white text-sm focus:outline-none placeholder-white/40 px-1 font-sans ${isMaterialDesignActive ? "text-[#1c1b1f] placeholder-[#49454f] text-base font-normal" : ""}`}
+                placeholder={isVIntelligenceActive ? "Hỏi Trợ lý V-Intelligence... (Nhấn Enter)" : "Search Vplay"}
+                value={isVIntelligenceActive ? vIntelQuery : searchQuery}
+                onChange={(e) => {
+                  if (isVIntelligenceActive) {
+                    setVIntelQuery(e.target.value);
+                  } else {
+                    setSearchQuery(e.target.value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && isVIntelligenceActive) {
+                    handleSendVIntelMsg();
+                  }
+                }}
+                className={`flex-1 bg-transparent border-none text-white text-sm focus:outline-none placeholder-white/40 px-1 font-sans ${isMaterialDesignActive ? "text-[#e6e1e5] placeholder-[#cac4d0]/60 text-base font-normal" : ""}`}
                 autoFocus
               />
-              {isMaterialDesignActive && (
-                <Mic className="w-5.5 h-5.5 text-[#49454f] z-20 mr-1 shrink-0 cursor-pointer hover:scale-110 transition-all duration-200" />
-              )}
-              {searchQuery && (
+              {isVIntelligenceActive && vIntelQuery.trim() && (
                 <button
-                  onClick={() => setSearchQuery("")}
-                  className={`p-1 ${isMaterialDesignActive ? "text-[#49454f] hover:text-[#1c1b1f]" : "text-white/40 hover:text-white"}`}
+                  onClick={() => handleSendVIntelMsg()}
+                  disabled={isVIntelLoading}
+                  className="p-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white transition-all bouncy-btn mr-1 shrink-0 cursor-pointer shadow"
+                  title="Gửi"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {isMaterialDesignActive && !isVIntelligenceActive && (
+                <Mic className="w-5.5 h-5.5 text-[#cac4d0] z-20 mr-1 shrink-0 cursor-pointer hover:scale-110 transition-all duration-200" />
+              )}
+              {((isVIntelligenceActive && vIntelQuery) || (!isVIntelligenceActive && searchQuery)) && (
+                <button
+                  onClick={() => {
+                    if (isVIntelligenceActive) {
+                      setVIntelQuery("");
+                    } else {
+                      setSearchQuery("");
+                    }
+                  }}
+                  className={`p-1 ${isMaterialDesignActive ? "text-[#cac4d0] hover:text-[#e6e1e5]" : "text-white/40 hover:text-white"}`}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
               <button
                 onClick={() => {
-                  setSearchQuery("");
-                  setActiveTab(prevTab);
+                  if (isVIntelligenceActive) {
+                    setVIntelQuery("");
+                    setVIntelHistory([]);
+                    if (reimaginedSearchOpen) {
+                      setReimaginedSearchOpen(false);
+                    } else {
+                      setActiveTab(prevTab);
+                    }
+                  } else {
+                    setSearchQuery("");
+                    if (isReimaginedSearchActive && reimaginedSearchOpen) {
+                      setReimaginedSearchOpen(false);
+                    } else {
+                      setActiveTab(prevTab);
+                    }
+                  }
                 }}
                 className={`w-8 h-8 flex items-center justify-center text-white cursor-default shrink-0 ${
                   isMaterialDesignActive ? "duration-200" : "bouncy-btn"
@@ -4110,7 +5450,7 @@ export default function App() {
                   <div className="flex items-center justify-around w-full h-full">
                     {[
                       { id: "home", icon: Home, label: "Home", isVtvGo: false },
-                      { id: "live", icon: Radio, label: "Live", isVtvGo: false },
+                      { id: "live", icon: Tv, label: "Live", isVtvGo: false },
                       ...customTabs.map((t: any) => ({
                         id: t.id,
                         icon: ICON_REGISTRY[t.iconName] || Sparkles,
@@ -4126,31 +5466,16 @@ export default function App() {
                         ? (activeTab === "live" && selectedChannel?.id === "vietnam-wild-live")
                         : (activeTab === tab.id && !(activeTab === "live" && selectedChannel?.id === "vietnam-wild-live"));
                       const Icon = tab.icon;
-                      const materialIconUrl = isMaterialDesignActive ? {
-                        home: "https://static.wikia.nocookie.net/ep-deo/images/7/79/Home_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081313",
-                        live: "https://static.wikia.nocookie.net/ep-deo/images/9/96/Sensors_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081313",
-                        settings: "https://static.wikia.nocookie.net/ep-deo/images/2/26/Settings_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081312"
-                      }[tab.id] : undefined;
                       
                       return (
                         <button 
                           key={tab.id}
                           onClick={() => {
                             if (tab.isVtvGo) {
-                              const now = new Date();
-                              const timeVal = now.getHours() * 60 + now.getMinutes();
-                              const startVal = 12 * 60 + 30;
-                              const endVal = 14 * 60 + 30;
-                              const isUnlocked = timeVal >= startVal && timeVal <= endVal;
- 
-                              if (isUnlocked) {
-                                const wildChannel = flattenedChannels.find(ch => ch.id === "vietnam-wild-live");
-                                if (wildChannel) {
-                                  setSelectedChannel(wildChannel);
-                                  setActiveTab("live");
-                                }
-                              } else {
-                                  setShowVtvGoLockedModal(true);
+                              const wildChannel = flattenedChannels.find(ch => ch.id === "vietnam-wild-live");
+                              if (wildChannel) {
+                                setSelectedChannel(wildChannel);
+                                setActiveTab("live");
                               }
                             } else {
                               setActiveTab(tab.id as any);
@@ -4179,15 +5504,15 @@ export default function App() {
                               }
                             }
                           }}
-                          className={`relative flex flex-col items-center justify-center flex-1 h-full cursor-default z-10 px-2 transition-all transform-gpu ${
+                          className={`relative group flex flex-col items-center justify-center flex-1 h-full cursor-default z-10 px-2 transition-all transform-gpu ${
                             isMaterialDesignActive ? "duration-200" : "bouncy-btn"
-                          } ${
-                            isActive 
-                              ? (isMaterialDesignActive ? "text-white font-medium" : "text-indigo-950 font-normal") 
-                              : (isMaterialDesignActive ? "text-white/60 hover:text-white" : "text-white/65 hover:text-white")
                           }`}
-                          title={tab.label}
                         >
+                          {/* Premium Custom Tooltip */}
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                            {tab.label}
+                          </div>
+
                           {isActive && (
                             <motion.div
                               layoutId="activeTabPill"
@@ -4201,23 +5526,14 @@ export default function App() {
                               }
                             />
                           )}
-                          {materialIconUrl ? (
-                            <img
-                              src={materialIconUrl}
-                              className={`w-6 h-6 transition-transform duration-300 ${isActive && !isMaterialDesignActive ? "scale-105" : ""}`}
-                              style={isMaterialDesignActive
-                                ? { filter: isActive ? "brightness(0)" : "brightness(0) invert(1)", opacity: isActive ? 1.0 : 0.6 }
-                                : (isActive 
-                                  ? { filter: "invert(85%) sepia(21%) saturate(1021%) hue-rotate(217deg) brightness(101%) contrast(102%)" } 
-                                  : { filter: "invert(27%) sepia(8%) saturate(1008%) hue-rotate(216deg) brightness(97%) contrast(88%)" }
-                                )
-                              }
-                              referrerPolicy="no-referrer"
-                              alt={tab.label}
-                            />
-                          ) : (
-                            <Icon className={`w-6 h-6 transition-transform duration-300 ${isActive && !isMaterialDesignActive ? "scale-105" : ""} ${isActive && isMaterialDesignActive ? "text-white opacity-100" : (isMaterialDesignActive ? "text-white opacity-60" : "")}`} />
-                          )}
+
+                          <Icon 
+                            className={`w-6 h-6 transition-all duration-300 ${
+                              isActive 
+                                ? (isMaterialDesignActive ? "scale-105 text-[#290a36] opacity-100" : "scale-105 text-indigo-950 opacity-100") 
+                                : "text-white opacity-85 group-hover:opacity-100 group-hover:scale-105"
+                            }`} 
+                          />
                         </button>
                       );
                     })}
@@ -4228,17 +5544,36 @@ export default function App() {
               {/* Separate Search Button */}
               <button
                 onClick={() => {
-                  setPrevTab(activeTab as any);
-                  setActiveTab("search");
+                  if (isVIntelligenceActive) {
+                    setVIntelSpinCount(prev => prev + 1);
+                  }
+                  if (isReimaginedSearchActive || isVIntelligenceActive) {
+                    setReimaginedSearchOpen(true);
+                  } else {
+                    setPrevTab(activeTab as any);
+                    setActiveTab("search");
+                  }
                 }}
-                className={`w-16 h-16 flex items-center justify-center group shrink-0 transform-gpu transition-all ${
+                className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
                   isMaterialDesignActive
                     ? "bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white shadow-lg border-0 rounded-[20px] duration-200"
                     : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
                 }`}
-                title="Search"
               >
-                {isMaterialDesignActive ? (
+                {/* Premium Custom Tooltip */}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  {isVIntelligenceActive ? "V-Intelligence" : "Tìm kiếm kênh"}
+                </div>
+                {isVIntelligenceActive ? (
+                  <motion.img
+                    animate={{ rotate: vIntelSpinCount * 360 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
+                    className="w-7.5 h-7.5 pointer-events-none object-contain group-hover:scale-110"
+                    referrerPolicy="no-referrer"
+                    alt="V-Intelligence"
+                  />
+                ) : isMaterialDesignActive ? (
                   <img
                     src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
                     className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
@@ -4290,6 +5625,256 @@ export default function App() {
           >
             {toastMessage}
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* V-Intelligence Copilot-style Sidebar Drawer */}
+      <AnimatePresence>
+        {isVIntelligenceActive && reimaginedSearchOpen && (
+          <>
+            {/* Soft backdrop on mobile only */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setReimaginedSearchOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] md:hidden"
+            />
+
+            <motion.div
+              initial={{ x: "100%", opacity: 0.95 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+              className="fixed top-[40px] right-0 h-[calc(100vh-40px)] w-full sm:w-[380px] md:w-[420px] bg-[#0c0819]/95 backdrop-blur-[40px] saturate-[180%] border-l border-white/10 shadow-[-10px_0_40px_rgba(0,0,0,0.6)] z-[90] flex flex-col text-left text-white"
+            >
+              {/* Copilot-style Glowing Header Accent */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-500 via-indigo-500 via-purple-500 to-pink-500" />
+
+              {/* Drawer Header */}
+              <div className="px-5 pt-6 pb-4 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+                <div className="flex items-center gap-3">
+                  <div className="relative cursor-pointer" onClick={() => setVIntelSpinCount(prev => prev + 1)}>
+                    <motion.img
+                      animate={{ rotate: vIntelSpinCount * 360 }}
+                      transition={{ duration: 0.8, ease: "easeInOut" }}
+                      src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
+                      className="w-8 h-8 object-contain filter drop-shadow-[0_0_8px_rgba(99,102,241,0.55)] hover:scale-105 transition-transform"
+                      referrerPolicy="no-referrer"
+                      alt="V-Intelligence"
+                    />
+                    {isVIntelLoading && (
+                      <span className="absolute inset-0 rounded-full border border-indigo-500 animate-ping opacity-75" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white tracking-wide flex items-center gap-1.5">
+                      V-Intelligence
+                      <span className="text-[9px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full">
+                        AI
+                      </span>
+                    </h3>
+                    <p className="text-[10px] text-white/50 font-medium">Trợ lý Trí tuệ Nhân tạo thông minh</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  {vIntelHistory.length > 0 && (
+                    <button
+                      onClick={() => setVIntelHistory([])}
+                      className="p-1.5 rounded-xl text-white/40 hover:text-red-400 hover:bg-white/5 transition-all cursor-pointer"
+                      title="Xóa cuộc trò chuyện"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setReimaginedSearchOpen(false)}
+                    className="p-1.5 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+                    title="Đóng"
+                  >
+                    <X className="w-4.5 h-4.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Segmented control for Copilot options: Chat và Search with AI */}
+              <div className="px-5 py-3 border-b border-white/5 bg-white/[0.005]">
+                <div className="p-0.5 rounded-xl bg-white/5 border border-white/5 flex gap-1">
+                  <button
+                    onClick={() => setVIntelMode("chat")}
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                      vIntelMode === "chat"
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10 border border-indigo-500/20"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    Chat
+                  </button>
+                  <button
+                    onClick={() => setVIntelMode("search")}
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                      vIntelMode === "search"
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10 border border-indigo-500/20"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <Search className="w-3.5 h-3.5" />
+                    Search with AI
+                  </button>
+                </div>
+              </div>
+
+              {/* Chat Content Body */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
+                {vIntelHistory.length === 0 ? (
+                  <div className="h-full flex flex-col justify-center py-6 text-center text-white/40">
+                    <div className="relative mb-4 flex items-center justify-center">
+                      <img
+                        src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
+                        className="w-14 h-14 animate-pulse object-contain filter drop-shadow-[0_0_12px_rgba(99,102,241,0.5)]"
+                        referrerPolicy="no-referrer"
+                        alt="V-Intelligence"
+                      />
+                    </div>
+                    <p className="text-sm font-bold text-white mb-1.5">
+                      {vIntelMode === "chat" ? "Chào mừng đến với Trợ lý V-Intelligence!" : "Tìm kiếm kênh thông minh bằng AI"}
+                    </p>
+                    <p className="text-[11.5px] text-white/50 leading-relaxed max-w-[320px] mx-auto mb-6">
+                      {vIntelMode === "chat"
+                        ? "Mình xưng hô là mình - bạn, luôn nhiệt tình và sẵn sàng hỗ trợ bạn điều khiển tivi, tìm kiếm thể loại, giải đáp các thắc mắc nhanh chóng."
+                        : "Công nghệ AI sinh tạo giúp bạn quét toàn bộ hệ thống kênh truyền hình Vplay để tìm chính xác kênh bạn muốn. Hãy nhập mô tả bên dưới."}
+                    </p>
+                    
+                    <div className="w-full space-y-2 text-left">
+                      <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest pl-1">
+                        Gợi ý cho bạn:
+                      </p>
+                      {(vIntelMode === "chat"
+                        ? [
+                            "Bật kênh VTV3",
+                            "Thời tiết hôm nay thế nào?",
+                            "Kênh VTV1 chiếu gì vậy?",
+                            "Kể cho mình nghe một câu chuyện vui"
+                          ]
+                        : [
+                            "Tìm các kênh thể thao, bóng đá",
+                            "Gợi ý các kênh truyền hình địa phương",
+                            "Kênh nào chiếu phim truyện?",
+                            "Mở đài phát thanh Radio ca nhạc"
+                          ]
+                      ).map((suggestion, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setVIntelQuery(suggestion);
+                            handleSendVIntelMsg(suggestion);
+                          }}
+                          className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/20 text-xs font-medium text-indigo-200 hover:text-white transition-all cursor-pointer flex items-center gap-2.5 group"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0 group-hover:scale-110 group-hover:rotate-12 transition-transform" />
+                          <span className="truncate">{suggestion}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {vIntelHistory.map((msg, index) => (
+                      <div
+                        key={index}
+                        className={`flex flex-col ${
+                          msg.role === "user" ? "items-end" : "items-start"
+                        }`}
+                      >
+                        <div className={`text-[9px] text-white/40 mb-1 font-semibold uppercase tracking-wider px-1 ${msg.role === "user" ? "text-right" : "text-left"}`}>
+                          {msg.role === "user" ? "Bạn" : "V-Intelligence"}
+                        </div>
+                        <div
+                          className={`p-3.5 rounded-2xl text-[12.5px] leading-relaxed max-w-[88%] whitespace-pre-wrap break-words shadow-md border ${
+                            msg.role === "user"
+                              ? "bg-gradient-to-br from-indigo-600/40 to-indigo-700/40 border-indigo-500/30 text-white rounded-tr-none"
+                              : "bg-white/5 border-white/10 text-white/95 rounded-tl-none"
+                          }`}
+                        >
+                          {msg.text}
+                        </div>
+                      </div>
+                    ))}
+                    {isVIntelLoading && (
+                      <div className="flex flex-col items-start animate-pulse">
+                        <div className="text-[9px] text-white/40 mb-1 font-semibold uppercase tracking-wider px-1">
+                          V-Intelligence
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-[12.5px] text-white/50 rounded-tl-none flex items-center gap-2">
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+                          <span>V-Intelligence đang suy nghĩ...</span>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={vIntelScrollRef} />
+                  </div>
+                )}
+              </div>
+
+              {/* Copilot Prompt Input Area at the bottom */}
+              <div className="p-4 border-t border-white/5 bg-white/[0.01] flex flex-col gap-2">
+                <div className="relative rounded-2xl bg-white/5 border border-white/10 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/50 transition-all p-3 flex flex-col gap-2 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                  <textarea
+                    rows={3}
+                    placeholder={vIntelMode === "chat" ? "Hỏi Trợ lý V-Intelligence... (Nhấn Enter)" : "Mô tả kênh bạn muốn tìm kiếm..."}
+                    value={vIntelQuery}
+                    onChange={(e) => setVIntelQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendVIntelMsg();
+                      }
+                    }}
+                    className="w-full bg-transparent border-0 text-white text-[12.5px] placeholder-white/30 focus:outline-none resize-none font-sans px-1 pt-1 leading-relaxed"
+                  />
+                  
+                  <div className="flex items-center justify-between px-1 pt-1 text-white/40">
+                    <span className="text-[10px] text-white/30 font-mono">
+                      {vIntelQuery.length}/2000
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {vIntelQuery.trim() && (
+                        <button
+                          onClick={() => setVIntelQuery("")}
+                          className="p-1 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-all cursor-pointer"
+                          title="Xóa"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleSendVIntelMsg()}
+                        disabled={isVIntelLoading || !vIntelQuery.trim()}
+                        className={`p-1.5 rounded-xl transition-all cursor-pointer shadow flex items-center justify-center ${
+                          vIntelQuery.trim()
+                            ? "bg-indigo-600 hover:bg-indigo-500 text-white hover:scale-105"
+                            : "bg-white/5 text-white/20 cursor-not-allowed"
+                        }`}
+                        title="Gửi"
+                      >
+                        {isVIntelLoading ? (
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Send className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-[9.5px] text-center text-white/30 px-2 leading-relaxed">
+                  Trợ lý AI sử dụng Gemini API. Câu trả lời có thể chứa thông tin chưa chính xác.
+                </div>
+              </div>
+
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
@@ -4578,6 +6163,128 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* STORAGE WARNING / FULL POPUPS */}
+      <AnimatePresence>
+        {showNearFullPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+            className="fixed inset-0 bg-black/60 backdrop-blur-[15px] z-[120] flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+              className={`w-full max-w-[420px] relative text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#1c1c1e]/95 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.4)] border border-white/10 text-white"
+              }`}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2.5 rounded-full bg-amber-500/10 text-amber-400">
+                  <HardDrive className="w-6 h-6 animate-pulse" />
+                </div>
+                <h3 className={`text-[19px] font-bold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
+                  Ổ cứng sắp đầy
+                </h3>
+              </div>
+              <p className={`text-[13px] mb-6 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/70"}`}>
+                Test Vplay là một ứng dụng dùng cho mục đích thử nghiệm và chỉ hỗ trợ sử dụng tối đa 3GB dữ liệu. Hãy dọn dẹp ổ cứng Vplay của bạn để sử dụng ứng dụng Test Vplay một cách mượt mà nhất
+              </p>
+              
+              <div className="space-y-2.5">
+                <button
+                  onClick={handleCleanStorage}
+                  className={`w-full py-3 px-4 rounded-full font-bold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                    isMaterialDesignActive
+                      ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
+                      : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-lg"
+                  }`}
+                >
+                  Dọn dẹp ổ cứng
+                </button>
+                <button
+                  onClick={() => setHasDismissedNearFull(true)}
+                  className={`w-full py-3 px-4 rounded-full font-semibold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                    isMaterialDesignActive
+                      ? "bg-white/5 hover:bg-white/10 text-[#e6e1e5] border border-white/10"
+                      : "bg-white/10 hover:bg-white/15 text-white"
+                  }`}
+                >
+                  Tiếp tục sử dụng
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showFullPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+            className="fixed inset-0 bg-black/80 backdrop-blur-[25px] z-[150] flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+              className={`w-full max-w-[420px] relative text-left transform-gpu ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#1c1c1e]/95 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 text-white"
+              }`}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2.5 rounded-full bg-red-500/10 text-red-400">
+                  <HardDrive className="w-6 h-6 animate-pulse" />
+                </div>
+                <h3 className={`text-[19px] font-bold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
+                  Ổ cứng đã đầy
+                </h3>
+              </div>
+              <p className={`text-[13px] mb-6 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/70"}`}>
+                Test Vplay là một ứng dụng dùng cho mục đích thử nghiệm và chỉ hỗ trợ sử dụng tối đa 3GB dữ liệu. Hãy dọn dẹp ổ cứng Vplay của bạn để tiếp tục sử dụng ứng dụng Test Vplay. Quyền sử dụng Vplay sẽ tạm thời bị khóa cho đến khi ổ cứng của bạn được dọn dẹp.
+              </p>
+              
+              <div className="space-y-2.5">
+                <button
+                  onClick={handleCleanStorage}
+                  className={`w-full py-3 px-4 rounded-full font-bold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                    isMaterialDesignActive
+                      ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
+                      : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-lg"
+                  }`}
+                >
+                  Dọn dẹp ổ cứng
+                </button>
+                <button
+                  onClick={() => window.location.reload()}
+                  className={`w-full py-3 px-4 rounded-full font-semibold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                    isMaterialDesignActive
+                      ? "bg-white/5 hover:bg-white/10 text-[#e6e1e5] border border-white/10"
+                      : "bg-white/10 hover:bg-white/15 text-white"
+                  }`}
+                >
+                  Tải lại trang
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* STORAGE CLEANUP MODAL WITH ADVANCED FEATURES */}
+      {renderCleanupModal()}
 
       {/* ABOUT VPLAY360 MODAL */}
       <AnimatePresence>
@@ -4911,8 +6618,11 @@ export default function App() {
                                       ? "bg-amber-500/5 border border-amber-400/30 hover:border-amber-400 hover:bg-amber-500/10"
                                       : "bg-white/5 border border-white/10 hover:border-white hover:bg-white/10")
                               }`}
-                              title={ch.name}
                             >
+                              {/* Premium Custom Tooltip */}
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-xl scale-95 group-hover:scale-100">
+                                {t(ch.name)}
+                              </div>
                               <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg">
                                 {ch.logoImg ? (
                                   <img
@@ -4997,6 +6707,20 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {isRemoteControlActive && (
+        <VirtualRemoteControl
+          isActive={isRemoteControlActive}
+          onDisable={() => {
+            setPlugins(prev => prev.map(p => p.id === "remote_control" ? { ...p, isActive: false } : p));
+          }}
+          channels={numberedChannels}
+          onSelectChannel={(ch) => {
+            handleSelectChannel(ch);
+            setActiveTab("live");
+          }}
+        />
+      )}
 
     </div>
     </MotionConfig>

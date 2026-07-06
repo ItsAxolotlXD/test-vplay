@@ -272,20 +272,98 @@
 }
 
 /* Material Design 3 Bouncy Button Hover Overrides */
-body.material-design-active .bouncy-btn,
-.material-design-active .bouncy-btn {
+body.material-design-3 .bouncy-btn,
+.material-design-3 .bouncy-btn,
+body.material-design-3 button,
+.material-design-3 button,
+body.material-design-3 a,
+.material-design-3 a,
+body.material-design-3 [role="button"],
+.material-design-3 [role="button"] {
   transform: none !important;
+  scale: none !important;
   transition: background-color 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
-body.material-design-active .bouncy-btn:hover,
-.material-design-active .bouncy-btn:hover {
+body.material-design-3 .bouncy-btn:hover,
+.material-design-3 .bouncy-btn:hover,
+body.material-design-3 button:hover,
+.material-design-3 button:hover,
+body.material-design-3 a:hover,
+.material-design-3 a:hover,
+body.material-design-3 [role="button"]:hover,
+.material-design-3 [role="button"]:hover {
+  transform: none !important;
+  scale: none !important;
+}
+
+body.material-design-3 .bouncy-btn:active,
+.material-design-3 .bouncy-btn:active,
+body.material-design-3 button:active,
+.material-design-3 button:active,
+body.material-design-3 a:active,
+.material-design-3 a:active,
+body.material-design-3 [role="button"]:active,
+.material-design-3 [role="button"]:active {
+  transform: none !important;
+  scale: none !important;
+}
+
+/* MD3 Range Slider Override */
+body.material-design-3 .range-slider-pill,
+.material-design-3 .range-slider-pill {
+  height: 16px !important;
+  border-radius: 9999px !important;
+}
+
+body.material-design-3 .range-slider-pill::-webkit-slider-thumb,
+.material-design-3 .range-slider-pill::-webkit-slider-thumb {
+  width: 4px !important;
+  height: 24px !important;
+  border-radius: 2px !important;
+  background: #ffffff !important;
+  border: 1px solid #381e72 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
   transform: none !important;
 }
 
-body.material-design-active .bouncy-btn:active,
-.material-design-active .bouncy-btn:active {
+body.material-design-3 .range-slider-pill::-moz-range-thumb,
+.material-design-3 .range-slider-pill::-moz-range-thumb {
+  width: 4px !important;
+  height: 24px !important;
+  border-radius: 2px !important;
+  background: #ffffff !important;
+  border: 1px solid #381e72 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
   transform: none !important;
+}
+
+body.material-design-3 .range-slider-pill:hover::-webkit-slider-thumb,
+.material-design-3 .range-slider-pill:hover::-webkit-slider-thumb {
+  transform: scaleY(1.1) !important;
+  background: #ffffff !important;
+  border-color: #381e72 !important;
+}
+
+body.material-design-3 .range-slider-pill:hover::-moz-range-thumb,
+.material-design-3 .range-slider-pill:hover::-moz-range-thumb {
+  transform: scaleY(1.1) !important;
+  background: #ffffff !important;
+  border-color: #381e72 !important;
+}
+
+body.material-design-3 .range-slider-pill:active::-webkit-slider-thumb,
+.material-design-3 .range-slider-pill:active::-webkit-slider-thumb {
+  transform: scaleY(1.2) !important;
+  background: #ffffff !important;
+  border-color: #381e72 !important;
+}
+
+body.material-design-3 .range-slider-pill:active::-moz-range-thumb,
+.material-design-3 .range-slider-pill:active::-moz-range-thumb {
+  transform: scaleY(1.2) !important;
+  background: #ffffff !important;
+  border-color: #381e72 !important;
 }
 
 
