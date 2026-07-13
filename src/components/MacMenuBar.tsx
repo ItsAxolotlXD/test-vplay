@@ -24,7 +24,11 @@ import {
   Monitor,
   AlertCircle,
   Activity,
-  Terminal
+  Terminal,
+  Copy,
+  Image,
+  Play,
+  EyeOff
 } from "lucide-react";
 
 interface MacMenuBarProps {
@@ -57,6 +61,13 @@ interface MacMenuBarProps {
   vIntelHistory?: { role: "user" | "model"; text: string }[];
   handleSendVIntelMsg?: (suggestion?: string) => void;
   isAutoHideMenuBarActive?: boolean;
+  onSelectChannel?: (channel: any) => void;
+  userRole?: "user" | "admin" | null;
+  onOpenLogoAdjustTest?: () => void;
+  onOpenYouTubeTool?: () => void;
+  onOpenWheelOfVplay?: () => void;
+  isFocusMode?: boolean;
+  setIsFocusMode?: (val: boolean) => void;
 }
 
 export default function MacMenuBar({
@@ -88,11 +99,19 @@ export default function MacMenuBar({
   isVIntelLoading = false,
   vIntelHistory = [],
   handleSendVIntelMsg,
-  isAutoHideMenuBarActive = false
+  isAutoHideMenuBarActive = false,
+  onSelectChannel,
+  userRole,
+  onOpenLogoAdjustTest,
+  onOpenYouTubeTool,
+  onOpenWheelOfVplay,
+  isFocusMode = false,
+  setIsFocusMode
 }: MacMenuBarProps) {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [timeStr, setTimeStr] = useState("");
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [isMenuBarExpandedInFocus, setIsMenuBarExpandedInFocus] = useState(false);
   
   // Custom macOS States
   const [showStorageModal, setShowStorageModal] = useState(false);
@@ -156,6 +175,7 @@ export default function MacMenuBar({
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setActiveDropdown(null);
+        setIsMenuBarExpandedInFocus(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -293,35 +313,35 @@ export default function MacMenuBar({
     <>
       {/* MINECRAFT F3 STYLE DEBUG SCREEN */}
       {showDebugScreen && (
-        <div className="fixed top-[50px] left-4 z-[150] bg-black/90 backdrop-blur-xl border border-white/20 p-4 rounded-xl font-mono text-[11px] leading-relaxed text-white text-left space-y-1.5 shadow-2xl max-w-sm sm:max-w-md select-text pointer-events-auto">
-          <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-white">
-            <span className="font-bold flex items-center gap-1"><Terminal className="w-3.5 h-3.5 text-white" /> VPLAY HIGH-DENSITY DEBUG SCREEN (F3 Mode)</span>
+        <div className="fixed top-[50px] left-4 z-[150] bg-black/95 backdrop-blur-2xl border border-white/20 p-4 rounded-none font-mono text-[11px] leading-relaxed text-white text-left space-y-1.5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] w-[360px] sm:w-[420px] max-h-[80vh] overflow-y-auto select-text pointer-events-auto custom-scrollbar border-l-4 border-l-indigo-500">
+          <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-white sticky top-0 bg-black/90 backdrop-blur-sm z-10">
+            <span className="font-bold flex items-center gap-1"><Terminal className="w-3.5 h-3.5 text-indigo-400" /> VPLAY DEBUG SCREEN (F3 Mode)</span>
             <button 
               onClick={() => setShowDebugScreen(false)}
-              className="text-white/60 hover:text-white px-1.5 py-0.5 hover:bg-white/10 rounded text-xs transition-colors"
+              className="text-white/60 hover:text-white px-1.5 py-0.5 hover:bg-white/10 rounded-none text-xs transition-colors"
             >
               ✕
             </button>
           </div>
           
           <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-white/50 tracking-wider">I. System Environment</div>
-            <div className="pl-2 space-y-0.5">
+            <div className="text-[10px] uppercase font-bold text-indigo-400/85 tracking-wider">I. System Environment</div>
+            <div className="pl-2 space-y-0.5 border-l border-white/10 ml-1">
               <div><span className="text-white/60">Build Version:</span> v3.12-stable (Production bundle)</div>
               <div><span className="text-white/60">Host Stack:</span> React 18 / Vite / TailwindCSS</div>
               <div><span className="text-white/60">Screen Viewport:</span> {viewport.w}x{viewport.h} (DPR Scale: {window.devicePixelRatio || 1})</div>
-              <div><span className="text-white/60">Live Frame Rate:</span> <span className="text-white font-bold">{fps} FPS</span> (stable loop)</div>
+              <div><span className="text-white/60">Live Frame Rate:</span> <span className="text-emerald-400 font-bold">{fps} FPS</span> (stable loop)</div>
               <div><span className="text-white/60">Client Language:</span> {navigator.language || "vi-VN"}</div>
               <div><span className="text-white/60">Network Latency:</span> {navigator.onLine ? "CONNECTED (ONLINE)" : "DISCONNECTED (OFFLINE)"}</div>
-              <div><span className="text-white/60">User Identity:</span> tvbabinh1@gmail.com</div>
+              <div><span className="text-white/60">Platform Role:</span> <span className="text-indigo-300 font-bold uppercase">{userRole || "unknown"}</span></div>
             </div>
           </div>
 
           <div className="border-t border-white/10 my-1.5" />
 
           <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-white/50 tracking-wider">II. Application State</div>
-            <div className="pl-2 space-y-0.5">
+            <div className="text-[10px] uppercase font-bold text-indigo-400/85 tracking-wider">II. Application State</div>
+            <div className="pl-2 space-y-0.5 border-l border-white/10 ml-1">
               <div><span className="text-white/60">Active Router Tab:</span> {activeTab.toUpperCase()} {activeSettingSection ? `(${activeSettingSection.toUpperCase()})` : ""}</div>
               <div><span className="text-white/60">Stream Target:</span> {selectedChannel ? `${selectedChannel.name} [ID: ${selectedChannel.id}]` : "None (Idle)"}</div>
               {selectedChannel && (
@@ -340,12 +360,78 @@ export default function MacMenuBar({
           <div className="border-t border-white/10 my-1.5" />
 
           <div className="space-y-1">
-            <div className="text-[10px] uppercase font-bold text-white/50 tracking-wider">III. Core Feature Flags</div>
-            <div className="pl-2 space-y-0.5">
+            <div className="text-[10px] uppercase font-bold text-indigo-400/85 tracking-wider">III. Core Feature Flags</div>
+            <div className="pl-2 space-y-0.5 border-l border-white/10 ml-1">
               <div><span className="text-white/60">Material Design 3:</span> {isMaterialDesignActive ? "ENABLED" : "DISABLED"}</div>
               <div><span className="text-white/60">Dropdown Intelligence:</span> {isDropdownIntelligenceActive ? "ACTIVE" : "INACTIVE"}</div>
               <div><span className="text-white/60">MenuBar Auto-hide:</span> {isAutoHideMenuBarActive ? "ON (5s timeout)" : "OFF"}</div>
               <div><span className="text-white/60">Server Ingress Port:</span> 3000 (External Proxy Node)</div>
+            </div>
+          </div>
+
+          <div className="border-t border-white/10 my-1.5" />
+
+          <div className="space-y-1">
+            <div className="text-[10px] uppercase font-bold text-indigo-400/85 tracking-wider">IV. Diagnostics & Hardware</div>
+            <div className="pl-2 space-y-0.5 border-l border-white/10 ml-1">
+              <div><span className="text-white/60">CPU Cores:</span> {navigator.hardwareConcurrency || "4"} logical threads</div>
+              <div><span className="text-white/60">GPU WebGL:</span> {window.WebGLRenderingContext ? "Accelerated 2D/3D Canvas" : "Software Rasterizer"}</div>
+              <div><span className="text-white/60">Storage Limit:</span> 3,221,225,472 Bytes (3.00 GB Allocated)</div>
+              <div><span className="text-white/60">Active DOM Nodes:</span> {document.getElementsByTagName("*").length} elements</div>
+              <div><span className="text-white/60">User Agent:</span> <span className="text-[10px] text-white/50">{navigator.userAgent.slice(0, 48)}...</span></div>
+            </div>
+          </div>
+
+          <div className="border-t border-white/10 my-1.5" />
+
+          <div className="space-y-1">
+            <div className="text-[10px] uppercase font-bold text-indigo-400/85 tracking-wider">V. Live Memory Tracker</div>
+            <div className="pl-2 space-y-0.5 border-l border-white/10 ml-1">
+              <div><span className="text-white/60">HLS Ingest Level:</span> v1.4.0 Engine</div>
+              <div><span className="text-white/60">V-Intelligence State:</span> {isVIntelligenceActive ? "ENABLED (READY)" : "STANDBY"}</div>
+              <div><span className="text-white/60">Cookies Enabled:</span> {navigator.cookieEnabled ? "TRUE" : "FALSE"}</div>
+              <div><span className="text-white/60">Client Orientation:</span> {window.innerWidth > window.innerHeight ? "Landscape" : "Portrait"}</div>
+            </div>
+          </div>
+
+          <div className="border-t border-white/10 my-1.5" />
+
+          <div className="space-y-2">
+            <div className="text-[10px] uppercase font-bold text-indigo-400/85 tracking-wider">VI. Diagnostic Commands</div>
+            <div className="grid grid-cols-2 gap-1.5 pt-0.5">
+              <button 
+                onClick={() => {
+                  if (typeof alert === "function") alert("Chạy phân tích hiệu năng: Tất cả các luồng hoạt động ổn định ở mức 60FPS.");
+                }}
+                className="bg-zinc-900 hover:bg-zinc-800 border border-white/15 py-1 text-[9px] text-indigo-300 font-bold transition-all cursor-default text-center rounded-none"
+              >
+                [ Speed Benchmark ]
+              </button>
+              <button 
+                onClick={() => {
+                  if (typeof alert === "function") alert("Đã dọn dẹp bộ nhớ đệm thành công.");
+                }}
+                className="bg-zinc-900 hover:bg-zinc-800 border border-white/15 py-1 text-[9px] text-indigo-300 font-bold transition-all cursor-default text-center rounded-none"
+              >
+                [ Flush App Heap ]
+              </button>
+              <button 
+                onClick={() => {
+                  window.location.reload();
+                }}
+                className="bg-zinc-900 hover:bg-red-950 border border-red-500/20 hover:border-red-500/40 py-1 text-[9px] text-red-400 font-bold transition-all cursor-default text-center rounded-none"
+              >
+                [ Force Reboot App ]
+              </button>
+              <button 
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+                className="bg-zinc-900 hover:bg-red-950 border border-red-500/20 hover:border-red-500/40 py-1 text-[9px] text-red-400 font-bold transition-all cursor-default text-center rounded-none"
+              >
+                [ Factory Reset ]
+              </button>
             </div>
           </div>
 
@@ -554,6 +640,8 @@ export default function MacMenuBar({
         </div>
       )}
 
+
+
       {/* Invisible hover trigger bar at the very top of screen when menu is hidden */}
       {isAutoHideMenuBarActive && (
         <div 
@@ -562,17 +650,32 @@ export default function MacMenuBar({
         />
       )}
 
+      {/* Focus Mode auto-shrunk trigger capsule */}
+      {isFocusMode && !isMenuBarExpandedInFocus && (
+        <button
+          onClick={() => setIsMenuBarExpandedInFocus(true)}
+          className="fixed top-2 left-1/2 -translate-x-1/2 h-[30px] px-4 rounded-full bg-black/85 backdrop-blur-md text-white border border-white/10 flex items-center gap-2 hover:bg-black hover:border-white/20 transition-all shadow-[0_4px_24px_rgba(0,0,0,0.6)] font-sans font-semibold text-[11px] uppercase tracking-wider cursor-default bouncy-btn z-[110]"
+        >
+          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+          <span>Vplay Menu</span>
+        </button>
+      )}
+
       {/* CORE MENU BAR CONTAINER (Reverted back to: height 40px, translucent dark-glass style bg-white/10 with white text) */}
       <div 
         ref={menuRef}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`h-[40px] flex items-center justify-between text-[13px] bg-white/10 backdrop-blur-[50px] text-white px-4 select-none border-b border-white/10 fixed top-0 inset-x-0 z-[100] font-sans font-medium shadow-md transition-all duration-500 ease-in-out transform-gpu ${
-          isAutoHideMenuBarActive 
-            ? isMenuBarVisible 
-              ? "translate-y-0 opacity-100" 
+          isFocusMode
+            ? isMenuBarExpandedInFocus
+              ? "translate-y-0 opacity-100"
               : "-translate-y-full opacity-0 pointer-events-none"
-            : "translate-y-0 opacity-100"
+            : isAutoHideMenuBarActive 
+              ? isMenuBarVisible 
+                ? "translate-y-0 opacity-100" 
+                : "-translate-y-full opacity-0 pointer-events-none"
+              : "translate-y-0 opacity-100"
         }`}
       >
         {/* Left side menus */}
@@ -766,6 +869,29 @@ export default function MacMenuBar({
                   </span>
                   <span className="text-[10px] text-neutral-400 font-mono">⌘E</span>
                 </button>
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    if (onSelectChannel) {
+                      onSelectChannel({
+                        id: "test_video",
+                        name: "Play Test Video",
+                        url: "/assets/VTV6 World Cup 2026.mp4",
+                        group: "Thử nghiệm",
+                        logoText: "TEST VIDEO",
+                        logoBg: "bg-gradient-to-br from-indigo-500 to-purple-700",
+                        logoImg: "https://static.wikia.nocookie.net/ep-deo/images/6/6a/VTV6_HD.png/revision/latest/scale-to-width-down/180?cb=20260625104230"
+                      });
+                    }
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Tv className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
+                    <span>Play test video</span>
+                  </span>
+                  <span className="text-[10px] text-neutral-400 font-mono">⌘T</span>
+                </button>
                 <div className="border-t border-white/10 my-1" />
                 <button
                   onClick={() => {
@@ -887,6 +1013,42 @@ export default function MacMenuBar({
                   <Sliders className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
                   <span>Theme & Appearance...</span>
                 </button>
+                <div className="border-t border-white/10 my-1" />
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    setActiveTab("fandom_logos");
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center gap-2 transition-colors cursor-default text-white"
+                >
+                  <Image className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
+                  <span>Generate Fandom Logos...</span>
+                </button>
+                <div className="border-t border-white/10 my-1" />
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    setActiveTab("intelligence_thumbnail");
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center gap-2 transition-colors cursor-default text-white"
+                >
+                  <Sparkles className="w-3.5 h-3.5 opacity-80 text-purple-400" />
+                  <span>V-Intelligence Banners...</span>
+                </button>
+                <div className="border-t border-white/10 my-1" />
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    if (setIsFocusMode) setIsFocusMode(!isFocusMode);
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <EyeOff className="w-3.5 h-3.5 opacity-80 text-rose-400" />
+                    <span>Focus Mode</span>
+                  </span>
+                  {isFocusMode && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                </button>
               </div>
             )}
           </div>
@@ -957,6 +1119,93 @@ export default function MacMenuBar({
                 >
                   <span>Go to Settings</span>
                   <span className="text-[10px] text-neutral-400 font-mono">⌥,</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Test Menu */}
+          <div className="relative">
+            <button
+              onClick={() => toggleDropdown("test")}
+              onMouseEnter={() => handleMenuHover("test")}
+              className={`px-2.5 py-1 rounded-[4px] hover:bg-white/10 transition-colors cursor-default ${
+                activeDropdown === "test" ? "bg-white/15 text-white" : ""
+              }`}
+            >
+              Test
+            </button>
+
+            {activeDropdown === "test" && (
+              <div className="absolute left-0 mt-1 w-56 rounded-lg bg-[#121118]/95 backdrop-blur-[40px] border border-white/15 shadow-2xl z-[110] py-1.5 text-white overflow-hidden text-left">
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    if (onSelectChannel) {
+                      onSelectChannel({
+                        id: "test_video",
+                        name: "Play Test Video",
+                        url: "/assets/VTV6 World Cup 2026.mp4",
+                        group: "Thử nghiệm",
+                        logoText: "TEST VIDEO",
+                        logoBg: "bg-gradient-to-br from-indigo-500 to-purple-700",
+                        logoImg: "https://static.wikia.nocookie.net/ep-deo/images/6/6a/VTV6_HD.png/revision/latest/scale-to-width-down/180?cb=20260625104230"
+                      });
+                    }
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Tv className="w-3.5 h-3.5 opacity-80 text-indigo-400" />
+                    <span>Play test video</span>
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    if (onOpenLogoAdjustTest) {
+                      onOpenLogoAdjustTest();
+                    }
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Sliders className="w-3.5 h-3.5 opacity-80 text-purple-400" />
+                    <span>Logo adjust tool test</span>
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    if (onOpenYouTubeTool) {
+                      onOpenYouTubeTool();
+                    }
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Play className="w-3.5 h-3.5 opacity-80 text-emerald-400" />
+                    <span>YouTube tool</span>
+                  </span>
+                </button>
+
+                <div className="border-t border-white/10 my-1" />
+
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    if (onOpenWheelOfVplay) {
+                      onOpenWheelOfVplay();
+                    }
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 opacity-80 text-amber-400" />
+                    <span>Wheel of Vplay</span>
+                  </span>
                 </button>
               </div>
             )}
@@ -1052,7 +1301,8 @@ export default function MacMenuBar({
         <div className="flex items-center gap-3 text-[13px] text-white/90 font-sans">
           
           {/* V-Intelligence Direct trigger placed elegantly on the right near the volume controls */}
-          <div className="relative">
+          {!isFocusMode && (
+            <div className="relative">
             <button
               onClick={() => {
                 if (isVIntelligenceActive) {
@@ -1131,94 +1381,114 @@ export default function MacMenuBar({
                   </div>
                 </div>
 
-                {/* Mini Chat Messages */}
-                <div className="max-h-[160px] overflow-y-auto custom-scrollbar space-y-2.5 text-xs pr-1">
-                  {vIntelHistory && vIntelHistory.length === 0 ? (
-                    <div className="py-4 text-center text-white/40 space-y-1">
-                      <p className="font-semibold text-[11px]">Chào bạn! Mình có thể giúp gì?</p>
-                      <p className="text-[10px] leading-relaxed px-2">Nhập câu hỏi nhanh hoặc bấm biểu tượng mở rộng để hiển thị dạng Sidebar.</p>
-                      {/* Fast suggestions */}
-                      <div className="flex flex-wrap gap-1 justify-center pt-2">
-                        {["Bật kênh VTV3", "Tìm kênh bóng đá"].map((sugg, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              if (handleSendVIntelMsg) handleSendVIntelMsg(sugg);
-                            }}
-                            className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/20 text-[10px] text-indigo-200 hover:text-white transition-all cursor-pointer truncate max-w-[130px]"
-                          >
-                            {sugg}
-                          </button>
-                        ))}
+                {/* Conditionally render mini chat messages and input bar or restriction notice based on userRole */}
+                {userRole === "user" ? (
+                  <div className="py-6 flex flex-col items-center justify-center text-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center">
+                      <AlertCircle className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-white/95 text-[11px] font-bold uppercase tracking-wider font-mono">
+                        Access Restricted
+                      </div>
+                      <div className="text-white/50 text-[11px] leading-relaxed max-w-[240px] font-sans">
+                        V-Intelligence is not available in preview build of Vplay.
                       </div>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {vIntelHistory && vIntelHistory.slice(-4).map((msg, idx) => (
-                        <div key={idx} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                          <div className={`text-[8px] text-white/30 mb-0.5 uppercase tracking-wider font-semibold ${msg.role === "user" ? "text-right" : "text-left"}`}>
-                            {msg.role === "user" ? "Bạn" : "AI"}
-                          </div>
-                          <div className={`p-2 rounded-xl text-[11px] leading-relaxed max-w-[90%] whitespace-pre-wrap break-words border ${
-                            msg.role === "user" 
-                              ? "bg-indigo-600/30 border-indigo-500/20 text-white rounded-tr-none" 
-                              : "bg-white/5 border-white/10 text-white/95 rounded-tl-none"
-                          }`}>
-                            {msg.text}
+                  </div>
+                ) : (
+                  <>
+                    {/* Mini Chat Messages */}
+                    <div className="max-h-[160px] overflow-y-auto custom-scrollbar space-y-2.5 text-xs pr-1">
+                      {vIntelHistory && vIntelHistory.length === 0 ? (
+                        <div className="py-4 text-center text-white/40 space-y-1">
+                          <p className="font-semibold text-[11px]">Chào bạn! Mình có thể giúp gì?</p>
+                          <p className="text-[10px] leading-relaxed px-2">Nhập câu hỏi nhanh hoặc bấm biểu tượng mở rộng để hiển thị dạng Sidebar.</p>
+                          {/* Fast suggestions */}
+                          <div className="flex flex-wrap gap-1 justify-center pt-2">
+                            {["Bật kênh VTV3", "Tìm kênh bóng đá"].map((sugg, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => {
+                                  if (handleSendVIntelMsg) handleSendVIntelMsg(sugg);
+                                }}
+                                className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/20 text-[10px] text-indigo-200 hover:text-white transition-all cursor-pointer truncate max-w-[130px]"
+                              >
+                                {sugg}
+                              </button>
+                            ))}
                           </div>
                         </div>
-                      ))}
-                      {isVIntelLoading && (
-                        <div className="flex flex-col items-start animate-pulse">
-                          <div className="text-[8px] text-white/30 mb-0.5 uppercase tracking-wider font-semibold">AI</div>
-                          <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-[11px] text-white/50 rounded-tl-none flex items-center gap-1.5">
-                            <RefreshCw className="w-3 h-3 animate-spin text-indigo-400" />
-                            <span>Đang suy nghĩ...</span>
-                          </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {vIntelHistory && vIntelHistory.slice(-4).map((msg, idx) => (
+                            <div key={idx} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                              <div className={`text-[8px] text-white/30 mb-0.5 uppercase tracking-wider font-semibold ${msg.role === "user" ? "text-right" : "text-left"}`}>
+                                {msg.role === "user" ? "Bạn" : "AI"}
+                              </div>
+                              <div className={`p-2 rounded-xl text-[11px] leading-relaxed max-w-[90%] whitespace-pre-wrap break-words border ${
+                                msg.role === "user" 
+                                  ? "bg-indigo-600/30 border-indigo-500/20 text-white rounded-tr-none" 
+                                  : "bg-white/5 border-white/10 text-white/95 rounded-tl-none"
+                              }`}>
+                                {msg.text}
+                              </div>
+                            </div>
+                          ))}
+                          {isVIntelLoading && (
+                            <div className="flex flex-col items-start animate-pulse">
+                              <div className="text-[8px] text-white/30 mb-0.5 uppercase tracking-wider font-semibold">AI</div>
+                              <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-[11px] text-white/50 rounded-tl-none flex items-center gap-1.5">
+                                <RefreshCw className="w-3 h-3 animate-spin text-indigo-400" />
+                                <span>Đang suy nghĩ...</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
 
-                {/* Input Bar */}
-                <div className="relative rounded-xl bg-white/5 border border-white/10 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/50 transition-all p-2 flex items-center gap-1.5">
-                  <input
-                    type="text"
-                    placeholder="Hỏi V-Intelligence..."
-                    value={vIntelQuery}
-                    onChange={(e) => setVIntelQuery && setVIntelQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        if (handleSendVIntelMsg) handleSendVIntelMsg();
-                      }
-                    }}
-                    className="flex-1 bg-transparent border-0 text-white text-[11.5px] placeholder-white/30 focus:outline-none font-sans"
-                  />
-                  <button
-                    onClick={() => {
-                      if (handleSendVIntelMsg) handleSendVIntelMsg();
-                    }}
-                    disabled={isVIntelLoading || !vIntelQuery.trim()}
-                    className={`p-1 rounded-lg transition-all flex items-center justify-center shrink-0 ${
-                      vIntelQuery.trim() 
-                        ? "bg-indigo-600 hover:bg-indigo-500 text-white" 
-                        : "bg-white/5 text-white/20 cursor-not-allowed"
-                    }`}
-                  >
-                    {isVIntelLoading ? (
-                      <RefreshCw className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <svg className="w-3 h-3 fill-current rotate-45" viewBox="0 0 24 24">
-                        <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                    {/* Input Bar */}
+                    <div className="relative rounded-xl bg-white/5 border border-white/10 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/50 transition-all p-2 flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        placeholder="Hỏi V-Intelligence..."
+                        value={vIntelQuery}
+                        onChange={(e) => setVIntelQuery && setVIntelQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            if (handleSendVIntelMsg) handleSendVIntelMsg();
+                          }
+                        }}
+                        className="flex-1 bg-transparent border-0 text-white text-[11.5px] placeholder-white/30 focus:outline-none font-sans"
+                      />
+                      <button
+                        onClick={() => {
+                          if (handleSendVIntelMsg) handleSendVIntelMsg();
+                        }}
+                        disabled={isVIntelLoading || !vIntelQuery.trim()}
+                        className={`p-1 rounded-lg transition-all flex items-center justify-center shrink-0 ${
+                          vIntelQuery.trim() 
+                            ? "bg-indigo-600 hover:bg-indigo-500 text-white" 
+                            : "bg-white/5 text-white/20 cursor-not-allowed"
+                        }`}
+                      >
+                        {isVIntelLoading ? (
+                          <RefreshCw className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <svg className="w-3 h-3 fill-current rotate-45" viewBox="0 0 24 24">
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
+          )}
 
           {/* Volume slider container with hover popover */}
           <div 

@@ -52,6 +52,8 @@ import { CATEGORIES, Category, Channel, processedChannels } from "./data/channel
 import ChannelPlayer from "./components/ChannelPlayer";
 import VirtualRemoteControl from "./components/VirtualRemoteControl";
 import MacMenuBar from "./components/MacMenuBar";
+import FandomLogosTab from "./components/FandomLogosTab";
+import IntelligenceThumbnailTab from "./components/IntelligenceThumbnailTab";
 
 const TRANSLATIONS: Record<string, string> = {
   // Categories
@@ -135,7 +137,13 @@ const TRANSLATIONS: Record<string, string> = {
   "modal.ChannelCreate.urlLabel": "Stream Feed Address",
   "modal.ChannelCreate.groupLabel": "Destination Category",
   "modal.ChannelCreate.cancel": "Cancel",
-  "modal.ChannelCreate.create": "Add Channel"
+  "modal.ChannelCreate.create": "Add Channel",
+
+  // V-Intelligence Banner translation keys
+  "title.intelligence_banner_top.name": "V-Intelligence System Terminal",
+  "title:intelligence_banner_bottom.name": "Neural High-Definition Stream Matrix",
+  "title.intelligence_banner_bottom.name": "Neural High-Definition Stream Matrix",
+  "title.intelligence_banner_desc.name": "Real-time intelligent thumbnail processor and low-latency channel feed monitoring board."
 };
 
 const t = (key: string): string => {
@@ -369,7 +377,7 @@ export default function App() {
   }, []);
 
   // Navigation State
-  const [activeTab, setActiveTab] = useState<"home" | "live" | "settings" | "search">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "live" | "settings" | "search" | "fandom_logos" | "intelligence_thumbnail">("home");
   const [prevTab, setPrevTab] = useState<"home" | "live" | "settings">("home");
 
   useEffect(() => {
@@ -494,6 +502,10 @@ export default function App() {
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showSplash, setShowSplash] = useState<boolean>(true);
+  const [roleSelection, setRoleSelection] = useState<"user" | "admin" | null>(null);
+  const [showAdminPassModal, setShowAdminPassModal] = useState<boolean>(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState<string>("");
+  const [adminError, setAdminError] = useState<string>("");
   const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false);
   const [showAboutModal, setShowAboutModal] = useState<boolean>(false);
   const [showClock, setShowClock] = useState<boolean>(() => {
@@ -536,7 +548,7 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
-    }, 2000);
+    }, 5000);
     return () => clearTimeout(timer);
   }, []);
   
@@ -560,6 +572,24 @@ export default function App() {
 
   // Picture in Picture states
   const [isPiPActive, setIsPiPActive] = useState<boolean>(false);
+
+  // Test Menu states
+  const [showLogoAdjustModal, setShowLogoAdjustModal] = useState<boolean>(false);
+  const [showYouTubeToolModal, setShowYouTubeToolModal] = useState<boolean>(false);
+  const [showWheelOfVplayModal, setShowWheelOfVplayModal] = useState<boolean>(false);
+  const [wheelInputText, setWheelInputText] = useState<string>("VTV1 HD\nVTV2 HD\nVTV3 HD\nVTV4 HD\nVTV5 HD\nVTV6 HD");
+  const [wheelWeights, setWheelWeights] = useState<Record<string, number>>({});
+  const [wheelSpinDuration, setWheelSpinDuration] = useState<number>(5); // default 5 seconds
+  const [wheelRotation, setWheelRotation] = useState<number>(0);
+  const [wheelIsSpinning, setWheelIsSpinning] = useState<boolean>(false);
+  const [wheelWinner, setWheelWinner] = useState<string | null>(null);
+  const [showFocusChannelsModal, setShowFocusChannelsModal] = useState<boolean>(false);
+  const [focusChannelsSearch, setFocusChannelsSearch] = useState<string>("");
+  const [focusChannelsCategory, setFocusChannelsCategory] = useState<string>("all");
+  const [logoSaturation, setLogoSaturation] = useState<number>(100);
+  const [logoBrightness, setLogoBrightness] = useState<number>(100);
+  const [logoOpacity, setLogoOpacity] = useState<number>(100);
+  const [youtubeUrlInput, setYoutubeUrlInput] = useState<string>("");
 
   const handleOpenMultiviewSelector = () => {
     setShowMultiviewSelectorPopup(true);
@@ -780,6 +810,20 @@ export default function App() {
     const feat = expFeatures.find(f => f.id === "auto_hide_menubar");
     return feat ? feat.status === "installed" && feat.isActive : false;
   }, [expFeatures]);
+
+  const [isFocusMode, setIsFocusMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("vplay_focus_mode") === "true";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("vplay_focus_mode", String(isFocusMode));
+    } catch (e) {}
+  }, [isFocusMode]);
 
   const [vIntelQuery, setVIntelQuery] = useState<string>("");
   const [isVIntelLoading, setIsVIntelLoading] = useState<boolean>(false);
@@ -1544,6 +1588,494 @@ export default function App() {
     }
   };
 
+  const renderWheelOfVplayModal = () => {
+    const parsedOptions = wheelInputText
+      .split("\n")
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .map((line, idx) => {
+        const weight = wheelWeights[line] ?? 1;
+        return { id: idx, name: line, weight };
+      });
+
+    const totalWeight = parsedOptions.reduce((acc, opt) => acc + opt.weight, 0);
+
+    const getSectorPath = (x: number, y: number, r: number, startAngle: number, endAngle: number) => {
+      if (endAngle - startAngle >= 359.99) {
+        endAngle = 359.99;
+      }
+      const startRad = (startAngle - 90) * Math.PI / 180;
+      const endRad = (endAngle - 90) * Math.PI / 180;
+      const x1 = x + r * Math.cos(startRad);
+      const y1 = y + r * Math.sin(startRad);
+      const x2 = x + r * Math.cos(endRad);
+      const y2 = y + r * Math.sin(endRad);
+      
+      const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+      
+      return [
+        "M", x, y,
+        "L", x1, y1,
+        "A", r, r, 0, largeArcFlag, 1, x2, y2,
+        "Z"
+      ].join(" ");
+    };
+
+    let currentAngle = 0;
+    const sectorPaths = parsedOptions.map((opt, idx) => {
+      const percentage = opt.weight / (totalWeight || 1);
+      const angleSweep = percentage * 360;
+      const startAngle = currentAngle;
+      const endAngle = currentAngle + angleSweep;
+      currentAngle = endAngle;
+
+      const colors = [
+        "#ff0055", // Red-pink
+        "#00ffcc", // Neon Cyan
+        "#9900ff", // Neon Purple
+        "#ff9900", // Neon Orange
+        "#0099ff", // Neon Blue
+        "#33cc33", // Green
+        "#ff00cc", // Hot Pink
+        "#ffff00"  // Yellow
+      ];
+      const color = colors[idx % colors.length];
+
+      const pathData = getSectorPath(150, 150, 140, startAngle, endAngle);
+
+      const middleAngle = startAngle + angleSweep / 2;
+      const textRad = (middleAngle - 90) * Math.PI / 180;
+      const textX = 150 + 75 * Math.cos(textRad);
+      const textY = 150 + 75 * Math.sin(textRad);
+
+      return {
+        ...opt,
+        startAngle,
+        endAngle,
+        color,
+        pathData,
+        textX,
+        textY,
+        textRotation: middleAngle
+      };
+    });
+
+    const handleSpin = () => {
+      if (wheelIsSpinning || parsedOptions.length === 0) return;
+
+      setWheelIsSpinning(true);
+      setWheelWinner(null);
+
+      const rand = Math.random() * totalWeight;
+      let runningSum = 0;
+      let winningOpt = parsedOptions[0];
+
+      for (const opt of parsedOptions) {
+        runningSum += opt.weight;
+        if (rand <= runningSum) {
+          winningOpt = opt;
+          break;
+        }
+      }
+
+      const winnerSector = sectorPaths.find(s => s.name === winningOpt.name);
+      if (!winnerSector) return;
+
+      const sectorCenter = winnerSector.startAngle + (winnerSector.endAngle - winnerSector.startAngle) / 2;
+      const targetAngle = 360 - sectorCenter;
+
+      // Ensure spin completes multiple full rotations
+      const totalSpinsAngle = 360 * 6 + targetAngle;
+      const nextRotation = wheelRotation + totalSpinsAngle - (wheelRotation % 360);
+      setWheelRotation(nextRotation);
+
+      setTimeout(() => {
+        setWheelIsSpinning(false);
+        setWheelWinner(winningOpt.name);
+      }, wheelSpinDuration * 1000);
+    };
+
+    const handleCycleWeight = (name: string) => {
+      const current = wheelWeights[name] ?? 1;
+      let next = 1;
+      if (current === 1) next = 2;
+      else if (current === 2) next = 5;
+      else if (current === 5) next = 10;
+      else next = 1;
+
+      setWheelWeights(prev => ({
+        ...prev,
+        [name]: next
+      }));
+    };
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="fixed inset-0 bg-black/80 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4 font-google select-none overflow-y-auto"
+        onClick={() => {
+          if (!wheelIsSpinning) setShowWheelOfVplayModal(false);
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 15 }}
+          transition={{ type: "spring", damping: 25, stiffness: 350 }}
+          className={`w-full max-w-4xl p-6 md:p-8 shadow-2xl relative text-left overflow-hidden flex flex-col ${
+            isMaterialDesignActive
+              ? "rounded-[28px] bg-[#211f26] border border-white/5 text-[#e6e1e5]"
+              : "rounded-[32px] bg-[#121118]/95 border border-white/10 text-white"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400">
+                <Sparkles className="w-5 h-5 animate-pulse" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white tracking-wide">WHEEL OF VPLAY</h3>
+                <p className="text-xs text-white/40">Vòng quay may mắn tùy biến với tỉ lệ cơ hội</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                if (!wheelIsSpinning) setShowWheelOfVplayModal(false);
+              }}
+              disabled={wheelIsSpinning}
+              className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 text-white/60 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Body content */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            {/* Column 1: Wheel Display */}
+            <div className="flex flex-col items-center justify-center space-y-6 relative py-4">
+              {/* Center Pointer */}
+              <div className="absolute top-1 z-20 flex flex-col items-center">
+                <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-purple-500 filter drop-shadow-[0_4px_10px_rgba(168,85,247,0.6)]" />
+                <div className="w-2.5 h-2.5 bg-white rounded-full -mt-4 shadow-sm" />
+              </div>
+
+              {/* Wheel Container */}
+              <div className="relative w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] rounded-full p-2 bg-gradient-to-b from-white/10 to-white/5 border border-white/20 shadow-2xl flex items-center justify-center overflow-hidden">
+                <div 
+                  className="w-full h-full rounded-full transition-transform ease-out shadow-[inset_0_4px_12px_rgba(0,0,0,0.6)]"
+                  style={{
+                    transform: `rotate(${wheelRotation}deg)`,
+                    transitionDuration: wheelIsSpinning ? `${wheelSpinDuration}s` : '0s',
+                    transitionTimingFunction: 'cubic-bezier(0.1, 0.8, 0.1, 1)'
+                  }}
+                >
+                  {parsedOptions.length === 0 ? (
+                    <div className="w-full h-full rounded-full bg-white/5 flex items-center justify-center border border-dashed border-white/20">
+                      <p className="text-xs text-white/40 font-medium">Nhập lựa chọn của bạn</p>
+                    </div>
+                  ) : (
+                    <svg className="w-full h-full overflow-visible" viewBox="0 0 300 300">
+                      <g>
+                        {sectorPaths.map((sector) => (
+                          <g key={sector.id}>
+                            {/* Sector path */}
+                            <path 
+                              d={sector.pathData} 
+                              fill={sector.color} 
+                              className="opacity-85 hover:opacity-95 transition-opacity stroke-black/20 stroke-[1.5px]"
+                            />
+                            {/* Label text */}
+                            <g transform={`translate(${sector.textX}, ${sector.textY}) rotate(${sector.textRotation})`}>
+                              <text
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                                fill="#ffffff"
+                                className="text-[10px] font-bold tracking-wide drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.9)] uppercase pointer-events-none"
+                                transform="rotate(90)"
+                              >
+                                {sector.name.length > 12 ? `${sector.name.substring(0, 10)}..` : sector.name}
+                              </text>
+                            </g>
+                          </g>
+                        ))}
+                      </g>
+                      {/* Center pin decoration */}
+                      <circle cx="150" cy="150" r="18" fill="#121118" stroke="rgba(255,255,255,0.25)" strokeWidth="4" />
+                      <circle cx="150" cy="150" r="6" fill="#a855f7" className="animate-pulse" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Spin Button */}
+              <div className="w-full max-w-xs flex flex-col items-center space-y-3">
+                <button
+                  onClick={handleSpin}
+                  disabled={wheelIsSpinning || parsedOptions.length === 0}
+                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-95 disabled:opacity-30 py-3.5 px-6 rounded-2xl text-sm font-bold tracking-wide uppercase shadow-[0_4px_20px_rgba(168,85,247,0.4)] hover:shadow-[0_4px_24px_rgba(168,85,247,0.6)] transition-all cursor-default text-center flex items-center justify-center gap-2"
+                >
+                  <RefreshCw className={`w-4 h-4 ${wheelIsSpinning ? 'animate-spin' : ''}`} />
+                  {wheelIsSpinning ? "Đang quay..." : "BẮT ĐẦU QUAY"}
+                </button>
+
+                {/* Landed Outcome Winner */}
+                <div className="h-12 flex items-center justify-center text-center">
+                  <AnimatePresence mode="wait">
+                    {wheelWinner && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                        className="py-1 px-4 rounded-xl bg-purple-500/15 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+                      >
+                        <p className="text-[11px] text-purple-400 font-bold uppercase tracking-widest mb-0.5">KẾT QUẢ VÒNG QUAY</p>
+                        <p className="text-sm font-black text-white uppercase tracking-wide">{wheelWinner}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 2: Controls and Options Configuration */}
+            <div className="flex flex-col space-y-5 h-full justify-start">
+              {/* Text area configuration */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs text-white/50 uppercase tracking-wider font-bold">Danh sách các lựa chọn</label>
+                  <span className="text-[10px] text-white/30 tracking-wide font-medium">(Mỗi dòng là một lựa chọn)</span>
+                </div>
+                <textarea
+                  value={wheelInputText}
+                  onChange={(e) => setWheelInputText(e.target.value)}
+                  disabled={wheelIsSpinning}
+                  placeholder="Nhập các lựa chọn..."
+                  className="w-full h-32 bg-black/40 border border-white/10 focus:border-purple-500/40 focus:outline-none p-3.5 rounded-2xl text-xs text-white placeholder-white/15 leading-relaxed font-sans resize-none disabled:opacity-40"
+                />
+              </div>
+
+              {/* Speed Controller (1s -> 1m) */}
+              <div className="space-y-2 bg-white/[0.02] border border-white/5 rounded-2xl p-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs text-white/50 uppercase tracking-wider font-bold">Thời gian quay</label>
+                  <span className="text-xs text-purple-400 font-bold">{wheelSpinDuration}s</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="60"
+                  value={wheelSpinDuration}
+                  onChange={(e) => setWheelSpinDuration(Number(e.target.value))}
+                  disabled={wheelIsSpinning}
+                  className="w-full accent-purple-500 h-1 bg-white/10 rounded-full cursor-pointer disabled:opacity-30"
+                />
+                {/* Speed presets */}
+                <div className="flex gap-2 pt-1">
+                  {[1, 5, 10, 30, 60].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setWheelSpinDuration(t)}
+                      disabled={wheelIsSpinning}
+                      className={`flex-1 py-1 rounded-lg text-[10px] font-bold transition-all border ${
+                        wheelSpinDuration === t
+                          ? 'bg-purple-500/25 border-purple-500/50 text-purple-300'
+                          : 'bg-white/5 border-white/5 text-white/50 hover:bg-white/10 hover:text-white'
+                      } disabled:opacity-30`}
+                    >
+                      {t === 60 ? "1m" : `${t}s`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Probability Weights and Multipliers */}
+              <div className="space-y-2 flex-1 flex flex-col min-h-0">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs text-white/50 uppercase tracking-wider font-bold">Hệ số cơ hội (x)</label>
+                  <span className="text-[10px] text-white/30 tracking-wide">(Nhấp để tăng hệ số trúng)</span>
+                </div>
+                <div className="bg-black/40 border border-white/10 rounded-2xl p-3 flex-1 overflow-y-auto max-h-[160px] space-y-1.5 custom-scrollbar">
+                  {parsedOptions.length === 0 ? (
+                    <div className="h-full flex items-center justify-center">
+                      <p className="text-[10px] text-white/30 font-medium">Chưa có lựa chọn nào được nhập</p>
+                    </div>
+                  ) : (
+                    parsedOptions.map((opt) => (
+                      <div 
+                        key={opt.id}
+                        onClick={() => {
+                          if (!wheelIsSpinning) handleCycleWeight(opt.name);
+                        }}
+                        className={`flex items-center justify-between p-2 rounded-xl transition-all ${
+                          wheelIsSpinning ? 'opacity-50' : 'hover:bg-white/5 cursor-pointer active:scale-[0.98]'
+                        }`}
+                      >
+                        <span className="text-[11px] font-medium text-white/80 truncate max-w-[200px]">{opt.name}</span>
+                        <div className="flex items-center gap-2">
+                          {/* Chance Percentage display */}
+                          <span className="text-[10px] text-white/30 font-mono">
+                            {((opt.weight / (totalWeight || 1)) * 100).toFixed(0)}%
+                          </span>
+                          {/* Multiplier Badge */}
+                          <span className={`text-[10px] font-black font-mono px-2 py-0.5 rounded-lg ${
+                            opt.weight === 1 ? 'bg-white/5 text-white/40' :
+                            opt.weight === 2 ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' :
+                            opt.weight === 5 ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                            'bg-amber-500/25 text-amber-300 border border-amber-500/40 animate-pulse'
+                          }`}>
+                            {opt.weight}x
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  const renderFocusChannelsModal = () => {
+    const cats = allAvailableCategoryList;
+    const allChs = flattenedChannels;
+
+    const filteredChs = allChs.filter(ch => {
+      const matchesSearch = ch.name.toLowerCase().includes(focusChannelsSearch.toLowerCase());
+      const matchesCat = focusChannelsCategory === "all" || ch.group === cats.find(c => c.id === focusChannelsCategory)?.name;
+      return matchesSearch && matchesCat;
+    });
+
+    return (
+      <AnimatePresence>
+        {showFocusChannelsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[120] flex items-center justify-center p-4 font-sans"
+            onClick={() => setShowFocusChannelsModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className={`w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] border border-white/5 shadow-2xl text-[#e6e1e5]"
+                  : "rounded-[30px] bg-[#121118]/90 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.8)] border border-white/10 text-white"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-white/10 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <Tv className="w-5 h-5 text-indigo-400 animate-pulse" />
+                  <h3 className="text-lg font-bold tracking-tight">Channels List</h3>
+                </div>
+                <button
+                  onClick={() => setShowFocusChannelsModal(false)}
+                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Search & Categories */}
+              <div className="p-4 border-b border-white/5 space-y-3 shrink-0">
+                <div className="relative">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <input
+                    type="text"
+                    placeholder="Search channels..."
+                    value={focusChannelsSearch}
+                    onChange={(e) => setFocusChannelsSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm placeholder-white/30 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all text-white font-sans"
+                  />
+                </div>
+
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+                  <button
+                    onClick={() => setFocusChannelsCategory("all")}
+                    className={`px-3 py-1.5 rounded-full transition-all ${
+                      focusChannelsCategory === "all"
+                        ? "bg-indigo-600 text-white font-medium"
+                        : "bg-white/5 hover:bg-white/10 text-white/60"
+                    }`}
+                  >
+                    All
+                  </button>
+                  {cats.map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => setFocusChannelsCategory(c.id)}
+                      className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all ${
+                        focusChannelsCategory === c.id
+                          ? "bg-indigo-600 text-white font-medium"
+                          : "bg-white/5 hover:bg-white/10 text-white/60"
+                      }`}
+                    >
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Channels Grid */}
+              <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+                {filteredChs.length === 0 ? (
+                  <div className="py-12 text-center text-white/40 text-sm">
+                    No channels found matching the criteria.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {filteredChs.map((ch) => {
+                      const isPlaying = selectedChannel.id === ch.id;
+                      return (
+                        <button
+                          key={ch.id}
+                          onClick={() => {
+                            handleSelectChannel(ch);
+                            setShowFocusChannelsModal(false);
+                          }}
+                          className={`p-3 rounded-2xl flex items-center gap-3 text-left transition-all group ${
+                            isPlaying
+                              ? "bg-indigo-600/30 border border-indigo-500/50 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                              : "bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 text-white/80"
+                          }`}
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-black/40 overflow-hidden flex items-center justify-center shrink-0 border border-white/10">
+                            {ch.logoImg ? (
+                              <img src={ch.logoImg} alt={ch.name} className="w-8 h-8 object-contain" referrerPolicy="no-referrer" />
+                            ) : (
+                              <div className="text-[10px] font-bold text-white/40">{ch.logoText}</div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-semibold truncate group-hover:text-white transition-colors">{ch.name}</div>
+                            <div className="text-[10px] text-white/40 truncate mt-0.5">{ch.group}</div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
+
   const renderCleanupModal = () => {
     return (
       <AnimatePresence>
@@ -1729,68 +2261,83 @@ export default function App() {
     );
   };
 
-  if (showSplash || currentStorageUsed >= 3.00 || isCleaning) {
+  if (showSplash || roleSelection === null || currentStorageUsed >= 3.00 || isCleaning) {
     return (
-      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-[99999] p-4 select-none">
+      <div className="fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google">
+        {/* Background ambient light */}
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
         {isCleaning ? (
-          <div className="w-full max-w-md p-6 bg-zinc-900/90 rounded-[28px] border border-white/10 text-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-24 h-24 bg-indigo-500/15 rounded-full blur-xl pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-24 h-24 bg-emerald-500/15 rounded-full blur-xl pointer-events-none" />
+          <div className="w-full max-w-md p-8 bg-[#121118]/85 backdrop-blur-2xl border border-white/10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.8)] relative overflow-hidden rounded-[28px] animate-fade-in flex flex-col items-center justify-center text-white">
+            {/* Ambient subtle glow background */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
 
-            <div className="relative z-10 space-y-5">
-              <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-indigo-500/10 text-indigo-400 relative">
-                <div className="absolute inset-0 rounded-full border border-indigo-500/40 animate-ping" />
-                <Trash2 className="w-8 h-8 animate-pulse" />
+            {/* Spinning vector ring */}
+            <svg className="animate-spin h-14 w-14 text-indigo-500 mb-6" viewBox="0 0 50 50">
+              <circle
+                className="opacity-100"
+                cx="25"
+                cy="25"
+                r="20"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray="40 150"
+                fill="none"
+              />
+            </svg>
+
+            {/* Title / Description */}
+            <h3 className="text-white text-base font-bold uppercase tracking-wider mb-2">
+              Dọn dẹp hệ thống...
+            </h3>
+            <p className="text-white/40 text-xs tracking-wide mb-6">
+              Vui lòng giữ ứng dụng mở, không tải lại trang.
+            </p>
+
+            {/* Custom thin terminal progress bar */}
+            <div className="w-full space-y-2 mb-6">
+              <div className="flex justify-between text-xs text-indigo-400 font-semibold uppercase tracking-wider">
+                <span>Tiến trình dọn dẹp</span>
+                <span>{cleanProgress}%</span>
               </div>
-
-              <div>
-                <h3 className="text-lg font-extrabold text-white tracking-tight">Đang tiến hành dọn dẹp hệ thống...</h3>
-                <p className="text-xs text-white/50 mt-1">Vui lòng giữ ứng dụng mở, không tải lại trang hoặc tắt trình duyệt.</p>
-              </div>
-
-              <div className="py-2.5 px-4 bg-white/5 rounded-2xl inline-block">
-                <span className="text-sm text-white/60 mr-1.5 font-medium">Thời gian còn lại:</span>
-                <span className="text-lg font-black font-mono text-emerald-400">
-                  {Math.floor(cleanTimeRemaining / 60).toString().padStart(2, "0")}
-                  :
-                  {(cleanTimeRemaining % 60).toString().padStart(2, "0")}
-                </span>
-              </div>
-
-              <div className="space-y-1.5 text-left">
-                <div className="flex justify-between text-xs text-white/70">
-                  <span className="font-semibold text-[11px] uppercase tracking-wider text-indigo-400">Tiến trình dọn dẹp</span>
-                  <span className="font-bold font-mono">{cleanProgress}%</span>
-                </div>
-                <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden p-0.5 border border-white/5">
-                  <div 
-                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 rounded-full transition-all duration-300" 
-                    style={{ width: `${cleanProgress}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="text-[12px] bg-black/40 border border-white/5 rounded-xl p-3 min-h-[48px] flex items-center justify-center font-mono text-white/80 transition-all duration-300">
-                {cleanProgress < 15 ? (
-                  <span className="animate-pulse">🔍 Đang phân tích hệ thống tệp và tệp tạm thời...</span>
-                ) : cleanProgress < 35 ? (
-                  <span className="animate-pulse">🗑️ Đang dọn dẹp phân mảnh dữ liệu rác bộ đệm...</span>
-                ) : cleanProgress < 55 ? (
-                  <span className="animate-pulse">📦 Đang tiến hành gỡ bỏ mô-đun rác Storage Feeder...</span>
-                ) : cleanProgress < 75 ? (
-                  <span className="animate-pulse">⚡ Giải phóng bộ nhớ Multiview & tối ưu hóa băng thông...</span>
-                ) : cleanProgress < 90 ? (
-                  <span className="animate-pulse">🛠️ Đang sắp xếp, tối ưu hóa lại bảng chỉ mục tệp tin...</span>
-                ) : cleanProgress < 98 ? (
-                  <span className="animate-pulse">⚡ Đang kiểm tra tính toàn vẹn hệ thống...</span>
-                ) : (
-                  <span className="text-emerald-400">✅ Dọn dẹp hoàn tất! Đang khởi động lại...</span>
-                )}
+              <div className="w-full h-2.5 bg-white/5 overflow-hidden border border-white/10 rounded-full p-[2px]">
+                <div 
+                  className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 transition-all duration-300 rounded-full" 
+                  style={{ width: `${cleanProgress}%` }}
+                />
               </div>
             </div>
+
+            {/* Tech details live log */}
+            <div className="text-[11px] bg-black/40 border border-white/5 rounded-none p-4 min-h-[56px] w-full flex items-center justify-center text-white/80 transition-all duration-300 leading-relaxed font-mono">
+              {cleanProgress < 15 ? (
+                <span className="animate-pulse">🔍 Đang phân tích hệ thống tệp và tệp tạm thời...</span>
+              ) : cleanProgress < 35 ? (
+                <span className="animate-pulse">🗑️ Đang dọn dẹp phân mảnh dữ liệu rác bộ đệm...</span>
+              ) : cleanProgress < 55 ? (
+                <span className="animate-pulse">📦 Đang tiến hành gỡ bỏ mô-đun rác Storage Feeder...</span>
+              ) : cleanProgress < 75 ? (
+                <span className="animate-pulse">⚡ Giải phóng bộ nhớ Multiview & tối ưu hóa băng thông...</span>
+              ) : cleanProgress < 90 ? (
+                <span className="animate-pulse">🛠️ Đang sắp xếp, tối ưu hóa lại bảng chỉ mục tệp tin...</span>
+              ) : cleanProgress < 98 ? (
+                <span className="animate-pulse">⚡ Đang kiểm tra tính toàn vẹn hệ thống...</span>
+              ) : (
+                <span className="text-emerald-400">✅ Dọn dẹp hoàn tất! Đang khởi động lại...</span>
+              )}
+            </div>
+
+            {/* Countdown timer */}
+            <div className="text-[10px] text-white/30 uppercase tracking-widest mt-4 font-mono">
+              Thời gian ước tính: {Math.floor(cleanTimeRemaining / 60).toString().padStart(2, "0")}
+              :
+              {(cleanTimeRemaining % 60).toString().padStart(2, "0")}
+            </div>
           </div>
-        ) : (
-          <>
+        ) : showSplash ? (
+          <div className="flex flex-col items-center justify-center">
             <svg className="animate-spin h-14 w-14 text-white mb-6" viewBox="0 0 50 50">
               <circle
                 className="opacity-100"
@@ -1804,8 +2351,129 @@ export default function App() {
                 fill="none"
               />
             </svg>
-            <div className="text-white/40 text-xs tracking-widest uppercase font-mono">Đang khởi động Vplay...</div>
-          </>
+            <div className="text-white/40 text-xs tracking-widest uppercase font-google font-medium animate-pulse">Connecting to services...</div>
+          </div>
+        ) : roleSelection === null ? (
+          <div className="w-full max-w-md p-8 bg-[#121118]/85 backdrop-blur-2xl border border-white/10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.8)] relative overflow-hidden rounded-[28px] animate-fade-in hover:border-white/15 transition-all text-white font-google">
+            {/* Ambient subtle glow background */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+            <div className="relative z-10 space-y-6">
+              {!showAdminPassModal ? (
+                <>
+                  <div className="space-y-1">
+                    <h2 className="text-lg font-bold text-white tracking-wide uppercase">BẠN LÀ AI?</h2>
+                    <p className="text-xs text-white/45 uppercase tracking-wider">Vui lòng chọn vai trò để tiếp tục</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 pt-2">
+                    {/* User Option Button */}
+                    <button
+                      onClick={() => {
+                        setRoleSelection("user");
+                      }}
+                      className="group flex items-center justify-between p-4 bg-white/[0.03] hover:bg-indigo-600/10 border border-white/10 hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-left rounded-2xl relative cursor-default"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-300 transition-colors">
+                          <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-white uppercase tracking-wider">Người trải nghiệm</div>
+                          <div className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors">Khám phá Vplay lập tức</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-indigo-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">SELECT &rarr;</span>
+                    </button>
+
+                    {/* Admin Option Button */}
+                    <button
+                      onClick={() => {
+                        setShowAdminPassModal(true);
+                        setAdminError("");
+                        setAdminPasswordInput("");
+                      }}
+                      className="group flex items-center justify-between p-4 bg-white/[0.03] hover:bg-purple-600/10 border border-white/10 hover:border-purple-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-left rounded-2xl relative cursor-default"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-colors">
+                          <Cpu className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-white uppercase tracking-wider">Nhà phát triển</div>
+                          <div className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors font-medium">Yêu cầu mã khóa bảo mật</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-purple-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">AUTH &rarr;</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-5 animate-fade-in text-left">
+                  <div className="text-center space-y-1">
+                    <h3 className="text-sm font-bold uppercase text-purple-400 tracking-wide">XÁC THỰC ADMIN</h3>
+                    <p className="text-xs text-white/40 uppercase tracking-wider">Nhập mã khóa bảo mật để cấp quyền</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-white/50 uppercase tracking-wider font-semibold">MẬT MÃ TRUY CẬP</label>
+                    <input
+                      type="password"
+                      value={adminPasswordInput}
+                      onChange={(e) => setAdminPasswordInput(e.target.value)}
+                      placeholder="Mật khẩu của Admin..."
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          if (adminPasswordInput === "3667") {
+                            setRoleSelection("admin");
+                            setShowAdminPassModal(false);
+                          } else {
+                            setAdminError("Mật khẩu không chính xác!");
+                          }
+                        }
+                      }}
+                      className="w-full bg-black/40 border border-white/10 focus:border-purple-500/50 px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none rounded-xl font-mono tracking-widest"
+                      autoFocus
+                    />
+                  </div>
+
+                  {adminError && (
+                    <div className="text-[10px] text-red-400 font-bold uppercase tracking-wider font-mono text-center">
+                      ⚠ {adminError}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={() => {
+                        if (adminPasswordInput === "3667") {
+                          setRoleSelection("admin");
+                          setShowAdminPassModal(false);
+                        } else {
+                          setAdminError("Mật khẩu không chính xác!");
+                        }
+                      }}
+                      className="flex-1 bg-purple-600 hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.3)] text-white font-bold py-2.5 text-xs uppercase tracking-wider rounded-xl transition-all cursor-default text-center"
+                    >
+                      Xác nhận
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAdminPassModal(false);
+                        setAdminError("");
+                        setAdminPasswordInput("");
+                      }}
+                      className="flex-1 bg-white/5 hover:bg-white/10 text-white/60 font-bold py-2.5 text-xs uppercase tracking-wider rounded-xl transition-all cursor-default text-center"
+                    >
+                      Quay lại
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="text-white">Kiểm tra tính toàn vẹn...</div>
         )}
 
         {currentStorageUsed >= 3.00 && showFullPopup && !isCleaning && (
@@ -1859,6 +2527,7 @@ export default function App() {
           </div>
         )}
         {renderCleanupModal()}
+      {renderFocusChannelsModal()}
       </div>
     );
   }
@@ -1897,6 +2566,13 @@ export default function App() {
           vIntelHistory={vIntelHistory}
           handleSendVIntelMsg={handleSendVIntelMsg}
           isAutoHideMenuBarActive={isAutoHideMenuBarActive}
+          onSelectChannel={handleSelectChannel}
+          userRole={roleSelection}
+          onOpenLogoAdjustTest={() => setShowLogoAdjustModal(true)}
+          onOpenYouTubeTool={() => setShowYouTubeToolModal(true)}
+          onOpenWheelOfVplay={() => setShowWheelOfVplayModal(true)}
+          isFocusMode={isFocusMode}
+          setIsFocusMode={setIsFocusMode}
         />
       
       {/* Decorative ambient glowing circles */}
@@ -2426,6 +3102,18 @@ export default function App() {
                     <span>Open Stream</span>
                   </a>
 
+                  {/* Channels button (Focus Mode only) */}
+                  {isFocusMode && (
+                    <button
+                      onClick={() => setShowFocusChannelsModal(true)}
+                      className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1 sm:gap-1.5 shrink-0 shadow-lg cursor-default bouncy-btn text-[10.5px] sm:text-xs font-semibold animate-pulse"
+                      title="Open Channels List"
+                    >
+                      <Tv className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-white" />
+                      <span>Channels</span>
+                    </button>
+                  )}
+
                   {/* Add custom channel button */}
                   <button
                     onClick={() => setShowCustomModal(true)}
@@ -2438,33 +3126,36 @@ export default function App() {
                 </div>
 
                 {/* Glass Category Filter row - Nested inside sticky container so it stays hard locked on mobile */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 mt-3 mb-1 lg:mb-6 lg:pb-4 lg:mt-4 border-b lg:border-none border-white/5 scrollbar-none">
-                  <button
-                    onClick={() => setSelectedCategory("all")}
-                    className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-normal whitespace-nowrap cursor-default bouncy-btn ${
-                      selectedCategory === "all" ? "glass-pill-active" : "glass-pill text-white/60 hover:text-white"
-                    }`}
-                  >
-                    All ({flattenedChannels.length})
-                  </button>
-                  
-                  {allAvailableCategoryList.map((cat) => (
+                {!isFocusMode && (
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 mt-3 mb-1 lg:mb-6 lg:pb-4 lg:mt-4 border-b lg:border-none border-white/5 scrollbar-none">
                     <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
+                      onClick={() => setSelectedCategory("all")}
                       className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-normal whitespace-nowrap cursor-default bouncy-btn ${
-                        selectedCategory === cat.id ? "glass-pill-active" : "glass-pill text-white/60 hover:text-white"
+                        selectedCategory === "all" ? "glass-pill-active" : "glass-pill text-white/60 hover:text-white"
                       }`}
                     >
-                      {cat.name} ({cat.channels.length})
+                      All ({flattenedChannels.length})
                     </button>
-                  ))}
-                </div>
+                    
+                    {allAvailableCategoryList.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-normal whitespace-nowrap cursor-default bouncy-btn ${
+                          selectedCategory === cat.id ? "glass-pill-active" : "glass-pill text-white/60 hover:text-white"
+                        }`}
+                      >
+                        {cat.name} ({cat.channels.length})
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* CHANNELS ACCORDION LIST matching reference screenshot specs */}
-            <div className="flex flex-col gap-10">
+            {!isFocusMode && (
+              <div className="flex flex-col gap-10">
               {filteredCategories.length === 0 ? (
                 <div className="py-20 text-center glass-panel rounded-2xl border border-white/10 max-w-xl mx-auto">
                   <HelpCircle className="w-12 h-12 text-white/30 mx-auto mb-3" />
@@ -2557,6 +3248,7 @@ export default function App() {
                 ))
               )}
             </div>
+            )}
           </>
         )}
 
@@ -2578,12 +3270,14 @@ export default function App() {
                     transition={{ duration: 0.8, ease: "easeInOut" }}
                     className="absolute inset-0"
                   >
-                    <img 
-                      src={homeSlides[currentSlide].thumbnail} 
-                      alt={homeSlides[currentSlide].titleMain} 
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover object-center md:object-right scale-102"
-                    />
+                    {!isFocusMode && (
+                      <img 
+                        src={homeSlides[currentSlide].thumbnail} 
+                        alt={homeSlides[currentSlide].titleMain} 
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-center md:object-right scale-102"
+                      />
+                    )}
                     
                     {/* Advanced Multi-Layer Vignette Overlays that match the thumbnail color dynamically */}
                     <div className={`absolute inset-0 bg-gradient-to-r ${homeSlides[currentSlide].vignetteLeft} z-10`} />
@@ -5200,6 +5894,25 @@ export default function App() {
           </div>
         )}
 
+        {/* VIEW: FANDOM LOGOS GENERATOR PAGE */}
+        {activeTab === "fandom_logos" && (
+          <FandomLogosTab onBack={() => setActiveTab("home")} />
+        )}
+
+        {/* VIEW: INTELLIGENCE THUMBNAIL PAGE */}
+        {activeTab === "intelligence_thumbnail" && (
+          <IntelligenceThumbnailTab
+            onBack={() => setActiveTab("home")}
+            onSelectChannel={(channel) => {
+              handleSelectChannel(channel);
+              setActiveTab("home");
+            }}
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
+            t={t}
+          />
+        )}
+
       </main>
 
       {/* High-fidelity progressive vintage blur backplate for Bottom Navigation Dock */}
@@ -5460,7 +6173,7 @@ export default function App() {
                         code: t.code
                       })),
                       { id: "settings", icon: Settings, label: "Settings", isVtvGo: false },
-                      { id: "vtvgo", icon: Star, label: "VTVgo", isVtvGo: true },
+                      ...(!isFocusMode ? [{ id: "vtvgo", icon: Star, label: "VTVgo", isVtvGo: true }] : []),
                     ].map((tab) => {
                       const isActive = tab.isVtvGo 
                         ? (activeTab === "live" && selectedChannel?.id === "vietnam-wild-live")
@@ -5651,7 +6364,28 @@ export default function App() {
               {/* Copilot-style Glowing Header Accent */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-500 via-indigo-500 via-purple-500 to-pink-500" />
 
-              {/* Drawer Header */}
+              {roleSelection === "user" ? (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative font-mono">
+                  <button
+                    onClick={() => setReimaginedSearchOpen(false)}
+                    className="absolute top-4 right-4 p-1.5 rounded-none text-white/40 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+                    title="Đóng"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  <div className="w-12 h-12 rounded-none bg-red-500/10 text-red-400 flex items-center justify-center mb-4">
+                    <AlertCircle className="w-6 h-6" />
+                  </div>
+                  <div className="text-white/95 text-xs font-semibold uppercase tracking-wider mb-2">
+                    Access Restricted
+                  </div>
+                  <div className="text-white/60 text-xs leading-relaxed max-w-[280px]">
+                    V-Intelligence is not available in preview build of Vplay.
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Drawer Header */}
               <div className="px-5 pt-6 pb-4 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
                 <div className="flex items-center gap-3">
                   <div className="relative cursor-pointer" onClick={() => setVIntelSpinCount(prev => prev + 1)}>
@@ -5872,6 +6606,8 @@ export default function App() {
                   Trợ lý AI sử dụng Gemini API. Câu trả lời có thể chứa thông tin chưa chính xác.
                 </div>
               </div>
+                </>
+              )}
 
             </motion.div>
           </>
@@ -6017,6 +6753,201 @@ export default function App() {
             </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* LOGO ADJUST TOOL TEST MODAL */}
+      <AnimatePresence>
+        {showLogoAdjustModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4 font-google select-none"
+            onClick={() => setShowLogoAdjustModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className={`w-full max-w-sm p-6 shadow-2xl relative text-left overflow-hidden flex flex-col ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] border border-white/5 text-[#e6e1e5]"
+                  : "rounded-3xl bg-[#121118]/90 border border-white/10 text-white"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center space-y-1 mb-5">
+                <h3 className="text-sm font-bold uppercase text-purple-400 tracking-wide">LOGO ADJUSTMENT TEST</h3>
+                <p className="text-xs text-white/40 uppercase tracking-wider font-medium">Tinh chỉnh bộ lọc hình ảnh hiển thị logo</p>
+              </div>
+
+              {/* Logo Preview box */}
+              <div className="w-full aspect-video bg-black/40 border border-white/10 flex items-center justify-center p-4 mb-5 relative overflow-hidden rounded-2xl">
+                <img 
+                  src="https://static.wikia.nocookie.net/logos/images/2/20/VTV2_21.11.2024-nay.png/revision/latest/scale-to-width-down/1000?cb=20250110115127&path-prefix=vi" 
+                  alt="VTV2 Test Logo" 
+                  className="max-h-24 max-w-full object-contain transition-all duration-75"
+                  referrerPolicy="no-referrer"
+                  style={{
+                    filter: `saturate(${logoSaturation}%) brightness(${logoBrightness}%) opacity(${logoOpacity}%)`
+                  }}
+                />
+              </div>
+
+              {/* Sliders */}
+              <div className="space-y-4 mb-6">
+                {/* Saturation */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[11px] uppercase text-neutral-400 font-semibold tracking-wider">
+                    <span>Saturation</span>
+                    <span className="text-white font-bold">{logoSaturation}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="200" 
+                    value={logoSaturation}
+                    onChange={(e) => setLogoSaturation(Number(e.target.value))}
+                    className="w-full accent-purple-500 h-1 bg-white/10 rounded-full cursor-pointer"
+                  />
+                </div>
+
+                {/* Brightness */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[11px] uppercase text-neutral-400 font-semibold tracking-wider">
+                    <span>Brightness</span>
+                    <span className="text-white font-bold">{logoBrightness}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="200" 
+                    value={logoBrightness}
+                    onChange={(e) => setLogoBrightness(Number(e.target.value))}
+                    className="w-full accent-purple-500 h-1 bg-white/10 rounded-full cursor-pointer"
+                  />
+                </div>
+
+                {/* Opacity */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[11px] uppercase text-neutral-400 font-semibold tracking-wider">
+                    <span>Opacity</span>
+                    <span className="text-white font-bold">{logoOpacity}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="100" 
+                    value={logoOpacity}
+                    onChange={(e) => setLogoOpacity(Number(e.target.value))}
+                    className="w-full accent-purple-500 h-1 bg-white/10 rounded-full cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setLogoSaturation(100);
+                    setLogoBrightness(100);
+                    setLogoOpacity(100);
+                  }}
+                  className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-2.5 text-xs uppercase tracking-wider transition-all cursor-default text-center rounded-xl text-white/80 font-semibold"
+                >
+                  Reset
+                </button>
+                <button
+                  onClick={() => setShowLogoAdjustModal(false)}
+                  className="flex-1 bg-purple-600 hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.3)] py-2.5 text-xs uppercase tracking-wider transition-all cursor-default text-center rounded-xl font-bold text-white"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* YOUTUBE TOOL MODAL */}
+      <AnimatePresence>
+        {showYouTubeToolModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4 font-google select-none"
+            onClick={() => setShowYouTubeToolModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className={`w-full max-w-sm p-6 shadow-2xl relative text-left overflow-hidden flex flex-col ${
+                isMaterialDesignActive
+                  ? "rounded-[28px] bg-[#211f26] border border-white/5 text-[#e6e1e5]"
+                  : "rounded-3xl bg-[#121118]/90 border border-white/10 text-white"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center space-y-1 mb-5">
+                <h3 className="text-sm font-bold uppercase text-emerald-400 tracking-wide">YOUTUBE PIPELINE</h3>
+                <p className="text-xs text-white/40 uppercase tracking-wider font-medium">Nhập đường dẫn YouTube để phát trong channel player</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] text-white/50 uppercase tracking-wider block font-semibold">ĐƯỜNG DẪN VIDEO YOUTUBE</label>
+                  <input
+                    type="text"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={youtubeUrlInput}
+                    onChange={(e) => setYoutubeUrlInput(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 focus:border-emerald-500/50 px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none rounded-xl"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => {
+                      if (!youtubeUrlInput.trim()) return;
+                      const ytChannel: Channel = {
+                        id: "youtube_custom_" + Date.now(),
+                        name: "YouTube Stream",
+                        url: youtubeUrlInput.trim(),
+                        group: "YouTube Tool",
+                        logoText: "YOUTUBE",
+                        logoBg: "bg-red-600",
+                        logoImg: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo_only.svg"
+                      };
+                      handleSelectChannel(ytChannel);
+                      setShowYouTubeToolModal(false);
+                      setActiveTab("live");
+                    }}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] py-2.5 text-xs uppercase tracking-wider transition-all cursor-default text-center rounded-xl font-bold text-white"
+                  >
+                    Play
+                  </button>
+                  <button
+                    onClick={() => setShowYouTubeToolModal(false)}
+                    className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-2.5 text-xs uppercase tracking-wider transition-all cursor-default text-center rounded-xl text-white/60 font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* WHEEL OF VPLAY MODAL */}
+      <AnimatePresence>
+        {showWheelOfVplayModal && renderWheelOfVplayModal()}
       </AnimatePresence>
 
       {/* CUSTOM MODALS RENDERING */}
@@ -6285,6 +7216,7 @@ export default function App() {
 
       {/* STORAGE CLEANUP MODAL WITH ADVANCED FEATURES */}
       {renderCleanupModal()}
+      {renderFocusChannelsModal()}
 
       {/* ABOUT VPLAY360 MODAL */}
       <AnimatePresence>

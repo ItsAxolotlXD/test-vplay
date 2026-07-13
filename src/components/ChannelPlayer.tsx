@@ -57,6 +57,13 @@ const translateName = (key: string): string => {
   return key;
 };
 
+const getYoutubeId = (url: string) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
 export default function ChannelPlayer({
   channel,
   volume,
@@ -228,6 +235,19 @@ export default function ChannelPlayer({
     const video = videoRef.current;
     if (!video) return;
 
+    const ytId = getYoutubeId(channel.url);
+    if (ytId) {
+      setIsLoading(false);
+      setHasError(false);
+      setErrorMessage("");
+      setIsPlaying(true);
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      return;
+    }
+
     if (isTestcard) {
       setIsLoading(false);
       setHasError(false);
@@ -265,7 +285,77 @@ export default function ChannelPlayer({
     };
 
     // Check if the source is video format or an absolute m3u8 url
-    if (channel.url.endsWith(".m3u8") || hlsRef.current === null) {
+    const isMp4 = channel.id === "test_video" || channel.url.endsWith(".mp4") || channel.url.includes(".mp4?") || channel.url.includes("/assets/");
+
+    if (isMp4) {
+      setIsLoading(true);
+      setHasError(false);
+      setErrorMessage("");
+      setIsPlaying(true);
+
+      const onLoadedMetadata = () => {
+        playVideo();
+      };
+
+      const onError = () => {
+        console.warn("Lỗi tải video mẫu từ:", video.src);
+        // Danh sách dự phòng các đường dẫn có thể có cho video mẫu
+        const fallbackUrls = [
+          "/assets/VTV6 World Cup 2026.mp4",
+          "/assets/vtv6_world_cup_2026.mp4",
+          "/assets/VTV6_World_Cup_2026.mp4",
+          "/assets/test_video.mp4"
+        ];
+        
+        const currentPath = video.src.replace(window.location.origin, "");
+        const currentIdx = fallbackUrls.indexOf(currentPath);
+        if (currentIdx !== -1 && currentIdx < fallbackUrls.length - 1) {
+          // Thử đường dẫn dự phòng tiếp theo
+          video.src = fallbackUrls[currentIdx + 1];
+          video.load();
+        } else {
+          // Nếu tất cả các tệp cục bộ đều không tìm thấy, tự động phát luồng VTV6 HLS làm fallback!
+          console.log("Không tìm thấy video mẫu cục bộ, tự động chuyển sang luồng trực tiếp VTV6.");
+          setErrorMessage("Không tìm thấy tệp video mẫu cục bộ. Đang tải luồng VTV6 trực tiếp để thay thế...");
+          
+          const fallbackHlsUrl = "https://live.fptplay53.net/fnxhd1/vtv6hd_vhls.smil/chunklist_b5000000.m3u8";
+          if (Hls.isSupported()) {
+            const hls = new Hls({
+              enableWorker: true,
+              lowLatencyMode: true,
+            });
+            hlsRef.current = hls;
+            hls.loadSource(fallbackHlsUrl);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              playVideo();
+              // Xóa thông báo lỗi tạm thời sau khi phát thành công
+              setTimeout(() => {
+                setErrorMessage("");
+              }, 3000);
+            });
+            hls.on(Hls.Events.ERROR, () => {
+              setHasError(true);
+              setErrorMessage("Không thể kết nối đến luồng VTV6 dự phòng.");
+              setIsLoading(false);
+            });
+          } else {
+            video.src = fallbackHlsUrl;
+            video.load();
+          }
+        }
+      };
+
+      video.addEventListener("loadedmetadata", onLoadedMetadata);
+      video.addEventListener("error", onError);
+      video.src = channel.url;
+      video.load();
+
+      return () => {
+        video.removeEventListener("loadedmetadata", onLoadedMetadata);
+        video.removeEventListener("error", onError);
+      };
+    } else if (channel.url.endsWith(".m3u8") || hlsRef.current === null) {
       if (Hls.isSupported()) {
         const hls = new Hls({
           enableWorker: true,
@@ -412,15 +502,24 @@ export default function ChannelPlayer({
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && !hasError && !isLoading && setShowControls(false)}
       >
-        {/* Real Video Element */}
-        <video
-          ref={videoRef}
-          className="w-full h-full object-contain bg-black cursor-default"
-          onClick={togglePlay}
-          playsInline
-          autoPlay
-          muted={muted}
-        />
+        {/* Real Video Element or YouTube Embed */}
+        {getYoutubeId(channel.url) ? (
+          <iframe
+            className="w-full h-full bg-black border-0 absolute inset-0 z-10"
+            src={`https://www.youtube.com/embed/${getYoutubeId(channel.url)}?autoplay=1&mute=${muted ? 1 : 0}&controls=1&rel=0`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            className="w-full h-full object-contain bg-black cursor-default"
+            onClick={togglePlay}
+            playsInline
+            autoPlay
+            muted={muted}
+          />
+        )}
 
         {/* Testcard or Stream Error EBU Colorbars View */}
         {((isTestcard && !isLoading) || (hasError && !isLoading)) && (

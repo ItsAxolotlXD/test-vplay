@@ -3,6 +3,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import * as cheerio from "cheerio";
 
 dotenv.config();
 
@@ -16,6 +17,193 @@ async function startServer() {
   // API Route: Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  // API Route: Generate Fandom Logos
+  app.get("/api/fandom-logos", async (req, res) => {
+    try {
+      const { lang, page } = req.query;
+      if (!lang || !page) {
+        return res.status(400).json({ error: "Thiếu tham số lang hoặc page." });
+      }
+
+      const wikiLang = String(lang).toLowerCase() === "vi" ? "vi" : "uk";
+      const wikiPage = String(page).trim();
+
+      // Query via MediaWiki Parse API
+      const apiUrl = `https://logos.fandom.com/${wikiLang}/api.php?action=parse&page=${encodeURIComponent(wikiPage)}&prop=text&format=json&origin=*`;
+      
+      let htmlText = "";
+      try {
+        const apiResponse = await fetch(apiUrl, {
+          headers: { 'User-Agent': 'VPlayLogoGenerator/1.0' }
+        });
+        if (apiResponse.ok) {
+          const data = await apiResponse.json() as any;
+          if (data && data.parse && data.parse.text && data.parse.text["*"]) {
+            htmlText = data.parse.text["*"];
+          }
+        }
+      } catch (err) {
+        console.error("Fandom parse API error:", err);
+      }
+
+      // Fallback: If parse API fails, fetch direct page HTML
+      if (!htmlText) {
+        try {
+          const htmlUrl = `https://logos.fandom.com/${wikiLang}/wiki/${encodeURIComponent(wikiPage)}`;
+          const htmlResponse = await fetch(htmlUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+          });
+          if (htmlResponse.ok) {
+            htmlText = await htmlResponse.text();
+          }
+        } catch (err) {
+          console.error("Fandom Direct HTML Scrape Error:", err);
+        }
+      }
+
+      if (!htmlText) {
+        return res.status(404).json({ error: `Không thể kết nối hoặc không tìm thấy trang "${wikiPage}" trên Fandom.` });
+      }
+
+      // Helper function to extract years or dates from captions
+      const extractDateFromCaption = (caption: string, defaultDate: string): string => {
+        const dateRegex = /\b(19\d{2}|20\d{2})\s*[-–—]\s*(19\d{2}|20\d{2}|present|nay|hiện\s+nay)\b|\b(19\d{2}|20\d{2})\b/gi;
+        const match = caption.match(dateRegex);
+        if (match) {
+          return match[0];
+        }
+        return defaultDate;
+      };
+
+      const $ = cheerio.load(htmlText);
+      const sections: { title: string; logos: { url: string; caption: string; date: string; title: string }[] }[] = [];
+
+      let currentSectionName = "Chung / Khác";
+      let currentLogos: any[] = [];
+      const seenUrls = new Set<string>();
+
+      // Traverse elements
+      $('h2, h3, h4, ul.gallery, div.thumb, figure.thumb').each((_i, el) => {
+        const tagName = el.name;
+        const $el = $(el);
+
+        if (['h2', 'h3', 'h4'].includes(tagName)) {
+          const headline = $el.find('.mw-headline');
+          if (headline.length > 0) {
+            const headingText = headline.text().trim();
+            const skipHeadings = [
+              "references", "see also", "external links", "navigation", "categories", 
+              "tài liệu tham khảo", "xem thêm", "liên kết ngoài", "chú thích", "bình luận", "comments"
+            ];
+            if (skipHeadings.some(h => headingText.toLowerCase().includes(h))) {
+              return;
+            }
+            
+            if (currentLogos.length > 0) {
+              sections.push({ title: currentSectionName, logos: currentLogos });
+            }
+            currentSectionName = headingText;
+            currentLogos = [];
+          }
+        } else if (tagName === 'ul' && $el.hasClass('gallery')) {
+          $el.find('li.gallerybox').each((_j, box) => {
+            const $box = $(box);
+            const img = $box.find('img');
+            let imgSrc = img.attr('data-src') || img.attr('src') || '';
+            if (imgSrc) {
+              if (imgSrc.includes('/revision/latest')) {
+                imgSrc = imgSrc.split('/revision/latest')[0] + '/revision/latest';
+              }
+              if (imgSrc.startsWith('//')) {
+                imgSrc = 'https:' + imgSrc;
+              }
+
+              const isCommonUI = imgSrc.includes("sprite") || imgSrc.includes("favicon") || imgSrc.includes("wiki_logo") || imgSrc.includes("Theme-") || imgSrc.includes("placeholder");
+              if (imgSrc.startsWith('http') && !isCommonUI && !seenUrls.has(imgSrc)) {
+                seenUrls.add(imgSrc);
+                const captionText = $box.find('.gallerytext').text().trim().replace(/\s+/g, ' ');
+                const cleanCaption = captionText || "Logo";
+                
+                let logoTitle = "Logo";
+                if (cleanCaption) {
+                  const parts = cleanCaption.split(/[.;|]/);
+                  if (parts[0] && parts[0].trim().length > 3) {
+                    logoTitle = parts[0].trim();
+                  } else {
+                    logoTitle = cleanCaption;
+                  }
+                }
+
+                currentLogos.push({
+                  url: imgSrc,
+                  caption: cleanCaption,
+                  title: logoTitle,
+                  date: extractDateFromCaption(cleanCaption, currentSectionName)
+                });
+              }
+            }
+          });
+        } else if (tagName === 'div' || tagName === 'figure') {
+          if ($el.hasClass('thumb') || $el.hasClass('thumbinner')) {
+            const img = $el.find('img');
+            let imgSrc = img.attr('data-src') || img.attr('src') || '';
+            if (imgSrc) {
+              if (imgSrc.includes('/revision/latest')) {
+                imgSrc = imgSrc.split('/revision/latest')[0] + '/revision/latest';
+              }
+              if (imgSrc.startsWith('//')) {
+                imgSrc = 'https:' + imgSrc;
+              }
+
+              const isCommonUI = imgSrc.includes("sprite") || imgSrc.includes("favicon") || imgSrc.includes("wiki_logo") || imgSrc.includes("Theme-") || imgSrc.includes("placeholder");
+              if (imgSrc.startsWith('http') && !isCommonUI && !seenUrls.has(imgSrc)) {
+                seenUrls.add(imgSrc);
+                const captionText = $el.find('.thumbcaption').text().trim().replace(/\s+/g, ' ');
+                const cleanCaption = captionText || "Logo";
+                
+                let logoTitle = "Logo";
+                if (cleanCaption) {
+                  const parts = cleanCaption.split(/[.;|]/);
+                  if (parts[0] && parts[0].trim().length > 3) {
+                    logoTitle = parts[0].trim();
+                  } else {
+                    logoTitle = cleanCaption;
+                  }
+                }
+
+                currentLogos.push({
+                  url: imgSrc,
+                  caption: cleanCaption,
+                  title: logoTitle,
+                  date: extractDateFromCaption(cleanCaption, currentSectionName)
+                });
+              }
+            }
+          }
+        }
+      });
+
+      if (currentLogos.length > 0) {
+        sections.push({ title: currentSectionName, logos: currentLogos });
+      }
+
+      const finalSections = sections.filter(s => s.logos.length > 0);
+
+      res.json({
+        success: true,
+        lang: wikiLang,
+        page: wikiPage,
+        sectionsCount: finalSections.length,
+        sections: finalSections
+      });
+    } catch (error: any) {
+      console.error("Fandom Logos Proxy Error:", error);
+      res.status(500).json({ error: error.message || "Không thể tải logo từ fandom" });
+    }
   });
 
   // API Route: V-Intelligence Gemini Assistant Proxy
