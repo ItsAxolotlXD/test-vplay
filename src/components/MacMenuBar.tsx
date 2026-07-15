@@ -28,7 +28,9 @@ import {
   Copy,
   Image,
   Play,
-  EyeOff
+  EyeOff,
+  Beaker,
+  Zap
 } from "lucide-react";
 
 interface MacMenuBarProps {
@@ -68,6 +70,26 @@ interface MacMenuBarProps {
   onOpenWheelOfVplay?: () => void;
   isFocusMode?: boolean;
   setIsFocusMode?: (val: boolean) => void;
+  expLowLatency: boolean;
+  setExpLowLatency: (val: boolean) => void;
+  expCache: boolean;
+  setExpCache: (val: boolean) => void;
+  expAmbientGlow: boolean;
+  setExpAmbientGlow: (val: boolean) => void;
+  expFeatures: {
+    id: string;
+    name: string;
+    desc: string;
+    status: "idle" | "installing" | "installed";
+    progress: number;
+    isActive: boolean;
+  }[];
+  toggleExpFeature: (id: string) => void;
+  testStreamUrl: string;
+  setTestStreamUrl: (val: string) => void;
+  onLaunchTestStream: (url: string) => void;
+  onTriggerCrash: () => void;
+  onOpenDuiMode?: () => void;
 }
 
 export default function MacMenuBar({
@@ -106,7 +128,20 @@ export default function MacMenuBar({
   onOpenYouTubeTool,
   onOpenWheelOfVplay,
   isFocusMode = false,
-  setIsFocusMode
+  setIsFocusMode,
+  expLowLatency,
+  setExpLowLatency,
+  expCache,
+  setExpCache,
+  expAmbientGlow,
+  setExpAmbientGlow,
+  expFeatures,
+  toggleExpFeature,
+  testStreamUrl,
+  setTestStreamUrl,
+  onLaunchTestStream,
+  onTriggerCrash,
+  onOpenDuiMode
 }: MacMenuBarProps) {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [timeStr, setTimeStr] = useState("");
@@ -906,50 +941,6 @@ export default function MacMenuBar({
             )}
           </div>
 
-          {/* Edit Menu */}
-          <div className="relative">
-            <button
-              onClick={() => toggleDropdown("edit")}
-              onMouseEnter={() => handleMenuHover("edit")}
-              className={`px-2.5 py-1 rounded-[4px] hover:bg-white/10 transition-colors cursor-default ${
-                activeDropdown === "edit" ? "bg-white/15 text-white" : ""
-              }`}
-            >
-              Edit
-            </button>
-
-            {activeDropdown === "edit" && (
-              <div className="absolute left-0 mt-1 w-52 rounded-lg bg-[#121118]/95 backdrop-blur-[40px] border border-white/15 shadow-2xl z-[110] py-1.5 text-white overflow-hidden text-left">
-                <button
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    setActiveTab("search");
-                  }}
-                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    <Search className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
-                    <span>Search Channels</span>
-                  </span>
-                  <span className="text-[10px] text-neutral-400 font-mono">⌘F</span>
-                </button>
-                <div className="border-t border-white/10 my-1" />
-                <button
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    toggleShowClock();
-                  }}
-                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    {showClock ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <div className="w-3.5 h-3.5" />}
-                    <span>Show Dock Clock</span>
-                  </span>
-                </button>
-              </div>
-            )}
-          </div>
-
           {/* View Menu */}
           <div className="relative">
             <button
@@ -1049,76 +1040,16 @@ export default function MacMenuBar({
                   </span>
                   {isFocusMode && <Check className="w-3.5 h-3.5 text-emerald-400" />}
                 </button>
-              </div>
-            )}
-          </div>
-
-          {/* Go Menu */}
-          <div className="relative">
-            <button
-              onClick={() => toggleDropdown("go")}
-              onMouseEnter={() => handleMenuHover("go")}
-              className={`px-2.5 py-1 rounded-[4px] hover:bg-white/10 transition-colors cursor-default ${
-                activeDropdown === "go" ? "bg-white/15 text-white" : ""
-              }`}
-            >
-              Go
-            </button>
-
-            {activeDropdown === "go" && (
-              <div className="absolute left-0 mt-1 w-52 rounded-lg bg-[#121118]/95 backdrop-blur-[40px] border border-white/15 shadow-2xl z-[110] py-1.5 text-white overflow-hidden text-left">
-                <button
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    setActiveTab("home");
-                  }}
-                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
-                >
-                  <span>Go to Home</span>
-                  <span className="text-[10px] text-neutral-400 font-mono">⌥H</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    setActiveTab("live");
-                  }}
-                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
-                >
-                  <span>Go to Live TV</span>
-                  <span className="text-[10px] text-neutral-400 font-mono">⌥L</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    setActiveTab("search");
-                  }}
-                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
-                >
-                  <span>Go to Search</span>
-                  <span className="text-[10px] text-neutral-400 font-mono">⌥S</span>
-                </button>
                 <div className="border-t border-white/10 my-1" />
                 <button
                   onClick={() => {
                     setActiveDropdown(null);
-                    setActiveTab("settings");
-                    setActiveSettingSection("plugin_store");
+                    if (onOpenDuiMode) onOpenDuiMode();
                   }}
-                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center gap-2 transition-colors cursor-default text-emerald-400 font-semibold"
                 >
-                  <span>Go to Plugin Store</span>
-                  <span className="text-[10px] text-neutral-400 font-mono">⌥P</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveDropdown(null);
-                    setActiveTab("settings");
-                    setActiveSettingSection(null);
-                  }}
-                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
-                >
-                  <span>Go to Settings</span>
-                  <span className="text-[10px] text-neutral-400 font-mono">⌥,</span>
+                  <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>View in DUI MODE</span>
                 </button>
               </div>
             )}
@@ -1137,7 +1068,7 @@ export default function MacMenuBar({
             </button>
 
             {activeDropdown === "test" && (
-              <div className="absolute left-0 mt-1 w-56 rounded-lg bg-[#121118]/95 backdrop-blur-[40px] border border-white/15 shadow-2xl z-[110] py-1.5 text-white overflow-hidden text-left">
+              <div className="absolute left-0 mt-1 w-64 rounded-lg bg-[#121118]/95 backdrop-blur-[40px] border border-white/15 shadow-2xl z-[110] py-1.5 text-white overflow-hidden text-left">
                 <button
                   onClick={() => {
                     setActiveDropdown(null);
@@ -1191,8 +1122,6 @@ export default function MacMenuBar({
                   </span>
                 </button>
 
-                <div className="border-t border-white/10 my-1" />
-
                 <button
                   onClick={() => {
                     setActiveDropdown(null);
@@ -1206,6 +1135,114 @@ export default function MacMenuBar({
                     <Sparkles className="w-3.5 h-3.5 opacity-80 text-amber-400" />
                     <span>Wheel of Vplay</span>
                   </span>
+                </button>
+
+                <div className="border-t border-white/10 my-1" />
+                
+                {/* Section: Experimental Settings */}
+                <div className="px-4 py-1 text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
+                  Tính năng Thử nghiệm
+                </div>
+
+                <button
+                  onClick={() => {
+                    setExpLowLatency(!expLowLatency);
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Zap className="w-3.5 h-3.5 opacity-80 text-amber-400" />
+                    <span>Low Latency Mode</span>
+                  </span>
+                  {expLowLatency && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setExpCache(!expCache);
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Database className="w-3.5 h-3.5 opacity-80 text-blue-400" />
+                    <span>Enhanced Stream Cache</span>
+                  </span>
+                  {expCache && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setExpAmbientGlow(!expAmbientGlow);
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 opacity-80 text-purple-400" />
+                    <span>Ambient Glow Effects</span>
+                  </span>
+                  {expAmbientGlow && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                </button>
+
+                <div className="border-t border-white/10 my-1" />
+                <div className="px-4 py-1 text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
+                  Cửa hàng Tính năng Thử nghiệm
+                </div>
+
+                {expFeatures.map((feat) => (
+                  <button
+                    key={feat.id}
+                    onClick={() => {
+                      toggleExpFeature(feat.id);
+                    }}
+                    className="w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Beaker className="w-3.5 h-3.5 opacity-80 text-indigo-400 shrink-0" />
+                      <span className="truncate pr-2">{feat.name}</span>
+                    </span>
+                    {feat.status === "installed" && feat.isActive && (
+                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    )}
+                  </button>
+                ))}
+
+                <div className="border-t border-white/10 my-1" />
+
+                <div className="px-4 py-1.5 space-y-1">
+                  <span className="text-[10px] text-white/40 uppercase font-bold tracking-wider">Launch M3U8 Direct Link</span>
+                  <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="text"
+                      placeholder="Paste .m3u8 link..."
+                      value={testStreamUrl}
+                      onChange={(e) => setTestStreamUrl(e.target.value)}
+                      className="flex-1 px-2 py-1 text-[10px] bg-white/5 border border-white/15 rounded text-white focus:outline-none focus:border-indigo-500/50 min-w-0"
+                    />
+                    <button
+                      onClick={() => {
+                        if (testStreamUrl) {
+                          onLaunchTestStream(testStreamUrl);
+                          setActiveDropdown(null);
+                        }
+                      }}
+                      className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 rounded text-[10px] font-bold text-white transition-colors cursor-default shrink-0"
+                    >
+                      Play
+                    </button>
+                  </div>
+                </div>
+
+                <div className="border-t border-white/10 my-1" />
+
+                <button
+                  onClick={() => {
+                    setActiveDropdown(null);
+                    onTriggerCrash();
+                  }}
+                  className="w-full px-4 py-1.5 text-left text-xs hover:bg-red-600/85 flex items-center gap-2 transition-colors cursor-default text-red-400 hover:text-white"
+                >
+                  <AlertCircle className="w-3.5 h-3.5 opacity-80" />
+                  <span>Trigger crash screen</span>
                 </button>
               </div>
             )}
