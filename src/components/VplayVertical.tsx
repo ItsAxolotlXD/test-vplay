@@ -83,7 +83,16 @@ const VIRTUAL_USERNAMES = [
   "tuấn_anh_vtv", "mai_lan_99", "hoang_hai_phong", "vplay_vip_user", 
   "thanh_hang_hn", "minh_quan_korea", "linh_chi_cute", "long_vu_sport", 
   "phuong_thao_vlog", "duy_khanh_bouncy", "ngoc_huyen_vtv3", "cuong_dolce",
-  "tram_anh_fashion", "tiến_dat_tech", "quỳnh_anh_vplay", "khanh_vy_official"
+  "tram_anh_fashion", "tiến_dat_tech", "quỳnh_anh_vplay", "khanh_vy_official",
+  "quang_huy_93", "minh_thu_bds", "binh_minh_chill", "khanh_an_vtv1",
+  "anh_tuan_live", "thuy_tien_sg", "quoc_bao_92", "lan_huong_vtv2",
+  "tien_dung_sport", "ngoc_anh_vtv6", "phuc_vinh_vplay", "diem_my_daily",
+  "vtv_go_fan", "the_anh_28", "beat_vn_member", "schannel_fan_cung",
+  "vinh_xo_review", "duy_tham_tech", "tan_one_piece", "linh_ka_official",
+  "son_tung_mtp_fan", "den_vau_chill", "suboi_rapviet", "justatee_fan",
+  "viet_anh_94", "huong_giang_vplay", "trung_quan_idol", "my_tam_fanpage",
+  "jack_5m", "kicm_producer", "viruss_reaction", "pewpew_tiem_banh",
+  "mixigaming_fan", "tiencookie_hit", "bichphuong_chill", "den_vau_rap"
 ];
 
 const USER_COLORS = [
@@ -148,6 +157,23 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
   const [userDisplayName, setUserDisplayName] = useState<string>(() => {
     return localStorage.getItem("vplay_comment_name") || "Bạn (Khách)";
   });
+
+  // V-Coins & Watch Timer states
+  const [vCoins, setVCoins] = useState<number>(() => {
+    const saved = localStorage.getItem("vplay_vcoins");
+    return saved ? parseInt(saved, 10) : 500;
+  });
+  const [countdown, setCountdown] = useState<number>(60);
+
+  // Watch Mode (Zoomed / Original)
+  const [watchMode, setWatchMode] = useState<"original" | "zoomed">("original");
+  const [zoomScale, setZoomScale] = useState<number>(1.5);
+  const [zoomOffsetX, setZoomOffsetX] = useState<number>(0);
+  const [zoomOffsetY, setZoomOffsetY] = useState<number>(0);
+
+  // Floating drawers inside players
+  const [showChannelSearchDrawer, setShowChannelSearchDrawer] = useState<boolean>(false);
+  const [showGiftModal, setShowGiftModal] = useState<boolean>(false);
   
   // Interactive Floating Hearts
   const [hearts, setHearts] = useState<FloatingHeart[]>([]);
@@ -221,6 +247,61 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
     setSharesCountMap(initialSharesCount);
   }, []);
 
+  // Persist V-coins to localStorage
+  useEffect(() => {
+    localStorage.setItem("vplay_vcoins", vCoins.toString());
+  }, [vCoins]);
+
+  // Countdown timer for earning coins (every 1 minute gets 50 coins)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          setVCoins(c => c + 50);
+          triggerToast("Bạn nhận được +50 V-coins nhờ xem chương trình! 💰📺");
+          return 60;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Creator/author replies back in the chat function
+  const triggerAuthorResponse = (type: 'comment' | 'superchat', customMsg?: string) => {
+    if (!currentChannel) return;
+    
+    setTimeout(() => {
+      let responseText = "";
+      const nick = userDisplayName || "Bạn";
+      
+      if (type === 'superchat') {
+        responseText = `🌟 [TÁC GIẢ] Cảm ơn Super Chat cực chất 100 Xu từ @${nick}: ${customMsg ? `"${customMsg}"` : "Cảm ơn bạn nhiều!"}! Chúc bạn có thời gian xem vui vẻ nha. 😍`;
+      } else {
+        const commentReplies = [
+          `@${nick} cảm ơn bạn đã quan tâm theo dõi luồng trực tiếp nha! ❤️`,
+          `Chào @${nick}, chúc bạn xem truyền hình vui vẻ trên Vplay nhé!`,
+          `Chuẩn luôn @${nick} ơi, nhớ thả tim ủng hộ stream nhé!`,
+          `Cảm ơn @${nick} đã tương tác cực sung! Kênh luôn phát Full HD 1080p mượt mà. 🔥`
+        ];
+        responseText = commentReplies[Math.floor(Math.random() * commentReplies.length)];
+      }
+
+      const broadcasterReply: CommentItem = {
+        id: `author-${Date.now()}-${Math.random()}`,
+        username: `👑 Broadcaster @${currentChannel.logoText?.toLowerCase()}`,
+        color: "from-purple-600 via-pink-600 to-rose-600 border border-rose-400 font-extrabold",
+        text: responseText,
+        timestamp: "Vừa xong"
+      };
+
+      setCommentsMap(prev => {
+        const currentList = prev[currentChannel.id] || [];
+        return { ...prev, [currentChannel.id]: [...currentList, broadcasterReply] };
+      });
+    }, 2800);
+  };
+
   // Set up HLS Video streaming
   useEffect(() => {
     const video = videoRef.current;
@@ -252,6 +333,17 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           video.play().catch(err => console.log("HLS play block:", err));
         });
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.warn("HLS Error:", data);
+          if (data.fatal) {
+            triggerToast(`Luồng ${currentChannel.name} gặp sự cố. Đang tự động bỏ qua...`);
+            setTimeout(() => {
+              if (handleNextShortRef.current) {
+                handleNextShortRef.current();
+              }
+            }, 1500);
+          }
+        });
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
         video.src = currentChannel.url;
         video.load();
@@ -259,7 +351,20 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
       }
     }
 
+    const handleVideoError = () => {
+      console.warn("Video element reported playback error.");
+      triggerToast(`Luồng ${currentChannel?.name} gặp sự cố tải. Đang bỏ qua...`);
+      setTimeout(() => {
+        if (handleNextShortRef.current) {
+          handleNextShortRef.current();
+        }
+      }, 1500);
+    };
+
+    video.addEventListener("error", handleVideoError);
+
     return () => {
+      video.removeEventListener("error", handleVideoError);
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
@@ -481,10 +586,10 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
     }
   };
 
-  // Lock document scroll on mount, unlock on unmount
+  // Keep standard scroll styling on mount, ensure scroller is visible
   useEffect(() => {
     const originalStyle = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = "auto";
     return () => {
       document.body.style.overflow = originalStyle;
     };
@@ -661,81 +766,43 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
       }, 9000);
     }
 
+    const postedMsg = newCommentText.trim();
     setNewCommentText("");
     
     // Save displayName to localstorage
     localStorage.setItem("vplay_comment_name", userDisplayName);
+
+    // Occasional 50% chance author responds to ordinary comments
+    if (Math.random() < 0.50) {
+      triggerAuthorResponse('comment', postedMsg);
+    }
   };
 
   const handleTriggerGift = () => {
-    if (!currentChannel) return;
-    
-    const giftItems = [
-      { name: "Hộp Quà Kim Cương 💎", icon: "💎" },
-      { name: "Siêu Xe Vplay 🏎️", icon: "🏎️" },
-      { name: "Bảo Ngọc Vương Miện 👑", icon: "👑" },
-      { name: "Tim Khổng Lồ 💖", icon: "💖" },
-      { name: "Tên Lửa Vũ Trụ 🚀", icon: "🚀" }
-    ];
-    const pickedGift = giftItems[Math.floor(Math.random() * giftItems.length)];
-    
-    // 1. Post simulated system-level gift comment in feed
-    const giftComment: CommentItem = {
-      id: `gift-${Date.now()}`,
-      username: userDisplayName || "Bạn (Khách)",
-      color: "from-pink-500 to-rose-600 border border-pink-400",
-      text: `🎁 Đã gửi tặng kênh [${pickedGift.name}]! Cảm ơn bạn rất nhiều!`,
-      timestamp: "Vừa xong",
-      isUser: true
-    };
-    
-    setCommentsMap(prev => {
-      const currentList = prev[currentChannel.id] || [];
-      return { ...prev, [currentChannel.id]: [...currentList, giftComment] };
-    });
-    
-    // 2. Increment comments count
-    setCommentsCountMap(prev => ({
-      ...prev,
-      [currentChannel.id]: (prev[currentChannel.id] || 1200) + 1
-    }));
-    
-    // 3. Increment likes dramatically
-    setLikesCountMap(prev => ({
-      ...prev,
-      [currentChannel.id]: (prev[currentChannel.id] || 15000) + Math.floor(Math.random() * 800) + 500
-    }));
-
-    // 4. Boost hearts
-    triggerHearts(25);
-    
-    // 5. Insert stream notification
-    const userEvent = {
-      id: `user-gift-${Date.now()}`,
-      type: 'gift' as const,
-      username: `@${userDisplayName.toLowerCase().replace(/\s+/g, "") || "khach"}`,
-      text: `đã gửi tặng [${pickedGift.name}] 🎁`,
-      detail: "Cảm ơn nhà tài trợ! 🎉"
-    };
-    setStreamEvents(prev => [...prev, userEvent].slice(-3));
-    
-    triggerToast(`Đã gửi tặng: ${pickedGift.name}! 🎉`);
+    setShowGiftModal(true);
   };
 
   const handleTriggerSuperChat = () => {
     if (!currentChannel) return;
+
+    if (vCoins < 100) {
+      triggerToast("Bạn không đủ V-coins để Super Chat! Phí: 100 Xu. Đang đợi countdown... 💰");
+      return;
+    }
     
     // Fast clean native window prompt
-    const msg = window.prompt("Nhập nội dung tin nhắn Super Chat nổi bật của bạn:", "Ủng hộ luồng trực tiếp nét căng! 🔥");
+    const msg = window.prompt("Nhập nội dung tin nhắn Super Chat (Phí: 100 Xu):", "Ủng hộ luồng trực tiếp nét căng! 🔥");
     if (msg === null) return; // User cancelled
     
     const finalMsg = msg.trim() || "Luồng trực tiếp tuyệt vời! 👍";
-    const superChatAmount = ["50.000đ", "100.000đ", "200.000đ", "500.000đ"][Math.floor(Math.random() * 4)];
+    
+    // Deduct 100 V-coins
+    setVCoins(prev => prev - 100);
     
     // 1. Post simulated golden Super Chat comment in feed
     const scComment: CommentItem = {
       id: `sc-${Date.now()}`,
-      username: `🌟 Super Chat [${superChatAmount}] - ${userDisplayName || "Bạn"}`,
+      username: `🌟 Super Chat [100 Xu] - ${userDisplayName || "Bạn"}`,
       color: "from-yellow-400 via-amber-500 to-orange-500 text-black border border-amber-300 font-bold",
       text: `💬 "${finalMsg}"`,
       timestamp: "Vừa xong",
@@ -754,19 +821,22 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
     }));
     
     // 3. Trigger hearts
-    triggerHearts(12);
+    triggerHearts(15);
     
     // 4. Insert stream notification
     const scEvent = {
       id: `user-sc-${Date.now()}`,
       type: 'superchat' as const,
       username: `@${userDisplayName.toLowerCase().replace(/\s+/g, "") || "khach"}`,
-      text: `đã gửi Super Chat ${superChatAmount}`,
+      text: `đã gửi Super Chat 100 Xu`,
       detail: `"${finalMsg}"`
     };
     setStreamEvents(prev => [...prev, scEvent].slice(-3));
+
+    // 5. Trigger creator feedback reply
+    triggerAuthorResponse('superchat', finalMsg);
     
-    triggerToast(`Đã gửi Super Chat ${superChatAmount}! 🌟`);
+    triggerToast("Đã gửi Super Chat! Trừ -100 V-coins 🌟");
   };
 
   const handleShareShort = (e: React.MouseEvent) => {
@@ -823,8 +893,8 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
         </div>
       )}
 
-      {/* LEFT COLUMN: Vertical TV Channels Sidebar Guide - Hidden on mobile, beautiful on desktop */}
-      <div className="hidden lg:flex w-[320px] shrink-0 flex-col bg-zinc-950/45 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl h-[760px]">
+      {/* LEFT COLUMN: Hidden entirely as requested */}
+      <div className="hidden">
         <div className="flex items-center gap-2.5 mb-4">
           <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/10">
             <Flame className="w-5 h-5 text-white animate-pulse" />
@@ -940,7 +1010,12 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           <div className="absolute inset-0 z-0 bg-zinc-950 flex items-center justify-center overflow-hidden">
             <video
               ref={videoRef}
-              className="w-full h-full object-cover scale-[1.78] origin-center transform transition-all duration-300"
+              className="w-full h-full object-cover origin-center transform transition-all duration-300 animate-fade-in"
+              style={
+                watchMode === "zoomed" 
+                  ? { transform: `scale(${1.78 * zoomScale}) translate(${zoomOffsetX}px, ${zoomOffsetY}px)` } 
+                  : { transform: `scale(1.78)` }
+              }
               playsInline
               autoPlay
               muted={muted}
@@ -991,46 +1066,144 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           </div>
 
           {/* TOP CONTROLS OVERLAY: Title, Play State & Volume Indicator */}
-          <div className="relative z-30 p-5 flex items-center justify-between pointer-events-auto">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-[9px] font-black tracking-widest text-white flex items-center gap-1 shadow-md uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                VPLAY VERTICAL
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-emerald-500/30 text-[9px] font-mono font-bold text-emerald-400 animate-pulse">
-                Viewer: {liveViewersCount.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Logo of currently playing channel replaces DANMAKU ON */}
-              <div 
-                className="flex items-center gap-1.5 bg-black/55 backdrop-blur-md border border-indigo-500/30 px-2 py-1 rounded-full shadow-lg shrink-0"
-                title={`Đang phát: ${currentChannel?.name}`}
-              >
-                <div className={`w-5 h-5 rounded-full ${currentChannel?.logoBg || "bg-indigo-600"} p-0.5 overflow-hidden flex items-center justify-center text-white text-[8px] font-black shrink-0 border border-white/10`}>
-                  {currentChannel?.logoImg ? (
-                    <img src={currentChannel.logoImg} alt={currentChannel.logoText} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
-                  ) : (
-                    currentChannel?.logoText || "TV"
-                  )}
-                </div>
-                <span className="text-[9px] font-extrabold text-indigo-300 tracking-wide uppercase truncate max-w-[50px]">
-                  {currentChannel?.logoText || "LIVE"}
+          <div className="relative z-30 p-5 flex flex-col gap-2 pointer-events-auto">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="px-2 py-0.5 rounded-full bg-red-600 text-[9px] font-black tracking-widest text-white flex items-center gap-1 shadow-md uppercase">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                  VPLAY VERTICAL
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-emerald-500/30 text-[9px] font-mono font-bold text-emerald-400 animate-pulse">
+                  Viewer: {liveViewersCount.toLocaleString()}
                 </span>
               </div>
 
+              <div className="flex items-center gap-2">
+                {/* Logo of currently playing channel replaces DANMAKU ON */}
+                <div 
+                  className="flex items-center bg-black/55 backdrop-blur-md border border-indigo-500/30 p-1 rounded-full shadow-lg shrink-0"
+                  title={`Đang phát: ${currentChannel?.name}`}
+                >
+                  <div className={`w-6 h-6 rounded-full ${currentChannel?.logoBg || "bg-indigo-600"} p-0.5 overflow-hidden flex items-center justify-center text-white text-[9px] font-black shrink-0 border border-white/10`}>
+                    {currentChannel?.logoImg ? (
+                      <img src={currentChannel.logoImg} alt={currentChannel.logoText} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                    ) : (
+                      currentChannel?.logoText || "TV"
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMuted(prev => !prev);
+                  }}
+                  className="p-2 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white hover:bg-black/75 cursor-default transition-all"
+                >
+                  {muted ? <VolumeX className="w-3.5 h-3.5 text-red-400 animate-pulse" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Middle top info bar: Coins & Watch Mode */}
+            <div className="flex items-center justify-between gap-1 w-full bg-black/55 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white/10">
+              {/* Coins & Countdown */}
+              <span className="text-[9px] font-bold text-yellow-400 flex items-center gap-1.5">
+                💰 <span className="font-mono">{vCoins.toLocaleString()} Xu</span>
+                <span className="text-[8px] text-white/50">(Nhận +50: {countdown}s)</span>
+              </span>
+
+              {/* Watch Mode selector */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setMuted(prev => !prev);
+                  setWatchMode(prev => prev === "original" ? "zoomed" : "original");
+                  triggerToast(watchMode === "original" ? "Đã bật Chế độ Phóng to! 🔍" : "Đã khôi phục Tỉ lệ gốc 📱");
                 }}
-                className="p-2 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white hover:bg-black/75 cursor-default transition-all"
+                className={`px-2 py-0.5 rounded-lg border text-[8px] font-black tracking-wide uppercase transition-all cursor-default ${
+                  watchMode === "zoomed"
+                    ? "bg-amber-500 border-amber-400 text-black shadow-lg font-extrabold animate-pulse"
+                    : "bg-white/10 border-white/10 text-white hover:bg-white/20"
+                }`}
+                title="Đổi Chế độ Xem (Gốc / Zoom)"
               >
-                {muted ? <VolumeX className="w-3.5 h-3.5 text-red-400 animate-pulse" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+                {watchMode === "zoomed" ? "Zoomed 🔍" : "Original 📱"}
               </button>
             </div>
           </div>
+
+          {/* Zoom Adjustments floating controls panel with locator tools */}
+          {watchMode === "zoomed" && (
+            <div 
+              className="absolute left-4 top-32 z-40 bg-black/90 backdrop-blur-md border border-amber-500/30 p-3 rounded-2xl flex flex-col gap-2.5 w-44 text-white shadow-2xl animate-fade-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between text-[10px] font-black text-amber-400 border-b border-white/10 pb-1">
+                <span>VỊ TRÍ PHÓNG TO</span>
+                <button 
+                  onClick={() => {
+                    setZoomOffsetX(0);
+                    setZoomOffsetY(0);
+                    setZoomScale(1.5);
+                  }}
+                  className="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-white hover:bg-white/20 uppercase cursor-default"
+                >
+                  Reset
+                </button>
+              </div>
+              
+              {/* Scale Slider */}
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between text-[9px] font-bold text-white/70">
+                  <span>Thu Phóng:</span>
+                  <span className="font-mono text-amber-300">{zoomScale.toFixed(1)}x</span>
+                </div>
+                <input 
+                  type="range"
+                  min="1.1"
+                  max="3.0"
+                  step="0.1"
+                  value={zoomScale}
+                  onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-amber-400"
+                />
+              </div>
+
+              {/* X Offset Slider */}
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between text-[9px] font-bold text-white/70">
+                  <span>Ngang (X):</span>
+                  <span className="font-mono text-amber-300">{zoomOffsetX}px</span>
+                </div>
+                <input 
+                  type="range"
+                  min="-150"
+                  max="150"
+                  step="5"
+                  value={zoomOffsetX}
+                  onChange={(e) => setZoomOffsetX(parseInt(e.target.value))}
+                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-amber-400"
+                />
+              </div>
+
+              {/* Y Offset Slider */}
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between text-[9px] font-bold text-white/70">
+                  <span>Dọc (Y):</span>
+                  <span className="font-mono text-amber-300">{zoomOffsetY}px</span>
+                </div>
+                <input 
+                  type="range"
+                  min="-150"
+                  max="150"
+                  step="5"
+                  value={zoomOffsetY}
+                  onChange={(e) => setZoomOffsetY(parseInt(e.target.value))}
+                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-amber-400"
+                />
+              </div>
+            </div>
+          )}
 
           {/* PAUSED BANNER OVERLAY */}
           {!isPlaying && (
@@ -1104,6 +1277,28 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
               </button>
               <span className="text-[10px] font-mono font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 {(sharesCountMap[currentChannel?.id] || 450).toLocaleString()}
+              </span>
+            </div>
+
+            {/* 4.5. Search Channel Magnify Button */}
+            <div className="flex flex-col items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowChannelSearchDrawer(prev => !prev);
+                  setShowCommentsDrawer(false);
+                }}
+                className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 ${
+                  showChannelSearchDrawer
+                    ? "bg-amber-500 border border-amber-400 text-black animate-pulse"
+                    : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
+                }`}
+                title="Tìm kiếm & Chọn kênh"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              <span className="text-[10px] font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                Tìm Kênh
               </span>
             </div>
 
@@ -1310,6 +1505,204 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
                   <Send className="w-3.5 h-3.5" />
                 </button>
               </form>
+            </div>
+          )}
+
+          {/* FLOATING CHANNEL SELECTOR & SEARCH DRAWER */}
+          {showChannelSearchDrawer && (
+            <div 
+              className="absolute inset-x-0 bottom-0 h-[75%] bg-zinc-950/95 backdrop-blur-2xl border-t border-white/15 rounded-t-[28px] z-50 flex flex-col justify-between shadow-[0_-15px_40px_rgba(0,0,0,0.8)] animate-slide-up"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="px-5 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <Search className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs font-black tracking-wide text-white uppercase">Tìm kiếm & Chọn kênh</span>
+                </div>
+                <button
+                  onClick={() => setShowChannelSearchDrawer(false)}
+                  className="p-1 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-default"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Search Input */}
+              <div className="p-3 border-b border-white/5 shrink-0">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
+                  <input
+                    type="text"
+                    placeholder="Nhập tên kênh cần tìm..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-white/[0.05] border border-white/10 focus:border-amber-400 rounded-xl pl-8.5 pr-4 py-2 text-[11px] text-white placeholder-white/30 outline-none transition-all font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* List of Channels */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+                {filteredSidebarChannels.map((ch) => {
+                  const isSel = currentChannel.id === ch.id;
+                  const originalIndex = videoChannels.findIndex(vc => vc.id === ch.id);
+                  return (
+                    <button
+                      key={ch.id}
+                      onClick={() => {
+                        if (originalIndex !== -1) {
+                          setCurrentIndex(originalIndex);
+                          setShowChannelSearchDrawer(false);
+                        }
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between border ${
+                        isSel 
+                          ? "bg-gradient-to-r from-amber-500/15 to-yellow-500/5 border-amber-500/40 text-white" 
+                          : "bg-white/[0.02] hover:bg-white/[0.05] border-transparent text-white/70 hover:text-white"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-7 h-7 rounded-lg ${ch.logoBg || "bg-indigo-600"} flex items-center justify-center font-bold text-[8px] uppercase tracking-wider shrink-0 border border-white/10 overflow-hidden`}>
+                          {ch.logoImg ? (
+                            <img src={ch.logoImg} alt={ch.logoText} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                          ) : (
+                            ch.logoText
+                          )}
+                        </div>
+                        <div className="min-w-0 text-left">
+                          <p className={`text-[11px] font-bold truncate ${isSel ? "text-amber-300" : "text-white"}`}>
+                            {translateName(ch.name)}
+                          </p>
+                          <p className="text-[9px] text-white/30 font-semibold uppercase mt-0.5">{ch.group}</p>
+                        </div>
+                      </div>
+                      {isSel && (
+                        <span className="text-[9px] text-amber-400 font-extrabold uppercase bg-amber-400/10 px-1.5 py-0.5 rounded-md">ĐANG XEM</span>
+                      )}
+                    </button>
+                  );
+                })}
+
+                {filteredSidebarChannels.length === 0 && (
+                  <p className="text-center text-white/30 text-xs py-8">Không tìm thấy kênh phù hợp</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* DYNAMIC GIFT STORE MODAL */}
+          {showGiftModal && (
+            <div 
+              className="absolute inset-x-0 bottom-0 h-[80%] bg-zinc-950/95 backdrop-blur-2xl border-t border-white/15 rounded-t-[28px] z-50 flex flex-col justify-between shadow-[0_-15px_40px_rgba(0,0,0,0.8)] animate-slide-up"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="px-5 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <Gift className="w-4 h-4 text-pink-400" />
+                  <span className="text-xs font-black tracking-wide text-white uppercase">Cửa Hàng Quà Tặng Vplay</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] bg-yellow-400/10 text-yellow-400 font-black px-2 py-0.5 rounded-full border border-yellow-400/20">
+                    💰 {vCoins.toLocaleString()} Xu
+                  </span>
+                  <button
+                    onClick={() => setShowGiftModal(false)}
+                    className="p-1 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors cursor-default"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Gift Cards Grid */}
+              <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 gap-3 custom-scrollbar">
+                {[
+                  { name: "Tim Khổng Lồ 💖", price: 100, icon: "💖", desc: "Tặng ngàn lời yêu thương" },
+                  { name: "Ly Trà Sữa 🧋", price: 500, icon: "🧋", desc: "Năng lượng cày livestream" },
+                  { name: "Hộp Quà Kim Cương 💎", price: 1000, icon: "💎", desc: "Đẳng cấp VIP member" },
+                  { name: "Bảo Ngọc Vương Miện 👑", price: 10000, icon: "👑", desc: "Vinh danh bá chủ phòng live" },
+                  { name: "Siêu Xe Vplay 🏎️", price: 100000, icon: "🏎️", desc: "Siêu xịn siêu sang chảnh" },
+                  { name: "Tên Lửa Vũ Trụ 🚀", price: 1000000, icon: "🚀", desc: "Món quà vũ trụ tối thượng" }
+                ].map((g) => {
+                  const displayPriceStr = g.price === 1000000 ? "1.000.000" : g.price.toLocaleString();
+                  return (
+                    <button
+                      key={g.name}
+                      onClick={() => {
+                        if (vCoins < g.price) {
+                          triggerToast(`Bạn không đủ V-coins! Thiếu ${(g.price - vCoins).toLocaleString()} Xu. Đợi clock cộng thêm nhé! 💰`);
+                          return;
+                        }
+                        
+                        // Deduct V-coins
+                        setVCoins(prev => prev - g.price);
+                        setShowGiftModal(false);
+
+                        // Create system comment in chat feed
+                        const giftComment: CommentItem = {
+                          id: `gift-${Date.now()}`,
+                          username: userDisplayName || "Bạn (Khách)",
+                          color: "from-pink-500 to-rose-600 border border-pink-400",
+                          text: `🎁 Đã gửi tặng kênh [${g.name}]! Cảm ơn bạn rất nhiều!`,
+                          timestamp: "Vừa xong",
+                          isUser: true
+                        };
+                        
+                        setCommentsMap(prev => {
+                          const currentList = prev[currentChannel.id] || [];
+                          return { ...prev, [currentChannel.id]: [...currentList, giftComment] };
+                        });
+                        
+                        // Increment stats
+                        setCommentsCountMap(prev => ({
+                          ...prev,
+                          [currentChannel.id]: (prev[currentChannel.id] || 1200) + 1
+                        }));
+                        
+                        setLikesCountMap(prev => ({
+                          ...prev,
+                          [currentChannel.id]: (prev[currentChannel.id] || 15000) + Math.floor(Math.random() * 1200) + 800
+                        }));
+
+                        // Boost floating hearts
+                        triggerHearts(30);
+
+                        // Add overlay live stream event notification banner
+                        const userEvent = {
+                          id: `user-gift-${Date.now()}`,
+                          type: 'gift' as const,
+                          username: `@${userDisplayName.toLowerCase().replace(/\s+/g, "") || "khach"}`,
+                          text: `đã gửi tặng ${g.name} 🎁`,
+                          detail: "Món quà tuyệt vời từ khán giả! 🎉"
+                        };
+                        setStreamEvents(prev => [...prev, userEvent].slice(-3));
+
+                        // Trigger broadcaster auto reply feedback after delay
+                        triggerAuthorResponse('comment', `Cảm ơn món quà ${g.name} cực kỳ giá trị nhé!`);
+
+                        triggerToast(`Đã gửi tặng ${g.name}! Trừ -${displayPriceStr} Xu 🎉`);
+                      }}
+                      className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-pink-500/30 text-center transition-all group cursor-default"
+                    >
+                      <div className="text-3xl group-hover:scale-125 transition-transform duration-300 my-1">{g.icon}</div>
+                      <div>
+                        <p className="text-[10px] font-black text-white">{g.name.split(" ")[0]}</p>
+                        <p className="text-[8px] text-white/40 mt-0.5 line-clamp-1 leading-normal">{g.desc}</p>
+                      </div>
+                      <div className="mt-2 text-[9px] font-black text-yellow-400 bg-yellow-400/5 border border-yellow-400/10 px-2 py-0.5 rounded-full w-full">
+                        {displayPriceStr} Xu
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Help footer */}
+              <div className="p-3 bg-zinc-950/80 border-t border-white/5 text-[9px] text-white/40 text-center font-bold">
+                Cứ mỗi 1 phút xem trực tuyến bạn sẽ nhận được +50 Xu miễn phí! 💰
+              </div>
             </div>
           )}
         </div>
