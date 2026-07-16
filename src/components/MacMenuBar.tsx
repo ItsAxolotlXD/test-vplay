@@ -30,7 +30,10 @@ import {
   Play,
   EyeOff,
   Beaker,
-  Zap
+  Zap,
+  Home,
+  Flame,
+  Star
 } from "lucide-react";
 
 interface MacMenuBarProps {
@@ -90,6 +93,8 @@ interface MacMenuBarProps {
   onLaunchTestStream: (url: string) => void;
   onTriggerCrash: () => void;
   onOpenDuiMode?: () => void;
+  customTabs?: any[];
+  channels?: any[];
 }
 
 export default function MacMenuBar({
@@ -103,6 +108,8 @@ export default function MacMenuBar({
   setShowAboutModal,
   setShowCustomModal,
   exportChannelsToM3u8,
+  customTabs = [],
+  channels = [],
   handleOpenMultiviewSelector,
   handleTogglePictureInPicture,
   isMaterialDesignActive,
@@ -863,6 +870,123 @@ export default function MacMenuBar({
               </div>
             )}
           </div>
+
+          {/* Dock Menu (ONLY visible when activeTab === "shorts") */}
+          {activeTab === "shorts" && (
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown("dock")}
+                onMouseEnter={() => handleMenuHover("dock")}
+                className={`px-2.5 py-1 rounded-[4px] hover:bg-white/10 transition-all font-bold text-indigo-300 border border-indigo-500/20 bg-indigo-500/5 cursor-default ${
+                  activeDropdown === "dock" ? "bg-indigo-600 text-white border-indigo-400" : ""
+                }`}
+              >
+                Dock
+              </button>
+
+              {activeDropdown === "dock" && (
+                <div className="absolute left-0 mt-1 w-52 rounded-lg bg-[#121118]/95 backdrop-blur-[40px] border border-white/15 shadow-2xl z-[110] py-1.5 text-white overflow-hidden text-left">
+                  <div className="px-3.5 py-1 text-[9px] text-neutral-400 font-bold uppercase tracking-wider">
+                    Quick Navigation
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setActiveDropdown(null);
+                      setActiveTab("home");
+                    }}
+                    className={`w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Home className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
+                      <span>Home</span>
+                    </span>
+                    {(activeTab as string) === "home" && <Check className="w-3 h-3 text-indigo-400" />}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveDropdown(null);
+                      setActiveTab("live");
+                    }}
+                    className={`w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Tv className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
+                      <span>Live TV</span>
+                    </span>
+                    {(activeTab as string) === "live" && <Check className="w-3 h-3 text-indigo-400" />}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveDropdown(null);
+                      setActiveTab("shorts");
+                    }}
+                    className={`w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Flame className="w-3.5 h-3.5 opacity-80 text-indigo-400" />
+                      <span className="font-semibold text-indigo-300">Vplay Vertical</span>
+                    </span>
+                    {activeTab === "shorts" && <Check className="w-3 h-3 text-indigo-400" />}
+                  </button>
+
+                  {/* Render Custom Tabs */}
+                  {customTabs.map((t: any) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setActiveDropdown(null);
+                        setActiveTab(t.id);
+                      }}
+                      className={`w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Sparkles className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
+                        <span>{t.name}</span>
+                      </span>
+                      {(activeTab as string) === t.id && <Check className="w-3 h-3 text-indigo-400" />}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => {
+                      setActiveDropdown(null);
+                      setActiveTab("settings");
+                    }}
+                    className={`w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Settings className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
+                      <span>Settings</span>
+                    </span>
+                    {(activeTab as string) === "settings" && <Check className="w-3 h-3 text-indigo-400" />}
+                  </button>
+
+                  {/* VTVgo shortcut */}
+                  <button
+                    onClick={() => {
+                      setActiveDropdown(null);
+                      if (channels && channels.length > 0 && onSelectChannel) {
+                        const wildCh = channels.find(ch => ch.id === "vietnam-wild-live");
+                        if (wildCh) {
+                          onSelectChannel(wildCh);
+                        }
+                      }
+                      setActiveTab("live");
+                    }}
+                    className={`w-full px-4 py-1.5 text-left text-xs hover:bg-indigo-600/85 flex items-center justify-between transition-colors cursor-default text-white`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Star className="w-3.5 h-3.5 opacity-80 text-neutral-300" />
+                      <span>VTVgo</span>
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* File Menu */}
           <div className="relative">

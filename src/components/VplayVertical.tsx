@@ -24,7 +24,10 @@ import {
   Flame,
   Info,
   Gift,
-  DollarSign
+  DollarSign,
+  RotateCw,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Channel } from "../data/channels";
 
@@ -132,9 +135,10 @@ interface VplayVerticalProps {
   channels: Channel[];
   onBack: () => void;
   isMaterialDesignActive?: boolean;
+  setActiveTab?: (tab: string) => void;
 }
 
-export default function VplayVertical({ channels, onBack, isMaterialDesignActive = false }: VplayVerticalProps) {
+export default function VplayVertical({ channels, onBack, isMaterialDesignActive = false, setActiveTab }: VplayVerticalProps) {
   // Filter out radio and non-video channels
   const videoChannels = channels.filter(ch => !ch.isRadio && ch.url !== "#testcard");
   
@@ -170,6 +174,8 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
   const [zoomScale, setZoomScale] = useState<number>(1.5);
   const [zoomOffsetX, setZoomOffsetX] = useState<number>(0);
   const [zoomOffsetY, setZoomOffsetY] = useState<number>(0);
+  const [isRotated, setIsRotated] = useState<boolean>(false);
+  const [clearDisplay, setClearDisplay] = useState<boolean>(false);
 
   // Floating drawers inside players
   const [showChannelSearchDrawer, setShowChannelSearchDrawer] = useState<boolean>(false);
@@ -246,6 +252,8 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
     setCommentsCountMap(initialCommentsCount);
     setSharesCountMap(initialSharesCount);
   }, []);
+
+
 
   // Persist V-coins to localStorage
   useEffect(() => {
@@ -338,9 +346,7 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           if (data.fatal) {
             triggerToast(`Luồng ${currentChannel.name} gặp sự cố. Đang tự động bỏ qua...`);
             setTimeout(() => {
-              if (handleNextShortRef.current) {
-                handleNextShortRef.current();
-              }
+              handleNextShort();
             }, 1500);
           }
         });
@@ -355,9 +361,7 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
       console.warn("Video element reported playback error.");
       triggerToast(`Luồng ${currentChannel?.name} gặp sự cố tải. Đang bỏ qua...`);
       setTimeout(() => {
-        if (handleNextShortRef.current) {
-          handleNextShortRef.current();
-        }
+        handleNextShort();
       }, 1500);
     };
 
@@ -595,71 +599,7 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
     };
   }, []);
 
-  // Scroll wheel & Touch swipe to switch channels
-  const handleNextShortRef = useRef(handleNextShort);
-  const handlePrevShortRef = useRef(handlePrevShort);
-  
-  useEffect(() => {
-    handleNextShortRef.current = handleNextShort;
-    handlePrevShortRef.current = handlePrevShort;
-  }, [currentIndex]);
-
-  useEffect(() => {
-    const lastScrollTime = { current: 0 };
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const now = Date.now();
-      if (now - lastScrollTime.current < 650) return; // 650ms threshold
-
-      if (e.deltaY > 15) {
-        handleNextShortRef.current();
-        lastScrollTime.current = now;
-      } else if (e.deltaY < -15) {
-        handlePrevShortRef.current();
-        lastScrollTime.current = now;
-      }
-    };
-
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      // Lock touch action to prevent bouncing
-      e.preventDefault();
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      const touchEndY = e.changedTouches[0].clientY;
-      const diffY = touchStartY - touchEndY;
-      const now = Date.now();
-      if (now - lastScrollTime.current < 650) return;
-
-      if (diffY > 40) {
-        // Swipe up -> next channel
-        handleNextShortRef.current();
-        lastScrollTime.current = now;
-      } else if (diffY < -40) {
-        // Swipe down -> prev channel
-        handlePrevShortRef.current();
-        lastScrollTime.current = now;
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, []);
+  // Standard scrolling is enabled on the page. Switch channels using up/down navigation controls.
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -883,7 +823,7 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch justify-center pb-12 text-white font-sans animate-fade-in relative min-h-[82vh]">
+    <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch justify-center pb-2 text-white font-sans animate-fade-in relative">
       
       {/* Toast Notification */}
       {showToast && (
@@ -984,22 +924,38 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
       {/* CENTER COLUMN: TikTok / Shorts Device Simulator */}
       <div className="flex-1 flex flex-col items-center justify-center relative">
         
-        {/* Mobile Header indicator (for desktop viewer layout optimization) */}
-        <div className="flex lg:hidden items-center justify-between w-full max-w-md px-4 mb-4 select-none">
-          <button onClick={onBack} className="text-white/75 hover:text-white flex items-center gap-1.5 text-xs font-semibold">
-            <ChevronUp className="w-4 h-4 rotate-270" />
+        {/* Top Control Bar for Vertical Mode - unified and gorgeous on both mobile & desktop */}
+        <div className={`flex items-center justify-between w-full px-2 mb-4 select-none z-10 transition-all duration-500 ease-in-out ${
+          isRotated ? "max-w-[720px] sm:max-w-[800px] md:max-w-[900px]" : "max-w-[390px] sm:max-w-[420px]"
+        }`}>
+          <button 
+            onClick={onBack} 
+            className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white flex items-center gap-1 text-xs font-semibold transition-all cursor-default"
+          >
+            <ChevronUp className="w-3.5 h-3.5 -rotate-90" />
             Trở về
           </button>
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-[10px] font-black tracking-widest text-white/50 uppercase">Vplay Vertical Live</span>
-          </div>
-          <div className="w-10 h-2 bg-white/10 rounded-full" />
+          
+          <button
+            onClick={() => {
+              if (setActiveTab) {
+                setActiveTab("live");
+              }
+            }}
+            className="px-3.5 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400/30 flex items-center gap-1 text-xs font-bold transition-all shadow-md shadow-indigo-600/20 cursor-default"
+          >
+            <Tv className="w-3.5 h-3.5" />
+            Watch on Full Resolution
+          </button>
         </div>
 
-        {/* 9:16 Portrait Vertical Viewer frame wrapper */}
+        {/* Device Viewer frame wrapper (9:16 portrait or 16:9 landscape depending on isRotated) */}
         <div 
-          className="w-full max-w-[390px] sm:max-w-[420px] aspect-[9/16] rounded-[36px] overflow-hidden relative border border-white/15 bg-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col justify-between group/shorts select-none"
+          className={`w-full rounded-[36px] overflow-hidden relative border border-white/15 bg-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col justify-between group/shorts select-none transition-all duration-500 ease-in-out ${
+            isRotated 
+              ? "max-w-[720px] sm:max-w-[800px] md:max-w-[900px] aspect-[16/9]" 
+              : "max-w-[390px] sm:max-w-[420px] aspect-[9/16]"
+          }`}
           onClick={togglePlay}
           onDoubleClick={handleDoubleTap}
         >
@@ -1012,9 +968,11 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
               ref={videoRef}
               className="w-full h-full object-cover origin-center transform transition-all duration-300 animate-fade-in"
               style={
-                watchMode === "zoomed" 
-                  ? { transform: `scale(${1.78 * zoomScale}) translate(${zoomOffsetX}px, ${zoomOffsetY}px)` } 
-                  : { transform: `scale(1.78)` }
+                isRotated
+                  ? { transform: "scale(1.0)" }
+                  : watchMode === "zoomed" 
+                    ? { transform: `scale(${1.78 * zoomScale}) translate(${zoomOffsetX}px, ${zoomOffsetY}px)` } 
+                    : { transform: `scale(1.78)` }
               }
               playsInline
               autoPlay
@@ -1029,7 +987,7 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           </div>
 
           {/* DANMAKU / BULLET COMMENTS SCREEN OVERLAY */}
-          {danmakuEnabled && (
+          {!clearDisplay && danmakuEnabled && (
             <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden mt-16 mb-44">
               {bulletComments.map((bullet) => (
                 <div
@@ -1048,92 +1006,96 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           )}
 
           {/* HEART CLOUD OVERLAY (Rising floating hearts) */}
-          <div className="absolute right-14 bottom-32 z-30 pointer-events-none">
-            {hearts.map((h) => (
-              <div
-                key={h.id}
-                className="absolute text-center animate-rising-heart opacity-0"
-                style={{
-                  color: h.color,
-                  fontSize: `${h.size}px`,
-                  left: `${h.x}px`,
-                  transform: `translateY(${h.y}px)`
-                }}
-              >
-                ❤️
-              </div>
-            ))}
-          </div>
+          {!clearDisplay && (
+            <div className="absolute right-14 bottom-32 z-30 pointer-events-none">
+              {hearts.map((h) => (
+                <div
+                  key={h.id}
+                  className="absolute text-center animate-rising-heart opacity-0"
+                  style={{
+                    color: h.color,
+                    fontSize: `${h.size}px`,
+                    left: `${h.x}px`,
+                    transform: `translateY(${h.y}px)`
+                  }}
+                >
+                  ❤️
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* TOP CONTROLS OVERLAY: Title, Play State & Volume Indicator */}
-          <div className="relative z-30 p-5 flex flex-col gap-2 pointer-events-auto">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="px-2 py-0.5 rounded-full bg-red-600 text-[9px] font-black tracking-widest text-white flex items-center gap-1 shadow-md uppercase">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                  VPLAY VERTICAL
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-emerald-500/30 text-[9px] font-mono font-bold text-emerald-400 animate-pulse">
-                  Viewer: {liveViewersCount.toLocaleString()}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {/* Logo of currently playing channel replaces DANMAKU ON */}
-                <div 
-                  className="flex items-center bg-black/55 backdrop-blur-md border border-indigo-500/30 p-1 rounded-full shadow-lg shrink-0"
-                  title={`Đang phát: ${currentChannel?.name}`}
-                >
-                  <div className={`w-6 h-6 rounded-full ${currentChannel?.logoBg || "bg-indigo-600"} p-0.5 overflow-hidden flex items-center justify-center text-white text-[9px] font-black shrink-0 border border-white/10`}>
-                    {currentChannel?.logoImg ? (
-                      <img src={currentChannel.logoImg} alt={currentChannel.logoText} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
-                    ) : (
-                      currentChannel?.logoText || "TV"
-                    )}
-                  </div>
+          {!clearDisplay && (
+            <div className="relative z-30 p-5 flex flex-col gap-2 pointer-events-auto">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-red-600 text-[9px] font-black tracking-widest text-white flex items-center gap-1 shadow-md uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                    VPLAY VERTICAL
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-emerald-500/30 text-[9px] font-mono font-bold text-emerald-400 animate-pulse">
+                    Viewer: {liveViewersCount.toLocaleString()}
+                  </span>
                 </div>
 
+                <div className="flex items-center gap-2">
+                  {/* Logo of currently playing channel replaces DANMAKU ON */}
+                  <div 
+                    className="flex items-center bg-black/55 backdrop-blur-md border border-indigo-500/30 p-1 rounded-full shadow-lg shrink-0"
+                    title={`Đang phát: ${currentChannel?.name}`}
+                  >
+                    <div className={`w-6 h-6 rounded-full ${currentChannel?.logoBg || "bg-indigo-600"} p-0.5 overflow-hidden flex items-center justify-center text-white text-[9px] font-black shrink-0 border border-white/10`}>
+                      {currentChannel?.logoImg ? (
+                        <img src={currentChannel.logoImg} alt={currentChannel.logoText} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                      ) : (
+                        currentChannel?.logoText || "TV"
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMuted(prev => !prev);
+                    }}
+                    className="p-2 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white hover:bg-black/75 cursor-default transition-all"
+                  >
+                    {muted ? <VolumeX className="w-3.5 h-3.5 text-red-400 animate-pulse" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Middle top info bar: Coins & Watch Mode */}
+              <div className="flex items-center justify-between gap-1 w-full bg-black/55 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white/10">
+                {/* Coins & Countdown */}
+                <span className="text-[9px] font-bold text-yellow-400 flex items-center gap-1.5">
+                  💰 <span className="font-mono">{vCoins.toLocaleString()} Xu</span>
+                  <span className="text-[8px] text-white/50">(Nhận +50: {countdown}s)</span>
+                </span>
+
+                {/* Watch Mode selector */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setMuted(prev => !prev);
+                    setWatchMode(prev => prev === "original" ? "zoomed" : "original");
+                    triggerToast(watchMode === "original" ? "Đã bật Chế độ Phóng to! 🔍" : "Đã khôi phục Tỉ lệ gốc 📱");
                   }}
-                  className="p-2 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white hover:bg-black/75 cursor-default transition-all"
+                  className={`px-2 py-0.5 rounded-lg border text-[8px] font-black tracking-wide uppercase transition-all cursor-default ${
+                    watchMode === "zoomed"
+                      ? "bg-amber-500 border-amber-400 text-black shadow-lg font-extrabold animate-pulse"
+                      : "bg-white/10 border-white/10 text-white hover:bg-white/20"
+                  }`}
+                  title="Đổi Chế độ Xem (Gốc / Zoom)"
                 >
-                  {muted ? <VolumeX className="w-3.5 h-3.5 text-red-400 animate-pulse" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+                  {watchMode === "zoomed" ? "Zoomed 🔍" : "Original 📱"}
                 </button>
               </div>
             </div>
-
-            {/* Middle top info bar: Coins & Watch Mode */}
-            <div className="flex items-center justify-between gap-1 w-full bg-black/55 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white/10">
-              {/* Coins & Countdown */}
-              <span className="text-[9px] font-bold text-yellow-400 flex items-center gap-1.5">
-                💰 <span className="font-mono">{vCoins.toLocaleString()} Xu</span>
-                <span className="text-[8px] text-white/50">(Nhận +50: {countdown}s)</span>
-              </span>
-
-              {/* Watch Mode selector */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setWatchMode(prev => prev === "original" ? "zoomed" : "original");
-                  triggerToast(watchMode === "original" ? "Đã bật Chế độ Phóng to! 🔍" : "Đã khôi phục Tỉ lệ gốc 📱");
-                }}
-                className={`px-2 py-0.5 rounded-lg border text-[8px] font-black tracking-wide uppercase transition-all cursor-default ${
-                  watchMode === "zoomed"
-                    ? "bg-amber-500 border-amber-400 text-black shadow-lg font-extrabold animate-pulse"
-                    : "bg-white/10 border-white/10 text-white hover:bg-white/20"
-                }`}
-                title="Đổi Chế độ Xem (Gốc / Zoom)"
-              >
-                {watchMode === "zoomed" ? "Zoomed 🔍" : "Original 📱"}
-              </button>
-            </div>
-          </div>
+          )}
 
           {/* Zoom Adjustments floating controls panel with locator tools */}
-          {watchMode === "zoomed" && (
+          {!clearDisplay && watchMode === "zoomed" && (
             <div 
               className="absolute left-4 top-32 z-40 bg-black/90 backdrop-blur-md border border-amber-500/30 p-3 rounded-2xl flex flex-col gap-2.5 w-44 text-white shadow-2xl animate-fade-in"
               onClick={(e) => e.stopPropagation()}
@@ -1206,7 +1168,7 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           )}
 
           {/* PAUSED BANNER OVERLAY */}
-          {!isPlaying && (
+          {!clearDisplay && !isPlaying && (
             <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/15 pointer-events-none">
               <div className="w-16 h-16 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white scale-90 animate-bounce">
                 <Play className="w-8 h-8 fill-white ml-1" />
@@ -1215,180 +1177,244 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           )}
 
           {/* RIGHT UTILITIES OVERLAY: TikTok Actions column */}
-          <div className="absolute right-3.5 bottom-24 sm:bottom-28 z-30 flex flex-col items-center gap-4.5 pointer-events-auto">
-            {/* 1. Channel Profile Picture widget */}
-            <div className="relative group/avatar">
-              <div className={`w-11 h-11 rounded-full border-2 border-indigo-400 ${currentChannel?.logoBg || "bg-indigo-600"} p-1 overflow-hidden shadow-xl flex items-center justify-center text-white text-xs font-black select-none`}>
-                {currentChannel?.logoImg ? (
-                  <img src={currentChannel.logoImg} alt={currentChannel.logoText} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
-                ) : (
-                  currentChannel?.logoText
-                )}
-              </div>
-              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full border border-black flex items-center justify-center shadow-lg cursor-default">
-                <span className="text-white text-[9px] font-black">+</span>
-              </div>
-            </div>
-
-            {/* 2. Love / Like Button */}
-            <div className="flex flex-col items-center gap-1">
-              <button
-                onClick={handleToggleLike}
-                className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 active:scale-130 ${
-                  isCurrentlyLiked 
-                    ? "bg-rose-600/90 border border-rose-400 text-white animate-once animate-pulse" 
-                    : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
-                }`}
-              >
-                <Heart className={`w-5 h-5 ${isCurrentlyLiked ? "fill-white text-white" : "text-white"}`} />
-              </button>
-              <span className="text-[10px] font-mono font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                {activeLikesCount.toLocaleString()}
-              </span>
-            </div>
-
-            {/* 3. Comment Toggle Button */}
-            <div className="flex flex-col items-center gap-1">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowCommentsDrawer(prev => !prev);
-                }}
-                className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 ${
-                  showCommentsDrawer
-                    ? "bg-indigo-600 border border-indigo-400 text-white"
-                    : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
-                }`}
-              >
-                <MessageCircle className="w-5 h-5" />
-              </button>
-              <span className="text-[10px] font-mono font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                {(commentsCountMap[currentChannel?.id] || 1200).toLocaleString()}
-              </span>
-            </div>
-
-            {/* 4. Share button */}
-            <div className="flex flex-col items-center gap-1">
-              <button
-                onClick={handleShareShort}
-                className="w-11 h-11 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-              <span className="text-[10px] font-mono font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                {(sharesCountMap[currentChannel?.id] || 450).toLocaleString()}
-              </span>
-            </div>
-
-            {/* 4.5. Search Channel Magnify Button */}
-            <div className="flex flex-col items-center gap-1">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowChannelSearchDrawer(prev => !prev);
-                  setShowCommentsDrawer(false);
-                }}
-                className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 ${
-                  showChannelSearchDrawer
-                    ? "bg-amber-500 border border-amber-400 text-black animate-pulse"
-                    : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
-                }`}
-                title="Tìm kiếm & Chọn kênh"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-              <span className="text-[10px] font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                Tìm Kênh
-              </span>
-            </div>
-
-            {/* 5. Navigation Control: Previous Short */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePrevShort();
-              }}
-              className="w-9 h-9 rounded-full bg-black/55 backdrop-blur-md border border-white/10 text-white hover:text-indigo-300 flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg cursor-default"
-              title="Kênh trước (Mũi tên lên)"
-            >
-              <ChevronUp className="w-5 h-5" />
-            </button>
-
-            {/* 6. Navigation Control: Next Short */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleNextShort();
-              }}
-              className="w-9 h-9 rounded-full bg-black/55 backdrop-blur-md border border-white/10 text-white hover:text-indigo-300 flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg cursor-default animate-bounce"
-              title="Kênh sau (Mũi tên xuống)"
-            >
-              <ChevronDown className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Real-time stream events ticker (gifting, joins, superchats) overlayed above metadata */}
-          <div className="absolute bottom-[88px] left-5 z-40 flex flex-col gap-1.5 max-w-[280px] pointer-events-none">
-            {streamEvents.map((ev) => {
-              let badgeStyle = "bg-black/55 border-white/10 text-white";
-              let textStyle = "text-white/80";
-
-              if (ev.type === 'gift') {
-                badgeStyle = "bg-gradient-to-r from-pink-950/80 to-rose-950/70 border-pink-500/30 text-pink-300 shadow-pink-500/10";
-                textStyle = "text-pink-100 font-bold";
-              } else if (ev.type === 'superchat') {
-                badgeStyle = "bg-gradient-to-r from-yellow-950/80 to-amber-950/70 border-amber-500/30 text-amber-300 shadow-amber-500/10";
-                textStyle = "text-amber-100 font-extrabold";
-              } else if (ev.type === 'join') {
-                badgeStyle = "bg-black/60 border-emerald-500/20 text-emerald-300";
-                textStyle = "text-emerald-100/90";
-              }
-
-              return (
-                <div 
-                  key={ev.id} 
-                  className={`px-2.5 py-1 rounded-lg border backdrop-blur-md shadow-md flex flex-col gap-0.5 text-[10px] animate-fade-in-slide-up ${badgeStyle}`}
-                >
-                  <div className="flex items-center gap-1 flex-wrap">
-                    <span className="font-extrabold">{ev.username}</span>
-                    <span className={textStyle}>{ev.text}</span>
-                  </div>
-                  {ev.detail && (
-                    <span className="text-[9px] text-white/50 italic pl-1 font-semibold truncate">
-                      {ev.detail}
-                    </span>
+          {!clearDisplay && (
+            <div className={`absolute right-3.5 z-30 flex flex-col items-center gap-4 pointer-events-auto transition-all duration-300 ${
+              isRotated ? "bottom-4 scale-90 sm:bottom-6 sm:scale-100" : "bottom-24 sm:bottom-28"
+            }`}>
+              {/* 1. Channel Profile Picture widget */}
+              <div className="relative group/avatar">
+                <div className={`w-11 h-11 rounded-full border-2 border-indigo-400 ${currentChannel?.logoBg || "bg-indigo-600"} p-1 overflow-hidden shadow-xl flex items-center justify-center text-white text-xs font-black select-none`}>
+                  {currentChannel?.logoImg ? (
+                    <img src={currentChannel.logoImg} alt={currentChannel.logoText} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                  ) : (
+                    currentChannel?.logoText
                   )}
                 </div>
-              );
-            })}
-          </div>
+                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full border border-black flex items-center justify-center shadow-lg cursor-default">
+                  <span className="text-white text-[9px] font-black">+</span>
+                </div>
+              </div>
+
+              {/* 2. Love / Like Button */}
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={handleToggleLike}
+                  className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 active:scale-130 ${
+                    isCurrentlyLiked 
+                      ? "bg-rose-600/90 border border-rose-400 text-white animate-once animate-pulse" 
+                      : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 ${isCurrentlyLiked ? "fill-white text-white" : "text-white"}`} />
+                </button>
+                <span className="text-[10px] font-mono font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  {activeLikesCount.toLocaleString()}
+                </span>
+              </div>
+
+              {/* 3. Comment Toggle Button */}
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCommentsDrawer(prev => !prev);
+                  }}
+                  className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 ${
+                    showCommentsDrawer
+                      ? "bg-indigo-600 border border-indigo-400 text-white"
+                      : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
+                  }`}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </button>
+                <span className="text-[10px] font-mono font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  {(commentsCountMap[currentChannel?.id] || 1200).toLocaleString()}
+                </span>
+              </div>
+
+              {/* 4. Share button */}
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={handleShareShort}
+                  className="w-11 h-11 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115"
+                >
+                  <Share2 className="w-5 h-5" />
+                </button>
+                <span className="text-[10px] font-mono font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  {(sharesCountMap[currentChannel?.id] || 450).toLocaleString()}
+                </span>
+              </div>
+
+              {/* 4.5. Search Channel Magnify Button */}
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowChannelSearchDrawer(prev => !prev);
+                    setShowCommentsDrawer(false);
+                  }}
+                  className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 ${
+                    showChannelSearchDrawer
+                      ? "bg-amber-500 border border-amber-400 text-black animate-pulse"
+                      : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
+                  }`}
+                  title="Tìm kiếm & Chọn kênh"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+                <span className="text-[10px] font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  Tìm Kênh
+                </span>
+              </div>
+
+              {/* 4.8. Rotate Button */}
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsRotated(prev => !prev);
+                  }}
+                  className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115 ${
+                    isRotated
+                      ? "bg-amber-500 border border-amber-400 text-black"
+                      : "bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white"
+                  }`}
+                  title={isRotated ? "Xoay dọc" : "Xoay ngang"}
+                >
+                  <RotateCw className={`w-5 h-5 transition-transform duration-500 ${isRotated ? "rotate-90" : "rotate-0"}`} />
+                </button>
+                <span className="text-[10px] font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  Xoay
+                </span>
+              </div>
+
+              {/* 4.9. Clear Display Toggle Button */}
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setClearDisplay(true);
+                    setShowCommentsDrawer(false);
+                    setShowChannelSearchDrawer(false);
+                    triggerToast("Đã ẩn toàn bộ giao diện! Nhấn 'Hiện Giao Diện' ở góc trên để khôi phục. 👀");
+                  }}
+                  className="w-11 h-11 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white/90 hover:text-white flex items-center justify-center shadow-lg cursor-default transition-all transform hover:scale-115"
+                  title="Ẩn toàn bộ giao diện (Clear Display)"
+                >
+                  <EyeOff className="w-5 h-5 text-neutral-300" />
+                </button>
+                <span className="text-[10px] font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  Ẩn G.Diện
+                </span>
+              </div>
+
+              {/* 5. Navigation Control: Previous Short */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePrevShort();
+                }}
+                className="w-9 h-9 rounded-full bg-black/55 backdrop-blur-md border border-white/10 text-white hover:text-indigo-300 flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg cursor-default"
+                title="Kênh trước (Mũi tên lên)"
+              >
+                <ChevronUp className="w-5 h-5" />
+              </button>
+
+              {/* 6. Navigation Control: Next Short */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNextShort();
+                }}
+                className="w-9 h-9 rounded-full bg-black/55 backdrop-blur-md border border-white/10 text-white hover:text-indigo-300 flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg cursor-default animate-bounce"
+                title="Kênh sau (Mũi tên xuống)"
+              >
+                <ChevronDown className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+
+          {/* Real-time stream events ticker (gifting, joins, superchats) overlayed above metadata */}
+          {!clearDisplay && (
+            <div className="absolute bottom-[88px] left-5 z-40 flex flex-col gap-1.5 max-w-[280px] pointer-events-none">
+              {streamEvents.map((ev) => {
+                let badgeStyle = "bg-black/55 border-white/10 text-white";
+                let textStyle = "text-white/80";
+
+                if (ev.type === 'gift') {
+                  badgeStyle = "bg-gradient-to-r from-pink-950/80 to-rose-950/70 border-pink-500/30 text-pink-300 shadow-pink-500/10";
+                  textStyle = "text-pink-100 font-bold";
+                } else if (ev.type === 'superchat') {
+                  badgeStyle = "bg-gradient-to-r from-yellow-950/80 to-amber-950/70 border-amber-500/30 text-amber-300 shadow-amber-500/10";
+                  textStyle = "text-amber-100 font-extrabold";
+                } else if (ev.type === 'join') {
+                  badgeStyle = "bg-black/60 border-emerald-500/20 text-emerald-300";
+                  textStyle = "text-emerald-100/90";
+                }
+
+                return (
+                  <div 
+                    key={ev.id} 
+                    className={`px-2.5 py-1 rounded-lg border backdrop-blur-md shadow-md flex flex-col gap-0.5 text-[10px] animate-fade-in-slide-up ${badgeStyle}`}
+                  >
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="font-extrabold">{ev.username}</span>
+                      <span className={textStyle}>{ev.text}</span>
+                    </div>
+                    {ev.detail && (
+                      <span className="text-[9px] text-white/50 italic pl-1 font-semibold truncate">
+                        {ev.detail}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* BOTTOM OVERLAYS: Channel Details & Rotating Vinyl Track */}
-          <div className="relative z-30 p-5 pt-0 flex items-end justify-between pointer-events-auto">
-            {/* Metadata Text */}
-            <div className="flex-1 mr-14 text-left drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
-              {/* Channel username */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-black tracking-tight text-indigo-300 hover:underline cursor-default">
-                  @{currentChannel ? currentChannel.logoText?.toLowerCase().replace(/\s+/g, "") : "vertical_tv"}
-                </span>
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-400 border border-black flex items-center justify-center text-[6px] text-black font-black" title="Tài khoản chính thức">✓</span>
+          {!clearDisplay && (
+            <div className="relative z-30 p-5 pt-0 flex items-end justify-between pointer-events-auto">
+              {/* Metadata Text */}
+              <div className="flex-1 mr-14 text-left drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                {/* Channel username */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-black tracking-tight text-indigo-300 hover:underline cursor-default">
+                    @{currentChannel ? currentChannel.logoText?.toLowerCase().replace(/\s+/g, "") : "vertical_tv"}
+                  </span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-400 border border-black flex items-center justify-center text-[6px] text-black font-black" title="Tài khoản chính thức">✓</span>
+                </div>
+                
+                {/* Channel full name */}
+                <h3 className="text-[13px] font-black text-white mt-1 uppercase tracking-wider">
+                  {currentChannel ? translateName(currentChannel.name) : "Vplay Television Stream"}
+                </h3>
               </div>
-              
-              {/* Channel full name */}
-              <h3 className="text-[13px] font-black text-white mt-1 uppercase tracking-wider">
-                {currentChannel ? translateName(currentChannel.name) : "Vplay Television Stream"}
-              </h3>
-            </div>
 
-            {/* Spinning Music Disc */}
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-800 to-black p-1.5 border border-white/20 shadow-lg flex items-center justify-center shrink-0 animate-spin-slow">
-              <div className="w-full h-full rounded-full bg-zinc-950 border border-indigo-500/30 flex items-center justify-center relative">
-                <div className="w-2.5 h-2.5 rounded-full bg-indigo-400" />
-                <div className="absolute w-6 h-6 border border-white/5 rounded-full" />
+              {/* Spinning Music Disc */}
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-800 to-black p-1.5 border border-white/20 shadow-lg flex items-center justify-center shrink-0 animate-spin-slow">
+                <div className="w-full h-full rounded-full bg-zinc-950 border border-indigo-500/30 flex items-center justify-center relative">
+                  <div className="w-2.5 h-2.5 rounded-full bg-indigo-400" />
+                  <div className="absolute w-6 h-6 border border-white/5 rounded-full" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* FLOATING RESTORE BUTTON FOR CLEAR DISPLAY */}
+          {clearDisplay && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setClearDisplay(false);
+                triggerToast("Đã khôi phục toàn bộ giao diện! 👀");
+              }}
+              className="absolute top-4 right-4 z-50 px-3 py-1.5 rounded-full bg-indigo-600/95 hover:bg-indigo-500 text-white border border-indigo-400/40 flex items-center gap-1.5 text-[10px] font-black transition-all shadow-lg hover:scale-105 active:scale-95 animate-fade-in pointer-events-auto"
+            >
+              <Eye className="w-3.5 h-3.5 animate-pulse text-indigo-200" />
+              <span>HIỆN GIAO DIỆN</span>
+            </button>
+          )}
 
           {/* SLIDE-UP COMMENTS DRAWER */}
           {showCommentsDrawer && (

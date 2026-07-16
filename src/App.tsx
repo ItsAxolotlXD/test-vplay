@@ -3711,6 +3711,8 @@ export default function App() {
           toggleExpFeature={toggleExpFeature}
           testStreamUrl={testStreamUrl}
           setTestStreamUrl={setTestStreamUrl}
+          customTabs={customTabs}
+          channels={processedChannels}
           onLaunchTestStream={(url) => {
             if (url) {
               const tempChannel: Channel = {
@@ -4072,7 +4074,13 @@ export default function App() {
       )}
 
       {/* Main Container */}
-      <main id="player-anchor" className={activeTab === "home" ? "w-full pt-0 z-10 relative" : "w-full max-w-7xl mx-auto px-4 pt-24 lg:pt-28 pb-8 z-10 relative"}>
+      <main id="player-anchor" className={
+        activeTab === "home" 
+          ? "w-full pt-0 z-10 relative" 
+          : activeTab === "shorts"
+            ? "w-full max-w-7xl mx-auto px-4 pt-14 lg:pt-16 pb-4 z-10 relative"
+            : "w-full max-w-7xl mx-auto px-4 pt-24 lg:pt-28 pb-8 z-10 relative"
+      }>
 
         {/* VIEW: LIVE TV BROADCASTING (PRIMARY GRAPHICS) */}
         {(activeTab === "live" || activeTab === "search") && (
@@ -4261,6 +4269,16 @@ export default function App() {
                   >
                     <MessageSquare className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                     <span>{showStandardComments ? "Ẩn Chat" : "Trò chuyện"}</span>
+                  </button>
+
+                  {/* Watch on Vertical button */}
+                  <button
+                    onClick={() => setActiveTab("shorts")}
+                    className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-black font-semibold flex items-center gap-1 sm:gap-1.5 shrink-0 shadow-lg cursor-default bouncy-btn text-[10.5px] sm:text-xs"
+                    title="Xem trên màn hình tỉ lệ dọc kiểu Shorts/TikTok"
+                  >
+                    <Flame className="w-3 sm:w-3.5 h-3 sm:h-3.5 fill-black" />
+                    <span>Watch on Vertical</span>
                   </button>
 
                   {/* Channels button (Focus Mode only) */}
@@ -4874,6 +4892,7 @@ export default function App() {
               channels={processedChannels} 
               onBack={() => setActiveTab("home")} 
               isMaterialDesignActive={isMaterialDesignActive}
+              setActiveTab={setActiveTab}
             />
           </div>
         )}
@@ -6774,9 +6793,11 @@ export default function App() {
       </main>
 
       {/* High-fidelity progressive vintage blur backplate for Bottom Navigation Dock */}
-      <div className="fixed bottom-0 inset-x-0 h-28 pointer-events-none z-40">
-        <div className="progressive-blur-dock" />
-      </div>
+      {activeTab !== "shorts" && (
+        <div className="fixed bottom-0 inset-x-0 h-28 pointer-events-none z-40">
+          <div className="progressive-blur-dock" />
+        </div>
+      )}
 
       {isDynamicSearchPillActive && isDuiSearchMenuOpen && (
         <>
@@ -6987,7 +7008,8 @@ export default function App() {
         </>
       )}
 
-      <nav id="bottom-dock-container" className="fixed bottom-6 inset-x-0 mx-auto w-11/12 max-w-[420px] z-50 h-16 transform-gpu">
+      {activeTab !== "shorts" && (
+        <nav id="bottom-dock-container" className="fixed bottom-6 inset-x-0 mx-auto w-11/12 max-w-[420px] z-50 h-16 transform-gpu">
         {/* Reimagined Search Popover */}
         <AnimatePresence>
           {isReimaginedSearchActive && reimaginedSearchOpen && (
@@ -7429,6 +7451,7 @@ export default function App() {
           )}
         </AnimatePresence>
       </nav>
+      )}
 
       {/* Channel Change Toast Notification */}
       <AnimatePresence>
