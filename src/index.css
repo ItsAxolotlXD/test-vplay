@@ -366,4 +366,490 @@ body.material-design-3 .range-slider-pill:active::-moz-range-thumb,
   border-color: #381e72 !important;
 }
 
+/* WinUI 3 Plugin Overrides */
+.winui-3-active {
+  --accent-color: #43bbfd;
+}
+
+/* Ensure modal overlays have a modern dark translucent background */
+.winui-3-active .bg-neutral-900\/30,
+.winui-3-active .bg-neutral-900\/40,
+.winui-3-active .bg-neutral-900\/60,
+.winui-3-active .bg-black\/60,
+.winui-3-active .bg-black\/80 {
+  background-color: rgba(12, 12, 12, 0.65) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Override inline text and backgrounds in dark-mode WinUI 3 dialogs */
+.winui-3-active .text-neutral-900,
+.winui-3-active .text-neutral-800,
+.winui-3-active .text-neutral-700 {
+  color: #ffffff !important;
+}
+
+.winui-3-active .text-neutral-600,
+.winui-3-active .text-neutral-500,
+.winui-3-active .text-neutral-400 {
+  color: #a3a3a3 !important;
+}
+
+.winui-3-active .bg-white {
+  background-color: #202020 !important;
+}
+
+.winui-3-active .bg-neutral-50,
+.winui-3-active .bg-neutral-100 {
+  background-color: #1a1a1a !important;
+}
+
+.winui-3-active .border-neutral-200,
+.winui-3-active .border-neutral-300 {
+  border-color: #2d2d2d !important;
+}
+
+.winui-3-active .divide-neutral-200 > * + * {
+  border-color: #2d2d2d !important;
+}
+
+.winui-3-active .divide-y {
+  border-color: #2d2d2d !important;
+}
+
+/* Range slider custom styling for WinUI 3 */
+.winui-3-active .range-slider-pill,
+.winui-3-active input[type="range"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  height: 4px !important;
+  border-radius: 9999px !important;
+  outline: none !important;
+  background-color: #4d4d4d !important;
+}
+
+/* WebKit (Chrome, Safari, Edge) Range Slider track/thumb overrides */
+.winui-3-active .range-slider-pill::-webkit-slider-runnable-track,
+.winui-3-active input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px !important;
+  border-radius: 9999px !important;
+  background-color: #4d4d4d !important;
+}
+
+.winui-3-active .range-slider-pill::-webkit-slider-thumb,
+.winui-3-active input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background-color: #43bbfd !important; /* Inner blue dot */
+  border: 4px solid #2d2d2d !important; /* Outer grey ring */
+  box-shadow: 0 0 0 1px #555555, 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  cursor: pointer !important;
+  margin-top: -6px !important;
+  transform: none !important;
+  transition: transform 0.1s ease !important;
+}
+
+.winui-3-active .range-slider-pill:hover::-webkit-slider-thumb,
+.winui-3-active input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.15) !important;
+}
+
+/* Mozilla Firefox Range Slider track/thumb overrides */
+.winui-3-active .range-slider-pill::-moz-range-track,
+.winui-3-active input[type="range"]::-moz-range-track {
+  height: 4px !important;
+  border-radius: 9999px !important;
+  background-color: #4d4d4d !important;
+}
+
+.winui-3-active .range-slider-pill::-moz-range-progress,
+.winui-3-active input[type="range"]::-moz-range-progress {
+  height: 4px !important;
+  border-radius: 9999px !important;
+  background-color: #43bbfd !important; /* Blue active progress */
+}
+
+.winui-3-active .range-slider-pill::-moz-range-thumb,
+.winui-3-active input[type="range"]::-moz-range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background-color: #43bbfd !important;
+  border: 4px solid #2d2d2d !important;
+  box-shadow: 0 0 0 1px #555555, 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  cursor: pointer !important;
+  transform: none !important;
+}
+
+/* WinUI 3 Toggle Switch Overrides */
+.winui-3-active button.w-12.h-6,
+.winui-3-active button.w-12.h-7 {
+  width: 40px !important;
+  height: 20px !important;
+  border-radius: 9999px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  transition: all 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  box-shadow: none !important;
+}
+
+/* OFF State Track background & border */
+.winui-3-active button.w-12.h-6[class*="bg-[#3a3a3c]"],
+.winui-3-active button.w-12.h-6[class*="bg-[#1d1b20]"],
+.winui-3-active button.w-12.h-6[class*="bg-white/20"],
+.winui-3-active button.w-12.h-7[class*="bg-[#3a3a3c]"],
+.winui-3-active button.w-12.h-7[class*="bg-[#1d1b20]"],
+.winui-3-active button.w-12.h-7[class*="bg-white/20"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.44) !important;
+}
+
+.winui-3-active button.w-12.h-6[class*="bg-[#3a3a3c]"]:hover,
+.winui-3-active button.w-12.h-6[class*="bg-[#1d1b20]"]:hover,
+.winui-3-active button.w-12.h-7[class*="bg-[#3a3a3c]"]:hover,
+.winui-3-active button.w-12.h-7[class*="bg-[#1d1b20]"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* ON State Track background & border */
+.winui-3-active button.w-12.h-6[class*="bg-[#34c759]"],
+.winui-3-active button.w-12.h-6[class*="bg-[#381e72]"],
+.winui-3-active button.w-12.h-7[class*="bg-[#34c759]"],
+.winui-3-active button.w-12.h-7[class*="bg-[#381e72]"] {
+  background-color: #43bbfd !important;
+  border: 1px solid #43bbfd !important;
+}
+
+.winui-3-active button.w-12.h-6[class*="bg-[#34c759]"]:hover,
+.winui-3-active button.w-12.h-6[class*="bg-[#381e72]"]:hover,
+.winui-3-active button.w-12.h-7[class*="bg-[#34c759]"]:hover,
+.winui-3-active button.w-12.h-7[class*="bg-[#381e72]"]:hover {
+  background-color: #5fc5fe !important;
+  border-color: #5fc5fe !important;
+}
+
+/* Disable default absolute/shadow wrappers on toggle switch */
+.winui-3-active button.w-12.h-6 .absolute,
+.winui-3-active button.w-12.h-7 .absolute {
+  display: none !important;
+}
+
+/* WinUI 3 Knob styling and transition */
+.winui-3-active button.w-12.h-6 div,
+.winui-3-active button.w-12.h-7 div {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  position: absolute !important;
+  top: 3px !important;
+  transition: all 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0) !important;
+  box-shadow: none !important;
+  border: none !important;
+  background-image: none !important;
+}
+
+/* Knob OFF position & color */
+.winui-3-active button.w-12.h-6[class*="bg-[#3a3a3c]"] div,
+.winui-3-active button.w-12.h-6[class*="bg-[#1d1b20]"] div,
+.winui-3-active button.w-12.h-6[class*="bg-white/20"] div,
+.winui-3-active button.w-12.h-7[class*="bg-[#3a3a3c]"] div,
+.winui-3-active button.w-12.h-7[class*="bg-[#1d1b20]"] div,
+.winui-3-active button.w-12.h-7[class*="bg-white/20"] div {
+  left: 4px !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  transform: none !important;
+}
+
+/* Knob ON position & color */
+.winui-3-active button.w-12.h-6[class*="bg-[#34c759]"] div,
+.winui-3-active button.w-12.h-6[class*="bg-[#381e72]"] div,
+.winui-3-active button.w-12.h-7[class*="bg-[#34c759]"] div,
+.winui-3-active button.w-12.h-7[class*="bg-[#381e72]"] div {
+  left: 22px !important;
+  background-color: #121212 !important;
+  transform: none !important;
+}
+
+/* WinUI 3 Button Styling Overrides (Home, Live TV, Vplay Vertical, Settings) */
+.winui-3-active button {
+  font-family: var(--font-sans), sans-serif !important;
+}
+
+/* Accent/Colored Buttons (Primary) */
+.winui-3-active button[class*="bg-indigo-65"],
+.winui-3-active button[class*="bg-indigo-60"],
+.winui-3-active button[class*="bg-indigo-50"],
+.winui-3-active button[class*="bg-indigo-600"],
+.winui-3-active button[class*="bg-red-600"],
+.winui-3-active button[class*="bg-[#005fb8]"],
+.winui-3-active button[class*="bg-teal-"],
+.winui-3-active button[class*="bg-[#d0bcff]"],
+.winui-3-active button.bg-accent-winui {
+  background-color: #43bbfd !important;
+  color: #121212 !important;
+  border: 1px solid #43bbfd !important;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+}
+
+.winui-3-active button[class*="bg-indigo-600"]:hover,
+.winui-3-active button[class*="bg-red-600"]:hover,
+.winui-3-active button[class*="bg-[#005fb8]"]:hover,
+.winui-3-active button[class*="bg-teal-"]:hover,
+.winui-3-active button[class*="bg-[#d0bcff]"]:hover {
+  background-color: #5fc5fe !important;
+  border-color: #5fc5fe !important;
+}
+
+.winui-3-active button[class*="bg-indigo-600"]:active,
+.winui-3-active button[class*="bg-red-600"]:active,
+.winui-3-active button[class*="bg-[#005fb8]"]:active,
+.winui-3-active button[class*="bg-[#d0bcff]"]:active {
+  background-color: #2ea3e4 !important;
+  border-color: #2ea3e4 !important;
+}
+
+/* Standard/Neutral Buttons (Secondary) */
+.winui-3-active button[class*="bg-white/"],
+.winui-3-active button[class*="bg-white/[0.0"],
+.winui-3-active button[class*="bg-neutral-"],
+.winui-3-active button[class*="bg-black/40"],
+.winui-3-active button[class*="bg-black/60"],
+.winui-3-active button[class*="bg-black/10"],
+.winui-3-active button[class*="bg-black/20"],
+.winui-3-active button[class*="bg-white/10"],
+.winui-3-active button[class*="bg-white/5"] {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border: 1px solid #3e3e3e !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12) !important;
+}
+
+.winui-3-active button[class*="bg-white/"]:hover,
+.winui-3-active button[class*="bg-white/[0.0"]:hover,
+.winui-3-active button[class*="bg-neutral-"]:hover,
+.winui-3-active button[class*="bg-black/"]:hover,
+.winui-3-active button[class*="bg-white/10"]:hover,
+.winui-3-active button[class*="bg-white/5"]:hover {
+  background-color: #383838 !important;
+  border-color: #4c4c4c !important;
+}
+
+.winui-3-active button[class*="bg-white/"]:active,
+.winui-3-active button[class*="bg-white/[0.0"]:active,
+.winui-3-active button[class*="bg-neutral-"]:active,
+.winui-3-active button[class*="bg-black/"]:active,
+.winui-3-active button[class*="bg-white/10"]:active,
+.winui-3-active button[class*="bg-white/5"]:active {
+  background-color: #252525 !important;
+  border-color: #3e3e3e !important;
+}
+
+/* WinUI 3 global border-radius override to 15px */
+.winui-3-active button,
+.winui-3-active input,
+.winui-3-active textarea,
+.winui-3-active select,
+.winui-3-active .rounded-sm,
+.winui-3-active .rounded,
+.winui-3-active .rounded-md,
+.winui-3-active .rounded-lg,
+.winui-3-active .rounded-xl,
+.winui-3-active .rounded-2xl,
+.winui-3-active .rounded-3xl,
+.winui-3-active .rounded-\[4px\],
+.winui-3-active .rounded-\[8px\],
+.winui-3-active .rounded-\[11px\],
+.winui-3-active .rounded-\[12px\],
+.winui-3-active .rounded-\[28px\],
+.winui-3-active .rounded-\[30px\],
+.winui-3-active [class*="rounded-"] {
+  &:not(.rounded-full):not([class*="rounded-full"]):not([class*="w-2.5"]):not([class*="h-2.5"]):not([class*="w-2"]):not([class*="h-2"]):not([class*="w-3"]):not([class*="h-3"]):not(.w-12):not(.h-6):not(.h-7):not([class*="w-12"]):not([class*="h-6"]):not([class*="h-7"]) {
+    border-radius: 15px !important;
+  }
+}
+
+/* WinUI 3 Dropdown Menu Animations & Overrides */
+@keyframes winui-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.winui-3-active div[class*="z-[110]"] {
+  animation: winui-slide-down 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0) forwards !important;
+  transform-origin: top left !important;
+  background-color: rgba(32, 32, 32, 0.95) !important;
+  backdrop-filter: blur(40px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top-color: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  padding: 5px !important;
+  min-width: 180px !important;
+}
+
+/* Standard and WinUI dropdown buttons styling */
+div[class*="bg-[#121118]"] button,
+div[class*="bg-[#0c0819]"] button,
+.winui-3-active div[class*="z-[110]"] button {
+  border-radius: 15px !important;
+  cursor: default !important;
+  margin: 1.5px 4px !important;
+  width: calc(100% - 8px) !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button {
+  position: relative !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  padding-left: 28px !important;
+  padding-right: 12px !important;
+  font-size: 11.5px !important;
+  font-family: var(--font-sans), sans-serif !important;
+  font-weight: 400 !important;
+  height: auto !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  transition: background-color 0.1s ease, color 0.1s ease !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button:hover {
+  background-color: rgba(255, 255, 255, 0.07) !important;
+  color: #ffffff !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button:active {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) scaleY(0) !important;
+  width: 3px !important;
+  height: 12px !important;
+  background-color: #43bbfd !important;
+  border-radius: 9999px !important;
+  opacity: 0 !important;
+  transition: transform 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0), opacity 0.15s ease !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button:hover::before {
+  transform: translateY(-50%) scaleY(1) !important;
+  opacity: 1 !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button:has(.lucide-check),
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-indigo-400"]),
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-emerald-400"]),
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-rose-400"]),
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-lime-400"]) {
+  color: #ffffff !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button:has(.lucide-check)::before,
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-indigo-400"])::before,
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-emerald-400"])::before,
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-rose-400"])::before,
+.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-lime-400"])::before {
+  transform: translateY(-50%) scaleY(1) !important;
+  opacity: 1 !important;
+}
+
+.winui-3-active div[class*="z-[110]"] button svg.lucide-check {
+  display: none !important;
+}
+
+.winui-3-active div[class*="z-[110]"] div {
+  font-family: var(--font-sans), sans-serif !important;
+}
+
+.winui-3-active div[class*="z-[110]"] div[class*="text-[9px]"],
+.winui-3-active div[class*="z-[110]"] div[class*="text-[11px]"] {
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  padding-left: 28px !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+  margin-top: 6px !important;
+  margin-bottom: 4px !important;
+}
+
+.winui-3-active div[class*="z-[110]"] div[class*="text-xs"] {
+  padding-left: 28px !important;
+  font-size: 11px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.winui-3-active div[class*="z-[110]"] .border-t {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin: 5px 0 !important;
+}
+
+/* Custom styling for select elements in WinUI 3 */
+.winui-3-active select {
+  background-color: #2c2c2c !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 6px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.winui-3-active select option {
+  background-color: #2c2c2c !important;
+  color: #ffffff !important;
+}
+
+/* WinUI 3 Settings Option Layout Padding Reduction */
+.winui-3-active div[class*="p-5"].rounded-\[15px\],
+.winui-3-active div[class*="p-5"].rounded-2xl {
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+}
+
+.winui-3-active div.space-y-4 > div.pt-4.border-t.border-white\/10 {
+  padding-top: 8px !important;
+  margin-top: 8px !important;
+}
+
+/* Custom 15px border radius for all buttons in Home, LiveTV, Settings, and Vplay Vertical tabs */
+.active-tab-home button,
+.active-tab-live button,
+.active-tab-settings button,
+.active-tab-shorts button,
+#player-anchor.active-tab-home button,
+#player-anchor.active-tab-live button,
+#player-anchor.active-tab-settings button,
+#player-anchor.active-tab-shorts button {
+  border-radius: 15px !important;
+}
+
+
 

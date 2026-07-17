@@ -37,6 +37,7 @@ interface ChannelPlayerProps {
   onToggleFavorite?: () => void;
   onPlaybackError?: (error: boolean, isTimeout?: boolean) => void;
   isMaterialDesignActive?: boolean;
+  isWinUI3Active?: boolean;
 }
 
 const translateName = (key: string): string => {
@@ -76,6 +77,7 @@ export default function ChannelPlayer({
   onToggleFavorite,
   onPlaybackError,
   isMaterialDesignActive = false,
+  isWinUI3Active = false,
 }: ChannelPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -716,7 +718,9 @@ export default function ChannelPlayer({
                 onChange={handleVolumeChangeLocal}
                 className="w-12 sm:w-16 h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
                 style={{
-                  background: isMaterialDesignActive
+                  background: isWinUI3Active
+                    ? `linear-gradient(to right, #43bbfd ${(muted ? 0 : volume) * 100}%, #4d4d4d ${(muted ? 0 : volume) * 100}%)`
+                    : isMaterialDesignActive
                     ? `linear-gradient(to right, #d0bcff ${(muted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) ${(muted ? 0 : volume) * 100}%)`
                     : `linear-gradient(to right, #0084ff ${(muted ? 0 : volume) * 100}%, rgba(255, 255, 255, 0.2) ${(muted ? 0 : volume) * 100}%)`
                 }}

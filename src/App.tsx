@@ -54,7 +54,9 @@ import {
   Mail,
   Bluetooth,
   Calculator,
-  Link
+  Link,
+  LogOut,
+  Power
 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
@@ -62,7 +64,7 @@ import ChannelPlayer from "./components/ChannelPlayer";
 import VplayVertical from "./components/VplayVertical";
 import LiveComments from "./components/LiveComments";
 import VirtualRemoteControl from "./components/VirtualRemoteControl";
-import MacMenuBar from "./components/MacMenuBar";
+import StartMenu from "./components/StartMenu";
 import FandomLogosTab from "./components/FandomLogosTab";
 import IntelligenceThumbnailTab from "./components/IntelligenceThumbnailTab";
 
@@ -265,6 +267,8 @@ const TRANSLATIONS: Record<string, string> = {
 
   // Menu keys
   "menu.ExportChannels.label": "Export Custom Channel List (M3U)",
+  "menu.SignOut.label": "Đăng xuất (Sign Out)",
+  "menu.Shutdown.label": "Tắt máy (Shutdown)",
 
   // Channel Creation Popup Keys
   "modal.ChannelCreate.title": "Add New Channel",
@@ -457,6 +461,21 @@ const renderDescription = (text: string) => {
   });
 };
 
+const pageTransitionVariants = {
+  enter: (direction: "left" | "right") => ({
+    x: direction === "right" ? "100%" : "-100%",
+    opacity: 0
+  }),
+  center: {
+    x: 0,
+    opacity: 1
+  },
+  exit: (direction: "left" | "right") => ({
+    x: direction === "right" ? "-100%" : "100%",
+    opacity: 0
+  })
+};
+
 export default function App() {
   // Local time state clock
   const [time, setTime] = useState(new Date());
@@ -515,11 +534,27 @@ export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<"home" | "live" | "settings" | "search" | "fandom_logos" | "intelligence_thumbnail" | "shorts">("home");
   const [prevTab, setPrevTab] = useState<"home" | "live" | "settings" | "shorts">("home");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
+  const lastTabRef = useRef<string>("home");
 
   useEffect(() => {
     if (activeTab !== "search") {
       setPrevTab(activeTab as any);
     }
+
+    const TAB_ORDER = ["home", "live", "shorts", "fandom_logos", "intelligence_thumbnail", "settings"];
+    const getTabIndex = (tabName: string) => {
+      const idx = TAB_ORDER.indexOf(tabName);
+      if (idx !== -1) return idx;
+      return 3.5; // for custom tabs
+    };
+
+    const oldIdx = getTabIndex(lastTabRef.current);
+    const newIdx = getTabIndex(activeTab);
+    if (oldIdx !== newIdx) {
+      setSlideDirection(newIdx > oldIdx ? "right" : "left");
+    }
+    lastTabRef.current = activeTab;
   }, [activeTab]);
 
   // Scroll Position Tracking for Floating Header
@@ -639,6 +674,50 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showSplash, setShowSplash] = useState<boolean>(true);
   const [roleSelection, setRoleSelection] = useState<"user" | "admin" | null>(null);
+  
+  const [signingOutProgress, setSigningOutProgress] = useState<boolean>(false);
+  const [shuttingDownProgress, setShuttingDownProgress] = useState<boolean>(false);
+  const [isWebCrashed, setIsWebCrashed] = useState<boolean>(false);
+  const [loginTime, setLoginTime] = useState<Date>(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLoginTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTimeBig = (date: Date) => {
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  const formatDateBig = (date: Date) => {
+    const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+    const dayName = days[date.getDay()];
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${dayName}, ngày ${day} tháng ${month} năm ${year}`;
+  };
+
+  const handleSignOut = () => {
+    setSigningOutProgress(true);
+    setTimeout(() => {
+      setSigningOutProgress(false);
+      setRoleSelection(null);
+    }, 10000);
+  };
+
+  const handleShutdown = () => {
+    setShuttingDownProgress(true);
+    setTimeout(() => {
+      setShuttingDownProgress(false);
+      setIsWebCrashed(true);
+    }, 10000);
+  };
   const [showAdminPassModal, setShowAdminPassModal] = useState<boolean>(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState<string>("");
   const [adminError, setAdminError] = useState<string>("");
@@ -710,7 +789,7 @@ export default function App() {
   const [isPiPActive, setIsPiPActive] = useState<boolean>(false);
 
   // Standard Player comments state
-  const [showStandardComments, setShowStandardComments] = useState<boolean>(true);
+  const [showStandardComments, setShowStandardComments] = useState<boolean>(false);
 
   // Test Menu states
   const [showLogoAdjustModal, setShowLogoAdjustModal] = useState<boolean>(false);
@@ -865,9 +944,9 @@ export default function App() {
         id: "dynamic_search_pill",
         name: "Thử nghiệm \"Dynamic Search Pill\"",
         desc: "Hiển thị một thanh tìm kiếm nhỏ hình quả nhộng (pill style) thanh lịch ngay giữa tab Home và tab Live TV.",
-        status: "idle" as const,
-        progress: 0,
-        isActive: false
+        status: "installed" as const,
+        progress: 100,
+        isActive: true
       }
     ];
 
@@ -891,6 +970,17 @@ export default function App() {
         merged.push(loadedFeat);
       }
     });
+
+    const initFlag = localStorage.getItem("vplay_search_pill_init_v2");
+    if (!initFlag) {
+      const idx = merged.findIndex(d => d.id === "dynamic_search_pill");
+      if (idx !== -1) {
+        merged[idx].status = "installed";
+        merged[idx].progress = 100;
+        merged[idx].isActive = true;
+      }
+      localStorage.setItem("vplay_search_pill_init_v2", "true");
+    }
 
     return merged;
   });
@@ -1363,7 +1453,7 @@ export default function App() {
           return;
         }
 
-        installPlugin(id);
+        handleInstallPluginWithConflictCheck(id);
         setDuiLogs(prev => [...prev, `[SUCCESS] Began background installation of plugin '${id}' (30s). Gõ '/store list' để xem tiến trình.`, ""]);
       } else if (action === "remove" || action === "uninstall") {
         if (args.length < 2) {
@@ -1702,9 +1792,25 @@ export default function App() {
   }[]>(() => {
     const defaultPlugins = [
       {
+        id: "winui_3",
+        name: "WinUI 3 by Microsoft",
+        desc: "Kích hoạt giao diện WinUI 3 chuẩn Microsoft Fluent Design mặc định của hệ thống, mang phong cách thanh lịch và bố cục Windows 11 hiện đại.",
+        status: "installed" as const,
+        progress: 100,
+        isActive: true
+      },
+      {
         id: "liquid_glass",
         name: "Liquid Glass UI Theme",
         desc: "Kích hoạt giao diện kính mờ Liquid Glass bóng bẩy phong cách Apple, mang lại hiệu ứng mờ sương, viền phản sáng lấp lánh và bo góc thanh thoát kiểu macOS.",
+        status: "idle" as const,
+        progress: 0,
+        isActive: false
+      },
+      {
+        id: "material_design",
+        name: "Material Design 3 Theme",
+        desc: "Kích hoạt giao diện Google Material Design 3 đầy màu sắc, bo góc lớn mềm mại và tích hợp hiệu ứng gợn sóng xúc giác.",
         status: "idle" as const,
         progress: 0,
         isActive: false
@@ -1729,14 +1835,6 @@ export default function App() {
         id: "remote_control",
         name: "Use remote control",
         desc: "Kích hoạt giả lập điều khiển từ xa vật lý. Khi bật, toàn bộ cử chỉ chạm (touch) và nhấp chuột sẽ bị vô hiệu hóa, thay thế bằng bàn phím điều khiển nổi và bàn phím mũi tên vật lý để duyệt các mục.",
-        status: "idle" as const,
-        progress: 0,
-        isActive: false
-      },
-      {
-        id: "winui_3",
-        name: "WinUI 3 by Microsoft",
-        desc: "Kích hoạt giao diện WinUI 3 chuẩn Microsoft Fluent Design, thay đổi toàn bộ style của popup dialog và các nút (buttons) theo chuẩn thiết kế Windows 11 hiện đại.",
         status: "idle" as const,
         progress: 0,
         isActive: false
@@ -1780,6 +1878,49 @@ export default function App() {
     localStorage.setItem("vplay_plugins", JSON.stringify(toSave));
   }, [plugins]);
 
+  const [designConflictInfo, setDesignConflictInfo] = useState<{
+    activeId: string;
+    targetId: string;
+    actionType: "install" | "activate";
+  } | null>(null);
+
+  // Auto fallback to WinUI 3 as default design if none is active
+  useEffect(() => {
+    const designIds = ["winui_3", "liquid_glass", "material_design"];
+    const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
+    if (!activeDesign) {
+      setPlugins(prev => {
+        const wui = prev.find(p => p.id === "winui_3");
+        if (wui && wui.status === "installed" && wui.isActive) return prev;
+        return prev.map(p => p.id === "winui_3" ? { ...p, status: "installed", progress: 100, isActive: true } : p);
+      });
+    }
+  }, [plugins]);
+
+  const handleInstallPluginWithConflictCheck = (id: string) => {
+    const designIds = ["winui_3", "liquid_glass", "material_design"];
+    if (designIds.includes(id)) {
+      const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
+      if (activeDesign && activeDesign.id !== id) {
+        setDesignConflictInfo({ activeId: activeDesign.id, targetId: id, actionType: "install" });
+        return;
+      }
+    }
+    installPlugin(id);
+  };
+
+  const handleTogglePluginWithConflictCheck = (id: string, currentActive: boolean) => {
+    const designIds = ["winui_3", "liquid_glass", "material_design"];
+    if (!currentActive && designIds.includes(id)) {
+      const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
+      if (activeDesign && activeDesign.id !== id) {
+        setDesignConflictInfo({ activeId: activeDesign.id, targetId: id, actionType: "activate" });
+        return;
+      }
+    }
+    setPlugins(prev => prev.map(p => p.id === id ? { ...p, isActive: !p.isActive } : p));
+  };
+
   const installPlugin = (id: string) => {
     setPlugins(prev => prev.map(p => {
       if (p.id === id) {
@@ -1818,8 +1959,9 @@ export default function App() {
   }, [plugins]);
 
   const isMaterialDesignActive = useMemo(() => {
-    return !liquidGlass;
-  }, [liquidGlass]);
+    const mat = plugins.find(p => p.id === "material_design");
+    return mat ? (mat.status === "installed" && mat.isActive) : false;
+  }, [plugins]);
 
   useEffect(() => {
     if (isMaterialDesignActive) {
@@ -1845,16 +1987,16 @@ export default function App() {
   }, [plugins]);
 
   const winui = useMemo(() => ({
-    card: "w-full bg-white text-neutral-800 rounded-[8px] shadow-[0_24px_65px_rgba(0,0,0,0.22)] border border-[#e5e5e5] overflow-hidden flex flex-col font-sans text-left",
-    header: "px-6 py-5 bg-white flex items-center justify-between shrink-0 border-b border-[#f0f0f0]",
-    title: "text-[18px] font-semibold text-neutral-900 tracking-tight leading-snug",
-    subtitle: "text-[12px] text-neutral-500 font-normal leading-relaxed mt-1",
-    body: "p-6 flex-1 overflow-y-auto text-sm text-neutral-600 leading-relaxed",
-    footer: "px-6 py-4 bg-[#f3f3f3] border-t border-[#e5e5e5] flex gap-2 justify-end shrink-0 items-center",
-    btnPrimary: "bg-[#005fb8] hover:bg-[#0067c0] active:bg-[#0052a1] text-white border border-[#005fb8] border-b-black/30 rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.16)] px-[16px] py-[6px] text-xs font-semibold cursor-pointer select-none transition-all duration-100 flex items-center justify-center gap-1.5",
-    btnSecondary: "bg-[#ffffff] hover:bg-[#f9f9f9] active:bg-[#f3f3f3] text-[#242424] border border-[#cccccc] border-b-[#b3b3b3] rounded-[4px] shadow-[0_1px_1px_rgba(0,0,0,0.06)] px-[16px] py-[6px] text-xs font-medium cursor-pointer select-none transition-all duration-100 flex items-center justify-center gap-1.5",
-    btnDanger: "bg-[#c42b1c] hover:bg-[#b32418] active:bg-[#a21e14] text-white border border-[#c42b1c] border-b-black/30 rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.16)] px-[16px] py-[6px] text-xs font-semibold cursor-pointer select-none transition-all duration-100 flex items-center justify-center gap-1.5",
-    input: "w-full bg-white border border-[#cccccc] hover:border-[#7a7a7a] focus:border-[#005fb8] px-3 py-2 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none rounded-[4px] shadow-sm transition-colors duration-100"
+    card: "w-full bg-[#202020] text-neutral-200 rounded-[15px] shadow-[0_24px_65px_rgba(0,0,0,0.6)] border border-[#2d2d2d] overflow-hidden flex flex-col font-sans text-left",
+    header: "px-6 py-5 bg-[#202020] flex items-center justify-between shrink-0 border-b border-[#2d2d2d]",
+    title: "text-[18px] font-semibold text-white tracking-tight leading-snug",
+    subtitle: "text-[12px] text-neutral-400 font-normal leading-relaxed mt-1",
+    body: "p-6 flex-1 overflow-y-auto text-sm text-neutral-300 leading-relaxed bg-[#202020]",
+    footer: "px-6 py-4 bg-[#1a1a1a] border-t border-[#2d2d2d] flex gap-2 justify-end shrink-0 items-center",
+    btnPrimary: "bg-[#43bbfd] hover:bg-[#5fc5fe] active:bg-[#2ea3e4] text-neutral-900 border border-[#43bbfd] border-b-black/20 rounded-[15px] shadow-[0_1px_2px_rgba(0,0,0,0.15)] px-[16px] py-[6px] text-xs font-semibold cursor-pointer select-none transition-all duration-100 flex items-center justify-center gap-1.5",
+    btnSecondary: "bg-[#2d2d2d] hover:bg-[#383838] active:bg-[#252525] text-white border border-[#3e3e3e] border-b-black/10 rounded-[15px] shadow-[0_1px_1px_rgba(0,0,0,0.12)] px-[16px] py-[6px] text-xs font-medium cursor-pointer select-none transition-all duration-100 flex items-center justify-center gap-1.5",
+    btnDanger: "bg-[#c42b1c] hover:bg-[#b32418] active:bg-[#a21e14] text-white border border-[#c42b1c] border-b-black/30 rounded-[15px] shadow-[0_1px_2px_rgba(0,0,0,0.16)] px-[16px] py-[6px] text-xs font-semibold cursor-pointer select-none transition-all duration-100 flex items-center justify-center gap-1.5",
+    input: "w-full bg-[#2d2d2d] border border-[#3e3e3e] hover:border-[#555555] focus:border-[#43bbfd] px-3 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none rounded-[15px] shadow-sm transition-colors duration-100"
   }), []);
 
   // Vplay Data Storage Capacity Logic
@@ -1913,6 +2055,7 @@ export default function App() {
 
   // 2-minute cleaning simulation states
   const [isCleaning, setIsCleaning] = useState<boolean>(false);
+  const [isStartMenuOpen, setIsStartMenuOpen] = useState<boolean>(false);
   const [cleanProgress, setCleanProgress] = useState<number>(0);
   const [cleanTimeRemaining, setCleanTimeRemaining] = useState<number>(120); // 120 seconds = 2 minutes
   const [pendingCleanType, setPendingCleanType] = useState<"quick" | "custom" | "all" | null>(null);
@@ -2385,6 +2528,9 @@ export default function App() {
 
   // Ambient backgrounds options config
   const getBgGradient = () => {
+    if (isWinUI3Active) {
+      return "bg-[#1c1c1c]";
+    }
     if (isMaterialDesignActive) {
       return "bg-[#1b0323]";
     }
@@ -3103,6 +3249,107 @@ export default function App() {
     );
   };
 
+  if (isWebCrashed) {
+    return (
+      <div className="fixed inset-0 bg-neutral-950 text-neutral-400 flex flex-col items-center justify-center z-[99999] p-6 font-mono select-none">
+        <div className="w-full max-w-2xl bg-black border border-red-500/20 rounded-2xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
+          {/* Decorative scanner lines */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/[0.02] to-transparent pointer-events-none" />
+          
+          <div className="flex items-center gap-4 text-red-500 border-b border-red-500/20 pb-4">
+            <AlertCircle className="w-8 h-8 animate-pulse shrink-0" />
+            <div>
+              <h1 className="text-sm font-bold tracking-widest uppercase">CRITICAL SYSTEM ERROR</h1>
+              <p className="text-[10px] text-red-500/60 uppercase">Vplay Core Kernel - Crash Dump</p>
+            </div>
+          </div>
+
+          <div className="space-y-4 text-xs font-mono leading-relaxed text-neutral-300">
+            <p className="text-red-400 font-bold">*** STOP: 0x000000D1 (0x0000000C, 0x00000002, 0x00000000, 0xF86B5A89)</p>
+            <p className="text-red-400 font-bold">*** vplay_sys.sys - Address F86B5A89 base at F86B0000, DateStamp 3667c4fa</p>
+            <p className="text-white/40">If this is the first time you've seen this Stop error screen, restart your computer. If this screen appears again, follow these steps:</p>
+            <div className="bg-red-950/10 border border-white/5 p-4 rounded-lg space-y-2 text-[11px] text-neutral-400 font-mono">
+              <p>&gt; System halted due to deliberate user shutdown request.</p>
+              <p>&gt; Releasing all HLS media stream pipelines... [DONE]</p>
+              <p>&gt; Freeing system graphic buffers... [DONE]</p>
+              <p>&gt; Unloading plugin store assemblies... [DONE]</p>
+              <p>&gt; Thread pool termination status: EXITED_WITH_PANIC (code 3667)</p>
+            </div>
+            <p className="text-white/50 text-[11px] pt-2">
+              Please reload the page to restart Vplay System and restore safe operation.
+            </p>
+          </div>
+
+          <div className="flex justify-end pt-4 border-t border-white/5">
+            <button
+              onClick={() => {
+                window.location.reload();
+              }}
+              className="px-5 py-2.5 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
+            >
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              Tải lại trang (Reload Page)
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (signingOutProgress) {
+    return (
+      <div className="fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google">
+        {/* Background ambient light */}
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div className="flex flex-col items-center justify-center animate-fade-in">
+          <svg className="animate-spin h-14 w-14 text-white mb-6" viewBox="0 0 50 50">
+            <circle
+              className="opacity-100"
+              cx="25"
+              cy="25"
+              r="20"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeDasharray="40 150"
+              fill="none"
+            />
+          </svg>
+          <div className="text-white/40 text-xs tracking-widest uppercase font-google font-medium animate-pulse">SIGNING OUT...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (shuttingDownProgress) {
+    return (
+      <div className="fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google">
+        {/* Background ambient light */}
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div className="flex flex-col items-center justify-center animate-fade-in">
+          <svg className="animate-spin h-14 w-14 text-red-500 mb-6" viewBox="0 0 50 50">
+            <circle
+              className="opacity-100"
+              cx="25"
+              cy="25"
+              r="20"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeDasharray="40 150"
+              fill="none"
+            />
+          </svg>
+          <div className="text-red-500/60 text-xs tracking-widest uppercase font-google font-medium animate-pulse">SHUTTING DOWN...</div>
+        </div>
+      </div>
+    );
+  }
+
   if (isCleaning) {
     return (
       <div className="fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google">
@@ -3350,6 +3597,7 @@ export default function App() {
                       muted={duiMuted}
                       onMutedChange={setDuiMuted}
                       isMaterialDesignActive={isMaterialDesignActive}
+                      isWinUI3Active={isWinUI3Active}
                     />
                   </div>
                   <div className="p-3 bg-[#0a0a0d] rounded-lg border border-neutral-900 text-[11px] space-y-1">
@@ -3478,7 +3726,19 @@ export default function App() {
             <div className="text-white/40 text-xs tracking-widest uppercase font-google font-medium animate-pulse">Connecting to services...</div>
           </div>
         ) : roleSelection === null ? (
-          <div className="w-full max-w-md p-8 bg-[#121118]/85 backdrop-blur-2xl border border-white/10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.8)] relative overflow-hidden rounded-[28px] animate-fade-in hover:border-white/15 transition-all text-white font-google">
+          <div className="flex flex-col items-center gap-6 w-full max-w-lg z-10">
+            {/* Elegant Large Digital Clock & Calendar */}
+            <div className="text-center space-y-1 mb-2 animate-fade-in">
+              <div className="text-5xl sm:text-6xl font-black tracking-tighter bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-lg font-sans">
+                {formatTimeBig(loginTime)}
+              </div>
+              <div className="text-[11px] sm:text-xs font-semibold text-indigo-300/80 uppercase tracking-widest">
+                {formatDateBig(loginTime)}
+              </div>
+            </div>
+
+            {/* Who are you Selection Card */}
+            <div className="w-full max-w-md p-8 bg-[#121118]/85 backdrop-blur-2xl border border-white/10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.8)] relative overflow-hidden rounded-[28px] animate-fade-in hover:border-white/15 transition-all text-white font-google">
             {/* Ambient subtle glow background */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -3596,6 +3856,7 @@ export default function App() {
               )}
             </div>
           </div>
+          </div>
         ) : (
           <div className="text-white">Kiểm tra tính toàn vẹn...</div>
         )}
@@ -3658,9 +3919,9 @@ export default function App() {
 
   return (
     <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
-      <div className={`min-h-screen text-white/95 pb-32 pt-[40px] transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+      <div className={`min-h-screen text-white/95 pb-32 pt-4 transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
         
-        <MacMenuBar
+        <StartMenu
           onOpenDuiMode={() => {
             setIsDuiMode(true);
             setIsDuiMonitorActive(false);
@@ -3693,7 +3954,6 @@ export default function App() {
           isVIntelLoading={isVIntelLoading}
           vIntelHistory={vIntelHistory}
           handleSendVIntelMsg={handleSendVIntelMsg}
-          isAutoHideMenuBarActive={isAutoHideMenuBarActive}
           onSelectChannel={handleSelectChannel}
           userRole={roleSelection}
           onOpenLogoAdjustTest={() => setShowLogoAdjustModal(true)}
@@ -3731,6 +3991,10 @@ export default function App() {
             localStorage.setItem("vplay_manual_crash", "true");
             setIsManualCrash(true);
           }}
+          isOpen={isStartMenuOpen}
+          onClose={() => setIsStartMenuOpen(false)}
+          onSignOut={handleSignOut}
+          onShutdown={handleShutdown}
         />
       
       {/* Decorative ambient glowing circles */}
@@ -3744,7 +4008,7 @@ export default function App() {
 
       {/* TV360 STYLE CINEMATIC HEADER (Floating on Top - Displays on ALL tabs) */}
       {(activeTab !== "settings" || activeSettingSection === null) && (
-        <header className="fixed top-[40px] inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-all duration-150">
+        <header className="fixed top-0 inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-all duration-150">
           {/* Progressive background blurs backplate - Only visible when scrolled down or when not on home tab */}
           <div className={`progressive-blur-header z-0 pointer-events-none border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
             isScrolled || activeTab !== "home" ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
@@ -3915,6 +4179,22 @@ export default function App() {
                               setActiveTab("settings");
                               setActiveSettingSection(null);
                             }
+                          },
+                          {
+                            label: t("menu.SignOut.label"),
+                            icon: LogOut,
+                            onClick: () => {
+                              setShowDropdownMenu(false);
+                              handleSignOut();
+                            }
+                          },
+                          {
+                            label: t("menu.Shutdown.label"),
+                            icon: Power,
+                            onClick: () => {
+                              setShowDropdownMenu(false);
+                              handleShutdown();
+                            }
                           }
                         ].map((item, idx) => {
                           const IconComp = item.icon;
@@ -3934,6 +4214,128 @@ export default function App() {
                           );
                         })}
                       </motion.div>
+                    ) : isWinUI3Active ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: -12, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -12, scale: 0.97 }}
+                        style={{ originX: 1, originY: 0 }}
+                        transition={{ duration: 0.15, ease: [0.1, 0.9, 0.2, 1.0] }}
+                        className="absolute right-0 mt-3 w-56 rounded-[12px] bg-[#202020]/95 backdrop-blur-[20px] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] z-50 p-1.5 text-white overflow-hidden text-left"
+                      >
+                        {/* Clock & Calendar toggle with checkmark / left vertical blue accent bar */}
+                        <button
+                          onClick={() => {
+                            toggleShowClock();
+                          }}
+                          className="w-full relative px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center justify-between font-sans font-normal text-white cursor-pointer transition-colors border-0 shadow-none"
+                        >
+                          {showClock && <div className="absolute left-1.5 top-2.5 bottom-2.5 w-[3px] rounded-full bg-[#43bbfd]" />}
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                            <span>{t("menu.ClockAndCalendar.label")}</span>
+                          </div>
+                        </button>
+                        
+                        <div className="border-t border-white/10 my-1" />
+                        
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            setShowAboutModal(true);
+                          }}
+                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
+                        >
+                          <Info className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                          {t("menu.AboutThisVersion.label")}
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            window.location.reload();
+                          }}
+                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                          {t("menu.ReloadApp.label")}
+                        </button>
+                        
+
+                        {(activeTab === "live" || activeTab === "vtvgo") && (
+                          <button
+                            onClick={() => {
+                              setShowDropdownMenu(false);
+                              exportChannelsToM3u8();
+                            }}
+                            className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
+                          >
+                            <Download className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                            {t("menu.ExportChannels.label")}
+                          </button>
+                        )}
+                        
+                        {activeTab === "live" && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setShowDropdownMenu(false);
+                                handleOpenMultiviewSelector();
+                              }}
+                              className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-t border-white/5 shadow-none"
+                            >
+                              <Grid className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                              {t("menu.ViewMultiview.label")}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setShowDropdownMenu(false);
+                                handleTogglePictureInPicture();
+                              }}
+                              className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
+                            >
+                              <Layers className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                              {t("menu.PictureInPicture.label")}
+                            </button>
+                          </>
+                        )}
+                        
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            setActiveTab("settings");
+                            setActiveSettingSection(null);
+                          }}
+                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
+                        >
+                          <Settings className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                          {t("menu.OpenSettings.label")}
+                        </button>
+
+                        <div className="border-t border-white/10 my-1" />
+
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            handleSignOut();
+                          }}
+                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
+                        >
+                          <LogOut className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
+                          {t("menu.SignOut.label")}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            handleShutdown();
+                          }}
+                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-red-600/20 rounded-[6px] flex items-center text-red-400 font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
+                        >
+                          <Power className="w-4 h-4 mr-2.5 text-red-400 stroke-[2]" />
+                          {t("menu.Shutdown.label")}
+                        </button>
+                      </motion.div>
                     ) : (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.85 }}
@@ -3952,7 +4354,7 @@ export default function App() {
                         >
                           <div className="flex items-center">
                             <Clock className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                            <span>menu.ClockAndCalendar.label</span>
+                            <span>{t("menu.ClockAndCalendar.label")}</span>
                           </div>
                           {showClock && <Check className="w-4 h-4 text-black stroke-[3.5]" />}
                         </button>
@@ -3967,7 +4369,7 @@ export default function App() {
                           className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
                         >
                           <Info className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          menu.AboutThisVersion.label
+                          {t("menu.AboutThisVersion.label")}
                         </button>
                         
                         <button
@@ -3978,7 +4380,7 @@ export default function App() {
                           className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
                         >
                           <RefreshCw className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          menu.ReloadApp.label
+                          {t("menu.ReloadApp.label")}
                         </button>
                         
 
@@ -3991,7 +4393,7 @@ export default function App() {
                             className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
                           >
                             <Download className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                            menu.ExportChannels.label
+                            {t("menu.ExportChannels.label")}
                           </button>
                         )}
                         
@@ -4005,7 +4407,7 @@ export default function App() {
                               className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal border-t border-black/5"
                             >
                               <Grid className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                              menu.ViewMultiview.label
+                              {t("menu.ViewMultiview.label")}
                             </button>
                             <button
                               onClick={() => {
@@ -4015,7 +4417,7 @@ export default function App() {
                               className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
                             >
                               <Layers className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                              menu.PictureInPicture.label
+                              {t("menu.PictureInPicture.label")}
                             </button>
                           </>
                         )}
@@ -4029,7 +4431,31 @@ export default function App() {
                           className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
                         >
                           <Settings className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          menu.OpenSettings.label
+                          {t("menu.OpenSettings.label")}
+                        </button>
+
+                        <div className="border-t border-black/10 my-2" />
+
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            handleSignOut();
+                          }}
+                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
+                        >
+                          <LogOut className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
+                          {t("menu.SignOut.label")}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setShowDropdownMenu(false);
+                            handleShutdown();
+                          }}
+                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-red-500/15 text-red-600 flex items-center font-sans font-normal"
+                        >
+                          <Power className="w-4 h-4 mr-2.5 text-red-500 stroke-[2]" />
+                          {t("menu.Shutdown.label")}
                         </button>
                       </motion.div>
                     )}
@@ -4076,11 +4502,22 @@ export default function App() {
       {/* Main Container */}
       <main id="player-anchor" className={
         activeTab === "home" 
-          ? "w-full pt-0 z-10 relative" 
+          ? "w-full pt-0 z-10 relative overflow-hidden active-tab-home" 
           : activeTab === "shorts"
-            ? "w-full max-w-7xl mx-auto px-4 pt-14 lg:pt-16 pb-4 z-10 relative"
-            : "w-full max-w-7xl mx-auto px-4 pt-24 lg:pt-28 pb-8 z-10 relative"
+            ? "w-full max-w-7xl mx-auto px-4 pt-14 lg:pt-16 pb-4 z-10 relative overflow-hidden active-tab-shorts"
+            : `w-full max-w-7xl mx-auto px-4 pt-24 lg:pt-28 pb-8 z-10 relative overflow-hidden active-tab-${activeTab}`
       }>
+        <AnimatePresence mode="popLayout" initial={false} custom={slideDirection}>
+          <motion.div
+            key={activeTab}
+            custom={slideDirection}
+            variants={pageTransitionVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={dynamicMotion ? { duration: 0.35, ease: "easeInOut" } : { duration: 0 }}
+            className="w-full relative"
+          >
 
         {/* VIEW: LIVE TV BROADCASTING (PRIMARY GRAPHICS) */}
         {(activeTab === "live" || activeTab === "search") && (
@@ -4174,6 +4611,8 @@ export default function App() {
                                   onVolumeChange={setVolume}
                                   muted={idx === 0 ? muted : true}
                                   onMutedChange={setMuted}
+                                  isMaterialDesignActive={isMaterialDesignActive}
+                                  isWinUI3Active={isWinUI3Active}
                                 />
                               </div>
                             ) : (
@@ -4203,6 +4642,7 @@ export default function App() {
                         onVolumeChange={setVolume}
                         muted={muted}
                         onMutedChange={setMuted}
+                        isWinUI3Active={isWinUI3Active}
                         onNextChannel={handleNextChannel}
                         onPrevChannel={handlePrevChannel}
                         isFavorite={favorites.includes(selectedChannel.id)}
@@ -4550,16 +4990,18 @@ export default function App() {
                       }
                       setActiveTab("live");
                     }}
-                     className={`px-8 sm:px-10 py-3 sm:py-4 rounded-full font-normal shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm cursor-pointer border transition-all duration-200 ${
+                     className={`h-9 px-5 rounded-[15px] font-normal shadow-xl flex items-center justify-center gap-2 text-xs cursor-pointer border transition-all duration-200 ${
                        isMaterialDesignActive
-                         ? "bg-[#d0bcff] hover:bg-[#ebdfff] border-0 shadow-lg text-black"
+                         ? "bg-[#d0bcff] hover:bg-[#ebdfff] border-0 text-black"
+                         : isWinUI3Active
+                         ? "bg-[#005fb8] hover:bg-[#0066c0] border-[#005fb8] text-white"
                          : "bg-red-600 hover:bg-red-700 border-red-500/10 shadow-red-600/30 text-white bouncy-btn"
                      }`}
                   >
                     {homeSlides[currentSlide].btnIcon === "compass" ? (
-                      <Compass className={`w-4.5 h-4.5 ${isMaterialDesignActive ? "text-black" : "text-white"}`} />
+                      <Compass className={`w-4 h-4 ${isMaterialDesignActive ? "text-black" : "text-white"}`} />
                     ) : (
-                      <Play className={`w-4.5 h-4.5 ${isMaterialDesignActive ? "fill-black text-black" : "fill-white text-white"}`} />
+                      <Play className={`w-4 h-4 ${isMaterialDesignActive ? "fill-black text-black" : "fill-white text-white"}`} />
                     )}
                     {homeSlides[currentSlide].btnText || "Watch now"}
                   </button>
@@ -4568,19 +5010,25 @@ export default function App() {
                   <div className="flex items-center gap-1.5 ml-2">
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev - 1 + homeSlides.length) % homeSlides.length)}
-                      className={isMaterialDesignActive
-                        ? "w-9 h-9 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-black flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
-                        : "w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
-                      }
+                      className={`w-9 h-9 rounded-[15px] flex items-center justify-center cursor-pointer transition-all ${
+                        isWinUI3Active
+                          ? "bg-[#2d2d2d] hover:bg-[#383838] border border-[#3e3e3e] text-white"
+                          : isMaterialDesignActive
+                          ? "bg-[#211f26] hover:bg-[#2d2b34] border border-white/10 text-white/90"
+                          : "bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65)]"
+                      } bouncy-btn`}
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev + 1) % homeSlides.length)}
-                      className={isMaterialDesignActive
-                        ? "w-9 h-9 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-black flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
-                        : "w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
-                      }
+                      className={`w-9 h-9 rounded-[15px] flex items-center justify-center cursor-pointer transition-all ${
+                        isWinUI3Active
+                          ? "bg-[#2d2d2d] hover:bg-[#383838] border border-[#3e3e3e] text-white"
+                          : isMaterialDesignActive
+                          ? "bg-[#211f26] hover:bg-[#2d2b34] border border-white/10 text-white/90"
+                          : "bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65)]"
+                      } bouncy-btn`}
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -5107,16 +5555,20 @@ export default function App() {
                       <button
                         key={sec.id}
                         onClick={() => setActiveSettingSection(sec.id)}
-                        className="w-full text-left bg-white/10 backdrop-blur-[10px] rounded-[15px] py-4.5 px-5 sm:py-5.5 sm:px-6 flex items-center gap-3.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] border-[3px] border-white/10 hover:border-white text-white cursor-default"
+                        className={`w-full text-left bg-white/10 backdrop-blur-[10px] rounded-[15px] flex items-center gap-3.5 text-white cursor-default ${
+                          isWinUI3Active 
+                            ? "py-2.5 px-4 shadow-[0_4px_16px_rgba(0,0,0,0.15)] border border-white/10 hover:border-white/20" 
+                            : "py-4.5 px-5 sm:py-5.5 sm:px-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] border-[3px] border-white/10 hover:border-white"
+                        }`}
                       >
-                        <div className="w-10 h-10 flex items-center justify-center shrink-0 text-white">
-                          <IconComp className="w-6 h-6 stroke-[1.8]" />
+                        <div className={`flex items-center justify-center shrink-0 text-white ${isWinUI3Active ? "w-8 h-8" : "w-10 h-10"}`}>
+                          <IconComp className={`${isWinUI3Active ? "w-5 h-5" : "w-6 h-6"} stroke-[1.8]`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-semibold text-white tracking-tight">{t(sec.title)}</h3>
+                          <h3 className={`${isWinUI3Active ? "text-sm" : "text-base"} font-semibold text-white tracking-tight`}>{t(sec.title)}</h3>
                           <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{t(sec.subtitle)}</p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-white/45 shrink-0" />
+                        <ChevronRight className={`text-white/45 shrink-0 ${isWinUI3Active ? "w-4 h-4" : "w-5 h-5"}`} />
                       </button>
                     );
                   })}
@@ -5152,16 +5604,20 @@ export default function App() {
                       <button
                         key={sec.id}
                         onClick={() => setActiveSettingSection(sec.id)}
-                        className="w-full text-left bg-white/10 backdrop-blur-[10px] rounded-[15px] py-4.5 px-5 sm:py-5.5 sm:px-6 flex items-center gap-3.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] border-[3px] border-white/10 hover:border-white text-white cursor-default"
+                        className={`w-full text-left bg-white/10 backdrop-blur-[10px] rounded-[15px] flex items-center gap-3.5 text-white cursor-default ${
+                          isWinUI3Active 
+                            ? "py-2.5 px-4 shadow-[0_4px_16px_rgba(0,0,0,0.15)] border border-white/10 hover:border-white/20" 
+                            : "py-4.5 px-5 sm:py-5.5 sm:px-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] border-[3px] border-white/10 hover:border-white"
+                        }`}
                       >
-                        <div className="w-10 h-10 flex items-center justify-center shrink-0 text-white">
-                          <IconComp className="w-6 h-6 stroke-[1.8]" />
+                        <div className={`flex items-center justify-center shrink-0 text-white ${isWinUI3Active ? "w-8 h-8" : "w-10 h-10"}`}>
+                          <IconComp className={`${isWinUI3Active ? "w-5 h-5" : "w-6 h-6"} stroke-[1.8]`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-semibold text-white tracking-tight">{t(sec.title)}</h3>
+                          <h3 className={`${isWinUI3Active ? "text-sm" : "text-base"} font-semibold text-white tracking-tight`}>{t(sec.title)}</h3>
                           <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{t(sec.subtitle)}</p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-white/45 shrink-0" />
+                        <ChevronRight className={`text-white/45 shrink-0 ${isWinUI3Active ? "w-4 h-4" : "w-5 h-5"}`} />
                       </button>
                     );
                   })}
@@ -5223,7 +5679,7 @@ export default function App() {
                               <div className="shrink-0 flex items-center gap-3 self-end sm:self-center">
                                 {plugin.status === "idle" && (
                                   <button
-                                    onClick={() => installPlugin(plugin.id)}
+                                    onClick={() => handleInstallPluginWithConflictCheck(plugin.id)}
                                     className="px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
                                   >
                                     Install (30s)
@@ -5237,7 +5693,7 @@ export default function App() {
                                       {isMaterialDesignActive ? (
                                         <button
                                           onClick={() => {
-                                            setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, isActive: !p.isActive } : p));
+                                            handleTogglePluginWithConflictCheck(plugin.id, plugin.isActive);
                                           }}
                                           className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
                                             plugin.isActive ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
@@ -5260,7 +5716,7 @@ export default function App() {
                                       ) : (
                                         <button
                                           onClick={() => {
-                                            setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, isActive: !p.isActive } : p));
+                                            handleTogglePluginWithConflictCheck(plugin.id, plugin.isActive);
                                           }}
                                           className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
                                             plugin.isActive ? "bg-[#34c759]" : "bg-white/20"
@@ -6197,7 +6653,9 @@ export default function App() {
                                         onChange={(e) => setDemoSliderVal(Number(e.target.value))}
                                         className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
                                         style={{
-                                          background: isMaterialDesignActive
+                                          background: isWinUI3Active
+                                            ? `linear-gradient(to right, #43bbfd ${demoSliderVal * 100}%, #4d4d4d ${demoSliderVal * 100}%)`
+                                            : isMaterialDesignActive
                                             ? `linear-gradient(to right, #d0bcff ${demoSliderVal * 100}%, rgba(255, 255, 255, 0.2) ${demoSliderVal * 100}%)`
                                             : `linear-gradient(to right, #0084ff ${demoSliderVal * 100}%, rgba(255, 255, 255, 0.2) ${demoSliderVal * 100}%)`
                                         }}
@@ -6790,6 +7248,8 @@ export default function App() {
           />
         )}
 
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* High-fidelity progressive vintage blur backplate for Bottom Navigation Dock */}
@@ -6799,30 +7259,34 @@ export default function App() {
         </div>
       )}
 
-      {isDynamicSearchPillActive && isDuiSearchMenuOpen && (
-        <>
-          {/* Centered Suggestion Overlay Backdrop */}
-          <div 
-            className="fixed inset-0 z-[105] bg-black/35 backdrop-blur-[4px]" 
-            onClick={() => setIsDuiSearchMenuOpen(false)} 
-          />
-          {/* Centered Modal Content Wrapper */}
-          <div className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 30 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className="w-full max-w-[480px] h-[550px] max-h-[80vh] rounded-[15px] border border-neutral-200 bg-white shadow-[0_24px_65px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col pointer-events-auto text-left text-neutral-800"
-              onClick={(e) => e.stopPropagation()}
-            >
+      <AnimatePresence>
+        {isDynamicSearchPillActive && isDuiSearchMenuOpen && (
+          <>
+            {/* Centered Suggestion Overlay Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[105] bg-transparent" 
+              onClick={() => setIsDuiSearchMenuOpen(false)} 
+            />
+            {/* Centered Modal Content Wrapper */}
+            <div className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none p-4">
+              <motion.div
+                initial={{ opacity: 0, y: "100%" }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: "100%" }}
+                transition={dynamicMotion ? { duration: 0.35, ease: "easeInOut" } : { duration: 0 }}
+                className="w-full max-w-[480px] h-[550px] max-h-[80vh] rounded-[15px] border border-white/10 bg-[#121214]/10 backdrop-blur-xl shadow-[0_24px_65px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col pointer-events-auto text-left text-white"
+                onClick={(e) => e.stopPropagation()}
+              >
               {/* Header */}
-              <div className="px-5 pt-4.5 pb-3.5 flex items-center justify-between border-b border-neutral-100 bg-neutral-50">
-                <span className="text-sm font-bold text-neutral-800 tracking-tight">Gợi ý tìm kiếm & Tiện ích Vplay</span>
+              <div className="px-5 pt-4.5 pb-3.5 flex items-center justify-between border-b border-white/10 bg-white/5">
+                <span className="text-sm font-bold text-white tracking-tight">Gợi ý tìm kiếm & Tiện ích Vplay</span>
                 <div className="flex items-center gap-2.5">
                   {/* User profile avatar */}
                   <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-500 p-0.5 shadow-sm overflow-hidden flex items-center justify-center cursor-pointer hover:scale-105 transition-all">
-                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-full rounded-full bg-[#1c1c1e] flex items-center justify-center overflow-hidden">
                       <img 
                         src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" 
                         alt="Avatar" 
@@ -6837,7 +7301,7 @@ export default function App() {
                       navigator.clipboard.writeText(window.location.href);
                       alert("Đã sao chép liên kết ứng dụng Vplay!");
                     }}
-                    className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-500 transition-colors"
+                    className="p-1.5 rounded-full hover:bg-white/10 text-white/70 transition-colors cursor-pointer"
                     title="Copy Link"
                   >
                     <Link className="w-3.5 h-3.5" />
@@ -6848,7 +7312,7 @@ export default function App() {
                       setActiveTab("settings");
                       setIsDuiSearchMenuOpen(false);
                     }}
-                    className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-500 transition-colors"
+                    className="p-1.5 rounded-full hover:bg-white/10 text-white/70 transition-colors cursor-pointer"
                     title="Settings"
                   >
                     <Settings className="w-3.5 h-3.5" />
@@ -6856,30 +7320,52 @@ export default function App() {
                 </div>
               </div>
 
+              {/* Inline Search Bar inside Modal */}
+              <div className="px-5 py-3 border-b border-white/5 bg-white/5">
+                <div className="relative flex items-center">
+                  <Search className="absolute left-3.5 w-4 h-4 text-white/40 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm kênh, phim hoặc tiện ích..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-white/5 hover:bg-white/10 focus:bg-white/10 border border-white/10 focus:border-white/20 rounded-[15px] pl-10 pr-10 py-2.5 text-xs text-white placeholder-white/40 focus:outline-none transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3.5 text-white/40 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {/* Body */}
-              <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1 custom-scrollbar bg-white">
+              <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1 custom-scrollbar bg-transparent">
                 {!searchQuery ? (
                   RECENT_SEARCHES_ITEMS.map((item) => {
                     // Determine icon component and colors based on type
                     let IconComponent = Tv;
-                    let iconColorClass = "text-sky-500";
+                    let iconColorClass = "text-sky-400";
                     let iconBgClass = "bg-sky-500/10";
 
                     if (item.iconType === "movie") {
                       IconComponent = Play;
-                      iconColorClass = "text-rose-500";
+                      iconColorClass = "text-rose-400";
                       iconBgClass = "bg-rose-500/10";
                     } else if (item.iconType === "settings") {
                       IconComponent = Sliders;
-                      iconColorClass = "text-amber-500";
+                      iconColorClass = "text-amber-400";
                       iconBgClass = "bg-amber-500/10";
                     } else if (item.iconType === "experimental") {
                       IconComponent = Beaker;
-                      iconColorClass = "text-purple-500";
+                      iconColorClass = "text-purple-400";
                       iconBgClass = "bg-purple-500/10";
                     } else if (item.iconType === "plugin") {
                       IconComponent = Package;
-                      iconColorClass = "text-emerald-500";
+                      iconColorClass = "text-emerald-400";
                       iconBgClass = "bg-emerald-500/10";
                     }
 
@@ -6926,7 +7412,7 @@ export default function App() {
                             setIsDuiSearchMenuOpen(false);
                           }
                         }}
-                        className="w-full flex items-center gap-3.5 px-3 py-2 rounded-xl hover:bg-neutral-50 text-left transition-colors group cursor-pointer"
+                        className="w-full flex items-center gap-3.5 px-3 py-2 rounded-xl hover:bg-white/5 text-left transition-colors group cursor-pointer"
                       >
                         {/* Icon Box */}
                         <div className={`w-9 h-9 rounded-lg ${iconBgClass} flex items-center justify-center shrink-0 transition-all group-hover:scale-105 duration-200 shadow-sm ${iconColorClass}`}>
@@ -6935,16 +7421,16 @@ export default function App() {
 
                         {/* Texts */}
                         <div className="flex-1 min-w-0 pr-2">
-                          <h4 className="text-xs font-semibold text-neutral-800 truncate leading-tight group-hover:text-indigo-600 transition-colors">
+                          <h4 className="text-xs font-semibold text-white/90 truncate leading-tight group-hover:text-indigo-300 transition-colors">
                             {item.title}
                           </h4>
-                          <p className="text-[10px] text-neutral-400 truncate mt-1 font-medium">
+                          <p className="text-[10px] text-white/50 truncate mt-1 font-medium">
                             {item.subtitle}
                           </p>
                         </div>
 
                         {/* Time text */}
-                        <div className="text-[9.5px] text-neutral-400 font-semibold shrink-0 self-center bg-neutral-100/80 px-2 py-0.5 rounded">
+                        <div className="text-[9.5px] text-white/60 font-semibold shrink-0 self-center bg-white/10 px-2 py-0.5 rounded">
                           {item.timestamp}
                         </div>
                       </button>
@@ -6953,11 +7439,11 @@ export default function App() {
                 ) : (
                   <div className="space-y-1">
                     {/* Matching Channels */}
-                    <div className="px-3 py-1.5 text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
+                    <div className="px-3 py-1.5 text-[10px] text-white/40 font-bold uppercase tracking-wider">
                       Kênh tìm thấy ({searchResults.length})
                     </div>
                     {searchResults.length === 0 ? (
-                      <div className="py-8 text-center text-xs text-neutral-400">
+                      <div className="py-8 text-center text-xs text-white/40">
                         Không tìm thấy kênh nào khớp với "{searchQuery}"
                       </div>
                     ) : (
@@ -6970,9 +7456,9 @@ export default function App() {
                             setIsDuiSearchMenuOpen(false);
                             setSearchQuery("");
                           }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-neutral-50 text-left transition-colors group cursor-pointer"
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 text-left transition-colors group cursor-pointer"
                         >
-                          <div className="w-9 h-9 rounded-lg bg-neutral-100 border border-neutral-200/50 flex items-center justify-center overflow-hidden shrink-0">
+                          <div className="w-9 h-9 rounded-lg bg-white/10 border border-white/5 flex items-center justify-center overflow-hidden shrink-0">
                             {ch.logoImg ? (
                               <img
                                 src={ch.logoImg}
@@ -6981,20 +7467,20 @@ export default function App() {
                                 referrerPolicy="no-referrer"
                               />
                             ) : (
-                              <span className="text-[10px] font-bold text-neutral-500">
+                              <span className="text-[10px] font-bold text-white/70">
                                 {ch.logoText || "TV"}
                               </span>
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-[11.5px] font-semibold text-neutral-800 truncate group-hover:text-indigo-600 transition-colors">
+                            <h4 className="text-[11.5px] font-semibold text-white/90 truncate group-hover:text-indigo-300 transition-colors">
                               {ch.name}
                             </h4>
-                            <p className="text-[9.5px] text-neutral-400 truncate mt-0.5">
+                            <p className="text-[9.5px] text-white/50 truncate mt-0.5">
                               {ch.group}
                             </p>
                           </div>
-                          <div className="w-6 h-6 rounded-full bg-neutral-100 group-hover:bg-indigo-600 text-neutral-400 group-hover:text-white flex items-center justify-center transition-colors shrink-0">
+                          <div className="w-6 h-6 rounded-full bg-white/10 group-hover:bg-indigo-600 text-white/50 group-hover:text-white flex items-center justify-center transition-colors shrink-0">
                             <Play className="w-2.5 h-2.5 fill-current" />
                           </div>
                         </button>
@@ -7008,8 +7494,74 @@ export default function App() {
         </>
       )}
 
+      {designConflictInfo && (
+        <div className="fixed inset-0 z-[125] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm pointer-events-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="w-full max-w-md bg-neutral-900 border border-white/10 rounded-[15px] p-6 shadow-2xl text-white text-left select-none"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 text-amber-500 mb-4">
+              <AlertCircle className="w-6 h-6 shrink-0" />
+              <h3 className="text-sm font-bold tracking-tight">Xung đột Giao diện Thiết kế!</h3>
+            </div>
+            
+            <p className="text-xs text-white/80 leading-relaxed mb-6 font-sans">
+              Hệ thống phát hiện giao diện <strong className="text-indigo-300">"{plugins.find(p => p.id === designConflictInfo.activeId)?.name}"</strong> hiện đang được kích hoạt.
+              <br /><br />
+              Để tránh xung đột CSS và lỗi hiển thị, bạn cần gỡ bỏ thiết kế cũ trước khi cài đặt hoặc áp dụng giao diện mới (<strong className="text-emerald-300">"{plugins.find(p => p.id === designConflictInfo.targetId)?.name}"</strong>).
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                onClick={() => setDesignConflictInfo(null)}
+                className="px-4 py-2 rounded-[15px] bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-all cursor-pointer border border-white/5"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={() => {
+                  const { activeId, targetId, actionType } = designConflictInfo;
+                  
+                  // 1. Deactivate & uninstall the active one
+                  setPlugins(prev => prev.map(p => {
+                    if (p.id === activeId) {
+                      return { ...p, status: "idle", progress: 0, isActive: false };
+                    }
+                    return p;
+                  }));
+                  
+                  // 2. Perform action on target design
+                  if (actionType === "install") {
+                    installPlugin(targetId);
+                  } else {
+                    setPlugins(prev => prev.map(p => {
+                      if (p.id === targetId) {
+                        return { ...p, status: "installed", progress: 100, isActive: true };
+                      }
+                      return p;
+                    }));
+                  }
+                  
+                  setDesignConflictInfo(null);
+                }}
+                className="px-4 py-2 rounded-[15px] bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold transition-all shadow-lg cursor-pointer border border-amber-500/20"
+              >
+                Gỡ bỏ & Áp dụng mới
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+
       {activeTab !== "shorts" && (
-        <nav id="bottom-dock-container" className="fixed bottom-6 inset-x-0 mx-auto w-11/12 max-w-[420px] z-50 h-16 transform-gpu">
+        <nav 
+          id="bottom-dock-container" 
+          className="fixed bottom-3 inset-x-0 mx-auto w-11/12 max-w-[500px] z-50 h-16 transform-gpu"
+        >
         {/* Reimagined Search Popover */}
         <AnimatePresence>
           {isReimaginedSearchActive && reimaginedSearchOpen && (
@@ -7237,9 +7789,30 @@ export default function App() {
               transition={dynamicMotion ? { duration: 0.25 } : { duration: 0 }}
               className="flex items-center gap-2.5 w-full h-16 transform-gpu"
             >
+              {/* Start Menu Button (Power Icon) */}
+              <button
+                id="vplay-start-dock-btn"
+                onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
+                className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
+                  isWinUI3Active
+                    ? "rounded-[12px] bg-[#202020] border border-[#2d2d2d] shadow-[0_8px_24px_rgba(0,0,0,0.4)] text-white hover:bg-[#2c2c2c] hover:border-[#3a3a3a]"
+                    : isMaterialDesignActive
+                    ? "bg-[#290a36] hover:bg-[#3d154f] text-white border border-white/5 shadow-lg rounded-[16px] duration-200"
+                    : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
+                }`}
+                title="Menu"
+              >
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  Menu
+                </div>
+                <Power className={`w-6 h-6 transition-all duration-300 ${isStartMenuOpen ? "text-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" : "text-white/90 group-hover:scale-110"}`} />
+              </button>
+
               {/* Main Tab Dock (Pill) */}
               <div className={`flex-1 h-full flex items-center justify-around px-2 py-1 relative transform-gpu ${
-                isMaterialDesignActive
+                isWinUI3Active
+                  ? "rounded-[15px] bg-[#202020] border border-[#2d2d2d] shadow-[0_12px_32px_rgba(0,0,0,0.4)]"
+                  : isMaterialDesignActive
                   ? "rounded-full bg-[#290a36] border border-white/5 shadow-[0_12px_32px_rgba(0,0,0,0.15)]"
                   : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)]"
               }`}>
@@ -7265,7 +7838,7 @@ export default function App() {
                         code: t.code
                       })),
                       { id: "settings", icon: Settings, label: "Settings", isVtvGo: false },
-                      ...(!isFocusMode ? [{ id: "vtvgo", icon: Star, label: "VTVgo", isVtvGo: true }] : []),
+                      { id: "vtvgo", icon: Star, label: "VTVgo", isVtvGo: true },
                     ].map((tab) => {
                       const isActive = tab.isVtvGo 
                         ? (activeTab === "live" && selectedChannel?.id === "vietnam-wild-live")
@@ -7274,15 +7847,11 @@ export default function App() {
                       
                       return (
                         <React.Fragment key={tab.id}>
-                          <button 
-                            onClick={() => {
-                              if (tab.isVtvGo) {
-                                const wildChannel = flattenedChannels.find(ch => ch.id === "vietnam-wild-live");
-                                if (wildChannel) {
-                                  setSelectedChannel(wildChannel);
-                                  setActiveTab("live");
-                                }
-                              } else {
+                           <button 
+                             onClick={() => {
+                               if (tab.isVtvGo) {
+                                 setShowVtvGoLockedModal(true);
+                               } else {
                                 setActiveTab(tab.id as any);
                                 if (tab.isCustom && tab.code) {
                                   try {
@@ -7325,7 +7894,9 @@ export default function App() {
                                   ? { type: "tween", duration: 0.18, ease: "easeInOut" }
                                   : (dynamicMotion ? { type: "spring", stiffness: 350, damping: 25 } : { type: "tween", duration: 0 })
                                 }
-                                className={isMaterialDesignActive 
+                                className={isWinUI3Active
+                                  ? "absolute bottom-1 w-8 h-[3px] bg-[#43bbfd] rounded-full left-1/2 -translate-x-1/2 z-20 shadow-[0_1px_4px_rgba(67,187,253,0.4)]"
+                                  : isMaterialDesignActive 
                                   ? "absolute w-14 h-8 bg-[#c9b2fa] rounded-full -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-none border-0"
                                   : "absolute inset-y-1 inset-x-1 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
                                 }
@@ -7335,7 +7906,7 @@ export default function App() {
                             <Icon 
                               className={`w-6 h-6 transition-all duration-300 ${
                                 isActive 
-                                  ? (isMaterialDesignActive ? "scale-105 text-[#290a36] opacity-100" : "scale-105 text-indigo-950 opacity-100") 
+                                  ? (isWinUI3Active ? "scale-105 text-[#43bbfd] opacity-100" : isMaterialDesignActive ? "scale-105 text-[#290a36] opacity-100" : "scale-105 text-indigo-950 opacity-100") 
                                   : "text-white opacity-85 group-hover:opacity-100 group-hover:scale-105"
                               }`} 
                             />
@@ -7343,7 +7914,11 @@ export default function App() {
 
                           {tab.id === "home" && isDynamicSearchPillActive && (
                             <div 
-                              className="mx-3 flex items-center bg-white/[0.08] hover:bg-white/[0.12] focus-within:bg-white/[0.15] border border-white/10 rounded-full px-3 py-1.5 focus-within:border-white/20 transition-all duration-300 w-32 sm:w-44 md:w-52 transform-gpu cursor-text"
+                              className={`mx-2 flex items-center transition-all duration-300 w-20 sm:w-28 md:w-32 transform-gpu cursor-text px-2.5 py-1 ${
+                                isWinUI3Active 
+                                  ? "bg-[#2d2d2d] hover:bg-[#383838] focus-within:bg-[#333] border border-[#3e3e3e] focus-within:border-[#43bbfd] rounded-[8px]" 
+                                  : "bg-white/[0.08] hover:bg-white/[0.12] focus-within:bg-white/[0.15] border border-white/10 rounded-full focus-within:border-white/20"
+                              }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setIsDuiSearchMenuOpen(true);
@@ -7381,54 +7956,59 @@ export default function App() {
               </div>
 
               {/* Separate Search Button */}
-              <button
-                onClick={() => {
-                  if (isVIntelligenceActive) {
-                    setVIntelSpinCount(prev => prev + 1);
-                  }
-                  if (isReimaginedSearchActive || isVIntelligenceActive) {
-                    setReimaginedSearchOpen(true);
-                  } else {
-                    setPrevTab(activeTab as any);
-                    setActiveTab("search");
-                  }
-                }}
-                className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
-                  isMaterialDesignActive
-                    ? "bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white shadow-lg border-0 rounded-[20px] duration-200"
-                    : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
-                }`}
-              >
-                {/* Premium Custom Tooltip */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                  {isVIntelligenceActive ? "V-Intelligence" : "Tìm kiếm kênh"}
-                </div>
-                {isVIntelligenceActive ? (
-                  <motion.img
-                    animate={{ rotate: vIntelSpinCount * 360 }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                    src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
-                    className="w-7.5 h-7.5 pointer-events-none object-contain group-hover:scale-110"
-                    referrerPolicy="no-referrer"
-                    alt="V-Intelligence"
-                  />
-                ) : isMaterialDesignActive ? (
-                  <img
-                    src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
-                    className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
-                    style={{ filter: "brightness(0)" }}
-                    referrerPolicy="no-referrer"
-                    alt="Search"
-                  />
-                ) : (
-                  <img 
-                    src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
-                    className="w-6.5 h-6.5 brightness-0 invert opacity-95 transition-all duration-300 group-hover:scale-110 pointer-events-none object-contain" 
-                    referrerPolicy="no-referrer"
-                    alt="Search"
-                  />
-                )}
-              </button>
+              {((!isDynamicSearchPillActive) || (isDynamicSearchPillActive && activeTab === "search")) && (
+                <button
+                  id="vplay-search-dock-btn"
+                  onClick={() => {
+                    if (isVIntelligenceActive) {
+                      setVIntelSpinCount(prev => prev + 1);
+                    }
+                    if (isReimaginedSearchActive || isVIntelligenceActive) {
+                      setReimaginedSearchOpen(true);
+                    } else {
+                      setPrevTab(activeTab as any);
+                      setActiveTab("search");
+                    }
+                  }}
+                  className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
+                    isWinUI3Active
+                      ? "rounded-[15px] bg-[#202020] border border-[#2d2d2d] shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white hover:bg-[#2c2c2c] hover:border-[#3a3a3a]"
+                      : isMaterialDesignActive
+                      ? "bg-[#290a36] hover:bg-[#3d154f] text-white border border-white/5 shadow-lg rounded-[20px] duration-200"
+                      : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
+                  }`}
+                >
+                  {/* Premium Custom Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                    {isVIntelligenceActive ? "V-Intelligence" : "Tìm kiếm kênh"}
+                  </div>
+                  {isVIntelligenceActive ? (
+                    <motion.img
+                      animate={{ rotate: vIntelSpinCount * 360 }}
+                      transition={{ duration: 0.8, ease: "easeInOut" }}
+                      src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
+                      className="w-7.5 h-7.5 pointer-events-none object-contain group-hover:scale-110"
+                      referrerPolicy="no-referrer"
+                      alt="V-Intelligence"
+                    />
+                  ) : isMaterialDesignActive ? (
+                    <img
+                      src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
+                      className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
+                      style={{ filter: "brightness(0) invert(1)" }}
+                      referrerPolicy="no-referrer"
+                      alt="Search"
+                    />
+                  ) : (
+                    <img 
+                      src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
+                      className="w-6.5 h-6.5 brightness-0 invert opacity-95 transition-all duration-300 group-hover:scale-110 pointer-events-none object-contain" 
+                      referrerPolicy="no-referrer"
+                      alt="Search"
+                    />
+                  )}
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -8889,6 +9469,8 @@ export default function App() {
                 onVolumeChange={setVolume}
                 muted={muted}
                 onMutedChange={setMuted}
+                isMaterialDesignActive={isMaterialDesignActive}
+                isWinUI3Active={isWinUI3Active}
                 onPlaybackError={() => {}}
               />
             </div>
