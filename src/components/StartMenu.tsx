@@ -39,7 +39,10 @@ import {
   Clock,
   User,
   ShieldAlert,
-  SlidersHorizontal
+  SlidersHorizontal,
+  AlertTriangle,
+  RotateCw,
+  Youtube
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -99,6 +102,7 @@ interface StartMenuProps {
   onLaunchTestStream: (url: string) => void;
   onTriggerCrash: () => void;
   onOpenDuiMode?: () => void;
+  onOpenSearch?: () => void;
   customTabs?: any[];
   channels?: any[];
   isOpen: boolean;
@@ -158,6 +162,7 @@ export default function StartMenu({
   onLaunchTestStream,
   onTriggerCrash,
   onOpenDuiMode,
+  onOpenSearch,
   isOpen,
   onClose,
   onSignOut,
@@ -169,6 +174,23 @@ export default function StartMenu({
     if (hour >= 10 && hour < 18) return "Good afternoon";
     return "Good evening";
   };
+
+  // Channel suggestions state
+  const [suggestedChannels, setSuggestedChannels] = useState<any[]>([]);
+
+  const handleRefreshChannelSuggestions = () => {
+    if (!channels || channels.length === 0) return;
+    const nonFavs = channels.filter((ch: any) => !(favorites || []).includes(ch.id));
+    const pool = nonFavs.length >= 3 ? nonFavs : channels;
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    setSuggestedChannels(shuffled.slice(0, 3));
+  };
+
+  useEffect(() => {
+    if (isOpen && channels && channels.length > 0 && suggestedChannels.length === 0) {
+      handleRefreshChannelSuggestions();
+    }
+  }, [isOpen, channels]);
 
   // Custom states transferred from old MacMenuBar
   const [showStorageModal, setShowStorageModal] = useState(false);
@@ -598,26 +620,36 @@ export default function StartMenu({
         {isOpen && (
           <motion.div
             ref={menuRef}
-            initial={{ opacity: 0, y: 120 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 120 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className={`fixed bottom-[84px] sm:bottom-[90px] left-1/2 -translate-x-1/2 w-[92vw] max-w-[560px] max-h-[calc(100vh-120px)] z-[160] rounded-[20px] border border-white/15 bg-[#18181b] shadow-[0_24px_60px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden text-left font-sans text-white`}
+            initial={{ opacity: 0, y: "100%", x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: "100%", x: "-50%" }}
+            transition={{ type: "spring", stiffness: 260, damping: 28 }}
+            className={`fixed bottom-[84px] sm:bottom-[90px] left-1/2 w-[92vw] max-w-[560px] max-h-[calc(100vh-140px)] z-[160] rounded-[20px] border border-white/15 bg-[#141416]/95 backdrop-blur-2xl shadow-[0_24px_60px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden text-left font-sans text-white`}
           >
             {/* Header branding */}
-            <div className="px-4 py-2.5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between relative">
-              <div className="flex items-center gap-2.5 z-10">
+            <div className="px-4.5 py-3 border-b border-white/5 bg-white/[0.02] flex items-center justify-between relative shrink-0">
+              <div className="flex items-center gap-2 z-10">
                 <img 
                   src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
                   alt="Vplay OS"
                   referrerPolicy="no-referrer"
                   className="h-5 w-auto object-contain brightness-110 saturate-[1.1]"
                 />
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onOpenSearch) onOpenSearch();
+                  }}
+                  className="p-1 rounded-md hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                  title="Tìm kiếm & Tiện ích Vplay"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
               </div>
 
-              {/* Centered greeting, white text, normal-case */}
+              {/* Centered greeting, white text */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="text-sm font-medium text-white tracking-wide">
+                <span className="text-xs sm:text-sm font-semibold text-white tracking-wide">
                   {getGreetingText()}
                 </span>
               </div>
@@ -631,302 +663,386 @@ export default function StartMenu({
               </div>
             </div>
 
-            {/* Core Body: 2 main columns */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/5 max-h-[280px] xs:max-h-[320px] sm:max-h-[360px] md:max-h-[390px] overflow-y-auto custom-scrollbar">
+            {/* Core Body: Scrollable container containing sections */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-5 custom-scrollbar max-h-[380px] xs:max-h-[420px] sm:max-h-[460px]">
               
-              {/* Left Column: Navigation & Media */}
-              <div className="p-3 space-y-3">
-                <div>
-                  <h3 className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest px-2 mb-1.5 flex items-center gap-1">
-                    <Tv className="w-3 h-3" /> Điều hướng & Kênh TV
-                  </h3>
-                  <div className="grid grid-cols-2 gap-1">
-                    <button
-                      onClick={() => {
-                        setActiveTab("home");
-                        onClose();
-                      }}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all text-left ${activeTab === "home" ? "bg-indigo-600 border-indigo-400 text-white" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
-                    >
-                      <Home className="w-3.5 h-3.5 shrink-0" />
-                      <span>Trang chủ</span>
-                    </button>
+              {/* SECTION: PINNED CHANNELS */}
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                    Kênh Đã Ghim (Favorites)
+                  </span>
+                </div>
+                {(() => {
+                  const pinned = (channels || []).filter((ch: any) => (favorites || []).includes(ch.id));
+                  return pinned.length > 0 ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      {pinned.map((ch: any) => (
+                        <button
+                          key={ch.id}
+                          onClick={() => {
+                            if (onSelectChannel) onSelectChannel(ch);
+                            onClose();
+                          }}
+                          className="group flex flex-col items-center justify-center p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
+                            {ch.logoImg ? (
+                              <img
+                                src={ch.logoImg}
+                                alt={ch.name}
+                                className="w-full h-full object-contain"
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <span className="text-[10px] font-bold text-white/60">
+                                {ch.logoText || "TV"}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] font-medium mt-1.5 text-white/90 group-hover:text-indigo-400 transition-colors line-clamp-1 w-full px-0.5">
+                            {ch.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-dashed border-white/10 text-center text-[10px] text-white/40 leading-relaxed">
+                      Chưa có kênh nào được ghim. Nhấp vào nút ❤️ yêu thích của kênh để tự động ghim tại đây!
+                    </div>
+                  );
+                })()}
+              </div>
 
-                    <button
-                      onClick={() => {
-                        setActiveTab("live");
-                        onClose();
-                      }}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all text-left ${activeTab === "live" ? "bg-indigo-600 border-indigo-400 text-white" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
-                    >
-                      <Tv className="w-3.5 h-3.5 shrink-0" />
-                      <span>Truyền hình</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setActiveTab("shorts");
-                        onClose();
-                      }}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all text-left ${activeTab === "shorts" ? "bg-indigo-600 border-indigo-400 text-white" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
-                    >
-                      <Flame className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                      <span>Vplay Vertical</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setActiveTab("settings");
-                        setActiveSettingSection(null);
-                        onClose();
-                      }}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all text-left ${activeTab === "settings" && activeSettingSection === null ? "bg-indigo-600 border-indigo-400 text-white" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
-                    >
-                      <Settings className="w-3.5 h-3.5 shrink-0" />
-                      <span>Cài đặt</span>
-                    </button>
-
-                    {customTabs.map((t: any) => (
+              {/* SECTION: SUGGESTED CHANNELS */}
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                    Gợi ý kênh hôm nay
+                  </span>
+                  <button
+                    onClick={handleRefreshChannelSuggestions}
+                    className="p-1 rounded-md hover:bg-white/10 text-white/50 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                    title="Làm mới gợi ý"
+                  >
+                    <RotateCw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {suggestedChannels.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {suggestedChannels.map((ch: any) => (
                       <button
-                        key={t.id}
+                        key={ch.id}
                         onClick={() => {
-                          setActiveTab(t.id);
+                          if (onSelectChannel) onSelectChannel(ch);
                           onClose();
                         }}
-                        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all text-left truncate ${activeTab === t.id ? "bg-indigo-600 border-indigo-400 text-white" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
+                        className="group flex flex-col items-center justify-center p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                        <span className="truncate">{t.name}</span>
+                        <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
+                          {ch.logoImg ? (
+                            <img
+                              src={ch.logoImg}
+                              alt={ch.name}
+                              className="w-full h-full object-contain"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <span className="text-[10px] font-bold text-white/60">
+                              {ch.logoText || "TV"}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] font-medium mt-1.5 text-white/90 group-hover:text-indigo-400 transition-colors line-clamp-1 w-full px-0.5">
+                          {ch.name}
+                        </span>
                       </button>
                     ))}
                   </div>
-                </div>
-
-                <div className="border-t border-white/5 pt-2.5">
-                  <h3 className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest px-2 mb-1.5 flex items-center gap-1">
-                    <Layers className="w-3 h-3" /> Tiện ích màn hình & luồng
-                  </h3>
-                  <div className="space-y-0.5">
-                    <button
-                      onClick={() => {
-                        onClose();
-                        setShowCustomModal(true);
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Plus className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                      <span className="flex-1">Thêm kênh</span>
-                      <span className="text-[9px] font-mono text-neutral-500">⌘N</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        onClose();
-                        exportChannelsToM3u8();
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Download className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span className="flex-1">Xuất danh sách kênh M3U</span>
-                      <span className="text-[9px] font-mono text-neutral-500">⌘E</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        onClose();
-                        if (onSelectChannel) {
-                          onSelectChannel({
-                            id: "test_video",
-                            name: "Play Test Video",
-                            url: "/assets/VTV6 World Cup 2026.mp4",
-                            group: "Thử nghiệm",
-                            logoText: "TEST VIDEO",
-                            logoBg: "bg-gradient-to-br from-indigo-500 to-purple-700",
-                            logoImg: "https://static.wikia.nocookie.net/ep-deo/images/6/6a/VTV6_HD.png/revision/latest/scale-to-width-down/180?cb=20260625104230"
-                          });
-                        }
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Tv className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                      <span className="flex-1">Chạy Luồng Video Mẫu</span>
-                      <span className="text-[9px] font-mono text-neutral-500">⌘T</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        onClose();
-                        handleOpenMultiviewSelector();
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Grid className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                      <span className="flex-1">Xem Đa Kênh (Multiview Grid)</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        onClose();
-                        handleTogglePictureInPicture();
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Layers className="w-3.5 h-3.5 text-pink-400 shrink-0" />
-                      <span className="flex-1">Mở Ảnh trong Ảnh (PIP Mode)</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => {
-                        toggleShowClock();
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span className="flex-1">Bật/Tắt hiển thị đồng hồ</span>
-                      <div className={`w-7 h-3.5 rounded-full p-0.5 transition-colors ${showClock ? "bg-indigo-600" : "bg-zinc-700"}`}>
-                        <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform ${showClock ? "translate-x-3" : "translate-x-0"}`} />
-                      </div>
-                    </button>
+                ) : (
+                  <div className="text-center py-4 text-[10px] text-white/40">
+                    Đang tải gợi ý...
                   </div>
+                )}
+              </div>
+
+              {/* SECTION: NAVIGATION */}
+              <div className="space-y-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                  <button
+                    onClick={() => {
+                      setActiveTab("home");
+                      onClose();
+                    }}
+                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all text-center cursor-pointer ${activeTab === "home" ? "bg-indigo-600 border-indigo-400 text-white shadow-lg" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
+                  >
+                    <Home className="w-3.5 h-3.5 shrink-0" />
+                    <span>Trang chủ</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab("live");
+                      onClose();
+                    }}
+                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all text-center cursor-pointer ${activeTab === "live" ? "bg-indigo-600 border-indigo-400 text-white shadow-lg" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
+                  >
+                    <Tv className="w-3.5 h-3.5 shrink-0" />
+                    <span>Truyền hình</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab("shorts");
+                      onClose();
+                    }}
+                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all text-center cursor-pointer ${activeTab === "shorts" ? "bg-indigo-600 border-indigo-400 text-white shadow-lg" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
+                  >
+                    <Flame className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                    <span>Vplay Vertical</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab("settings");
+                      setActiveSettingSection(null);
+                      onClose();
+                    }}
+                    className={`flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all text-center cursor-pointer ${activeTab === "settings" && activeSettingSection === null ? "bg-indigo-600 border-indigo-400 text-white shadow-lg" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80"}`}
+                  >
+                    <Settings className="w-3.5 h-3.5 shrink-0" />
+                    <span>Cài đặt</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Right Column: Diagnostics & Dev Tools */}
-              <div className="p-3 space-y-3 bg-white/[0.01]">
-                <div>
-                  <h3 className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest px-2 mb-1.5 flex items-center gap-1">
-                    <Activity className="w-3 h-3" /> Chẩn đoán & Sức khỏe OS
-                  </h3>
-                  <div className="space-y-0.5">
-                    <button
-                      onClick={() => {
-                        setShowStorageModal(true);
+              {/* SECTION: TILES UTILITIES */}
+              <div className="grid grid-cols-2 gap-2">
+                
+                {/* Tile: Thêm kênh */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    setShowCustomModal(true);
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Plus className="w-5 h-5 text-indigo-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Thêm kênh</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Phím tắt: ⌘N</span>
+                </button>
+
+                {/* Tile: Xuất danh sách */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    exportChannelsToM3u8();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Download className="w-5 h-5 text-emerald-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Xuất file M3U</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Phím tắt: ⌘E</span>
+                </button>
+
+                {/* Tile: Chạy luồng mẫu */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onSelectChannel) {
+                      onSelectChannel({
+                        id: "test_video",
+                        name: "Play Test Video",
+                        url: "/assets/VTV6 World Cup 2026.mp4",
+                        group: "Thử nghiệm",
+                        logoText: "TEST VIDEO",
+                        logoBg: "bg-gradient-to-br from-indigo-500 to-purple-700",
+                        logoImg: "https://static.wikia.nocookie.net/ep-deo/images/6/6a/VTV6_HD.png/revision/latest/scale-to-width-down/180?cb=20260625104230"
+                      });
+                    }
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Tv className="w-5 h-5 text-sky-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Luồng Video Mẫu</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Phím tắt: ⌘T</span>
+                </button>
+
+                {/* Tile: Xem đa kênh */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    handleOpenMultiviewSelector();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Grid className="w-5 h-5 text-purple-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Xem Đa Kênh</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Multiview Grid</span>
+                </button>
+
+                {/* Tile: PIP Mode */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    handleTogglePictureInPicture();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Layers className="w-5 h-5 text-pink-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Ảnh trong Ảnh</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">PIP Mode</span>
+                </button>
+
+                {/* Tile: Bật/Tắt Đồng hồ */}
+                <button
+                  onClick={() => {
+                    toggleShowClock();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Clock className="w-5 h-5 text-amber-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Bật/Tắt Đồng Hồ</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">{showClock ? "Đang bật" : "Đang tắt"}</span>
+                </button>
+
+                {/* Tile: Quản lý ổ cứng */}
+                <button
+                  onClick={() => {
+                    setShowStorageModal(true);
+                    onClose();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Database className="w-5 h-5 text-emerald-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Ổ cứng & Cache</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Dung lượng, dữ liệu rác</span>
+                </button>
+
+                {/* Tile: Báo cáo hệ thống */}
+                <button
+                  onClick={() => {
+                    setShowSystemReport(true);
+                    onClose();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Monitor className="w-5 h-5 text-blue-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Báo Cáo Hệ Thống</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">CPU & Proxy</span>
+                </button>
+
+                {/* Tile: Bảng gỡ lỗi F3 */}
+                <button
+                  onClick={() => {
+                    setShowDebugScreen(true);
+                    onClose();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Terminal className="w-5 h-5 text-indigo-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Bảng Gỡ Lỗi F3</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Minecraft Style FPS</span>
+                </button>
+
+                {/* Tile: Adjust Logos */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onOpenLogoAdjustTest) onOpenLogoAdjustTest();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <SlidersHorizontal className="w-5 h-5 text-neutral-300 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Adjust Logos</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Kiểm thử logo</span>
+                </button>
+
+                {/* Tile: YouTube Embed */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onOpenYouTubeTool) onOpenYouTubeTool();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Youtube className="w-5 h-5 text-red-500 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">YouTube Embed</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Nhúng video YouTube</span>
+                </button>
+
+                {/* Tile: Wheel of Vplay */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onOpenWheelOfVplay) onOpenWheelOfVplay();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <HelpCircle className="w-5 h-5 text-pink-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Wheel of Vplay</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Vòng quay may mắn</span>
+                </button>
+
+                {/* Tile: DUI Monitor */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onOpenDuiMode) onOpenDuiMode();
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Activity className="w-5 h-5 text-emerald-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">DUI Monitor</span>
+                  <span className="text-[9px] text-white/40 mt-0.5">Bảng giám sát mạng</span>
+                </button>
+              </div>
+
+              {/* Stream URL custom input */}
+              <div className="bg-white/[0.02] p-3 rounded-xl border border-white/5 space-y-1.5">
+                <span className="text-[10px] text-white/40 font-bold block uppercase tracking-wider">Chạy dòng truyền M3U8</span>
+                <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-lg border border-white/5 focus-within:border-indigo-500/30 transition-all">
+                  <input 
+                    type="text"
+                    placeholder="Nhập đường dẫn luồng M3U8..."
+                    value={testStreamUrl}
+                    onChange={(e) => setTestStreamUrl(e.target.value)}
+                    className="bg-transparent text-[11px] text-white px-2 focus:outline-none w-full placeholder-white/30"
+                  />
+                  <button
+                    onClick={() => {
+                      if (testStreamUrl) {
+                        onLaunchTestStream(testStreamUrl);
                         onClose();
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Database className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <div className="flex-1 flex flex-col text-left">
-                        <span>Quản lý ổ cứng & Cache</span>
-                        <span className="text-[9px] text-white/40">Dung lượng rác, luồng, dữ liệu lưu trữ</span>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setShowSystemReport(true);
-                        onClose();
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Monitor className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                      <div className="flex-1 flex flex-col text-left">
-                        <span>Báo cáo thông tin hệ thống</span>
-                        <span className="text-[9px] text-white/40">Cấu hình CPU, Node proxy, WebGL</span>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setShowDebugScreen(true);
-                        onClose();
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] hover:bg-white/10 transition-colors text-white/80 hover:text-white"
-                    >
-                      <Terminal className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                      <div className="flex-1 flex flex-col text-left">
-                        <span>Bảng gỡ lỗi F3 (Debug Panel)</span>
-                        <span className="text-[9px] text-white/40">Minecraft style FPS, memory trackers</span>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="border-t border-white/5 pt-2.5">
-                  <h3 className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest px-2 mb-1.5 flex items-center gap-1">
-                    <SlidersHorizontal className="w-3 h-3" /> Thử nghiệm & Thao tác nhanh
-                  </h3>
-                  
-                  <div className="space-y-1.5 px-2">
-                    {/* Test stream url input */}
-                    <div className="flex items-center gap-1 bg-white/5 p-0.5 rounded-lg border border-white/5">
-                      <input 
-                        type="text"
-                        placeholder="M3U8 Stream URL..."
-                        value={testStreamUrl}
-                        onChange={(e) => setTestStreamUrl(e.target.value)}
-                        className="bg-transparent text-[10px] text-white px-2 focus:outline-none w-full placeholder-white/30"
-                      />
-                      <button
-                        onClick={() => {
-                          if (testStreamUrl) {
-                            onLaunchTestStream(testStreamUrl);
-                            onClose();
-                          }
-                        }}
-                        className="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-500 rounded text-[9px] font-bold text-white shrink-0 cursor-pointer"
-                      >
-                        Chạy
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-1 pt-0.5">
-                      <button
-                        onClick={() => {
-                          onClose();
-                          if (onOpenLogoAdjustTest) onOpenLogoAdjustTest();
-                        }}
-                        className="bg-white/5 hover:bg-white/10 text-[9px] font-semibold py-1 px-1.5 rounded border border-white/5 hover:border-white/10 text-neutral-300"
-                      >
-                        Adjust Logos
-                      </button>
-                      <button
-                        onClick={() => {
-                          onClose();
-                          if (onOpenYouTubeTool) onOpenYouTubeTool();
-                        }}
-                        className="bg-white/5 hover:bg-white/10 text-[9px] font-semibold py-1 px-1.5 rounded border border-white/5 hover:border-white/10 text-neutral-300"
-                      >
-                        YouTube Embed
-                      </button>
-                      <button
-                        onClick={() => {
-                          onClose();
-                          if (onOpenWheelOfVplay) onOpenWheelOfVplay();
-                        }}
-                        className="bg-white/5 hover:bg-white/10 text-[9px] font-semibold py-1 px-1.5 rounded border border-white/5 hover:border-white/10 text-neutral-300"
-                      >
-                        Wheel of Vplay
-                      </button>
-                      <button
-                        onClick={() => {
-                          onClose();
-                          if (onOpenDuiMode) onOpenDuiMode();
-                        }}
-                        className="bg-white/5 hover:bg-white/10 text-[9px] font-semibold py-1 px-1.5 rounded border border-white/5 hover:border-white/10 text-neutral-300"
-                      >
-                        DUI Monitor
-                      </button>
-                    </div>
-
-                    <div className="pt-0.5 flex gap-1">
-                      <button
-                        onClick={() => {
-                          onTriggerCrash();
-                          onClose();
-                        }}
-                        className="flex-1 bg-red-950/20 hover:bg-red-950/40 text-red-400 border border-red-500/10 hover:border-red-500/30 text-[9px] font-bold py-1 px-1.5 rounded transition-colors"
-                      >
-                        Simulate Kernel Crash
-                      </button>
-                    </div>
-                  </div>
+                      }
+                    }}
+                    className="px-3.5 py-1 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-[10px] font-bold text-white shrink-0 cursor-pointer transition-colors"
+                  >
+                    Chạy
+                  </button>
                 </div>
               </div>
+
+              {/* Simulate Kernel Crash */}
+              <div className="pt-1">
+                <button
+                  onClick={() => {
+                    onTriggerCrash();
+                    onClose();
+                  }}
+                  className="w-full bg-red-950/20 hover:bg-red-950/40 text-red-400 border border-red-500/10 hover:border-red-500/30 text-[10px] font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>Mô phỏng lỗi hệ thống (Kernel Crash)</span>
+                </button>
+              </div>
+
             </div>
 
             {/* Bottom Footer Section: Session, sleep and power buttons */}
-            <div className="px-4.5 py-2.5 bg-white/5 border-t border-white/5 flex items-center justify-between flex-wrap gap-2">
+            <div className="px-4.5 py-3 bg-white/5 border-t border-white/5 flex items-center justify-between flex-wrap gap-2 shrink-0">
               
               {/* User profile card (Windows style) */}
               <div className="flex items-center gap-2.5">
@@ -942,7 +1058,7 @@ export default function StartMenu({
               </div>
 
               {/* Power Actions */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {/* About Vplay */}
                 <button
                   onClick={() => {
@@ -950,7 +1066,7 @@ export default function StartMenu({
                     onClose();
                   }}
                   title="Thông tin Vplay"
-                  className="w-7.5 h-7.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-neutral-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                  className="w-7.5 h-7.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-neutral-300 hover:text-white flex items-center justify-center transition-all cursor-pointer shrink-0"
                 >
                   <Info className="w-3.5 h-3.5" />
                 </button>
@@ -961,7 +1077,7 @@ export default function StartMenu({
                     setIsSleeping(true);
                   }}
                   title="Chế độ ngủ"
-                  className="w-7.5 h-7.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-neutral-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                  className="w-7.5 h-7.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-neutral-300 hover:text-white flex items-center justify-center transition-all cursor-pointer shrink-0"
                 >
                   <Moon className="w-3.5 h-3.5" />
                 </button>
@@ -972,10 +1088,10 @@ export default function StartMenu({
                     onClose();
                     onSignOut();
                   }}
-                  title="Đăng xuất khỏi hệ thống"
-                  className="w-7.5 h-7.5 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/30 border border-indigo-500/20 text-indigo-400 hover:text-indigo-300 flex items-center justify-center transition-all cursor-pointer"
+                  className="px-3 h-7.5 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/30 border border-indigo-500/20 text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 text-[11px] font-bold transition-all cursor-pointer"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-3.5 h-3.5 shrink-0" />
+                  <span>Đăng xuất</span>
                 </button>
 
                 {/* Shutdown Button */}
@@ -984,10 +1100,10 @@ export default function StartMenu({
                     onClose();
                     onShutdown();
                   }}
-                  title="Tắt máy (Shutdown)"
-                  className="w-7.5 h-7.5 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/20 hover:border-red-500 flex items-center justify-center transition-all cursor-pointer"
+                  className="px-3 h-7.5 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/20 hover:border-red-500 flex items-center gap-1.5 text-[11px] font-bold transition-all cursor-pointer"
                 >
-                  <Power className="w-3.5 h-3.5" />
+                  <Power className="w-3.5 h-3.5 shrink-0" />
+                  <span>Tắt máy</span>
                 </button>
               </div>
             </div>

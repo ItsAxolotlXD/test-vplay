@@ -55,6 +55,7 @@ import {
   Bluetooth,
   Calculator,
   Link,
+  Copy,
   LogOut,
   Power
 } from "lucide-react";
@@ -1081,6 +1082,18 @@ export default function App() {
   const [isDuiMode, setIsDuiMode] = useState<boolean>(false);
   const [isDuiMonitorActive, setIsDuiMonitorActive] = useState<boolean>(false);
   const [isDuiSearchMenuOpen, setIsDuiSearchMenuOpen] = useState<boolean>(false);
+  const [spotlightActiveTab, setSpotlightActiveTab] = useState<"utilities" | "folders" | "themes" | "logs" | null>(null);
+  const [dynamicRecentSearches, setDynamicRecentSearches] = useState<any[]>(RECENT_SEARCHES_ITEMS);
+  const [isShufflingSuggestions, setIsShufflingSuggestions] = useState<boolean>(false);
+
+  const handleRefreshSuggestions = () => {
+    setIsShufflingSuggestions(true);
+    setTimeout(() => {
+      const shuffled = [...RECENT_SEARCHES_ITEMS].sort(() => Math.random() - 0.5);
+      setDynamicRecentSearches(shuffled);
+      setIsShufflingSuggestions(false);
+    }, 400);
+  };
   const [isCalcOpen, setIsCalcOpen] = useState<boolean>(false);
   const [isBudgetOpen, setIsBudgetOpen] = useState<boolean>(false);
   const [isInboxOpen, setIsInboxOpen] = useState<boolean>(false);
@@ -7260,239 +7273,529 @@ export default function App() {
       )}
 
       <AnimatePresence>
-        {isDynamicSearchPillActive && isDuiSearchMenuOpen && (
+        {isDuiSearchMenuOpen && (
           <>
             {/* Centered Suggestion Overlay Backdrop */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[105] bg-transparent" 
+              className="fixed inset-0 z-[105] bg-black/40 backdrop-blur-xs" 
               onClick={() => setIsDuiSearchMenuOpen(false)} 
             />
-            {/* Centered Modal Content Wrapper */}
-            <div className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none p-4">
+            {/* Centered Spotlight Search Wrapper */}
+            <div className="fixed inset-x-0 top-[25%] z-[110] flex flex-col items-center pointer-events-none px-4 select-none">
               <motion.div
-                initial={{ opacity: 0, y: "100%" }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: "100%" }}
-                transition={dynamicMotion ? { duration: 0.35, ease: "easeInOut" } : { duration: 0 }}
-                className="w-full max-w-[480px] h-[550px] max-h-[80vh] rounded-[15px] border border-white/10 bg-[#121214]/10 backdrop-blur-xl shadow-[0_24px_65px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col pointer-events-auto text-left text-white"
-                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                transition={dynamicMotion ? { duration: 0.25, ease: "easeOut" } : { duration: 0 }}
+                className="w-full max-w-[640px] pointer-events-auto flex flex-col gap-3"
               >
-              {/* Header */}
-              <div className="px-5 pt-4.5 pb-3.5 flex items-center justify-between border-b border-white/10 bg-white/5">
-                <span className="text-sm font-bold text-white tracking-tight">Gợi ý tìm kiếm & Tiện ích Vplay</span>
-                <div className="flex items-center gap-2.5">
-                  {/* User profile avatar */}
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-500 p-0.5 shadow-sm overflow-hidden flex items-center justify-center cursor-pointer hover:scale-105 transition-all">
-                    <div className="w-full h-full rounded-full bg-[#1c1c1e] flex items-center justify-center overflow-hidden">
-                      <img 
-                        src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" 
-                        alt="Avatar" 
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                  </div>
-                  {/* Link/chain icon */}
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      alert("Đã sao chép liên kết ứng dụng Vplay!");
-                    }}
-                    className="p-1.5 rounded-full hover:bg-white/10 text-white/70 transition-colors cursor-pointer"
-                    title="Copy Link"
-                  >
-                    <Link className="w-3.5 h-3.5" />
-                  </button>
-                  {/* Settings/gear icon */}
-                  <button 
-                    onClick={() => {
-                      setActiveTab("settings");
-                      setIsDuiSearchMenuOpen(false);
-                    }}
-                    className="p-1.5 rounded-full hover:bg-white/10 text-white/70 transition-colors cursor-pointer"
-                    title="Settings"
-                  >
-                    <Settings className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Inline Search Bar inside Modal */}
-              <div className="px-5 py-3 border-b border-white/5 bg-white/5">
-                <div className="relative flex items-center">
-                  <Search className="absolute left-3.5 w-4 h-4 text-white/40 pointer-events-none" />
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm kênh, phim hoặc tiện ích..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/5 hover:bg-white/10 focus:bg-white/10 border border-white/10 focus:border-white/20 rounded-[15px] pl-10 pr-10 py-2.5 text-xs text-white placeholder-white/40 focus:outline-none transition-all"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-3.5 text-white/40 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Body */}
-              <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1 custom-scrollbar bg-transparent">
-                {!searchQuery ? (
-                  RECENT_SEARCHES_ITEMS.map((item) => {
-                    // Determine icon component and colors based on type
-                    let IconComponent = Tv;
-                    let iconColorClass = "text-sky-400";
-                    let iconBgClass = "bg-sky-500/10";
-
-                    if (item.iconType === "movie") {
-                      IconComponent = Play;
-                      iconColorClass = "text-rose-400";
-                      iconBgClass = "bg-rose-500/10";
-                    } else if (item.iconType === "settings") {
-                      IconComponent = Sliders;
-                      iconColorClass = "text-amber-400";
-                      iconBgClass = "bg-amber-500/10";
-                    } else if (item.iconType === "experimental") {
-                      IconComponent = Beaker;
-                      iconColorClass = "text-purple-400";
-                      iconBgClass = "bg-purple-500/10";
-                    } else if (item.iconType === "plugin") {
-                      IconComponent = Package;
-                      iconColorClass = "text-emerald-400";
-                      iconBgClass = "bg-emerald-500/10";
-                    }
-
-                    return (
+                {/* Horizontal Bar with Input and 4 buttons */}
+                <div className="w-full flex items-center gap-2.5">
+                  {/* Capsule-shaped Search Input */}
+                  <div className="flex-1 h-13.5 rounded-full bg-[#e3f0ff]/85 backdrop-blur-xl border border-white/40 shadow-[0_12px_40px_rgba(0,0,0,0.15)] flex items-center px-4.5 transition-all">
+                    <Search className="w-5 h-5 text-slate-500 shrink-0" />
+                    {/* Vertical Divider Cursor */}
+                    <div className="w-[1px] h-5 bg-slate-300/80 mx-3 shrink-0" />
+                    <input
+                      type="text"
+                      placeholder="Spotlight Search"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        if (e.target.value) {
+                          setSpotlightActiveTab(null);
+                        }
+                      }}
+                      className="flex-1 bg-transparent border-none text-slate-800 placeholder-slate-400 focus:outline-none text-[15px] font-sans h-full font-medium"
+                      autoFocus
+                    />
+                    {searchQuery && (
                       <button
-                        key={item.id}
-                        onClick={() => {
-                          if (item.actionType === "search") {
-                            setSearchQuery(item.query || "");
-                            if (activeTab !== "home") {
-                              setActiveTab("home");
-                            }
-                            setIsDuiSearchMenuOpen(false);
-                          } else if (item.actionType === "tab") {
-                            if (item.tab) setActiveTab(item.tab);
-                            setIsDuiSearchMenuOpen(false);
-                          } else if (item.actionType === "experimental") {
-                            if (item.feature === "glow") {
-                              const nextVal = !expAmbientGlow;
-                              setExpAmbientGlow(nextVal);
-                              localStorage.setItem("vplay_exp_glow", String(nextVal));
-                              setDuiLogs(prev => [...prev, `[EXPERIMENTAL] Ambient Glow Background toggled to ${nextVal ? "ON" : "OFF"}`, ""]);
-                              alert(`Đã ${nextVal ? "BẬT" : "TẮT"} tính năng thử nghiệm Ambient Glow Background!`);
-                            } else if (item.feature === "lowlatency") {
-                              const nextVal = !expLowLatency;
-                              setExpLowLatency(nextVal);
-                              localStorage.setItem("vplay_exp_lowlatency", String(nextVal));
-                              setDuiLogs(prev => [...prev, `[EXPERIMENTAL] Low-latency Stream Mode toggled to ${nextVal ? "ON" : "OFF"}`, ""]);
-                              alert(`Đã ${nextVal ? "BẬT" : "TẮT"} tính năng thử nghiệm Low-latency Stream Mode!`);
-                            }
-                            setIsDuiSearchMenuOpen(false);
-                          } else if (item.actionType === "plugin") {
-                            const pluginId = item.pluginId;
-                            const isInstalled = plugins.some(p => p.id === pluginId && p.status === "installed");
-                            if (isInstalled) {
-                              setPlugins(prev => prev.map(p => p.id === pluginId ? { ...p, isActive: !p.isActive } : p));
-                              setDuiLogs(prev => [...prev, `[PLUGIN] Toggled active state for plugin: ${pluginId}`, ""]);
-                              alert(`Đã bật/tắt hoạt động của plugin ${pluginId}!`);
-                            } else {
-                              setPlugins(prev => prev.map(p => p.id === pluginId ? { ...p, status: "installed", progress: 100, isActive: true } : p));
-                              setDuiLogs(prev => [...prev, `[PLUGIN] Installed plugin: ${pluginId}`, ""]);
-                              alert(`Đã cài đặt thành công và kích hoạt plugin ${pluginId}!`);
-                            }
-                            setIsDuiSearchMenuOpen(false);
-                          }
-                        }}
-                        className="w-full flex items-center gap-3.5 px-3 py-2 rounded-xl hover:bg-white/5 text-left transition-colors group cursor-pointer"
+                        onClick={() => setSearchQuery("")}
+                        className="text-slate-400 hover:text-slate-600 p-1.5 transition-colors cursor-pointer"
                       >
-                        {/* Icon Box */}
-                        <div className={`w-9 h-9 rounded-lg ${iconBgClass} flex items-center justify-center shrink-0 transition-all group-hover:scale-105 duration-200 shadow-sm ${iconColorClass}`}>
-                          <IconComponent className="w-4.5 h-4.5" />
-                        </div>
-
-                        {/* Texts */}
-                        <div className="flex-1 min-w-0 pr-2">
-                          <h4 className="text-xs font-semibold text-white/90 truncate leading-tight group-hover:text-indigo-300 transition-colors">
-                            {item.title}
-                          </h4>
-                          <p className="text-[10px] text-white/50 truncate mt-1 font-medium">
-                            {item.subtitle}
-                          </p>
-                        </div>
-
-                        {/* Time text */}
-                        <div className="text-[9.5px] text-white/60 font-semibold shrink-0 self-center bg-white/10 px-2 py-0.5 rounded">
-                          {item.timestamp}
-                        </div>
+                        <X className="w-4 h-4" />
                       </button>
-                    );
-                  })
-                ) : (
-                  <div className="space-y-1">
-                    {/* Matching Channels */}
-                    <div className="px-3 py-1.5 text-[10px] text-white/40 font-bold uppercase tracking-wider">
-                      Kênh tìm thấy ({searchResults.length})
-                    </div>
-                    {searchResults.length === 0 ? (
-                      <div className="py-8 text-center text-xs text-white/40">
-                        Không tìm thấy kênh nào khớp với "{searchQuery}"
-                      </div>
-                    ) : (
-                      searchResults.slice(0, 8).map((ch) => (
-                        <button
-                          key={ch.id}
-                          onClick={() => {
-                            handleSelectChannel(ch);
-                            setActiveTab("home");
-                            setIsDuiSearchMenuOpen(false);
-                            setSearchQuery("");
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 text-left transition-colors group cursor-pointer"
-                        >
-                          <div className="w-9 h-9 rounded-lg bg-white/10 border border-white/5 flex items-center justify-center overflow-hidden shrink-0">
-                            {ch.logoImg ? (
-                              <img
-                                src={ch.logoImg}
-                                alt={ch.name}
-                                className="w-full h-full object-contain"
-                                referrerPolicy="no-referrer"
-                              />
-                            ) : (
-                              <span className="text-[10px] font-bold text-white/70">
-                                {ch.logoText || "TV"}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-[11.5px] font-semibold text-white/90 truncate group-hover:text-indigo-300 transition-colors">
-                              {ch.name}
-                            </h4>
-                            <p className="text-[9.5px] text-white/50 truncate mt-0.5">
-                              {ch.group}
-                            </p>
-                          </div>
-                          <div className="w-6 h-6 rounded-full bg-white/10 group-hover:bg-indigo-600 text-white/50 group-hover:text-white flex items-center justify-center transition-colors shrink-0">
-                            <Play className="w-2.5 h-2.5 fill-current" />
-                          </div>
-                        </button>
-                      ))
                     )}
                   </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        </>
-      )}
+
+                  {/* Button 1: Apps / Utilities (Compass icon) */}
+                  <button
+                    onClick={() => {
+                      setSpotlightActiveTab(prev => prev === "utilities" ? null : "utilities");
+                      setSearchQuery("");
+                    }}
+                    className={`w-13.5 h-13.5 rounded-full flex items-center justify-center border transition-all cursor-pointer shadow-[0_12px_40px_rgba(0,0,0,0.12)] shrink-0 ${
+                      spotlightActiveTab === "utilities"
+                        ? "bg-slate-800 text-white border-slate-700 scale-95"
+                        : "bg-[#e3f0ff]/85 backdrop-blur-xl border-white/40 text-slate-700 hover:bg-[#d5e8ff] hover:scale-105"
+                    }`}
+                    title="Tiện ích & Plugins"
+                  >
+                    <Compass className="w-[22px] h-[22px]" />
+                  </button>
+
+                  {/* Button 2: Folders */}
+                  <button
+                    onClick={() => {
+                      setSpotlightActiveTab(prev => prev === "folders" ? null : "folders");
+                      setSearchQuery("");
+                    }}
+                    className={`w-13.5 h-13.5 rounded-full flex items-center justify-center border transition-all cursor-pointer shadow-[0_12px_40px_rgba(0,0,0,0.12)] shrink-0 ${
+                      spotlightActiveTab === "folders"
+                        ? "bg-slate-800 text-white border-slate-700 scale-95"
+                        : "bg-[#e3f0ff]/85 backdrop-blur-xl border-white/40 text-slate-700 hover:bg-[#d5e8ff] hover:scale-105"
+                    }`}
+                    title="Danh mục kênh"
+                  >
+                    <Folder className="w-[21px] h-[21px]" />
+                  </button>
+
+                  {/* Button 3: Themes / Interface Modes */}
+                  <button
+                    onClick={() => {
+                      setSpotlightActiveTab(prev => prev === "themes" ? null : "themes");
+                      setSearchQuery("");
+                    }}
+                    className={`w-13.5 h-13.5 rounded-full flex items-center justify-center border transition-all cursor-pointer shadow-[0_12px_40px_rgba(0,0,0,0.12)] shrink-0 ${
+                      spotlightActiveTab === "themes"
+                        ? "bg-slate-800 text-white border-slate-700 scale-95"
+                        : "bg-[#e3f0ff]/85 backdrop-blur-xl border-white/40 text-slate-700 hover:bg-[#d5e8ff] hover:scale-105"
+                    }`}
+                    title="Giao diện & Chế độ"
+                  >
+                    <Layers className="w-[21px] h-[21px]" />
+                  </button>
+
+                  {/* Button 4: Logs & App Copy URL */}
+                  <button
+                    onClick={() => {
+                      setSpotlightActiveTab(prev => prev === "logs" ? null : "logs");
+                      setSearchQuery("");
+                    }}
+                    className={`w-13.5 h-13.5 rounded-full flex items-center justify-center border transition-all cursor-pointer shadow-[0_12px_40px_rgba(0,0,0,0.12)] shrink-0 ${
+                      spotlightActiveTab === "logs"
+                        ? "bg-slate-800 text-white border-slate-700 scale-95"
+                        : "bg-[#e3f0ff]/85 backdrop-blur-xl border-white/40 text-slate-700 hover:bg-[#d5e8ff] hover:scale-105"
+                    }`}
+                    title="Nhật ký & Sao chép"
+                  >
+                    <Copy className="w-[21px] h-[21px]" />
+                  </button>
+                </div>
+
+                {/* Spotlight Dropdown Content */}
+                <AnimatePresence mode="wait">
+                  {(searchQuery || spotlightActiveTab) && (
+                    <motion.div
+                      key={searchQuery ? "search" : spotlightActiveTab || "none"}
+                      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={dynamicMotion ? { duration: 0.18, ease: "easeOut" } : { duration: 0 }}
+                      className="w-full bg-[#f4f8ff]/95 backdrop-blur-2xl border border-white/50 shadow-[0_24px_55px_rgba(0,0,0,0.25)] rounded-[24px] p-4.5 text-slate-800 max-h-[420px] overflow-y-auto custom-scrollbar flex flex-col text-left"
+                    >
+                      {searchQuery && (
+                        <div className="space-y-1">
+                          <div className="px-2 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200/50 flex justify-between items-center">
+                            <span>Kết quả tìm kiếm Spotlight</span>
+                            <span className="font-mono text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">
+                              {searchResults.length} kênh
+                            </span>
+                          </div>
+                          <div className="pt-2 space-y-1">
+                            {searchResults.length === 0 ? (
+                              <div className="py-12 text-center flex flex-col items-center justify-center text-slate-400">
+                                <HelpCircle className="w-8 h-8 mb-2 text-slate-300" />
+                                <p className="text-xs font-semibold">Không tìm thấy kênh nào khớp</p>
+                                <p className="text-[10px] text-slate-400 mt-0.5">Hãy thử tìm theo tên khác (ví dụ: VTV3, Bóng Đá...)</p>
+                              </div>
+                            ) : (
+                              searchResults.slice(0, 6).map((ch) => (
+                                <button
+                                  key={ch.id}
+                                  onClick={() => {
+                                    handleSelectChannel(ch);
+                                    setActiveTab("live");
+                                    setIsDuiSearchMenuOpen(false);
+                                    setSearchQuery("");
+                                  }}
+                                  className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl hover:bg-slate-500/10 text-left transition-colors group cursor-pointer"
+                                >
+                                  <div className="w-10 h-10 rounded-xl bg-white border border-slate-200/60 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                    {ch.logoImg ? (
+                                      <img
+                                        src={ch.logoImg}
+                                        alt={ch.name}
+                                        className="w-full h-full object-contain"
+                                        referrerPolicy="no-referrer"
+                                      />
+                                    ) : (
+                                      <span className="text-xs font-bold text-slate-500">
+                                        {ch.logoText || "TV"}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                                      {ch.name}
+                                    </h4>
+                                    <p className="text-[11px] text-slate-500 truncate mt-0.5 font-medium">
+                                      {ch.group}
+                                    </p>
+                                  </div>
+                                  <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-indigo-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-all shrink-0">
+                                    <Play className="w-3 h-3 fill-current ml-0.5" />
+                                  </div>
+                                </button>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {spotlightActiveTab === "utilities" && (
+                        <div className="space-y-3">
+                          <div className="px-2 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200/50 flex justify-between items-center">
+                            <span>Tiện ích & Plugins hệ thống</span>
+                            <button
+                              onClick={handleRefreshSuggestions}
+                              className="text-xs font-semibold text-indigo-600 hover:text-indigo-500 flex items-center gap-1 cursor-pointer"
+                            >
+                              <RefreshCw className={`w-3 h-3 ${isShufflingSuggestions ? "animate-spin" : ""}`} />
+                              Làm mới gợi ý
+                            </button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            {/* V-Intelligence */}
+                            <button
+                              onClick={() => {
+                                setReimaginedSearchOpen(true);
+                                setIsDuiSearchMenuOpen(false);
+                              }}
+                              className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/50 hover:bg-indigo-50/50 hover:border-indigo-200 text-left transition-all cursor-pointer group shadow-sm"
+                            >
+                              <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center shrink-0 text-indigo-600">
+                                <Sparkles className="w-5 h-5" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                  <span>V-Intelligence AI</span>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                </div>
+                                <div className="text-[10px] text-slate-500 truncate mt-0.5">Trình tìm kiếm thông minh Copilot</div>
+                              </div>
+                            </button>
+
+                            {/* Shuffle Suggestions */}
+                            <button
+                              onClick={() => {
+                                handleRefreshSuggestions();
+                              }}
+                              className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/50 hover:bg-amber-50/50 hover:border-amber-200 text-left transition-all cursor-pointer group shadow-sm"
+                            >
+                              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 text-amber-600">
+                                <RefreshCw className={`w-5 h-5 ${isShufflingSuggestions ? "animate-spin" : ""}`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-bold text-slate-800">Làm mới Gợi ý</div>
+                                <div className="text-[10px] text-slate-500 truncate mt-0.5">Xáo trộn danh mục tìm nhanh</div>
+                              </div>
+                            </button>
+                          </div>
+
+                          {/* Plugin Installer List */}
+                          <div className="pt-1.5 space-y-1.5">
+                            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">Quản lý Plugins hoạt động</h5>
+                            <div className="space-y-1">
+                              {plugins.map((plugin) => {
+                                const isInstalled = plugin.status === "installed";
+                                const isActive = plugin.isActive;
+                                return (
+                                  <div
+                                    key={plugin.id}
+                                    className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-100 shadow-xs"
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-slate-600 ${isInstalled ? "bg-emerald-100 text-emerald-600" : "bg-slate-100"}`}>
+                                        <Package className="w-4 h-4" />
+                                      </div>
+                                      <div>
+                                        <h6 className="text-xs font-bold text-slate-800">{plugin.name}</h6>
+                                        <p className="text-[9.5px] text-slate-500">{plugin.description}</p>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        if (isInstalled) {
+                                          setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, isActive: !p.isActive } : p));
+                                        } else {
+                                          setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, status: "installed", progress: 100, isActive: true } : p));
+                                        }
+                                      }}
+                                      className={`px-3 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                                        isInstalled
+                                          ? isActive
+                                            ? "bg-rose-100 hover:bg-rose-200 text-rose-600"
+                                            : "bg-emerald-100 hover:bg-emerald-200 text-emerald-600"
+                                          : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                      }`}
+                                    >
+                                      {isInstalled ? (isActive ? "Tắt" : "Bật") : "Cài đặt"}
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {spotlightActiveTab === "folders" && (
+                        <div className="space-y-3">
+                          <div className="px-2 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200/50">
+                            Danh mục kênh & Thư mục Vplay
+                          </div>
+
+                          {/* Favorites count quick info */}
+                          <div className="flex items-center justify-between p-3 rounded-2xl bg-pink-50 border border-pink-100/50">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0">
+                                <Heart className="w-5 h-5 fill-current animate-pulse" />
+                              </div>
+                              <div>
+                                <h5 className="text-xs font-bold text-pink-800">Kênh Yêu Thích Của Bạn</h5>
+                                <p className="text-[10px] text-pink-600 font-medium">Đã lưu {favorites.length} kênh truyền hình</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setSelectedCategory("favorites");
+                                setActiveTab("live");
+                                setIsDuiSearchMenuOpen(false);
+                              }}
+                              className="px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-[10px] font-bold rounded-lg cursor-pointer transition-colors"
+                            >
+                              Truy cập nhanh
+                            </button>
+                          </div>
+
+                          <div className="pt-1.5 space-y-1.5">
+                            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">Khám phá theo danh mục</h5>
+                            <div className="grid grid-cols-2 gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-1">
+                              {CATEGORIES.map((cat) => {
+                                return (
+                                  <button
+                                    key={cat.id}
+                                    onClick={() => {
+                                      setSelectedCategory(cat.id);
+                                      setActiveTab("live");
+                                      setIsDuiSearchMenuOpen(false);
+                                    }}
+                                    className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-slate-200/50 hover:bg-slate-50 transition-all text-left cursor-pointer"
+                                  >
+                                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                                      <Tv className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <h6 className="text-xs font-bold text-slate-800 truncate">{cat.name}</h6>
+                                      <p className="text-[9.5px] text-slate-400 font-mono">Dữ liệu kênh</p>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {spotlightActiveTab === "themes" && (
+                        <div className="space-y-3">
+                          <div className="px-2 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200/50">
+                            Cá nhân hóa & Chế độ giao diện
+                          </div>
+
+                          <div className="space-y-2 pt-1">
+                            {/* WinUI 3 */}
+                            <div className="flex items-center justify-between p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                                  <Sliders className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h6 className="text-xs font-bold text-slate-800">Giao diện Fluent WinUI 3</h6>
+                                  <p className="text-[9.5px] text-slate-400">Thiết kế phong cách Windows 11 Fluent</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const designIds = ["winui_3", "liquid_glass", "material_design"];
+                                  if (!isWinUI3Active) {
+                                    const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
+                                    if (activeDesign && activeDesign.id !== "winui_3") {
+                                      setDesignConflictInfo({ activeId: activeDesign.id, targetId: "winui_3", actionType: "activate" });
+                                      return;
+                                    }
+                                  }
+                                  setPlugins(prev => prev.map(p => {
+                                    if (p.id === "winui_3") return { ...p, status: "installed", progress: 100, isActive: !isWinUI3Active };
+                                    return p;
+                                  }));
+                                }}
+                                className={`px-3 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                                  isWinUI3Active ? "bg-indigo-600 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                }`}
+                              >
+                                {isWinUI3Active ? "Đang Bật" : "Bật"}
+                              </button>
+                            </div>
+
+                            {/* Material Design */}
+                            <div className="flex-col sm:flex-row flex sm:items-center justify-between p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs gap-2">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                                  <Palette className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h6 className="text-xs font-bold text-slate-800">Giao diện Material Design 3</h6>
+                                  <p className="text-[9.5px] text-slate-400">Phong cách Android Dynamic You ấm áp</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const designIds = ["winui_3", "liquid_glass", "material_design"];
+                                  if (!isMaterialDesignActive) {
+                                    const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
+                                    if (activeDesign && activeDesign.id !== "material_design") {
+                                      setDesignConflictInfo({ activeId: activeDesign.id, targetId: "material_design", actionType: "activate" });
+                                      return;
+                                    }
+                                  }
+                                  setPlugins(prev => prev.map(p => {
+                                    if (p.id === "material_design") return { ...p, status: "installed", progress: 100, isActive: !isMaterialDesignActive };
+                                    return p;
+                                  }));
+                                }}
+                                className={`px-3 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                                  isMaterialDesignActive ? "bg-indigo-600 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                }`}
+                              >
+                                {isMaterialDesignActive ? "Đang Bật" : "Bật"}
+                              </button>
+                            </div>
+
+                            {/* Experimental Ambient Glow */}
+                            <div className="flex items-center justify-between p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                                  <Sparkles className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h6 className="text-xs font-bold text-slate-800">Hiệu ứng Ambient Glow</h6>
+                                  <p className="text-[9.5px] text-slate-400">Nền phát quang mờ ảo theo nội dung phát</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const nextGlow = !expAmbientGlow;
+                                  setExpAmbientGlow(nextGlow);
+                                  localStorage.setItem("vplay_exp_glow", String(nextGlow));
+                                  setDuiLogs(prev => [...prev, `[EXPERIMENTAL] Ambient Glow Background toggled to ${nextGlow ? "ON" : "OFF"}`, ""]);
+                                }}
+                                className={`px-3 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                                  expAmbientGlow ? "bg-indigo-600 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                }`}
+                              >
+                                {expAmbientGlow ? "Đang Bật" : "Bật"}
+                              </button>
+                            </div>
+
+                            {/* Low Latency Mode */}
+                            <div className="flex items-center justify-between p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                  <Sliders className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h6 className="text-xs font-bold text-slate-800">Truyền phát độ trễ thấp</h6>
+                                  <p className="text-[9.5px] text-slate-400">Tối ưu hóa băng thông kết nối m3u8</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const nextLatency = !expLowLatency;
+                                  setExpLowLatency(nextLatency);
+                                  localStorage.setItem("vplay_exp_lowlatency", String(nextLatency));
+                                  setDuiLogs(prev => [...prev, `[EXPERIMENTAL] Low-latency Stream Mode toggled to ${nextLatency ? "ON" : "OFF"}`, ""]);
+                                }}
+                                className={`px-3 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                                  expLowLatency ? "bg-indigo-600 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                }`}
+                              >
+                                {expLowLatency ? "Đang Bật" : "Bật"}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {spotlightActiveTab === "logs" && (
+                        <div className="space-y-3">
+                          <div className="px-2 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200/50">
+                            Hệ thống Vplay & Chia sẻ liên kết
+                          </div>
+
+                          <div className="flex items-center justify-between p-3 rounded-2xl bg-indigo-50 border border-indigo-100/50">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                                <Link className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h5 className="text-xs font-bold text-indigo-800">Sao Chép Liên Kết Ứng Dụng</h5>
+                                <p className="text-[10px] text-indigo-600 font-medium">Chia sẻ ứng dụng Vplay cực nhanh</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(window.location.href);
+                                alert("Đã sao chép liên kết ứng dụng Vplay!");
+                              }}
+                              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold rounded-lg cursor-pointer transition-colors"
+                            >
+                              Sao chép
+                            </button>
+                          </div>
+
+                          {/* Monospace Logs Console */}
+                          <div className="pt-1.5 space-y-1.5">
+                            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">Nhật ký hoạt động DUI</h5>
+                            <div className="bg-slate-900 rounded-xl p-3 font-mono text-[9.5px] text-emerald-400 space-y-1 max-h-[140px] overflow-y-auto custom-scrollbar select-text">
+                              {duiLogs.length === 0 ? (
+                                <p className="text-slate-500 italic">Chưa có bản ghi hoạt động nào.</p>
+                              ) : (
+                                duiLogs.slice(-6).map((log, index) => (
+                                  <p key={index} className="leading-relaxed truncate">
+                                    <span className="text-slate-500 mr-1.5">&gt;</span>
+                                    {log || " "}
+                                  </p>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
 
       {designConflictInfo && (
         <div className="fixed inset-0 z-[125] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm pointer-events-auto">
@@ -7555,7 +7858,6 @@ export default function App() {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
 
       {activeTab !== "shorts" && (
         <nav 
@@ -7956,59 +8258,49 @@ export default function App() {
               </div>
 
               {/* Separate Search Button */}
-              {((!isDynamicSearchPillActive) || (isDynamicSearchPillActive && activeTab === "search")) && (
-                <button
-                  id="vplay-search-dock-btn"
-                  onClick={() => {
-                    if (isVIntelligenceActive) {
-                      setVIntelSpinCount(prev => prev + 1);
-                    }
-                    if (isReimaginedSearchActive || isVIntelligenceActive) {
-                      setReimaginedSearchOpen(true);
-                    } else {
-                      setPrevTab(activeTab as any);
-                      setActiveTab("search");
-                    }
-                  }}
-                  className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
-                    isWinUI3Active
-                      ? "rounded-[15px] bg-[#202020] border border-[#2d2d2d] shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white hover:bg-[#2c2c2c] hover:border-[#3a3a3a]"
-                      : isMaterialDesignActive
-                      ? "bg-[#290a36] hover:bg-[#3d154f] text-white border border-white/5 shadow-lg rounded-[20px] duration-200"
-                      : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
-                  }`}
-                >
-                  {/* Premium Custom Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                    {isVIntelligenceActive ? "V-Intelligence" : "Tìm kiếm kênh"}
-                  </div>
-                  {isVIntelligenceActive ? (
-                    <motion.img
-                      animate={{ rotate: vIntelSpinCount * 360 }}
-                      transition={{ duration: 0.8, ease: "easeInOut" }}
-                      src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
-                      className="w-7.5 h-7.5 pointer-events-none object-contain group-hover:scale-110"
-                      referrerPolicy="no-referrer"
-                      alt="V-Intelligence"
-                    />
-                  ) : isMaterialDesignActive ? (
-                    <img
-                      src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
-                      className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
-                      style={{ filter: "brightness(0) invert(1)" }}
-                      referrerPolicy="no-referrer"
-                      alt="Search"
-                    />
-                  ) : (
-                    <img 
-                      src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
-                      className="w-6.5 h-6.5 brightness-0 invert opacity-95 transition-all duration-300 group-hover:scale-110 pointer-events-none object-contain" 
-                      referrerPolicy="no-referrer"
-                      alt="Search"
-                    />
-                  )}
-                </button>
-              )}
+              <button
+                id="vplay-search-dock-btn"
+                onClick={() => {
+                  setIsDuiSearchMenuOpen(true);
+                }}
+                className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
+                  isWinUI3Active
+                    ? "rounded-[15px] bg-[#202020] border border-[#2d2d2d] shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white hover:bg-[#2c2c2c] hover:border-[#3a3a3a]"
+                    : isMaterialDesignActive
+                    ? "bg-[#290a36] hover:bg-[#3d154f] text-white border border-white/5 shadow-lg rounded-[20px] duration-200"
+                    : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
+                }`}
+              >
+                {/* Premium Custom Tooltip */}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  Tìm kiếm
+                </div>
+                {isVIntelligenceActive ? (
+                  <motion.img
+                    animate={{ rotate: vIntelSpinCount * 360 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
+                    className="w-7.5 h-7.5 pointer-events-none object-contain group-hover:scale-110"
+                    referrerPolicy="no-referrer"
+                    alt="V-Intelligence"
+                  />
+                ) : isMaterialDesignActive ? (
+                  <img
+                    src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
+                    className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
+                    style={{ filter: "brightness(0) invert(1)" }}
+                    referrerPolicy="no-referrer"
+                    alt="Search"
+                  />
+                ) : (
+                  <img 
+                    src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
+                    className="w-6.5 h-6.5 brightness-0 invert opacity-95 transition-all duration-300 group-hover:scale-110 pointer-events-none object-contain" 
+                    referrerPolicy="no-referrer"
+                    alt="Search"
+                  />
+                )}
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
