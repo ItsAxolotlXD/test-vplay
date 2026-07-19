@@ -25,6 +25,7 @@ import {
   Star,
   Bookmark,
   ChevronRight,
+  ChevronDown,
   ChevronLeft,
   ExternalLink,
   MapPin,
@@ -477,6 +478,132 @@ const pageTransitionVariants = {
   })
 };
 
+interface SafeToCloseScreenProps {
+  message?: string;
+  showCrashControls?: boolean;
+  onDuiMode?: () => void;
+  onCleanStorage?: () => void;
+  storageOverlimit?: boolean;
+  onResetCount?: () => void;
+}
+
+function SafeToCloseScreen({
+  message,
+  showCrashControls,
+  onDuiMode,
+  onCleanStorage,
+  storageOverlimit,
+  onResetCount
+}: SafeToCloseScreenProps) {
+  useEffect(() => {
+    let audioCtx: AudioContext | null = null;
+    let osc: OscillatorNode | null = null;
+    let gainNode: GainNode | null = null;
+
+    const startBeep = () => {
+      try {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+          osc = audioCtx.createOscillator();
+          gainNode = audioCtx.createGain();
+
+          osc.type = "sine";
+          osc.frequency.value = 1000; // 1kHz beep
+          gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // pleasant/moderate volume level
+
+          osc.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          osc.start();
+        }
+      } catch (err) {
+        console.warn("Could not start audio context on safe-to-close screen:", err);
+      }
+    };
+
+    // Attempt to start immediately
+    startBeep();
+
+    // If browser auto-play policy blocks it, start on any interaction
+    const handleInteraction = () => {
+      if (!audioCtx || audioCtx.state === "suspended") {
+        startBeep();
+      }
+    };
+    window.addEventListener("click", handleInteraction);
+    window.addEventListener("keydown", handleInteraction);
+
+    return () => {
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+      try {
+        if (osc) {
+          osc.stop();
+        }
+        if (audioCtx) {
+          audioCtx.close();
+        }
+      } catch (err) {
+        console.error("Error cleaning up audio:", err);
+      }
+    };
+  }, []);
+
+  return (
+    <div 
+      className="fixed inset-0 bg-cover bg-center text-slate-300 flex flex-col items-center justify-center z-[99999] p-8 font-mono select-none"
+      style={{
+        backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/EBU_Colorbars_HD.svg/960px-EBU_Colorbars_HD.svg.png?_=20220810032923")'
+      }}
+    >
+      <div className="bg-black/90 border border-white/10 backdrop-blur-md p-8 sm:p-10 rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.95)] max-w-xl text-center space-y-5">
+        <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-snug">
+          {message ? (
+            <span 
+              onClick={onResetCount} 
+              className="cursor-pointer hover:opacity-80 active:opacity-100 select-text font-bold"
+            >
+              {message}
+            </span>
+          ) : (
+            "It is now safe to close the app"
+          )}
+        </p>
+        <div className="h-0.5 bg-white/20 w-32 mx-auto rounded-full" />
+        
+        {showCrashControls ? (
+          <div className="space-y-4">
+            <p className="text-xs sm:text-sm text-slate-400 font-mono leading-relaxed">
+              Something went wrong while running the code or services. Try reload again or{" "}
+              <span 
+                onClick={onDuiMode} 
+                className="underline cursor-pointer text-white font-semibold hover:text-indigo-300 transition-colors"
+              >
+                press here
+              </span>{" "}
+              to open DUI mode
+            </p>
+            {storageOverlimit && onCleanStorage && (
+              <div className="pt-2">
+                <button
+                  onClick={onCleanStorage}
+                  className="px-6 py-2.5 border border-white/20 hover:border-white/50 hover:bg-white hover:text-black transition-all duration-300 font-mono text-xs font-bold uppercase tracking-widest cursor-pointer"
+                >
+                  Cleanup storage
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs sm:text-sm text-slate-400 font-mono leading-relaxed">
+            To start the app, press F5 on the keyboard or the refresh icon on your browser
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   // Local time state clock
   const [time, setTime] = useState(new Date());
@@ -678,6 +805,10 @@ export default function App() {
   
   const [signingOutProgress, setSigningOutProgress] = useState<boolean>(false);
   const [shuttingDownProgress, setShuttingDownProgress] = useState<boolean>(false);
+  const [isPreShutdown, setIsPreShutdown] = useState<boolean>(false);
+  const [isPreCrash, setIsPreCrash] = useState<boolean>(false);
+  const [isBlackScreenDelay, setIsBlackScreenDelay] = useState<boolean>(false);
+  const [isSafeToClose, setIsSafeToClose] = useState<boolean>(false);
   const [isWebCrashed, setIsWebCrashed] = useState<boolean>(false);
   const [loginTime, setLoginTime] = useState<Date>(new Date());
 
@@ -713,11 +844,19 @@ export default function App() {
   };
 
   const handleShutdown = () => {
-    setShuttingDownProgress(true);
+    setIsPreShutdown(true);
     setTimeout(() => {
-      setShuttingDownProgress(false);
-      setIsWebCrashed(true);
-    }, 10000);
+      setIsPreShutdown(false);
+      setShuttingDownProgress(true);
+      setTimeout(() => {
+        setShuttingDownProgress(false);
+        setIsBlackScreenDelay(true);
+        setTimeout(() => {
+          setIsBlackScreenDelay(false);
+          setIsSafeToClose(true);
+        }, 3000);
+      }, 5000);
+    }, 3000);
   };
   const [showAdminPassModal, setShowAdminPassModal] = useState<boolean>(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState<string>("");
@@ -1085,6 +1224,11 @@ export default function App() {
   const [spotlightActiveTab, setSpotlightActiveTab] = useState<"utilities" | "folders" | "themes" | "logs" | null>(null);
   const [dynamicRecentSearches, setDynamicRecentSearches] = useState<any[]>(RECENT_SEARCHES_ITEMS);
   const [isShufflingSuggestions, setIsShufflingSuggestions] = useState<boolean>(false);
+  const [isHeaderSearchOpen, setIsHeaderSearchOpen] = useState<boolean>(false);
+  const [headerSearchQuery, setHeaderSearchQuery] = useState<string>("");
+  const [isPowerMenuOpen, setIsPowerMenuOpen] = useState<boolean>(false);
+  const [selectedPowerAction, setSelectedPowerAction] = useState<"shutdown" | "restart" | "signout" | "factory_reset">("shutdown");
+  const [isCustomPowerDropdownOpen, setIsCustomPowerDropdownOpen] = useState<boolean>(false);
 
   const handleRefreshSuggestions = () => {
     setIsShufflingSuggestions(true);
@@ -1204,6 +1348,7 @@ export default function App() {
         "  /history                        - Xem lịch sử các kênh đã phát qua DUI",
         "  /theme [emerald|amber|rose|cyan|violet] - Đổi giao diện màu sắc của DUI Terminal",
         "  /reboot                         - Khởi động lại hệ thống phát và DUI console",
+        "  /bypass [crash]                 - Bỏ qua chế độ crash thủ công",
         "  /about                          - Về Vplay app",
         "  /clear                          - Xóa màn hình terminal",
         "  /exit                           - Thoát chế độ CLI, quay lại crash GUI",
@@ -1214,6 +1359,20 @@ export default function App() {
     } else if (command === "/exit" || command === "exit") {
       setIsDuiMode(false);
       setDuiLogs(prev => [...prev, "[Returning to standard crash interface...]", ""]);
+    } else if (command === "/bypass") {
+      if (args.length > 0 && args[0].toLowerCase() === "crash") {
+        localStorage.removeItem("vplay_manual_crash");
+        setIsManualCrash(false);
+        setIsDuiMode(false);
+        setCrashClickCount(0);
+        setDuiLogs(prev => [...prev, "[SUCCESS] Bypassed manual crash safely. Returning to home layout...", ""]);
+      } else {
+        setDuiLogs(prev => [
+          ...prev,
+          "Usage: /bypass crash - Bỏ qua chế độ crash thủ công",
+          ""
+        ]);
+      }
     } else if (command === "/about") {
       setDuiLogs(prev => [
         ...prev,
@@ -3262,50 +3421,15 @@ export default function App() {
     );
   };
 
-  if (isWebCrashed) {
+  if (isSafeToClose || isWebCrashed) {
     return (
-      <div className="fixed inset-0 bg-neutral-950 text-neutral-400 flex flex-col items-center justify-center z-[99999] p-6 font-mono select-none">
-        <div className="w-full max-w-2xl bg-black border border-red-500/20 rounded-2xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
-          {/* Decorative scanner lines */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/[0.02] to-transparent pointer-events-none" />
-          
-          <div className="flex items-center gap-4 text-red-500 border-b border-red-500/20 pb-4">
-            <AlertCircle className="w-8 h-8 animate-pulse shrink-0" />
-            <div>
-              <h1 className="text-sm font-bold tracking-widest uppercase">CRITICAL SYSTEM ERROR</h1>
-              <p className="text-[10px] text-red-500/60 uppercase">Vplay Core Kernel - Crash Dump</p>
-            </div>
-          </div>
+      <SafeToCloseScreen />
+    );
+  }
 
-          <div className="space-y-4 text-xs font-mono leading-relaxed text-neutral-300">
-            <p className="text-red-400 font-bold">*** STOP: 0x000000D1 (0x0000000C, 0x00000002, 0x00000000, 0xF86B5A89)</p>
-            <p className="text-red-400 font-bold">*** vplay_sys.sys - Address F86B5A89 base at F86B0000, DateStamp 3667c4fa</p>
-            <p className="text-white/40">If this is the first time you've seen this Stop error screen, restart your computer. If this screen appears again, follow these steps:</p>
-            <div className="bg-red-950/10 border border-white/5 p-4 rounded-lg space-y-2 text-[11px] text-neutral-400 font-mono">
-              <p>&gt; System halted due to deliberate user shutdown request.</p>
-              <p>&gt; Releasing all HLS media stream pipelines... [DONE]</p>
-              <p>&gt; Freeing system graphic buffers... [DONE]</p>
-              <p>&gt; Unloading plugin store assemblies... [DONE]</p>
-              <p>&gt; Thread pool termination status: EXITED_WITH_PANIC (code 3667)</p>
-            </div>
-            <p className="text-white/50 text-[11px] pt-2">
-              Please reload the page to restart Vplay System and restore safe operation.
-            </p>
-          </div>
-
-          <div className="flex justify-end pt-4 border-t border-white/5">
-            <button
-              onClick={() => {
-                window.location.reload();
-              }}
-              className="px-5 py-2.5 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
-            >
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              Tải lại trang (Reload Page)
-            </button>
-          </div>
-        </div>
-      </div>
+  if (isBlackScreenDelay) {
+    return (
+      <div className="fixed inset-0 bg-black z-[99999] cursor-wait" />
     );
   }
 
@@ -3338,13 +3462,9 @@ export default function App() {
 
   if (shuttingDownProgress) {
     return (
-      <div className="fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google">
-        {/* Background ambient light */}
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-
+      <div className="fixed inset-0 bg-neutral-950 flex flex-col items-center justify-center z-[99999] p-4 select-none font-sans cursor-wait">
         <div className="flex flex-col items-center justify-center animate-fade-in">
-          <svg className="animate-spin h-14 w-14 text-red-500 mb-6" viewBox="0 0 50 50">
+          <svg className="animate-spin h-14 w-14 text-white mb-6" viewBox="0 0 50 50">
             <circle
               className="opacity-100"
               cx="25"
@@ -3357,7 +3477,7 @@ export default function App() {
               fill="none"
             />
           </svg>
-          <div className="text-red-500/60 text-xs tracking-widest uppercase font-google font-medium animate-pulse">SHUTTING DOWN...</div>
+          <div className="text-white text-xs tracking-widest uppercase font-semibold animate-pulse">SHUTTING DOWN...</div>
         </div>
       </div>
     );
@@ -3664,53 +3784,30 @@ export default function App() {
     }
 
     return (
-      <div className="fixed inset-0 bg-black text-white flex flex-col items-center justify-center z-[99999] p-6 font-mono select-none">
-        <div className="text-center space-y-6 max-w-lg">
-          <p className="text-sm tracking-widest leading-relaxed select-text font-mono">
-            <span 
-              onClick={() => {
-                setCrashClickCount(prev => {
-                  const next = prev + 1;
-                  if (next >= 10) {
-                    localStorage.removeItem("vplay_manual_crash");
-                    setIsManualCrash(false);
-                    if (currentStorageUsed >= 3.00) {
-                      handleCleanAllStorage();
-                    }
-                    return 0;
-                  }
-                  return next;
-                });
-              }}
-              className="font-bold hover:opacity-50 transition-opacity cursor-pointer duration-200"
-            >
-              Vplay
-            </span> has crashed. Safe mode is enabled
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            {currentStorageUsed >= 3.00 && (
-              <button
-                onClick={handleCleanAllStorage}
-                className="px-6 py-3 border border-white hover:bg-white hover:text-black transition-all duration-300 font-mono text-xs font-bold uppercase tracking-widest cursor-pointer"
-              >
-                Cleanup storage
-              </button>
-            )}
-            
-            <button
-              onClick={() => {
-                setIsDuiMode(true);
-                setIsDuiMonitorActive(false);
-              }}
-              className="px-6 py-3 border border-white hover:bg-white hover:text-black transition-all duration-300 font-mono text-xs font-bold uppercase tracking-widest cursor-pointer flex items-center gap-2"
-            >
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              Use commands
-            </button>
-          </div>
-        </div>
-      </div>
+      <SafeToCloseScreen 
+        message="Vplay has crashed"
+        showCrashControls={true}
+        onDuiMode={() => {
+          setIsDuiMode(true);
+          setIsDuiMonitorActive(false);
+        }}
+        onCleanStorage={handleCleanAllStorage}
+        storageOverlimit={currentStorageUsed >= 3.00}
+        onResetCount={() => {
+          setCrashClickCount(prev => {
+            const next = prev + 1;
+            if (next >= 10) {
+              localStorage.removeItem("vplay_manual_crash");
+              setIsManualCrash(false);
+              if (currentStorageUsed >= 3.00) {
+                handleCleanAllStorage();
+              }
+              return 0;
+            }
+            return next;
+          });
+        }}
+      />
     );
   }
 
@@ -3933,6 +4030,9 @@ export default function App() {
   return (
     <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
       <div className={`min-h-screen text-white/95 pb-32 pt-4 transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+        {(isPreShutdown || isPreCrash) && (
+          <div className="fixed inset-0 bg-black/10 z-[999999] cursor-wait pointer-events-auto" />
+        )}
         
         <StartMenu
           onOpenDuiMode={() => {
@@ -4001,8 +4101,12 @@ export default function App() {
             }
           }}
           onTriggerCrash={() => {
-            localStorage.setItem("vplay_manual_crash", "true");
-            setIsManualCrash(true);
+            setIsPreCrash(true);
+            setTimeout(() => {
+              setIsPreCrash(false);
+              localStorage.setItem("vplay_manual_crash", "true");
+              setIsManualCrash(true);
+            }, 3000);
           }}
           isOpen={isStartMenuOpen}
           onClose={() => setIsStartMenuOpen(false)}
@@ -4078,14 +4182,297 @@ export default function App() {
               </div>
             </button>
 
-            {/* Notification bell icon */}
-            <button className="relative group p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer">
-              <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500 ring-2 ring-transparent animate-pulse" />
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                Thông báo
-              </div>
-            </button>
+            {/* Spotlight search icon button */}
+            <div className="relative header-spotlight-container">
+              <button
+                onClick={() => {
+                  setIsHeaderSearchOpen(prev => !prev);
+                  setIsPowerMenuOpen(false);
+                }}
+                className={`relative group p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                  isHeaderSearchOpen 
+                    ? "bg-white/20 text-white shadow-lg scale-95" 
+                    : "bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white hover:scale-105"
+                }`}
+              >
+                <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  Spotlight Search
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {isHeaderSearchOpen && (
+                  <>
+                    {/* Invisible clickaway backdrop */}
+                    <div 
+                      className="fixed inset-0 z-40 cursor-default" 
+                      onClick={() => {
+                        setIsHeaderSearchOpen(false);
+                        setHeaderSearchQuery("");
+                      }}
+                    />
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      className="absolute right-0 mt-2.5 w-72 sm:w-80 bg-[#16161a]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 flex flex-col gap-3 select-none text-left"
+                    >
+                      {/* Input search area */}
+                      <div className="flex items-center h-11 rounded-xl bg-white/10 border border-white/5 px-3 transition-all focus-within:border-indigo-500/50 focus-within:bg-white/15">
+                        <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                        <input
+                          type="text"
+                          placeholder="Spotlight Search"
+                          value={headerSearchQuery}
+                          onChange={(e) => setHeaderSearchQuery(e.target.value)}
+                          className="flex-1 bg-transparent border-none text-white placeholder-slate-400 focus:outline-none text-xs sm:text-sm pl-2.5 h-full font-medium"
+                          autoFocus
+                        />
+                        <Mic className="w-4 h-4 text-teal-400 shrink-0 cursor-pointer hover:text-teal-300 transition-colors" />
+                      </div>
+
+                      {/* Content list */}
+                      <div className="max-h-64 overflow-y-auto custom-scrollbar flex flex-col gap-1 pr-1">
+                        {!headerSearchQuery ? (
+                          <div className="flex flex-col items-center justify-center py-6 text-center">
+                            <span className="text-slate-400 text-xs font-medium">Nhập từ khóa để tìm kiếm nhanh</span>
+                          </div>
+                        ) : (
+                          <>
+                            {/* Filter channels */}
+                            {(() => {
+                              const filtered = processedChannels.filter(c => 
+                                c.name.toLowerCase().includes(headerSearchQuery.toLowerCase()) ||
+                                (c.group && c.group.toLowerCase().includes(headerSearchQuery.toLowerCase()))
+                              ).slice(0, 5);
+
+                              if (filtered.length === 0) {
+                                return (
+                                  <div className="text-center py-4 text-slate-400 text-xs">
+                                    Không tìm thấy kết quả phù hợp
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div className="flex flex-col gap-1">
+                                  <div className="px-2 pb-1 text-[10px] font-bold text-slate-500 tracking-wider uppercase">
+                                    Kênh truyền hình ({filtered.length})
+                                  </div>
+                                  {filtered.map(channel => (
+                                    <button
+                                      key={channel.id}
+                                      onClick={() => {
+                                        setSelectedChannel(channel);
+                                        setActiveTab("live");
+                                        setIsHeaderSearchOpen(false);
+                                        setHeaderSearchQuery("");
+                                      }}
+                                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 text-left transition-all cursor-pointer group/item"
+                                    >
+                                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm transition-transform group-hover/item:scale-105 ${channel.logoBg || 'bg-gradient-to-br from-indigo-500 to-indigo-800'}`}>
+                                        {channel.logoText || channel.name.slice(0, 2).toUpperCase()}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-white text-xs font-bold truncate group-hover/item:text-indigo-400 transition-colors">{channel.name}</p>
+                                        <p className="text-slate-400 text-[10px] truncate">{channel.group || "Kênh phát sóng"}</p>
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              );
+                            })()}
+                          </>
+                        )}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Power icon button */}
+            <div className="relative header-power-container">
+              <button
+                onClick={() => {
+                  setIsPowerMenuOpen(prev => !prev);
+                  setIsHeaderSearchOpen(false);
+                }}
+                className={`relative group p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                  isPowerMenuOpen 
+                    ? "bg-red-500/20 text-red-400 shadow-lg scale-95" 
+                    : "bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white hover:scale-105"
+                }`}
+              >
+                <Power className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  Nguồn & Hệ thống
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {isPowerMenuOpen && (
+                  <div 
+                    className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[9999] flex items-center justify-center p-4 cursor-default"
+                    onClick={() => {
+                      setIsPowerMenuOpen(false);
+                      setIsCustomPowerDropdownOpen(false);
+                    }}
+                  >
+                    {/* Dialog Card Container - Fully Dark Theme */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.93, y: 8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.93, y: 8 }}
+                      transition={{ duration: 0.18, ease: [0.1, 0.9, 0.2, 1] }}
+                      className="w-[430px] max-w-full bg-[#1e1e24] border border-white/10 rounded-[12px] shadow-[0_24px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col select-none cursor-default"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Title Bar or Header Area */}
+                      <div className="flex items-center justify-between px-5 pt-4 text-white/90">
+                        <span className="text-[11.5px] font-bold text-slate-400 tracking-wider uppercase font-sans">Shut Down App</span>
+                        <button 
+                          onClick={() => {
+                            setIsPowerMenuOpen(false);
+                            setIsCustomPowerDropdownOpen(false);
+                          }}
+                          className="p-1 hover:bg-white/10 rounded-[4px] transition-colors text-slate-400 hover:text-white cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Middle Content Area */}
+                      <div className="flex gap-5 px-6 py-5">
+                        {/* Left Column: Power icon in a blue glowing circle */}
+                        <div className="flex items-start justify-center pt-1 shrink-0">
+                          <div className="w-14 h-14 rounded-full border-[3px] border-[#0078d4] flex items-center justify-center bg-[#0078d4]/10 shadow-[0_0_15px_rgba(0,120,212,0.3)] animate-pulse">
+                            <Power className="w-7 h-7 text-[#0078d4] stroke-[2.5]" />
+                          </div>
+                        </div>
+
+                        {/* Right Column: Text & Custom Dropdown Inputs */}
+                        <div className="flex-1 flex flex-col gap-2.5 text-left font-sans">
+                          <p className="text-white/95 text-[14px] sm:text-[14.5px] font-semibold leading-snug">
+                            What do you want the app to do?
+                          </p>
+
+                          {/* Custom App Dropdown Selector */}
+                          <div className="relative mt-1">
+                            <button
+                              type="button"
+                              onClick={() => setIsCustomPowerDropdownOpen(prev => !prev)}
+                              className="w-full flex items-center justify-between px-3 py-2 bg-[#2d2d34] border border-white/10 hover:border-white/20 active:bg-[#383840] rounded-[6px] text-xs sm:text-sm text-white font-medium cursor-pointer select-none transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] focus:outline-none focus:border-indigo-500"
+                            >
+                              <span>
+                                {selectedPowerAction === "shutdown" && "Shut down"}
+                                {selectedPowerAction === "restart" && "Restart"}
+                                {selectedPowerAction === "signout" && "Sign out"}
+                                {selectedPowerAction === "factory_reset" && "Factory reset"}
+                              </span>
+                              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isCustomPowerDropdownOpen ? "rotate-180" : ""}`} />
+                            </button>
+
+                            {/* Dropdown Options List */}
+                            <AnimatePresence>
+                              {isCustomPowerDropdownOpen && (
+                                <>
+                                  {/* Overlay clickaway to close option list */}
+                                  <div 
+                                    className="fixed inset-0 z-40 cursor-default" 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setIsCustomPowerDropdownOpen(false);
+                                    }}
+                                  />
+                                  <motion.div
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -5 }}
+                                    transition={{ duration: 0.1 }}
+                                    className="absolute left-0 right-0 mt-1 bg-[#25252b] border border-white/15 rounded-[6px] shadow-[0_10px_30px_rgba(0,0,0,0.5)] z-50 overflow-hidden py-1"
+                                  >
+                                    {[
+                                      { id: "shutdown", label: "Shut down" },
+                                      { id: "restart", label: "Restart" },
+                                      { id: "signout", label: "Sign out" },
+                                      { id: "factory_reset", label: "Factory reset" }
+                                    ].map(opt => (
+                                      <button
+                                        key={opt.id}
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedPowerAction(opt.id as any);
+                                          setIsCustomPowerDropdownOpen(false);
+                                        }}
+                                        className={`w-full text-left px-3 py-2 text-xs sm:text-sm text-white/90 cursor-pointer select-none transition-all flex items-center justify-between ${
+                                          selectedPowerAction === opt.id 
+                                            ? "bg-indigo-600/30 text-indigo-400 font-bold border-l-2 border-indigo-500" 
+                                            : "hover:bg-white/5"
+                                        }`}
+                                      >
+                                        <span>{opt.label}</span>
+                                        {selectedPowerAction === opt.id && (
+                                          <Check className="w-3.5 h-3.5 text-indigo-400" />
+                                        )}
+                                      </button>
+                                    ))}
+                                  </motion.div>
+                                </>
+                              )}
+                            </AnimatePresence>
+                          </div>
+
+                          {/* Option Description text */}
+                          <p className="text-slate-400 text-[11px] sm:text-[11.5px] font-normal min-h-[32px] mt-1 leading-normal">
+                            {selectedPowerAction === "shutdown" && "Closes all features and turns off the app."}
+                            {selectedPowerAction === "restart" && "Closes all features, and starts the app again."}
+                            {selectedPowerAction === "signout" && "Signs you out of your current session."}
+                            {selectedPowerAction === "factory_reset" && "Resets the application back to its original factory settings and clears all local storage."}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Bottom Dark Footer Action Bar */}
+                      <div className="bg-[#17171c] border-t border-white/5 px-6 py-4 flex justify-end gap-2.5 rounded-b-[12px]">
+                        <button
+                          onClick={() => {
+                            setIsPowerMenuOpen(false);
+                            setIsCustomPowerDropdownOpen(false);
+                            if (selectedPowerAction === "shutdown") {
+                              handleShutdown();
+                            } else if (selectedPowerAction === "restart") {
+                              window.location.reload();
+                            } else if (selectedPowerAction === "signout") {
+                              handleSignOut();
+                            } else if (selectedPowerAction === "factory_reset") {
+                              localStorage.clear();
+                              window.location.reload();
+                            }
+                          }}
+                          className="px-6 py-1.5 bg-[#0078d4] hover:bg-[#006cc0] border border-[#0078d4] active:bg-[#005a9e] text-white text-[12.5px] sm:text-[13px] font-semibold rounded-[4px] min-w-[76px] shadow-[0_2px_4px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,120,212,0.3)] transition-all cursor-pointer text-center flex items-center justify-center"
+                        >
+                          OK
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsPowerMenuOpen(false);
+                            setIsCustomPowerDropdownOpen(false);
+                          }}
+                          className="px-6 py-1.5 bg-[#2d2d34] hover:bg-[#383840] border border-white/10 hover:border-white/15 text-slate-300 hover:text-white text-[12.5px] sm:text-[13px] font-medium rounded-[4px] min-w-[76px] transition-all cursor-pointer text-center flex items-center justify-center"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* User avatar displaying email info */}
             <div className="relative group/avatar flex items-center gap-2 cursor-pointer z-50">
