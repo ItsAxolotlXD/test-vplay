@@ -604,6 +604,66 @@ function SafeToCloseScreen({
   );
 }
 
+const playClickSound = () => {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1100, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.06);
+    
+    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.06);
+  } catch (e) {
+    // Ignore context blocked
+  }
+};
+
+const playToggleSound = (isOn: boolean) => {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = "sine";
+    if (isOn) {
+      osc.frequency.setValueAtTime(550, ctx.currentTime);
+      osc.frequency.setValueAtTime(950, ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.03, ctx.currentTime);
+      gain.gain.setValueAtTime(0.03, ctx.currentTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    } else {
+      osc.frequency.setValueAtTime(850, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.03, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    }
+  } catch (e) {
+    // Ignore
+  }
+};
+
 export default function App() {
   // Local time state clock
   const [time, setTime] = useState(new Date());
@@ -657,6 +717,80 @@ export default function App() {
       setTime(new Date());
     }, 10000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Global sound feedback effect for button and toggle presses
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      
+      let el: HTMLElement | null = target;
+      let isButton = false;
+      let isToggle = false;
+      
+      while (el && el !== document.body) {
+        const tagName = el.tagName.toLowerCase();
+        const role = el.getAttribute("role");
+        const type = el.getAttribute("type");
+        const className = el.className || "";
+        
+        // Detect toggles
+        if (
+          (tagName === "input" && (type === "checkbox" || type === "radio")) ||
+          role === "switch" ||
+          role === "checkbox" ||
+          (typeof className === "string" && (
+            className.includes("toggle") || 
+            className.includes("switch") || 
+            className.includes("checkbox")
+          ))
+        ) {
+          isToggle = true;
+          break;
+        }
+        
+        // Detect buttons/clickable controls
+        if (
+          tagName === "button" ||
+          tagName === "a" ||
+          role === "button" ||
+          role === "tab" ||
+          (typeof className === "string" && (
+            className.includes("btn") || 
+            className.includes("button") || 
+            className.includes("clickable") || 
+            className.includes("bouncy-btn") ||
+            className.includes("cursor-pointer")
+          ))
+        ) {
+          isButton = true;
+          break;
+        }
+        
+        el = el.parentElement;
+      }
+      
+      if (isToggle) {
+        let isOn = true;
+        if (el instanceof HTMLInputElement) {
+          isOn = el.checked;
+        } else if (el) {
+          const ariaChecked = el.getAttribute("aria-checked");
+          if (ariaChecked) {
+            isOn = ariaChecked === "true";
+          }
+        }
+        playToggleSound(isOn);
+      } else if (isButton) {
+        playClickSound();
+      }
+    };
+    
+    document.addEventListener("click", handleGlobalClick, { capture: true });
+    return () => {
+      document.removeEventListener("click", handleGlobalClick, { capture: true });
+    };
   }, []);
 
   // Navigation State
@@ -802,6 +936,22 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showSplash, setShowSplash] = useState<boolean>(true);
   const [roleSelection, setRoleSelection] = useState<"user" | "admin" | null>(null);
+  const [pendingRole, setPendingRole] = useState<"user" | "admin" | null>(null);
+  const [isDelayingTransition, setIsDelayingTransition] = useState<boolean>(false);
+  const [showWelcomeSplash, setShowWelcomeSplash] = useState<boolean>(false);
+
+  const handleSelectRole = (role: "user" | "admin") => {
+    setIsDelayingTransition(true);
+    setTimeout(() => {
+      setIsDelayingTransition(false);
+      setShowWelcomeSplash(true);
+      setPendingRole(role);
+      setTimeout(() => {
+        setShowWelcomeSplash(false);
+        setRoleSelection(role);
+      }, 5000);
+    }, 3000);
+  };
   
   const [signingOutProgress, setSigningOutProgress] = useState<boolean>(false);
   const [shuttingDownProgress, setShuttingDownProgress] = useState<boolean>(false);
@@ -2857,10 +3007,10 @@ export default function App() {
         }}
       >
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
+          initial={{ opacity: 0, scale: 0.95, y: 0 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          transition={{ type: "spring", damping: 25, stiffness: 350 }}
+          exit={{ opacity: 0, scale: 0.95, y: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
           className={`w-full max-w-4xl p-6 md:p-8 shadow-2xl relative text-left overflow-hidden flex flex-col ${
             isMaterialDesignActive
               ? "rounded-[28px] bg-[#211f26] border border-white/5 text-[#e6e1e5]"
@@ -3100,10 +3250,10 @@ export default function App() {
             onClick={() => setShowFocusChannelsModal(false)}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : { opacity: 0, scale: 0.95, y: 15 }}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : { opacity: 0, scale: 0.95, y: 0 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : { opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : { opacity: 0, scale: 0.95, y: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
               className={isWinUI3Active ? `w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden ${winui.card}` : `w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden ${
                 isMaterialDesignActive
                   ? "rounded-[28px] bg-[#211f26] border border-white/5 shadow-2xl text-[#e6e1e5]"
@@ -3232,9 +3382,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[200] flex items-center justify-center p-4 overflow-y-auto select-none" : "fixed inset-0 bg-black/75 backdrop-blur-[20px] z-[200] flex items-center justify-center p-4 overflow-y-auto"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0, y: 15 } : { opacity: 0, scale: 0.95, y: 15 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0, y: 0 } : { opacity: 0, scale: 0.95, y: 0 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0, y: 15 } : { opacity: 0, scale: 0.95, y: 15 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0, y: 0 } : { opacity: 0, scale: 0.95, y: 0 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
               className={isWinUI3Active ? `w-full max-w-[430px] relative text-left transform-gpu ${winui.card}` : `w-full max-w-[430px] relative text-left transform-gpu ${
                 isMaterialDesignActive
@@ -3811,29 +3961,60 @@ export default function App() {
     );
   }
 
-  if (showSplash || roleSelection === null) {
+  if (showSplash || roleSelection === null || isDelayingTransition || showWelcomeSplash) {
     return (
-      <div className="fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google">
+      <div className={`fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google ${isDelayingTransition ? "cursor-wait" : ""}`}>
         {/* Background ambient light */}
         <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
         {showSplash ? (
           <div className="flex flex-col items-center justify-center">
-            <svg className="animate-spin h-14 w-14 text-white mb-6" viewBox="0 0 50 50">
-              <circle
-                className="opacity-100"
-                cx="25"
-                cy="25"
-                r="20"
-                stroke="currentColor"
-                strokeWidth="5"
-                strokeLinecap="round"
-                strokeDasharray="40 150"
-                fill="none"
-              />
-            </svg>
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif" 
+              className="h-14 w-14 object-contain mb-6" 
+              alt="Loading..." 
+              referrerPolicy="no-referrer" 
+            />
             <div className="text-white/40 text-xs tracking-widest uppercase font-google font-medium animate-pulse">Connecting to services...</div>
+          </div>
+        ) : isDelayingTransition ? (
+          <div className="flex flex-col items-center justify-center cursor-wait pointer-events-auto">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif" 
+              className="h-12 w-12 object-contain mb-6 cursor-wait" 
+              alt="Transition..." 
+              referrerPolicy="no-referrer" 
+            />
+            <div className="text-white/50 text-xs tracking-widest uppercase font-mono font-medium animate-pulse cursor-wait">
+              Initializing secure workspace...
+            </div>
+          </div>
+        ) : showWelcomeSplash ? (
+          <div className="flex flex-col items-center justify-center text-center max-w-xl z-10 space-y-6 animate-fade-in">
+            <img 
+              src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
+              alt="Vplay Brand Logo"
+              referrerPolicy="no-referrer"
+              className="h-14 sm:h-16 w-auto object-contain mx-auto transition-transform duration-300 hover:scale-105 animate-pulse"
+            />
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight uppercase bg-gradient-to-r from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent">
+                {pendingRole === "admin" ? "XIN CHÀO NHÀ PHÁT TRIỂN" : "CHÀO MỪNG BẠN ĐẾN VỚI VPLAY"}
+              </h1>
+              <p className="text-[11px] sm:text-xs text-indigo-300/60 uppercase tracking-widest font-mono">
+                {pendingRole === "admin" ? "Quyền quản trị tối cao đã được xác thực" : "Hệ thống truyền hình giải trí đỉnh cao"}
+              </p>
+            </div>
+            
+            <div className="pt-4">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif" 
+                className="h-10 w-10 object-contain mx-auto opacity-70" 
+                alt="Loading welcome..." 
+                referrerPolicy="no-referrer" 
+              />
+            </div>
           </div>
         ) : roleSelection === null ? (
           <div className="flex flex-col items-center gap-6 w-full max-w-lg z-10">
@@ -3864,7 +4045,7 @@ export default function App() {
                     {/* User Option Button */}
                     <button
                       onClick={() => {
-                        setRoleSelection("user");
+                        handleSelectRole("user");
                       }}
                       className="group flex items-center justify-between p-4 bg-white/[0.03] hover:bg-indigo-600/10 border border-white/10 hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-left rounded-2xl relative cursor-default"
                     >
@@ -3919,7 +4100,7 @@ export default function App() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           if (adminPasswordInput === "3667") {
-                            setRoleSelection("admin");
+                            handleSelectRole("admin");
                             setShowAdminPassModal(false);
                           } else {
                             setAdminError("Mật khẩu không chính xác!");
@@ -3941,7 +4122,7 @@ export default function App() {
                     <button
                       onClick={() => {
                         if (adminPasswordInput === "3667") {
-                          setRoleSelection("admin");
+                          handleSelectRole("admin");
                           setShowAdminPassModal(false);
                         } else {
                           setAdminError("Mật khẩu không chính xác!");
@@ -3974,9 +4155,9 @@ export default function App() {
         {currentStorageUsed >= 3.00 && showFullPopup && !isCleaning && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-[25px] z-[150] flex items-center justify-center p-4">
             <motion.div
-              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
               animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
               transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
               className={`w-full max-w-[420px] relative text-left transform-gpu ${
                 isMaterialDesignActive
@@ -8696,10 +8877,10 @@ export default function App() {
         <AnimatePresence>
           {playbackError && (
             <motion.div
-              initial={{ opacity: 0, y: 15, scale: 0.9 }}
+              initial={{ opacity: 0, y: 0, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 15, scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              exit={{ opacity: 0, y: 0, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="mt-3 mx-auto w-fit px-5 py-2.5 rounded-full bg-red-600/25 backdrop-blur-[12px] border border-red-500/35 text-red-200 text-xs font-normal flex items-center gap-2 shadow-[0_12px_32px_rgba(239,68,68,0.25)] select-none"
             >
               <AlertCircle className="w-4.5 h-4.5 text-red-400 animate-pulse" />
@@ -9011,9 +9192,9 @@ export default function App() {
             className="fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"
           >
             <motion.div
-              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
               animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 }}
+              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
               transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
               className={`w-full max-w-[350px] relative text-left transform-gpu ${
                 isMaterialDesignActive
@@ -9153,10 +9334,10 @@ export default function App() {
             onClick={() => setShowLogoAdjustModal(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              initial={{ opacity: 0, scale: 0.95, y: 0 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              exit={{ opacity: 0, scale: 0.95, y: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
               className={`w-full max-w-sm p-6 shadow-2xl relative text-left overflow-hidden flex flex-col ${
                 isMaterialDesignActive
                   ? "rounded-[28px] bg-[#211f26] border border-white/5 text-[#e6e1e5]"
@@ -9268,10 +9449,10 @@ export default function App() {
             onClick={() => setShowYouTubeToolModal(false)}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : { opacity: 0, scale: 0.95, y: 15 }}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : { opacity: 0, scale: 0.95, y: 0 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : { opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : { opacity: 0, scale: 0.95, y: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
               className={isWinUI3Active ? `w-full max-w-sm ${winui.card}` : `w-full max-w-sm p-6 shadow-2xl relative text-left overflow-hidden flex flex-col ${
                 isMaterialDesignActive
                   ? "rounded-[28px] bg-[#211f26] border border-white/5 text-[#e6e1e5]"
@@ -9572,9 +9753,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[100] flex items-center justify-center p-4 select-none" : "fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
               className={isWinUI3Active ? `w-full max-w-[350px] relative text-left transform-gpu ${winui.card}` : `w-full max-w-[350px] relative text-left transform-gpu ${
                 isMaterialDesignActive
@@ -9615,9 +9796,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[120] flex items-center justify-center p-4 select-none" : "fixed inset-0 bg-black/60 backdrop-blur-[15px] z-[120] flex items-center justify-center p-4"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
               className={isWinUI3Active ? `w-full max-w-[420px] relative text-left transform-gpu ${winui.card}` : `w-full max-w-[420px] relative text-left transform-gpu ${
                 isMaterialDesignActive
@@ -9674,9 +9855,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[150] flex items-center justify-center p-4 select-none" : "fixed inset-0 bg-black/80 backdrop-blur-[25px] z-[150] flex items-center justify-center p-4"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
               className={isWinUI3Active ? `w-full max-w-[420px] relative text-left transform-gpu ${winui.card}` : `w-full max-w-[420px] relative text-left transform-gpu ${
                 isMaterialDesignActive
@@ -9738,9 +9919,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[100] flex items-center justify-center p-4 select-none" : "fixed inset-0 bg-black/50 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
               className={isWinUI3Active ? `w-full max-w-[350px] p-6 text-left transform-gpu ${winui.card}` : `w-full max-w-[350px] p-6 text-left transform-gpu ${
                 isMaterialDesignActive
@@ -9791,9 +9972,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[100] flex items-center justify-center p-4 select-none" : "fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className={isWinUI3Active ? `w-full max-w-[380px] relative text-left transform-gpu ${winui.card}` : `w-full max-w-[380px] relative text-left transform-gpu ${
                 isMaterialDesignActive
@@ -9902,9 +10083,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[110] flex items-center justify-center p-4 select-none" : "fixed inset-0 bg-black/50 backdrop-blur-[20px] z-[110] flex items-center justify-center p-4"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.15 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className={isWinUI3Active ? `w-full max-w-[420px] p-6 text-left transform-gpu ${winui.card}` : `w-full max-w-[420px] p-6 text-left transform-gpu ${
                 isMaterialDesignActive
@@ -9983,9 +10164,9 @@ export default function App() {
             className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[120] flex items-center justify-center p-4 select-none" : "fixed inset-0 bg-black/55 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4"}
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.12 })}
+              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 5 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 1.12 })}
+              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 })}
               transition={isMaterialDesignActive ? { duration: 0.25 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className={isWinUI3Active ? `w-full max-w-4xl max-h-[85vh] p-6 flex flex-col text-left transform-gpu overflow-hidden ${winui.card}` : `w-full max-w-4xl max-h-[85vh] p-6 flex flex-col text-left transform-gpu overflow-hidden ${
                 isMaterialDesignActive
