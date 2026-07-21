@@ -181,57 +181,57 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-800 font-sans pb-24">
+    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100 font-sans pb-24">
       {/* Top Banner / Header */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 py-4 sm:px-6 shadow-xs">
+      <header className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-30 px-4 py-4 sm:px-6 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button 
               onClick={onBack}
-              className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer border border-slate-200/50"
+              className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-300 transition-colors cursor-pointer border border-zinc-850"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 text-white" />
             </button>
-            <div>
-              <h1 className="text-lg sm:text-xl font-extrabold text-slate-950 flex items-center gap-2">
-                <Users className="w-5 h-5 text-indigo-600" />
+            <div className="text-left">
+              <h1 className="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-red-500" />
                 Tra cứu Thành viên Vplay
               </h1>
-              <p className="text-xs text-slate-500 font-medium">Tìm kiếm và quản lý thông tin tài khoản người dùng của hệ sinh thái Vplay</p>
+              <p className="text-xs text-zinc-400 font-medium">Tìm kiếm và quản lý thông tin tài khoản người dùng của hệ sinh thái Vplay</p>
             </div>
           </div>
 
           {/* Quick Metrics */}
           <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-            <div className="bg-slate-100 border border-slate-200/60 rounded-xl px-3 py-1.5 flex items-center gap-2">
-              <User className="w-3.5 h-3.5 text-indigo-600" />
+            <div className="bg-zinc-850 border border-zinc-800 rounded-xl px-3 py-1.5 flex items-center gap-2">
+              <User className="w-3.5 h-3.5 text-zinc-300" />
               <div className="text-left">
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Tổng User</p>
-                <p className="text-xs font-extrabold text-slate-800">{metrics.total.toLocaleString()}</p>
+                <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Tổng User</p>
+                <p className="text-xs font-extrabold text-white">{metrics.total.toLocaleString()}</p>
               </div>
             </div>
 
-            <div className="bg-amber-50 border border-amber-200/50 rounded-xl px-3 py-1.5 flex items-center gap-2">
-              <Award className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+            <div className="bg-amber-950/20 border border-amber-800/30 rounded-xl px-3 py-1.5 flex items-center gap-2">
+              <Award className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
               <div className="text-left">
                 <p className="text-[9px] font-bold text-amber-500 uppercase tracking-wider">VIP Users</p>
-                <p className="text-xs font-extrabold text-amber-700">{metrics.vips}</p>
+                <p className="text-xs font-extrabold text-amber-400">{metrics.vips}</p>
               </div>
             </div>
 
-            <div className="bg-purple-50 border border-purple-200/50 rounded-xl px-3 py-1.5 flex items-center gap-2">
-              <ShieldAlert className="w-3.5 h-3.5 text-purple-600" />
+            <div className="bg-purple-950/20 border border-purple-800/30 rounded-xl px-3 py-1.5 flex items-center gap-2">
+              <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />
               <div className="text-left">
-                <p className="text-[9px] font-bold text-purple-500 uppercase tracking-wider">Moderators</p>
-                <p className="text-xs font-extrabold text-purple-700">{metrics.mods}</p>
+                <p className="text-[9px] font-bold text-purple-400 uppercase tracking-wider">Moderators</p>
+                <p className="text-xs font-extrabold text-purple-300">{metrics.mods}</p>
               </div>
             </div>
 
-            <div className="bg-teal-50 border border-teal-200/50 rounded-xl px-3 py-1.5 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping" />
+            <div className="bg-emerald-950/20 border border-emerald-850/30 rounded-xl px-3 py-1.5 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               <div className="text-left">
-                <p className="text-[9px] font-bold text-teal-500 uppercase tracking-wider">Online</p>
-                <p className="text-xs font-extrabold text-teal-700">{metrics.online}</p>
+                <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Online</p>
+                <p className="text-xs font-extrabold text-emerald-300">{metrics.online}</p>
               </div>
             </div>
           </div>
@@ -243,15 +243,15 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
         
         {/* Filters Sidebar */}
         <div className="lg:col-span-1 space-y-5">
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/75 shadow-xs space-y-5">
-            <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+          <div className="bg-zinc-900 rounded-2xl p-5 border border-zinc-800 shadow-lg space-y-5">
+            <h3 className="text-sm font-bold text-white border-b border-zinc-800 pb-3 flex items-center justify-between">
               <span>Bộ lọc nâng cao</span>
-              <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">{filteredUsers.length}</span>
+              <span className="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-mono">{filteredUsers.length}</span>
             </h3>
 
             {/* Role Filter */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Vai trò / Cấp bậc</label>
+            <div className="space-y-2 text-left">
+              <label className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider block">Vai trò / Cấp bậc</label>
               <div className="flex flex-col gap-1.5">
                 {[
                   { value: "All", label: "Tất cả" },
@@ -265,10 +265,10 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                       setRoleFilter(item.value as any);
                       setCurrentPage(1);
                     }}
-                    className={`text-left px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                    className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                       roleFilter === item.value 
-                        ? "bg-indigo-600 text-white shadow-sm" 
-                        : "bg-slate-50 hover:bg-slate-100 text-slate-700"
+                        ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20" 
+                        : "bg-zinc-850 hover:bg-zinc-800 text-zinc-300"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -279,8 +279,8 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
             </div>
 
             {/* Status Filter */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Trạng thái Hoạt động</label>
+            <div className="space-y-2 text-left">
+              <label className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider block">Trạng thái Hoạt động</label>
               <div className="flex flex-col gap-1.5">
                 {[
                   { value: "All", label: "Tất cả" },
@@ -294,10 +294,10 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                       setStatusFilter(item.value as any);
                       setCurrentPage(1);
                     }}
-                    className={`text-left px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                    className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                       statusFilter === item.value 
-                        ? "bg-teal-600 text-white shadow-sm" 
-                        : "bg-slate-50 hover:bg-slate-100 text-slate-700"
+                        ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20" 
+                        : "bg-zinc-850 hover:bg-zinc-800 text-zinc-300"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -308,19 +308,19 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
             </div>
 
             {/* Sorting Filter */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Sắp xếp theo</label>
+            <div className="space-y-2 text-left">
+              <label className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider block">Sắp xếp theo</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="w-full bg-zinc-850 border border-zinc-850 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-200 focus:outline-none focus:ring-2 focus:ring-red-500/20"
               >
-                <option value="id_asc">ID: Tăng dần (Mặc định)</option>
-                <option value="id_desc">ID: Giảm dần</option>
-                <option value="name_asc">Tên: A - Z</option>
-                <option value="name_desc">Tên: Z - A</option>
-                <option value="joined_newest">Ngày tham gia: Mới nhất</option>
-                <option value="joined_oldest">Ngày tham gia: Cũ nhất</option>
+                <option value="id_asc" className="bg-zinc-900">ID: Tăng dần (Mặc định)</option>
+                <option value="id_desc" className="bg-zinc-900">ID: Giảm dần</option>
+                <option value="name_asc" className="bg-zinc-900">Tên: A - Z</option>
+                <option value="name_desc" className="bg-zinc-900">Tên: Z - A</option>
+                <option value="joined_newest" className="bg-zinc-900">Ngày tham gia: Mới nhất</option>
+                <option value="joined_oldest" className="bg-zinc-900">Ngày tham gia: Cũ nhất</option>
               </select>
             </div>
           </div>
@@ -330,19 +330,19 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
         <div className="lg:col-span-3 space-y-4">
           
           {/* Main Search Bar */}
-          <div className="flex items-center gap-3 bg-white border border-slate-200/80 rounded-2xl px-4 py-3 shadow-xs">
-            <Search className="w-5 h-5 text-slate-400 shrink-0" />
+          <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 shadow-md">
+            <Search className="w-5 h-5 text-zinc-400 shrink-0" />
             <input
               type="text"
               placeholder="Nhập tên người dùng, username hoặc mã ID (ví dụ: V123456)..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="flex-1 bg-transparent border-none text-sm text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+              className="flex-1 bg-transparent border-none text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none font-medium text-left"
             />
             {searchQuery && (
               <button 
                 onClick={handleClearSearch}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer transition-colors p-1"
+                className="text-zinc-400 hover:text-white cursor-pointer transition-colors p-1"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -351,10 +351,10 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
 
           {/* Users Grid */}
           {paginatedUsers.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200/80 py-16 text-center flex flex-col items-center justify-center p-6">
-              <Users className="w-16 h-16 text-slate-200 mb-4" />
-              <h3 className="text-base font-bold text-slate-800">Không tìm thấy người dùng nào</h3>
-              <p className="text-xs text-slate-500 max-w-sm mt-1">Vui lòng kiểm tra lại từ khóa tìm kiếm hoặc điều chỉnh các bộ lọc bên trái.</p>
+            <div className="bg-zinc-900 rounded-2xl border border-zinc-800 py-16 text-center flex flex-col items-center justify-center p-6">
+              <Users className="w-16 h-16 text-zinc-700 mb-4" />
+              <h3 className="text-base font-bold text-zinc-200">Không tìm thấy người dùng nào</h3>
+              <p className="text-xs text-zinc-400 max-w-sm mt-1">Vui lòng kiểm tra lại từ khóa tìm kiếm hoặc điều chỉnh các bộ lọc bên trái.</p>
               { (searchQuery || roleFilter !== "All" || statusFilter !== "All") && (
                 <button
                   onClick={() => {
@@ -362,7 +362,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                     setRoleFilter("All");
                     setStatusFilter("All");
                   }}
-                  className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-sm cursor-pointer"
+                  className="mt-4 px-4 py-2 bg-[#cc1827] hover:bg-[#b01420] text-white font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer"
                 >
                   Đặt lại bộ lọc
                 </button>
@@ -374,7 +374,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                 <div
                   key={user.id}
                   onClick={() => setSelectedUser(user)}
-                  className="bg-white rounded-2xl border border-slate-200/75 p-4 hover:border-indigo-500/50 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between h-40 shadow-xs"
+                  className="bg-zinc-900/50 rounded-2xl border border-zinc-850 p-4 hover:border-red-500/50 hover:bg-zinc-900 transition-all cursor-pointer group flex flex-col justify-between h-40 shadow-sm text-left"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0">
@@ -383,41 +383,41 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                         {user.name.split(" ").slice(-1)[0][0]}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-xs sm:text-sm font-black text-slate-900 truncate group-hover:text-indigo-600 transition-colors">
+                        <h4 className="text-xs sm:text-sm font-black text-zinc-100 truncate group-hover:text-red-400 transition-colors">
                           {user.name}
                         </h4>
-                        <p className="text-[10px] text-slate-400 truncate font-mono mt-0.5">@{user.username}</p>
+                        <p className="text-[10px] text-zinc-400 truncate font-mono mt-0.5">@{user.username}</p>
                       </div>
                     </div>
 
                     <div className="shrink-0 flex flex-col items-end gap-1.5">
                       <span className={`w-2 h-2 rounded-full ${
                         user.status === "Online" 
-                          ? "bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.6)]" 
+                          ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" 
                           : user.status === "Idle"
-                          ? "bg-amber-500"
-                          : "bg-slate-300"
+                          ? "bg-amber-400"
+                          : "bg-zinc-600"
                       }`} />
-                      <span className="text-[9px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200/40 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[9px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700/40 px-1.5 py-0.5 rounded-md">
                         {user.userId}
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-4 border-t border-slate-100 pt-3 flex items-center justify-between">
+                  <div className="mt-4 border-t border-zinc-800 pt-3 flex items-center justify-between">
                     <div className="flex flex-col">
-                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Cấp độ</span>
-                      <span className="text-xs font-black text-slate-800">Lv. {user.level}</span>
+                      <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Cấp độ</span>
+                      <span className="text-xs font-black text-zinc-200">Lv. {user.level}</span>
                     </div>
 
                     <div className="flex flex-col items-end">
-                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Cấp bậc</span>
+                      <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Cấp bậc</span>
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                         user.role === "VIP User"
-                          ? "bg-amber-100 text-amber-700 border border-amber-200/30"
+                          ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                           : user.role === "Moderator"
-                            ? "bg-purple-100 text-purple-700 border border-purple-200/30"
-                            : "bg-slate-100 text-slate-600"
+                            ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                            : "bg-zinc-800 text-zinc-400 border border-zinc-700/40"
                       }`}>
                         {user.role}
                       </span>
@@ -430,23 +430,23 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
 
           {/* Pagination Footer */}
           {totalPages > 1 && (
-            <div className="bg-white border border-slate-200/80 rounded-2xl px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
-              <p className="text-xs font-bold text-slate-500">
-                Hiển thị <span className="text-slate-800">{(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredUsers.length)}</span> trên <span className="text-slate-800 font-extrabold">{filteredUsers.length}</span> người dùng
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+              <p className="text-xs font-bold text-zinc-400 text-left">
+                Hiển thị <span className="text-white">{(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredUsers.length)}</span> trên <span className="text-white font-extrabold">{filteredUsers.length}</span> người dùng
               </p>
 
               <div className="flex items-center gap-1.5 select-none">
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(1)}
-                  className="px-2.5 py-1.5 bg-white border border-slate-200 text-xs font-bold rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 transition-colors cursor-pointer shadow-xs"
+                  className="px-2.5 py-1.5 bg-zinc-800 border border-zinc-700 text-xs font-bold rounded-lg hover:bg-zinc-700 disabled:opacity-40 disabled:hover:bg-zinc-800 text-zinc-200 transition-colors cursor-pointer shadow-sm"
                 >
                   Đầu
                 </button>
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  className="p-1.5 bg-white border border-slate-200 text-xs font-bold rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 transition-colors cursor-pointer shadow-xs flex items-center"
+                  className="p-1.5 bg-zinc-800 border border-zinc-700 text-xs font-bold rounded-lg hover:bg-zinc-700 disabled:opacity-40 disabled:hover:bg-zinc-800 text-zinc-200 transition-colors cursor-pointer shadow-sm flex items-center"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -465,8 +465,8 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                           onClick={() => setCurrentPage(pageNumber)}
                           className={`w-8 h-8 flex items-center justify-center text-xs font-black rounded-lg transition-colors cursor-pointer ${
                             currentPage === pageNumber
-                              ? "bg-indigo-600 text-white"
-                              : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                              ? "bg-[#cc1827] text-white font-extrabold shadow-md shadow-red-900/30"
+                              : "bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700"
                           }`}
                         >
                           {pageNumber}
@@ -480,14 +480,14 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  className="p-1.5 bg-white border border-slate-200 text-xs font-bold rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 transition-colors cursor-pointer shadow-xs flex items-center"
+                  className="p-1.5 bg-zinc-800 border border-zinc-700 text-xs font-bold rounded-lg hover:bg-zinc-700 disabled:opacity-40 disabled:hover:bg-zinc-800 text-zinc-200 transition-colors cursor-pointer shadow-sm flex items-center"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(totalPages)}
-                  className="px-2.5 py-1.5 bg-white border border-slate-200 text-xs font-bold rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 transition-colors cursor-pointer shadow-xs"
+                  className="px-2.5 py-1.5 bg-zinc-800 border border-zinc-700 text-xs font-bold rounded-lg hover:bg-zinc-700 disabled:opacity-40 disabled:hover:bg-zinc-800 text-zinc-200 transition-colors cursor-pointer shadow-sm"
                 >
                   Cuối
                 </button>
@@ -499,9 +499,9 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
 
       {/* User Details Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[999] flex items-center justify-center p-4">
           <div 
-            className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-100 animate-fade-in text-left flex flex-col"
+            className="bg-zinc-900 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-zinc-800 animate-fade-in text-left flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header banner */}
@@ -513,7 +513,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                 <X className="w-4 h-4" />
               </button>
               <div className="absolute top-12 left-6">
-                <div className={`w-20 h-20 rounded-full border-4 border-white bg-gradient-to-tr ${selectedUser.avatarColor} flex items-center justify-center text-white text-3xl font-black shadow-md uppercase`}>
+                <div className={`w-20 h-20 rounded-full border-4 border-zinc-900 bg-gradient-to-tr ${selectedUser.avatarColor} flex items-center justify-center text-white text-3xl font-black shadow-md uppercase`}>
                   {selectedUser.name.split(" ").slice(-1)[0][0]}
                 </div>
               </div>
@@ -523,53 +523,53 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
             <div className="px-6 pt-12 pb-6 space-y-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-black text-slate-950">{selectedUser.name}</h3>
+                  <h3 className="text-lg font-black text-white">{selectedUser.name}</h3>
                   <span className={`w-2 h-2 rounded-full ${
-                    selectedUser.status === "Online" ? "bg-teal-500" : selectedUser.status === "Idle" ? "bg-amber-500" : "bg-slate-300"
+                    selectedUser.status === "Online" ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" : selectedUser.status === "Idle" ? "bg-amber-400" : "bg-zinc-600"
                   }`} />
                 </div>
-                <p className="text-xs text-slate-400 font-mono">@{selectedUser.username}</p>
+                <p className="text-xs text-zinc-400 font-mono">@{selectedUser.username}</p>
               </div>
 
               {/* Detailed Grid */}
-              <div className="grid grid-cols-2 gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-200/50">
+              <div className="grid grid-cols-2 gap-3.5 bg-zinc-950 p-4 rounded-2xl border border-zinc-850">
                 <div className="flex items-center gap-2.5">
-                  <Fingerprint className="w-4 h-4 text-indigo-500" />
-                  <div>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Mã số ID</p>
-                    <p className="text-xs font-bold text-slate-800 font-mono">{selectedUser.userId}</p>
+                  <Fingerprint className="w-4 h-4 text-zinc-400" />
+                  <div className="text-left">
+                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Mã số ID</p>
+                    <p className="text-xs font-bold text-white font-mono">{selectedUser.userId}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <Briefcase className="w-4 h-4 text-purple-500" />
-                  <div>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Cấp bậc</p>
-                    <p className="text-xs font-bold text-slate-800">{selectedUser.role}</p>
+                  <Briefcase className="w-4 h-4 text-zinc-400" />
+                  <div className="text-left">
+                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Cấp bậc</p>
+                    <p className="text-xs font-bold text-white">{selectedUser.role}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <TrendingUp className="w-4 h-4 text-emerald-500" />
-                  <div>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Điểm tích lũy</p>
-                    <p className="text-xs font-bold text-slate-800 font-mono">{selectedUser.reputation} XP</p>
+                  <TrendingUp className="w-4 h-4 text-zinc-400" />
+                  <div className="text-left">
+                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Điểm tích lũy</p>
+                    <p className="text-xs font-bold text-white font-mono">{selectedUser.reputation} XP</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <Award className="w-4 h-4 text-amber-500" />
-                  <div>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Cấp độ Level</p>
-                    <p className="text-xs font-bold text-slate-800">Cấp {selectedUser.level}</p>
+                  <Award className="w-4 h-4 text-zinc-400" />
+                  <div className="text-left">
+                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Cấp độ Level</p>
+                    <p className="text-xs font-bold text-white">Cấp {selectedUser.level}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 col-span-2 border-t border-slate-200/60 pt-3 mt-1.5">
-                  <Calendar className="w-4 h-4 text-slate-400" />
+                <div className="flex items-center gap-2.5 col-span-2 border-t border-zinc-800 pt-3 mt-1.5 text-left">
+                  <Calendar className="w-4 h-4 text-zinc-400" />
                   <div>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Ngày đăng ký tham gia</p>
-                    <p className="text-xs font-bold text-slate-800">{new Date(selectedUser.joinedDate).toLocaleDateString("vi-VN", { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Ngày đăng ký tham gia</p>
+                    <p className="text-xs font-bold text-white">{new Date(selectedUser.joinedDate).toLocaleDateString("vi-VN", { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
                 </div>
               </div>
@@ -578,15 +578,15 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
               <div className="flex gap-2">
                 <button
                   onClick={() => setSelectedUser(null)}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
+                  className="flex-1 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold rounded-xl transition-all cursor-pointer text-center"
                 >
                   Đóng cửa sổ
                 </button>
                 <a
                   href={`mailto:${selectedUser.username}@vplay.vn`}
-                  className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-xs"
+                  className="flex-1 py-2.5 bg-[#cc1827] hover:bg-[#b01420] text-white text-xs font-bold rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-md shadow-red-900/10"
                 >
-                  <Mail className="w-3.5 h-3.5" />
+                  <Mail className="w-3.5 h-3.5 text-white" />
                   Gửi thư liên hệ
                 </a>
               </div>
