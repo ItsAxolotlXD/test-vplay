@@ -33,6 +33,7 @@ import {
   Bell,
   Trash2,
   User,
+  Users,
   Palette,
   Beaker,
   AlertCircle,
@@ -58,7 +59,9 @@ import {
   Link,
   Copy,
   LogOut,
-  Power
+  Power,
+  Sun,
+  Moon
 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
@@ -69,6 +72,7 @@ import VirtualRemoteControl from "./components/VirtualRemoteControl";
 import StartMenu from "./components/StartMenu";
 import FandomLogosTab from "./components/FandomLogosTab";
 import IntelligenceThumbnailTab from "./components/IntelligenceThumbnailTab";
+import VplayUsersTab from "./components/VplayUsersTab";
 
 const RECENT_SEARCHES_ITEMS = [
   // 1. Các kênh truyền hình
@@ -604,7 +608,7 @@ function SafeToCloseScreen({
   );
 }
 
-const playClickSound = () => {
+const playClickSound = (volumeMultiplier: number = 0.8) => {
   try {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioCtx) return;
@@ -616,7 +620,8 @@ const playClickSound = () => {
     osc.frequency.setValueAtTime(1100, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.06);
     
-    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+    // Significantly increased baseline volume (from 0.04 to 0.35)
+    gain.gain.setValueAtTime(0.35 * volumeMultiplier, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
     
     osc.connect(gain);
@@ -628,7 +633,7 @@ const playClickSound = () => {
   }
 };
 
-const playToggleSound = (isOn: boolean) => {
+const playToggleSound = (isOn: boolean, volumeMultiplier: number = 0.8) => {
   try {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioCtx) return;
@@ -640,8 +645,9 @@ const playToggleSound = (isOn: boolean) => {
     if (isOn) {
       osc.frequency.setValueAtTime(550, ctx.currentTime);
       osc.frequency.setValueAtTime(950, ctx.currentTime + 0.04);
-      gain.gain.setValueAtTime(0.03, ctx.currentTime);
-      gain.gain.setValueAtTime(0.03, ctx.currentTime + 0.04);
+      // Significantly increased baseline volume (from 0.03 to 0.28)
+      gain.gain.setValueAtTime(0.28 * volumeMultiplier, ctx.currentTime);
+      gain.gain.setValueAtTime(0.28 * volumeMultiplier, ctx.currentTime + 0.04);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
       
       osc.connect(gain);
@@ -651,7 +657,8 @@ const playToggleSound = (isOn: boolean) => {
     } else {
       osc.frequency.setValueAtTime(850, ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.03, ctx.currentTime);
+      // Significantly increased baseline volume (from 0.03 to 0.28)
+      gain.gain.setValueAtTime(0.28 * volumeMultiplier, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
       
       osc.connect(gain);
@@ -781,9 +788,9 @@ export default function App() {
             isOn = ariaChecked === "true";
           }
         }
-        playToggleSound(isOn);
+        playToggleSound(isOn, systemVolumeRef.current);
       } else if (isButton) {
-        playClickSound();
+        playClickSound(systemVolumeRef.current);
       }
     };
     
@@ -794,9 +801,10 @@ export default function App() {
   }, []);
 
   // Navigation State
-  const [activeTab, setActiveTab] = useState<"home" | "live" | "settings" | "search" | "fandom_logos" | "intelligence_thumbnail" | "shorts">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "live" | "settings" | "search" | "fandom_logos" | "intelligence_thumbnail" | "shorts" | "vplay_users">("home");
   const [prevTab, setPrevTab] = useState<"home" | "live" | "settings" | "shorts">("home");
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
+  const [userTabQuery, setUserTabQuery] = useState<string>("");
   const lastTabRef = useRef<string>("home");
 
   useEffect(() => {
@@ -906,6 +914,16 @@ export default function App() {
     const saved = localStorage.getItem("glass_tv_volume");
     return saved ? parseFloat(saved) : 0.8;
   });
+  
+  const [systemVolume, setSystemVolume] = useState<number>(() => {
+    const saved = localStorage.getItem("vplay_system_volume");
+    return saved !== null ? parseFloat(saved) : 0.8;
+  });
+
+  const systemVolumeRef = useRef(systemVolume);
+  useEffect(() => {
+    systemVolumeRef.current = systemVolume;
+  }, [systemVolume]);
   
   const [muted, setMuted] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -1166,6 +1184,39 @@ export default function App() {
     return saved !== null ? saved === "true" : true;
   });
 
+  // Dock to Sidebar state
+  const [dockToSidebar, setDockToSidebar] = useState<boolean>(() => {
+    const saved = localStorage.getItem("vplay_dock_to_sidebar");
+    return saved !== null ? saved === "true" : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_dock_to_sidebar", dockToSidebar ? "true" : "false");
+  }, [dockToSidebar]);
+
+  // Sidebar collapsed state
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    const saved = localStorage.getItem("vplay_sidebar_collapsed");
+    return saved === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_sidebar_collapsed", isSidebarCollapsed ? "true" : "false");
+  }, [isSidebarCollapsed]);
+
+  const [isSidebarCategoriesOpen, setIsSidebarCategoriesOpen] = useState<boolean>(true);
+  const [isSidebarFeaturesOpen, setIsSidebarFeaturesOpen] = useState<boolean>(true);
+
+  // App Theme Mode state
+  const [appThemeMode, setAppThemeMode] = useState<"light" | "dark">(() => {
+    const saved = localStorage.getItem("vplay_app_theme_mode");
+    return (saved === "light" || saved === "dark") ? saved : "dark";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_app_theme_mode", appThemeMode);
+  }, [appThemeMode]);
+
   useEffect(() => {
     localStorage.setItem("glass_tv_amoled_dark", amoledDark ? "true" : "false");
   }, [amoledDark]);
@@ -1371,11 +1422,69 @@ export default function App() {
   const [isDuiMode, setIsDuiMode] = useState<boolean>(false);
   const [isDuiMonitorActive, setIsDuiMonitorActive] = useState<boolean>(false);
   const [isDuiSearchMenuOpen, setIsDuiSearchMenuOpen] = useState<boolean>(false);
-  const [spotlightActiveTab, setSpotlightActiveTab] = useState<"utilities" | "folders" | "themes" | "logs" | null>(null);
+  const [spotlightActiveTab, setSpotlightActiveTab] = useState<"utilities" | "folders" | "themes" | "logs" | "users" | null>(null);
+  const [spotlightUserPage, setSpotlightUserPage] = useState<number>(1);
+  const [spotlightUserSearchQuery, setSpotlightUserSearchQuery] = useState<string>("");
+
+  const vplayUsers = useMemo(() => {
+    const list = [];
+    const firstNames = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Võ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý"];
+    const middleNames = ["Văn", "Thị", "Hữu", "Đức", "Minh", "Kim", "Anh", "Quốc", "Thành", "Ngọc", "Tuấn", "Thanh", "Hoài", "Khánh", "Xuân"];
+    const lastNames = ["Hải", "Nam", "An", "Bình", "Chinh", "Cường", "Dũng", "Đông", "Giang", "Hà", "Hùng", "Huy", "Khoa", "Lâm", "Long", "Minh", "Phong", "Quân", "Sơn", "Tùng", "Vinh", "Vy", "Trang", "Linh", "Hương", "Lan", "Mai", "Cúc", "Trúc", "Đào"];
+    
+    for (let i = 1; i <= 1000; i++) {
+      const fn = firstNames[i % firstNames.length];
+      const mn = middleNames[(i * 3) % middleNames.length];
+      const ln = lastNames[(i * 7) % lastNames.length];
+      const name = `${fn} ${mn} ${ln}`;
+      
+      const normalizedName = name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "d")
+        .toLowerCase()
+        .replace(/\s+/g, "");
+      
+      const username = `${normalizedName}_vplay${i}`;
+      const randomSixDigits = String((123456 + i * 7654321) % 900000 + 100000);
+      const userId = `V${randomSixDigits}`;
+      
+      list.push({
+        id: i,
+        name,
+        username,
+        userId,
+        role: i % 25 === 0 ? "VIP User" : i % 100 === 0 ? "Moderator" : "Vplay Member",
+        joinedDate: `2024-0${(i % 9) + 1}-15`
+      });
+    }
+    return list;
+  }, []);
+
+  const filteredUsers = useMemo(() => {
+    if (!spotlightUserSearchQuery) return vplayUsers;
+    const q = spotlightUserSearchQuery.toLowerCase().trim();
+    return vplayUsers.filter(u => 
+      u.name.toLowerCase().includes(q) || 
+      u.username.toLowerCase().includes(q) || 
+      u.userId.toLowerCase().includes(q)
+    );
+  }, [vplayUsers, spotlightUserSearchQuery]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredUsers.length / 100) || 1;
+  }, [filteredUsers]);
+  
+  const paginatedUsers = useMemo(() => {
+    const startIdx = (spotlightUserPage - 1) * 100;
+    return filteredUsers.slice(startIdx, startIdx + 100);
+  }, [filteredUsers, spotlightUserPage]);
   const [dynamicRecentSearches, setDynamicRecentSearches] = useState<any[]>(RECENT_SEARCHES_ITEMS);
   const [isShufflingSuggestions, setIsShufflingSuggestions] = useState<boolean>(false);
   const [isHeaderSearchOpen, setIsHeaderSearchOpen] = useState<boolean>(false);
   const [headerSearchQuery, setHeaderSearchQuery] = useState<string>("");
+  const [headerSearchTab, setHeaderSearchTab] = useState<"channels" | "users">("channels");
   const [isPowerMenuOpen, setIsPowerMenuOpen] = useState<boolean>(false);
   const [selectedPowerAction, setSelectedPowerAction] = useState<"shutdown" | "restart" | "signout" | "factory_reset">("shutdown");
   const [isCustomPowerDropdownOpen, setIsCustomPowerDropdownOpen] = useState<boolean>(false);
@@ -2698,6 +2807,10 @@ export default function App() {
   }, [volume]);
 
   useEffect(() => {
+    localStorage.setItem("vplay_system_volume", systemVolume.toString());
+  }, [systemVolume]);
+
+  useEffect(() => {
     localStorage.setItem("glass_tv_last_channel", JSON.stringify(selectedChannel));
   }, [selectedChannel]);
 
@@ -2850,6 +2963,9 @@ export default function App() {
 
   // Ambient backgrounds options config
   const getBgGradient = () => {
+    if (appThemeMode === "light") {
+      return "bg-gradient-to-tr from-[#f1f5f9] via-[#f8fafc] to-[#e2e8f0]";
+    }
     if (isWinUI3Active) {
       return "bg-[#1c1c1c]";
     }
@@ -4210,7 +4326,656 @@ export default function App() {
 
   return (
     <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
-      <div className={`min-h-screen text-white/95 pb-32 pt-4 transition-colors duration-1000 overflow-x-clip ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+      <div className={`min-h-screen ${appThemeMode === "light" ? "text-slate-800 light-theme" : "text-white/95"} pb-32 pt-4 transition-all duration-1000 overflow-x-clip ${dockToSidebar ? (isSidebarCollapsed ? "md:pl-20" : "md:pl-72") : ""} ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+        {/* LEFT SIDEBAR (Visible only on desktop when Dock to Sidebar is active) */}
+        {dockToSidebar && (
+          <aside className={`fixed top-0 left-0 h-screen z-[55] flex flex-col border-r shadow-2xl transition-all duration-300 select-none ${
+            isSidebarCollapsed ? "w-20" : "w-72"
+          } ${
+            appThemeMode === "light" 
+              ? "bg-slate-50 border-slate-200/80 text-slate-800" 
+              : amoledDark 
+                ? "bg-black border-neutral-900 text-white" 
+                : "bg-[#0a0813] border-white/5 text-white"
+          } hidden md:flex`}>
+            
+            {/* Header/Logo segment */}
+            <div className={`p-6 border-b border-slate-200/5 dark:border-white/5 flex ${isSidebarCollapsed ? "flex-col gap-4 items-center" : "items-center justify-between gap-3"}`}>
+              <img 
+                src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
+                alt="Vplay Logo"
+                referrerPolicy="no-referrer"
+                className={`${isSidebarCollapsed ? "h-6" : "h-8"} w-auto object-contain transition-all`}
+              />
+              <button 
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                title={isSidebarCollapsed ? "Mở rộng Sidebar" : "Thu gọn Sidebar"}
+                className="p-1.5 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 transition-colors cursor-pointer text-slate-400 hover:text-white shrink-0"
+              >
+                {isSidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+              </button>
+            </div>
+
+            {/* Navigation Body */}
+            <div className="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar">
+              
+              {/* Home Link */}
+              <button
+                onClick={() => {
+                  setActiveTab("home");
+                  setActiveSettingSection(null);
+                }}
+                title="Trang chủ"
+                className={(() => {
+                  const isActive = activeTab === "home";
+                  const base = "w-full py-3 transition-all duration-200 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
+                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
+                  let themeColors = "";
+                  if (isActive) {
+                    themeColors = appThemeMode === "light" 
+                      ? "text-[#cc1827] hover:bg-[#cc1827] hover:text-white" 
+                      : "text-red-500 hover:bg-[#cc1827] hover:text-white";
+                  } else {
+                    themeColors = appThemeMode === "light" 
+                      ? "text-slate-600 hover:bg-[#cc1827] hover:text-white" 
+                      : "text-white/70 hover:bg-[#cc1827] hover:text-white";
+                  }
+                  return `${base} ${alignment} ${themeColors}`;
+                })()}
+              >
+                <Home className="w-5 h-5 shrink-0" />
+                {!isSidebarCollapsed && <span>Trang chủ</span>}
+              </button>
+
+              {/* Categories Accordion */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => setIsSidebarCategoriesOpen(!isSidebarCategoriesOpen)}
+                  title="Thể loại"
+                  className={`w-full py-3 transition-all cursor-pointer rounded-xl flex items-center justify-between ${
+                    isSidebarCollapsed ? "justify-center px-0" : "px-4"
+                  } ${
+                    appThemeMode === "light"
+                      ? "text-slate-600 hover:bg-[#cc1827] hover:text-white"
+                      : "text-white/70 hover:bg-[#cc1827] hover:text-white"
+                  }`}
+                >
+                  <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"} font-semibold text-sm`}>
+                    <Layers className="w-5 h-5 shrink-0 text-teal-500" />
+                    {!isSidebarCollapsed && <span>Thể loại</span>}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isSidebarCategoriesOpen ? "rotate-180" : ""}`} />
+                  )}
+                </button>
+                
+                {isSidebarCategoriesOpen && (
+                  <div className={`flex flex-col gap-1.5 pt-1 pb-2 transition-all ${
+                    isSidebarCollapsed ? "items-center px-2" : "pl-6 ml-6 border-l border-slate-200 dark:border-white/10"
+                  }`}>
+                    {[
+                      { id: "all", name: "Top Kênh / Nổi bật", short: "Top" },
+                      { id: "VTV", name: "Kênh VTV Live", short: "VTV" },
+                      { id: "VTC", name: "Kênh VTC Digital", short: "VTC" },
+                      { id: "HTV", name: "Kênh HTV / SCTV", short: "HTV" },
+                      { id: "Sports", name: "Thể thao Trực tiếp", short: "SPO" },
+                      { id: "Local", name: "Truyền hình Địa phương", short: "ĐP" }
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => {
+                          setSelectedCategory(cat.id);
+                          setActiveTab("home");
+                          setActiveSettingSection(null);
+                        }}
+                        title={cat.name}
+                        className={`text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                          isSidebarCollapsed 
+                            ? "w-10 h-10 flex items-center justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
+                            : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white"
+                        } ${
+                          selectedCategory === cat.id && activeTab === "home"
+                            ? "text-[#cc1827] dark:text-red-500 font-bold bg-[#cc1827]/10"
+                            : appThemeMode === "light"
+                              ? "text-slate-500"
+                              : "text-white/60"
+                        }`}
+                      >
+                        {isSidebarCollapsed ? cat.short : cat.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Live TV Main Button */}
+              <button
+                onClick={() => {
+                  setActiveTab("live");
+                  setActiveSettingSection(null);
+                }}
+                title="Xem Truyền Hình"
+                className={(() => {
+                  const isActive = activeTab === "live";
+                  const base = "w-full py-3 transition-all duration-200 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
+                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
+                  let themeColors = "";
+                  if (isActive) {
+                    themeColors = appThemeMode === "light" 
+                      ? "text-[#cc1827] hover:bg-[#cc1827] hover:text-white" 
+                      : "text-red-500 hover:bg-[#cc1827] hover:text-white";
+                  } else {
+                    themeColors = appThemeMode === "light" 
+                      ? "text-slate-600 hover:bg-[#cc1827] hover:text-white" 
+                      : "text-white/70 hover:bg-[#cc1827] hover:text-white";
+                  }
+                  return `${base} ${alignment} ${themeColors}`;
+                })()}
+              >
+                <div className="flex items-center gap-3.5">
+                  <Radio className="w-5 h-5 shrink-0 text-red-500 animate-pulse" />
+                  {!isSidebarCollapsed && <span>Xem Truyền Hình</span>}
+                </div>
+              </button>
+
+              {/* Special Features Accordion */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => setIsSidebarFeaturesOpen(!isSidebarFeaturesOpen)}
+                  title="Tính năng Vplay"
+                  className={`w-full py-3 transition-all cursor-pointer rounded-xl flex items-center justify-between ${
+                    isSidebarCollapsed ? "justify-center px-0" : "px-4"
+                  } ${
+                    appThemeMode === "light"
+                      ? "text-slate-600 hover:bg-[#cc1827] hover:text-white"
+                      : "text-white/70 hover:bg-[#cc1827] hover:text-white"
+                  }`}
+                >
+                  <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"} font-semibold text-sm`}>
+                    <Tv className="w-5 h-5 shrink-0 text-indigo-500" />
+                    {!isSidebarCollapsed && <span>Tính năng Vplay</span>}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isSidebarFeaturesOpen ? "rotate-180" : ""}`} />
+                  )}
+                </button>
+                
+                {isSidebarFeaturesOpen && (
+                  <div className={`flex flex-col gap-1.5 pt-1 pb-2 transition-all ${
+                    isSidebarCollapsed ? "items-center px-2" : "pl-6 ml-6 border-l border-slate-200 dark:border-white/10"
+                  }`}>
+                    <button
+                      onClick={() => {
+                        setActiveTab("shorts");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Vplay Vertical (Shorts)"
+                      className={`text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center ${
+                        isSidebarCollapsed 
+                          ? "w-10 h-10 justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
+                          : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white gap-2"
+                      } ${
+                        activeTab === "shorts"
+                          ? "text-[#cc1827] dark:text-red-500 font-bold bg-[#cc1827]/10"
+                          : appThemeMode === "light"
+                            ? "text-slate-500"
+                            : "text-white/60"
+                      }`}
+                    >
+                      <Sparkles className="w-4 h-4 text-orange-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>Vplay Vertical</span>}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab("vplay_users");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Tra cứu Người dùng Vplay"
+                      className={`text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center ${
+                        isSidebarCollapsed 
+                          ? "w-10 h-10 justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
+                          : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white gap-2"
+                      } ${
+                        activeTab === "vplay_users"
+                          ? "text-[#cc1827] dark:text-red-500 font-bold bg-[#cc1827]/10"
+                          : appThemeMode === "light"
+                            ? "text-slate-500"
+                            : "text-white/60"
+                      }`}
+                    >
+                      <Users className="w-4 h-4 text-sky-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>Tra cứu người dùng</span>}
+                    </button>
+                    
+                    {customTabs.map((ct: any) => (
+                      <button
+                        key={ct.id}
+                        onClick={() => {
+                          setActiveTab(ct.id);
+                          setActiveSettingSection(null);
+                        }}
+                        title={ct.name}
+                        className={`text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center ${
+                          isSidebarCollapsed 
+                            ? "w-10 h-10 justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
+                            : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white gap-2"
+                        } ${
+                          activeTab === ct.id
+                            ? "text-[#cc1827] dark:text-red-500 font-bold bg-[#cc1827]/10"
+                            : appThemeMode === "light"
+                              ? "text-slate-500"
+                              : "text-white/60"
+                        }`}
+                      >
+                        <Compass className="w-4 h-4 text-emerald-400 shrink-0" />
+                        {!isSidebarCollapsed && <span>{ct.name}</span>}
+                      </button>
+                    ))}
+                    
+                    <button
+                      onClick={() => {
+                        setShowVtvGoLockedModal(true);
+                      }}
+                      title="VTVgo VIP"
+                      className={`text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center ${
+                        isSidebarCollapsed 
+                          ? "w-10 h-10 justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
+                          : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white gap-2"
+                      } ${
+                        appThemeMode === "light"
+                          ? "text-slate-500"
+                          : "text-white/60"
+                      }`}
+                    >
+                      <Star className="w-4 h-4 text-amber-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>VTVgo VIP</span>}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Settings Tab */}
+              <button
+                onClick={() => {
+                  setActiveTab("settings");
+                  setActiveSettingSection(null);
+                }}
+                title="Thiết lập hệ thống"
+                className={(() => {
+                  const isActive = activeTab === "settings";
+                  const base = "w-full py-3 transition-all duration-200 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
+                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
+                  let themeColors = "";
+                  if (isActive) {
+                    themeColors = appThemeMode === "light" 
+                      ? "text-[#cc1827] hover:bg-[#cc1827] hover:text-white" 
+                      : "text-red-500 hover:bg-[#cc1827] hover:text-white";
+                  } else {
+                    themeColors = appThemeMode === "light" 
+                      ? "text-slate-600 hover:bg-[#cc1827] hover:text-white" 
+                      : "text-white/70 hover:bg-[#cc1827] hover:text-white";
+                  }
+                  return `${base} ${alignment} ${themeColors}`;
+                })()}
+              >
+                <Settings className="w-5 h-5 shrink-0" />
+                {!isSidebarCollapsed && <span>Thiết lập hệ thống</span>}
+              </button>
+
+            </div>
+
+            {/* Theme Toggle Switch on Sidebar */}
+            <div className={`p-4 border-t ${
+              appThemeMode === "light" ? "border-slate-200" : "border-white/5"
+            } flex items-center justify-between`}>
+              {!isSidebarCollapsed ? (
+                <>
+                  <span className="text-xs font-semibold">Chế độ</span>
+                  <div className="flex items-center gap-1 bg-slate-200/50 dark:bg-white/5 p-1 rounded-xl border border-slate-200/20 dark:border-white/5 select-none">
+                    <button
+                      onClick={() => setAppThemeMode("light")}
+                      title="Giao diện Sáng"
+                      className={`p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                        appThemeMode === "light"
+                          ? "bg-white text-slate-900 shadow-sm"
+                          : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      <Sun className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setAppThemeMode("dark")}
+                      title="Giao diện Tối"
+                      className={`p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                        appThemeMode === "dark"
+                          ? "bg-[#cc1827] text-white shadow-md"
+                          : "text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <Moon className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <button
+                  onClick={() => setAppThemeMode(appThemeMode === "light" ? "dark" : "light")}
+                  title={appThemeMode === "light" ? "Chuyển sang giao diện Tối" : "Chuyển sang giao diện Sáng"}
+                  className={`p-3 rounded-xl transition-all cursor-pointer flex items-center justify-center mx-auto ${
+                    appThemeMode === "light"
+                      ? "bg-slate-200/50 text-slate-600 hover:bg-[#cc1827] hover:text-white"
+                      : "bg-white/5 text-white/80 hover:bg-[#cc1827] hover:text-white"
+                  } w-12 h-12`}
+                >
+                  {appThemeMode === "light" ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-indigo-400" />}
+                </button>
+              )}
+            </div>
+
+            {/* Quick Actions Panel (Plugin Store, Search, Volume, Power) inside Sidebar */}
+            <div className={`p-4 border-t ${
+              appThemeMode === "light" ? "border-slate-200" : "border-white/5"
+            } space-y-2`}>
+              {!isSidebarCollapsed && (
+                <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase pl-1">
+                  Công cụ hệ thống
+                </div>
+              )}
+              
+              <div className={`flex ${isSidebarCollapsed ? "flex-col items-center gap-3" : "grid grid-cols-4 gap-2"}`}>
+                
+                {/* Plugin Store */}
+                <button
+                  onClick={() => {
+                    setActiveTab("settings");
+                    setActiveSettingSection("plugin_store");
+                  }}
+                  title="Cửa hàng Plugin"
+                  className={`relative rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                    appThemeMode === "light"
+                      ? "bg-slate-200/50 text-slate-600 hover:bg-[#cc1827] hover:text-white"
+                      : "bg-white/5 text-white/80 hover:bg-[#cc1827] hover:text-white"
+                  } ${isSidebarCollapsed ? "w-12 h-12" : "w-full h-11"}`}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-indigo-500" />
+                </button>
+
+                {/* Spotlight Search Container */}
+                <div className="relative sidebar-spotlight-container w-full flex justify-center">
+                  <button
+                    onClick={() => {
+                      setIsHeaderSearchOpen(prev => !prev);
+                      setIsPowerMenuOpen(false);
+                    }}
+                    title="Tìm kiếm nhanh"
+                    className={`rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                      isHeaderSearchOpen
+                        ? "bg-[#cc1827] text-white"
+                        : appThemeMode === "light"
+                          ? "bg-slate-200/50 text-slate-600 hover:bg-[#cc1827] hover:text-white"
+                          : "bg-white/5 text-white/80 hover:bg-[#cc1827] hover:text-white"
+                    } ${isSidebarCollapsed ? "w-12 h-12" : "w-full h-11"}`}
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
+
+                  <AnimatePresence>
+                    {isHeaderSearchOpen && (
+                      <>
+                        {/* Invisible clickaway backdrop */}
+                        <div 
+                          className="fixed inset-0 z-[100] cursor-default" 
+                          onClick={() => {
+                            setIsHeaderSearchOpen(false);
+                            setHeaderSearchQuery("");
+                          }}
+                        />
+                        
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, x: -10 }}
+                          animate={{ opacity: 1, scale: 1, x: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, x: -10 }}
+                          transition={{ duration: 0.15 }}
+                          className={`absolute ${isSidebarCollapsed ? "left-[64px]" : "left-[240px]"} bottom-0 ml-3 w-72 sm:w-80 bg-white dark:bg-[#151324] backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] z-[110] flex flex-col gap-3 select-none text-left`}
+                        >
+                          {/* Input search area */}
+                          <div className="flex items-center h-11 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 px-3 transition-all focus-within:border-red-500 focus-within:bg-white dark:focus-within:bg-slate-800">
+                            <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                            <input
+                              type="text"
+                              placeholder="Tìm nhanh kênh..."
+                              value={headerSearchQuery}
+                              onChange={(e) => setHeaderSearchQuery(e.target.value)}
+                              className="flex-1 bg-transparent border-none text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none text-xs pl-2.5 h-full font-medium"
+                              autoFocus
+                            />
+                            <Mic className="w-4 h-4 text-teal-600 shrink-0 cursor-pointer hover:text-teal-500 transition-colors" />
+                          </div>
+
+                          {/* Suggested & Search results */}
+                          <div className="max-h-64 overflow-y-auto custom-scrollbar flex flex-col gap-3 pr-1 text-slate-800 dark:text-white">
+                            {!headerSearchQuery ? (
+                              <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
+                                <button
+                                  onClick={() => {
+                                    setActiveTab("vplay_users");
+                                    setUserTabQuery("");
+                                    setIsHeaderSearchOpen(false);
+                                  }}
+                                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-pink-600 text-white text-xs font-bold transition-all cursor-pointer w-full"
+                                >
+                                  <Users className="w-4 h-4" />
+                                  <span>Tra cứu Người dùng Vplay</span>
+                                </button>
+                                <span className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">Nhập từ khóa tìm kiếm</span>
+                              </div>
+                            ) : (
+                              <>
+                                {(() => {
+                                  const q = headerSearchQuery.toLowerCase();
+                                  const filteredChannels = processedChannels.filter(c => 
+                                    c.name.toLowerCase().includes(q) ||
+                                    (c.group && c.group.toLowerCase().includes(q))
+                                  ).slice(0, 4);
+
+                                  const filteredUsersList = vplayUsers.filter(u => 
+                                    u.name.toLowerCase().includes(q) ||
+                                    u.username.toLowerCase().includes(q) ||
+                                    u.userId.toLowerCase().includes(q)
+                                  ).slice(0, 4);
+
+                                  if (filteredChannels.length === 0 && filteredUsersList.length === 0) {
+                                    return (
+                                      <div className="text-center py-6 text-slate-400 text-xs flex flex-col items-center justify-center gap-1">
+                                        <HelpCircle className="w-6 h-6 text-slate-400" />
+                                        <span>Không tìm thấy kết quả</span>
+                                      </div>
+                                    );
+                                  }
+
+                                  return (
+                                    <div className="flex flex-col gap-3">
+                                      {filteredChannels.length > 0 && (
+                                        <div className="flex flex-col gap-1">
+                                          <div className="px-2 pb-0.5 text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase">
+                                            Kênh ({filteredChannels.length})
+                                          </div>
+                                          {filteredChannels.map(channel => (
+                                            <button
+                                              key={channel.id}
+                                              onClick={() => {
+                                                setSelectedChannel(channel);
+                                                setActiveTab("live");
+                                                setIsHeaderSearchOpen(false);
+                                                setHeaderSearchQuery("");
+                                              }}
+                                              className="w-full flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-left transition-all cursor-pointer"
+                                            >
+                                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black text-white shrink-0 shadow-sm ${channel.logoBg || 'bg-gradient-to-br from-indigo-500 to-indigo-800'}`}>
+                                                {channel.logoText || channel.name.slice(0, 2).toUpperCase()}
+                                              </div>
+                                              <div className="flex-1 min-w-0">
+                                                <p className="text-slate-800 dark:text-white text-xs font-bold truncate">{channel.name}</p>
+                                                <p className="text-slate-400 text-[9px] truncate">{channel.group}</p>
+                                              </div>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+
+                                      {filteredUsersList.length > 0 && (
+                                        <div className="flex flex-col gap-1 border-t border-slate-100 dark:border-white/5 pt-2">
+                                          <div className="px-2 pb-0.5 text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase">
+                                            Người dùng ({filteredUsersList.length})
+                                          </div>
+                                          {filteredUsersList.map(user => (
+                                            <button
+                                              key={user.id}
+                                              onClick={() => {
+                                                setActiveTab("vplay_users");
+                                                setUserTabQuery(user.userId);
+                                                setIsHeaderSearchOpen(false);
+                                                setHeaderSearchQuery("");
+                                              }}
+                                              className="w-full flex items-center justify-between p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-left transition-all cursor-pointer"
+                                            >
+                                              <div className="flex items-center gap-2 min-w-0">
+                                                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 flex items-center justify-center text-white text-[9px] font-bold shrink-0">
+                                                  {user.name.split(" ").slice(-1)[0][0]}
+                                                </div>
+                                                <div className="min-w-0">
+                                                  <p className="text-slate-800 dark:text-white text-xs font-bold truncate">{user.name}</p>
+                                                  <p className="text-slate-400 text-[9px] truncate font-mono">@{user.username}</p>
+                                                </div>
+                                              </div>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                              </>
+                            )}
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Volume Slider Container */}
+                <div className="relative sidebar-volume-container w-full flex justify-center">
+                  <button
+                    onClick={() => setShowDropdownMenu(prev => !prev)}
+                    title="Âm lượng"
+                    className={`rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                      showDropdownMenu
+                        ? "bg-[#cc1827] text-white"
+                        : appThemeMode === "light"
+                          ? "bg-slate-200/50 text-slate-600 hover:bg-[#cc1827] hover:text-white"
+                          : "bg-white/5 text-white/80 hover:bg-[#cc1827] hover:text-white"
+                    } ${isSidebarCollapsed ? "w-12 h-12" : "w-full h-11"}`}
+                  >
+                    <Volume2 className="w-5 h-5" />
+                  </button>
+
+                  <AnimatePresence>
+                    {showDropdownMenu && (
+                      <>
+                        <div className="fixed inset-0 z-[100] cursor-default" onClick={() => setShowDropdownMenu(false)} />
+                        
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, x: -10 }}
+                          animate={{ opacity: 1, scale: 1, x: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, x: -10 }}
+                          transition={{ duration: 0.15 }}
+                          className={`absolute ${isSidebarCollapsed ? "left-[64px]" : "left-[240px]"} bottom-0 ml-3 w-64 rounded-2xl bg-white dark:bg-[#151324] border border-slate-200/80 dark:border-white/10 p-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] z-[110] text-slate-800 dark:text-white text-left font-sans`}
+                        >
+                          <h3 className="text-xs font-bold mb-3 tracking-wider uppercase text-slate-500 dark:text-slate-400">Tùy chỉnh Âm lượng</h3>
+                          <div className="flex flex-col gap-4">
+                            {/* Playback Volume */}
+                            <div className="flex flex-col gap-1.5 text-left">
+                              <div className="flex items-center justify-between text-[11px] font-medium text-slate-700 dark:text-slate-300 font-sans">
+                                <span className="flex items-center gap-2"><Tv className="w-3.5 h-3.5 text-[#cc1827]" /> Playback (Kênh)</span>
+                                <span>{Math.round(volume * 100)}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.01"
+                                value={volume}
+                                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                                className="w-full h-1 rounded-lg appearance-none cursor-pointer range-slider-pill outline-none"
+                                style={{
+                                  background: `linear-gradient(to right, #cc1827 ${volume * 100}%, rgba(0, 0, 0, 0.1) ${volume * 100}%)`
+                                }}
+                              />
+                            </div>
+
+                            {/* System Volume */}
+                            <div className="flex flex-col gap-1.5 text-left">
+                              <div className="flex items-center justify-between text-[11px] font-medium text-slate-700 dark:text-slate-300 font-sans">
+                                <span className="flex items-center gap-2"><Volume2 className="w-3.5 h-3.5 text-[#cc1827]" /> System (Hệ thống)</span>
+                                <span>{Math.round(systemVolume * 100)}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.01"
+                                value={systemVolume}
+                                onChange={(e) => setSystemVolume(parseFloat(e.target.value))}
+                                className="w-full h-1 rounded-lg appearance-none cursor-pointer range-slider-pill outline-none"
+                                style={{
+                                  background: `linear-gradient(to right, #cc1827 ${systemVolume * 100}%, rgba(0, 0, 0, 0.1) ${systemVolume * 100}%)`
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Power Button */}
+                <button
+                  onClick={() => {
+                    setIsPowerMenuOpen(prev => !prev);
+                    setIsHeaderSearchOpen(false);
+                  }}
+                  title="Nguồn hệ thống"
+                  className={`rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                    isPowerMenuOpen
+                      ? "bg-[#cc1827] text-white animate-pulse"
+                      : appThemeMode === "light"
+                        ? "bg-slate-200/50 text-slate-600 hover:bg-[#cc1827] hover:text-white"
+                        : "bg-white/5 text-white/80 hover:bg-[#cc1827] hover:text-white"
+                  } ${isSidebarCollapsed ? "w-12 h-12" : "w-full h-11"}`}
+                >
+                  <Power className="w-5 h-5" />
+                </button>
+
+              </div>
+            </div>
+
+            {/* Sidebar Footer */}
+            {!isSidebarCollapsed && (
+              <div className={`p-4 border-t text-[11px] font-mono text-center shrink-0 ${
+                appThemeMode === "light" 
+                  ? "border-slate-200 text-slate-400" 
+                  : "border-white/5 text-white/30"
+              }`}>
+                Vplay System • v3.6.0
+              </div>
+            )}
+
+          </aside>
+        )}
+
         {(isPreShutdown || isPreCrash) && (
           <div className="fixed inset-0 bg-black/10 z-[999999] cursor-wait pointer-events-auto" />
         )}
@@ -4306,7 +5071,7 @@ export default function App() {
 
       {/* TV360 STYLE CINEMATIC HEADER (Floating on Top - Displays on ALL tabs) */}
       {(activeTab !== "settings" || activeSettingSection === null) && (
-        <header className="fixed top-0 inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-all duration-150">
+        <header className={`fixed top-0 left-0 right-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-all duration-150 ${dockToSidebar ? (isSidebarCollapsed ? "md:left-20" : "md:left-72") : ""}`}>
           {/* Progressive background blurs backplate - Only visible when scrolled down or when not on home tab */}
           <div className={`progressive-blur-header z-0 pointer-events-none border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
             isScrolled || activeTab !== "home" ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
@@ -4321,7 +5086,6 @@ export default function App() {
                 referrerPolicy="no-referrer"
                 className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
-              <span className="hidden xs:inline-block font-sans font-black text-lg bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent uppercase tracking-wider select-none">360</span>
             </div>
 
             {/* Real-time Ticking Digital Clock */}
@@ -4354,7 +5118,7 @@ export default function App() {
                 setActiveTab("settings");
                 setActiveSettingSection("plugin_store");
               }}
-              className="relative group p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer"
+              className={`relative group p-1.5 rounded-full hover:bg-white/10 text-white/85 hover:text-white transition-all cursor-pointer ${dockToSidebar ? "md:hidden" : ""}`}
             >
               <ShoppingBag className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-indigo-500 ring-2 ring-transparent" />
@@ -4364,7 +5128,7 @@ export default function App() {
             </button>
 
             {/* Spotlight search icon button */}
-            <div className="relative header-spotlight-container">
+            <div className={`relative header-spotlight-container ${dockToSidebar ? "md:hidden" : ""}`}>
               <button
                 onClick={() => {
                   setIsHeaderSearchOpen(prev => !prev);
@@ -4399,70 +5163,131 @@ export default function App() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute right-0 mt-2.5 w-72 sm:w-80 bg-[#16161a]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 flex flex-col gap-3 select-none text-left"
+                      className="absolute right-0 mt-2.5 w-72 sm:w-80 bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.12)] z-50 flex flex-col gap-3 select-none text-left"
                     >
                       {/* Input search area */}
-                      <div className="flex items-center h-11 rounded-xl bg-white/10 border border-white/5 px-3 transition-all focus-within:border-indigo-500/50 focus-within:bg-white/15">
+                      <div className="flex items-center h-11 rounded-xl bg-slate-100 border border-slate-200/50 px-3 transition-all focus-within:border-indigo-500/50 focus-within:bg-white">
                         <Search className="w-4 h-4 text-slate-400 shrink-0" />
                         <input
                           type="text"
-                          placeholder="Spotlight Search"
+                          placeholder="Tìm nhanh kênh hoặc người dùng..."
                           value={headerSearchQuery}
                           onChange={(e) => setHeaderSearchQuery(e.target.value)}
-                          className="flex-1 bg-transparent border-none text-white placeholder-slate-400 focus:outline-none text-xs sm:text-sm pl-2.5 h-full font-medium"
+                          className="flex-1 bg-transparent border-none text-slate-800 placeholder-slate-400 focus:outline-none text-xs sm:text-sm pl-2.5 h-full font-medium"
                           autoFocus
                         />
-                        <Mic className="w-4 h-4 text-teal-400 shrink-0 cursor-pointer hover:text-teal-300 transition-colors" />
+                        <Mic className="w-4 h-4 text-teal-600 shrink-0 cursor-pointer hover:text-teal-500 transition-colors" />
                       </div>
 
                       {/* Content list */}
-                      <div className="max-h-64 overflow-y-auto custom-scrollbar flex flex-col gap-1 pr-1">
+                      <div className="max-h-64 overflow-y-auto custom-scrollbar flex flex-col gap-3.5 pr-1">
                         {!headerSearchQuery ? (
-                          <div className="flex flex-col items-center justify-center py-6 text-center">
-                            <span className="text-slate-400 text-xs font-medium">Nhập từ khóa để tìm kiếm nhanh</span>
+                          <div className="flex flex-col items-center justify-center py-6 text-center gap-3">
+                            <button
+                              id="header-user-lookup-btn"
+                              onClick={() => {
+                                setActiveTab("vplay_users");
+                                setUserTabQuery("");
+                                setIsHeaderSearchOpen(false);
+                              }}
+                              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white text-xs font-bold shadow-md transition-all cursor-pointer hover:scale-105 active:scale-95 w-full"
+                            >
+                              <Users className="w-4 h-4" />
+                              <span>Tra cứu Người dùng Vplay</span>
+                            </button>
+                            <span className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">Nhập từ khóa để tìm kiếm nhanh</span>
                           </div>
                         ) : (
                           <>
-                            {/* Filter channels */}
+                            {/* Filter channels and users */}
                             {(() => {
-                              const filtered = processedChannels.filter(c => 
-                                c.name.toLowerCase().includes(headerSearchQuery.toLowerCase()) ||
-                                (c.group && c.group.toLowerCase().includes(headerSearchQuery.toLowerCase()))
-                              ).slice(0, 5);
+                              const q = headerSearchQuery.toLowerCase();
+                              const filteredChannels = processedChannels.filter(c => 
+                                c.name.toLowerCase().includes(q) ||
+                                (c.group && c.group.toLowerCase().includes(q))
+                              ).slice(0, 4);
 
-                              if (filtered.length === 0) {
+                              const filteredUsersList = vplayUsers.filter(u => 
+                                u.name.toLowerCase().includes(q) ||
+                                u.username.toLowerCase().includes(q) ||
+                                u.userId.toLowerCase().includes(q)
+                              ).slice(0, 4);
+
+                              if (filteredChannels.length === 0 && filteredUsersList.length === 0) {
                                 return (
-                                  <div className="text-center py-4 text-slate-400 text-xs">
-                                    Không tìm thấy kết quả phù hợp
+                                  <div className="text-center py-8 text-slate-400 text-xs flex flex-col items-center justify-center gap-2">
+                                    <HelpCircle className="w-8 h-8 text-slate-400" />
+                                    <span>Không tìm thấy kết quả phù hợp</span>
                                   </div>
                                 );
                               }
 
                               return (
-                                <div className="flex flex-col gap-1">
-                                  <div className="px-2 pb-1 text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                                    Kênh truyền hình ({filtered.length})
-                                  </div>
-                                  {filtered.map(channel => (
-                                    <button
-                                      key={channel.id}
-                                      onClick={() => {
-                                        setSelectedChannel(channel);
-                                        setActiveTab("live");
-                                        setIsHeaderSearchOpen(false);
-                                        setHeaderSearchQuery("");
-                                      }}
-                                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 text-left transition-all cursor-pointer group/item"
-                                    >
-                                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm transition-transform group-hover/item:scale-105 ${channel.logoBg || 'bg-gradient-to-br from-indigo-500 to-indigo-800'}`}>
-                                        {channel.logoText || channel.name.slice(0, 2).toUpperCase()}
+                                <div className="flex flex-col gap-4">
+                                  {/* Channels Group */}
+                                  {filteredChannels.length > 0 && (
+                                    <div className="flex flex-col gap-1">
+                                      <div className="px-2 pb-1 text-[10px] font-bold text-slate-500 tracking-wider uppercase">
+                                        Kênh truyền hình ({filteredChannels.length})
                                       </div>
-                                      <div className="flex-1 min-w-0">
-                                        <p className="text-white text-xs font-bold truncate group-hover/item:text-indigo-400 transition-colors">{channel.name}</p>
-                                        <p className="text-slate-400 text-[10px] truncate">{channel.group || "Kênh phát sóng"}</p>
+                                      {filteredChannels.map(channel => (
+                                        <button
+                                          key={channel.id}
+                                          onClick={() => {
+                                            setSelectedChannel(channel);
+                                            setActiveTab("live");
+                                            setIsHeaderSearchOpen(false);
+                                            setHeaderSearchQuery("");
+                                          }}
+                                          className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-100 text-left transition-all cursor-pointer group/item animate-fade-in"
+                                        >
+                                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm transition-transform group-hover/item:scale-105 ${channel.logoBg || 'bg-gradient-to-br from-indigo-500 to-indigo-800'}`}>
+                                            {channel.logoText || channel.name.slice(0, 2).toUpperCase()}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <p className="text-slate-800 text-xs font-bold truncate group-hover/item:text-indigo-600 transition-colors">{channel.name}</p>
+                                            <p className="text-slate-400 text-[10px] truncate">{channel.group || "Kênh phát sóng"}</p>
+                                          </div>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {/* Users Group */}
+                                  {filteredUsersList.length > 0 && (
+                                    <div className="flex flex-col gap-1 border-t border-slate-100 pt-3">
+                                      <div className="px-2 pb-1 text-[10px] font-bold text-slate-500 tracking-wider uppercase">
+                                        Người dùng Vplay ({filteredUsersList.length})
                                       </div>
-                                    </button>
-                                  ))}
+                                      {filteredUsersList.map(user => (
+                                        <button
+                                          key={user.id}
+                                          onClick={() => {
+                                            setActiveTab("vplay_users");
+                                            setUserTabQuery(user.userId);
+                                            setIsHeaderSearchOpen(false);
+                                            setHeaderSearchQuery("");
+                                          }}
+                                          className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-slate-100 text-left transition-all cursor-pointer group/item animate-fade-in"
+                                        >
+                                          <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 flex items-center justify-center text-white text-[10px] font-bold shrink-0 shadow-sm">
+                                              {user.name.split(" ").slice(-1)[0][0]}
+                                            </div>
+                                            <div className="min-w-0">
+                                              <p className="text-slate-800 text-xs font-bold truncate group-hover/item:text-teal-600 transition-colors">{user.name}</p>
+                                              <p className="text-slate-400 text-[10px] truncate font-mono">@{user.username}</p>
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-2 shrink-0">
+                                            <span className="text-[9px] font-mono font-semibold bg-slate-100 text-slate-600 border border-slate-200/40 px-1.5 py-0.5 rounded-md">
+                                              {user.userId}
+                                            </span>
+                                          </div>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })()}
@@ -4476,7 +5301,7 @@ export default function App() {
             </div>
 
             {/* Power icon button */}
-            <div className="relative header-power-container">
+            <div className={`relative header-power-container ${dockToSidebar ? "md:hidden" : ""}`}>
               <button
                 onClick={() => {
                   setIsPowerMenuOpen(prev => !prev);
@@ -4655,21 +5480,8 @@ export default function App() {
               </AnimatePresence>
             </div>
 
-            {/* User avatar displaying email info */}
-            <div className="relative group/avatar flex items-center gap-2 cursor-pointer z-50">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-pink-500 via-indigo-600 to-teal-400 p-0.5 shadow-md">
-                <div className="w-full h-full rounded-full bg-[#120e24] flex items-center justify-center select-none text-white">
-                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/90" />
-                </div>
-              </div>
-              {/* Floating tooltip */}
-              <div className="absolute top-full right-0 mt-2 pointer-events-none opacity-0 group-hover/avatar:opacity-100 transition-all duration-150 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg px-2.5 py-1.5 shadow-xl text-[10px] sm:text-[11px] text-white/90 whitespace-nowrap z-50 scale-95 group-hover/avatar:scale-100">
-                Tài khoản: <span className="font-extrabold text-pink-300">Premium Member</span>
-              </div>
-            </div>
-
             {/* Top Menu Dropdown Button */}
-            <div className="relative">
+            <div className={`relative ${dockToSidebar ? "md:hidden" : ""}`}>
               <button
                 onClick={() => setShowDropdownMenu(prev => !prev)}
                 className={`relative group transition-all cursor-pointer flex items-center justify-center active:scale-95 duration-200 ${
@@ -4678,9 +5490,9 @@ export default function App() {
                     : "p-1.5 sm:p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white"
                 }`}
               >
-                <Menu className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+                <Volume2 className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 <div className="absolute top-full right-0 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                  Menu tùy chọn
+                  Tùy chỉnh âm lượng
                 </div>
               </button>
               
@@ -4697,103 +5509,50 @@ export default function App() {
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         style={{ originX: 1, originY: 0 }}
                         transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-                        className="absolute right-0 mt-3 w-64 rounded-[28px] bg-[#2b2930] border border-[#3d3a46] shadow-[0_8px_30px_rgb(0,0,0,0.5)] z-50 p-2 text-[#e6e1e5] overflow-hidden animate-fade-in"
+                        className="absolute right-0 mt-3 w-72 rounded-[28px] bg-[#2b2930] border border-[#3d3a46] shadow-[0_8px_30px_rgb(0,0,0,0.5)] z-50 p-5 text-[#e6e1e5] overflow-hidden animate-fade-in font-sans"
                       >
-                        {[
-                          {
-                            label: "Refresh & Reload",
-                            icon: RefreshCw,
-                            onClick: () => {
-                              setShowDropdownMenu(false);
-                              window.location.reload();
-                            }
-                          },
-                          {
-                            label: "Clock & Calendar",
-                            icon: Clock,
-                            active: showClock,
-                            onClick: () => {
-                              toggleShowClock();
-                            }
-                          },
-                          {
-                            label: "About Vplay",
-                            icon: Info,
-                            onClick: () => {
-                              setShowDropdownMenu(false);
-                              setShowAboutModal(true);
-                            }
-                          },
-                          ...(activeTab === "live" || activeTab === "vtvgo" ? [
-                            {
-                              label: "Export Channels (M3U)",
-                              icon: Download,
-                              onClick: () => {
-                                setShowDropdownMenu(false);
-                                exportChannelsToM3u8();
-                              }
-                            }
-                          ] : []),
-                          ...(activeTab === "live" ? [
-                            {
-                              label: "Multiview Mode",
-                              icon: Grid,
-                              onClick: () => {
-                                setShowDropdownMenu(false);
-                                handleOpenMultiviewSelector();
-                              }
-                            },
-                            {
-                              label: "Picture in Picture",
-                              icon: Layers,
-                              onClick: () => {
-                                setShowDropdownMenu(false);
-                                handleTogglePictureInPicture();
-                              }
-                            }
-                          ] : []),
-                          {
-                            label: "Settings",
-                            icon: Settings,
-                            onClick: () => {
-                              setShowDropdownMenu(false);
-                              setActiveTab("settings");
-                              setActiveSettingSection(null);
-                            }
-                          },
-                          {
-                            label: t("menu.SignOut.label"),
-                            icon: LogOut,
-                            onClick: () => {
-                              setShowDropdownMenu(false);
-                              handleSignOut();
-                            }
-                          },
-                          {
-                            label: t("menu.Shutdown.label"),
-                            icon: Power,
-                            onClick: () => {
-                              setShowDropdownMenu(false);
-                              handleShutdown();
-                            }
-                          }
-                        ].map((item, idx) => {
-                          const IconComp = item.icon;
-                          const isToggledActive = "active" in item ? item.active : false;
-                          return (
-                            <button
-                              key={idx}
-                              onClick={item.onClick}
-                              className="w-full px-4.5 py-3 text-left text-sm font-normal flex items-center gap-3.5 hover:bg-[#3d3a46]/80 active:bg-[#3d3a46] rounded-[18px] transition-colors cursor-pointer text-[#e6e1e5]"
-                            >
-                              <IconComp className="w-[18px] h-[18px] text-[#cac4d0] shrink-0" />
-                              <span className="flex-1 text-[#e6e1e5] font-sans text-[14px]">{item.label}</span>
-                              {isToggledActive && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#d0bcff] shrink-0" />
-                              )}
-                            </button>
-                          );
-                        })}
+                        <h3 className="text-sm font-semibold mb-4 text-[#d0bcff] tracking-wide uppercase text-xs">Tùy chỉnh Âm lượng</h3>
+                        <div className="flex flex-col gap-5">
+                          {/* Playback Volume */}
+                          <div className="flex flex-col gap-1.5 text-left">
+                            <div className="flex items-center justify-between text-xs font-medium text-[#cac4d0]">
+                              <span className="flex items-center gap-1.5"><Tv className="w-4 h-4 text-[#d0bcff]" /> Playback (Truyền hình)</span>
+                              <span>{Math.round(volume * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={volume}
+                              onChange={(e) => setVolume(parseFloat(e.target.value))}
+                              className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
+                              style={{
+                                background: `linear-gradient(to right, #d0bcff ${volume * 100}%, rgba(255, 255, 255, 0.2) ${volume * 100}%)`
+                              }}
+                            />
+                          </div>
+
+                          {/* System Volume */}
+                          <div className="flex flex-col gap-1.5 text-left">
+                            <div className="flex items-center justify-between text-xs font-medium text-[#cac4d0]">
+                              <span className="flex items-center gap-1.5"><Volume2 className="w-4 h-4 text-[#d0bcff]" /> System (Hệ thống)</span>
+                              <span>{Math.round(systemVolume * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={systemVolume}
+                              onChange={(e) => setSystemVolume(parseFloat(e.target.value))}
+                              className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
+                              style={{
+                                background: `linear-gradient(to right, #d0bcff ${systemVolume * 100}%, rgba(255, 255, 255, 0.2) ${systemVolume * 100}%)`
+                              }}
+                            />
+                          </div>
+                        </div>
                       </motion.div>
                     ) : isWinUI3Active ? (
                       <motion.div
@@ -4802,120 +5561,50 @@ export default function App() {
                         exit={{ opacity: 0, y: -12, scale: 0.97 }}
                         style={{ originX: 1, originY: 0 }}
                         transition={{ duration: 0.15, ease: [0.1, 0.9, 0.2, 1.0] }}
-                        className="absolute right-0 mt-3 w-56 rounded-[12px] bg-[#202020]/95 backdrop-blur-[20px] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] z-50 p-1.5 text-white overflow-hidden text-left"
+                        className="absolute right-0 mt-3 w-64 rounded-[12px] bg-[#202020]/95 backdrop-blur-[20px] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] z-50 p-4.5 text-white overflow-hidden text-left font-sans"
                       >
-                        {/* Clock & Calendar toggle with checkmark / left vertical blue accent bar */}
-                        <button
-                          onClick={() => {
-                            toggleShowClock();
-                          }}
-                          className="w-full relative px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center justify-between font-sans font-normal text-white cursor-pointer transition-colors border-0 shadow-none"
-                        >
-                          {showClock && <div className="absolute left-1.5 top-2.5 bottom-2.5 w-[3px] rounded-full bg-[#43bbfd]" />}
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                            <span>{t("menu.ClockAndCalendar.label")}</span>
+                        <h3 className="text-xs font-semibold mb-3 text-white/60 tracking-wider uppercase">Âm lượng hệ thống</h3>
+                        <div className="flex flex-col gap-4">
+                          {/* Playback Volume */}
+                          <div className="flex flex-col gap-1.5 text-left">
+                            <div className="flex items-center justify-between text-[11px] font-normal text-white/80">
+                              <span className="flex items-center gap-2"><Tv className="w-3.5 h-3.5 text-[#43bbfd]" /> Playback (Truyền hình)</span>
+                              <span>{Math.round(volume * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={volume}
+                              onChange={(e) => setVolume(parseFloat(e.target.value))}
+                              className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
+                              style={{
+                                background: `linear-gradient(to right, #43bbfd ${volume * 100}%, #4d4d4d ${volume * 100}%)`
+                              }}
+                            />
                           </div>
-                        </button>
-                        
-                        <div className="border-t border-white/10 my-1" />
-                        
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            setShowAboutModal(true);
-                          }}
-                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
-                        >
-                          <Info className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                          {t("menu.AboutThisVersion.label")}
-                        </button>
-                        
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            window.location.reload();
-                          }}
-                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
-                        >
-                          <RefreshCw className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                          {t("menu.ReloadApp.label")}
-                        </button>
-                        
 
-                        {(activeTab === "live" || activeTab === "vtvgo") && (
-                          <button
-                            onClick={() => {
-                              setShowDropdownMenu(false);
-                              exportChannelsToM3u8();
-                            }}
-                            className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
-                          >
-                            <Download className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                            {t("menu.ExportChannels.label")}
-                          </button>
-                        )}
-                        
-                        {activeTab === "live" && (
-                          <>
-                            <button
-                              onClick={() => {
-                                setShowDropdownMenu(false);
-                                handleOpenMultiviewSelector();
+                          {/* System Volume */}
+                          <div className="flex flex-col gap-1.5 text-left">
+                            <div className="flex items-center justify-between text-[11px] font-normal text-white/80">
+                              <span className="flex items-center gap-2"><Volume2 className="w-3.5 h-3.5 text-[#43bbfd]" /> System (Hệ thống)</span>
+                              <span>{Math.round(systemVolume * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={systemVolume}
+                              onChange={(e) => setSystemVolume(parseFloat(e.target.value))}
+                              className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
+                              style={{
+                                background: `linear-gradient(to right, #43bbfd ${systemVolume * 100}%, #4d4d4d ${systemVolume * 100}%)`
                               }}
-                              className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-t border-white/5 shadow-none"
-                            >
-                              <Grid className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                              {t("menu.ViewMultiview.label")}
-                            </button>
-                            <button
-                              onClick={() => {
-                                setShowDropdownMenu(false);
-                                handleTogglePictureInPicture();
-                              }}
-                              className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
-                            >
-                              <Layers className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                              {t("menu.PictureInPicture.label")}
-                            </button>
-                          </>
-                        )}
-                        
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            setActiveTab("settings");
-                            setActiveSettingSection(null);
-                          }}
-                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
-                        >
-                          <Settings className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                          {t("menu.OpenSettings.label")}
-                        </button>
-
-                        <div className="border-t border-white/10 my-1" />
-
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            handleSignOut();
-                          }}
-                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-white/10 rounded-[6px] flex items-center text-white font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
-                        >
-                          <LogOut className="w-4 h-4 mr-2.5 text-white/80 stroke-[2]" />
-                          {t("menu.SignOut.label")}
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            handleShutdown();
-                          }}
-                          className="w-full px-4 pl-7 py-2 text-left text-xs hover:bg-red-600/20 rounded-[6px] flex items-center text-red-400 font-sans font-normal cursor-pointer transition-colors border-0 shadow-none"
-                        >
-                          <Power className="w-4 h-4 mr-2.5 text-red-400 stroke-[2]" />
-                          {t("menu.Shutdown.label")}
-                        </button>
+                            />
+                          </div>
+                        </div>
                       </motion.div>
                     ) : (
                       <motion.div
@@ -4924,120 +5613,50 @@ export default function App() {
                         exit={{ opacity: 0, scale: 0.85 }}
                         style={{ originX: 1, originY: 0 }}
                         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute right-0 mt-3 w-56 rounded-[30px] bg-white/70 backdrop-blur-[15px] border border-white/40 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.35),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.1),0_12px_40px_rgba(0,0,0,0.1)] z-50 py-3.5 text-black overflow-hidden"
+                        className="absolute right-0 mt-3 w-64 rounded-[30px] bg-white/80 backdrop-blur-[15px] border border-white/40 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.35),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.1),0_12px_40px_rgba(0,0,0,0.1)] z-50 p-4.5 text-black overflow-hidden font-sans"
                       >
-                        {/* Clock & Calendar toggle with checkmark */}
-                        <button
-                          onClick={() => {
-                            toggleShowClock();
-                          }}
-                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center justify-between font-sans font-normal text-black"
-                        >
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                            <span>{t("menu.ClockAndCalendar.label")}</span>
+                        <h3 className="text-xs font-semibold mb-3 text-slate-800 tracking-wider uppercase text-left font-bold">Cài đặt âm lượng</h3>
+                        <div className="flex flex-col gap-4">
+                          {/* Playback Volume */}
+                          <div className="flex flex-col gap-1.5 text-left">
+                            <div className="flex items-center justify-between text-[11px] font-medium text-slate-700">
+                              <span className="flex items-center gap-2"><Tv className="w-3.5 h-3.5 text-indigo-600" /> Playback (Truyền hình)</span>
+                              <span>{Math.round(volume * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={volume}
+                              onChange={(e) => setVolume(parseFloat(e.target.value))}
+                              className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
+                              style={{
+                                background: `linear-gradient(to right, #6366f1 ${volume * 100}%, rgba(0, 0, 0, 0.1) ${volume * 100}%)`
+                              }}
+                            />
                           </div>
-                          {showClock && <Check className="w-4 h-4 text-black stroke-[3.5]" />}
-                        </button>
-                        
-                        <div className="border-t border-black/10 my-2" />
-                        
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            setShowAboutModal(true);
-                          }}
-                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                        >
-                          <Info className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          {t("menu.AboutThisVersion.label")}
-                        </button>
-                        
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            window.location.reload();
-                          }}
-                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                        >
-                          <RefreshCw className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          {t("menu.ReloadApp.label")}
-                        </button>
-                        
 
-                        {(activeTab === "live" || activeTab === "vtvgo") && (
-                          <button
-                            onClick={() => {
-                              setShowDropdownMenu(false);
-                              exportChannelsToM3u8();
-                            }}
-                            className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                          >
-                            <Download className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                            {t("menu.ExportChannels.label")}
-                          </button>
-                        )}
-                        
-                        {activeTab === "live" && (
-                          <>
-                            <button
-                              onClick={() => {
-                                setShowDropdownMenu(false);
-                                handleOpenMultiviewSelector();
+                          {/* System Volume */}
+                          <div className="flex flex-col gap-1.5 text-left">
+                            <div className="flex items-center justify-between text-[11px] font-medium text-slate-700">
+                              <span className="flex items-center gap-2"><Volume2 className="w-3.5 h-3.5 text-indigo-600" /> System (Hệ thống)</span>
+                              <span>{Math.round(systemVolume * 100)}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.01"
+                              value={systemVolume}
+                              onChange={(e) => setSystemVolume(parseFloat(e.target.value))}
+                              className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
+                              style={{
+                                background: `linear-gradient(to right, #6366f1 ${systemVolume * 100}%, rgba(0, 0, 0, 0.1) ${systemVolume * 100}%)`
                               }}
-                              className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal border-t border-black/5"
-                            >
-                              <Grid className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                              {t("menu.ViewMultiview.label")}
-                            </button>
-                            <button
-                              onClick={() => {
-                                setShowDropdownMenu(false);
-                                handleTogglePictureInPicture();
-                              }}
-                              className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                            >
-                              <Layers className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                              {t("menu.PictureInPicture.label")}
-                            </button>
-                          </>
-                        )}
-                        
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            setActiveTab("settings");
-                            setActiveSettingSection(null);
-                          }}
-                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                        >
-                          <Settings className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          {t("menu.OpenSettings.label")}
-                        </button>
-
-                        <div className="border-t border-black/10 my-2" />
-
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            handleSignOut();
-                          }}
-                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-black/5 flex items-center text-black font-sans font-normal"
-                        >
-                          <LogOut className="w-4 h-4 mr-2.5 text-black/70 stroke-[2]" />
-                          {t("menu.SignOut.label")}
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setShowDropdownMenu(false);
-                            handleShutdown();
-                          }}
-                          className="w-full px-5 py-2.5 text-left text-[13px] hover:bg-red-500/15 text-red-600 flex items-center font-sans font-normal"
-                        >
-                          <Power className="w-4 h-4 mr-2.5 text-red-500 stroke-[2]" />
-                          {t("menu.Shutdown.label")}
-                        </button>
+                            />
+                          </div>
+                        </div>
                       </motion.div>
                     )}
                   </>
@@ -5050,7 +5669,7 @@ export default function App() {
 
       {/* SETTINGS DETAILS HEADER (Floating on Top - Exclusively inside settings sub-sections) */}
       {activeTab === "settings" && activeSettingSection !== null && (
-        <header className="fixed top-[40px] inset-x-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none">
+        <header className={`fixed top-[40px] left-0 right-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none ${dockToSidebar ? (isSidebarCollapsed ? "md:left-20" : "md:left-72") : ""}`}>
           {/* Progressive background blurs backplate */}
           <div className="progressive-blur-header z-0 pointer-events-none border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.3)] opacity-100 visible" />
 
@@ -6413,6 +7032,59 @@ export default function App() {
                             </motion.div>
                           </button>
                         )}
+                      </div>
+
+                      {/* Dock to Sidebar Toggle */}
+                      <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                        <div className="flex-1 pr-4">
+                          <h4 className="text-sm font-semibold text-white">Dock to Sidebar</h4>
+                          <p className="text-xs text-white/60 mt-0.5">Khi bật, thanh dock điều hướng ở phía dưới sẽ được chuyển sang thanh sidebar bên trái màn hình như VTVGo/TV360</p>
+                        </div>
+                        <button
+                          onClick={() => setDockToSidebar(!dockToSidebar)}
+                          className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                            dockToSidebar ? "bg-[#34c759]" : "bg-white/20"
+                          }`}
+                        >
+                          <motion.div
+                            animate={{ x: dockToSidebar ? 20 : 0 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                            className="relative w-6 h-5 flex items-center justify-center group"
+                          >
+                            <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                            <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                          </motion.div>
+                        </button>
+                      </div>
+
+                      {/* Switch App Theme Mode */}
+                      <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                        <div className="flex-1 pr-4">
+                          <h4 className="text-sm font-semibold text-white">Switch App Theme Mode</h4>
+                          <p className="text-xs text-white/60 mt-0.5">Lựa chọn chế độ sáng (Light Mode) thanh lịch hoặc tối (Dark Mode) chìm đắm cho giao diện</p>
+                        </div>
+                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+                          <button
+                            onClick={() => setAppThemeMode("light")}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                              appThemeMode === "light"
+                                ? "bg-white text-slate-900 shadow-md"
+                                : "text-white/60 hover:text-white"
+                            }`}
+                          >
+                            Light
+                          </button>
+                          <button
+                            onClick={() => setAppThemeMode("dark")}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                              appThemeMode === "dark"
+                                ? "bg-[#cc1827] text-white shadow-md"
+                                : "text-white/60 hover:text-white"
+                            }`}
+                          >
+                            Dark
+                          </button>
+                        </div>
                       </div>
 
                     </div>
@@ -7829,6 +8501,17 @@ export default function App() {
           />
         )}
 
+        {/* VIEW: VPLAY USERS DIRECTORY PAGE */}
+        {activeTab === "vplay_users" && (
+          <VplayUsersTab 
+            onBack={() => {
+              setActiveTab("home");
+              setUserTabQuery("");
+            }} 
+            initialSearchQuery={userTabQuery}
+          />
+        )}
+
           </motion.div>
         </AnimatePresence>
       </main>
@@ -7952,6 +8635,22 @@ export default function App() {
                     title="Nhật ký & Sao chép"
                   >
                     <Copy className="w-[21px] h-[21px]" />
+                  </button>
+
+                  {/* Button 5: User Lookup */}
+                  <button
+                    onClick={() => {
+                      setSpotlightActiveTab(prev => prev === "users" ? null : "users");
+                      setSearchQuery("");
+                    }}
+                    className={`w-13.5 h-13.5 rounded-full flex items-center justify-center border transition-all cursor-pointer shadow-[0_12px_40px_rgba(0,0,0,0.12)] shrink-0 ${
+                      spotlightActiveTab === "users"
+                        ? "bg-slate-800 text-white border-slate-700 scale-95"
+                        : "bg-[#e3f0ff]/85 backdrop-blur-xl border-white/40 text-slate-700 hover:bg-[#d5e8ff] hover:scale-105"
+                    }`}
+                    title="Tra cứu Người dùng"
+                  >
+                    <Users className="w-[21px] h-[21px]" />
                   </button>
                 </div>
 
@@ -8356,6 +9055,110 @@ export default function App() {
                           </div>
                         </div>
                       )}
+
+                      {spotlightActiveTab === "users" && (
+                        <div className="space-y-3 flex flex-col h-full font-sans">
+                          {/* Search Bar inside User Lookup */}
+                          <div className="flex items-center gap-2 bg-white/80 border border-slate-200/50 rounded-xl px-3 py-2 shadow-xs shrink-0">
+                            <Search className="w-4 h-4 text-slate-500" />
+                            <input
+                              type="text"
+                              placeholder="Tìm nhanh theo Tên, Username hoặc ID (ví dụ: V123456)..."
+                              value={spotlightUserSearchQuery}
+                              onChange={(e) => {
+                                setSpotlightUserSearchQuery(e.target.value);
+                                setSpotlightUserPage(1);
+                              }}
+                              className="flex-1 bg-transparent border-none text-[12px] text-slate-800 placeholder-slate-400 focus:outline-none font-medium h-5"
+                            />
+                            {spotlightUserSearchQuery && (
+                              <button 
+                                onClick={() => {
+                                  setSpotlightUserSearchQuery("");
+                                  setSpotlightUserPage(1);
+                                }} 
+                                className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="px-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200/50 flex justify-between items-center shrink-0">
+                            <span>Danh sách người dùng Vplay ({filteredUsers.length})</span>
+                            <span className="font-mono text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                              Trang {spotlightUserPage} / {totalPages}
+                            </span>
+                          </div>
+
+                          {/* Users List Container */}
+                          <div className="flex-1 overflow-y-auto max-h-[190px] pr-1 space-y-1.5 custom-scrollbar min-h-[120px]">
+                            {paginatedUsers.length === 0 ? (
+                              <div className="py-8 text-center flex flex-col items-center justify-center text-slate-400">
+                                <Users className="w-8 h-8 mb-2 text-slate-300" />
+                                <p className="text-xs font-semibold">Không tìm thấy người dùng nào</p>
+                              </div>
+                            ) : (
+                              paginatedUsers.map((user) => (
+                                <div
+                                  key={user.id}
+                                  className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-100 hover:bg-slate-50 transition-colors group shadow-xs"
+                                >
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 flex items-center justify-center text-white text-[11px] font-bold shrink-0 shadow-sm animate-fade-in">
+                                      {user.name.split(" ").slice(-1)[0][0]}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <h6 className="text-xs font-bold text-slate-800 truncate">{user.name}</h6>
+                                      <p className="text-[10px] text-slate-400 truncate mt-0.5 font-mono">@{user.username}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2.5 shrink-0">
+                                    <span className="text-[10px] font-mono font-semibold bg-slate-100 text-slate-600 border border-slate-200/40 px-2 py-0.5 rounded-md">
+                                      {user.userId}
+                                    </span>
+                                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                                      user.role === "VIP User"
+                                        ? "bg-amber-100 text-amber-700"
+                                        : user.role === "Moderator"
+                                          ? "bg-purple-100 text-purple-700"
+                                          : "bg-slate-100 text-slate-500"
+                                    }`}>
+                                      {user.role}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+
+                          {/* Pagination Controls */}
+                          {totalPages > 1 && (
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 shrink-0">
+                              <button
+                                disabled={spotlightUserPage === 1}
+                                onClick={() => setSpotlightUserPage(prev => Math.max(1, prev - 1))}
+                                className="px-3 py-1 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 border border-slate-200 text-[10px] font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1 shadow-sm select-none"
+                              >
+                                <ChevronLeft className="w-3 h-3" /> Trước
+                              </button>
+                              
+                              <span className="text-[10px] font-bold text-slate-500">
+                                {spotlightUserPage} / {totalPages}
+                              </span>
+
+                              <button
+                                disabled={spotlightUserPage === totalPages}
+                                onClick={() => setSpotlightUserPage(prev => Math.min(totalPages, prev + 1))}
+                                className="px-3 py-1 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 border border-slate-200 text-[10px] font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1 shadow-sm select-none"
+                              >
+                                Tiếp <ChevronRight className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -8430,7 +9233,7 @@ export default function App() {
       {activeTab !== "shorts" && (
         <nav 
           id="bottom-dock-container" 
-          className="fixed bottom-3 inset-x-0 mx-auto w-11/12 max-w-[500px] z-50 h-16 transform-gpu"
+          className={`fixed bottom-3 inset-x-0 mx-auto w-11/12 max-w-[500px] z-50 h-16 transform-gpu ${dockToSidebar ? "md:hidden" : ""}`}
         >
         {/* Reimagined Search Popover */}
         <AnimatePresence>
@@ -8791,7 +9594,7 @@ export default function App() {
                               }`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setIsDuiSearchMenuOpen(true);
+                                setIsHeaderSearchOpen(true);
                               }}
                             >
                               <Search className="w-3.5 h-3.5 text-white/45 mr-1.5 shrink-0" />
@@ -8799,9 +9602,10 @@ export default function App() {
                                 type="text"
                                 placeholder="Tìm kênh..."
                                 value={searchQuery}
-                                onFocus={() => setIsDuiSearchMenuOpen(true)}
+                                onFocus={() => setIsHeaderSearchOpen(true)}
                                 onChange={(e) => {
                                   setSearchQuery(e.target.value);
+                                  setHeaderSearchQuery(e.target.value);
                                   if (activeTab !== "home") {
                                     setActiveTab("home");
                                   }
@@ -8829,7 +9633,7 @@ export default function App() {
               <button
                 id="vplay-search-dock-btn"
                 onClick={() => {
-                  setIsDuiSearchMenuOpen(true);
+                  setIsHeaderSearchOpen(true);
                 }}
                 className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
                   isWinUI3Active

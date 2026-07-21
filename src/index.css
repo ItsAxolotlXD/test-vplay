@@ -851,5 +851,79 @@ div[class*="bg-[#0c0819]"] button,
   border-radius: 15px !important;
 }
 
+/* --- Light Mode Refined Theme Override Styles --- */
+.light-theme {
+  color: #1e293b !important;
+}
+
+.light-theme .glass-panel {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08) !important;
+}
+
+.light-theme .glass-panel-deep {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12) !important;
+}
+
+.light-theme .progressive-blur-header {
+  background: linear-gradient(to bottom, rgba(241, 245, 249, 0.98) 0%, rgba(241, 245, 249, 0.85) 35%, rgba(241, 245, 249, 0.4) 75%, rgba(241, 245, 249, 0) 100%) !important;
+  border-bottom-color: rgba(15, 23, 42, 0.05) !important;
+}
+
+.light-theme ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.02) !important;
+}
+
+.light-theme ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.12) !important;
+}
+
+.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.25) !important;
+}
+
+/* Light theme overrides for sub-components, headings and lists */
+.light-theme h1, 
+.light-theme h2, 
+.light-theme h3, 
+.light-theme h4, 
+.light-theme h5, 
+.light-theme h6 {
+  color: #0f172a !important;
+}
+
+.light-theme p,
+.light-theme span,
+.light-theme label {
+  color: #334155 !important;
+}
+
+.light-theme input,
+.light-theme select,
+.light-theme textarea {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+.light-theme input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.light-theme button:not([class*="bg-red-"]):not([class*="bg-[#cc1827]"]):not([class*="bg-teal-"]):not([class*="bg-indigo-"]) {
+  color: #334155 !important;
+}
+
+.light-theme button:hover:not([class*="bg-red-"]):not([class*="bg-[#cc1827]"]):not([class*="bg-teal-"]):not([class*="bg-indigo-"]) {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+
 
 
