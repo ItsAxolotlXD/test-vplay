@@ -188,7 +188,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
           <div className="flex items-center gap-3">
             <button 
               onClick={onBack}
-              className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-300 transition-colors cursor-pointer border border-zinc-850"
+              className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-300 transition-colors cursor-pointer border border-zinc-800"
             >
               <ArrowLeft className="w-4 h-4 text-white" />
             </button>
@@ -203,7 +203,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
 
           {/* Quick Metrics */}
           <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-            <div className="bg-zinc-850 border border-zinc-800 rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <div className="bg-zinc-800 border border-zinc-700/80 rounded-xl px-3 py-1.5 flex items-center gap-2">
               <User className="w-3.5 h-3.5 text-zinc-300" />
               <div className="text-left">
                 <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Tổng User</p>
@@ -268,7 +268,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                     className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                       roleFilter === item.value 
                         ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20" 
-                        : "bg-zinc-850 hover:bg-zinc-800 text-zinc-300"
+                        : "bg-zinc-800 hover:bg-zinc-750 text-zinc-300"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -297,7 +297,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                     className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                       statusFilter === item.value 
                         ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20" 
-                        : "bg-zinc-850 hover:bg-zinc-800 text-zinc-300"
+                        : "bg-zinc-800 hover:bg-zinc-750 text-zinc-300"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -313,7 +313,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full bg-zinc-850 border border-zinc-850 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-200 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                className="w-full bg-zinc-800 border border-zinc-700/80 rounded-xl px-3 py-2.5 text-xs font-bold text-zinc-200 focus:outline-none focus:ring-2 focus:ring-red-500/20"
               >
                 <option value="id_asc" className="bg-zinc-900">ID: Tăng dần (Mặc định)</option>
                 <option value="id_desc" className="bg-zinc-900">ID: Giảm dần</option>
@@ -331,7 +331,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
           
           {/* Main Search Bar */}
           <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 shadow-md">
-            <Search className="w-5 h-5 text-zinc-400 shrink-0" />
+            <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-5 h-5 shrink-0 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
             <input
               type="text"
               placeholder="Nhập tên người dùng, username hoặc mã ID (ví dụ: V123456)..."
@@ -374,7 +374,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                 <div
                   key={user.id}
                   onClick={() => setSelectedUser(user)}
-                  className="bg-zinc-900/50 rounded-2xl border border-zinc-850 p-4 hover:border-red-500/50 hover:bg-zinc-900 transition-all cursor-pointer group flex flex-col justify-between h-40 shadow-sm text-left"
+                  className="bg-zinc-900/50 rounded-2xl border border-zinc-800/80 p-4 hover:border-red-500/50 hover:bg-zinc-900 transition-all cursor-pointer group flex flex-col justify-between h-40 shadow-sm text-left"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0">
@@ -532,7 +532,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
               </div>
 
               {/* Detailed Grid */}
-              <div className="grid grid-cols-2 gap-3.5 bg-zinc-950 p-4 rounded-2xl border border-zinc-850">
+              <div className="grid grid-cols-2 gap-3.5 bg-zinc-950 p-4 rounded-2xl border border-zinc-800/80">
                 <div className="flex items-center gap-2.5">
                   <Fingerprint className="w-4 h-4 text-zinc-400" />
                   <div className="text-left">

@@ -90,7 +90,7 @@ export default function IntelligenceThumbnailTab({
       {/* Control Area (Search) without language selection (ko lang) */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-between">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
           <input
             type="text"
             value={searchQuery}

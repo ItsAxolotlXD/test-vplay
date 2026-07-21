@@ -169,7 +169,7 @@ export default function FandomLogosTab({ onBack }: FandomLogosTabProps) {
                 }}
                 className="w-full bg-white/5 border border-white/10 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3 text-xs text-white font-medium placeholder-white/30 focus:outline-none transition-all"
               />
-              <Search className="w-4 h-4 text-white/30 absolute right-4 pointer-events-none" />
+              <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-4 h-4 absolute right-4 pointer-events-none object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
             </div>
 
             {/* Submit button */}
@@ -369,7 +369,7 @@ export default function FandomLogosTab({ onBack }: FandomLogosTabProps) {
 
           <div className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl space-y-2.5">
             <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
-              <Search className="w-4 h-4" />
+              <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-4 h-4 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
             </div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white/80">Nhập đúng định dạng</h4>
             <p className="text-xs text-white/50 leading-relaxed">
