@@ -1319,6 +1319,50 @@ export default function App() {
   const [expAmbientGlow, setExpAmbientGlow] = useState<boolean>(() => localStorage.getItem("vplay_exp_glow") === "true");
   const [testStreamUrl, setTestStreamUrl] = useState<string>("");
 
+  // Tab switching 3-second loading state to prevent lag
+  const [isTabLoading, setIsTabLoading] = useState<boolean>(false);
+  const prevTabKeyRef = useRef<string>(`${activeTab}_${vstudySubFilter}_${activeSettingSection}`);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerSearchLoading = () => {
+    setIsTabLoading(true);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setIsTabLoading(false);
+      timerRef.current = null;
+    }, 3000);
+  };
+
+  useEffect(() => {
+    const currentTabKey = `${activeTab}_${vstudySubFilter}_${activeSettingSection}`;
+    if (prevTabKeyRef.current !== currentTabKey) {
+      prevTabKeyRef.current = currentTabKey;
+      setIsTabLoading(true);
+
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+
+      timerRef.current = setTimeout(() => {
+        setIsTabLoading(false);
+        timerRef.current = null;
+      }, 3000);
+    }
+  }, [activeTab, vstudySubFilter, activeSettingSection]);
+
+  useEffect(() => {
+    if (isTabLoading) {
+      document.body.style.cursor = "wait";
+    } else {
+      document.body.style.cursor = "";
+    }
+    return () => {
+      document.body.style.cursor = "";
+    };
+  }, [isTabLoading]);
+
   // Reimagined Search state
   const [reimaginedSearchOpen, setReimaginedSearchOpen] = useState<boolean>(false);
 
@@ -8527,12 +8571,24 @@ export default function App() {
               className="w-full max-w-2xl relative"
             >
               <div className="flex items-center h-14 sm:h-16 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 px-5 transition-all focus-within:border-red-500/80 focus-within:ring-4 focus-within:ring-red-500/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
-                <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-5.5 h-5.5 shrink-0 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+                <img 
+                  src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" 
+                  className="w-5.5 h-5.5 shrink-0 object-contain cursor-pointer hover:scale-110 transition-transform" 
+                  style={{ filter: "brightness(0) invert(1)" }} 
+                  referrerPolicy="no-referrer" 
+                  alt="Search" 
+                  onClick={() => triggerSearchLoading()}
+                />
                 <input
                   type="text"
                   placeholder="Nhập tên kênh truyền hình hoặc người dùng..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      triggerSearchLoading();
+                    }
+                  }}
                   className="flex-1 bg-transparent border-none text-white text-base sm:text-lg focus:outline-none placeholder-white/30 pl-4 h-full font-medium"
                   autoFocus
                 />
@@ -8717,7 +8773,14 @@ export default function App() {
                 <div className="w-full flex items-center gap-2.5">
                   {/* Capsule-shaped Search Input */}
                   <div className="flex-1 h-13.5 rounded-full bg-[#e3f0ff]/85 backdrop-blur-xl border border-white/40 shadow-[0_12px_40px_rgba(0,0,0,0.15)] flex items-center px-4.5 transition-all">
-                    <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-5 h-5 shrink-0 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+                    <img 
+                      src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" 
+                      className="w-5 h-5 shrink-0 object-contain cursor-pointer hover:scale-110 transition-transform" 
+                      style={{ filter: "brightness(0) invert(1)" }} 
+                      referrerPolicy="no-referrer" 
+                      alt="Search" 
+                      onClick={() => triggerSearchLoading()}
+                    />
                     {/* Vertical Divider Cursor */}
                     <div className="w-[1px] h-5 bg-slate-300/80 mx-3 shrink-0" />
                     <input
@@ -8728,6 +8791,11 @@ export default function App() {
                         setSearchQuery(e.target.value);
                         if (e.target.value) {
                           setSpotlightActiveTab(null);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          triggerSearchLoading();
                         }
                       }}
                       className="flex-1 bg-transparent border-none text-slate-800 placeholder-slate-400 focus:outline-none text-[15px] font-sans h-full font-medium"
@@ -9559,8 +9627,12 @@ export default function App() {
                   }
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && isVIntelligenceActive) {
-                    handleSendVIntelMsg();
+                  if (e.key === "Enter") {
+                    if (isVIntelligenceActive) {
+                      handleSendVIntelMsg();
+                    } else {
+                      triggerSearchLoading();
+                    }
                   }
                 }}
                 className={`flex-1 bg-transparent border-none text-white text-sm focus:outline-none placeholder-white/40 px-1 font-sans ${isMaterialDesignActive ? "text-[#e6e1e5] placeholder-[#cac4d0]/60 text-base font-normal" : ""}`}
@@ -9767,7 +9839,14 @@ export default function App() {
                                 setActiveTab("search");
                               }}
                             >
-                              <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-3.5 h-3.5 mr-1.5 shrink-0 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+                              <img 
+                                src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" 
+                                className="w-3.5 h-3.5 mr-1.5 shrink-0 object-contain cursor-pointer" 
+                                style={{ filter: "brightness(0) invert(1)" }} 
+                                referrerPolicy="no-referrer" 
+                                alt="Search" 
+                                onClick={() => triggerSearchLoading()}
+                              />
                               <input
                                 type="text"
                                 placeholder="Tìm kênh..."
@@ -9777,6 +9856,11 @@ export default function App() {
                                   setSearchQuery(e.target.value);
                                   if (activeTab !== "search") {
                                     setActiveTab("search");
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    triggerSearchLoading();
                                   }
                                 }}
                                 className="w-full bg-transparent text-[11px] text-white focus:outline-none placeholder-white/45"
@@ -11605,6 +11689,32 @@ export default function App() {
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* 6. TAB SWITCHING LOADING OVERLAY */}
+      <AnimatePresence>
+        {isTabLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center select-none pointer-events-auto cursor-wait transform-gpu"
+          >
+            <div className="p-6 rounded-3xl bg-zinc-900/95 border border-white/10 shadow-2xl flex flex-col items-center justify-center relative transform-gpu">
+              {/* Smooth Hardware-Accelerated iOS/Windows Ring Spinner */}
+              <div className="relative w-14 h-14 flex items-center justify-center">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif"
+                  alt="Loading..."
+                  className="w-14 h-14 object-contain filter drop-shadow-md transform-gpu will-change-transform relative z-10"
+                  referrerPolicy="no-referrer"
+                  style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)" }}
+                />
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

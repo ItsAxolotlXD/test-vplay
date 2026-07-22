@@ -246,11 +246,14 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
     return Number(localStorage.getItem("vstudy_total_wrong") || "14");
   });
   const [studentName, setStudentName] = useState<string>(() => {
-    return localStorage.getItem("vstudy_student_name") || "Người học hành";
+    const saved = localStorage.getItem("vstudy_student_name");
+    if (!saved || saved === "Nguyễn Văn Sĩ Tử") {
+      return "Người học hành";
+    }
+    return saved;
   });
   const [isEditingStudentName, setIsEditingStudentName] = useState<boolean>(false);
   const [tempStudentName, setTempStudentName] = useState<string>("");
-  const [showHocBaModal, setShowHocBaModal] = useState<boolean>(false);
   const [historySearchQuery, setHistorySearchQuery] = useState<string>("");
   const [historyFilterLevel, setHistoryFilterLevel] = useState<string>("all");
 
@@ -780,17 +783,326 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
 
           {/* TRA CỨU HỌC BẠ BUTTON */}
           <button
-            onClick={() => setShowHocBaModal(true)}
+            onClick={() => {
+              if (onSelectSubFilter) {
+                onSelectSubFilter(subFilter === "hoc_ba" ? "all" : "hoc_ba");
+              }
+            }}
             className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-900/30 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center justify-center gap-2 uppercase tracking-wider ring-1 ring-amber-300/40"
           >
             <GraduationCap className="w-4 h-4 text-slate-950" />
-            <span>Tra Cứu Học Bạ</span>
+            <span>{subFilter === "hoc_ba" ? "Quay Lại Danh Sách Môn" : "Tra Cứu Học Bạ"}</span>
           </button>
         </div>
       </div>
 
       {/* 2. MAIN ACTIVE STUDY AREA */}
       {!isQuizActive ? (
+        subFilter === "hoc_ba" ? (
+          /* TRANG TRA CỨU HỌC BẠ FULL VIEW */
+          <div className="space-y-6 text-left">
+            {/* Title Header Banner */}
+            <div className="p-6 rounded-3xl bg-zinc-900/80 border border-amber-500/30 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <GraduationCap className="w-8 h-8" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">
+                    HỌC BẠ ĐIỆN TỬ SĨ TỬ
+                  </span>
+                  <h2 className="text-2xl font-black text-white tracking-tight mt-1">
+                    Tra Cứu Học Bạ & Lịch Sử Làm Bài Tập
+                  </h2>
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Theo dõi tiến độ, bảng điểm và toàn bộ lịch sử thi trực tuyến
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  if (onSelectSubFilter) onSelectSubFilter("all");
+                }}
+                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-xl border border-white/10 transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Quay lại danh sách môn</span>
+              </button>
+            </div>
+
+            {/* Student Personal Banner & Editable Name */}
+            <div className="p-5 rounded-3xl bg-zinc-900/80 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-red-600 to-amber-400 flex items-center justify-center text-white font-black text-2xl shadow-md border border-white/20 shrink-0">
+                  {studentName.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    {isEditingStudentName ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={tempStudentName}
+                          onChange={(e) => setTempStudentName(e.target.value)}
+                          className="px-3 py-1.5 bg-zinc-950 border border-amber-500/50 rounded-xl text-sm text-white focus:outline-none"
+                          placeholder="Nhập tên của bạn..."
+                        />
+                        <button
+                          onClick={() => {
+                            if (tempStudentName.trim()) {
+                              setStudentName(tempStudentName.trim());
+                              localStorage.setItem("vstudy_student_name", tempStudentName.trim());
+                            }
+                            setIsEditingStudentName(false);
+                          }}
+                          className="px-3 py-1.5 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl cursor-pointer"
+                        >
+                          Lưu
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <h3 className="text-xl font-black text-white">{studentName}</h3>
+                        <button
+                          onClick={() => {
+                            setTempStudentName(studentName);
+                            setIsEditingStudentName(true);
+                          }}
+                          className="p-1 text-zinc-500 hover:text-amber-400 transition-colors cursor-pointer"
+                          title="Đổi tên sĩ tử"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <p className="text-xs text-zinc-400 mt-1 flex items-center gap-2">
+                    <span className="text-amber-400 font-bold">Cấp Độ {level}</span> • <span>Hệ Thống Luyện Thi Quốc Gia V-Study</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 bg-zinc-950 px-4 py-2.5 rounded-2xl border border-white/5 text-xs text-zinc-300">
+                <Flame className="w-5 h-5 text-amber-500 fill-amber-500" />
+                <span>Chuỗi học tập: <strong className="text-white">{streak} ngày</strong></span>
+              </div>
+            </div>
+
+            {/* Core KPI Metrics Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* 1. Tổng Điểm Tích Lũy */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-950/40 via-zinc-900 to-zinc-950 border border-amber-500/20">
+                <div className="flex items-center justify-between text-amber-400 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Tổng Điểm Thưởng</span>
+                  <Zap className="w-5 h-5" />
+                </div>
+                <p className="text-3xl font-black text-amber-400">{totalScore}</p>
+                <p className="text-[11px] text-zinc-500 mt-1">+10 điểm/câu đúng</p>
+              </div>
+
+              {/* 2. Số Câu Đã Làm */}
+              <div className="p-5 rounded-2xl bg-zinc-900/80 border border-white/10">
+                <div className="flex items-center justify-between text-indigo-400 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Số Câu Đã Giải</span>
+                  <FileText className="w-5 h-5" />
+                </div>
+                <p className="text-3xl font-black text-white">{totalQuestionsAnswered}</p>
+                <p className="text-[11px] text-zinc-500 mt-1">{completedQuizzes} đề thi hoàn thành</p>
+              </div>
+
+              {/* 3. Số Câu Đúng */}
+              <div className="p-5 rounded-2xl bg-emerald-950/30 border border-emerald-500/20">
+                <div className="flex items-center justify-between text-emerald-400 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Số Câu Đúng</span>
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <p className="text-3xl font-black text-emerald-400">{totalCorrectAnswers}</p>
+                <p className="text-[11px] text-emerald-500/80 mt-1">Đã tích lũy chính xác</p>
+              </div>
+
+              {/* 4. Số Câu Sai */}
+              <div className="p-5 rounded-2xl bg-red-950/30 border border-red-500/20">
+                <div className="flex items-center justify-between text-red-400 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Số Câu Sai</span>
+                  <XCircle className="w-5 h-5" />
+                </div>
+                <p className="text-3xl font-black text-red-400">{totalWrongAnswers}</p>
+                <p className="text-[11px] text-red-500/80 mt-1">Cần rèn luyện thêm</p>
+              </div>
+            </div>
+
+            {/* Accuracy & Progress Bar */}
+            <div className="p-5 rounded-2xl bg-zinc-900/80 border border-white/10 space-y-3">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-zinc-300 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  Tỷ Lệ Giải Đề Chính Xác Chốt Hạ:
+                </span>
+                <span className="text-emerald-400 font-mono font-black text-base">
+                  {totalQuestionsAnswered > 0 ? Math.round((totalCorrectAnswers / totalQuestionsAnswered) * 100) : 0}%
+                </span>
+              </div>
+              <div className="w-full h-3.5 bg-zinc-950 rounded-full overflow-hidden border border-white/5 p-0.5">
+                <div 
+                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" 
+                  style={{ width: `${totalQuestionsAnswered > 0 ? Math.round((totalCorrectAnswers / totalQuestionsAnswered) * 100) : 0}%` }} 
+                />
+              </div>
+            </div>
+
+            {/* EXAM HISTORY TABLE SECTION */}
+            <div className="space-y-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <h3 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-amber-400" />
+                  Lịch Sử Làm Bài Tập & Kỳ Thi
+                </h3>
+
+                {/* Clear History Button */}
+                {historyList.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử làm bài tập?")) {
+                        setHistoryList([]);
+                        localStorage.removeItem("vstudy_history");
+                      }
+                    }}
+                    className="px-3.5 py-2 bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 rounded-xl text-xs font-bold text-red-400 hover:text-red-200 transition-colors cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Xóa Lịch Sử</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Filters & Search bar for history */}
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="relative flex-1 w-full">
+                  <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm môn học, bài kiểm tra..."
+                    value={historySearchQuery}
+                    onChange={(e) => setHistorySearchQuery(e.target.value)}
+                    className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+                  />
+                </div>
+
+                {/* Level dropdown filter */}
+                <div className="flex items-center gap-1 w-full sm:w-auto bg-zinc-900 border border-white/10 rounded-xl p-1 shrink-0">
+                  <button
+                    onClick={() => setHistoryFilterLevel("all")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      historyFilterLevel === "all" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    Tất Cả
+                  </button>
+                  <button
+                    onClick={() => setHistoryFilterLevel("super_exam")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      historyFilterLevel === "super_exam" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    Siêu Tổng Hợp
+                  </button>
+                  <button
+                    onClick={() => setHistoryFilterLevel("thpt")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      historyFilterLevel === "thpt" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    THPT
+                  </button>
+                  <button
+                    onClick={() => setHistoryFilterLevel("thcs")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      historyFilterLevel === "thcs" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    THCS
+                  </button>
+                  <button
+                    onClick={() => setHistoryFilterLevel("tieu_hoc")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      historyFilterLevel === "tieu_hoc" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    Tiểu Học
+                  </button>
+                </div>
+              </div>
+
+              {/* History List Table / Cards */}
+              {historyList.length === 0 ? (
+                <div className="p-12 text-center bg-zinc-900/40 rounded-3xl border border-white/5 space-y-3">
+                  <FileText className="w-10 h-10 text-zinc-600 mx-auto" />
+                  <p className="text-sm text-zinc-400 font-medium">Chưa có lịch sử làm bài tập nào.</p>
+                  <p className="text-xs text-zinc-500">Hãy hoàn thành các bài thi để tích lũy điểm và học bạ!</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {historyList
+                    .filter((item) => {
+                      const matchesLevel = historyFilterLevel === "all" || item.level === historyFilterLevel;
+                      const matchesSearch =
+                        !historySearchQuery.trim() ||
+                        item.subjectName.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                        item.date.includes(historySearchQuery);
+                      return matchesLevel && matchesSearch;
+                    })
+                    .map((item) => {
+                      const percent = Math.round((item.correct / item.totalQuestions) * 100);
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-4 rounded-2xl bg-zinc-900/80 hover:bg-zinc-900 border border-white/5 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
+                                item.level === "super_exam" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
+                                item.level === "thpt" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
+                                item.level === "thcs" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" :
+                                "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                              }`}>
+                                {item.level === "super_exam" ? "Siêu Tổng Hợp" : item.level.toUpperCase()}
+                              </span>
+                              <h4 className="text-sm font-bold text-white">{item.subjectName}</h4>
+                            </div>
+                            <p className="text-xs text-zinc-400 flex items-center gap-3 font-mono">
+                              <span>📅 {item.date}</span>
+                              <span>⏱️ {Math.floor(item.timeSpent / 60)} phút {item.timeSpent % 60}s</span>
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                            <div className="text-right">
+                              <div className="text-sm font-black text-emerald-400">
+                                {item.correct}/{item.totalQuestions} câu ({percent}%)
+                              </div>
+                              <div className="text-xs text-amber-400 font-bold">
+                                +{item.scoreGained} điểm thưởng
+                              </div>
+                            </div>
+
+                            <div className={`px-3 py-1.5 rounded-xl text-xs font-black ${
+                              percent >= 80 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
+                              percent >= 50 ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                              "bg-red-500/10 text-red-400 border border-red-500/20"
+                            }`}>
+                              {percent >= 80 ? "Xuất Sắc" : percent >= 50 ? "Đạt" : "Cần Ôn Lại"}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
         <div className="space-y-6 text-left">
           
           {/* HERO BANNER: BÀI KIỂM TRA SIÊU TỔNG HỢP 100 CÂU - 2 TIẾNG */}
@@ -871,7 +1183,7 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
                     : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
                 }`}
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <Baby className="w-3.5 h-3.5 text-amber-400" />
                 <span>V-Study Tiểu học</span>
                 <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-full font-mono">
                   {subjectsData.filter((s) => s.level === "tieu_hoc").length} môn
@@ -1009,7 +1321,8 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
             </p>
           </div>
         </div>
-      ) : (
+      )
+    ) : (
         /* QUIZ LOBBY & CLASSROOM ACTIVE SYSTEM */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
@@ -1579,333 +1892,6 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
 
           </div>
 
-        </div>
-      )}
-
-      {/* 3. MODAL TRA CỨU HỌC BẠ SĨ TỬ V-STUDY */}
-      {showHocBaModal && (
-        <div className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
-          <div className="relative w-full max-w-4xl bg-zinc-950 border border-amber-500/30 rounded-3xl shadow-2xl overflow-hidden my-auto text-left flex flex-col max-h-[90vh]">
-            
-            {/* Modal Header */}
-            <div className="p-5 sm:p-6 bg-gradient-to-r from-red-950 via-zinc-900 to-amber-950 border-b border-white/10 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-red-600 p-0.5 shadow-lg">
-                  <div className="w-full h-full bg-zinc-950 rounded-[14px] flex items-center justify-center text-amber-400">
-                    <GraduationCap className="w-6 h-6" />
-                  </div>
-                </div>
-                <div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-wider">
-                    HỌC BẠ ĐIỆN TỬ SĨ TỬ
-                  </span>
-                  <h2 className="text-xl font-black text-white tracking-tight flex items-center gap-2 mt-0.5">
-                    Học Bạ & Lịch Sử Làm Bài Tập
-                  </h2>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowHocBaModal(false)}
-                className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Scrollable Content */}
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
-              
-              {/* Student Personal Banner & Editable Name */}
-              <div className="p-4 rounded-2xl bg-zinc-900/80 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-600 to-amber-400 flex items-center justify-center text-white font-black text-xl shadow-md border border-white/20">
-                    {studentName.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      {isEditingStudentName ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={tempStudentName}
-                            onChange={(e) => setTempStudentName(e.target.value)}
-                            className="px-2.5 py-1 bg-zinc-950 border border-amber-500/50 rounded-lg text-sm text-white focus:outline-none"
-                            placeholder="Nhập tên của bạn..."
-                          />
-                          <button
-                            onClick={() => {
-                              if (tempStudentName.trim()) {
-                                setStudentName(tempStudentName.trim());
-                                localStorage.setItem("vstudy_student_name", tempStudentName.trim());
-                              }
-                              setIsEditingStudentName(false);
-                            }}
-                            className="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold text-xs rounded-lg cursor-pointer"
-                          >
-                            Lưu
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <h3 className="text-lg font-black text-white">{studentName}</h3>
-                          <button
-                            onClick={() => {
-                              setTempStudentName(studentName);
-                              setIsEditingStudentName(true);
-                            }}
-                            className="p-1 text-zinc-500 hover:text-amber-400 transition-colors cursor-pointer"
-                            title="Đổi tên sĩ tử"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                    <p className="text-xs text-zinc-400 mt-0.5 flex items-center gap-2">
-                      <span className="text-amber-400 font-bold">Cấp Độ {level}</span> • <span>Hệ Thống Luyện Thi Quốc Gia V-Study</span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 bg-zinc-950 px-3.5 py-2 rounded-xl border border-white/5 text-xs text-zinc-300">
-                  <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  <span>Chuỗi học tập: <strong className="text-white">{streak} ngày</strong></span>
-                </div>
-              </div>
-
-              {/* Core KPI Metrics Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                
-                {/* 1. Tổng Điểm Tích Lũy */}
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-950/40 via-zinc-900 to-zinc-950 border border-amber-500/20">
-                  <div className="flex items-center justify-between text-amber-400 mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Tổng Điểm Thưởng</span>
-                    <Zap className="w-4 h-4" />
-                  </div>
-                  <p className="text-2xl font-black text-amber-400">{totalScore}</p>
-                  <p className="text-[10px] text-zinc-500 mt-1">+10 điểm/câu đúng</p>
-                </div>
-
-                {/* 2. Số Câu Đã Làm */}
-                <div className="p-4 rounded-2xl bg-zinc-900/80 border border-white/10">
-                  <div className="flex items-center justify-between text-indigo-400 mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Số Câu Đã Giải</span>
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  <p className="text-2xl font-black text-white">{totalQuestionsAnswered}</p>
-                  <p className="text-[10px] text-zinc-500 mt-1">{completedQuizzes} đề thi hoàn thành</p>
-                </div>
-
-                {/* 3. Số Câu Đúng */}
-                <div className="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/20">
-                  <div className="flex items-center justify-between text-emerald-400 mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Số Câu Đúng</span>
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <p className="text-2xl font-black text-emerald-400">{totalCorrectAnswers}</p>
-                  <p className="text-[10px] text-emerald-500/80 mt-1">Đã tích lũy chính xác</p>
-                </div>
-
-                {/* 4. Số Câu Sai */}
-                <div className="p-4 rounded-2xl bg-red-950/30 border border-red-500/20">
-                  <div className="flex items-center justify-between text-red-400 mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Số Câu Sai</span>
-                    <XCircle className="w-4 h-4" />
-                  </div>
-                  <p className="text-2xl font-black text-red-400">{totalWrongAnswers}</p>
-                  <p className="text-[10px] text-red-500/80 mt-1">Cần rèn luyện thêm</p>
-                </div>
-
-              </div>
-
-              {/* Accuracy & Progress Bar */}
-              <div className="p-4 rounded-2xl bg-zinc-900/60 border border-white/5 space-y-2">
-                <div className="flex items-center justify-between text-xs font-bold">
-                  <span className="text-zinc-300 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    Tỷ Lệ Giải Đề Chính Xác Chốt Hạ:
-                  </span>
-                  <span className="text-emerald-400 font-mono font-black text-sm">
-                    {totalQuestionsAnswered > 0 ? Math.round((totalCorrectAnswers / totalQuestionsAnswered) * 100) : 0}%
-                  </span>
-                </div>
-                <div className="w-full h-3 bg-zinc-950 rounded-full overflow-hidden border border-white/5 p-0.5">
-                  <div 
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" 
-                    style={{ width: `${totalQuestionsAnswered > 0 ? Math.round((totalCorrectAnswers / totalQuestionsAnswered) * 100) : 0}%` }} 
-                  />
-                </div>
-              </div>
-
-              {/* EXAM HISTORY TABLE SECTION */}
-              <div className="space-y-4 pt-2">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <h3 className="text-base font-black text-white tracking-tight flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-amber-400" />
-                    Lịch Sử Làm Bài Tập & Kỳ Thi
-                  </h3>
-
-                  {/* Clear History Button */}
-                  {historyList.length > 0 && (
-                    <button
-                      onClick={() => {
-                        if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử làm bài tập?")) {
-                          setHistoryList([]);
-                          localStorage.removeItem("vstudy_history");
-                        }
-                      }}
-                      className="px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 rounded-xl text-[11px] font-bold text-red-400 hover:text-red-200 transition-colors cursor-pointer flex items-center gap-1.5"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Xóa Lịch Sử</span>
-                    </button>
-                  )}
-                </div>
-
-                {/* Filters & Search bar for history */}
-                <div className="flex flex-col sm:flex-row items-center gap-2">
-                  <div className="relative flex-1 w-full">
-                    <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      placeholder="Tìm kiếm môn học, bài kiểm tra..."
-                      value={historySearchQuery}
-                      onChange={(e) => setHistorySearchQuery(e.target.value)}
-                      className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
-                    />
-                  </div>
-
-                  {/* Level dropdown filter */}
-                  <div className="flex items-center gap-1 w-full sm:w-auto bg-zinc-900 border border-white/10 rounded-xl p-1 shrink-0">
-                    <button
-                      onClick={() => setHistoryFilterLevel("all")}
-                      className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                        historyFilterLevel === "all" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      Tất Cả
-                    </button>
-                    <button
-                      onClick={() => setHistoryFilterLevel("super_exam")}
-                      className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                        historyFilterLevel === "super_exam" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      Siêu Tổng Hợp
-                    </button>
-                    <button
-                      onClick={() => setHistoryFilterLevel("thpt")}
-                      className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                        historyFilterLevel === "thpt" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      THPT
-                    </button>
-                    <button
-                      onClick={() => setHistoryFilterLevel("thcs")}
-                      className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                        historyFilterLevel === "thcs" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      THCS
-                    </button>
-                    <button
-                      onClick={() => setHistoryFilterLevel("tieu_hoc")}
-                      className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                        historyFilterLevel === "tieu_hoc" ? "bg-amber-500 text-slate-950" : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      Tiểu Học
-                    </button>
-                  </div>
-                </div>
-
-                {/* History List Table / Cards */}
-                {historyList.length === 0 ? (
-                  <div className="p-8 text-center bg-zinc-900/40 rounded-2xl border border-white/5 space-y-2">
-                    <FileText className="w-8 h-8 text-zinc-600 mx-auto" />
-                    <p className="text-xs text-zinc-400 font-medium">Chưa có lịch sử làm bài tập nào.</p>
-                    <p className="text-[11px] text-zinc-500">Hãy hoàn thành các bài thi để tích lũy điểm và học bạ!</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-                    {historyList
-                      .filter((item) => {
-                        const matchesLevel = historyFilterLevel === "all" || item.level === historyFilterLevel;
-                        const matchesSearch =
-                          !historySearchQuery.trim() ||
-                          item.subjectName.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
-                          item.date.includes(historySearchQuery);
-                        return matchesLevel && matchesSearch;
-                      })
-                      .map((item) => {
-                        const percent = Math.round((item.correct / item.totalQuestions) * 100);
-                        return (
-                          <div
-                            key={item.id}
-                            className="p-3.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-900 border border-white/5 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
-                          >
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase ${
-                                  item.level === "super_exam" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
-                                  item.level === "thpt" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
-                                  item.level === "thcs" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" :
-                                  "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                }`}>
-                                  {item.level === "super_exam" ? "Siêu Tổng Hợp" : item.level.toUpperCase()}
-                                </span>
-                                <h4 className="text-xs font-bold text-white">{item.subjectName}</h4>
-                              </div>
-                              <p className="text-[10px] text-zinc-400 flex items-center gap-2 font-mono">
-                                <span>📅 {item.date}</span>
-                                <span>⏱️ {Math.floor(item.timeSpent / 60)} phút {item.timeSpent % 60}s</span>
-                              </p>
-                            </div>
-
-                            <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                              {/* Score & Accuracy badge */}
-                              <div className="text-right">
-                                <div className="text-xs font-black text-emerald-400">
-                                  {item.correct}/{item.totalQuestions} câu ({percent}%)
-                                </div>
-                                <div className="text-[10px] text-amber-400 font-bold">
-                                  +{item.scoreGained} điểm thưởng
-                                </div>
-                              </div>
-
-                              <div className={`px-2.5 py-1 rounded-lg text-[10px] font-black ${
-                                percent >= 80 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
-                                percent >= 50 ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
-                                "bg-red-500/10 text-red-400 border border-red-500/20"
-                              }`}>
-                                {percent >= 80 ? "Xuất Sắc" : percent >= 50 ? "Đạt" : "Cần Ôn Lại"}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-zinc-900 border-t border-white/10 flex items-center justify-between shrink-0">
-              <p className="text-[11px] text-zinc-500 font-medium">
-                Dữ liệu học bạ tự động đồng bộ và lưu trên hệ thống local storage V-Study.
-              </p>
-              <button
-                onClick={() => setShowHocBaModal(false)}
-                className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-md cursor-pointer transition-all"
-              >
-                Đóng Học Bạ
-              </button>
-            </div>
-
-          </div>
         </div>
       )}
 
