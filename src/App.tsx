@@ -20,6 +20,10 @@ import {
   Flame, 
   Home, 
   Compass, 
+  GraduationCap,
+  BookOpen,
+  School,
+  Zap,
   Radio, 
   Star,
   Bookmark,
@@ -61,7 +65,8 @@ import {
   LogOut,
   Power,
   Sun,
-  Moon
+  Moon,
+  Baby
 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
@@ -1254,7 +1259,7 @@ export default function App() {
   // Dock to Sidebar state
   const [dockToSidebar, setDockToSidebar] = useState<boolean>(() => {
     const saved = localStorage.getItem("vplay_dock_to_sidebar");
-    return saved !== null ? saved === "true" : false;
+    return saved !== null ? saved === "true" : true;
   });
 
   useEffect(() => {
@@ -1280,6 +1285,8 @@ export default function App() {
 
   const [isSidebarCategoriesOpen, setIsSidebarCategoriesOpen] = useState<boolean>(true);
   const [isSidebarFeaturesOpen, setIsSidebarFeaturesOpen] = useState<boolean>(true);
+  const [isVStudySidebarOpen, setIsVStudySidebarOpen] = useState<boolean>(true);
+  const [vstudySubFilter, setVStudySubFilter] = useState<"all" | "tieu_hoc" | "thcs" | "thpt" | "super_exam" | "hoc_ba">("all");
   const [isSidebarVolumeOpen, setIsSidebarVolumeOpen] = useState<boolean>(false);
   const [isSidebarPowerOpen, setIsSidebarPowerOpen] = useState<boolean>(false);
 
@@ -4571,6 +4578,189 @@ export default function App() {
                 {!isSidebarCollapsed && <span>Explore Vietnam</span>}
               </button>
 
+              {/* V-Study Accordion Menu with Sub-categories */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => {
+                    setActiveTab("v_study");
+                    setIsVStudySidebarOpen(!isVStudySidebarOpen);
+                    setActiveSettingSection(null);
+                  }}
+                  title="V-Study Học Tập"
+                  className={(() => {
+                    const isActive = activeTab === "v_study";
+                    const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center justify-between font-semibold text-sm select-none";
+                    const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
+                    const themeColors = isActive
+                      ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20"
+                      : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
+                    return `${base} ${alignment} ${themeColors}`;
+                  })()}
+                >
+                  <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"}`}>
+                    <GraduationCap className="w-5 h-5 shrink-0 text-white" />
+                    {!isSidebarCollapsed && <span>V-Study</span>}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 text-white ${
+                        isVStudySidebarOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </button>
+
+                {isVStudySidebarOpen && (
+                  <div
+                    className={`flex flex-col gap-1 pt-1 pb-2 transition-none duration-0 ${
+                      isSidebarCollapsed
+                        ? "items-center px-2"
+                        : "pl-5 ml-5 border-l border-white/10"
+                    }`}
+                  >
+                    {/* Sub-item 1: Tất cả môn */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("v_study");
+                        setVStudySubFilter("all");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Tất cả môn học"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "v_study" && vstudySubFilter === "all"
+                          ? "text-white font-bold underline underline-offset-4 decoration-red-500"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <BookOpen className="w-3.5 h-3.5 text-white shrink-0" />
+                      {!isSidebarCollapsed && <span>Tất cả môn học</span>}
+                    </button>
+
+                    {/* Sub-item 2: V-Study Tiểu học */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("v_study");
+                        setVStudySubFilter("tieu_hoc");
+                        setActiveSettingSection(null);
+                      }}
+                      title="V-Study Tiểu học"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "v_study" && vstudySubFilter === "tieu_hoc"
+                          ? "text-white font-bold underline underline-offset-4 decoration-amber-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <Baby className="w-3.5 h-3.5 text-white shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Study Tiểu học</span>}
+                    </button>
+
+                    {/* Sub-item 3: V-Study THCS */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("v_study");
+                        setVStudySubFilter("thcs");
+                        setActiveSettingSection(null);
+                      }}
+                      title="V-Study THCS"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "v_study" && vstudySubFilter === "thcs"
+                          ? "text-white font-bold underline underline-offset-4 decoration-blue-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <School className="w-3.5 h-3.5 text-white shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Study THCS</span>}
+                    </button>
+
+                    {/* Sub-item 4: V-Study THPT */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("v_study");
+                        setVStudySubFilter("thpt");
+                        setActiveSettingSection(null);
+                      }}
+                      title="V-Study THPT"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "v_study" && vstudySubFilter === "thpt"
+                          ? "text-white font-bold underline underline-offset-4 decoration-emerald-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <GraduationCap className="w-3.5 h-3.5 text-white shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Study THPT</span>}
+                    </button>
+
+                    {/* Sub-item 5: BÀI KIỂM TRA SIÊU TỔNG HỢP */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("v_study");
+                        setVStudySubFilter("super_exam");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Bài Kiểm Tra Siêu Tổng Hợp (100 Câu - 2 Giờ)"
+                      className={`text-xs font-bold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "v_study" && vstudySubFilter === "super_exam"
+                          ? "text-white font-black underline underline-offset-4 decoration-red-500"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <Zap className="w-3.5 h-3.5 text-white shrink-0" />
+                      {!isSidebarCollapsed && (
+                        <span className="truncate tracking-tight text-[11px] uppercase">
+                          Kiểm Tra Siêu Tổng Hợp
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Sub-item 6: TRA CỨU HỌC BẠ */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("v_study");
+                        setVStudySubFilter("hoc_ba");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Tra cứu học bạ"
+                      className={`text-xs font-bold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "v_study" && vstudySubFilter === "hoc_ba"
+                          ? "text-white font-black underline underline-offset-4 decoration-amber-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <Search className="w-3.5 h-3.5 text-white shrink-0" />
+                      {!isSidebarCollapsed && (
+                        <span className="truncate tracking-tight text-[11px] uppercase">
+                          Tra Cứu Học Bạ
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* Plugins Accordion */}
               <div className="space-y-1">
                 <button
@@ -4599,13 +4789,13 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="Tra cứu Người dùng Vplay"
-                      className={`text-xs font-semibold rounded-lg transition-none duration-0 cursor-pointer flex items-center ${
+                      className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
                         isSidebarCollapsed 
-                          ? "w-10 h-10 justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
-                          : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white gap-2"
+                          ? "w-10 h-10 justify-center p-0 hover:text-white" 
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
                       } ${
                         activeTab === "vplay_users"
-                          ? "bg-[#cc1827] text-white font-bold shadow-md"
+                          ? "text-white font-bold underline underline-offset-4 decoration-red-500"
                           : "text-zinc-300"
                       }`}
                     >
@@ -4621,13 +4811,13 @@ export default function App() {
                           setActiveSettingSection(null);
                         }}
                         title={ct.name}
-                        className={`text-xs font-semibold rounded-lg transition-none duration-0 cursor-pointer flex items-center ${
+                        className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
                           isSidebarCollapsed 
-                            ? "w-10 h-10 justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
-                            : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white gap-2"
+                            ? "w-10 h-10 justify-center p-0 hover:text-white" 
+                            : "w-full text-left py-2 px-3 hover:text-white gap-2"
                         } ${
                           activeTab === ct.id
-                            ? "bg-[#cc1827] text-white font-bold shadow-md"
+                            ? "text-white font-bold underline underline-offset-4 decoration-red-500"
                             : "text-zinc-300"
                         }`}
                       >
@@ -4641,11 +4831,11 @@ export default function App() {
                         setShowVtvGoLockedModal(true);
                       }}
                       title="VTVgo VIP"
-                      className={`text-xs font-semibold rounded-lg transition-none duration-0 cursor-pointer flex items-center ${
+                      className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
                         isSidebarCollapsed 
-                          ? "w-10 h-10 justify-center p-0 hover:bg-[#cc1827] hover:text-white" 
-                          : "w-full text-left py-2 px-3 hover:bg-[#cc1827] hover:text-white gap-2"
-                      } text-zinc-300`}
+                          ? "w-10 h-10 justify-center p-0 hover:text-white" 
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } text-zinc-300 hover:text-white`}
                     >
                       <Star className="w-4 h-4 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>VTVgo VIP</span>}
@@ -4669,19 +4859,19 @@ export default function App() {
                             }
                           }}
                           title={`${plugin.name} ${isInstalled ? (isActive ? "(Đang bật)" : "(Đang tắt)") : "(Chưa cài đặt)"}`}
-                          className={`text-xs font-semibold rounded-lg transition-none duration-0 cursor-pointer flex items-center ${
+                          className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
                             isSidebarCollapsed 
                               ? "w-10 h-10 justify-center p-0" 
                               : "w-full text-left py-2 px-3 gap-2"
                           } ${
                             !isInstalled
-                              ? "text-red-500 hover:bg-red-500/10"
+                              ? "text-red-400 hover:text-red-300"
                               : isActive
-                                ? "bg-[#cc1827] text-white font-bold shadow-md hover:bg-[#b01420]"
-                                : "text-zinc-300 hover:bg-white/10"
+                                ? "text-white font-bold underline underline-offset-4 decoration-red-500"
+                                : "text-zinc-300 hover:text-white"
                           }`}
                         >
-                          <PluginIcon className={`w-4 h-4 shrink-0 ${!isInstalled ? "text-red-500" : "text-white"}`} />
+                          <PluginIcon className="w-4 h-4 text-white shrink-0" />
                           {!isSidebarCollapsed && (
                             <span className="truncate flex-1 flex items-center justify-between gap-1 text-left">
                               <span className="truncate">{plugin.name}</span>
@@ -6522,217 +6712,129 @@ export default function App() {
         {activeTab === "settings" && (
           <div className="max-w-5xl mx-auto py-4 animate-fade-in font-sans">
             <AnimatePresence mode="wait">
-              {!activeSettingSection ? (
-                <motion.div
-                  key="list"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  className="space-y-3"
-                >
-                  {/* Storage Info Bar */}
-                  <div className={`p-5 rounded-[15px] border ${
-                    isMaterialDesignActive 
-                      ? "bg-[#211f26] border-[#49454f] text-[#e6e1e5]" 
-                      : "bg-white/5 border-white/10 backdrop-blur-[20px] text-white"
-                  }`}>
-                    <div className="flex items-center justify-between mb-3">
+              <div className="space-y-6">
+                {/* Category Navigation Pills */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                  {[
+                    { id: null, label: "Tất cả Cài đặt", icon: Settings },
+                    { id: "appearance", label: "Giao diện & Theme", icon: Palette },
+                    { id: "plugin_store", label: "Cửa hàng Plugin", icon: ShoppingBag },
+                    { id: "profile", label: "Tài khoản & Dữ liệu", icon: User },
+                    { id: "accessibility", label: "Trợ năng & Hệ thống", icon: Sliders },
+                    { id: "custom_tab", label: "Tùy chọn Developer", icon: Cpu },
+                    { id: "design_system", label: "Design System", icon: Layers },
+                  ].map((cat) => {
+                    const IconC = cat.icon;
+                    const isCatActive = activeSettingSection === cat.id;
+                    return (
+                      <button
+                        key={cat.id ?? "all"}
+                        onClick={() => setActiveSettingSection(cat.id)}
+                        className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
+                          isCatActive
+                            ? "bg-[#cc1827] text-white shadow-md shadow-red-900/30"
+                            : "bg-white/10 hover:bg-white/15 text-white/70 hover:text-white border border-white/10"
+                        }`}
+                      >
+                        <IconC className="w-3.5 h-3.5" />
+                        <span>{cat.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Storage Info Bar */}
+                <div className={`p-5 rounded-[15px] border ${
+                  isMaterialDesignActive 
+                    ? "bg-[#211f26] border-[#49454f] text-[#e6e1e5]" 
+                    : "bg-white/5 border-white/10 backdrop-blur-[20px] text-white"
+                }`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <HardDrive className={`w-5 h-5 ${currentStorageUsed >= 2.8 ? "text-red-400 animate-pulse" : currentStorageUsed >= 2.0 ? "text-amber-400" : "text-indigo-400"}`} />
+                      <span className="font-semibold text-sm">Ổ cứng lưu trữ Vplay</span>
+                    </div>
+                    <span className="text-xs font-mono font-medium opacity-90">
+                      {currentStorageUsed.toFixed(2)} GB / 3.00 GB
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-4 relative">
+                    <div 
+                      className={`h-full transition-all duration-500 ease-out rounded-full ${
+                        currentStorageUsed >= 2.8 
+                          ? "bg-gradient-to-r from-red-500 to-rose-600" 
+                          : currentStorageUsed >= 2.0 
+                            ? "bg-gradient-to-r from-amber-500 to-orange-600" 
+                            : "bg-gradient-to-r from-indigo-500 to-purple-600"
+                      }`}
+                      style={{ width: `${(currentStorageUsed / 3.00) * 100}%` }}
+                    />
+                  </div>
+
+                  {/* Storage Breakdowns & Action */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-white/5">
+                    <div className="text-[11px] opacity-70 space-y-0.5">
+                      <span className="block font-medium">Chi tiết sử dụng:</span>
+                      <div className="flex flex-wrap gap-x-3 gap-y-1">
+                        <span>Hệ thống: 0.15GB</span>
+                        {dynamicMotion && <span className="text-indigo-300">Dynamic Motion: 0.55GB</span>}
+                        {isMultiviewMode && <span className="text-purple-300">Multiview: 0.95GB</span>}
+                        {plugins.map(p => {
+                          if (p.status === "installed") {
+                            const weight = p.id === "liquid_glass" ? 1.20 : p.id === "remove_shiny_border" ? 0.35 : 0.45;
+                            return <span key={p.id} className="text-emerald-300">{p.name}: {weight}GB</span>;
+                          }
+                          return null;
+                        })}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleCleanStorage}
+                      className={`px-4 py-2 rounded-full font-semibold text-xs transition-all active:scale-95 cursor-default flex items-center gap-1.5 shrink-0 ${
+                        isMaterialDesignActive
+                          ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
+                          : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-md"
+                      }`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Dọn dẹp ổ cứng
+                    </button>
+                  </div>
+                </div>
+
+                {/* Project Details Banner */}
+                <div className="bg-white/10 backdrop-blur-[20px] rounded-[15px] p-5 sm:p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] border border-white/10 flex flex-col gap-4 relative overflow-hidden mb-4">
+                  <div className="space-y-3 z-10 w-full">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-none">
+                      Project Vplay Refresh
+                    </h2>
+                    <div className="flex flex-col gap-2.5 text-xs sm:text-sm text-white/80">
                       <div className="flex items-center gap-2">
-                        <HardDrive className={`w-5 h-5 ${currentStorageUsed >= 2.8 ? "text-red-400 animate-pulse" : currentStorageUsed >= 2.0 ? "text-amber-400" : "text-indigo-400"}`} />
-                        <span className="font-semibold text-sm">Ổ cứng lưu trữ Vplay</span>
+                        <Pen className="w-4 h-4 text-emerald-400 shrink-0 stroke-[2.5]" />
+                        <span className="font-normal text-white/70">Version: <strong className="text-white font-semibold">26.8.1 (Beta)</strong></span>
                       </div>
-                      <span className="text-xs font-mono font-medium opacity-90">
-                        {currentStorageUsed.toFixed(2)} GB / 3.00 GB
-                      </span>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-4 relative">
-                      <div 
-                        className={`h-full transition-all duration-500 ease-out rounded-full ${
-                          currentStorageUsed >= 2.8 
-                            ? "bg-gradient-to-r from-red-500 to-rose-600" 
-                            : currentStorageUsed >= 2.0 
-                              ? "bg-gradient-to-r from-amber-500 to-orange-600" 
-                              : "bg-gradient-to-r from-indigo-500 to-purple-600"
-                        }`}
-                        style={{ width: `${(currentStorageUsed / 3.00) * 100}%` }}
-                      />
-                    </div>
-
-                    {/* Storage Breakdowns & Action */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-white/5">
-                      <div className="text-[11px] opacity-70 space-y-0.5">
-                        <span className="block font-medium">Chi tiết sử dụng:</span>
-                        <div className="flex flex-wrap gap-x-3 gap-y-1">
-                          <span>Hệ thống: 0.15GB</span>
-                          {dynamicMotion && <span className="text-indigo-300">Dynamic Motion: 0.55GB</span>}
-                          {isMultiviewMode && <span className="text-purple-300">Multiview: 0.95GB</span>}
-                          {plugins.map(p => {
-                            if (p.status === "installed") {
-                              const weight = p.id === "liquid_glass" ? 1.20 : p.id === "remove_shiny_border" ? 0.35 : 0.45;
-                              return <span key={p.id} className="text-emerald-300">{p.name}: {weight}GB</span>;
-                            }
-                            return null;
-                          })}
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <Crown className="w-4 h-4 text-amber-400 shrink-0 stroke-[2.5]" />
+                        <span className="font-normal text-white/70">Author: <strong className="text-white font-semibold">VNRT</strong></span>
                       </div>
-
-                      <button
-                        onClick={handleCleanStorage}
-                        className={`px-4 py-2 rounded-full font-semibold text-xs transition-all active:scale-95 cursor-default flex items-center gap-1.5 shrink-0 ${
-                          isMaterialDesignActive
-                            ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
-                            : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-md"
-                        }`}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Dọn dẹp ổ cứng
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Project Details Banner */}
-                  <div className="bg-white/10 backdrop-blur-[20px] rounded-[15px] p-5 sm:p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] border border-white/10 flex flex-col gap-4 relative overflow-hidden mb-4">
-                    <div className="space-y-3 z-10 w-full">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-none">
-                        Project Vplay Refresh
-                      </h2>
-                      <div className="flex flex-col gap-2.5 text-xs sm:text-sm text-white/80">
-                        <div className="flex items-center gap-2">
-                          <Pen className="w-4 h-4 text-emerald-400 shrink-0 stroke-[2.5]" />
-                          <span className="font-normal text-white/70">Version: <strong className="text-white font-semibold">26.8.1 (Beta)</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Crown className="w-4 h-4 text-amber-400 shrink-0 stroke-[2.5]" />
-                          <span className="font-normal text-white/70">Author: <strong className="text-white font-semibold">VNRT</strong></span>
-                        </div>
-                        <div className="flex items-start gap-2 leading-relaxed">
-                          <Heart className="w-4 h-4 text-rose-400 shrink-0 mt-0.5 fill-rose-500/15 stroke-[2.5]" />
-                          <span className="text-white/70">
-                            Supporters: <strong className="text-white font-medium">FTV OFFICIAL, HMG, DHA, - Bsod999, Myyer, Nquinanh, TV Archive Official</strong>
-                          </span>
-                        </div>
+                      <div className="flex items-start gap-2 leading-relaxed">
+                        <Heart className="w-4 h-4 text-rose-400 shrink-0 mt-0.5 fill-rose-500/15 stroke-[2.5]" />
+                        <span className="text-white/70">
+                          Supporters: <strong className="text-white font-medium">FTV OFFICIAL, HMG, DHA, - Bsod999, Myyer, Nquinanh, TV Archive Official</strong>
+                        </span>
                       </div>
                     </div>
-                    {/* A subtle absolute glowing visual behind */}
-                    <div className="absolute right-0 bottom-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
                   </div>
+                  <div className="absolute right-0 bottom-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+                </div>
 
-                  {[
-                    {
-                      id: "plugin_store",
-                      title: "settings.sections.PluginStore.title",
-                      subtitle: "settings.sections.PluginStore.subtitle",
-                      icon: ShoppingBag,
-                    },
-                    {
-                      id: "profile",
-                      title: "settings.sections.Profile.title",
-                      subtitle: "settings.sections.Profile.subtitle",
-                      icon: User,
-                    },
-                    {
-                      id: "appearance",
-                      title: "settings.sections.Appearance.title",
-                      subtitle: "settings.sections.Appearance.subtitle",
-                      icon: Palette,
-                    },
-                    {
-                      id: "accessibility",
-                      title: "settings.sections.Accessibility.title",
-                      subtitle: "settings.sections.Accessibility.subtitle",
-                      icon: Sliders,
-                    },
-                    {
-                      id: "broadcast",
-                      title: "settings.sections.Broadcast.title",
-                      subtitle: "settings.sections.Broadcast.subtitle",
-                      icon: Tv,
-                    }
-                  ].map((sec) => {
-                    const IconComp = sec.icon;
-                    return (
-                      <button
-                        key={sec.id}
-                        onClick={() => setActiveSettingSection(sec.id)}
-                        className={`w-full text-left bg-white/10 backdrop-blur-[10px] rounded-[15px] flex items-center gap-3.5 text-white cursor-default ${
-                          isWinUI3Active 
-                            ? "py-2.5 px-4 shadow-[0_4px_16px_rgba(0,0,0,0.15)] border border-white/10 hover:border-white/20" 
-                            : "py-4.5 px-5 sm:py-5.5 sm:px-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] border-[3px] border-white/10 hover:border-white"
-                        }`}
-                      >
-                        <div className={`flex items-center justify-center shrink-0 text-white ${isWinUI3Active ? "w-8 h-8" : "w-10 h-10"}`}>
-                          <IconComp className={`${isWinUI3Active ? "w-5 h-5" : "w-6 h-6"} stroke-[1.8]`} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className={`${isWinUI3Active ? "text-sm" : "text-base"} font-semibold text-white tracking-tight`}>{t(sec.title)}</h3>
-                          <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{t(sec.subtitle)}</p>
-                        </div>
-                        <ChevronRight className={`text-white/45 shrink-0 ${isWinUI3Active ? "w-4 h-4" : "w-5 h-5"}`} />
-                      </button>
-                    );
-                  })}
-
-                  {/* Developer Options Heading */}
-                  <div className="pt-4 pb-1.5 px-2 flex items-center gap-2 text-white/50 text-[11px] font-bold tracking-wider uppercase select-none font-sans">
-                    <Cpu className="w-3.5 h-3.5 stroke-[2.5]" />
-                    <span>{t("settings.section.developeroptions.title")}</span>
-                  </div>
-
-                  {[
-                    {
-                      id: "custom_tab",
-                      title: "Create custom tab",
-                      subtitle: "Design a custom personalized navigation tab with custom icons, layout, and logic",
-                      icon: Plus,
-                    },
-                    {
-                      id: "custom_modal",
-                      title: "Create custom modal",
-                      subtitle: "Build custom pop-up alert dialog boxes with tailored HTML structures and functional logic",
-                      icon: Sparkles,
-                    },
-                    {
-                      id: "design_system",
-                      title: "settings.sections.DesignSystem.title",
-                      subtitle: "settings.sections.DesignSystem.subtitle",
-                      icon: Layers,
-                    }
-                  ].map((sec) => {
-                    const IconComp = sec.icon;
-                    return (
-                      <button
-                        key={sec.id}
-                        onClick={() => setActiveSettingSection(sec.id)}
-                        className={`w-full text-left bg-white/10 backdrop-blur-[10px] rounded-[15px] flex items-center gap-3.5 text-white cursor-default ${
-                          isWinUI3Active 
-                            ? "py-2.5 px-4 shadow-[0_4px_16px_rgba(0,0,0,0.15)] border border-white/10 hover:border-white/20" 
-                            : "py-4.5 px-5 sm:py-5.5 sm:px-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] border-[3px] border-white/10 hover:border-white"
-                        }`}
-                      >
-                        <div className={`flex items-center justify-center shrink-0 text-white ${isWinUI3Active ? "w-8 h-8" : "w-10 h-10"}`}>
-                          <IconComp className={`${isWinUI3Active ? "w-5 h-5" : "w-6 h-6"} stroke-[1.8]`} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className={`${isWinUI3Active ? "text-sm" : "text-base"} font-semibold text-white tracking-tight`}>{t(sec.title)}</h3>
-                          <p className="text-[11.5px] sm:text-xs text-white/60 mt-0.5 leading-relaxed truncate">{t(sec.subtitle)}</p>
-                        </div>
-                        <ChevronRight className={`text-white/45 shrink-0 ${isWinUI3Active ? "w-4 h-4" : "w-5 h-5"}`} />
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="detail"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="mt-16 sm:mt-20 bg-white/10 backdrop-blur-[10px] rounded-[15px] p-6 sm:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/10 text-white"
-                >
-                  {activeSettingSection === "plugin_store" && (
-                    <div className="space-y-6">
+                {/* CATEGORY SECTIONS CONTAINER */}
+                <div className="space-y-8">
+                  {(!activeSettingSection || activeSettingSection === "plugin_store") && (
+                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
                       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                         <div className="w-12 h-12 flex items-center justify-center shrink-0 text-indigo-400">
                           <ShoppingBag className="w-6 h-6" />
@@ -6850,20 +6952,20 @@ export default function App() {
                     </div>
                   )}
 
-                  {activeSettingSection === "appearance" && (
-                    <div className="space-y-6">
+                  {(!activeSettingSection || activeSettingSection === "appearance") && (
+                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
                       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
+                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-amber-400">
                           <Palette className="w-6 h-6" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-white">settings.sections.Appearance.title</h3>
-                          <p className="text-xs text-white/60">settings.sections.Appearance.description</p>
+                          <h3 className="text-lg font-semibold text-white">Giao diện & Theme</h3>
+                          <p className="text-xs text-white/60">Tùy chỉnh màu nền, chế độ tối AMOLED, thanh điều hướng và giao diện ứng dụng.</p>
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-sm font-semibold block text-white/90">settings.appearance.BackdropGlow.label</label>
+                        <label className="text-sm font-semibold block text-white/90">Màu hiệu ứng nền (Backdrop Glow)</label>
                         <div className="grid grid-cols-2 gap-2.5">
                           {[
                             { id: "cosmic", name: "Cosmic Glow", color: "from-pink-600 to-indigo-800" },
@@ -6991,76 +7093,55 @@ export default function App() {
                     </div>
                   )}
 
-                  {activeSettingSection === "profile" && (
-                    <div className="space-y-6">
+                  {(!activeSettingSection || activeSettingSection === "profile") && (
+                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
                       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
+                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-emerald-400">
                           <User className="w-6 h-6" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-white">settings.sections.Profile.title</h3>
-                          <p className="text-xs text-white/60">settings.sections.Profile.description</p>
+                          <h3 className="text-lg font-semibold text-white">Tài khoản & Dữ liệu</h3>
+                          <p className="text-xs text-white/60">Quản lý danh sách kênh yêu thích, kênh tùy chỉnh và bộ nhớ cá nhân.</p>
                         </div>
                       </div>
 
                       <div className="space-y-4">
                         <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3.5 text-xs text-white/80">
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-white/90">settings.profile.TotalFavorites.title</span>
-                            <span className="font-mono text-amber-300 font-bold bg-white/5 px-2 py-0.5 rounded">{favorites.length} channels</span>
+                            <span>Kênh đã lưu vào Yêu thích:</span>
+                            <span className="font-bold text-white">{favorites.length} kênh</span>
                           </div>
-                          {favorites.length > 0 && (
-                            <button 
+                          <div className="flex items-center justify-between">
+                            <span>Kênh tùy chỉnh đã thêm:</span>
+                            <span className="font-bold text-white">{customChannels.length} kênh</span>
+                          </div>
+                          <div className="pt-2 border-t border-white/10 flex justify-end">
+                            <button
                               onClick={() => {
-                                if (confirm("Are you sure you want to clear your entire favorites list?")) {
+                                if (confirm("Bạn có chắc chắn muốn xóa toàn bộ kênh Yêu thích?")) {
                                   setFavorites([]);
                                 }
                               }}
-                              className="py-1.5 px-3 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/25 transition-all cursor-default font-semibold text-[11px]"
+                              className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
                             >
-                              settings.profile.DeleteAllFavorites.button
+                              <Trash2 className="w-3.5 h-3.5" />
+                              Xóa danh sách Yêu thích
                             </button>
-                          )}
-
-                          <hr className="border-white/5" />
-
-                          <div className="flex items-center justify-between">
-                            <span className="font-semibold text-white/90">settings.profile.CustomChannels.title</span>
-                            <span className="font-mono text-indigo-300 font-bold bg-white/5 px-2 py-0.5 rounded">{customChannels.length} channels</span>
                           </div>
-                          {customChannels.length > 0 && (
-                            <button 
-                              onClick={() => {
-                                if (confirm("Are you sure you want to delete all custom channels?")) {
-                                  setCustomChannels([]);
-                                }
-                              }}
-                              className="py-1.5 px-3 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/25 transition-all cursor-default font-semibold text-[11px]"
-                            >
-                              settings.profile.DeleteCustomChannels.button
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="p-4 rounded-xl bg-orange-500/5 border border-orange-500/15 text-xs leading-relaxed text-orange-200">
-                          <div className="font-bold text-orange-300 mb-1">
-                            settings.profile.OnlineAccountNotice.title
-                          </div>
-                          settings.profile.OnlineAccountNotice.description
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {activeSettingSection === "accessibility" && (
-                    <div className="space-y-6">
+                  {(!activeSettingSection || activeSettingSection === "accessibility") && (
+                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
                       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
+                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-cyan-400">
                           <Sliders className="w-6 h-6" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-white">settings.sections.Accessibility.title</h3>
-                          <p className="text-xs text-white/60">settings.sections.Accessibility.description</p>
+                          <h3 className="text-lg font-semibold text-white">Trợ năng & Trải nghiệm</h3>
+                          <p className="text-xs text-white/60">Cấu hình tự động trượt banner và hiệu ứng chuyển động ứng dụng.</p>
                         </div>
                       </div>
 
@@ -7068,8 +7149,8 @@ export default function App() {
                         {/* Option: Auto slide banner */}
                         <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
                           <div className="space-y-1">
-                            <h4 className="text-sm font-semibold text-white">settings.accessibility.AutoSlide.title</h4>
-                            <p className="text-xs text-white/60 leading-relaxed">settings.accessibility.AutoSlide.subtitle</p>
+                            <h4 className="text-sm font-semibold text-white">Tự động trượt Banner Trang chủ</h4>
+                            <p className="text-xs text-white/60 leading-relaxed">Tự động xoay chuyển slide banner ở trang chủ sau mỗi 5 giây</p>
                           </div>
                           
                           <div className="flex items-center">
@@ -7106,10 +7187,7 @@ export default function App() {
                                   transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
                                   className="relative w-6 h-5 flex items-center justify-center group"
                                 >
-                                  {/* Outer hover halo/bubble (capsule-shaped matching the pill, expanding on hover) */}
                                   <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                  
-                                  {/* Knob - horizontal pill shape */}
                                   <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
                                 </motion.div>
                               </button>
@@ -7120,8 +7198,8 @@ export default function App() {
                         {/* Option: Dynamic Motion */}
                         <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
                           <div className="space-y-1">
-                            <h4 className="text-sm font-semibold text-white">Dynamic Motion</h4>
-                            <p className="text-xs text-white/60 leading-relaxed">Disables all transitions, entry animations, translations, and scaling. Everything will use instant transitions.</p>
+                            <h4 className="text-sm font-semibold text-white">Dynamic Motion (Tắt hiệu ứng chuyển động)</h4>
+                            <p className="text-xs text-white/60 leading-relaxed">Tắt toàn bộ hiệu ứng hoạt họa và chuyển cảnh để tối ưu tốc độ phản hồi tức thì.</p>
                           </div>
                           
                           <div className="flex items-center">
@@ -7169,10 +7247,8 @@ export default function App() {
                     </div>
                   )}
 
-
-
-                  {activeSettingSection === "custom_tab" && (
-                    <div className="space-y-6 text-left">
+                  {(!activeSettingSection || activeSettingSection === "custom_tab") && (
+                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6 text-left">
                       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                         <div className="w-12 h-12 flex items-center justify-center bg-indigo-500/10 rounded-2xl border border-indigo-500/20 text-indigo-400">
                           <Plus className="w-6 h-6" />
@@ -7326,7 +7402,7 @@ export default function App() {
                                 setTabEditId(null);
                                 setTabNameInput("");
                                 setTabIconInput("Sparkles");
-                                setTabCodeInput("// Enter JavaScript code logic here\n");
+                                setTabCodeInput("/* Enter JavaScript code logic here */\n");
                                 setTabHtmlInput("");
                               }}
                               className="px-4 py-2.5 rounded-[12px] bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-colors"
@@ -7341,7 +7417,7 @@ export default function App() {
                                   return;
                                 }
                                 if (tabEditId) {
-                                  // Update
+                                  /* Update */
                                   setCustomTabs(prev => prev.map(t => t.id === tabEditId ? {
                                     ...t,
                                     name: tabNameInput,
@@ -7350,7 +7426,7 @@ export default function App() {
                                     htmlContent: tabHtmlInput
                                   } : t));
                                 } else {
-                                  // Create
+                                  /* Create */
                                   const newId = `custom_tab_${Date.now()}`;
                                   setCustomTabs(prev => [...prev, {
                                     id: newId,
@@ -7360,11 +7436,11 @@ export default function App() {
                                     htmlContent: tabHtmlInput
                                   }]);
                                 }
-                                // Reset form
+                                /* Reset form */
                                 setTabEditId(null);
                                 setTabNameInput("");
                                 setTabIconInput("Sparkles");
-                                setTabCodeInput("// Enter JavaScript code logic here\n");
+                                setTabCodeInput("/* Enter JavaScript code logic here */\n");
                                 setTabHtmlInput("");
                               }}
                               className="px-5 py-2.5 rounded-[12px] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-lg shadow-indigo-600/25 flex items-center gap-1.5"
@@ -7542,7 +7618,7 @@ export default function App() {
                                 setModalEditId(null);
                                 setModalNameInput("");
                                 setModalIconInput("Sparkles");
-                                setModalCodeInput("// Enter JavaScript code logic here\n");
+                                setModalCodeInput("/* Enter JavaScript code logic here */\n");
                                 setModalHtmlInput("");
                               }}
                               className="px-4 py-2.5 rounded-[12px] bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-colors"
@@ -7581,7 +7657,7 @@ export default function App() {
                                 setModalEditId(null);
                                 setModalNameInput("");
                                 setModalIconInput("Sparkles");
-                                setModalCodeInput("// Enter JavaScript code logic here\n");
+                                setModalCodeInput("/* Enter JavaScript code logic here */\n");
                                 setModalHtmlInput("");
                               }}
                               className="px-5 py-2.5 rounded-[12px] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-lg shadow-indigo-600/25 flex items-center gap-1.5"
@@ -7595,7 +7671,7 @@ export default function App() {
                     </div>
                   )}
 
-                  {activeSettingSection === "design_system" && (
+                  {(!activeSettingSection || activeSettingSection === "design_system") && (
                     <div className="space-y-8 animate-fade-in pb-12">
                       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                         <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
@@ -8361,24 +8437,12 @@ export default function App() {
                             </div>
                           </div>
                         </div>
-
                       </div>
                     </div>
                   )}
 
-                  {activeSettingSection !== "appearance" && activeSettingSection !== "profile" && activeSettingSection !== "accessibility" && activeSettingSection !== "design_system" && activeSettingSection !== "plugin_store" && activeSettingSection !== "custom_tab" && activeSettingSection !== "custom_modal" && (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 flex items-center justify-center mx-auto mb-4 animate-pulse">
-                        <Sparkles className="w-8 h-8" />
-                      </div>
-                      <h3 className="text-lg font-black text-white uppercase tracking-widest mb-2">Coming Soon</h3>
-                      <p className="text-xs text-white/60 max-w-xs mx-auto leading-relaxed">
-                        This feature is actively being developed and will be released in the upcoming version of Vplay.
-                      </p>
-                    </div>
-                  )}
-                </motion.div>
-              )}
+                </div>
+              </div>
             </AnimatePresence>
           </div>
         )}
@@ -8434,6 +8498,8 @@ export default function App() {
         {/* VIEW: V-STUDY EDUCATION PAGE */}
         {activeTab === "v_study" && (
           <VStudyTab 
+            subFilter={vstudySubFilter}
+            onSelectSubFilter={(sf) => setVStudySubFilter(sf)}
             onBack={() => {
               setActiveTab("home");
             }} 
