@@ -66,7 +66,9 @@ import {
   Power,
   Sun,
   Moon,
-  Baby
+  Baby,
+  Coins,
+  BadgeCheck
 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
@@ -81,6 +83,8 @@ import VplayUsersTab from "./components/VplayUsersTab";
 import VplayVBoxTab from "./components/VplayVBoxTab";
 import ExploreVietnamTab from "./components/ExploreVietnamTab";
 import VStudyTab from "./components/VStudyTab";
+import VerifiedTab from "./components/VerifiedTab";
+import VFlowTab from "./components/VFlowTab";
 
 const RECENT_SEARCHES_ITEMS = [
   // 1. Các kênh truyền hình
@@ -225,11 +229,11 @@ const TRANSLATIONS: Record<string, string> = {
   "home.search.placeholder": "Search channels...",
 
   // Special event / VTVGo Locked modal
-  "title.special_event.banner_top.name": "Live Broadcast",
-  "title.special_event.banner_bottom.name": "VTVgo Experimental Stream",
-  "title.special_event.banner_desc.name": "Technical test stream. Only active during specified hours.",
-  "title.special_event.title.name": "VTVgo Not Broadcasting Yet",
-  "title.special_event.desc.name": "VTVgo channels are only live from 12:30 PM to 2:30 PM daily for special streams. Please try again later.",
+  "title.special_event.banner_top.name": "Hướng tới đưa Vplay",
+  "title.special_event.banner_bottom.name": "trở thành siêu ứng dụng của Việt Nam",
+  "title.special_event.banner_desc.name": "Hệ sinh thái truyền hình trực tuyến, mạng xã hội giải trí & ứng dụng đa phương tiện hàng đầu Việt Nam.",
+  "title.special_event.title.name": "Hướng tới đưa Vplay trở thành siêu ứng dụng của Việt Nam",
+  "title.special_event.desc.name": "Hệ sinh thái truyền hình trực tuyến, mạng xã hội giải trí & ứng dụng đa phương tiện hàng đầu Việt Nam.",
   "modal.close_button.name": "Close",
 
   // Settings section titles & subtitles
@@ -403,42 +407,22 @@ const ICON_REGISTRY: Record<string, React.ComponentType<any>> = {
 const homeSlides = [
   {
     id: 0,
-    titleTop: "title.special_event.banner_top.name",
-    titleMain: "title.special_event.banner_bottom.name",
+    titleTop: "Hướng tới đưa Vplay",
+    titleMain: "trở thành siêu ứng dụng của Việt Nam",
     titleSub: "",
-    genreText: "SPECIAL LIVE EVENT",
-    subSlogan: "NATIONAL BIODIVERSITY CONSERVATION",
-    thumbnail: "https://cdn-images.vtv.vn/66349b6076cb4dee98746cf1/2026/06/20/cover-91667111629561629180275.png",
-    channelId: "vietnam-wild-live",
-    channelPlayName: "Vietnam Wild LIVE",
+    genreText: "SIÊU ỨNG DỤNG ĐA PHƯƠNG TIỆN",
+    subSlogan: "HỆ SINH THÁI TRUYỀN HÌNH & GIẢI TRÍ HÀNG ĐẦU VIỆT NAM",
+    thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80",
+    channelId: "vplay_live",
+    channelPlayName: "Vplay Super App",
     ageRating: "G",
-    ratingText: "HD Quality | Live on VTVgo",
+    ratingText: "Full HD 4K | Vplay Ecosystem",
     vignetteLeft: "from-black/90 via-black/55 to-transparent",
     vignetteBottom: "from-[#07050f] via-[#07050f]/85 to-transparent",
     vignetteTop: "from-black/45 via-transparent to-transparent",
-    description: "title.special_event.banner_desc.name",
+    description: "Hệ sinh thái truyền hình trực tuyến, mạng xã hội giải trí & ứng dụng đa phương tiện hàng đầu Việt Nam.",
     showCountdown: false,
-    logo: "https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest?cb=20260625120702",
-    btnText: "Watch Now",
-    btnIcon: "play"
-  },
-  {
-    id: 1,
-    titleTop: "VTV6",
-    titleMain: "For a Healthy Vietnam!",
-    titleSub: "",
-    genreText: "NATIONAL SPORTS & HEALTH",
-    subSlogan: "EMPOWERING ASPIRATION, SPREADING VIETNAMESE YOUTH ENERGY",
-    thumbnail: "https://i.ytimg.com/vi/cXv_D6qIy0s/maxresdefault.jpg",
-    channelId: "vtv3",
-    channelPlayName: "VTV6 - For a Healthy Vietnam! (FHD)",
-    ageRating: "G",
-    ratingText: "Live Sports | Copyrighted",
-    vignetteLeft: "from-black/90 via-black/55 to-transparent",
-    vignetteBottom: "from-[#07050f] via-[#07050f]/85 to-transparent",
-    vignetteTop: "from-black/45 via-transparent to-transparent",
-    logo: "https://static.wikia.nocookie.net/logos/images/5/56/VTV6_logo_07.06.2026.png/revision/latest?cb=20260608073805&path-prefix=uk",
-    description: "News, features, and reports on domestic and international sports produced by the Sports Television Center, aiming to promote mass sports, school sports, and professional sports development in Vietnam, as well as community health and comprehensive development.",
+    logo: "https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi",
     btnText: "Watch Now",
     btnIcon: "play"
   },
@@ -687,6 +671,8 @@ const getPluginIcon = (id: string) => {
       return Flame;
     case "material_design":
       return Palette;
+    case "minecraft_ore":
+      return Box;
     case "remove_shiny_border":
       return Layers;
     case "storage_feeder":
@@ -697,6 +683,35 @@ const getPluginIcon = (id: string) => {
       return Package;
   }
 };
+
+function WindowsSpinner({ size = 52, className = "" }: { size?: number; className?: string }) {
+  return (
+    <div
+      className={`relative flex items-center justify-center shrink-0 pointer-events-none select-none isolate transform-gpu ${className}`}
+      style={{
+        width: size,
+        height: size,
+        WebkitTransform: "translateZ(0)",
+        transform: "translateZ(0)",
+      }}
+    >
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif"
+        alt="Loading..."
+        decoding="async"
+        loading="eager"
+        referrerPolicy="no-referrer"
+        className="w-full h-full object-contain pointer-events-none select-none transform-gpu will-change-transform"
+        style={{
+          WebkitTransform: "translateZ(0)",
+          transform: "translateZ(0)",
+          WebkitBackfaceVisibility: "hidden",
+          backfaceVisibility: "hidden",
+        }}
+      />
+    </div>
+  );
+}
 
 export default function App() {
   // Local time state clock
@@ -1285,6 +1300,7 @@ export default function App() {
 
   const [isSidebarCategoriesOpen, setIsSidebarCategoriesOpen] = useState<boolean>(true);
   const [isSidebarFeaturesOpen, setIsSidebarFeaturesOpen] = useState<boolean>(true);
+  const [isVerifiedExclusiveOpen, setIsVerifiedExclusiveOpen] = useState<boolean>(true);
   const [isVStudySidebarOpen, setIsVStudySidebarOpen] = useState<boolean>(true);
   const [vstudySubFilter, setVStudySubFilter] = useState<"all" | "tieu_hoc" | "thcs" | "thpt" | "super_exam" | "hoc_ba">("all");
   const [isSidebarVolumeOpen, setIsSidebarVolumeOpen] = useState<boolean>(false);
@@ -1313,6 +1329,56 @@ export default function App() {
     localStorage.setItem("vplay_dynamic_motion", dynamicMotion ? "true" : "false");
   }, [dynamicMotion]);
 
+  // V-Coins & Verified Subscription State
+  const [vCoins, setVCoins] = useState<number>(() => {
+    const saved = localStorage.getItem("vplay_vcoins");
+    return saved !== null ? parseInt(saved, 10) : 1500000;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_vcoins", vCoins.toString());
+  }, [vCoins]);
+
+  const [verifiedSub, setVerifiedSub] = useState<{
+    plan: "none" | "verified" | "verified_plus";
+    expiresAt: number | null;
+  }>(() => {
+    const saved = localStorage.getItem("vplay_verified_sub");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // ignore
+      }
+    }
+    return { plan: "none", expiresAt: null };
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_verified_sub", JSON.stringify(verifiedSub));
+  }, [verifiedSub]);
+
+  // Toast notification for earning V-coins
+  const [vcoinToast, setVcoinToast] = useState<string | null>(null);
+
+  // Interval timer: earn 10 V-coins (or 20 for Verified PLUS) every 1 minute on Live TV or Vertical tab
+  useEffect(() => {
+    if (activeTab !== "live" && activeTab !== "shorts") return;
+
+    const interval = setInterval(() => {
+      const reward = verifiedSub.plan === "verified_plus" ? 20 : 10;
+      setVCoins((prev) => prev + reward);
+      const modeName = activeTab === "live" ? "Live TV" : "Vertical";
+      setVcoinToast(`+${reward} V-coins! (Đã xem 1 phút ${modeName})`);
+
+      setTimeout(() => {
+        setVcoinToast(null);
+      }, 4000);
+    }, 60000); // 1 minute = 60,000 ms
+
+    return () => clearInterval(interval);
+  }, [activeTab, verifiedSub.plan]);
+
   // Experimental states
   const [expLowLatency, setExpLowLatency] = useState<boolean>(() => localStorage.getItem("vplay_exp_lowlatency") === "true");
   const [expCache, setExpCache] = useState<boolean>(() => localStorage.getItem("vplay_exp_cache") === "true");
@@ -1320,11 +1386,25 @@ export default function App() {
   const [testStreamUrl, setTestStreamUrl] = useState<string>("");
 
   // Tab switching 3-second loading state to prevent lag
+  const LOADING_MESSAGES = [
+    "Just a moment",
+    "Have a cup of coffee",
+    "Not for too long",
+    "Grab a snack",
+    "Please wait",
+    "We're ready"
+  ];
+  const [loadingText, setLoadingText] = useState<string>("Just a moment");
   const [isTabLoading, setIsTabLoading] = useState<boolean>(false);
   const prevTabKeyRef = useRef<string>(`${activeTab}_${vstudySubFilter}_${activeSettingSection}`);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const getRandomLoadingText = () => {
+    return LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)];
+  };
+
   const triggerSearchLoading = () => {
+    setLoadingText(getRandomLoadingText());
     setIsTabLoading(true);
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -1339,6 +1419,7 @@ export default function App() {
     const currentTabKey = `${activeTab}_${vstudySubFilter}_${activeSettingSection}`;
     if (prevTabKeyRef.current !== currentTabKey) {
       prevTabKeyRef.current = currentTabKey;
+      setLoadingText(getRandomLoadingText());
       setIsTabLoading(true);
 
       if (timerRef.current) {
@@ -2374,6 +2455,14 @@ export default function App() {
         isActive: false
       },
       {
+        id: "minecraft_ore",
+        name: "Minecraft Ore UI Design",
+        desc: "Kích hoạt giao diện Minecraft Bedrock & Education Edition độc đáo: toàn bộ nút bấm, slider, checkbox, input box, công tắc toggle switch... biến đổi thành phong cách khối vuông pixel 3D chuẩn game.",
+        status: "installed" as const,
+        progress: 100,
+        isActive: false
+      },
+      {
         id: "remove_shiny_border",
         name: "Minimalist Borderless Flat Mode",
         desc: "Completely strips all shiny reflections, glass highlights, and reflective outer borders surrounding cards and buttons to provide a pristine, ultra-minimalist flat interface.",
@@ -2444,7 +2533,7 @@ export default function App() {
 
   // Auto fallback to WinUI 3 as default design if none is active
   useEffect(() => {
-    const designIds = ["winui_3", "liquid_glass", "material_design"];
+    const designIds = ["winui_3", "liquid_glass", "material_design", "minecraft_ore"];
     const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
     if (!activeDesign) {
       setPlugins(prev => {
@@ -2456,7 +2545,7 @@ export default function App() {
   }, [plugins]);
 
   const handleInstallPluginWithConflictCheck = (id: string) => {
-    const designIds = ["winui_3", "liquid_glass", "material_design"];
+    const designIds = ["winui_3", "liquid_glass", "material_design", "minecraft_ore"];
     if (designIds.includes(id)) {
       const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
       if (activeDesign && activeDesign.id !== id) {
@@ -2468,7 +2557,7 @@ export default function App() {
   };
 
   const handleTogglePluginWithConflictCheck = (id: string, currentActive: boolean) => {
-    const designIds = ["winui_3", "liquid_glass", "material_design"];
+    const designIds = ["winui_3", "liquid_glass", "material_design", "minecraft_ore"];
     if (!currentActive && designIds.includes(id)) {
       const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
       if (activeDesign && activeDesign.id !== id) {
@@ -2528,6 +2617,19 @@ export default function App() {
       document.body.classList.remove("material-design-active");
     }
   }, [isMaterialDesignActive]);
+
+  const isMinecraftOreActive = useMemo(() => {
+    const mo = plugins.find(p => p.id === "minecraft_ore");
+    return mo ? (mo.status === "installed" && mo.isActive) : false;
+  }, [plugins]);
+
+  useEffect(() => {
+    if (isMinecraftOreActive) {
+      document.body.classList.add("minecraft-ore-active");
+    } else {
+      document.body.classList.remove("minecraft-ore-active");
+    }
+  }, [isMinecraftOreActive]);
 
   const isRemoveShinyBorderActive = useMemo(() => {
     const rsb = plugins.find(p => p.id === "remove_shiny_border");
@@ -4213,22 +4315,12 @@ export default function App() {
 
         {showSplash ? (
           <div className="flex flex-col items-center justify-center">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif" 
-              className="h-14 w-14 object-contain mb-6" 
-              alt="Loading..." 
-              referrerPolicy="no-referrer" 
-            />
+            <WindowsSpinner size={56} className="mb-6" />
             <div className="text-white/40 text-xs tracking-widest uppercase font-google font-medium animate-pulse">Connecting to services...</div>
           </div>
         ) : isDelayingTransition ? (
           <div className="flex flex-col items-center justify-center cursor-wait pointer-events-auto">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif" 
-              className="h-12 w-12 object-contain mb-6 cursor-wait" 
-              alt="Transition..." 
-              referrerPolicy="no-referrer" 
-            />
+            <WindowsSpinner size={48} className="mb-6 cursor-wait" />
             <div className="text-white/50 text-xs tracking-widest uppercase font-mono font-medium animate-pulse cursor-wait">
               Initializing secure workspace...
             </div>
@@ -4250,13 +4342,8 @@ export default function App() {
               </p>
             </div>
             
-            <div className="pt-4">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif" 
-                className="h-10 w-10 object-contain mx-auto opacity-70" 
-                alt="Loading welcome..." 
-                referrerPolicy="no-referrer" 
-              />
+            <div className="pt-4 flex justify-center">
+              <WindowsSpinner size={42} className="opacity-80" />
             </div>
           </div>
         ) : roleSelection === null ? (
@@ -4474,14 +4561,32 @@ export default function App() {
                 : "bg-zinc-800 border-zinc-700 text-white"
             } flex`}>
             
-            {/* Header/Logo segment */}
-            <div className={`p-6 border-b border-zinc-700/80 flex ${isSidebarCollapsed ? "flex-col gap-4 items-center" : "items-center justify-between gap-3"}`}>
-              <img 
-                src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
-                alt="Vplay Logo"
-                referrerPolicy="no-referrer"
-                className={`${isSidebarCollapsed ? "h-6" : "h-8"} w-auto object-contain transition-all`}
-              />
+            {/* Header/Logo segment with V-coins counter right beside website logo */}
+            <div className={`p-4 sm:p-5 border-b border-zinc-700/80 flex ${isSidebarCollapsed ? "flex-col items-center gap-3" : "items-center justify-between gap-2"}`}>
+              <div className={`flex items-center gap-2 min-w-0 ${isSidebarCollapsed ? "flex-col" : ""}`}>
+                <img 
+                  src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
+                  alt="Vplay Logo"
+                  referrerPolicy="no-referrer"
+                  className={`${isSidebarCollapsed ? "h-6" : "h-7 sm:h-8"} w-auto object-contain transition-all shrink-0`}
+                />
+                
+                {/* V-Coins Counter placed directly beside logo - ONLY number, no extra text */}
+                <button
+                  onClick={() => {
+                    setActiveTab("verified");
+                    setActiveSettingSection(null);
+                  }}
+                  title="Số dư V-pearls"
+                  className="px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-600/20 hover:from-amber-500/35 hover:to-yellow-500/35 border border-amber-500/40 text-amber-300 flex items-center gap-1.5 transition-all cursor-pointer shrink-0 shadow-[0_0_12px_rgba(245,158,11,0.25)] active:scale-95"
+                >
+                  <Coins className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />
+                  <span className="text-xs font-black font-mono tracking-tight text-amber-300">
+                    {vCoins.toLocaleString()}
+                  </span>
+                </button>
+              </div>
+
               <button 
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                 title={isSidebarCollapsed ? "Mở rộng Sidebar" : "Thu gọn Sidebar"}
@@ -4511,7 +4616,17 @@ export default function App() {
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
-                <Home className="w-5 h-5 shrink-0 text-white" />
+                {isMinecraftOreActive ? (
+                  <img
+                    src="https://static.wikia.nocookie.net/ep-deo/images/f/f5/Home-02b3e27c45a2cdc76560.png/revision/latest?cb=20260723030207"
+                    className="w-5 h-5 shrink-0 object-contain"
+                    style={{ filter: activeTab === "home" ? "brightness(0) invert(1)" : "brightness(0)" }}
+                    referrerPolicy="no-referrer"
+                    alt="Home"
+                  />
+                ) : (
+                  <Home className="w-5 h-5 shrink-0 text-white" />
+                )}
                 {!isSidebarCollapsed && <span>Home</span>}
               </button>
 
@@ -4533,7 +4648,15 @@ export default function App() {
                     return `${base} ${alignment} ${themeColors}`;
                   })()}
                 >
-                  <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-5 h-5 shrink-0 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+                  <img
+                    src={isMinecraftOreActive 
+                      ? "https://static.wikia.nocookie.net/ep-deo/images/c/c8/MagnifyingGlass-52f96e5f47f42e682a00.png/revision/latest?cb=20260723030208"
+                      : "https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"}
+                    className="w-5 h-5 shrink-0 object-contain"
+                    style={{ filter: activeTab === "search" ? "brightness(0) invert(1)" : (isMinecraftOreActive ? "brightness(0)" : "brightness(0) invert(1)") }}
+                    referrerPolicy="no-referrer"
+                    alt="Search"
+                  />
                   {!isSidebarCollapsed && <span>Spotlight Search</span>}
                 </button>
               </div>
@@ -4555,7 +4678,17 @@ export default function App() {
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
-                <Radio className="w-5 h-5 shrink-0 text-white" />
+                {isMinecraftOreActive ? (
+                  <img
+                    src="https://static.wikia.nocookie.net/ep-deo/images/d/d2/Session-fc4accf64e76146486fc.png/revision/latest?cb=20260723030208"
+                    className="w-5 h-5 shrink-0 object-contain"
+                    style={{ filter: activeTab === "live" ? "brightness(0) invert(1)" : "brightness(0)" }}
+                    referrerPolicy="no-referrer"
+                    alt="Live"
+                  />
+                ) : (
+                  <Radio className="w-5 h-5 shrink-0 text-white" />
+                )}
                 {!isSidebarCollapsed && <span>Live TV</span>}
               </button>
 
@@ -4580,6 +4713,109 @@ export default function App() {
                 {!isSidebarCollapsed && <span>Vertical</span>}
               </button>
 
+              {/* Verified Exclusive Accordion Menu with Sub-categories */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => {
+                    setIsVerifiedExclusiveOpen(!isVerifiedExclusiveOpen);
+                  }}
+                  title="Verified Exclusive"
+                  className={(() => {
+                    const isActive = activeTab === "verified" || activeTab === "vflow";
+                    const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center justify-between font-semibold text-sm select-none";
+                    const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
+                    const themeColors = isActive
+                      ? "bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-amber-500/25 text-amber-300 border border-amber-500/40 shadow-lg shadow-amber-500/10 font-bold"
+                      : "text-amber-300 hover:bg-amber-500/20 hover:text-amber-200";
+                    return `${base} ${alignment} ${themeColors}`;
+                  })()}
+                >
+                  <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"}`}>
+                    <Crown className="w-5 h-5 shrink-0 text-amber-400" />
+                    {!isSidebarCollapsed && <span>Verified Exclusive</span>}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 text-amber-300 ${
+                        isVerifiedExclusiveOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </button>
+
+                {isVerifiedExclusiveOpen && (
+                  <div
+                    className={`flex flex-col gap-1 pt-1 pb-2 transition-none duration-0 ${
+                      isSidebarCollapsed
+                        ? "items-center px-2"
+                        : "pl-5 ml-5 border-l border-amber-500/30"
+                    }`}
+                  >
+                    {/* Sub-item 1: Verified */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("verified");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Vplay Verified VIP"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "verified"
+                          ? "text-amber-300 font-bold underline underline-offset-4 decoration-amber-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <BadgeCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                      {!isSidebarCollapsed && (
+                        <div className="flex items-center justify-between w-full pr-1">
+                          <span>Verified</span>
+                          {verifiedSub.plan !== "none" ? (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400 text-black font-extrabold uppercase">
+                              PRO
+                            </span>
+                          ) : (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-extrabold uppercase">
+                              VIP
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Sub-item 2: V-Flow */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("vflow");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Mạng Xã Hội V-Flow (Verified Only)"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "vflow"
+                          ? "text-amber-300 font-bold underline underline-offset-4 decoration-amber-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <Globe className="w-4 h-4 text-amber-400 shrink-0" />
+                      {!isSidebarCollapsed && (
+                        <div className="flex items-center justify-between w-full pr-1">
+                          <span>V-Flow</span>
+                          <span className="text-[8px] px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/40 text-amber-300 font-extrabold uppercase">
+                            VIP MXH
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* V-Box Link - placed under Vertical */}
               <button
                 onClick={() => {
@@ -4597,7 +4833,17 @@ export default function App() {
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
-                <Box className="w-5 h-5 shrink-0 text-white" />
+                {isMinecraftOreActive ? (
+                  <img
+                    src="https://static.wikia.nocookie.net/ep-deo/images/3/36/Cube-c5d0fbf870d415a0c44a.png/revision/latest?cb=20260723030206"
+                    className="w-5 h-5 shrink-0 object-contain"
+                    style={{ filter: activeTab === "vbox" ? "brightness(0) invert(1)" : "brightness(0)" }}
+                    referrerPolicy="no-referrer"
+                    alt="Vbox"
+                  />
+                ) : (
+                  <Box className="w-5 h-5 shrink-0 text-white" />
+                )}
                 {!isSidebarCollapsed && <span>V-Box</span>}
               </button>
 
@@ -4803,162 +5049,6 @@ export default function App() {
                     </button>
                   </div>
                 )}
-              </div>
-
-              {/* Plugins Accordion */}
-              <div className="space-y-1">
-                <button
-                  onClick={() => setIsSidebarFeaturesOpen(!isSidebarFeaturesOpen)}
-                  title="Plugins"
-                  className={`w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center justify-between ${
-                    isSidebarCollapsed ? "justify-center px-0" : "px-4"
-                  } text-zinc-300 hover:bg-[#cc1827] hover:text-white`}
-                >
-                  <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"} font-semibold text-sm`}>
-                    <Tv className="w-5 h-5 shrink-0 text-white" />
-                    {!isSidebarCollapsed && <span>Plugins</span>}
-                  </div>
-                  {!isSidebarCollapsed && (
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-white ${isSidebarFeaturesOpen ? "rotate-180" : ""}`} />
-                  )}
-                </button>
-                
-                {isSidebarFeaturesOpen && (
-                  <div className={`flex flex-col gap-1.5 pt-1 pb-2 transition-none duration-0 ${
-                    isSidebarCollapsed ? "items-center px-2" : "pl-6 ml-6 border-l border-zinc-600 dark:border-zinc-700"
-                  }`}>
-                    <button
-                      onClick={() => {
-                        setActiveTab("vplay_users");
-                        setActiveSettingSection(null);
-                      }}
-                      title="Tra cứu Người dùng Vplay"
-                      className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed 
-                          ? "w-10 h-10 justify-center p-0 hover:text-white" 
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${
-                        activeTab === "vplay_users"
-                          ? "text-white font-bold underline underline-offset-4 decoration-red-500"
-                          : "text-zinc-300"
-                      }`}
-                    >
-                      <Users className="w-4 h-4 text-white shrink-0" />
-                      {!isSidebarCollapsed && <span>Tra cứu người dùng</span>}
-                    </button>
-                    
-                    {customTabs.map((ct: any) => (
-                      <button
-                        key={ct.id}
-                        onClick={() => {
-                          setActiveTab(ct.id);
-                          setActiveSettingSection(null);
-                        }}
-                        title={ct.name}
-                        className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
-                          isSidebarCollapsed 
-                            ? "w-10 h-10 justify-center p-0 hover:text-white" 
-                            : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                        } ${
-                          activeTab === ct.id
-                            ? "text-white font-bold underline underline-offset-4 decoration-red-500"
-                            : "text-zinc-300"
-                        }`}
-                      >
-                        <Compass className="w-4 h-4 text-white shrink-0" />
-                        {!isSidebarCollapsed && <span>{ct.name}</span>}
-                      </button>
-                    ))}
-                    
-                    <button
-                      onClick={() => {
-                        setShowVtvGoLockedModal(true);
-                      }}
-                      title="VTVgo VIP"
-                      className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed 
-                          ? "w-10 h-10 justify-center p-0 hover:text-white" 
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } text-zinc-300 hover:text-white`}
-                    >
-                      <Star className="w-4 h-4 text-white shrink-0" />
-                      {!isSidebarCollapsed && <span>VTVgo VIP</span>}
-                    </button>
-
-                    {/* Render all system plugins */}
-                    {plugins.map((plugin) => {
-                      const PluginIcon = getPluginIcon(plugin.id);
-                      const isInstalled = plugin.status === "installed";
-                      const isActive = plugin.isActive;
-                      
-                      return (
-                        <button
-                          key={plugin.id}
-                          onClick={() => {
-                            if (isInstalled) {
-                              handleTogglePluginWithConflictCheck(plugin.id, plugin.isActive);
-                            } else {
-                              setActiveTab("settings");
-                              setActiveSettingSection("plugin_store");
-                            }
-                          }}
-                          title={`${plugin.name} ${isInstalled ? (isActive ? "(Đang bật)" : "(Đang tắt)") : "(Chưa cài đặt)"}`}
-                          className={`text-xs font-semibold transition-none duration-0 cursor-pointer flex items-center bg-transparent ${
-                            isSidebarCollapsed 
-                              ? "w-10 h-10 justify-center p-0" 
-                              : "w-full text-left py-2 px-3 gap-2"
-                          } ${
-                            !isInstalled
-                              ? "text-red-400 hover:text-red-300"
-                              : isActive
-                                ? "text-white font-bold underline underline-offset-4 decoration-red-500"
-                                : "text-zinc-300 hover:text-white"
-                          }`}
-                        >
-                          <PluginIcon className="w-4 h-4 text-white shrink-0" />
-                          {!isSidebarCollapsed && (
-                            <span className="truncate flex-1 flex items-center justify-between gap-1 text-left">
-                              <span className="truncate">{plugin.name}</span>
-                              {isInstalled && (
-                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isActive ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" : "bg-zinc-500"}`} />
-                              )}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* System Tools (Công cụ hệ thống) rendered as individual list items */}
-              {!isSidebarCollapsed && (
-                <div className="text-[10px] font-bold text-zinc-400 tracking-wider uppercase pl-1 pt-2">
-                  Công cụ hệ thống
-                </div>
-              )}
-
-              {/* Cửa hàng Plugin */}
-              <div className="relative w-full">
-                <button
-                  onClick={() => {
-                    setActiveTab("settings");
-                    setActiveSettingSection("plugin_store");
-                  }}
-                  title="Cửa hàng Plugin"
-                  className={(() => {
-                    const isActive = activeTab === "settings" && activeSettingSection === "plugin_store";
-                    const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
-                    const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
-                    const themeColors = isActive
-                      ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20 hover:bg-[#b01420]"
-                      : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
-                    return `${base} ${alignment} ${themeColors}`;
-                  })()}
-                >
-                  <ShoppingBag className="w-5 h-5 shrink-0 text-white" />
-                  {!isSidebarCollapsed && <span>Cửa hàng Plugin</span>}
-                </button>
               </div>
 
               {/* Âm lượng split into child items directly inside sidebar */}
@@ -5200,7 +5290,17 @@ export default function App() {
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
-                <Settings className="w-5 h-5 shrink-0 text-white" />
+                {isMinecraftOreActive ? (
+                  <img
+                    src="https://static.wikia.nocookie.net/ep-deo/images/2/22/Settings-8f90a7636bfd4c817e7b.png/revision/latest?cb=20260723030208"
+                    className="w-5 h-5 shrink-0 object-contain"
+                    style={{ filter: (activeTab === "settings" && activeSettingSection === null) ? "brightness(0) invert(1)" : "brightness(0)" }}
+                    referrerPolicy="no-referrer"
+                    alt="Preferences"
+                  />
+                ) : (
+                  <Settings className="w-5 h-5 shrink-0 text-white" />
+                )}
                 {!isSidebarCollapsed && <span>Preferences</span>}
               </button>
 
@@ -8550,6 +8650,35 @@ export default function App() {
           />
         )}
 
+        {/* VIEW: VPLAY VERIFIED VIP PAGE */}
+        {activeTab === "verified" && (
+          <VerifiedTab
+            onBack={() => setActiveTab("home")}
+            vCoins={vCoins}
+            setVCoins={setVCoins}
+            verifiedSub={verifiedSub}
+            setVerifiedSub={setVerifiedSub}
+            onNavigateToTab={(tab) => {
+              setActiveTab(tab);
+              setActiveSettingSection(null);
+            }}
+          />
+        )}
+
+        {/* VIEW: V-FLOW SOCIAL MEDIA PAGE (VERIFIED ONLY) */}
+        {activeTab === "vflow" && (
+          <VFlowTab
+            onBack={() => setActiveTab("home")}
+            verifiedSub={verifiedSub}
+            onNavigateToTab={(tab) => {
+              setActiveTab(tab);
+              setActiveSettingSection(null);
+            }}
+            vCoins={vCoins}
+            setVCoins={setVCoins}
+          />
+        )}
+
         {/* VIEW: SPOTLIGHT SEARCH PAGE */}
         {activeTab === "search" && (
           <div className="w-full max-w-4xl mx-auto px-4 py-12 md:py-20 flex flex-col items-center justify-center min-h-[60vh] text-center select-none">
@@ -9172,7 +9301,7 @@ export default function App() {
                               </div>
                               <button
                                 onClick={() => {
-                                  const designIds = ["winui_3", "liquid_glass", "material_design"];
+                                  const designIds = ["winui_3", "liquid_glass", "material_design", "minecraft_ore"];
                                   if (!isMaterialDesignActive) {
                                     const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
                                     if (activeDesign && activeDesign.id !== "material_design") {
@@ -9190,6 +9319,40 @@ export default function App() {
                                 }`}
                               >
                                 {isMaterialDesignActive ? "Đang Bật" : "Bật"}
+                              </button>
+                            </div>
+
+                            {/* Minecraft Ore UI Design */}
+                            <div className="flex-col sm:flex-row flex sm:items-center justify-between p-2.5 bg-white border border-slate-100 rounded-xl shadow-xs gap-2">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                  <Box className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <h6 className="text-xs font-bold text-slate-800">Giao diện Minecraft Ore UI Design</h6>
+                                  <p className="text-[9.5px] text-slate-400">Thiết kế khối vuông pixel 3D chuẩn Minecraft</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const designIds = ["winui_3", "liquid_glass", "material_design", "minecraft_ore"];
+                                  if (!isMinecraftOreActive) {
+                                    const activeDesign = plugins.find(p => designIds.includes(p.id) && p.status === "installed" && p.isActive);
+                                    if (activeDesign && activeDesign.id !== "minecraft_ore") {
+                                      setDesignConflictInfo({ activeId: activeDesign.id, targetId: "minecraft_ore", actionType: "activate" });
+                                      return;
+                                    }
+                                  }
+                                  setPlugins(prev => prev.map(p => {
+                                    if (p.id === "minecraft_ore") return { ...p, status: "installed", progress: 100, isActive: !isMinecraftOreActive };
+                                    return p;
+                                  }));
+                                }}
+                                className={`px-3 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                                  isMinecraftOreActive ? "bg-emerald-600 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                                }`}
+                              >
+                                {isMinecraftOreActive ? "Đang Bật" : "Bật"}
                               </button>
                             </div>
 
@@ -11700,23 +11863,34 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center select-none pointer-events-auto cursor-wait transform-gpu"
+            className="fixed inset-0 z-[99999] bg-[#4a4a4d] flex flex-col items-center justify-center select-none pointer-events-auto cursor-wait transform-gpu p-4"
           >
-            <div className="p-6 rounded-3xl bg-zinc-900/95 border border-white/10 shadow-2xl flex flex-col items-center justify-center relative transform-gpu">
-              {/* Smooth Hardware-Accelerated iOS/Windows Ring Spinner */}
-              <div className="relative w-14 h-14 flex items-center justify-center">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif"
-                  alt="Loading..."
-                  className="w-14 h-14 object-contain filter drop-shadow-md transform-gpu will-change-transform relative z-10"
-                  referrerPolicy="no-referrer"
-                  style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)" }}
-                />
+            {/* Minecraft Bedrock / Education Edition Error Dialog Loading Screen */}
+            <div className="w-[450px] max-w-full bg-[#313133] border-2 border-[#181818] shadow-2xl flex flex-col select-none">
+              {/* Top Header Panel */}
+              <div className="bg-[#4d4d50] border border-[#6b6b70] py-3.5 px-4 flex items-center justify-center m-0.5">
+                <span className="text-white text-[12px] sm:text-[13px] font-bold tracking-tight text-center minecraft-font leading-snug">
+                  An error has occurred
+                </span>
+              </div>
+              {/* Bottom Body Panel */}
+              <div className="bg-[#313133] border-t border-[#181818] py-4.5 px-4 flex items-center justify-center">
+                <span className="text-white text-[10px] sm:text-[11px] font-normal tracking-wide text-center minecraft-font leading-relaxed opacity-95">
+                  Going back to the previous screen...
+                </span>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* FLOATING V-COINS EARNED TOAST NOTIFICATION */}
+      {vcoinToast && (
+        <div className="fixed bottom-6 right-6 z-[99999] bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black font-extrabold px-4 py-3 rounded-2xl shadow-2xl border border-amber-300 flex items-center gap-2.5 animate-bounce pointer-events-none select-none">
+          <Coins className="w-5 h-5 fill-black shrink-0" />
+          <span className="text-xs">{vcoinToast}</span>
+        </div>
+      )}
 
     </div>
     </MotionConfig>
