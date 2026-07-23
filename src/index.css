@@ -947,9 +947,12 @@ body.minecraft-ore-active div {
 
 /* Force pixel sharp square corners on all buttons, inputs, cards, badges */
 body.minecraft-ore-active button,
+body.minecraft-ore-active button *,
 body.minecraft-ore-active input:not([type="checkbox"]):not([type="range"]),
 body.minecraft-ore-active select,
 body.minecraft-ore-active textarea,
+body.minecraft-ore-active div[role="button"],
+body.minecraft-ore-active a[role="button"],
 body.minecraft-ore-active .rounded-sm,
 body.minecraft-ore-active .rounded,
 body.minecraft-ore-active .rounded-md,
@@ -1259,6 +1262,47 @@ body.minecraft-ore-active .bg-[#07050f] {
   transform-origin: center center;
   will-change: transform, opacity;
 }
+
+/* --- Panorama 360 Mode Overrides: Solid Gray for all transparent / opacity-0 elements --- */
+.panorama-active-mode .bg-transparent:not(button):not(a):not(input):not(select):not(svg):not(path),
+.panorama-active-mode .bg-black\/0,
+.panorama-active-mode .bg-white\/0,
+.panorama-active-mode .bg-slate-900\/0,
+.panorama-active-mode .bg-zinc-900\/0,
+.panorama-active-mode .bg-black\/5,
+.panorama-active-mode .bg-black\/10,
+.panorama-active-mode .bg-black\/15,
+.panorama-active-mode .bg-black\/20,
+.panorama-active-mode .bg-black\/25,
+.panorama-active-mode .bg-black\/30,
+.panorama-active-mode .bg-black\/40,
+.panorama-active-mode .bg-black\/50,
+.panorama-active-mode .bg-black\/60,
+.panorama-active-mode .bg-black\/70,
+.panorama-active-mode .bg-black\/80,
+.panorama-active-mode .bg-black\/90,
+.panorama-active-mode .bg-white\/5,
+.panorama-active-mode .bg-white\/10,
+.panorama-active-mode .glass-panel,
+.panorama-active-mode .glass-panel-deep {
+  background-color: #272732 !important;
+  opacity: 1 !important;
+}
+
+.panorama-active-mode .opacity-0:not(button):not(a):not(input):not(select):not(svg):not(path) {
+  opacity: 1 !important;
+  background-color: #272732 !important;
+}
+
+.panorama-active-mode .progressive-blur-header,
+.panorama-active-mode .progressive-blur-dock,
+.panorama-active-mode .progressive-blur-player {
+  background: #1e1e28 !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 
 
 

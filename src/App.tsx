@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { PanoramaBackground } from "./components/PanoramaBackground";
 import { 
   Search, 
+  ArrowLeft,
   Heart, 
   ThumbsUp,
   Sliders, 
@@ -85,6 +87,7 @@ import ExploreVietnamTab from "./components/ExploreVietnamTab";
 import VStudyTab from "./components/VStudyTab";
 import VerifiedTab from "./components/VerifiedTab";
 import VFlowTab from "./components/VFlowTab";
+import NotificationsTab, { AppNotification } from "./components/NotificationsTab";
 
 const RECENT_SEARCHES_ITEMS = [
   // 1. Các kênh truyền hình
@@ -460,18 +463,18 @@ const renderDescription = (text: string) => {
 };
 
 const pageTransitionVariants = {
-  enter: (direction: "left" | "right") => ({
-    x: direction === "right" ? "100%" : "-100%",
+  enter: {
+    x: "100%",
     opacity: 0
-  }),
+  },
   center: {
     x: 0,
     opacity: 1
   },
-  exit: (direction: "left" | "right") => ({
-    x: direction === "right" ? "-100%" : "100%",
+  exit: {
+    x: "-100%",
     opacity: 0
-  })
+  }
 };
 
 interface SafeToCloseScreenProps {
@@ -609,17 +612,18 @@ const playClickSound = (volumeMultiplier: number = 0.8) => {
     const gain = ctx.createGain();
     
     osc.type = "sine";
-    osc.frequency.setValueAtTime(1100, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.06);
+    // Warm balanced pop click sound (slightly lower pitch)
+    osc.frequency.setValueAtTime(800, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1350, ctx.currentTime + 0.015);
+    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.045);
     
-    // Significantly increased baseline volume (from 0.04 to 0.35)
     gain.gain.setValueAtTime(0.35 * volumeMultiplier, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.045);
     
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.06);
+    osc.stop(ctx.currentTime + 0.045);
   } catch (e) {
     // Ignore context blocked
   }
@@ -1052,6 +1056,12 @@ export default function App() {
 
   const handleSelectRole = (role: "user" | "admin") => {
     setIsDelayingTransition(true);
+    if (role === "admin") {
+      setVerifiedSub({
+        plan: "verified_plus",
+        expiresAt: Date.now() + 3650 * 24 * 60 * 60 * 1000,
+      });
+    }
     setTimeout(() => {
       setIsDelayingTransition(false);
       setRoleSelection(role);
@@ -1301,6 +1311,7 @@ export default function App() {
   const [isSidebarCategoriesOpen, setIsSidebarCategoriesOpen] = useState<boolean>(true);
   const [isSidebarFeaturesOpen, setIsSidebarFeaturesOpen] = useState<boolean>(true);
   const [isVerifiedExclusiveOpen, setIsVerifiedExclusiveOpen] = useState<boolean>(true);
+  const [verifiedInitialSection, setVerifiedInitialSection] = useState<"plans" | "comparison" | "earning" | "storage">("plans");
   const [isVStudySidebarOpen, setIsVStudySidebarOpen] = useState<boolean>(true);
   const [vstudySubFilter, setVStudySubFilter] = useState<"all" | "tieu_hoc" | "thcs" | "thpt" | "super_exam" | "hoc_ba">("all");
   const [isSidebarVolumeOpen, setIsSidebarVolumeOpen] = useState<boolean>(false);
@@ -1379,6 +1390,177 @@ export default function App() {
     return () => clearInterval(interval);
   }, [activeTab, verifiedSub.plan]);
 
+  // Notifications State & 1-minute random generator
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => {
+    const saved = localStorage.getItem("vplay_app_notifications");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // ignore
+      }
+    }
+    return [
+      {
+        id: "notif-1",
+        type: "update_available",
+        title: "Cập nhật ứng dụng Vplay",
+        message: "Đã có bản cập nhật v4.2.5 mới với nhiều cải tiến hiệu năng. Nhấp 'Check for Update' trên menu để cài đặt.",
+        time: "5 phút trước",
+        timestamp: Date.now() - 300000,
+        isRead: false,
+        linkTab: "notifications"
+      },
+      {
+        id: "notif-2",
+        type: "vstudy",
+        title: "Tin nhắn nhắc học từ V-Study",
+        message: "Đã đến lịch ôn tập từ vựng Tiếng Anh và giải đề Toán THPT. Nhấp để vào học ngay!",
+        time: "15 phút trước",
+        timestamp: Date.now() - 900000,
+        isRead: false,
+        linkTab: "v_study"
+      },
+      {
+        id: "notif-3",
+        type: "vpearls",
+        title: "Nhận V-Pearls quà tặng",
+        message: "Bạn vừa nhận được +500 V-pearls từ sự kiện điểm danh chuỗi 7 ngày liên tiếp!",
+        time: "1 giờ trước",
+        timestamp: Date.now() - 3600000,
+        isRead: true
+      },
+      {
+        id: "notif-4",
+        type: "vbox",
+        title: "Phản hồi từ Developer trong V-Box",
+        message: "Nhà phát triển Vplay vừa trả lời bài đăng góp ý '#FB-8921' của bạn trong V-Box.",
+        time: "2 giờ trước",
+        timestamp: Date.now() - 7200000,
+        isRead: true,
+        linkTab: "vbox"
+      }
+    ];
+  });
+
+  const unreadNotificationsCount = useMemo(() => {
+    return notifications.filter((n) => !n.isRead).length;
+  }, [notifications]);
+
+  useEffect(() => {
+    localStorage.setItem("vplay_app_notifications", JSON.stringify(notifications));
+  }, [notifications]);
+
+  // 1-minute random notification generator (runs every 60s)
+  useEffect(() => {
+    const possibleEvents: Omit<AppNotification, "id" | "time" | "timestamp" | "isRead">[] = [
+      {
+        type: "verified_buy",
+        title: "Đăng ký Verified VIP thành công",
+        message: "Chúc mừng! Bạn đã mua/kích hoạt thành công gói Vplay Verified VIP đẳng cấp.",
+        linkTab: "verified"
+      },
+      {
+        type: "verified_expire",
+        title: "Gói Verified VIP đã hết hạn",
+        message: "Cảnh báo: Gói VIP Verified của bạn đã hết hạn. Gia hạn ngay để duy trì đặc quyền huy hiệu!",
+        linkTab: "verified"
+      },
+      {
+        type: "vpearls",
+        title: "Nhận V-Pearls phần thưởng",
+        message: "Chúc mừng! Bạn vừa nhận được +500 V-pearls phần thưởng từ hệ thống.",
+        linkTab: "verified"
+      },
+      {
+        type: "vstudy",
+        title: "Tin nhắn nhắc học từ V-Study",
+        message: "V-Study: Đã đến giờ ôn luyện bài học hôm nay! Nhấn vào để tham gia lớp học ngay.",
+        linkTab: "v_study"
+      },
+      {
+        type: "vbox",
+        title: "Có phản hồi từ Developer trong V-Box",
+        message: "Nhà phát triển Vplay vừa gửi phản hồi phản ánh/góp ý của bạn trong V-Box Feedback Hub.",
+        linkTab: "vbox"
+      },
+      {
+        type: "update_success",
+        title: "App đã update thành công",
+        message: "Vplay App đã tự động đồng bộ và nâng cấp thành công lên phiên bản mới nhất v4.2.5!",
+        linkTab: "notifications"
+      },
+      {
+        type: "update_available",
+        title: "App có update bản mới",
+        message: "Đã có bản cập nhật Vplay v4.2.5 mới. Nhấn 'Check for Update' trên menu để nâng cấp.",
+        linkTab: "notifications"
+      }
+    ];
+
+    const interval = setInterval(() => {
+      const selected = possibleEvents[Math.floor(Math.random() * possibleEvents.length)];
+      const newNotif: AppNotification = {
+        ...selected,
+        id: "notif-" + Date.now() + "-" + Math.random().toString(36).substring(2, 6),
+        time: "Vừa xong",
+        timestamp: Date.now(),
+        isRead: false
+      };
+      setNotifications((prev) => [newNotif, ...prev.slice(0, 49)]);
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Check for Update state & 1-minute non-closable popup
+  const [isUpdatingApp, setIsUpdatingApp] = useState<boolean>(false);
+  const [updateCountdown, setUpdateCountdown] = useState<number>(60);
+
+  const startCheckForUpdate = () => {
+    setIsUpdatingApp(true);
+    setUpdateCountdown(60);
+  };
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    let countdownInterval: NodeJS.Timeout | null = null;
+
+    if (isUpdatingApp) {
+      setUpdateCountdown(60);
+
+      countdownInterval = setInterval(() => {
+        setUpdateCountdown((prev) => {
+          if (prev <= 1) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      timer = setTimeout(() => {
+        setIsUpdatingApp(false);
+        const successNotif: AppNotification = {
+          id: "notif-upd-" + Date.now(),
+          type: "update_success",
+          title: "App đã update thành công",
+          message: "Vplay App đã cập nhật thành công lên phiên bản v4.2.5 với nhiều cải tiến tốc độ và tính năng mới!",
+          time: "Vừa xong",
+          timestamp: Date.now(),
+          isRead: false,
+          linkTab: "notifications"
+        };
+        setNotifications((prev) => [successNotif, ...prev]);
+      }, 60000); // 1 minute (60,000 ms)
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      if (countdownInterval) clearInterval(countdownInterval);
+    };
+  }, [isUpdatingApp]);
+
   // Experimental states
   const [expLowLatency, setExpLowLatency] = useState<boolean>(() => localStorage.getItem("vplay_exp_lowlatency") === "true");
   const [expCache, setExpCache] = useState<boolean>(() => localStorage.getItem("vplay_exp_cache") === "true");
@@ -1396,7 +1578,7 @@ export default function App() {
   ];
   const [loadingText, setLoadingText] = useState<string>("Just a moment");
   const [isTabLoading, setIsTabLoading] = useState<boolean>(false);
-  const prevTabKeyRef = useRef<string>(`${activeTab}_${vstudySubFilter}_${activeSettingSection}`);
+  const prevTabKeyRef = useRef<string>(activeTab);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const getRandomLoadingText = () => {
@@ -1404,34 +1586,15 @@ export default function App() {
   };
 
   const triggerSearchLoading = () => {
-    setLoadingText(getRandomLoadingText());
-    setIsTabLoading(true);
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    timerRef.current = setTimeout(() => {
-      setIsTabLoading(false);
-      timerRef.current = null;
-    }, 3000);
+    // Tab loading screen ONLY applies when switching tabs, not during search or in-page actions
   };
 
   useEffect(() => {
-    const currentTabKey = `${activeTab}_${vstudySubFilter}_${activeSettingSection}`;
-    if (prevTabKeyRef.current !== currentTabKey) {
-      prevTabKeyRef.current = currentTabKey;
-      setLoadingText(getRandomLoadingText());
-      setIsTabLoading(true);
-
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-
-      timerRef.current = setTimeout(() => {
-        setIsTabLoading(false);
-        timerRef.current = null;
-      }, 3000);
+    if (prevTabKeyRef.current !== activeTab) {
+      prevTabKeyRef.current = activeTab;
+      setIsTabLoading(false);
     }
-  }, [activeTab, vstudySubFilter, activeSettingSection]);
+  }, [activeTab]);
 
   useEffect(() => {
     if (isTabLoading) {
@@ -2485,6 +2648,14 @@ export default function App() {
         status: "idle" as const,
         progress: 0,
         isActive: false
+      },
+      {
+        id: "panorama",
+        name: "Panorama 360° Background",
+        desc: "Kích hoạt hình nền Panorama quay 360° liên tục phong cách Minecraft title screen menu, thay thế toàn bộ background mặc định của ứng dụng với góc quay panorama mượt mà.",
+        status: "installed" as const,
+        progress: 100,
+        isActive: false
       }
     ];
 
@@ -2640,6 +2811,15 @@ export default function App() {
     const rc = plugins.find(p => p.id === "remote_control");
     return rc ? (rc.status === "installed" && rc.isActive) : false;
   }, [plugins]);
+
+  const isPanoramaActive = useMemo(() => {
+    const pan = plugins.find(p => p.id === "panorama");
+    return pan ? (pan.status === "installed" && pan.isActive) : false;
+  }, [plugins]);
+
+  const effectiveAmoledDark = useMemo(() => {
+    return isPanoramaActive ? false : amoledDark;
+  }, [isPanoramaActive, amoledDark]);
 
   const isWinUI3Active = useMemo(() => {
     const wui = plugins.find(p => p.id === "winui_3");
@@ -3192,6 +3372,9 @@ export default function App() {
 
   // Ambient backgrounds options config
   const getBgGradient = () => {
+    if (isPanoramaActive) {
+      return "bg-transparent";
+    }
     if (appThemeMode === "light") {
       return "bg-gradient-to-tr from-[#f1f5f9] via-[#f8fafc] to-[#e2e8f0]";
     }
@@ -3204,7 +3387,7 @@ export default function App() {
     if (!liquidGlass) {
       return "bg-[#121214]";
     }
-    if (amoledDark) {
+    if (effectiveAmoledDark) {
       return "bg-black";
     }
     switch (bgColor) {
@@ -4538,9 +4721,136 @@ export default function App() {
     );
   }
 
+  const getPageTitleUpper = () => {
+    // Check open modals first
+    if (showAboutModal) return "VPLAY GLASS TV • THÔNG TIN ỨNG DỤNG";
+    if (showCustomModal) return "MODAL TÙY CHỈNH";
+    if (showAdminPassModal) return "XÁC NHẬN MẬT KHẨU ADMIN";
+
+    if (activeTab === "home") return "HOME • TRANG CHỦ";
+    if (activeTab === "search") {
+      return searchQuery.trim() ? `SPOTLIGHT SEARCH • "${searchQuery.trim().toUpperCase()}"` : "SPOTLIGHT SEARCH";
+    }
+    if (activeTab === "notifications") return "THÔNG BÁO";
+    if (activeTab === "live") {
+      return selectedChannel?.name ? `LIVE TV • ${selectedChannel.name.toUpperCase()}` : "LIVE TV";
+    }
+    if (activeTab === "shorts") return "VERTICAL • SHORTS";
+    if (activeTab === "verified") {
+      return verifiedSub.plan !== "none" ? `VERIFIED • GÓI PRO (${verifiedSub.plan.toUpperCase()})` : "VERIFIED • XÁC THỰC TÀI KHOẢN";
+    }
+    if (activeTab === "vflow") return "V-FLOW • MẠNG XÃ HỘI";
+    if (activeTab === "vbox") return "V-BOX • PHẢN HỒI & HỖ TRỢ";
+    if (activeTab === "explore_vietnam") return "EXPLORE VIETNAM • DU LỊCH & KHÁM PHÁ";
+    if (activeTab === "v_study") {
+      if (vstudySubFilter === "tieu_hoc") return "V-STUDY • TIỂU HỌC";
+      if (vstudySubFilter === "thcs") return "V-STUDY • THCS";
+      if (vstudySubFilter === "thpt") return "V-STUDY • THPT";
+      if (vstudySubFilter === "super_exam") return "V-STUDY • ĐỀ THI SIÊU CẤP";
+      if (vstudySubFilter === "hoc_ba") return "V-STUDY • HỌC BẠ ĐIỆN TỬ";
+      return "V-STUDY • TẤT CẢ MÔN HỌC";
+    }
+    if (activeTab === "vplay_users") return "TÀI KHOẢN • THÀNH VIÊN VPLAY";
+    if (activeTab === "fandom_logos") return "FANDOM LOGOS • BIỂU TƯỢNG";
+    if (activeTab === "intelligence_thumbnails") return "V-INTELLIGENCE THUMBNAILS";
+    if (activeTab === "settings") {
+      if (activeSettingSection === "plugin_store") return "PREFERENCES • PLUGIN STORE";
+      if (activeSettingSection === "appearance") return "PREFERENCES • APPEARANCE (GIAO DIỆN)";
+      if (activeSettingSection === "profile") return "PREFERENCES • ACCOUNT & DATA";
+      if (activeSettingSection === "accessibility") return "PREFERENCES • ACCESSIBILITY";
+      if (activeSettingSection === "broadcast") return "PREFERENCES • BROADCAST & STREAMING";
+      if (activeSettingSection === "design_system") return "PREFERENCES • DESIGN SYSTEM";
+      if (activeSettingSection === "custom_tab") return "PREFERENCES • CREATE CUSTOM TAB";
+      if (activeSettingSection === "custom_modal") return "PREFERENCES • CREATE CUSTOM MODAL";
+      return "PREFERENCES • CÀI ĐẶT CHUNG";
+    }
+    const customTabItem = customTabs?.find((t) => t.id === activeTab);
+    if (customTabItem) {
+      return customTabItem.title.toUpperCase();
+    }
+    return activeTab.replace(/_/g, " ").toUpperCase();
+  };
+
+  const handleHeaderBack = () => {
+    if (activeTab === "settings" && activeSettingSection !== null) {
+      setActiveSettingSection(null);
+    } else if (activeTab !== "home") {
+      setActiveTab("home");
+      setActiveSettingSection(null);
+    }
+  };
+
   return (
     <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
-      <div className={`min-h-screen ${appThemeMode === "light" ? "text-slate-800 light-theme" : "text-white/95"} pb-32 pt-4 transition-all duration-1000 overflow-x-clip ${dockToSidebar ? (isSidebarCollapsed ? "md:pl-20" : "md:pl-72") : ""} ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""}`}>
+      <div className={`min-h-screen ${appThemeMode === "light" ? "text-slate-800 light-theme" : "text-white/95"} pb-32 pt-4 transition-colors duration-1000 overflow-x-clip ${dockToSidebar ? (isSidebarCollapsed ? "md:pl-20" : "md:pl-72") : ""} ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""} ${isPanoramaActive ? "panorama-active-mode" : ""}`}>
+        
+        {/* PANORAMA 360 MINECRAFT BACKGROUND PLUGIN */}
+        {isPanoramaActive && <PanoramaBackground />}
+
+        {/* ALWAYS ON TOP PAGE TITLE HEADER BAR */}
+        <div 
+          className="fixed top-0 left-0 right-0 h-10 z-[99999] bg-[#e5e5e5] text-black font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between px-1 sm:px-2 pointer-events-auto select-none font-['Montserrat']"
+          style={{ boxShadow: "0px 5px 0px 0px #808080" }}
+        >
+          {/* Left section: Back button & Sidebar toggle button */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <button
+              onClick={handleHeaderBack}
+              title="Quay lại (Back)"
+              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+            >
+              <ArrowLeft className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
+              <span className="hidden xs:inline tracking-wider font-['Montserrat']">BACK</span>
+            </button>
+
+            {dockToSidebar && (
+              <button
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                title={isSidebarCollapsed ? "Mở rộng Sidebar" : "Thu gọn Sidebar"}
+                className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+              >
+                <Menu className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
+              </button>
+            )}
+          </div>
+
+          {/* Page Title in exact Sidebar form */}
+          <span className="truncate px-2 font-black text-center tracking-wider text-xs sm:text-sm font-['Montserrat']">
+            {getPageTitleUpper()}
+          </span>
+
+          {/* Right section: V-Pearls counter & Search button */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* V-Pearls Count (black icon, black text) */}
+            <button
+              onClick={() => {
+                setActiveTab("verified");
+                setActiveSettingSection(null);
+              }}
+              title="Số dư V-pearls"
+              className="flex items-center gap-1 p-1 bg-transparent text-black font-black text-xs sm:text-sm cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+            >
+              <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0 stroke-[2.5]" />
+              <span className="font-mono font-black text-black tracking-tight">
+                {vCoins.toLocaleString()}
+              </span>
+            </button>
+
+            {/* Search button */}
+            <button
+              onClick={() => {
+                setActiveTab("search");
+                setActiveSettingSection(null);
+              }}
+              title="Tìm kiếm (Search)"
+              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+            >
+              <span className="hidden xs:inline tracking-wider font-['Montserrat']">SEARCH</span>
+              <Search className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
+            </button>
+          </div>
+        </div>
+
         {/* LEFT SIDEBAR (Visible when Dock to Sidebar is active) */}
         {dockToSidebar && (
           <>
@@ -4551,50 +4861,15 @@ export default function App() {
                 onClick={() => setIsSidebarCollapsed(true)}
               />
             )}
-            <aside className={`fixed top-0 left-0 h-screen z-[55] flex flex-col border-r shadow-2xl transition-all duration-300 select-none ${
+            <aside className={`fixed top-10 left-0 h-[calc(100vh-2.5rem)] z-[55] flex flex-col border-r shadow-2xl transition-none duration-0 select-none ${
               isSidebarCollapsed 
                 ? "-translate-x-full w-0 opacity-0 pointer-events-none border-none md:translate-x-0 md:w-20 md:opacity-100 md:pointer-events-auto md:border-r" 
                 : "translate-x-0 w-[50vw] md:w-72 md:translate-x-0 md:opacity-100 md:pointer-events-auto md:border-r"
             } ${
-              amoledDark 
+              effectiveAmoledDark 
                 ? "bg-black border-neutral-900 text-white" 
                 : "bg-zinc-800 border-zinc-700 text-white"
             } flex`}>
-            
-            {/* Header/Logo segment with V-coins counter right beside website logo */}
-            <div className={`p-4 sm:p-5 border-b border-zinc-700/80 flex ${isSidebarCollapsed ? "flex-col items-center gap-3" : "items-center justify-between gap-2"}`}>
-              <div className={`flex items-center gap-2 min-w-0 ${isSidebarCollapsed ? "flex-col" : ""}`}>
-                <img 
-                  src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
-                  alt="Vplay Logo"
-                  referrerPolicy="no-referrer"
-                  className={`${isSidebarCollapsed ? "h-6" : "h-7 sm:h-8"} w-auto object-contain transition-all shrink-0`}
-                />
-                
-                {/* V-Coins Counter placed directly beside logo - ONLY number, no extra text */}
-                <button
-                  onClick={() => {
-                    setActiveTab("verified");
-                    setActiveSettingSection(null);
-                  }}
-                  title="Số dư V-pearls"
-                  className="px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-600/20 hover:from-amber-500/35 hover:to-yellow-500/35 border border-amber-500/40 text-amber-300 flex items-center gap-1.5 transition-all cursor-pointer shrink-0 shadow-[0_0_12px_rgba(245,158,11,0.25)] active:scale-95"
-                >
-                  <Coins className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />
-                  <span className="text-xs font-black font-mono tracking-tight text-amber-300">
-                    {vCoins.toLocaleString()}
-                  </span>
-                </button>
-              </div>
-
-              <button 
-                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                title={isSidebarCollapsed ? "Mở rộng Sidebar" : "Thu gọn Sidebar"}
-                className="p-1.5 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 transition-colors cursor-pointer text-slate-300 hover:text-white shrink-0"
-              >
-                {isSidebarCollapsed ? <ChevronRight className="w-5 h-5 text-white" /> : <ChevronLeft className="w-5 h-5 text-white" />}
-              </button>
-            </div>
 
             {/* Navigation Body */}
             <div className="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar">
@@ -4660,6 +4935,37 @@ export default function App() {
                   {!isSidebarCollapsed && <span>Spotlight Search</span>}
                 </button>
               </div>
+
+              {/* Notifications Link */}
+              <button
+                onClick={() => {
+                  setActiveTab("notifications");
+                  setActiveSettingSection(null);
+                }}
+                title="Thông báo"
+                className={(() => {
+                  const isActive = activeTab === "notifications";
+                  const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center justify-between font-semibold text-sm select-none bg-transparent relative";
+                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
+                  const themeColors = isActive
+                    ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20 hover:bg-[#cc1827]"
+                    : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
+                  return `${base} ${alignment} ${themeColors}`;
+                })()}
+              >
+                <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"}`}>
+                  <Bell className="w-5 h-5 shrink-0 text-white" />
+                  {!isSidebarCollapsed && <span>Thông báo</span>}
+                </div>
+                {!isSidebarCollapsed && unreadNotificationsCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-red-600 text-white font-extrabold text-[11px] shadow-sm">
+                    {unreadNotificationsCount}
+                  </span>
+                )}
+                {isSidebarCollapsed && unreadNotificationsCount > 0 && (
+                  <div className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-[#121216]" />
+                )}
+              </button>
 
               {/* Live TV Link */}
               <button
@@ -4755,6 +5061,7 @@ export default function App() {
                     <button
                       onClick={() => {
                         setActiveTab("verified");
+                        setVerifiedInitialSection("plans");
                         setActiveSettingSection(null);
                       }}
                       title="Vplay Verified VIP"
@@ -4763,7 +5070,7 @@ export default function App() {
                           ? "w-9 h-9 justify-center p-0 hover:text-white"
                           : "w-full text-left py-2 px-3 hover:text-white gap-2"
                       } ${
-                        activeTab === "verified"
+                        activeTab === "verified" && verifiedInitialSection !== "storage"
                           ? "text-amber-300 font-bold underline underline-offset-4 decoration-amber-400"
                           : "text-zinc-300"
                       }`}
@@ -4772,26 +5079,51 @@ export default function App() {
                       {!isSidebarCollapsed && (
                         <div className="flex items-center justify-between w-full pr-1">
                           <span>Verified</span>
-                          {verifiedSub.plan !== "none" ? (
+                          {verifiedSub.plan !== "none" && (
                             <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400 text-black font-extrabold uppercase">
                               PRO
-                            </span>
-                          ) : (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-extrabold uppercase">
-                              VIP
                             </span>
                           )}
                         </div>
                       )}
                     </button>
 
-                    {/* Sub-item 2: V-Flow */}
+                    {/* Sub-item 2: Mua Storage */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("verified");
+                        setVerifiedInitialSection("storage");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Mua Storage Cloud VIP"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "verified" && verifiedInitialSection === "storage"
+                          ? "text-cyan-300 font-bold underline underline-offset-4 decoration-cyan-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <HardDrive className="w-4 h-4 text-cyan-400 shrink-0" />
+                      {!isSidebarCollapsed && (
+                        <div className="flex items-center justify-between w-full pr-1">
+                          <span>Mua Storage</span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-extrabold uppercase">
+                            CLOUD
+                          </span>
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Sub-item 3: V-Flow */}
                     <button
                       onClick={() => {
                         setActiveTab("vflow");
                         setActiveSettingSection(null);
                       }}
-                      title="Mạng Xã Hội V-Flow (Verified Only)"
+                      title="Mạng Xã Hội V-Flow"
                       className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
                         isSidebarCollapsed
                           ? "w-9 h-9 justify-center p-0 hover:text-white"
@@ -4806,9 +5138,6 @@ export default function App() {
                       {!isSidebarCollapsed && (
                         <div className="flex items-center justify-between w-full pr-1">
                           <span>V-Flow</span>
-                          <span className="text-[8px] px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-400/40 text-amber-300 font-extrabold uppercase">
-                            VIP MXH
-                          </span>
                         </div>
                       )}
                     </button>
@@ -4908,14 +5237,14 @@ export default function App() {
                         : "pl-5 ml-5 border-l border-white/10"
                     }`}
                   >
-                    {/* Sub-item 1: Tất cả môn */}
+                    {/* Sub-item 1: Khóa học */}
                     <button
                       onClick={() => {
                         setActiveTab("v_study");
                         setVStudySubFilter("all");
                         setActiveSettingSection(null);
                       }}
-                      title="Tất cả môn học"
+                      title="Khóa học"
                       className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
                         isSidebarCollapsed
                           ? "w-9 h-9 justify-center p-0 hover:text-white"
@@ -4927,7 +5256,7 @@ export default function App() {
                       }`}
                     >
                       <BookOpen className="w-3.5 h-3.5 text-white shrink-0" />
-                      {!isSidebarCollapsed && <span>Tất cả môn học</span>}
+                      {!isSidebarCollapsed && <span>Khóa học</span>}
                     </button>
 
                     {/* Sub-item 2: V-Study Tiểu học */}
@@ -5304,47 +5633,21 @@ export default function App() {
                 {!isSidebarCollapsed && <span>Preferences</span>}
               </button>
 
-            </div>
+              {/* Check for Update Link */}
+              <button
+                onClick={startCheckForUpdate}
+                title="Check for Update"
+                className={(() => {
+                  const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
+                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
+                  const themeColors = "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
+                  return `${base} ${alignment} ${themeColors}`;
+                })()}
+              >
+                <RefreshCw className="w-5 h-5 shrink-0 text-sky-400" />
+                {!isSidebarCollapsed && <span>Check for Update</span>}
+              </button>
 
-            {/* Theme Toggle Switch on Sidebar */}
-            <div className="p-4 border-t border-zinc-600 dark:border-zinc-700/50 flex items-center justify-between">
-              {!isSidebarCollapsed ? (
-                <>
-                  <span className="text-xs font-semibold text-zinc-300">Chế độ</span>
-                  <div className="flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-zinc-600/35 select-none">
-                    <button
-                      onClick={() => setAppThemeMode("light")}
-                      title="Giao diện Sáng"
-                      className={`p-1.5 rounded-lg text-xs font-semibold transition-none duration-0 cursor-pointer ${
-                        appThemeMode === "light"
-                          ? "bg-[#cc1827] text-white shadow-sm"
-                          : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      <Sun className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => setAppThemeMode("dark")}
-                      title="Giao diện Tối"
-                      className={`p-1.5 rounded-lg text-xs font-semibold transition-none duration-0 cursor-pointer ${
-                        appThemeMode === "dark"
-                          ? "bg-[#cc1827] text-white shadow-md"
-                          : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      <Moon className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <button
-                  onClick={() => setAppThemeMode(appThemeMode === "light" ? "dark" : "light")}
-                  title={appThemeMode === "light" ? "Chuyển sang giao diện Tối" : "Chuyển sang giao diện Sáng"}
-                  className="p-3 rounded-xl transition-none duration-0 cursor-pointer flex items-center justify-center mx-auto bg-black/20 text-zinc-300 hover:bg-[#cc1827] hover:text-white w-12 h-12"
-                >
-                  {appThemeMode === "light" ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-indigo-400" />}
-                </button>
-              )}
             </div>
 
           </aside>
@@ -5436,7 +5739,7 @@ export default function App() {
         />
       
       {/* Decorative ambient glowing circles */}
-      {liquidGlass && !isMaterialDesignActive && !amoledDark && (
+      {liquidGlass && !isMaterialDesignActive && !effectiveAmoledDark && (
         <>
           <div className="absolute top-24 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
           <div className="absolute top-1/2 right-10 w-[600px] h-[600px] bg-pink-600/10 rounded-full blur-[130px] pointer-events-none"></div>
@@ -5446,7 +5749,7 @@ export default function App() {
 
       {/* TV360 STYLE CINEMATIC HEADER (Floating on Top - Displays on ALL tabs) */}
       {(activeTab !== "settings" || activeSettingSection === null) && activeTab !== "vbox" && (
-        <header className={`fixed top-0 left-0 right-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-all duration-150 ${dockToSidebar ? (isSidebarCollapsed ? "md:left-20" : "md:left-72") : ""}`}>
+        <header className={`fixed top-10 left-0 right-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none transition-none ${dockToSidebar ? (isSidebarCollapsed ? "md:left-20" : "md:left-72") : ""}`}>
           {/* Progressive background blurs backplate - Only visible when scrolled down or when not on home tab */}
           <div className={`progressive-blur-header z-0 pointer-events-none border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${
             isScrolled || activeTab !== "home" ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
@@ -5902,7 +6205,7 @@ export default function App() {
 
       {/* SETTINGS DETAILS HEADER (Floating on Top - Exclusively inside settings sub-sections) */}
       {activeTab === "settings" && activeSettingSection !== null && (
-        <header className={`fixed top-[40px] left-0 right-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none ${dockToSidebar ? (isSidebarCollapsed ? "md:left-20" : "md:left-72") : ""}`}>
+        <header className={`fixed top-10 left-0 right-0 h-24 z-50 px-4 sm:px-8 md:px-12 flex items-center justify-between pointer-events-auto select-none ${dockToSidebar ? (isSidebarCollapsed ? "md:left-20" : "md:left-72") : ""}`}>
           {/* Progressive background blurs backplate */}
           <div className="progressive-blur-header z-0 pointer-events-none border-b border-white/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.3)] opacity-100 visible" />
 
@@ -5942,15 +6245,14 @@ export default function App() {
               ? "w-full pt-0 pb-8 z-10 relative active-tab-vbox"
               : `w-full max-w-7xl mx-auto px-4 pt-24 lg:pt-28 pb-8 z-10 relative overflow-hidden active-tab-${activeTab}`
       }>
-        <AnimatePresence mode="popLayout" initial={false} custom={slideDirection}>
+        <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
-            key={activeTab}
-            custom={slideDirection}
+            key={`${activeTab}-${activeSettingSection || 'main'}-${vstudySubFilter || 'all'}`}
             variants={pageTransitionVariants}
             initial="enter"
             animate="center"
             exit="exit"
-            transition={dynamicMotion ? { duration: 0.35, ease: "easeInOut" } : { duration: 0 }}
+            transition={dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 }}
             className="w-full relative"
           >
 
@@ -7140,22 +7442,30 @@ export default function App() {
                         <div className="flex-1 pr-4">
                           <h4 className="text-sm font-semibold text-white">settings.appearance.AmoledDark.title</h4>
                           <p className="text-xs text-white/60 mt-0.5">settings.appearance.AmoledDark.subtitle</p>
+                          {isPanoramaActive && (
+                            <span className="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 mt-1 inline-block">
+                              Đã bị khóa do Plugin Panorama đang bật
+                            </span>
+                          )}
                         </div>
                         {isMaterialDesignActive ? (
                           <button
-                            onClick={() => setAmoledDark(!amoledDark)}
-                            className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
-                              amoledDark ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
+                            disabled={isPanoramaActive}
+                            onClick={() => !isPanoramaActive && setAmoledDark(!amoledDark)}
+                            className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative flex items-center shrink-0 border-2 ${
+                              isPanoramaActive
+                                ? "opacity-40 cursor-not-allowed bg-[#1d1b20] border-[#938f99]"
+                                : amoledDark ? "bg-[#381e72] border-transparent cursor-pointer" : "bg-[#1d1b20] border-[#938f99] cursor-pointer"
                             }`}
                           >
                             <motion.div
-                              animate={{ x: amoledDark ? 20 : 0 }}
+                              animate={{ x: effectiveAmoledDark ? 20 : 0 }}
                               transition={{ type: "spring", stiffness: 500, damping: 30 }}
                               className={`rounded-full flex items-center justify-center transition-all duration-300 ${
-                                amoledDark ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
+                                effectiveAmoledDark ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
                               }`}
                             >
-                              {amoledDark && (
+                              {effectiveAmoledDark && (
                                 <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -7164,13 +7474,16 @@ export default function App() {
                           </button>
                         ) : (
                           <button
-                            onClick={() => setAmoledDark(!amoledDark)}
-                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                              amoledDark ? "bg-[#34c759]" : "bg-white/20"
+                            disabled={isPanoramaActive}
+                            onClick={() => !isPanoramaActive && setAmoledDark(!amoledDark)}
+                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative flex items-center ${
+                              isPanoramaActive
+                                ? "opacity-40 cursor-not-allowed bg-white/10"
+                                : amoledDark ? "bg-[#34c759] cursor-pointer" : "bg-white/20 cursor-pointer"
                             }`}
                           >
                             <motion.div
-                              animate={{ x: amoledDark ? 20 : 0 }}
+                              animate={{ x: effectiveAmoledDark ? 20 : 0 }}
                               transition={{ type: "spring", stiffness: 500, damping: 30 }}
                               className="relative w-6 h-5 flex items-center justify-center group"
                             >
@@ -8658,6 +8971,7 @@ export default function App() {
             setVCoins={setVCoins}
             verifiedSub={verifiedSub}
             setVerifiedSub={setVerifiedSub}
+            initialSection={verifiedInitialSection}
             onNavigateToTab={(tab) => {
               setActiveTab(tab);
               setActiveSettingSection(null);
@@ -8676,6 +8990,32 @@ export default function App() {
             }}
             vCoins={vCoins}
             setVCoins={setVCoins}
+          />
+        )}
+
+        {/* VIEW: NOTIFICATIONS CENTER PAGE */}
+        {activeTab === "notifications" && (
+          <NotificationsTab
+            notifications={notifications}
+            onMarkAllRead={() => {
+              setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+            }}
+            onClearAll={() => {
+              setNotifications([]);
+            }}
+            onMarkRead={(id) => {
+              setNotifications((prev) =>
+                prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+              );
+            }}
+            onDeleteNotification={(id) => {
+              setNotifications((prev) => prev.filter((n) => n.id !== id));
+            }}
+            onBack={() => setActiveTab("home")}
+            onNavigateToTab={(tab) => {
+              setActiveTab(tab);
+              setActiveSettingSection(null);
+            }}
           />
         )}
 
@@ -11862,24 +12202,30 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[99999] bg-[#4a4a4d] flex flex-col items-center justify-center select-none pointer-events-auto cursor-wait transform-gpu p-4"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[99999] bg-black/30 backdrop-blur-xs flex flex-col items-center justify-center select-none pointer-events-auto cursor-wait transform-gpu p-4 overflow-hidden"
           >
-            {/* Minecraft Bedrock / Education Edition Error Dialog Loading Screen */}
-            <div className="w-[450px] max-w-full bg-[#313133] border-2 border-[#181818] shadow-2xl flex flex-col select-none">
+            {/* Minecraft Bedrock / Education Edition Dialog Loading Screen */}
+            <motion.div
+              initial={{ x: 180, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="w-[450px] max-w-full bg-[#313133] border-2 border-[#181818] shadow-2xl flex flex-col select-none font-google font-sans"
+            >
               {/* Top Header Panel */}
               <div className="bg-[#4d4d50] border border-[#6b6b70] py-3.5 px-4 flex items-center justify-center m-0.5">
-                <span className="text-white text-[12px] sm:text-[13px] font-bold tracking-tight text-center minecraft-font leading-snug">
-                  An error has occurred
+                <span className="text-white text-[13px] sm:text-[14px] font-bold tracking-tight text-center font-google font-sans leading-snug">
+                  Just a moment...
                 </span>
               </div>
               {/* Bottom Body Panel */}
-              <div className="bg-[#313133] border-t border-[#181818] py-4.5 px-4 flex items-center justify-center">
-                <span className="text-white text-[10px] sm:text-[11px] font-normal tracking-wide text-center minecraft-font leading-relaxed opacity-95">
-                  Going back to the previous screen...
+              <div className="bg-[#313133] border-t border-[#181818] py-4.5 px-5 flex items-center justify-center gap-3.5 min-h-[64px]">
+                <WindowsSpinner size={24} className="shrink-0" />
+                <span className="text-white text-[11px] sm:text-[12px] font-medium tracking-wide text-center font-google font-sans leading-relaxed opacity-95">
+                  {loadingText}
                 </span>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -11889,6 +12235,46 @@ export default function App() {
         <div className="fixed bottom-6 right-6 z-[99999] bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black font-extrabold px-4 py-3 rounded-2xl shadow-2xl border border-amber-300 flex items-center gap-2.5 animate-bounce pointer-events-none select-none">
           <Coins className="w-5 h-5 fill-black shrink-0" />
           <span className="text-xs">{vcoinToast}</span>
+        </div>
+      )}
+
+      {/* UNCLOSABLE CHECK FOR UPDATE POPUP (1 MINUTE DURATION) */}
+      {isUpdatingApp && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[999999] flex items-center justify-center p-4 cursor-wait select-none pointer-events-auto">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-md bg-[#1c1c24] border border-white/20 rounded-2xl p-8 shadow-[0_25px_60px_rgba(0,0,0,0.8)] text-center flex flex-col items-center relative overflow-hidden"
+          >
+            {/* Top accent bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 animate-pulse" />
+
+            {/* Windows Spinner */}
+            <div className="w-20 h-20 mb-6 flex items-center justify-center relative">
+              <WindowsSpinner size={56} className="cursor-wait" />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-extrabold text-white mb-2 tracking-tight">
+              Đang cập nhật phiên bản mới...
+            </h2>
+            <p className="text-xs text-zinc-300 mb-6 leading-relaxed">
+              Hệ thống Vplay đang tải và nâng cấp các gói dữ liệu phiên bản mới. Vui lòng không tắt ứng dụng hoặc đóng trình duyệt.
+            </p>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-zinc-800 rounded-full h-2.5 overflow-hidden border border-white/10 mb-3">
+              <div
+                className="bg-gradient-to-r from-sky-500 to-indigo-500 h-full rounded-full transition-all duration-1000 ease-linear"
+                style={{ width: `${((60 - updateCountdown) / 60) * 100}%` }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between w-full text-[11px] font-mono text-zinc-400">
+              <span>Tiến trình: {Math.round(((60 - updateCountdown) / 60) * 100)}%</span>
+              <span className="font-bold text-sky-400">Thời gian còn lại: {updateCountdown}s</span>
+            </div>
+          </motion.div>
         </div>
       )}
 

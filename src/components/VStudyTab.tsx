@@ -33,7 +33,9 @@ import {
   TrendingUp,
   X,
   Baby,
-  Home
+  Home,
+  Languages,
+  PenTool
 } from "lucide-react";
 import { 
   Question, 
@@ -42,6 +44,8 @@ import {
   subjectsData,
   getSuperExamSubject
 } from "../data/vstudyData";
+import EnglishCefrModule from "./vstudy/EnglishCefrModule";
+import LiteratureWritingModule from "./vstudy/LiteratureWritingModule";
 
 export interface ExamHistoryItem {
   id: string;
@@ -218,6 +222,20 @@ interface VStudyTabProps {
 }
 
 export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter }: VStudyTabProps) {
+  // Main Module Tab Mode
+  const [modeTab, setModeTab] = useState<"quizzes" | "english_cefr" | "literature_writing" | "hoc_ba">(() => {
+    if (subFilter === "hoc_ba") return "hoc_ba";
+    return "quizzes";
+  });
+
+  useEffect(() => {
+    if (subFilter === "hoc_ba") {
+      setModeTab("hoc_ba");
+    } else if (subFilter === "all" || subFilter === "tieu_hoc" || subFilter === "thcs" || subFilter === "thpt" || subFilter === "super_exam") {
+      setModeTab("quizzes");
+    }
+  }, [subFilter]);
+
   // Global student profile stats stored in localStorage
   const [xp, setXp] = useState<number>(() => {
     return Number(localStorage.getItem("vstudy_xp") || "120");
@@ -236,6 +254,31 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
   const [totalScore, setTotalScore] = useState<number>(() => {
     return Number(localStorage.getItem("vstudy_total_score") || "1280");
   });
+
+  const handleAddScoreAndXp = (scoreGained: number, xpGained: number) => {
+    setTotalScore((prev) => {
+      const next = prev + scoreGained;
+      localStorage.setItem("vstudy_total_score", next.toString());
+      return next;
+    });
+
+    setXp((prev) => {
+      const nextXp = prev + xpGained;
+      const targetXp = level * 100;
+      if (nextXp >= targetXp) {
+        setLevel((l) => {
+          const nl = l + 1;
+          localStorage.setItem("vstudy_level", nl.toString());
+          return nl;
+        });
+        const rem = nextXp - targetXp;
+        localStorage.setItem("vstudy_xp", rem.toString());
+        return rem;
+      }
+      localStorage.setItem("vstudy_xp", nextXp.toString());
+      return nextXp;
+    });
+  };
   const [totalQuestionsAnswered, setTotalQuestionsAnswered] = useState<number>(() => {
     return Number(localStorage.getItem("vstudy_total_questions") || "130");
   });
@@ -796,9 +839,80 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
         </div>
       </div>
 
+      {/* MODULE MODE SELECTION TABS */}
+      {!isQuizActive && (
+        <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-zinc-900/80 border border-white/10 shadow-lg">
+          <button
+            onClick={() => {
+              setModeTab("quizzes");
+              if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
+            }}
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              modeTab === "quizzes"
+                ? "bg-[#cc1827] text-white shadow-lg shadow-[#cc1827]/30 border border-red-500/30"
+                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+            }`}
+          >
+            <BookOpen className="w-4 h-4 text-white" />
+            <span>1. Trắc Nghiệm Tổng Hợp</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setModeTab("english_cefr");
+              if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
+            }}
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              modeTab === "english_cefr"
+                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/40 border border-blue-400/30"
+                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+            }`}
+          >
+            <Languages className="w-4 h-4 text-blue-300" />
+            <span>2. Tiếng Anh (A2, B1, B1+, B2)</span>
+            <span className="px-1.5 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-[10px]">4 Kỹ Năng</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setModeTab("literature_writing");
+              if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
+            }}
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              modeTab === "literature_writing"
+                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/40 border border-emerald-400/30"
+                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+            }`}
+          >
+            <PenTool className="w-4 h-4 text-emerald-300" />
+            <span>3. Luyện Viết Văn THCS/THPT</span>
+            <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px]">AI Chấm Điểm</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setModeTab("hoc_ba");
+              if (onSelectSubFilter) onSelectSubFilter("hoc_ba");
+            }}
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              modeTab === "hoc_ba"
+                ? "bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 shadow-lg shadow-amber-900/40 border border-amber-300/40"
+                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+            }`}
+          >
+            <GraduationCap className="w-4 h-4 text-slate-950" />
+            <span>4. Tra Cứu Học Bạ</span>
+          </button>
+        </div>
+      )}
+
       {/* 2. MAIN ACTIVE STUDY AREA */}
       {!isQuizActive ? (
-        subFilter === "hoc_ba" ? (
+        modeTab === "english_cefr" ? (
+          <EnglishCefrModule onAddScoreAndXp={handleAddScoreAndXp} playSynthSound={playSynthSound} />
+        ) : modeTab === "literature_writing" ? (
+          <LiteratureWritingModule onAddScoreAndXp={handleAddScoreAndXp} playSynthSound={playSynthSound} />
+        ) : modeTab === "hoc_ba" || subFilter === "hoc_ba" ? (
           /* TRANG TRA CỨU HỌC BẠ FULL VIEW */
           <div className="space-y-6 text-left">
             {/* Title Header Banner */}
@@ -1169,7 +1283,7 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Tất cả môn</span>
+                <span>Khóa học</span>
                 <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-full font-mono">
                   {subjectsData.length}
                 </span>

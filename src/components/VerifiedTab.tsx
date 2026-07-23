@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -24,7 +24,10 @@ import {
   Sliders,
   Shield,
   Layers,
-  Sparkle
+  Sparkle,
+  HardDrive,
+  Database,
+  Cloud
 } from "lucide-react";
 
 export interface VerifiedSubState {
@@ -39,6 +42,7 @@ interface VerifiedTabProps {
   verifiedSub: VerifiedSubState;
   setVerifiedSub: React.Dispatch<React.SetStateAction<VerifiedSubState>>;
   onNavigateToTab: (tab: string) => void;
+  initialSection?: "plans" | "comparison" | "earning" | "storage";
 }
 
 export default function VerifiedTab({
@@ -48,17 +52,31 @@ export default function VerifiedTab({
   verifiedSub,
   setVerifiedSub,
   onNavigateToTab,
+  initialSection = "plans"
 }: VerifiedTabProps) {
   const [confirmModal, setConfirmModal] = useState<"verified_basic" | "verified_standard" | "verified" | "verified_plus" | null>(null);
   const [errorModal, setErrorModal] = useState<{ required: number; current: number } | null>(null);
   const [successModal, setSuccessModal] = useState<"verified_basic" | "verified_standard" | "verified" | "verified_plus" | null>(null);
+  const [storageSuccessModal, setStorageSuccessModal] = useState<{ name: string; gb: number } | null>(null);
+
+  const [userStorageGb, setUserStorageGb] = useState<number>(() => {
+    const saved = localStorage.getItem("vplay_user_cloud_storage");
+    return saved ? parseInt(saved, 10) : 15;
+  });
+
   const [dailyClaimed, setDailyClaimed] = useState<boolean>(() => {
     const today = new Date().toDateString();
     const lastClaim = localStorage.getItem("vplay_last_daily_claim");
     return lastClaim === today;
   });
   const [dailyBonusToast, setDailyBonusToast] = useState<boolean>(false);
-  const [activeTabSection, setActiveTabSection] = useState<"plans" | "comparison" | "earning">("plans");
+  const [activeTabSection, setActiveTabSection] = useState<"plans" | "comparison" | "earning" | "storage">(initialSection);
+
+  useEffect(() => {
+    if (initialSection) {
+      setActiveTabSection(initialSection);
+    }
+  }, [initialSection]);
 
   // Package Prices
   const PLAN_PRICES = {
@@ -95,6 +113,17 @@ export default function VerifiedTab({
       return;
     }
     setConfirmModal(plan);
+  };
+
+  const handleBuyStorage = (gb: number, price: number, name: string) => {
+    if (vCoins < price) {
+      setErrorModal({ required: price, current: vCoins });
+      return;
+    }
+    setVCoins((prev) => prev - price);
+    setUserStorageGb((prev) => Math.max(prev, gb));
+    localStorage.setItem("vplay_user_cloud_storage", Math.max(userStorageGb, gb).toString());
+    setStorageSuccessModal({ name, gb });
   };
 
   const executePurchase = () => {
@@ -342,7 +371,7 @@ export default function VerifiedTab({
         </div>
 
         {/* TAB SWITCHER SECTIONS */}
-        <div className="flex items-center justify-center gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border border-white/10 max-w-md mx-auto shadow-xl">
+        <div className="flex items-center justify-center gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border border-white/10 max-w-xl mx-auto shadow-xl">
           <button
             onClick={() => setActiveTabSection("plans")}
             className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
@@ -361,7 +390,7 @@ export default function VerifiedTab({
                 : "text-zinc-400 hover:text-white"
             }`}
           >
-            Bảng So Sánh Quyền Lợi
+            Bảng So Sánh
           </button>
           <button
             onClick={() => setActiveTabSection("earning")}
@@ -371,7 +400,18 @@ export default function VerifiedTab({
                 : "text-zinc-400 hover:text-white"
             }`}
           >
-            Cách Tích V-pearls
+            Tích V-pearls
+          </button>
+          <button
+            onClick={() => setActiveTabSection("storage")}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              activeTabSection === "storage"
+                ? "bg-gradient-to-r from-cyan-500 via-sky-400 to-blue-500 text-black shadow-md"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            <HardDrive className="w-3.5 h-3.5" />
+            <span>Mua Storage</span>
           </button>
         </div>
 
@@ -762,6 +802,224 @@ export default function VerifiedTab({
           </div>
         )}
 
+        {/* SECTION 4: MUA STORAGE CLOUD */}
+        {activeTabSection === "storage" && (
+          <div className="space-y-8 pt-2">
+            {/* Current Storage Usage Banner */}
+            <div className="relative rounded-3xl bg-gradient-to-r from-zinc-950 via-cyan-950/40 to-zinc-950 border border-cyan-500/40 p-6 sm:p-8 shadow-2xl overflow-hidden">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300">
+                      <HardDrive className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                      Dung Lượng Lưu Trữ Hiện Tại
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white mt-2">
+                    {userStorageGb} GB Cloud Storage VIP
+                  </h2>
+                  <p className="text-xs text-zinc-300 mt-1 max-w-xl">
+                    Lưu trữ video 4K, bản sao lưu truyền hình, tài liệu học tập V-Study và dữ liệu Mạng Xã Hội V-Flow với tốc độ siêu nhanh.
+                  </p>
+                </div>
+
+                <div className="bg-zinc-900/80 border border-cyan-500/30 rounded-2xl p-4 w-full md:w-72 shrink-0">
+                  <div className="flex items-center justify-between text-xs font-bold mb-2">
+                    <span className="text-zinc-400">Đã sử dụng: 2.8 GB</span>
+                    <span className="text-cyan-300 font-mono">{userStorageGb} GB</span>
+                  </div>
+                  <div className="w-full h-3 rounded-full bg-zinc-800 overflow-hidden p-0.5 border border-cyan-500/20">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-sky-300 transition-all duration-500"
+                      style={{ width: `${Math.min(100, (2.8 / userStorageGb) * 100)}%` }}
+                    />
+                  </div>
+                  <div className="text-[10px] text-zinc-400 mt-2 text-right">
+                    Server Băng Thông CDN 1 Gbps
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Storage Package Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Package 1: 100 GB */}
+              <div className="rounded-3xl bg-zinc-950/90 border border-zinc-800 hover:border-cyan-400/60 p-6 flex flex-col justify-between transition-all group">
+                <div>
+                  <div className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase w-fit mb-3">
+                    Lưu Trữ Cơ Bản
+                  </div>
+                  <h3 className="text-xl font-black text-white">Cloud Basic 100 GB</h3>
+                  <p className="text-xs text-zinc-400 mt-1">Lưu trữ hình ảnh, tài liệu cá nhân</p>
+
+                  <div className="my-4 pb-4 border-b border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-cyan-300 font-mono">5,000</span>
+                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Dung lượng <strong>100 GB</strong> tốc độ cao</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Tự động đồng bộ V-Box & V-Flow</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Bảo mật mã hóa 256-bit AES</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleBuyStorage(100, 5000, "Cloud Basic 100 GB")}
+                  className="w-full py-3 rounded-2xl bg-zinc-900 hover:bg-cyan-400 hover:text-black text-white font-black text-xs border border-cyan-500/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <HardDrive className="w-4 h-4" />
+                  <span>Mua 100 GB (5.000 VP)</span>
+                </button>
+              </div>
+
+              {/* Package 2: 500 GB */}
+              <div className="rounded-3xl bg-zinc-950/90 border border-cyan-500/40 hover:border-cyan-400 p-6 flex flex-col justify-between transition-all group relative">
+                <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-cyan-400 text-black text-[10px] font-black uppercase shadow-md">
+                  Phổ Biến
+                </div>
+                <div>
+                  <div className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[10px] font-black uppercase w-fit mb-3">
+                    Lưu Trữ Chuẩn
+                  </div>
+                  <h3 className="text-xl font-black text-white">Cloud Standard 500 GB</h3>
+                  <p className="text-xs text-zinc-400 mt-1">Lưu trữ video Full HD & ảnh chất lượng gốc</p>
+
+                  <div className="my-4 pb-4 border-b border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-cyan-300 font-mono">18,000</span>
+                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Dung lượng <strong>500 GB</strong> tốc độ cao</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Lưu kho video Live TV & V-Box</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Chia sẻ link tốc độ cao</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleBuyStorage(500, 18000, "Cloud Standard 500 GB")}
+                  className="w-full py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
+                >
+                  <HardDrive className="w-4 h-4" />
+                  <span>Mua 500 GB (18.000 VP)</span>
+                </button>
+              </div>
+
+              {/* Package 3: 1 TB */}
+              <div className="rounded-3xl bg-zinc-950/90 border border-amber-500/50 hover:border-amber-400 p-6 flex flex-col justify-between transition-all group relative">
+                <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-amber-400 text-black text-[10px] font-black uppercase shadow-md">
+                  BESTSELLER
+                </div>
+                <div>
+                  <div className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-black uppercase w-fit mb-3">
+                    Đẳng Cấp Pro
+                  </div>
+                  <h3 className="text-xl font-black text-white">Cloud Pro 1 TB</h3>
+                  <p className="text-xs text-zinc-400 mt-1">Kho phim 4K HDR & Streamer Chuyên Nghiệp</p>
+
+                  <div className="my-4 pb-4 border-b border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-amber-300 font-mono">35,000</span>
+                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Dung lượng <strong>1.000 GB (1 TB)</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Lưu kho phim 4K không nén</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Ưu tiên băng thông CDN Vplay</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleBuyStorage(1000, 35000, "Cloud Pro 1 TB")}
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-300 text-black font-black text-xs hover:from-amber-300 hover:to-yellow-200 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                >
+                  <HardDrive className="w-4 h-4" />
+                  <span>Mua 1 TB (35.000 VP)</span>
+                </button>
+              </div>
+
+              {/* Package 4: 2 TB */}
+              <div className="rounded-3xl bg-zinc-950/90 border border-purple-500/40 hover:border-purple-400 p-6 flex flex-col justify-between transition-all group">
+                <div>
+                  <div className="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-black uppercase w-fit mb-3">
+                    Tối Thượng Ultimate
+                  </div>
+                  <h3 className="text-xl font-black text-white">Cloud Ultimate 2 TB</h3>
+                  <p className="text-xs text-zinc-400 mt-1">Dung lượng vô cực cho nhà sáng tạo nội dung</p>
+
+                  <div className="my-4 pb-4 border-b border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-purple-300 font-mono">60,000</span>
+                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
+                      <span>Dung lượng <strong>2.000 GB (2 TB)</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
+                      <span>Máy chủ riêng biệt Dedicated Cloud</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
+                      <span>Hỗ trợ VIP 24/7 trực tiếp</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleBuyStorage(2000, 60000, "Cloud Ultimate 2 TB")}
+                  className="w-full py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20"
+                >
+                  <HardDrive className="w-4 h-4" />
+                  <span>Mua 2 TB (60.000 VP)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* MODAL: CONFIRM PURCHASE */}
@@ -933,6 +1191,47 @@ export default function VerifiedTab({
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black font-black text-sm shadow-[0_10px_30px_rgba(245,158,11,0.4)] cursor-pointer"
             >
               Trải Nghiệm Ngay
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: STORAGE SUCCESS */}
+      {storageSuccessModal && (
+        <div className="fixed inset-0 z-[100000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-md rounded-3xl bg-gradient-to-b from-zinc-950 via-zinc-950 to-cyan-950/60 border-2 border-cyan-400 p-6 sm:p-8 text-center space-y-6 shadow-[0_0_60px_rgba(6,182,212,0.4)] relative">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-cyan-400 to-sky-200 p-0.5 mx-auto shadow-[0_0_35px_rgba(6,182,212,0.6)]">
+              <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center text-cyan-400">
+                <HardDrive className="w-10 h-10 animate-pulse" />
+              </div>
+            </div>
+
+            <div>
+              <div className="inline-block px-3.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-black uppercase tracking-wider mb-2">
+                KÍCH HOẠT DUNG LƯỢNG CLOUD
+              </div>
+              <h3 className="text-2xl font-black text-white">Mua Storage Thành Công!</h3>
+              <p className="text-xs text-zinc-300 mt-2">
+                Dung lượng lưu trữ của bạn đã được nâng lên{" "}
+                <strong className="text-cyan-400">{storageSuccessModal.gb} GB Cloud Storage VIP</strong>
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-200 text-left space-y-1.5">
+              <div className="flex items-center gap-2 font-black text-cyan-300">
+                <HardDrive className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span>Băng thông CDN VIP 1 Gbps đã sẵn sàng!</span>
+              </div>
+              <p className="text-[11px] text-zinc-400 pl-6">
+                Bạn có thể sao lưu video 4K, lưu trữ tài liệu V-Study và chia sẻ hình ảnh V-Flow thoải mái.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setStorageSuccessModal(null)}
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 text-black font-black text-sm shadow-[0_10px_30px_rgba(6,182,212,0.4)] cursor-pointer"
+            >
+              Hoàn Tất & Sử Dụng
             </button>
           </div>
         </div>

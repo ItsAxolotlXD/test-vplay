@@ -66,91 +66,123 @@ export interface VFlowPost {
   isBookmarked?: boolean;
 }
 
-const INITIAL_POSTS: VFlowPost[] = [
-  {
-    id: "post-1",
-    author: "Vplay Sports",
-    handle: "@vplay_sports",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    isVerified: true,
-    verifiedType: "verified_plus",
-    time: "10 phút trước",
-    content: "🔥 Siêu kinh điển Ngoại Hạng Anh tối nay đã sẵn sàng trên kênh Vplay Sports 1 HD! Anh em bắt kèo đội nào thắng? Tốc độ phát 4K Ultra HD trên Server VIP mượt căng đét nhé!",
-    tag: "BóngĐá",
-    imageUrl: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1000&auto=format&fit=crop&q=80",
-    likes: 342,
-    isLiked: false,
-    shares: 48,
-    comments: [
-      {
-        id: "c-1",
-        author: "Trần Minh Hoàn",
-        handle: "@hoan_vplay",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-        isVerified: true,
-        verifiedType: "verified",
-        text: "Kênh phát mượt lắm ad ơi, 4K sắc nét không delay giây nào!",
-        time: "5 phút trước",
-        likes: 12,
-      },
-      {
-        id: "c-2",
-        author: "Phạm Thu Hà",
-        handle: "@thuha_vtv",
-        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-        isVerified: true,
-        verifiedType: "verified_plus",
-        text: "Arsenal win 2-1 chắc chắn luôn 🔥",
-        time: "2 phút trước",
-        likes: 8,
-      }
-    ]
-  },
-  {
-    id: "post-2",
-    author: "Minh Tuấn Cinema",
-    handle: "@minhtuan_movie",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-    isVerified: true,
-    verifiedType: "verified",
-    time: "45 phút trước",
-    content: "Vừa xem xong bộ phim chiếu rạp mới trên mục V-Box của ứng dụng Vplay. Chất lượng âm thanh vòm Dolby Atmos cực đỉnh. Anh em Verified nhớ trải nghiệm tính năng này nhé!",
-    tag: "PhimẢnh",
-    imageUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1000&auto=format&fit=crop&q=80",
-    likes: 189,
-    isLiked: true,
-    shares: 19,
-    comments: [
-      {
-        id: "c-3",
-        author: "Hoàng Yến",
-        handle: "@hoangyen_vplay",
-        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
-        isVerified: true,
-        verifiedType: "verified",
-        text: "Chuẩn luôn bác ơi, mở loa ngoài nghe sống động như rạp!",
-        time: "20 phút trước",
-        likes: 5,
-      }
-    ]
-  },
-  {
-    id: "post-3",
-    author: "Vplay Official",
-    handle: "@vplay_official",
-    avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
-    isVerified: true,
-    verifiedType: "verified_plus",
-    time: "2 giờ trước",
-    content: "✨ CHÍNH THỨC RA MẮT MẠNG XÃ HỘI V-FLOW CHO HỘI VIÊN VERIFIED!\n\nTự do đăng bài viết, chia sẻ hình ảnh, khoảnh khắc video và giao lưu cùng cộng đồng Vplay VIP. Đừng quên điểm danh hàng ngày để tích lũy V-coins nhận gói Verified 100% miễn phí!",
-    tag: "VplayUpdate",
-    imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1000&auto=format&fit=crop&q=80",
-    likes: 890,
-    isLiked: false,
-    shares: 154,
-    comments: []
+export function generate100Posts(): VFlowPost[] {
+  const AUTHORS = [
+    { author: "Vplay Sports 1 HD", handle: "@vplay_sports", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "Minh Tuấn Cinema", handle: "@minhtuan_movie", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Vplay Official", handle: "@vplay_official", avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "Phương Thảo VTV", handle: "@thao_vtv", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Đức Hùng Tech", handle: "@hung_tech_4k", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Khánh Linh Travel", handle: "@linh_explore", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Nam Gamer Pro", handle: "@nam_esports", avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "Mai Anh Style", handle: "@maianh_fashion", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Gia Huy Football", handle: "@huy_premier", avatar: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Thanh Trúc Review", handle: "@truc_review", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Quốc Bảo Vplay", handle: "@bao_vbox", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "Thu Hà Foodie", handle: "@ha_food", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Văn Sang Otaku", handle: "@sang_anime", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
+    { author: "Mỹ Linh Music", handle: "@mylinh_sing", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "Hoài Thương V-Study", handle: "@thuong_study", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const }
+  ];
+
+  const IMAGES = [
+    "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1000&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1000&auto=format&fit=crop&q=80"
+  ];
+
+  const POST_TEMPLATES = [
+    { tag: "BóngĐá", text: "🔥 Siêu kinh điển Ngoại Hạng Anh trực tiếp trên Vplay Sports 1 HD! Trận đấu kịch tính đến phút cuối cùng.", hasImg: true },
+    { tag: "PhimẢnh", text: "Vừa trải nghiệm bộ phim chiếu rạp mới nhất trên V-Box. Chất lượng âm thanh Dolby Atmos quá đỉnh!", hasImg: true },
+    { tag: "VplayUpdate", text: "✨ Mạng Xã Hội V-Flow chào đón bài viết thứ 100! Hãy nâng cấp Verified để nhận trọn bộ quà tặng độc quyền.", hasImg: true },
+    { tag: "CongNghe", text: "Bàn về công nghệ Smart TV 8K mới ra mắt. Tốc độ truyền tải dữ liệu Cloud Vplay chạy mượt không chút giật lag.", hasImg: true },
+    { tag: "DuLich", text: "Chuyến du lịch Sapa mùa này quá tuyệt vời! Không khí trong lành và cảnh đẹp núi rừng trùng điệp.", hasImg: true },
+    { tag: "AmThuc", text: "Cuối tuần đi thưởng thức món Phở Bò Hà Nội chuẩn vị gia truyền. Bát phở nóng hổi đậm đà hương vị.", hasImg: true },
+    { tag: "AmNhac", text: "Concert Âm Nhạc Trực Tiếp trên kênh Vplay Music HD hoành tráng không ngờ! Dàn âm thanh đỉnh cao.", hasImg: true },
+    { tag: "GameMobile", text: "Trận chung kết giải đấu Esports Vplay hôm nay vô cùng gay cấn. Đội tuyển vô địch thi đấu xuất sắc!", hasImg: true },
+    { tag: "Showbiz", text: "Cập nhật thảm đỏ sự kiện điện ảnh tối nay. Các nghệ sĩ xuất hiện lộng lẫy trên truyền hình Vplay.", hasImg: true },
+    { tag: "VStudy", text: "Hôm nay mình vừa ôn luyện xong bộ đề thi thử THPT Quốc Gia trên V-Study. Rất chi tiết và bổ ích!", hasImg: false },
+    { tag: "BóngĐá", text: "Cập nhật kết quả Cúp C1 Châu Âu: Trận đấu nghẹt thở với cú đúp phút 89. Anh em thấy thế nào?", hasImg: false },
+    { tag: "PhimẢnh", text: "Top 5 bộ phim hành động bom tấn đáng xem nhất cuối tuần này trên Vplay Cinema HD.", hasImg: true },
+    { tag: "CongNghe", text: "So sánh tốc độ băng thông 1Gbps trên server VIP Vplay và server thường. Khác biệt rõ rệt!", hasImg: false },
+    { tag: "DuLich", text: "Khám phá bãi biển Phú Quốc rực rỡ nắng vàng. Địa điểm không thể bỏ qua mùa hè này.", hasImg: true },
+    { tag: "AmThuc", text: "Quán bún bò Huế cực ngon tại trung tâm thành phố, topping đầy đặn giá cực hạt dẻ.", hasImg: true },
+    { tag: "AmNhac", text: "Bài hát mới vừa cán mốc 10 triệu lượt nghe trên kênh V-Flow Audio. Giai điệu bắt tai gây nghiện!", hasImg: false },
+    { tag: "GameMobile", text: "Cần tìm đồng đội leo rank Cao Thủ tối nay! Anh em nào online inbox vào team luôn nhé.", hasImg: false },
+    { tag: "VplayUpdate", text: "Thông báo nâng cấp Server Cloud Storage lên 2 TB cho tất cả hội viên VIP Vplay!", hasImg: true },
+    { tag: "Showbiz", text: "Bài phỏng vấn độc quyền độc lạ cùng đạo diễn nổi tiếng Việt Nam trên kênh Vplay Talkshow.", hasImg: false },
+    { tag: "VStudy", text: "Bí quyết đạt điểm 9+ môn Toán trong kỳ thi sắp tới. Cùng tham khảo tài liệu V-Study nhé!", hasImg: false }
+  ];
+
+  const COMMENT_POOL = [
+    "Bài viết hay quá bạn ơi!",
+    "Chất lượng mượt mà thật sự, cho 5 sao ⭐️⭐️⭐️⭐️⭐️",
+    "Đã thả tim và bookmark rồi nhé!",
+    "Hóng trận tiếp theo quá ad ơi 🔥",
+    "V-Flow dùng thích thật, đăng bài mượt đét!",
+    "Tuyệt vời! Cảm ơn thông tin hữu ích của bạn.",
+    "Bao giờ có chương trình tặng V-coins tiếp theo vậy ad?",
+    "Giao diện Verified đẹp xuất sắc luôn!",
+    "Hoàn toàn đồng ý với ý kiến của bác!",
+    "Gói VIP quá đáng tiền, xem phim 4K sướng mắt."
+  ];
+
+  const postsList: VFlowPost[] = [];
+
+  for (let i = 1; i <= 100; i++) {
+    const authorObj = AUTHORS[(i - 1) % AUTHORS.length];
+    const template = POST_TEMPLATES[(i - 1) % POST_TEMPLATES.length];
+    const imgUrl = template.hasImg ? IMAGES[(i - 1) % IMAGES.length] : undefined;
+    const likesCount = 15 + Math.floor((101 - i) * 14.2) + (i % 7) * 8;
+    const sharesCount = 2 + Math.floor(likesCount / 15);
+    
+    const commentCount = 1 + (i % 4);
+    const commentsList: VFlowComment[] = [];
+    for (let c = 0; c < commentCount; c++) {
+      const commenter = AUTHORS[(i + c + 2) % AUTHORS.length];
+      commentsList.push({
+        id: `c-${i}-${c}`,
+        author: commenter.author,
+        handle: commenter.handle,
+        avatar: commenter.avatar,
+        isVerified: commenter.isVerified,
+        verifiedType: commenter.verifiedType,
+        text: COMMENT_POOL[(i + c * 3) % COMMENT_POOL.length],
+        time: `${(c + 1) * 4 + (i % 6)} phút trước`,
+        likes: 2 + (c * 3) + (i % 4)
+      });
+    }
+
+    postsList.push({
+      id: `post-${i}`,
+      author: authorObj.author,
+      handle: authorObj.handle,
+      avatar: authorObj.avatar,
+      isVerified: authorObj.isVerified,
+      verifiedType: authorObj.verifiedType,
+      time: `${i * 10} phút trước`,
+      content: `${template.text}\n\n(#BàiViết ${i}/100 trên V-Flow Community)`,
+      tag: template.tag,
+      imageUrl: imgUrl,
+      likes: likesCount,
+      isLiked: false,
+      shares: sharesCount,
+      comments: commentsList,
+      isBookmarked: false
+    });
   }
-];
+
+  return postsList;
+}
 
 export default function VFlowTab({
   onBack,
@@ -160,19 +192,32 @@ export default function VFlowTab({
   setVCoins
 }: VFlowTabProps) {
   const isVerifiedUser = verifiedSub.plan !== "none";
-  const [demoMode, setDemoMode] = useState<boolean>(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState<boolean>(false);
+  const [upgradePromptReason, setUpgradePromptReason] = useState<string>("tương tác");
+
+  const checkVerifiedPermission = (actionName: string): boolean => {
+    if (!isVerifiedUser) {
+      setUpgradePromptReason(actionName);
+      setShowUpgradeModal(true);
+      return false;
+    }
+    return true;
+  };
 
   // Posts State
   const [posts, setPosts] = useState<VFlowPost[]>(() => {
     const saved = localStorage.getItem("vplay_vflow_posts");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 80) {
+          return parsed;
+        }
       } catch (e) {
         // ignore
       }
     }
-    return INITIAL_POSTS;
+    return generate100Posts();
   });
 
   useEffect(() => {
@@ -208,10 +253,7 @@ export default function VFlowTab({
     e.preventDefault();
     if (!newPostText.trim()) return;
 
-    if (!isVerifiedUser && !demoMode) {
-      showToast("Chỉ tài khoản Verified mới có thể đăng bài viết!");
-      return;
-    }
+    if (!checkVerifiedPermission("đăng bài viết mới")) return;
 
     const newPost: VFlowPost = {
       id: "post-" + Date.now(),
@@ -239,6 +281,8 @@ export default function VFlowTab({
 
   // Like Toggle
   const handleToggleLike = (postId: string) => {
+    if (!checkVerifiedPermission("thả tim bài viết")) return;
+
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id === postId) {
@@ -256,6 +300,8 @@ export default function VFlowTab({
 
   // Bookmark Toggle
   const handleToggleBookmark = (postId: string) => {
+    if (!checkVerifiedPermission("lưu bài viết yêu thích")) return;
+
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id === postId) {
@@ -271,6 +317,8 @@ export default function VFlowTab({
   // Add Comment
   const handleAddComment = (postId: string) => {
     if (!commentInput.trim()) return;
+
+    if (!checkVerifiedPermission("bình luận bài viết")) return;
 
     const newComment: VFlowComment = {
       id: "c-" + Date.now(),
@@ -377,68 +425,50 @@ export default function VFlowTab({
       {/* MAIN CONTENT AREA */}
       <div className="max-w-4xl mx-auto py-6 space-y-6 relative z-10">
 
-        {/* LOCKED SCREEN BANNER IF NOT VERIFIED & NOT IN DEMO MODE */}
-        {!isVerifiedUser && !demoMode && (
-          <div className="relative rounded-3xl bg-gradient-to-b from-amber-950/60 via-zinc-950 to-zinc-950 border-2 border-amber-500/60 p-6 sm:p-10 shadow-[0_10px_50px_rgba(245,158,11,0.25)] text-center space-y-6 overflow-hidden">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500" />
-            
-            <div className="w-20 h-20 rounded-full bg-amber-500/20 border border-amber-400/50 flex items-center justify-center mx-auto text-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.4)] animate-pulse">
-              <Lock className="w-9 h-9" />
-            </div>
-
-            <div className="max-w-lg mx-auto space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-extrabold uppercase">
-                <BadgeCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>Đặc Quyền Dành Cho Hội Viên Verified VIP</span>
+        {/* READ-ONLY BANNER FOR NON-VERIFIED USERS */}
+        {!isVerifiedUser && (
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs font-bold flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+            <div className="flex items-center gap-2.5">
+              <Lock className="w-5 h-5 text-amber-400 shrink-0 animate-pulse" />
+              <div>
+                <span className="font-extrabold text-amber-300">Chế độ Xem Thử (Read-Only):</span>{" "}
+                <span>Bạn đang duyệt 100+ bài viết truyền hình & cộng đồng V-Flow. Hãy nâng cấp Verified VIP để Đăng bài, Thả tim & Bình luận!</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white">
-                Mở Khóa Mạng Xã Hội V-Flow
-              </h2>
-              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                V-Flow là không gian mạng xã hội độc quyền nơi các Hội viên Verified Vplay tự do đăng bài viết, thảo luận các trận bóng đá, chia sẻ khoảnh khắc video ngắn và tương tác trực tiếp cùng cộng đồng VIP.
-              </p>
             </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto pt-2">
-              <button
-                onClick={() => onNavigateToTab("verified")}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 hover:from-amber-300 hover:to-yellow-200 text-black font-black text-sm shadow-[0_10px_30px_rgba(245,158,11,0.4)] transition-all transform hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Crown className="w-5 h-5 fill-black" />
-                <span>Nâng Cấp Verified (Dùng V-pearls Free)</span>
-              </button>
-
-              <button
-                onClick={() => setDemoMode(true)}
-                className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-zinc-200 font-extrabold text-xs border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>Xem Thử Demo V-Flow</span>
-              </button>
-            </div>
+            <button
+              onClick={() => onNavigateToTab("verified")}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 text-black font-black text-xs hover:from-amber-300 hover:to-yellow-200 cursor-pointer shrink-0 shadow-md flex items-center gap-1.5"
+            >
+              <Crown className="w-4 h-4 fill-black" />
+              <span>Nâng Cấp VIP Ngay</span>
+            </button>
           </div>
         )}
 
-        {/* FEED & COMPOSER (SHOW IF VERIFIED OR DEMO MODE) */}
-        {(isVerifiedUser || demoMode) && (
-          <>
-            {demoMode && !isVerifiedUser && (
-              <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 shrink-0 text-amber-400" />
-                  <span>Bạn đang ở chế độ Xem Thử Demo V-Flow. Nâng cấp Verified để mở khóa tài khoản chính thức.</span>
+        {/* CREATE POST COMPOSER BOX */}
+        <div className="rounded-3xl bg-zinc-950/90 border border-white/10 p-4 sm:p-5 shadow-xl space-y-4 relative overflow-hidden">
+          {!isVerifiedUser && (
+            <div className="absolute inset-0 z-20 bg-zinc-950/85 backdrop-blur-xs flex flex-col sm:flex-row items-center justify-between p-4 px-6 gap-3 text-center sm:text-left border border-amber-500/30 rounded-3xl">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-400 shrink-0">
+                  <Lock className="w-4 h-4" />
                 </div>
-                <button
-                  onClick={() => onNavigateToTab("verified")}
-                  className="px-3 py-1 rounded-xl bg-amber-400 text-black font-black text-[11px] hover:bg-amber-300 cursor-pointer shrink-0"
-                >
-                  Nâng Cấp VIP
-                </button>
+                <div>
+                  <h4 className="text-xs font-black text-white">Chức Năng Đăng Bài VIP</h4>
+                  <p className="text-[11px] text-zinc-400">Nâng cấp Verified VIP để đăng bài viết, ảnh & cảm nghĩ lên V-Flow</p>
+                </div>
               </div>
-            )}
+              <button
+                onClick={() => onNavigateToTab("verified")}
+                className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs cursor-pointer shrink-0 shadow-md flex items-center gap-1"
+              >
+                <Crown className="w-3.5 h-3.5 fill-black" />
+                <span>Nâng Cấp VIP</span>
+              </button>
+            </div>
+          )}
 
-            {/* CREATE POST COMPOSER BOX */}
-            <div className="rounded-3xl bg-zinc-950/90 border border-white/10 p-4 sm:p-5 shadow-xl space-y-4">
-              <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3">
                 <div className="relative shrink-0">
                   <img
                     src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"
@@ -765,10 +795,62 @@ export default function VFlowTab({
                 ))
               )}
             </div>
-          </>
-        )}
 
       </div>
+
+      {/* UPGRADE PROMPT MODAL FOR UNVERIFIED USERS */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 z-[100000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-md rounded-3xl bg-zinc-950 border border-amber-500/50 p-6 sm:p-8 text-center space-y-5 shadow-2xl relative">
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-2 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-400/50 flex items-center justify-center mx-auto text-amber-400">
+              <Lock className="w-8 h-8 animate-bounce" />
+            </div>
+
+            <div>
+              <h3 className="text-xl font-black text-white">Yêu Cầu Tài Khoản Verified VIP!</h3>
+              <p className="text-xs text-zinc-300 mt-2">
+                Bạn cần sở hữu gói <strong className="text-amber-400">Verified VIP</strong> để thực hiện thao tác <span className="text-amber-300 font-bold">{upgradePromptReason}</span> trên Mạng xã hội V-Flow.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 text-left space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                <BadgeCheck className="w-4 h-4 text-amber-400" />
+                <span>Nâng cấp Verified 100% Miễn Phí bằng V-pearls!</span>
+              </div>
+              <p className="text-[11px] text-zinc-400 pl-5">
+                Chỉ cần điểm danh hàng ngày nhận 50 V-pearls/ngày để đổi gói Verified hoàn toàn miễn phí.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowUpgradeModal(false)}
+                className="w-1/2 py-3 rounded-2xl bg-zinc-900 text-zinc-400 font-bold text-xs hover:text-white cursor-pointer"
+              >
+                Trải Nghiệm Đọc
+              </button>
+              <button
+                onClick={() => {
+                  setShowUpgradeModal(false);
+                  onNavigateToTab("verified");
+                }}
+                className="w-1/2 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-300 text-black font-black text-xs shadow-lg shadow-amber-500/20 cursor-pointer"
+              >
+                Nâng Cấp VIP Ngay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
