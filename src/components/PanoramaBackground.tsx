@@ -23,7 +23,7 @@ export const PanoramaBackground: React.FC = () => {
     // Load Minecraft panorama image texture - Updated custom panorama URL
     const panoramaImg = new Image();
     panoramaImg.crossOrigin = "anonymous";
-    panoramaImg.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkXzs1Va5TxwXVnniOcGwp7ij9pBT4RkKVXnek-w5AuQ&s=10";
+    panoramaImg.src = "https://storage.ghost.io/c/c0/e7/c0e78dd7-e7af-4603-8ab9-09f05cab06f3/content/images/size/w2000/2023/06/2023-06-09_21.48.56-1.png";
 
     let imgLoaded = false;
     panoramaImg.onload = () => {

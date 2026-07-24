@@ -10,6 +10,7 @@ import {
   Info, 
   Tv, 
   Grid, 
+  Grid2X2, 
   HelpCircle, 
   Plus, 
   X, 
@@ -70,7 +71,15 @@ import {
   Moon,
   Baby,
   Coins,
-  BadgeCheck
+  BadgeCheck,
+  Notebook,
+  Building2,
+  Languages,
+  BookOpenCheck,
+  CalendarCheck,
+  Gamepad2,
+  Mic,
+  Briefcase
 } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
 import { CATEGORIES, Category, Channel, processedChannels } from "./data/channels";
@@ -88,6 +97,20 @@ import VStudyTab from "./components/VStudyTab";
 import VerifiedTab from "./components/VerifiedTab";
 import VFlowTab from "./components/VFlowTab";
 import NotificationsTab, { AppNotification } from "./components/NotificationsTab";
+import { 
+  VNotesTab, 
+  VBankTab, 
+  VBooksTab, 
+  VCalcTab, 
+  VRemindersTab, 
+  VArcadeTab, 
+  VRecorderTab, 
+  VOfficeTab 
+} from "./components/vapps";
+import { CopilotTab } from "./components/CopilotTab";
+import { FloatingStickyNotes } from "./components/FloatingStickyNotes";
+import { UnderConstructionModal } from "./components/UnderConstructionModal";
+import { UnderConstructionTab } from "./components/UnderConstructionTab";
 
 const RECENT_SEARCHES_ITEMS = [
   // 1. Các kênh truyền hình
@@ -409,6 +432,25 @@ const ICON_REGISTRY: Record<string, React.ComponentType<any>> = {
 
 const homeSlides = [
   {
+    id: 10,
+    titleTop: "Welcome to a",
+    titleMain: "design preview!",
+    titleSub: "",
+    genreText: "ORE UI DESIGN SYSTEM PREVIEW",
+    subSlogan: "EXPERIMENTAL ORE UI DESIGN LANGUAGE",
+    thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80",
+    channelId: "vplay_live",
+    channelPlayName: "Vplay Ore UI Preview",
+    ageRating: "EXPERIMENTAL",
+    ratingText: "Ore UI Design Language | Vplay Web Tech",
+    vignetteLeft: "from-black/90 via-black/55 to-transparent",
+    vignetteBottom: "from-[#07050f] via-[#07050f]/85 to-transparent",
+    vignetteTop: "from-black/45 via-transparent to-transparent",
+    description: "We are currently experimenting new Ore UI design language. It is a collection of open source packages designed for building interactive and user-friendly and better performance response interfaces of Vplay using web technology and we would love to hear what you think of this brand new design. Keep in mind that it is still a work in progress, some part may contains unexpected issues and some functionality might be missing. Only available for some devices and scenarios.",
+    btnText: "Explore Ore UI",
+    btnIcon: "compass"
+  },
+  {
     id: 0,
     titleTop: "Hướng tới đưa Vplay",
     titleMain: "trở thành siêu ứng dụng của Việt Nam",
@@ -700,7 +742,7 @@ function WindowsSpinner({ size = 52, className = "" }: { size?: number; classNam
       }}
     >
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Windows-loading-cargando.gif"
+        src="https://i.ibb.co/YF4Q2tmz/animation-074ed0ba8c16bb30e36c.gif"
         alt="Loading..."
         decoding="async"
         loading="eager"
@@ -1316,6 +1358,18 @@ export default function App() {
   const [vstudySubFilter, setVStudySubFilter] = useState<"all" | "tieu_hoc" | "thcs" | "thpt" | "super_exam" | "hoc_ba">("all");
   const [isSidebarVolumeOpen, setIsSidebarVolumeOpen] = useState<boolean>(false);
   const [isSidebarPowerOpen, setIsSidebarPowerOpen] = useState<boolean>(false);
+  const [isVAppsSidebarOpen, setIsVAppsSidebarOpen] = useState<boolean>(true);
+
+  // In-page 2-second loading state on tab navigation
+  const [isTabLoading, setIsTabLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsTabLoading(true);
+    const timer = setTimeout(() => {
+      setIsTabLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
 
   // App Theme Mode state
   const [appThemeMode, setAppThemeMode] = useState<"light" | "dark">(() => {
@@ -1577,7 +1631,6 @@ export default function App() {
     "We're ready"
   ];
   const [loadingText, setLoadingText] = useState<string>("Just a moment");
-  const [isTabLoading, setIsTabLoading] = useState<boolean>(false);
   const prevTabKeyRef = useRef<string>(activeTab);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -2701,6 +2754,9 @@ export default function App() {
     targetId: string;
     actionType: "install" | "activate";
   } | null>(null);
+
+  const [isUnderConstructionOpen, setIsUnderConstructionOpen] = useState(false);
+  const [isCopilotDrawerOpen, setIsCopilotDrawerOpen] = useState(false);
 
   // Auto fallback to WinUI 3 as default design if none is active
   useEffect(() => {
@@ -4743,13 +4799,22 @@ export default function App() {
     if (activeTab === "vbox") return "V-BOX • PHẢN HỒI & HỖ TRỢ";
     if (activeTab === "explore_vietnam") return "EXPLORE VIETNAM • DU LỊCH & KHÁM PHÁ";
     if (activeTab === "v_study") {
-      if (vstudySubFilter === "tieu_hoc") return "V-STUDY • TIỂU HỌC";
-      if (vstudySubFilter === "thcs") return "V-STUDY • THCS";
-      if (vstudySubFilter === "thpt") return "V-STUDY • THPT";
-      if (vstudySubFilter === "super_exam") return "V-STUDY • ĐỀ THI SIÊU CẤP";
-      if (vstudySubFilter === "hoc_ba") return "V-STUDY • HỌC BẠ ĐIỆN TỬ";
-      return "V-STUDY • TẤT CẢ MÔN HỌC";
+      if (vstudySubFilter === "tieu_hoc") return "V-LEARN • TIỂU HỌC";
+      if (vstudySubFilter === "thcs") return "V-LEARN • THCS";
+      if (vstudySubFilter === "thpt") return "V-LEARN • THPT";
+      if (vstudySubFilter === "super_exam") return "V-LEARN • ĐỀ THI SIÊU CẤP";
+      if (vstudySubFilter === "hoc_ba") return "V-LEARN • HỌC BẠ ĐIỆN TỬ";
+      return "V-LEARN • KHÓA HỌC";
     }
+    if (activeTab === "copilot") return "COPILOT • TRỢ LÝ AI SÁNG TẠO";
+    if (activeTab === "v_notes") return "V-NOTES • GHI CHÚ THÔNG MINH";
+    if (activeTab === "v_bank") return "V-BANK • NGÂN HÀNG KỸ THUẬT SỐ";
+    if (activeTab === "v_books") return "V-BOOKS • SÁCH ĐIỆN TỬ (100 TÁC PHẨM)";
+    if (activeTab === "v_calc") return "V-CALC • MÁY TÍNH & ĐỔI ĐƠN VỊ";
+    if (activeTab === "v_reminders") return "V-REMINDERS • NHẮC NHỞ & CÔNG VIỆC";
+    if (activeTab === "v_arcade") return "V-ARCADE • 100 TRÒ CHƠI GIẢI TRÍ";
+    if (activeTab === "v_recorder") return "V-RECORDER • TRÌNH GHI ÂM";
+    if (activeTab === "v_office") return "V-OFFICE • BỘ ỨNG DỤNG VĂN PHÒNG";
     if (activeTab === "vplay_users") return "TÀI KHOẢN • THÀNH VIÊN VPLAY";
     if (activeTab === "fandom_logos") return "FANDOM LOGOS • BIỂU TƯỢNG";
     if (activeTab === "intelligence_thumbnails") return "V-INTELLIGENCE THUMBNAILS";
@@ -4864,7 +4929,7 @@ export default function App() {
             <aside className={`fixed top-10 left-0 h-[calc(100vh-2.5rem)] z-[55] flex flex-col border-r shadow-2xl transition-none duration-0 select-none ${
               isSidebarCollapsed 
                 ? "-translate-x-full w-0 opacity-0 pointer-events-none border-none md:translate-x-0 md:w-20 md:opacity-100 md:pointer-events-auto md:border-r" 
-                : "translate-x-0 w-[50vw] md:w-72 md:translate-x-0 md:opacity-100 md:pointer-events-auto md:border-r"
+                : "translate-x-0 w-full md:w-72 md:translate-x-0 md:opacity-100 md:pointer-events-auto md:border-r"
             } ${
               effectiveAmoledDark 
                 ? "bg-black border-neutral-900 text-white" 
@@ -4936,6 +5001,35 @@ export default function App() {
                 </button>
               </div>
 
+              {/* Copilot Link (Placed next to Spotlight Search) */}
+              <button
+                onClick={() => {
+                  setIsCopilotDrawerOpen(prev => !prev);
+                  setActiveSettingSection(null);
+                }}
+                title="Copilot AI Drawer"
+                className={(() => {
+                  const isActive = isCopilotDrawerOpen || activeTab === "copilot";
+                  const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
+                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
+                  const themeColors = isActive
+                    ? "bg-white/10 text-white border-l-4 border-indigo-500 active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600"
+                    : "text-zinc-300 hover:bg-white/10 hover:text-white active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600";
+                  return `${base} ${alignment} ${themeColors}`;
+                })()}
+              >
+                <img
+                  src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                  }}
+                  className="w-5 h-5 shrink-0 object-contain filter drop-shadow-[0_0_6px_rgba(99,102,241,0.5)]"
+                  referrerPolicy="no-referrer"
+                  alt="Copilot"
+                />
+                {!isSidebarCollapsed && <span>Copilot</span>}
+              </button>
+
               {/* Notifications Link */}
               <button
                 onClick={() => {
@@ -4967,38 +5061,7 @@ export default function App() {
                 )}
               </button>
 
-              {/* Live TV Link */}
-              <button
-                onClick={() => {
-                  setActiveTab("live");
-                  setActiveSettingSection(null);
-                }}
-                title="Live TV"
-                className={(() => {
-                  const isActive = activeTab === "live";
-                  const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
-                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
-                  const themeColors = isActive
-                    ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20 hover:bg-[#cc1827]"
-                    : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
-                  return `${base} ${alignment} ${themeColors}`;
-                })()}
-              >
-                {isMinecraftOreActive ? (
-                  <img
-                    src="https://static.wikia.nocookie.net/ep-deo/images/d/d2/Session-fc4accf64e76146486fc.png/revision/latest?cb=20260723030208"
-                    className="w-5 h-5 shrink-0 object-contain"
-                    style={{ filter: activeTab === "live" ? "brightness(0) invert(1)" : "brightness(0)" }}
-                    referrerPolicy="no-referrer"
-                    alt="Live"
-                  />
-                ) : (
-                  <Radio className="w-5 h-5 shrink-0 text-white" />
-                )}
-                {!isSidebarCollapsed && <span>Live TV</span>}
-              </button>
-
-              {/* Vertical Link - placed under Live TV */}
+              {/* Vertical Link */}
               <button
                 onClick={() => {
                   setActiveTab("shorts");
@@ -5019,7 +5082,375 @@ export default function App() {
                 {!isSidebarCollapsed && <span>Vertical</span>}
               </button>
 
-              {/* Verified Exclusive Accordion Menu with Sub-categories */}
+              {/* Coming soon Button */}
+              <button
+                onClick={() => {
+                  setActiveTab("under_construction");
+                  setActiveSettingSection(null);
+                }}
+                title="Coming soon"
+                className={(() => {
+                  const isActive = activeTab === "under_construction" || activeTab === "coming_soon";
+                  const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent text-amber-400 hover:bg-white/10 hover:text-amber-300";
+                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
+                  const themeColors = isActive ? "bg-white/10 text-amber-300 font-bold" : "";
+                  return `${base} ${alignment} ${themeColors}`;
+                })()}
+              >
+                <img
+                  src="https://static.wikia.nocookie.net/ep-deo/images/3/37/Load_not_done.png/revision/latest?cb=20260724133427"
+                  referrerPolicy="no-referrer"
+                  className="w-5 h-5 shrink-0 object-contain [image-rendering:pixelated]"
+                  alt="Coming soon"
+                />
+                {!isSidebarCollapsed && <span>Coming soon</span>}
+              </button>
+
+              {/* V-Apps Ecosystem Accordion Menu */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => {
+                    setIsVAppsSidebarOpen(!isVAppsSidebarOpen);
+                  }}
+                  title="Hệ sinh thái V-Apps"
+                  className={(() => {
+                    const isActive = ["live", "v_notes", "v_books", "v_calc", "v_reminders", "v_arcade", "v_recorder", "v_office", "explore_vietnam", "vbox", "v_study"].includes(activeTab);
+                    const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center justify-between font-semibold text-sm select-none";
+                    const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
+                    const themeColors = isActive
+                      ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20"
+                      : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
+                    return `${base} ${alignment} ${themeColors}`;
+                  })()}
+                >
+                  <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"}`}>
+                    <Grid2X2 className="w-5 h-5 shrink-0 text-white" />
+                    {!isSidebarCollapsed && <span>V-Apps</span>}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 text-white ${
+                        isVAppsSidebarOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </button>
+
+                {isVAppsSidebarOpen && (
+                  <div
+                    className={`flex flex-col gap-1 pt-1 pb-2 transition-none duration-0 ${
+                      isSidebarCollapsed
+                        ? "items-center px-2"
+                        : "pl-5 ml-5 border-l border-white/10"
+                    }`}
+                  >
+                    {/* 0. Live TV (mục con trong V-Apps) */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("live");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Truyền hình Live TV"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "live" ? "text-red-400 font-bold underline underline-offset-4 decoration-red-500" : "text-zinc-300"}`}
+                    >
+                      <Radio className="w-3.5 h-3.5 text-red-500 shrink-0 animate-pulse" />
+                      {!isSidebarCollapsed && <span>Truyền hình Live TV</span>}
+                    </button>
+                    {/* 1. Explore Vietnam */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("explore_vietnam");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Explore Vietnam"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "explore_vietnam" ? "text-emerald-300 font-bold underline underline-offset-4 decoration-emerald-400" : "text-zinc-300"}`}
+                    >
+                      <Compass className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>Explore Vietnam</span>}
+                    </button>
+
+                    {/* 2. V-Arcade */}
+                    <button
+                      onClick={() => { setActiveTab("v_arcade"); setActiveSettingSection(null); }}
+                      title="V-Arcade"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "v_arcade" ? "text-indigo-300 font-bold underline underline-offset-4 decoration-indigo-400" : "text-zinc-300"}`}
+                    >
+                      <Gamepad2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Arcade</span>}
+                    </button>
+
+                    {/* 3. V-Books */}
+                    <button
+                      onClick={() => { setActiveTab("v_books"); setActiveSettingSection(null); }}
+                      title="V-Books"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "v_books" ? "text-purple-300 font-bold underline underline-offset-4 decoration-purple-400" : "text-zinc-300"}`}
+                    >
+                      <BookOpenCheck className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Books</span>}
+                    </button>
+
+                    {/* 4. V-Box */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("vbox");
+                        setActiveSettingSection(null);
+                      }}
+                      title="V-Box Feedback Hub"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "vbox" ? "text-cyan-300 font-bold underline underline-offset-4 decoration-cyan-400" : "text-zinc-300"}`}
+                    >
+                      {isMinecraftOreActive ? (
+                        <img
+                          src="https://static.wikia.nocookie.net/ep-deo/images/3/36/Cube-c5d0fbf870d415a0c44a.png/revision/latest?cb=20260723030206"
+                          className="w-3.5 h-3.5 shrink-0 object-contain"
+                          style={{ filter: activeTab === "vbox" ? "brightness(0) invert(1)" : "brightness(0)" }}
+                          referrerPolicy="no-referrer"
+                          alt="Vbox"
+                        />
+                      ) : (
+                        <Box className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                      )}
+                      {!isSidebarCollapsed && <span>V-Box</span>}
+                    </button>
+
+                    {/* 5. V-Calc */}
+                    <button
+                      onClick={() => { setActiveTab("v_calc"); setActiveSettingSection(null); }}
+                      title="V-Calc"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "v_calc" ? "text-teal-300 font-bold underline underline-offset-4 decoration-teal-400" : "text-zinc-300"}`}
+                    >
+                      <Calculator className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Calc</span>}
+                    </button>
+
+                    {/* 6. V-Learn (Accordion inside V-Apps) */}
+                    <div className="space-y-1 w-full">
+                      <button
+                        onClick={() => {
+                          setActiveTab("v_study");
+                          setIsVStudySidebarOpen(!isVStudySidebarOpen);
+                          setActiveSettingSection(null);
+                        }}
+                        title="V-Learn Học Tập"
+                        className={`text-xs font-semibold transition-all cursor-pointer flex items-center justify-between bg-transparent ${
+                          isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white"
+                        } ${activeTab === "v_study" ? "text-red-300 font-bold underline underline-offset-4 decoration-red-400" : "text-zinc-300"}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <GraduationCap className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                          {!isSidebarCollapsed && <span>V-Learn</span>}
+                        </div>
+                        {!isSidebarCollapsed && (
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 transition-transform duration-200 text-zinc-300 ${
+                              isVStudySidebarOpen ? "rotate-180" : ""
+                            }`}
+                          />
+                        )}
+                      </button>
+
+                      {isVStudySidebarOpen && (
+                        <div
+                          className={`flex flex-col gap-1 pt-1 pb-1 transition-none duration-0 ${
+                            isSidebarCollapsed
+                              ? "items-center px-1"
+                              : "pl-4 ml-3 border-l border-white/10"
+                          }`}
+                        >
+                          {/* Sub-item A: Khóa học */}
+                          <button
+                            onClick={() => {
+                              setActiveTab("v_study");
+                              setVStudySubFilter("all");
+                              setActiveSettingSection(null);
+                            }}
+                            title="Khóa học"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            } ${
+                              activeTab === "v_study" && vstudySubFilter === "all"
+                                ? "text-white font-bold underline underline-offset-4 decoration-red-500"
+                                : "text-zinc-400"
+                            }`}
+                          >
+                            <BookOpen className="w-3 h-3 text-white shrink-0" />
+                            {!isSidebarCollapsed && <span>Khóa học</span>}
+                          </button>
+
+                          {/* Sub-item B: Kiểm Tra Siêu Tổng Hợp */}
+                          <button
+                            onClick={() => {
+                              setActiveTab("v_study");
+                              setVStudySubFilter("super_exam");
+                              setActiveSettingSection(null);
+                            }}
+                            title="Bài Kiểm Tra Siêu Tổng Hợp (100 Câu - 2 Giờ)"
+                            className={`text-[11px] font-bold transition-all cursor-pointer flex items-center bg-transparent ${
+                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            } ${
+                              activeTab === "v_study" && vstudySubFilter === "super_exam"
+                                ? "text-white font-black underline underline-offset-4 decoration-red-500"
+                                : "text-zinc-400"
+                            }`}
+                          >
+                            <Zap className="w-3 h-3 text-white shrink-0" />
+                            {!isSidebarCollapsed && (
+                              <span className="truncate tracking-tight text-[10px] uppercase">
+                                Kiểm Tra Siêu Tổng Hợp
+                              </span>
+                            )}
+                          </button>
+
+                          {/* Sub-item C: Tra Cứu Học Bạ */}
+                          <button
+                            onClick={() => {
+                              setActiveTab("v_study");
+                              setVStudySubFilter("hoc_ba");
+                              setActiveSettingSection(null);
+                            }}
+                            title="Tra cứu học bạ"
+                            className={`text-[11px] font-bold transition-all cursor-pointer flex items-center bg-transparent ${
+                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            } ${
+                              activeTab === "v_study" && vstudySubFilter === "hoc_ba"
+                                ? "text-white font-black underline underline-offset-4 decoration-amber-400"
+                                : "text-zinc-400"
+                            }`}
+                          >
+                            <Search className="w-3 h-3 text-white shrink-0" />
+                            {!isSidebarCollapsed && (
+                              <span className="truncate tracking-tight text-[10px] uppercase">
+                                Tra Cứu Học Bạ
+                              </span>
+                            )}
+                          </button>
+
+                          {/* Sub-item D: V-Learn THCS */}
+                          <button
+                            onClick={() => {
+                              setActiveTab("v_study");
+                              setVStudySubFilter("thcs");
+                              setActiveSettingSection(null);
+                            }}
+                            title="V-Learn THCS"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            } ${
+                              activeTab === "v_study" && vstudySubFilter === "thcs"
+                                ? "text-white font-bold underline underline-offset-4 decoration-blue-400"
+                                : "text-zinc-400"
+                            }`}
+                          >
+                            <School className="w-3 h-3 text-white shrink-0" />
+                            {!isSidebarCollapsed && <span>V-Learn THCS</span>}
+                          </button>
+
+                          {/* Sub-item E: V-Learn THPT */}
+                          <button
+                            onClick={() => {
+                              setActiveTab("v_study");
+                              setVStudySubFilter("thpt");
+                              setActiveSettingSection(null);
+                            }}
+                            title="V-Learn THPT"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            } ${
+                              activeTab === "v_study" && vstudySubFilter === "thpt"
+                                ? "text-white font-bold underline underline-offset-4 decoration-emerald-400"
+                                : "text-zinc-400"
+                            }`}
+                          >
+                            <GraduationCap className="w-3 h-3 text-white shrink-0" />
+                            {!isSidebarCollapsed && <span>V-Learn THPT</span>}
+                          </button>
+
+                          {/* Sub-item F: V-Learn Tiểu học */}
+                          <button
+                            onClick={() => {
+                              setActiveTab("v_study");
+                              setVStudySubFilter("tieu_hoc");
+                              setActiveSettingSection(null);
+                            }}
+                            title="V-Learn Tiểu học"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            } ${
+                              activeTab === "v_study" && vstudySubFilter === "tieu_hoc"
+                                ? "text-white font-bold underline underline-offset-4 decoration-amber-400"
+                                : "text-zinc-400"
+                            }`}
+                          >
+                            <Baby className="w-3 h-3 text-white shrink-0" />
+                            {!isSidebarCollapsed && <span>V-Learn Tiểu học</span>}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 7. V-Notes */}
+                    <button
+                      onClick={() => { setActiveTab("v_notes"); setActiveSettingSection(null); }}
+                      title="V-Notes"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "v_notes" ? "text-amber-300 font-bold underline underline-offset-4 decoration-amber-400" : "text-zinc-300"}`}
+                    >
+                      <Notebook className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Notes</span>}
+                    </button>
+
+                    {/* 8. V-Office */}
+                    <button
+                      onClick={() => { setActiveTab("v_office"); setActiveSettingSection(null); }}
+                      title="V-Office"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "v_office" ? "text-sky-300 font-bold underline underline-offset-4 decoration-sky-400" : "text-zinc-300"}`}
+                    >
+                      <Briefcase className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Office</span>}
+                    </button>
+
+                    {/* 9. V-Recorder */}
+                    <button
+                      onClick={() => { setActiveTab("v_recorder"); setActiveSettingSection(null); }}
+                      title="V-Recorder"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "v_recorder" ? "text-red-300 font-bold underline underline-offset-4 decoration-red-400" : "text-zinc-300"}`}
+                    >
+                      <Mic className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Recorder</span>}
+                    </button>
+
+                    {/* 10. V-Reminders */}
+                    <button
+                      onClick={() => { setActiveTab("v_reminders"); setActiveSettingSection(null); }}
+                      title="V-Reminders"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${activeTab === "v_reminders" ? "text-rose-300 font-bold underline underline-offset-4 decoration-rose-400" : "text-zinc-300"}`}
+                    >
+                      <CalendarCheck className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                      {!isSidebarCollapsed && <span>V-Reminders</span>}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Verified Exclusive Accordion Menu with Sub-categories sorted alphabetically */}
               <div className="space-y-1">
                 <button
                   onClick={() => {
@@ -5027,7 +5458,7 @@ export default function App() {
                   }}
                   title="Verified Exclusive"
                   className={(() => {
-                    const isActive = activeTab === "verified" || activeTab === "vflow";
+                    const isActive = activeTab === "verified" || activeTab === "vflow" || activeTab === "v_bank";
                     const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center justify-between font-semibold text-sm select-none";
                     const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
                     const themeColors = isActive
@@ -5057,38 +5488,7 @@ export default function App() {
                         : "pl-5 ml-5 border-l border-amber-500/30"
                     }`}
                   >
-                    {/* Sub-item 1: Verified */}
-                    <button
-                      onClick={() => {
-                        setActiveTab("verified");
-                        setVerifiedInitialSection("plans");
-                        setActiveSettingSection(null);
-                      }}
-                      title="Vplay Verified VIP"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${
-                        activeTab === "verified" && verifiedInitialSection !== "storage"
-                          ? "text-amber-300 font-bold underline underline-offset-4 decoration-amber-400"
-                          : "text-zinc-300"
-                      }`}
-                    >
-                      <BadgeCheck className="w-4 h-4 text-amber-400 shrink-0" />
-                      {!isSidebarCollapsed && (
-                        <div className="flex items-center justify-between w-full pr-1">
-                          <span>Verified</span>
-                          {verifiedSub.plan !== "none" && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400 text-black font-extrabold uppercase">
-                              PRO
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </button>
-
-                    {/* Sub-item 2: Mua Storage */}
+                    {/* Sub-item 1: Mua Storage */}
                     <button
                       onClick={() => {
                         setActiveTab("verified");
@@ -5112,6 +5512,34 @@ export default function App() {
                           <span>Mua Storage</span>
                           <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-extrabold uppercase">
                             CLOUD
+                          </span>
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Sub-item 2: V-Bank */}
+                    <button
+                      onClick={() => {
+                        setActiveTab("v_bank");
+                        setActiveSettingSection(null);
+                      }}
+                      title="Ngân Hàng V-Bank"
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
+                        isSidebarCollapsed
+                          ? "w-9 h-9 justify-center p-0 hover:text-white"
+                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                      } ${
+                        activeTab === "v_bank"
+                          ? "text-emerald-300 font-bold underline underline-offset-4 decoration-emerald-400"
+                          : "text-zinc-300"
+                      }`}
+                    >
+                      <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      {!isSidebarCollapsed && (
+                        <div className="flex items-center justify-between w-full pr-1">
+                          <span>V-Bank</span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-extrabold uppercase">
+                            VIP
                           </span>
                         </div>
                       )}
@@ -5141,239 +5569,35 @@ export default function App() {
                         </div>
                       )}
                     </button>
-                  </div>
-                )}
-              </div>
 
-              {/* V-Box Link - placed under Vertical */}
-              <button
-                onClick={() => {
-                  setActiveTab("vbox");
-                  setActiveSettingSection(null);
-                }}
-                title="V-Box Feedback Hub"
-                className={(() => {
-                  const isActive = activeTab === "vbox";
-                  const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
-                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
-                  const themeColors = isActive
-                    ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20 hover:bg-[#cc1827]"
-                    : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
-                  return `${base} ${alignment} ${themeColors}`;
-                })()}
-              >
-                {isMinecraftOreActive ? (
-                  <img
-                    src="https://static.wikia.nocookie.net/ep-deo/images/3/36/Cube-c5d0fbf870d415a0c44a.png/revision/latest?cb=20260723030206"
-                    className="w-5 h-5 shrink-0 object-contain"
-                    style={{ filter: activeTab === "vbox" ? "brightness(0) invert(1)" : "brightness(0)" }}
-                    referrerPolicy="no-referrer"
-                    alt="Vbox"
-                  />
-                ) : (
-                  <Box className="w-5 h-5 shrink-0 text-white" />
-                )}
-                {!isSidebarCollapsed && <span>V-Box</span>}
-              </button>
-
-              {/* Explore Vietnam Link - placed under V-Box */}
-              <button
-                onClick={() => {
-                  setActiveTab("explore_vietnam");
-                  setActiveSettingSection(null);
-                }}
-                title="Explore Vietnam"
-                className={(() => {
-                  const isActive = activeTab === "explore_vietnam";
-                  const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center font-semibold text-sm select-none bg-transparent";
-                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
-                  const themeColors = isActive
-                    ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20 hover:bg-[#cc1827]"
-                    : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
-                  return `${base} ${alignment} ${themeColors}`;
-                })()}
-              >
-                <Compass className="w-5 h-5 shrink-0 text-white" />
-                {!isSidebarCollapsed && <span>Explore Vietnam</span>}
-              </button>
-
-              {/* V-Study Accordion Menu with Sub-categories */}
-              <div className="space-y-1">
-                <button
-                  onClick={() => {
-                    setActiveTab("v_study");
-                    setIsVStudySidebarOpen(!isVStudySidebarOpen);
-                    setActiveSettingSection(null);
-                  }}
-                  title="V-Study Học Tập"
-                  className={(() => {
-                    const isActive = activeTab === "v_study";
-                    const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-xl flex items-center justify-between font-semibold text-sm select-none";
-                    const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
-                    const themeColors = isActive
-                      ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20"
-                      : "text-zinc-300 hover:bg-[#cc1827] hover:text-white";
-                    return `${base} ${alignment} ${themeColors}`;
-                  })()}
-                >
-                  <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"}`}>
-                    <GraduationCap className="w-5 h-5 shrink-0 text-white" />
-                    {!isSidebarCollapsed && <span>V-Study</span>}
-                  </div>
-                  {!isSidebarCollapsed && (
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 text-white ${
-                        isVStudySidebarOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  )}
-                </button>
-
-                {isVStudySidebarOpen && (
-                  <div
-                    className={`flex flex-col gap-1 pt-1 pb-2 transition-none duration-0 ${
-                      isSidebarCollapsed
-                        ? "items-center px-2"
-                        : "pl-5 ml-5 border-l border-white/10"
-                    }`}
-                  >
-                    {/* Sub-item 1: Khóa học */}
+                    {/* Sub-item 4: Verified */}
                     <button
                       onClick={() => {
-                        setActiveTab("v_study");
-                        setVStudySubFilter("all");
+                        setActiveTab("verified");
+                        setVerifiedInitialSection("plans");
                         setActiveSettingSection(null);
                       }}
-                      title="Khóa học"
+                      title="Vplay Verified VIP"
                       className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
                         isSidebarCollapsed
                           ? "w-9 h-9 justify-center p-0 hover:text-white"
                           : "w-full text-left py-2 px-3 hover:text-white gap-2"
                       } ${
-                        activeTab === "v_study" && vstudySubFilter === "all"
-                          ? "text-white font-bold underline underline-offset-4 decoration-red-500"
+                        activeTab === "verified" && verifiedInitialSection !== "storage"
+                          ? "text-amber-300 font-bold underline underline-offset-4 decoration-amber-400"
                           : "text-zinc-300"
                       }`}
                     >
-                      <BookOpen className="w-3.5 h-3.5 text-white shrink-0" />
-                      {!isSidebarCollapsed && <span>Khóa học</span>}
-                    </button>
-
-                    {/* Sub-item 2: V-Study Tiểu học */}
-                    <button
-                      onClick={() => {
-                        setActiveTab("v_study");
-                        setVStudySubFilter("tieu_hoc");
-                        setActiveSettingSection(null);
-                      }}
-                      title="V-Study Tiểu học"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${
-                        activeTab === "v_study" && vstudySubFilter === "tieu_hoc"
-                          ? "text-white font-bold underline underline-offset-4 decoration-amber-400"
-                          : "text-zinc-300"
-                      }`}
-                    >
-                      <Baby className="w-3.5 h-3.5 text-white shrink-0" />
-                      {!isSidebarCollapsed && <span>V-Study Tiểu học</span>}
-                    </button>
-
-                    {/* Sub-item 3: V-Study THCS */}
-                    <button
-                      onClick={() => {
-                        setActiveTab("v_study");
-                        setVStudySubFilter("thcs");
-                        setActiveSettingSection(null);
-                      }}
-                      title="V-Study THCS"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${
-                        activeTab === "v_study" && vstudySubFilter === "thcs"
-                          ? "text-white font-bold underline underline-offset-4 decoration-blue-400"
-                          : "text-zinc-300"
-                      }`}
-                    >
-                      <School className="w-3.5 h-3.5 text-white shrink-0" />
-                      {!isSidebarCollapsed && <span>V-Study THCS</span>}
-                    </button>
-
-                    {/* Sub-item 4: V-Study THPT */}
-                    <button
-                      onClick={() => {
-                        setActiveTab("v_study");
-                        setVStudySubFilter("thpt");
-                        setActiveSettingSection(null);
-                      }}
-                      title="V-Study THPT"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${
-                        activeTab === "v_study" && vstudySubFilter === "thpt"
-                          ? "text-white font-bold underline underline-offset-4 decoration-emerald-400"
-                          : "text-zinc-300"
-                      }`}
-                    >
-                      <GraduationCap className="w-3.5 h-3.5 text-white shrink-0" />
-                      {!isSidebarCollapsed && <span>V-Study THPT</span>}
-                    </button>
-
-                    {/* Sub-item 5: BÀI KIỂM TRA SIÊU TỔNG HỢP */}
-                    <button
-                      onClick={() => {
-                        setActiveTab("v_study");
-                        setVStudySubFilter("super_exam");
-                        setActiveSettingSection(null);
-                      }}
-                      title="Bài Kiểm Tra Siêu Tổng Hợp (100 Câu - 2 Giờ)"
-                      className={`text-xs font-bold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${
-                        activeTab === "v_study" && vstudySubFilter === "super_exam"
-                          ? "text-white font-black underline underline-offset-4 decoration-red-500"
-                          : "text-zinc-300"
-                      }`}
-                    >
-                      <Zap className="w-3.5 h-3.5 text-white shrink-0" />
+                      <BadgeCheck className="w-4 h-4 text-amber-400 shrink-0" />
                       {!isSidebarCollapsed && (
-                        <span className="truncate tracking-tight text-[11px] uppercase">
-                          Kiểm Tra Siêu Tổng Hợp
-                        </span>
-                      )}
-                    </button>
-
-                    {/* Sub-item 6: TRA CỨU HỌC BẠ */}
-                    <button
-                      onClick={() => {
-                        setActiveTab("v_study");
-                        setVStudySubFilter("hoc_ba");
-                        setActiveSettingSection(null);
-                      }}
-                      title="Tra cứu học bạ"
-                      className={`text-xs font-bold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${
-                        activeTab === "v_study" && vstudySubFilter === "hoc_ba"
-                          ? "text-white font-black underline underline-offset-4 decoration-amber-400"
-                          : "text-zinc-300"
-                      }`}
-                    >
-                      <Search className="w-3.5 h-3.5 text-white shrink-0" />
-                      {!isSidebarCollapsed && (
-                        <span className="truncate tracking-tight text-[11px] uppercase">
-                          Tra Cứu Học Bạ
-                        </span>
+                        <div className="flex items-center justify-between w-full pr-1">
+                          <span>Verified</span>
+                          {verifiedSub.plan !== "none" && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400 text-black font-extrabold uppercase">
+                              PRO
+                            </span>
+                          )}
+                        </div>
                       )}
                     </button>
                   </div>
@@ -5836,6 +6060,34 @@ export default function App() {
               </button>
             </div>
 
+            {/* Copilot icon button (opens Drawer) */}
+            <div className={`relative header-copilot-container ${dockToSidebar ? "md:hidden" : ""}`}>
+              <button
+                onClick={() => {
+                  setIsCopilotDrawerOpen(prev => !prev);
+                  setIsPowerMenuOpen(false);
+                }}
+                className={`relative group p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                  isCopilotDrawerOpen
+                    ? "bg-indigo-600/30 border-indigo-500/50 text-white shadow-lg scale-95" 
+                    : "bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white hover:scale-105"
+                }`}
+              >
+                <img
+                  src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                  }}
+                  className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain filter drop-shadow-[0_0_6px_rgba(99,102,241,0.5)]"
+                  referrerPolicy="no-referrer"
+                  alt="Copilot"
+                />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  Copilot AI Drawer
+                </div>
+              </button>
+            </div>
+
             {/* Power icon button */}
             <div className={`relative header-power-container ${dockToSidebar ? "md:hidden" : ""}`}>
               <button
@@ -6255,7 +6507,18 @@ export default function App() {
             transition={dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 }}
             className="w-full relative"
           >
-
+            {isTabLoading ? (
+              <div className="w-full min-h-[75vh] flex flex-col items-center justify-center p-8 text-center animate-fade-in">
+                <img 
+                  src="https://i.ibb.co/YF4Q2tmz/animation-074ed0ba8c16bb30e36c.gif" 
+                  alt="Loading..." 
+                  className="w-16 h-16 object-contain pointer-events-none select-none mb-4"
+                  referrerPolicy="no-referrer"
+                />
+                <span className="text-xs uppercase tracking-widest text-white/50 font-semibold font-mono">Đang tải nội dung...</span>
+              </div>
+            ) : (
+              <>
         {/* VIEW: LIVE TV BROADCASTING (PRIMARY GRAPHICS) */}
         {activeTab === "live" && (
           <>
@@ -6654,16 +6917,18 @@ export default function App() {
                     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     className="flex flex-col items-start gap-1 w-full"
                   >
+
+
                     {/* Calligraphy logo and title text stylistics with Google Sans font */}
                     <div className="flex flex-col select-none mb-3 font-google gap-0.5">
-                      <div className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-none text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-100 to-zinc-300 drop-shadow-[0_4px_15px_rgba(0,0,0,0.95)] font-google">
+                      <div className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-none text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.95)] tracking-tight">
                         {homeSlides[currentSlide].titleTop}
                       </div>
-                      <div className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide leading-none text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-fuchsia-500 to-rose-400 drop-shadow-[0_3px_12px_rgba(0,0,0,0.95)] -mt-1 font-google">
+                      <div className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-wide leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] via-[#00d2ff] to-[#38c02b] drop-shadow-[0_3px_12px_rgba(0,0,0,0.95)] -mt-1">
                         {homeSlides[currentSlide].titleMain}
                       </div>
                       {homeSlides[currentSlide].titleSub && (
-                        <div className="text-base xs:text-lg sm:text-xl md:text-2xl font-semibold text-white drop-shadow tracking-wide mt-0.5 text-transparent bg-clip-text bg-gradient-to-r from-[#00ffcc] to-teal-300 font-google">
+                        <div className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-[#00d2ff] drop-shadow tracking-wide mt-0.5 font-mono">
                           {homeSlides[currentSlide].titleSub}
                         </div>
                       )}
@@ -6682,38 +6947,38 @@ export default function App() {
                     )}
 
                     {homeSlides[currentSlide].description && (
-                      <p className="text-white/80 text-xs sm:text-sm max-w-2xl mt-4 leading-relaxed drop-shadow select-none">
+                      <p className="text-slate-200/90 text-xs sm:text-sm max-w-2xl mt-3 leading-relaxed drop-shadow select-none bg-[#111318]/70 border-l-4 border-[#10b981] p-3 rounded-r-lg backdrop-blur-md">
                         {renderDescription(homeSlides[currentSlide].description)}
                       </p>
                     )}
 
                     {homeSlides[currentSlide].showCountdown && (
-                      <div className="flex flex-col gap-1.5 mt-4 bg-black/40 backdrop-blur-md border border-white/10 px-4 py-3 rounded-2xl select-none max-w-xs shadow-lg">
-                        <span className="text-[10px] text-white/50 uppercase font-bold tracking-wider">Time remaining for the event</span>
-                        <div className="flex items-center gap-1.5 font-mono text-base sm:text-lg font-extrabold text-teal-400">
-                          <span className="bg-white/5 border border-white/10 px-2 py-1 rounded-lg shadow-inner">{countdown.days}d</span>
-                          <span className="text-white/40">:</span>
-                          <span className="bg-white/5 border border-white/10 px-2 py-1 rounded-lg shadow-inner">{countdown.hours}h</span>
-                          <span className="text-white/40">:</span>
-                          <span className="bg-white/5 border border-white/10 px-2 py-1 rounded-lg shadow-inner">{countdown.minutes}m</span>
-                          <span className="text-white/40">:</span>
-                          <span className="bg-white/5 border border-white/10 px-2 py-1 rounded-lg shadow-inner">{countdown.seconds}s</span>
+                      <div className="flex flex-col gap-1.5 mt-4 bg-[#181a20]/90 backdrop-blur-md border-2 border-[#383c4a] px-4 py-3 rounded-xl select-none max-w-xs shadow-xl">
+                        <span className="text-[10px] text-emerald-400 font-mono font-bold uppercase tracking-wider">Time remaining for the event</span>
+                        <div className="flex items-center gap-1.5 font-mono text-base sm:text-lg font-black text-emerald-300">
+                          <span className="bg-[#21242e] border border-[#484c5c] px-2 py-1 rounded shadow-inner">{countdown.days}d</span>
+                          <span className="text-emerald-500/60">:</span>
+                          <span className="bg-[#21242e] border border-[#484c5c] px-2 py-1 rounded shadow-inner">{countdown.hours}h</span>
+                          <span className="text-emerald-500/60">:</span>
+                          <span className="bg-[#21242e] border border-[#484c5c] px-2 py-1 rounded shadow-inner">{countdown.minutes}m</span>
+                          <span className="text-emerald-500/60">:</span>
+                          <span className="bg-[#21242e] border border-[#484c5c] px-2 py-1 rounded shadow-inner">{countdown.seconds}s</span>
                         </div>
                       </div>
                     )}
 
                     {/* Film attributes tags metadata */}
-                    <div className="flex items-center gap-1.5 sm:gap-2.5 mt-3 text-[10px] xs:text-xs sm:text-sm font-semibold text-white/90 select-none drop-shadow">
-                      <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[9px] uppercase tracking-wider shadow shadow-red-500/25">
+                    <div className="flex items-center gap-2 sm:gap-3 mt-3 text-[10px] xs:text-xs sm:text-sm font-bold text-white select-none drop-shadow">
+                      <span className="px-2 py-0.5 rounded bg-[#10b981] text-[#052e16] font-mono font-black text-[10px] uppercase tracking-wider shadow-[0_2px_0_#047857]">
                         {homeSlides[currentSlide].ageRating}
                       </span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                      <span>{homeSlides[currentSlide].ratingText}</span>
+                      <span className="w-1.5 h-1.5 rounded-sm bg-[#10b981]" />
+                      <span className="font-mono text-slate-300">{homeSlides[currentSlide].ratingText}</span>
                     </div>
                   </motion.div>
                 </AnimatePresence>
 
-                {/* Elegant big glass play buttons */}
+                {/* Ore UI 3D Beveled Action Buttons */}
                 <div className="flex items-center gap-3 mt-6 sm:mt-8">
                   <button 
                     onClick={() => {
@@ -6727,59 +6992,45 @@ export default function App() {
                       }
                       setActiveTab("live");
                     }}
-                     className={`h-9 px-5 rounded-[15px] font-normal shadow-xl flex items-center justify-center gap-2 text-xs cursor-pointer border transition-all duration-200 ${
-                       isMaterialDesignActive
-                         ? "bg-[#d0bcff] hover:bg-[#ebdfff] border-0 text-black"
-                         : isWinUI3Active
-                         ? "bg-[#005fb8] hover:bg-[#0066c0] border-[#005fb8] text-white"
-                         : "bg-red-600 hover:bg-red-700 border-red-500/10 shadow-red-600/30 text-white bouncy-btn"
-                     }`}
+                    className="h-10 px-6 rounded-lg font-mono font-bold text-xs uppercase tracking-wider text-white bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-[0_4px_12px_rgba(32,139,58,0.4)] flex items-center justify-center gap-2 cursor-pointer transition-all duration-150"
                   >
                     {homeSlides[currentSlide].btnIcon === "compass" ? (
-                      <Compass className={`w-4 h-4 ${isMaterialDesignActive ? "text-black" : "text-white"}`} />
+                      <Compass className="w-4 h-4 text-white" />
                     ) : (
-                      <Play className={`w-4 h-4 ${isMaterialDesignActive ? "fill-black text-black" : "fill-white text-white"}`} />
+                      <Play className="w-4 h-4 fill-white text-white" />
                     )}
                     {homeSlides[currentSlide].btnText || "Watch now"}
                   </button>
 
-                  {/* Slider indicator arrows and paging inside the banner */}
-                  <div className="flex items-center gap-1.5 ml-2">
+                  {/* Ore UI Slider indicators and paging arrows */}
+                  <div className="flex items-center gap-2 ml-2">
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev - 1 + homeSlides.length) % homeSlides.length)}
-                      className={`w-9 h-9 rounded-[15px] flex items-center justify-center cursor-pointer transition-all ${
-                        isWinUI3Active
-                          ? "bg-[#2d2d2d] hover:bg-[#383838] border border-[#3e3e3e] text-white"
-                          : isMaterialDesignActive
-                          ? "bg-[#211f26] hover:bg-[#2d2b34] border border-white/10 text-white/90"
-                          : "bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65)]"
-                      } bouncy-btn`}
+                      className="w-10 h-10 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center cursor-pointer transition-all shadow-md"
+                      title="Previous"
                     >
-                      <ChevronLeft className="w-4 h-4" />
+                      <ChevronLeft className="w-4 h-4 text-emerald-400" />
                     </button>
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev + 1) % homeSlides.length)}
-                      className={`w-9 h-9 rounded-[15px] flex items-center justify-center cursor-pointer transition-all ${
-                        isWinUI3Active
-                          ? "bg-[#2d2d2d] hover:bg-[#383838] border border-[#3e3e3e] text-white"
-                          : isMaterialDesignActive
-                          ? "bg-[#211f26] hover:bg-[#2d2b34] border border-white/10 text-white/90"
-                          : "bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65)]"
-                      } bouncy-btn`}
+                      className="w-10 h-10 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center cursor-pointer transition-all shadow-md"
+                      title="Next"
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-4 h-4 text-emerald-400" />
                     </button>
                   </div>
                 </div>
 
-                {/* Bullet page dot selectors */}
-                <div className="flex items-center gap-1.5 mt-5 sm:mt-7 select-none ml-1">
+                {/* Bullet page dot selectors - Ore UI style rectangular progress blocks */}
+                <div className="flex items-center gap-2 mt-5 sm:mt-7 select-none ml-1">
                   {homeSlides.map((slide, idx) => (
                     <span 
                       key={idx}
                       onClick={() => setCurrentSlide(idx)}
-                      className={`cursor-pointer transition-all duration-300 rounded-full h-1.5 ${
-                        currentSlide === idx ? "w-5 bg-red-500" : "w-1.5 bg-white/25 hover:bg-white/40"
+                      className={`cursor-pointer transition-all duration-200 rounded-sm h-2 ${
+                        currentSlide === idx 
+                          ? "w-6 bg-[#10b981] shadow-[0_0_8px_#10b981]" 
+                          : "w-2 bg-[#383c4a] hover:bg-[#484c5c]"
                       }`}
                     />
                   ))}
@@ -6788,50 +7039,45 @@ export default function App() {
               </div>
             </div>
 
-            {/* LOWER CONTENT SECTIONS (NESTED SAFELY IN MAX-W-7XL MX-AUTO WITH SPACING FOR PERFECT DESIGN COHESION) */}
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 py-8 space-y-12">
+            {/* LOWER CONTENT SECTIONS (NESTED SAFELY IN MAX-W-7XL MX-AUTO WITH ORE UI STYLING) */}
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 py-8 space-y-10">
 
-            {/* ROW: "GỢI Ý CHO BẠN" CAROUSEL SLIDER (ADDED ABOVE KÊNH YÊU THÍCH AS REQUESTED) */}
+            {/* ROW: "GỢI Ý CHO BẠN" ORE UI CAROUSEL SLIDER */}
             {recommendedChannels.length > 0 && (
-              <div className="space-y-4 relative group/reco-carousel animate-fade-in">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-5 rounded bg-blue-500" />
-                    <h3 className="text-sm sm:text-base font-bold tracking-tight text-white/95 font-google">home.categories.SuggestForYou.name</h3>
-                    <span className="text-xs text-blue-400/80 font-mono mt-1">({recommendedChannels.length})</span>
+              <div className="space-y-4 relative group/reco-carousel animate-fade-in bg-[#181a20]/95 border-2 border-[#333744] shadow-2xl rounded-2xl p-5 backdrop-blur-md">
+                <div className="flex items-center justify-between border-b border-[#2d303b] pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-3 h-3 rounded-sm bg-[#10b981] shadow-[0_0_8px_#10b981]" />
+                    <h3 className="text-base sm:text-lg font-mono font-bold tracking-wide text-white uppercase flex items-center gap-2">
+                      {t("home.categories.SuggestForYou.name")}
+                    </h3>
+                    <span className="text-xs font-mono font-bold text-[#10b981] bg-[#10b981]/15 px-2 py-0.5 rounded border border-[#10b981]/30">
+                      {recommendedChannels.length}
+                    </span>
                   </div>
 
                   {/* Navigation Arrows for Carousel */}
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setRecoRefreshTrigger(prev => prev + 1)}
-                      className={isMaterialDesignActive
-                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center mr-1 group/refresh-btn bouncy-btn border-0 shadow-lg"
-                        : "w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] mr-1 group/refresh-btn bouncy-btn"
-                      }
+                      className="w-8 h-8 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#454958] border-b-2 border-[#1c1e24] text-white flex items-center justify-center cursor-pointer transition-all shadow group/refresh-btn"
                       title="Làm mới gợi ý"
                     >
-                      <RefreshCw className="w-3.5 h-3.5 group-hover/refresh-btn:rotate-180 transition-transform duration-500" />
+                      <RefreshCw className="w-3.5 h-3.5 text-emerald-400 group-hover/refresh-btn:rotate-180 transition-transform duration-500" />
                     </button>
                     <button 
                       onClick={() => scrollRecommendations("left")}
-                      className={isMaterialDesignActive
-                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
-                        : "w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
-                      }
+                      className="w-8 h-8 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#454958] border-b-2 border-[#1c1e24] text-white flex items-center justify-center cursor-pointer transition-all shadow"
                       title="Quay lại"
                     >
-                      <ChevronLeft className="w-4 h-4" />
+                      <ChevronLeft className="w-4 h-4 text-slate-300" />
                     </button>
                     <button 
                       onClick={() => scrollRecommendations("right")}
-                      className={isMaterialDesignActive
-                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center cursor-pointer bouncy-btn border-0 shadow-lg"
-                        : "w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer flex items-center justify-center border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] bouncy-btn"
-                      }
+                      className="w-8 h-8 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#454958] border-b-2 border-[#1c1e24] text-white flex items-center justify-center cursor-pointer transition-all shadow"
                       title="Xem tiếp theo"
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-4 h-4 text-slate-300" />
                     </button>
                   </div>
                 </div>
@@ -6839,7 +7085,7 @@ export default function App() {
                 {/* Tiles Container */}
                 <div 
                   ref={recoScrollRef}
-                  className="flex gap-3 overflow-x-auto pb-2 scroll-smooth scrollbar-none snap-x"
+                  className="flex gap-3 overflow-x-auto pb-2 pt-1 scroll-smooth scrollbar-none snap-x"
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   {recommendedChannels.map((ch) => {
@@ -6855,29 +7101,24 @@ export default function App() {
                             handleSelectChannel(ch);
                             setActiveTab("live");
                           }}
-                          className={`group relative rounded-xl p-0.5 sm:p-1 cursor-pointer flex items-center justify-center w-28 xs:w-34 sm:w-42 md:w-48 h-[56px] xs:h-[68px] sm:h-[84px] md:h-[96px] select-none ${
-                            isMaterialDesignActive
-                              ? isPlaying
-                                ? "bg-[#c9b2fa]/20 border-0 shadow-lg"
-                                : "bg-[#36343b] hover:bg-[#49454f] border-0"
-                              : (isPlaying 
-                                  ? "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
-                                  : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
-                                )
+                          className={`group relative rounded-xl p-1 cursor-pointer flex items-center justify-center w-28 xs:w-34 sm:w-42 md:w-48 h-[56px] xs:h-[68px] sm:h-[84px] md:h-[96px] select-none bg-[#21242e] border-2 transition-all duration-200 ${
+                            isPlaying 
+                              ? "border-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.35)] bg-[#10b981]/10" 
+                              : "border-[#383c4a] hover:border-[#10b981] hover:shadow-[0_0_12px_rgba(16,185,129,0.2)]"
                           }`}
                         >
                           {/* Stable Channel Number Badge */}
                           {channelNumberMap[ch.id] && (
-                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/85 backdrop-blur-md text-[8px] font-mono font-bold text-[#d0bcff]/90 border border-white/10 z-20 select-none shadow-md">
+                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-[#10b981] text-[#052e16] font-mono font-black text-[8px] z-20 select-none shadow-[0_2px_0_#047857]">
                               {channelNumberMap[ch.id]}
                             </div>
                           )}
                           {/* Premium Custom Tooltip */}
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-xl scale-95 group-hover:scale-100">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-[#181a20] border-2 border-[#383c4a] text-white text-[10px] sm:text-[11px] font-mono font-bold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-2xl scale-95 group-hover:scale-100">
                             {t(ch.name)}
                           </div>
-                          {/* Logo Graphic Container - fills the box completely */}
-                          <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg">
+                          {/* Logo Graphic Container */}
+                          <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg bg-[#161820]">
                             {ch.logoImg ? (
                               <img
                                 src={ch.logoImg}
@@ -6892,20 +7133,16 @@ export default function App() {
                             )}
                           </div>
                       
-                          {/* Heart/Fav Button overlay (shown on top corner) */}
+                          {/* Heart/Fav Button overlay */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleFavorite(ch.id, e);
                             }}
-                            className="absolute top-1 right-1 p-1 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/90 hover:scale-110 active:scale-120 duration-200"
+                            className="absolute top-1 right-1 p-1 rounded-lg bg-[#181a20]/80 border border-[#383c4a] opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-[#2a2d36] hover:scale-110 active:scale-120 duration-200"
                             title={isFav ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
                           >
-                            {isMaterialDesignActive ? (
-                              <ThumbsUp className={`w-3.5 h-3.5 ${isFav ? "text-[#d0bcff] fill-[#d0bcff]" : "text-white/70 hover:text-white"}`} />
-                            ) : (
-                              <Heart className={`w-3.5 h-3.5 ${isFav ? "text-red-500 fill-red-500" : "text-white/70 hover:text-white"}`} />
-                            )}
+                            <Heart className={`w-3.5 h-3.5 ${isFav ? "text-emerald-400 fill-emerald-400" : "text-slate-400 hover:text-white"}`} />
                           </button>
                         </div>
                       </div>
@@ -6915,37 +7152,35 @@ export default function App() {
               </div>
             )}
 
-            {/* ROW: "KÊNH YÊU THÍCH" CAROUSEL SLIDER (ADDED ABOVE XEM TIẾP SECTIONS EXACTLY AS REQUESTED) */}
+            {/* ROW: "KÊNH YÊU THÍCH" ORE UI CAROUSEL SLIDER */}
             {favoriteChannelsList.length > 0 && (
-              <div className="space-y-4 relative group/fav-carousel animate-fade-in">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-5 rounded bg-amber-400" />
-                    <h3 className="text-sm sm:text-base font-bold tracking-tight text-white/95 font-google">home.categories.Favorited.name</h3>
-                    <span className="text-xs text-amber-400/80 font-mono mt-1">({favoriteChannelsList.length})</span>
+              <div className="space-y-4 relative group/fav-carousel animate-fade-in bg-[#181a20]/95 border-2 border-[#333744] shadow-2xl rounded-2xl p-5 backdrop-blur-md">
+                <div className="flex items-center justify-between border-b border-[#2d303b] pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-3 h-3 rounded-sm bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" />
+                    <h3 className="text-base sm:text-lg font-mono font-bold tracking-wide text-white uppercase flex items-center gap-2">
+                      {t("home.categories.Favorited.name")}
+                    </h3>
+                    <span className="text-xs font-mono font-bold text-[#00d2ff] bg-[#00d2ff]/15 px-2 py-0.5 rounded border border-[#00d2ff]/30">
+                      {favoriteChannelsList.length}
+                    </span>
                   </div>
 
                   {/* Navigation Arrows for Carousel */}
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => scrollFavorites("left")}
-                      className={isMaterialDesignActive
-                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center transition-all cursor-pointer border-0 shadow-lg"
-                        : "w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-120 shadow"
-                      }
+                      className="w-8 h-8 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#454958] border-b-2 border-[#1c1e24] text-white flex items-center justify-center cursor-pointer transition-all shadow"
                       title="Quay lại"
                     >
-                      <ChevronLeft className="w-4 h-4" />
+                      <ChevronLeft className="w-4 h-4 text-slate-300" />
                     </button>
                     <button 
                       onClick={() => scrollFavorites("right")}
-                      className={isMaterialDesignActive
-                        ? "w-8 h-8 rounded-full bg-[#c9b2fa] hover:bg-[#dcd0ff] text-white flex items-center justify-center transition-all cursor-pointer border-0 shadow-lg"
-                        : "w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-120 shadow"
-                      }
+                      className="w-8 h-8 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#454958] border-b-2 border-[#1c1e24] text-white flex items-center justify-center cursor-pointer transition-all shadow"
                       title="Xem tiếp theo"
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-4 h-4 text-slate-300" />
                     </button>
                   </div>
                 </div>
@@ -6953,7 +7188,7 @@ export default function App() {
                 {/* Tiles Container */}
                 <div 
                   ref={favScrollRef}
-                  className="flex gap-3 overflow-x-auto pb-2 scroll-smooth scrollbar-none snap-x"
+                  className="flex gap-3 overflow-x-auto pb-2 pt-1 scroll-smooth scrollbar-none snap-x"
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   {favoriteChannelsList.map((ch) => {
@@ -6968,29 +7203,24 @@ export default function App() {
                             handleSelectChannel(ch);
                             setActiveTab("live");
                           }}
-                          className={`group relative rounded-xl p-0.5 sm:p-1 cursor-pointer flex items-center justify-center w-28 xs:w-34 sm:w-42 md:w-48 h-[56px] xs:h-[68px] sm:h-[84px] md:h-[96px] select-none ${
-                            isMaterialDesignActive
-                              ? isPlaying
-                                ? "bg-[#c9b2fa]/20 border-0 shadow-lg"
-                                : "bg-[#36343b] hover:bg-[#49454f] border-0"
-                              : (isPlaying 
-                                  ? "bg-white/20 backdrop-blur-lg border-[3.5px] border-white shadow-md shadow-pink-500/10" 
-                                  : "bg-white/5 backdrop-blur-md border-2 border-white/10 hover:border-[3.5px] hover:border-white"
-                                )
+                          className={`group relative rounded-xl p-1 cursor-pointer flex items-center justify-center w-28 xs:w-34 sm:w-42 md:w-48 h-[56px] xs:h-[68px] sm:h-[84px] md:h-[96px] select-none bg-[#21242e] border-2 transition-all duration-200 ${
+                            isPlaying 
+                              ? "border-[#00d2ff] shadow-[0_0_15px_rgba(0,210,255,0.35)] bg-[#00d2ff]/10" 
+                              : "border-[#383c4a] hover:border-[#00d2ff] hover:shadow-[0_0_12px_rgba(0,210,255,0.2)]"
                           }`}
                         >
                           {/* Stable Channel Number Badge */}
                           {channelNumberMap[ch.id] && (
-                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/85 backdrop-blur-md text-[8px] font-mono font-bold text-[#d0bcff]/90 border border-white/10 z-20 select-none shadow-md">
+                            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-[#00d2ff] text-[#003545] font-mono font-black text-[8px] z-20 select-none shadow-[0_2px_0_#0088b3]">
                               {channelNumberMap[ch.id]}
                             </div>
                           )}
                           {/* Premium Custom Tooltip */}
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-xl scale-95 group-hover:scale-100">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-[#181a20] border-2 border-[#383c4a] text-white text-[10px] sm:text-[11px] font-mono font-bold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-[60] shadow-2xl scale-95 group-hover:scale-100">
                             {t(ch.name)}
                           </div>
-                          {/* Logo Graphic Container - fills the box completely */}
-                          <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg">
+                          {/* Logo Graphic Container */}
+                          <div className="w-full h-full flex justify-center items-center overflow-hidden rounded-lg bg-[#161820]">
                             {ch.logoImg ? (
                               <img
                                 src={ch.logoImg}
@@ -7005,20 +7235,16 @@ export default function App() {
                             )}
                           </div>
                       
-                          {/* Heart/Unfav Button overlay (shown on top corner or toggleable) */}
+                          {/* Heart/Unfav Button overlay */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleFavorite(ch.id, e);
                             }}
-                            className="absolute top-1 right-1 p-1 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/90 hover:scale-110 active:scale-120 duration-200"
+                            className="absolute top-1 right-1 p-1 rounded-lg bg-[#181a20]/80 border border-[#383c4a] opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-[#2a2d36] hover:scale-110 active:scale-120 duration-200"
                             title="Xóa khỏi yêu thích"
                           >
-                            {isMaterialDesignActive ? (
-                              <ThumbsUp className="w-3.5 h-3.5 text-[#d0bcff] fill-[#d0bcff]" />
-                            ) : (
-                              <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
-                            )}
+                            <Heart className="w-3.5 h-3.5 text-[#00d2ff] fill-[#00d2ff]" />
                           </button>
                         </div>
                       </div>
@@ -7028,40 +7254,48 @@ export default function App() {
               </div>
             )}
 
-
-
-            {/* Quick stats grid */}
+            {/* ORE UI QUICK STATS GRID (MINERAL ORE INVENTORY PANEL) */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center pt-2">
               {[
-                { label: "National Channels", value: "13 VTV HD", color: "text-cyan-400" },
-                { label: "News & Entertainment", value: "19 VTVCab", color: "text-fuchsia-400" },
-                { label: "HCM City & Premium", value: "15 HTV HD", color: "text-orange-400" },
-                { label: "Local & Radio", value: "Almost 70+", color: "text-teal-400" },
+                { label: "National Channels", value: "13 VTV HD", color: "text-[#10b981]", borderColor: "border-[#10b981]/40", bg: "bg-[#10b981]/10", gem: "Emerald Ore" },
+                { label: "News & Entertainment", value: "19 VTVCab", color: "text-[#00d2ff]", borderColor: "border-[#00d2ff]/40", bg: "bg-[#00d2ff]/10", gem: "Diamond Ore" },
+                { label: "HCM City & Premium", value: "15 HTV HD", color: "text-[#ffb703]", borderColor: "border-[#ffb703]/40", bg: "bg-[#ffb703]/10", gem: "Gold Ore" },
+                { label: "Local & Radio", value: "Almost 70+", color: "text-[#ff4d6d]", borderColor: "border-[#ff4d6d]/40", bg: "bg-[#ff4d6d]/10", gem: "Redstone Ore" },
               ].map((stat, i) => (
-                <div key={i} className="p-4 rounded-2xl glass-panel border border-white/10 flex flex-col justify-center">
-                  <span className="text-xs text-white/50">{stat.label}</span>
-                  <span className={`text-lg font-extrabold mt-1.5 ${stat.color}`}>{stat.value}</span>
+                <div key={i} className={`p-4 rounded-xl bg-[#181a20] border-2 ${stat.borderColor} ${stat.bg} flex flex-col justify-center items-center shadow-lg transition-transform hover:-translate-y-1`}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className={`w-2 h-2 rounded-sm ${stat.color.replace('text-', 'bg-')}`} />
+                    <span className="text-[10px] font-mono font-bold uppercase text-slate-400">{stat.gem}</span>
+                  </div>
+                  <span className="text-xs text-slate-300 font-mono">{stat.label}</span>
+                  <span className={`text-base sm:text-lg font-mono font-black mt-1 ${stat.color}`}>{stat.value}</span>
                 </div>
               ))}
             </div>
 
-            {/* Feature guides */}
-            <div className="p-6 rounded-2xl glass-panel border border-white/12">
-              <h3 className="text-base font-bold mb-4 flex items-center gap-2">
-                <Compass className="w-5 h-5 text-pink-400" /> User Guide & Tips
+            {/* ORE UI USER GUIDE & TIPS PANEL */}
+            <div className="p-6 rounded-2xl bg-[#181a20]/95 border-2 border-[#333744] shadow-2xl backdrop-blur-md">
+              <h3 className="text-base font-mono font-bold uppercase tracking-wider mb-4 flex items-center gap-2 text-[#10b981]">
+                <Compass className="w-5 h-5 text-[#10b981]" /> User Guide & Tips (Ore UI System)
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-white/70">
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-white">1. Select a live channel</h4>
-                  <p className="leading-relaxed text-xs text-white/60">Click on any channel card to tune into its live stream under the 'Live' tab.</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-300">
+                <div className="p-4 rounded-xl bg-[#21242e] border border-[#383c4a] space-y-2">
+                  <h4 className="font-mono font-bold text-emerald-400 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-sm bg-emerald-400" /> 1. Live Streaming
+                  </h4>
+                  <p className="leading-relaxed text-xs text-slate-400">Select any channel tile to launch high-performance HLS live streams in the Live Player view.</p>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-white">2. Favorites Library</h4>
-                  <p className="leading-relaxed text-xs text-white/60">Click the star icon on any channel card to save it to your Favorites, displaying instantly on this Home page.</p>
+                <div className="p-4 rounded-xl bg-[#21242e] border border-[#383c4a] space-y-2">
+                  <h4 className="font-mono font-bold text-cyan-400 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-sm bg-cyan-400" /> 2. Favorites Slot
+                  </h4>
+                  <p className="leading-relaxed text-xs text-slate-400">Toggle the heart icon on channel cards to instantly pin them to your Ore UI Favorites inventory.</p>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-white">3. Custom m3u8 Playlist</h4>
-                  <p className="leading-relaxed text-xs text-white/60">Click the 'Add Channel' button next to search to seamlessly import your own custom m3u8 playlists.</p>
+                <div className="p-4 rounded-xl bg-[#21242e] border border-[#383c4a] space-y-2">
+                  <h4 className="font-mono font-bold text-amber-400 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-sm bg-amber-400" /> 3. Custom Playlists
+                  </h4>
+                  <p className="leading-relaxed text-xs text-slate-400">Import custom m3u8 streams or M3U playlist URLs anytime via the Add Channel modal.</p>
                 </div>
               </div>
             </div>
@@ -9019,6 +9253,66 @@ export default function App() {
           />
         )}
 
+        {/* VIEW: COPILOT PAGE */}
+        {activeTab === "copilot" && (
+          <CopilotTab
+            onBack={() => setActiveTab("home")}
+            channels={processedChannels}
+            onSelectChannel={(ch) => handleSelectChannel(ch)}
+          />
+        )}
+
+        {/* VIEW: UNDER CONSTRUCTION / COMING SOON PAGE */}
+        {(activeTab === "under_construction" || activeTab === "coming_soon") && (
+          <UnderConstructionTab
+            onClose={() => setActiveTab("home")}
+          />
+        )}
+
+        {/* VIEW: V-NOTES PAGE */}
+        {activeTab === "v_notes" && (
+          <VNotesTab onBack={() => setActiveTab("home")} />
+        )}
+
+        {/* VIEW: V-BANK PAGE */}
+        {activeTab === "v_bank" && (
+          <VBankTab 
+            onBack={() => setActiveTab("home")} 
+            vCoins={vCoins} 
+            setVCoins={setVCoins}
+          />
+        )}
+
+        {/* VIEW: V-BOOKS PAGE */}
+        {activeTab === "v_books" && (
+          <VBooksTab />
+        )}
+
+        {/* VIEW: V-CALC PAGE */}
+        {activeTab === "v_calc" && (
+          <VCalcTab onBack={() => setActiveTab("home")} />
+        )}
+
+        {/* VIEW: V-REMINDERS PAGE */}
+        {activeTab === "v_reminders" && (
+          <VRemindersTab onBack={() => setActiveTab("home")} />
+        )}
+
+        {/* VIEW: V-ARCADE PAGE */}
+        {activeTab === "v_arcade" && (
+          <VArcadeTab />
+        )}
+
+        {/* VIEW: V-RECORDER PAGE */}
+        {activeTab === "v_recorder" && (
+          <VRecorderTab onBack={() => setActiveTab("home")} />
+        )}
+
+        {/* VIEW: V-OFFICE PAGE */}
+        {activeTab === "v_office" && (
+          <VOfficeTab onBack={() => setActiveTab("home")} />
+        )}
+
         {/* VIEW: SPOTLIGHT SEARCH PAGE */}
         {activeTab === "search" && (
           <div className="w-full max-w-4xl mx-auto px-4 py-12 md:py-20 flex flex-col items-center justify-center min-h-[60vh] text-center select-none">
@@ -9206,7 +9500,8 @@ export default function App() {
             </AnimatePresence>
           </div>
         )}
-
+            </>
+          )}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -10403,16 +10698,7 @@ export default function App() {
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
                   Tìm kiếm
                 </div>
-                {isVIntelligenceActive ? (
-                  <motion.img
-                    animate={{ rotate: vIntelSpinCount * 360 }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                    src="https://static.wikia.nocookie.net/logopedia/images/6/65/Windows_Copilot_2023_%28Preview%29.svg/revision/latest?cb=20230615034330"
-                    className="w-7.5 h-7.5 pointer-events-none object-contain group-hover:scale-110"
-                    referrerPolicy="no-referrer"
-                    alt="V-Intelligence"
-                  />
-                ) : isMaterialDesignActive ? (
+                {isMaterialDesignActive ? (
                   <img
                     src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
                     className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
@@ -10428,6 +10714,34 @@ export default function App() {
                     alt="Search"
                   />
                 )}
+              </button>
+
+              {/* Separate Copilot Dock Button */}
+              <button
+                id="vplay-copilot-dock-btn"
+                onClick={() => {
+                  setIsCopilotDrawerOpen(prev => !prev);
+                }}
+                className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
+                  isWinUI3Active
+                    ? "rounded-[15px] bg-[#202020] border border-[#2d2d2d] shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white hover:bg-[#2c2c2c] hover:border-[#3a3a3a]"
+                    : isMaterialDesignActive
+                    ? "bg-[#290a36] hover:bg-[#3d154f] text-white border border-white/5 shadow-lg rounded-[20px] duration-200"
+                    : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
+                }`}
+              >
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                  Copilot AI Drawer
+                </div>
+                <img
+                  src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                  }}
+                  className="w-7 h-7 object-contain group-hover:scale-110 filter drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]"
+                  referrerPolicy="no-referrer"
+                  alt="Copilot"
+                />
               </button>
             </motion.div>
           )}
@@ -12230,6 +12544,9 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* FLOATING STICKY NOTES OVERLAY */}
+      <FloatingStickyNotes />
+
       {/* FLOATING V-COINS EARNED TOAST NOTIFICATION */}
       {vcoinToast && (
         <div className="fixed bottom-6 right-6 z-[99999] bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black font-extrabold px-4 py-3 rounded-2xl shadow-2xl border border-amber-300 flex items-center gap-2.5 animate-bounce pointer-events-none select-none">
@@ -12277,6 +12594,75 @@ export default function App() {
           </motion.div>
         </div>
       )}
+
+      {/* COPILOT DRAWER SLIDE-OVER PANEL */}
+      <AnimatePresence>
+        {isCopilotDrawerOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCopilotDrawerOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9990] transition-opacity"
+            />
+
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed top-0 right-0 h-full w-full sm:w-[450px] md:w-[500px] lg:w-[540px] bg-[#12141e]/98 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] z-[9995] flex flex-col overflow-hidden text-white font-sans"
+            >
+              {/* Drawer Header */}
+              <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/5 shrink-0">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                    }}
+                    className="w-6 h-6 object-contain filter drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]"
+                    referrerPolicy="no-referrer"
+                    alt="Copilot"
+                  />
+                  <div>
+                    <h3 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                      Copilot AI Drawer
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono font-bold uppercase">
+                        Vplay AI
+                      </span>
+                    </h3>
+                    <p className="text-[11px] text-slate-400">Trợ lý trí tuệ nhân tạo thế hệ mới</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsCopilotDrawerOpen(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                  title="Đóng Drawer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Drawer Body - CopilotTab */}
+              <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+                <CopilotTab
+                  channels={processedChannels}
+                  onSelectChannel={(ch) => {
+                    handleSelectChannel(ch);
+                    setIsCopilotDrawerOpen(false);
+                  }}
+                  onBack={() => setIsCopilotDrawerOpen(false)}
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
     </div>
     </MotionConfig>
