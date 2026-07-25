@@ -106,7 +106,7 @@ export const VRecorderTab: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-3 sm:p-6 text-white font-sans">
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
       {/* Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-red-950/70 via-zinc-900 to-black border border-red-500/30 shadow-2xl">
         <div className="flex items-center gap-4">
@@ -115,10 +115,10 @@ export const VRecorderTab: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-red-300 uppercase">
+              <h1 className="text-2xl font-black tracking-tight text-white uppercase">
                 V-Recorder Voice Studio
               </h1>
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-red-600 text-white font-black uppercase tracking-wider">
+              <span className="text-[10px] px-2.5 py-0.5 bg-[#208b3a] text-white font-black uppercase tracking-wider rounded-none">
                 Ghi Âm Chất Lượng Cao
               </span>
             </div>
@@ -138,7 +138,7 @@ export const VRecorderTab: React.FC = () => {
               key={i}
               style={{ height: isRecording ? `${Math.random() * 80 + 20}%` : "20%" }}
               className={`w-1.5 rounded-full transition-all duration-150 ${
-                isRecording ? "bg-red-500 animate-pulse" : "bg-zinc-700"
+                isRecording ? "bg-emerald-500 animate-pulse" : "bg-zinc-700"
               }`}
             />
           ))}
@@ -153,7 +153,7 @@ export const VRecorderTab: React.FC = () => {
         {!isRecording ? (
           <button
             onClick={startRecording}
-            className="flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-2xl shadow-red-600/40 transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-3 px-8 py-4 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 active:translate-y-0.5 text-white font-black text-sm uppercase tracking-wider rounded-none shadow-2xl transition-all cursor-pointer active:scale-95"
           >
             <Mic className="w-5 h-5" /> Bắt Đầu Ghi Âm
           </button>

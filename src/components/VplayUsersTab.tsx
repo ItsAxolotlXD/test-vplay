@@ -265,9 +265,9 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                       setRoleFilter(item.value as any);
                       setCurrentPage(1);
                     }}
-                    className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                    className={`text-left px-3 py-2.5 text-xs font-bold transition-all flex items-center justify-between cursor-pointer rounded-none ${
                       roleFilter === item.value 
-                        ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20" 
+                        ? "bg-[#208b3a] text-white shadow-lg" 
                         : "bg-zinc-800 hover:bg-zinc-750 text-zinc-300"
                     }`}
                   >
@@ -294,9 +294,9 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                       setStatusFilter(item.value as any);
                       setCurrentPage(1);
                     }}
-                    className={`text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                    className={`text-left px-3 py-2.5 text-xs font-bold transition-all flex items-center justify-between cursor-pointer rounded-none ${
                       statusFilter === item.value 
-                        ? "bg-[#cc1827] text-white shadow-lg shadow-red-900/20" 
+                        ? "bg-[#208b3a] text-white shadow-lg" 
                         : "bg-zinc-800 hover:bg-zinc-750 text-zinc-300"
                     }`}
                   >
@@ -362,7 +362,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                     setRoleFilter("All");
                     setStatusFilter("All");
                   }}
-                  className="mt-4 px-4 py-2 bg-[#cc1827] hover:bg-[#b01420] text-white font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer"
+                  className="mt-4 px-4 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-all shadow-md cursor-pointer"
                 >
                   Đặt lại bộ lọc
                 </button>
@@ -584,7 +584,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                 </button>
                 <a
                   href={`mailto:${selectedUser.username}@vplay.vn`}
-                  className="flex-1 py-2.5 bg-[#cc1827] hover:bg-[#b01420] text-white text-xs font-bold rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-md shadow-red-900/10"
+                  className="flex-1 py-2.5 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 text-white text-xs font-bold uppercase tracking-wider rounded-none transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-md"
                 >
                   <Mail className="w-3.5 h-3.5 text-white" />
                   Gửi thư liên hệ

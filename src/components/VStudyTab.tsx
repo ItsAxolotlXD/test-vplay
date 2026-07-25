@@ -44,6 +44,7 @@ import {
   subjectsData,
   getSuperExamSubject
 } from "../data/vstudyData";
+import { playSynthSound } from "../utils/audio";
 import EnglishCefrModule from "./vstudy/EnglishCefrModule";
 import LiteratureWritingModule from "./vstudy/LiteratureWritingModule";
 
@@ -110,66 +111,6 @@ const defaultMockHistory: ExamHistoryItem[] = [
     timeSpent: 180
   }
 ];
-
-// Web Audio API Sound Synthesizer for educational cues
-const playSynthSound = (type: "correct" | "incorrect" | "join" | "tick" | "complete") => {
-  try {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    if (type === "correct") {
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
-      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.4);
-    } else if (type === "incorrect") {
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(220, ctx.currentTime);
-      osc.frequency.setValueAtTime(147, ctx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.3);
-    } else if (type === "join") {
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(329.63, ctx.currentTime);
-      osc.frequency.setValueAtTime(440.00, ctx.currentTime + 0.12);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.35);
-    } else if (type === "tick") {
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      gain.gain.setValueAtTime(0.05, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
-    } else if (type === "complete") {
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      osc.frequency.setValueAtTime(554, ctx.currentTime + 0.1);
-      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.2);
-      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.6);
-    }
-  } catch (err) {
-    console.warn("Audio Context is blocked or unsupported", err);
-  }
-};
 
 interface Companion {
   id: string;
@@ -642,6 +583,12 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
     localStorage.setItem("vstudy_total_correct", newTotalCorrect.toString());
     localStorage.setItem("vstudy_total_wrong", newTotalWrong.toString());
 
+    // Sync points to V-Bank V-Learn balance
+    const currentVLearnPoints = parseInt(localStorage.getItem("vlearn_study_points") || "2500");
+    const updatedVLearnPoints = currentVLearnPoints + scoreGained;
+    localStorage.setItem("vlearn_study_points", updatedVLearnPoints.toString());
+    window.dispatchEvent(new Event("vlearn_points_updated"));
+
     const newHistoryItem: ExamHistoryItem = {
       id: `hist-${Date.now()}`,
       date: new Date().toLocaleString("vi-VN", {
@@ -750,35 +697,54 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
   const totalAnsweredCount = userAnswers.filter((a) => a !== null).length;
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-6 space-y-6 text-zinc-100 font-sans select-none pb-24">
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
       
-      {/* 1. TOP ACADEMIC HEADER BAR */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
+      {/* Banner Header - V-Notes style */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-emerald-950/80 via-zinc-900/90 to-zinc-950 border border-emerald-500/30 shadow-2xl backdrop-blur-md">
+        <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2.5 rounded-xl bg-zinc-900/80 hover:bg-[#cc1827] text-zinc-300 hover:text-white transition-all border border-white/5 cursor-pointer shadow-md"
-            title="Trở về Trang chủ Vplay"
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 text-white transition-all cursor-pointer shrink-0"
+            title="Trở về"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
+          <div className="p-3.5 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl shadow-lg shadow-emerald-600/30 text-white font-black shrink-0">
+            <GraduationCap className="w-8 h-8" />
+          </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="p-1 rounded-md bg-[#cc1827] text-white font-black text-[10px] uppercase tracking-wider">
-                V-STUDY 2026
-              </span>
-              <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                Hệ Thống Luyện Thi & Học Tập Toàn Cấp
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl font-black tracking-tight text-white uppercase">
+                V-Learn Học Tập & Ôn Thi
               </h1>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-black uppercase tracking-wider">
+                100+ Đề Thi & Bài Tập Trắc Nghiệm
+              </span>
             </div>
-            <p className="text-xs text-zinc-400 font-medium mt-0.5">
-              Tích hợp ngân hàng hơn 100+ bài tập trắc nghiệm Tiểu Học, THCS và THPT
+            <p className="text-xs text-zinc-400 mt-1">
+              Hệ thống luyện thi trắc nghiệm trực tuyến toàn cấp (Tiểu Học, THCS, THPT), luyện nói Tiếng Anh CEFR và tra cứu học bạ điện tử.
             </p>
           </div>
         </div>
 
+        {/* Global Student Stats Badge */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="px-4 py-2.5 rounded-2xl bg-zinc-900/80 border border-white/10 flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+              <Flame className="w-4 h-4 text-amber-500" />
+              <span>Streak: {streak} ngày</span>
+            </div>
+            <div className="w-px h-4 bg-white/10" />
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span>{xp} XP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
         {/* Global Student Stats Cards & Tra Cứu Học Bạ */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-zinc-900/60 p-2.5 rounded-2xl border border-white/5 shadow-md">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-zinc-900/60 p-2.5 rounded-2xl border border-white/5 shadow-md mb-6">
           <div className="flex flex-wrap items-center gap-3">
             {/* Level Progress */}
             <div className="px-3 py-1.5 bg-zinc-950 rounded-xl flex items-center gap-2 border border-white/5">
@@ -837,7 +803,6 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
             <span>{subFilter === "hoc_ba" ? "Quay Lại Danh Sách Môn" : "Tra Cứu Học Bạ"}</span>
           </button>
         </div>
-      </div>
 
       {/* MODULE MODE SELECTION TABS */}
       {!isQuizActive && (

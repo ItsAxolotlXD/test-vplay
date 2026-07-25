@@ -204,7 +204,7 @@ export const VNotesTab: React.FC = () => {
               <h1 className="text-2xl font-black tracking-tight text-white uppercase">
                 V-Notes
               </h1>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-600 text-white font-black uppercase tracking-wider">
+              <span className="text-[10px] px-2.5 py-0.5 bg-[#208b3a] text-white font-black uppercase tracking-wider rounded-none">
                 Ore UI Rich Text
               </span>
             </div>
@@ -216,7 +216,7 @@ export const VNotesTab: React.FC = () => {
 
         <button
           onClick={handleCreateNote}
-          className="flex items-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-red-600/30 transition-all cursor-pointer shrink-0 active:scale-95"
+          className="flex items-center gap-2 px-5 py-3 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 active:translate-y-0.5 text-white font-bold text-xs uppercase tracking-wider rounded-none shadow-lg transition-all cursor-pointer shrink-0 active:scale-95"
         >
           <Plus className="w-4 h-4" /> Tạo Ghi Chú Mới
         </button>
@@ -234,7 +234,7 @@ export const VNotesTab: React.FC = () => {
               placeholder="Tìm kiếm ghi chú..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-all"
+              className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition-all"
             />
           </div>
 
@@ -244,9 +244,9 @@ export const VNotesTab: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3 py-1.5 text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer rounded-none ${
                   selectedCategory === cat
-                    ? "bg-red-600 text-white shadow-md"
+                    ? "bg-[#208b3a] text-white shadow-md"
                     : "bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white"
                 }`}
               >

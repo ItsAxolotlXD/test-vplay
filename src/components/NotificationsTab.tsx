@@ -228,17 +228,17 @@ export default function NotificationsTab({
               <button
                 key={tab.id}
                 onClick={() => setFilterType(tab.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer border ${
+                className={`px-3.5 py-1.5 text-xs whitespace-nowrap transition-all cursor-pointer border rounded-none ${
                   isActive
-                    ? "bg-[#cc1827] border-red-500 text-white font-bold shadow-md shadow-red-900/30"
+                    ? "bg-[#208b3a] border-[#125322] text-white font-bold shadow-md"
                     : "bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {tab.label}
                 {tab.count !== undefined && tab.count > 0 && (
                   <span
-                    className={`ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                      isActive ? "bg-white text-red-600" : "bg-white/20 text-white"
+                    className={`ml-1.5 px-1.5 py-0.2 text-[10px] font-bold rounded-none ${
+                      isActive ? "bg-white text-[#208b3a]" : "bg-white/20 text-white"
                     }`}
                   >
                     {tab.count}

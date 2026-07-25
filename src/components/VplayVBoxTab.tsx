@@ -306,49 +306,56 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
   }, [currentFeedbacksList, searchQuery, typeFilter]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100 font-sans pb-24 text-left">
-      {/* Sticky Header */}
-      <header className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-30 px-4 py-4 sm:px-6 shadow-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={onBack}
-              className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-300 transition-colors cursor-pointer border border-zinc-800"
-            >
-              <ArrowLeft className="w-4 h-4 text-white" />
-            </button>
-            <div className="text-left">
-              <h1 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-                <Box className="w-5 h-5 text-red-500" />
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans text-left">
+      {/* Banner Header - V-Notes style */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-red-950/80 via-zinc-900/90 to-zinc-950 border border-red-500/30 shadow-2xl backdrop-blur-md">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onBack}
+            className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 text-white transition-all cursor-pointer shrink-0"
+            title="Trở về"
+          >
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
+          <div className="p-3.5 bg-gradient-to-br from-red-600 to-rose-800 rounded-2xl shadow-lg shadow-red-600/30 text-white font-black shrink-0">
+            <Box className="w-8 h-8" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl font-black tracking-tight text-white uppercase">
                 V-Box Feedback Hub
               </h1>
-              <p className="text-xs text-zinc-400 font-medium">Hòm thư đóng góp ý kiến, phản hồi lỗi và đặt câu hỏi cho đội ngũ Vplay Developers</p>
+              <span className="text-[10px] px-2.5 py-0.5 bg-[#208b3a] text-white font-black uppercase tracking-wider rounded-none">
+                Đóng Góp Ý Kiến & Hòm Thư
+              </span>
             </div>
+            <p className="text-xs text-zinc-400 mt-1">
+              Hòm thư đóng góp ý kiến, phản hồi lỗi và đặt câu hỏi cho đội ngũ Vplay Developers.
+            </p>
           </div>
-
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2.5 bg-[#cc1827] hover:bg-[#b01420] text-white font-black text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer self-start md:self-center"
-          >
-            <Plus className="w-4 h-4" />
-            Tạo phản hồi mới
-          </button>
         </div>
-      </header>
+
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 px-5 py-3 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 active:translate-y-0.5 text-white font-bold text-xs uppercase tracking-wider rounded-none shadow-lg transition-all cursor-pointer shrink-0 active:scale-95"
+        >
+          <Plus className="w-4 h-4" /> Tạo Phản Hồi Mới
+        </button>
+      </div>
 
       {/* Main layout */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <main className="w-full flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
         
         {/* Navigation & Filters Panel */}
         <div className="lg:col-span-1 space-y-4">
           
           {/* Sub-Tabs Selector */}
-          <div className="bg-zinc-900 rounded-2xl p-2 border border-zinc-800/80 flex gap-1">
+          <div className="bg-[#18181c] rounded-3xl p-2 border border-white/10 flex gap-1 shadow-xl">
             <button
               onClick={() => setActiveSubTab("community")}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+              className={`flex-1 py-2.5 rounded-none text-xs font-extrabold transition-all cursor-pointer ${
                 activeSubTab === "community"
-                  ? "bg-[#cc1827] text-white shadow-md shadow-red-900/10"
+                  ? "bg-[#208b3a] text-white shadow-md"
                   : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
@@ -356,9 +363,9 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
             </button>
             <button
               onClick={() => setActiveSubTab("your")}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer relative ${
+              className={`flex-1 py-2.5 rounded-none text-xs font-extrabold transition-all cursor-pointer relative ${
                 activeSubTab === "your"
-                  ? "bg-[#cc1827] text-white shadow-md shadow-red-900/10"
+                  ? "bg-[#208b3a] text-white shadow-md"
                   : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
@@ -372,7 +379,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
           </div>
 
           {/* Quick Filters */}
-          <div className="bg-zinc-900 rounded-2xl p-5 border border-zinc-800/80 space-y-4">
+          <div className="bg-[#18181c] rounded-3xl p-5 border border-white/10 space-y-4 shadow-xl">
             <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5 border-b border-zinc-800 pb-2.5">
               <Filter className="w-3.5 h-3.5 text-red-500" />
               Lọc theo Mã hiệu
@@ -410,8 +417,8 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
         <div className="lg:col-span-3 space-y-4">
           
           {/* Search bar */}
-          <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800/80 rounded-2xl px-4 py-3 shadow-md">
-            <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-5 h-5 shrink-0 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+          <div className="flex items-center gap-3 bg-[#18181c] border border-white/10 rounded-3xl px-4 py-3.5 shadow-xl">
+            <Search className="w-5 h-5 text-zinc-400 shrink-0" />
             <input
               type="text"
               placeholder={`Tìm kiếm tiêu đề, mã hiệu hoặc nội dung trong ${activeSubTab === "community" ? "Community Box" : "Your Box"}...`}
@@ -431,14 +438,14 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
           {/* Feedback Feed Cards */}
           {filteredFeedbacks.length === 0 ? (
-            <div className="bg-zinc-900 rounded-2xl border border-zinc-800/80 py-16 text-center flex flex-col items-center justify-center p-6">
+            <div className="bg-[#18181c] rounded-3xl border border-white/10 py-16 text-center flex flex-col items-center justify-center p-6 shadow-xl">
               <Box className="w-14 h-14 text-zinc-800 mb-3" />
               <h3 className="text-sm font-bold text-zinc-300">Không tìm thấy phản hồi nào</h3>
               <p className="text-xs text-zinc-400 max-w-sm mt-1">Điều chỉnh bộ lọc hoặc từ khóa tìm kiếm để khám phá thêm các ý kiến khác.</p>
               {activeSubTab === "your" && (
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="mt-4 px-4 py-2 bg-[#cc1827] hover:bg-[#b01420] text-white font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer"
+                  className="mt-4 px-4 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-all shadow-md cursor-pointer"
                 >
                   Gửi phản hồi đầu tiên của bạn
                 </button>
@@ -449,7 +456,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
               {filteredFeedbacks.map((feedback) => (
                 <div 
                   key={feedback.id}
-                  className="bg-zinc-900/50 rounded-2xl border border-zinc-800/80 p-5 hover:border-zinc-700/50 transition-all text-left flex flex-col gap-4 relative shadow-sm hover:shadow-md"
+                  className="bg-[#18181c] rounded-3xl border border-white/10 p-5 hover:border-white/20 transition-all text-left flex flex-col gap-4 relative shadow-xl"
                 >
                   {/* Card Top: Code badges & Date */}
                   <div className="flex items-center justify-between flex-wrap gap-2">
@@ -669,7 +676,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-[#cc1827] hover:bg-[#b01420] text-white text-xs font-black rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-md shadow-red-900/10"
+                  className="flex-1 py-2.5 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 text-white text-xs font-black rounded-none uppercase tracking-wider transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-md"
                 >
                   <Send className="w-3.5 h-3.5" />
                   Gửi phản hồi

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { playSynthSound } from "../../utils/audio";
 import {
   CreditCard,
   Send,
@@ -60,6 +61,22 @@ export const VBankTab: React.FC = () => {
   useEffect(() => {
     localStorage.setItem("vplay_vpearls", vPearls.toString());
   }, [vPearls]);
+
+  // Sync points from V-Learn exercises dynamically
+  useEffect(() => {
+    const syncPoints = () => {
+      const saved = localStorage.getItem("vlearn_study_points");
+      if (saved) {
+        setStudyPoints(parseInt(saved));
+      }
+    };
+    window.addEventListener("vlearn_points_updated", syncPoints);
+    window.addEventListener("storage", syncPoints);
+    return () => {
+      window.removeEventListener("vlearn_points_updated", syncPoints);
+      window.removeEventListener("storage", syncPoints);
+    };
+  }, []);
 
   // Transfer Form State
   const [recipientBank, setRecipientBank] = useState("V-Bank (Nội bộ Vplay)");
@@ -177,6 +194,9 @@ export const VBankTab: React.FC = () => {
     const actualPointsUsed = pearlsEarned * 10;
     setStudyPoints((prev) => prev - actualPointsUsed);
     setVPearls((prev) => prev + pearlsEarned);
+
+    // Play conversion crystal sound effect
+    playSynthSound("convert_pearls");
 
     const newTx: Transaction = {
       id: `tx-${Date.now()}`,

@@ -115,7 +115,7 @@ export const VRemindersTab: React.FC = () => {
   });
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-3 sm:p-6 text-white font-sans">
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
       {/* Banner Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-orange-950/70 via-zinc-900 to-black border border-orange-500/30 shadow-2xl">
         <div className="flex items-center gap-4">
