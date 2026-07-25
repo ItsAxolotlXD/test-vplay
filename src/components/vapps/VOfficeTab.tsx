@@ -57,13 +57,13 @@ export const VOfficeTab: React.FC = () => {
         </div>
 
         {/* Office App Switcher Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-zinc-900 border border-white/10 rounded-2xl overflow-x-auto max-w-full">
+        <div className="flex items-center gap-1.5 p-1 bg-zinc-900 border border-white/10 rounded-none overflow-x-auto max-w-full">
           <button
             onClick={() => setActiveOfficeApp("pages")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-none text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               activeOfficeApp === "pages"
-                ? "bg-blue-600 text-white shadow-md font-black"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#2563eb] hover:bg-[#3b82f6] text-white border-b-4 border-[#1d4ed8] active:border-b-0 active:translate-y-1 shadow-md font-black"
+                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20]"
             }`}
           >
             <FileText className="w-4 h-4 text-blue-300" /> V-Pages (Word Editor)
@@ -71,10 +71,10 @@ export const VOfficeTab: React.FC = () => {
 
           <button
             onClick={() => setActiveOfficeApp("numbers")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-none text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               activeOfficeApp === "numbers"
-                ? "bg-emerald-600 text-white shadow-md font-black"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md font-black"
+                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20]"
             }`}
           >
             <Table className="w-4 h-4 text-emerald-300" /> V-Numbers (Excel Sheet)
@@ -206,7 +206,7 @@ const VPagesApp: React.FC = () => {
 
           <button
             onClick={handlePrint}
-            className="p-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl border border-white/10 cursor-pointer"
+            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none cursor-pointer shadow-md"
             title="In tài liệu"
           >
             <Printer className="w-4 h-4" />
@@ -214,14 +214,14 @@ const VPagesApp: React.FC = () => {
 
           <button
             onClick={handleExportText}
-            className="flex items-center gap-1 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl border border-white/10 cursor-pointer"
+            className="flex items-center gap-1 px-3 py-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white text-xs font-bold rounded-none cursor-pointer shadow-md"
           >
             <FileCode className="w-3.5 h-3.5" /> TXT
           </button>
 
           <button
             onClick={handleExportHTML}
-            className="flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase rounded-xl shadow-lg cursor-pointer"
+            className="flex items-center gap-1 px-4 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white text-xs font-black uppercase rounded-none shadow-md cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" /> Xuất HTML
           </button>
@@ -471,7 +471,7 @@ const VNumbersApp: React.FC = () => {
             link.download = "VNumbers_Sheet.csv";
             link.click();
           }}
-          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase rounded-xl cursor-pointer"
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-bold text-xs uppercase rounded-none shadow-md cursor-pointer"
         >
           <Download className="w-3.5 h-3.5" /> Xuất File CSV
         </button>

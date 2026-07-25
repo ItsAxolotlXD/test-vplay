@@ -153,16 +153,16 @@ export const VRecorderTab: React.FC = () => {
         {!isRecording ? (
           <button
             onClick={startRecording}
-            className="flex items-center gap-3 px-8 py-4 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 active:translate-y-0.5 text-white font-black text-sm uppercase tracking-wider rounded-none shadow-2xl transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-3 px-8 py-4 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-black text-sm uppercase tracking-wider rounded-none shadow-2xl transition-all cursor-pointer"
           >
             <Mic className="w-5 h-5" /> Bắt Đầu Ghi Âm
           </button>
         ) : (
           <button
             onClick={stopRecording}
-            className="flex items-center gap-3 px-8 py-4 bg-zinc-800 hover:bg-zinc-700 border-2 border-red-500 text-red-400 font-black text-sm uppercase tracking-wider rounded-2xl shadow-2xl transition-all cursor-pointer active:scale-95 animate-pulse"
+            className="flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-500 border-b-4 border-red-800 active:border-b-0 active:translate-y-1 text-white font-black text-sm uppercase tracking-wider rounded-none shadow-2xl transition-all cursor-pointer animate-pulse"
           >
-            <Square className="w-5 h-5 text-red-500" /> Dừng Thu Âm
+            <Square className="w-5 h-5 text-white" /> Dừng Thu Âm
           </button>
         )}
       </div>
@@ -187,7 +187,7 @@ export const VRecorderTab: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => togglePlay(rec)}
-                    className="p-3 bg-red-600 hover:bg-red-500 text-white rounded-xl shadow-md transition-all cursor-pointer"
+                    className="p-3 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white rounded-none shadow-md transition-all cursor-pointer"
                   >
                     {activePlayingId === rec.id ? (
                       <Pause className="w-4 h-4" />
@@ -207,13 +207,13 @@ export const VRecorderTab: React.FC = () => {
                   <a
                     href={rec.url}
                     download={`${rec.name}.webm`}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-300 transition-all"
+                    className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 rounded-none text-zinc-300 transition-all shadow-md"
                   >
                     <Download className="w-4 h-4" />
                   </a>
                   <button
                     onClick={() => deleteRecording(rec.id)}
-                    className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-all cursor-pointer"
+                    className="p-2 bg-red-600 hover:bg-red-500 border-b-4 border-red-800 active:border-b-0 active:translate-y-1 text-white rounded-none transition-all cursor-pointer shadow-md"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

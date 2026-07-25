@@ -149,27 +149,33 @@ export const VCalcTab: React.FC = () => {
         </div>
 
         {/* Mode Switcher */}
-        <div className="flex items-center gap-1.5 p-1 bg-zinc-900 border border-white/10 rounded-2xl">
+        <div className="flex items-center gap-1.5 p-1 bg-zinc-900 border border-white/10 rounded-none">
           <button
             onClick={() => setCalcMode("basic")}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              calcMode === "basic" ? "bg-purple-600 text-white shadow-md" : "text-zinc-400 hover:text-white"
+            className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
+              calcMode === "basic" 
+                ? "bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white shadow-md" 
+                : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] text-zinc-300 hover:text-white"
             }`}
           >
             Cơ bản
           </button>
           <button
             onClick={() => setCalcMode("scientific")}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              calcMode === "scientific" ? "bg-purple-600 text-white shadow-md" : "text-zinc-400 hover:text-white"
+            className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
+              calcMode === "scientific" 
+                ? "bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white shadow-md" 
+                : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] text-zinc-300 hover:text-white"
             }`}
           >
             Khoa học
           </button>
           <button
             onClick={() => setCalcMode("converter")}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              calcMode === "converter" ? "bg-purple-600 text-white shadow-md" : "text-zinc-400 hover:text-white"
+            className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all cursor-pointer ${
+              calcMode === "converter" 
+                ? "bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white shadow-md" 
+                : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] text-zinc-300 hover:text-white"
             }`}
           >
             Đổi đơn vị
@@ -233,7 +239,7 @@ export const VCalcTab: React.FC = () => {
               <CalcBtn text=")" onClick={() => handleNumClick(")")} />
               <button
                 onClick={handleEquals}
-                className="py-4 bg-purple-600 hover:bg-purple-500 text-white font-black text-lg rounded-2xl shadow-lg transition-all cursor-pointer col-span-1"
+                className="py-4 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-black text-lg rounded-none shadow-md transition-all cursor-pointer col-span-1"
               >
                 =
               </button>
@@ -290,8 +296,10 @@ export const VCalcTab: React.FC = () => {
                   else if (t.id === "currency") { setFromUnit("USD"); setToUnit("VND"); }
                   else if (t.id === "data") { setFromUnit("GB"); setToUnit("MB"); }
                 }}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  converterType === t.id ? "bg-purple-600 text-white shadow-md" : "bg-white/5 hover:bg-white/10 text-zinc-400"
+                className={`px-4 py-2 rounded-none text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  converterType === t.id 
+                    ? "bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white shadow-md" 
+                    : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-zinc-300"
                 }`}
               >
                 {t.name}
@@ -362,14 +370,14 @@ const CalcBtn: React.FC<{
 }> = ({ text, onClick, action, danger, highlight }) => (
   <button
     onClick={onClick}
-    className={`py-3.5 rounded-2xl font-black text-sm transition-all cursor-pointer active:scale-95 ${
+    className={`py-3.5 rounded-none font-black text-sm transition-all cursor-pointer active:border-b-0 active:translate-y-1 shadow-md ${
       danger
-        ? "bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30"
+        ? "bg-red-600 hover:bg-red-500 border-b-4 border-red-800 text-white"
         : action
-        ? "bg-purple-900/40 hover:bg-purple-900/60 text-purple-300 border border-purple-500/30"
+        ? "bg-[#2563eb] hover:bg-[#3b82f6] border-b-4 border-[#1d4ed8] text-white"
         : highlight
-        ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-        : "bg-zinc-900 hover:bg-zinc-800 text-white border border-white/5"
+        ? "bg-amber-600 hover:bg-amber-500 border-b-4 border-amber-800 text-white"
+        : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] text-white"
     }`}
   >
     {text}

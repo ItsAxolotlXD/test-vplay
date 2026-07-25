@@ -139,7 +139,7 @@ export const VRemindersTab: React.FC = () => {
 
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-5 py-3 bg-orange-500 hover:bg-orange-400 text-black font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-orange-500/20 transition-all cursor-pointer shrink-0"
+          className="flex items-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 text-slate-950 font-black text-xs uppercase tracking-wider rounded-none shadow-md transition-all cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" /> Thêm Nhắc Nhở Mới
         </button>
@@ -164,7 +164,7 @@ export const VRemindersTab: React.FC = () => {
                 placeholder="Nhập công việc..."
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-zinc-900 border border-white/10 rounded-none px-4 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500"
               />
             </div>
 
@@ -173,7 +173,7 @@ export const VRemindersTab: React.FC = () => {
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as any)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-2xl px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
+                className="w-full bg-zinc-900 border border-white/10 rounded-none px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
               >
                 <option value="Công việc">Công việc</option>
                 <option value="Học tập">Học tập</option>
@@ -188,7 +188,7 @@ export const VRemindersTab: React.FC = () => {
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value as any)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-2xl px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
+                className="w-full bg-zinc-900 border border-white/10 rounded-none px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
               >
                 <option value="High">Cao (Quan trọng)</option>
                 <option value="Medium">Trung bình</option>
@@ -202,7 +202,7 @@ export const VRemindersTab: React.FC = () => {
                 type="date"
                 value={newDueDate}
                 onChange={(e) => setNewDueDate(e.target.value)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white focus:outline-none"
+                className="w-full bg-zinc-900 border border-white/10 rounded-none px-4 py-2.5 text-xs text-white focus:outline-none"
               />
             </div>
 
@@ -212,7 +212,7 @@ export const VRemindersTab: React.FC = () => {
                 type="time"
                 value={newDueTime}
                 onChange={(e) => setNewDueTime(e.target.value)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-2xl px-4 py-2.5 text-xs text-white focus:outline-none"
+                className="w-full bg-zinc-900 border border-white/10 rounded-none px-4 py-2.5 text-xs text-white focus:outline-none"
               />
             </div>
           </div>
@@ -221,13 +221,13 @@ export const VRemindersTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-xs font-bold rounded-xl cursor-pointer"
+              className="px-4 py-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white text-xs font-bold rounded-none shadow-md cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-orange-500 hover:bg-orange-400 text-black font-extrabold text-xs uppercase rounded-xl cursor-pointer"
+              className="px-5 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-extrabold text-xs uppercase rounded-none shadow-md cursor-pointer"
             >
               Lưu Nhắc Nhở
             </button>
@@ -244,7 +244,7 @@ export const VRemindersTab: React.FC = () => {
             placeholder="Tìm kiếm nhắc nhở..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-zinc-900 border border-white/10 rounded-2xl pl-10 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500"
+            className="w-full bg-zinc-900 border border-white/10 rounded-none pl-10 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500"
           />
         </div>
 
@@ -253,10 +253,10 @@ export const VRemindersTab: React.FC = () => {
             <button
               key={st}
               onClick={() => setFilterStatus(st as any)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-none text-xs font-bold transition-all cursor-pointer ${
                 filterStatus === st
-                  ? "bg-orange-500 text-black font-black"
-                  : "bg-white/5 hover:bg-white/10 text-zinc-400"
+                  ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 font-black shadow-md"
+                  : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
               }`}
             >
               {st === "all" ? "Tất cả" : st === "pending" ? "Đang chờ" : "Đã hoàn thành"}

@@ -312,7 +312,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
         <div className="flex items-center gap-4">
           <button 
             onClick={onBack}
-            className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 text-white transition-all cursor-pointer shrink-0"
+            className="p-3 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer shrink-0 rounded-none shadow-md"
             title="Trở về"
           >
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -547,13 +547,13 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
                     <button
                       onClick={() => handleVote(feedback.id, activeSubTab === "your")}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                      className={`px-3 py-1.5 rounded-none text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer ${
                         feedback.userVoted
-                          ? "bg-red-500/10 text-red-400 border-red-500/20"
-                          : "bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-800"
+                          ? "bg-red-600 hover:bg-red-500 text-white border-b-4 border-red-800 active:border-b-0 active:translate-y-1 shadow-md"
+                          : "bg-[#2a2d36] hover:bg-[#383c48] text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 shadow-md"
                       }`}
                     >
-                      <ThumbsUp className={`w-3.5 h-3.5 ${feedback.userVoted ? "fill-current text-red-400" : ""}`} />
+                      <ThumbsUp className={`w-3.5 h-3.5 ${feedback.userVoted ? "fill-current text-white" : ""}`} />
                       <span>Đồng tình ({feedback.votes})</span>
                     </button>
                   </div>

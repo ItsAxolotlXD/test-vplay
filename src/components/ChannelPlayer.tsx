@@ -590,7 +590,7 @@ export default function ChannelPlayer({
                           videoRef.current.load();
                         }
                       }}
-                      className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all text-xs font-semibold border border-white/10 flex items-center justify-center gap-2"
+                      className="px-5 py-2.5 rounded-none bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
                     >
                       <RotateCcw className="w-3.5 h-3.5" /> Thử kết nối lại
                     </button>
@@ -732,10 +732,7 @@ export default function ChannelPlayer({
               {/* Button 1: Dynamic Favorite/ThumbsUp */}
               <button 
                 onClick={onToggleFavorite}
-                className={isMaterialDesignActive 
-                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#e6e1e5] shadow-md group"
-                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default group"
-                }
+                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-none bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center shadow-md cursor-pointer transition-all group"
                 title={isFavorite ? "Bỏ yêu thích" : "Yêu thích kênh"}
               >
                 {isMaterialDesignActive ? (
@@ -748,41 +745,32 @@ export default function ChannelPlayer({
               {/* Button 2: Skip back */}
               <button 
                 onClick={onPrevChannel}
-                className={isMaterialDesignActive 
-                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#cac4d0] hover:text-[#e6e1e5] shadow-md"
-                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
-                }
+                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-none bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center shadow-md cursor-pointer transition-all"
                 title="Kênh trước"
               >
-                <SkipBack className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white"}`} />
+                <SkipBack className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400" />
               </button>
 
               {/* Button 3: Play/Pause center */}
               <button 
                 onClick={togglePlay}
-                className={isMaterialDesignActive 
-                  ? "w-12 h-12 sm:w-15 sm:h-15 rounded-full bg-[#d0bcff] flex items-center justify-center text-[#381e72] shadow-lg"
-                  : "w-11 h-11 xs:w-12 xs:h-12 sm:w-15 sm:h-15 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_12px_24px_rgba(0,0,0,0.3)] cursor-default"
-                }
+                className="w-11 h-11 xs:w-12 xs:h-12 sm:w-15 sm:h-15 rounded-none bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(32,139,58,0.4)] cursor-pointer transition-all"
                 title={isPlaying ? "Tạm Dừng" : "Phát"}
               >
                 {isPlaying ? (
-                  <Pause className={`w-4.5 h-4.5 sm:w-6 sm:h-6 ${isMaterialDesignActive ? "fill-[#381e72] text-[#381e72]" : "fill-white text-white"}`} />
+                  <Pause className="w-4.5 h-4.5 sm:w-6 sm:h-6 fill-white text-white" />
                 ) : (
-                  <Play className={`w-4.5 h-4.5 sm:w-6 sm:h-6 translate-x-0.5 ${isMaterialDesignActive ? "fill-[#381e72] text-[#381e72]" : "fill-white text-white"}`} />
+                  <Play className="w-4.5 h-4.5 sm:w-6 sm:h-6 translate-x-0.5 fill-white text-white" />
                 )}
               </button>
 
               {/* Button 4: Skip forward */}
               <button 
                 onClick={onNextChannel}
-                className={isMaterialDesignActive 
-                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#cac4d0] hover:text-[#e6e1e5] shadow-md"
-                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
-                }
+                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-none bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center shadow-md cursor-pointer transition-all"
                 title="Kênh sau"
               >
-                <SkipForward className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white"}`} />
+                <SkipForward className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400" />
               </button>
 
               {/* Button 5: Reload */}
@@ -792,26 +780,20 @@ export default function ChannelPlayer({
                   setIsLoading(true);
                   if (videoRef.current) videoRef.current.load();
                 }}
-                className={isMaterialDesignActive 
-                  ? "w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#211f26] border border-[#313033] flex items-center justify-center text-[#cac4d0] hover:text-[#e6e1e5] shadow-md"
-                  : "w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-[1.5px] border border-white/10 bouncy-btn flex items-center justify-center text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default"
-                }
+                className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-none bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center shadow-md cursor-pointer transition-all"
                 title="Tải lại luồng"
               >
-                <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 animate-once ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white"}`} />
+                <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-once text-emerald-400" />
               </button>
             </div>
 
             {/* Right Utility: Fullscreen */}
             <button 
               onClick={handleFullscreen}
-              className={isMaterialDesignActive 
-                ? "p-2 sm:p-2.5 rounded-full bg-[#211f26] border border-[#313033] text-[#cac4d0] hover:text-[#e6e1e5] shadow-md flex items-center justify-center shrink-0"
-                : "p-2 sm:p-2.5 rounded-full bg-white/10 backdrop-blur-[1.5px] bouncy-btn text-white/70 hover:text-white border border-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-default flex items-center justify-center shrink-0"
-              }
+              className="p-2 sm:p-2.5 rounded-none bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center cursor-pointer transition-all shadow-md shrink-0"
               title="Toàn màn hình"
             >
-              <Maximize className="w-4 h-4" />
+              <Maximize className="w-4 h-4 text-emerald-400" />
             </button>
           </div>
         </div>

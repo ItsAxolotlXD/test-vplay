@@ -36,11 +36,11 @@ export const UnderConstructionModal: React.FC<UnderConstructionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 select-none">
-      {/* Bedrock / Ore UI Under Construction Dialog */}
-      <div className="w-full max-w-3xl bg-[#313233] border-2 border-[#1e1e1f] shadow-2xl p-6 sm:p-10 flex flex-col items-center text-center text-white font-sans relative animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/0 backdrop-blur-none p-4 select-none">
+      {/* Transparent Under Construction Dialog (0% Opacity Background) */}
+      <div className="w-full max-w-3xl bg-transparent border-0 shadow-none p-6 sm:p-10 flex flex-col items-center text-center text-white relative animate-in fade-in zoom-in-95 duration-150">
         {/* Header Title */}
-        <h2 className="text-white text-lg sm:text-xl font-medium tracking-wide mb-4 sm:mb-6 font-mono">
+        <h2 className="text-white text-lg sm:text-xl font-bold tracking-wide mb-4 sm:mb-6 uppercase">
           Under construction
         </h2>
 
@@ -55,16 +55,16 @@ export const UnderConstructionModal: React.FC<UnderConstructionModalProps> = ({
         </div>
 
         {/* Subtitle description */}
-        <p className="text-zinc-300 text-xs sm:text-sm my-4 sm:my-6 max-w-lg leading-relaxed">
+        <p className="text-zinc-200 text-xs sm:text-sm my-4 sm:my-6 max-w-lg leading-relaxed">
           We're still working on this feature. Check back soon!
         </p>
 
-        {/* 2-Button Action Row */}
+        {/* 2-Button Action Row - White WATCH NOW style buttons with black text */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full max-w-xl mt-2">
           {/* Give Feedback Button */}
           <button
             onClick={handleGiveFeedback}
-            className="w-full py-2.5 sm:py-3 px-4 bg-[#dfdfdf] hover:bg-white active:bg-[#bebebe] text-black font-semibold text-xs sm:text-sm border-2 border-black/80 flex items-center justify-center gap-2 cursor-pointer transition-none shadow-md"
+            className="w-full h-11 py-3 px-6 bg-white hover:bg-zinc-100 active:bg-zinc-200 text-black font-bold text-xs sm:text-sm uppercase tracking-wider border-b-4 border-zinc-400 active:border-b-0 active:translate-y-1 rounded-none flex items-center justify-center gap-2 cursor-pointer transition-all duration-150 shadow-md"
           >
             <ExternalLink className="w-4 h-4 text-black shrink-0" />
             <span>Give Feedback</span>
@@ -73,7 +73,7 @@ export const UnderConstructionModal: React.FC<UnderConstructionModalProps> = ({
           {/* Go back to old UI Button */}
           <button
             onClick={handleGoBack}
-            className="w-full py-2.5 sm:py-3 px-4 bg-[#dfdfdf] hover:bg-white active:bg-[#bebebe] text-black font-semibold text-xs sm:text-sm border-2 border-black/80 flex items-center justify-center gap-2 cursor-pointer transition-none shadow-md"
+            className="w-full h-11 py-3 px-6 bg-white hover:bg-zinc-100 active:bg-zinc-200 text-black font-bold text-xs sm:text-sm uppercase tracking-wider border-b-4 border-zinc-400 active:border-b-0 active:translate-y-1 rounded-none flex items-center justify-center gap-2 cursor-pointer transition-all duration-150 shadow-md"
           >
             <span>Go back to old UI</span>
           </button>

@@ -66,7 +66,7 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white cursor-pointer transition-colors"
+              className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white cursor-pointer transition-colors rounded-none shadow-md"
               title="Quay lại"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -84,11 +84,11 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
         </div>
 
         {/* Custom Toolbar */}
-        <div className="flex items-center gap-2 bg-zinc-900/80 p-1.5 rounded-2xl border border-white/5 self-start md:self-center shadow-lg">
+        <div className="flex items-center gap-2 bg-zinc-900/80 p-1.5 rounded-none border border-white/5 self-start md:self-center shadow-lg">
           <button
             onClick={handleZoomIn}
             disabled={scale >= 4}
-            className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/10 disabled:opacity-40 transition-all cursor-pointer"
+            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white disabled:opacity-40 transition-all cursor-pointer rounded-none shadow-md"
             title="Phóng to"
           >
             <ZoomIn className="w-4.5 h-4.5" />
@@ -96,7 +96,7 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
           <button
             onClick={handleZoomOut}
             disabled={scale <= 0.5}
-            className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/10 disabled:opacity-40 transition-all cursor-pointer"
+            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white disabled:opacity-40 transition-all cursor-pointer rounded-none shadow-md"
             title="Thu nhỏ"
           >
             <ZoomOut className="w-4.5 h-4.5" />
@@ -104,7 +104,7 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
           <div className="h-4 w-[1px] bg-white/10 mx-1" />
           <button
             onClick={handleReset}
-            className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+            className="px-3 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold rounded-none shadow-md"
             title="Đặt lại bản đồ"
           >
             <RotateCcw className="w-4 h-4" />

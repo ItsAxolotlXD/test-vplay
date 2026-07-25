@@ -1,12 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
-@import url('https://fonts.cdnfonts.com/css/google-sans');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Playfair Display", Georgia, serif;
-  --font-mono: "Playfair Display", "JetBrains Mono", monospace;
-  --font-google: "Playfair Display", serif;
+  --font-sans: "Montserrat", sans-serif;
+  --font-mono: "Montserrat", sans-serif;
+  --font-google: "Montserrat", sans-serif;
   --font-montserrat: "Montserrat", sans-serif;
+}
+
+*, html, body, button, input, select, textarea {
+  font-family: "Montserrat", sans-serif !important;
 }
 
 /* Custom gorgeous scrollbar for glassmorphic style */
@@ -1277,9 +1280,14 @@ body.minecraft-ore-active .bg-[#07050f] {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Enforce Playfair Display font family across all elements */
-html, body, *, ::before, ::after {
-  font-family: "Playfair Display", Georgia, serif !important;
+/* Font Montserrat Utility Override */
+.font-montserrat, .font-montserrat * {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Default Montserrat font family across body elements */
+html, body {
+  font-family: 'Montserrat', sans-serif !important;
 }
 
 

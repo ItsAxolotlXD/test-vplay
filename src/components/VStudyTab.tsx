@@ -704,7 +704,7 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 text-white transition-all cursor-pointer shrink-0"
+            className="p-3 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer shrink-0 rounded-none shadow-md"
             title="Trở về"
           >
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -797,7 +797,7 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
                 onSelectSubFilter(subFilter === "hoc_ba" ? "all" : "hoc_ba");
               }
             }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-900/30 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center justify-center gap-2 uppercase tracking-wider ring-1 ring-amber-300/40"
+            className="w-full sm:w-auto px-4 py-2.5 bg-amber-500 hover:bg-amber-400 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 text-slate-950 font-black text-xs rounded-none shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 uppercase tracking-wider"
           >
             <GraduationCap className="w-4 h-4 text-slate-950" />
             <span>{subFilter === "hoc_ba" ? "Quay Lại Danh Sách Môn" : "Tra Cứu Học Bạ"}</span>
@@ -806,16 +806,16 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
 
       {/* MODULE MODE SELECTION TABS */}
       {!isQuizActive && (
-        <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-zinc-900/80 border border-white/10 shadow-lg">
+        <div className="flex flex-wrap items-center gap-2 p-2 rounded-none bg-zinc-900/80 border border-white/10 shadow-lg">
           <button
             onClick={() => {
               setModeTab("quizzes");
               if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
               modeTab === "quizzes"
-                ? "bg-[#cc1827] text-white shadow-lg shadow-[#cc1827]/30 border border-red-500/30"
-                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md"
+                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
             }`}
           >
             <BookOpen className="w-4 h-4 text-white" />
@@ -827,15 +827,15 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               setModeTab("english_cefr");
               if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
               modeTab === "english_cefr"
-                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-900/40 border border-blue-400/30"
-                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                ? "bg-[#2563eb] hover:bg-[#3b82f6] text-white border-b-4 border-[#1d4ed8] active:border-b-0 active:translate-y-1 shadow-md"
+                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
             }`}
           >
             <Languages className="w-4 h-4 text-blue-300" />
             <span>2. Tiếng Anh (A2, B1, B1+, B2)</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-[10px]">4 Kỹ Năng</span>
+            <span className="px-1.5 py-0.5 rounded-none bg-blue-500/20 text-blue-300 text-[10px]">4 Kỹ Năng</span>
           </button>
 
           <button
@@ -843,15 +843,15 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               setModeTab("literature_writing");
               if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
               modeTab === "literature_writing"
-                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/40 border border-emerald-400/30"
-                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                ? "bg-emerald-600 hover:bg-emerald-500 text-white border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 shadow-md"
+                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
             }`}
           >
             <PenTool className="w-4 h-4 text-emerald-300" />
             <span>3. Luyện Viết Văn THCS/THPT</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px]">AI Chấm Điểm</span>
+            <span className="px-1.5 py-0.5 rounded-none bg-emerald-500/20 text-emerald-300 text-[10px]">AI Chấm Điểm</span>
           </button>
 
           <button
@@ -859,10 +859,10 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               setModeTab("hoc_ba");
               if (onSelectSubFilter) onSelectSubFilter("hoc_ba");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
               modeTab === "hoc_ba"
-                ? "bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 shadow-lg shadow-amber-900/40 border border-amber-300/40"
-                : "bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                ? "bg-amber-500 hover:bg-amber-400 text-slate-950 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 shadow-md"
+                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
             }`}
           >
             <GraduationCap className="w-4 h-4 text-slate-950" />
@@ -1226,7 +1226,7 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               <div className="w-full lg:w-auto shrink-0 pt-2 lg:pt-0">
                 <button
                   onClick={handleStartSuperExam}
-                  className="w-full lg:w-auto px-8 py-4 bg-gradient-to-r from-red-600 via-amber-500 to-yellow-400 hover:from-red-500 hover:to-yellow-300 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-red-900/30 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-3 uppercase tracking-wider ring-2 ring-amber-300/50"
+                  className="w-full lg:w-auto px-8 py-4 bg-amber-500 hover:bg-amber-400 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 text-slate-950 font-black text-sm rounded-none shadow-md transition-all cursor-pointer flex items-center justify-center gap-3 uppercase tracking-wider"
                 >
                   <Play className="w-5 h-5 fill-slate-950" />
                   <span>Vào Thi Siêu Tổng Hợp Ngay</span>
@@ -1236,65 +1236,65 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
           </div>
 
           {/* Sub-Category Navigation & Search Controls */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-zinc-900/40 p-2.5 rounded-2xl border border-white/5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-zinc-900/40 p-2.5 rounded-none border border-white/5">
             {/* Level Tabs */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
               <button
                 onClick={() => { setActiveLevel("all"); if (onSelectSubFilter) onSelectSubFilter("all"); }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                   activeLevel === "all" && subFilter !== "super_exam"
-                    ? "bg-[#cc1827] text-white shadow-lg shadow-[#cc1827]/25"
-                    : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                    ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md"
+                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Khóa học</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-full font-mono">
+                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
                   {subjectsData.length}
                 </span>
               </button>
 
               <button
                 onClick={() => { setActiveLevel("tieu_hoc"); if (onSelectSubFilter) onSelectSubFilter("tieu_hoc"); }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                   activeLevel === "tieu_hoc"
-                    ? "bg-amber-600 text-white shadow-lg shadow-amber-600/25"
-                    : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                    ? "bg-amber-600 hover:bg-amber-500 text-white border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 shadow-md"
+                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
                 }`}
               >
                 <Baby className="w-3.5 h-3.5 text-amber-400" />
                 <span>V-Study Tiểu học</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-full font-mono">
+                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
                   {subjectsData.filter((s) => s.level === "tieu_hoc").length} môn
                 </span>
               </button>
 
               <button
                 onClick={() => { setActiveLevel("thcs"); if (onSelectSubFilter) onSelectSubFilter("thcs"); }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                   activeLevel === "thcs"
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
-                    : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                    ? "bg-[#2563eb] hover:bg-[#3b82f6] text-white border-b-4 border-[#1d4ed8] active:border-b-0 active:translate-y-1 shadow-md"
+                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
                 }`}
               >
                 <School className="w-3.5 h-3.5 text-blue-400" />
                 <span>V-Study THCS</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-full font-mono">
+                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
                   {subjectsData.filter((s) => s.level === "thcs").length} môn
                 </span>
               </button>
 
               <button
                 onClick={() => { setActiveLevel("thpt"); if (onSelectSubFilter) onSelectSubFilter("thpt"); }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                   activeLevel === "thpt"
-                    ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25"
-                    : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                    ? "bg-emerald-600 hover:bg-emerald-500 text-white border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 shadow-md"
+                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
                 }`}
               >
                 <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
                 <span>V-Study THPT</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-full font-mono">
+                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
                   {subjectsData.filter((s) => s.level === "thpt").length} môn
                 </span>
               </button>
@@ -1302,7 +1302,7 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               {/* Super Exam Quick Tab */}
               <button
                 onClick={handleStartSuperExam}
-                className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer bg-gradient-to-r from-red-600 to-amber-500 text-white shadow-md hover:brightness-110`}
+                className="px-3.5 py-2 rounded-none text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer bg-red-600 hover:bg-red-500 border-b-4 border-red-800 active:border-b-0 active:translate-y-1 text-white shadow-md"
               >
                 <Zap className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
                 <span>⚡ Kiểm Tra Siêu Tổng Hợp (100 câu)</span>

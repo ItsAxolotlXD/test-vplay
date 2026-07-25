@@ -4854,33 +4854,38 @@ export default function App() {
 
         {/* ALWAYS ON TOP PAGE TITLE HEADER BAR */}
         <div 
-          className="fixed top-0 left-0 right-0 h-10 z-[99999] bg-[#e5e5e5] text-black font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between px-1 sm:px-2 pointer-events-auto select-none font-['Montserrat']"
-          style={{ boxShadow: "0px 5px 0px 0px #808080" }}
+          className="fixed top-0 left-0 right-0 h-10 z-[99999] bg-[#e5e5e5] text-black font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between px-1 sm:px-2 pointer-events-auto select-none font-montserrat"
+          style={{ boxShadow: "0px 5px 0px 0px #808080", fontFamily: "'Montserrat', sans-serif" }}
         >
           {/* Left section: Back button & Sidebar toggle button */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <button
               onClick={handleHeaderBack}
               title="Quay lại (Back)"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
+              style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
               <ArrowLeft className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
-              <span className="hidden xs:inline tracking-wider font-['Montserrat']">BACK</span>
+              <span className="hidden xs:inline tracking-wider font-montserrat" style={{ fontFamily: "'Montserrat', sans-serif" }}>BACK</span>
             </button>
 
             {dockToSidebar && (
               <button
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                 title={isSidebarCollapsed ? "Mở rộng Sidebar" : "Thu gọn Sidebar"}
-                className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+                className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
+                style={{ fontFamily: "'Montserrat', sans-serif" }}
               >
                 <Menu className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
               </button>
             )}
           </div>
 
-          {/* Page Title in exact Sidebar form */}
-          <span className="truncate px-2 font-black text-center tracking-wider text-xs sm:text-sm font-['Montserrat']">
+          {/* Page Title in exact Sidebar form using Montserrat font */}
+          <span 
+            className="truncate px-2 font-black text-center tracking-wider text-xs sm:text-sm uppercase font-montserrat"
+            style={{ fontFamily: "'Montserrat', sans-serif" }}
+          >
             {getPageTitleUpper()}
           </span>
 
@@ -4893,7 +4898,8 @@ export default function App() {
                 setActiveSettingSection(null);
               }}
               title="Số dư V-pearls"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-black text-xs sm:text-sm cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1 p-1 bg-transparent text-black font-black text-xs sm:text-sm cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
+              style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
               <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0 stroke-[2.5]" />
               <span className="font-mono font-black text-black tracking-tight">
@@ -4907,9 +4913,10 @@ export default function App() {
                 setIsCopilotDrawerOpen(prev => !prev);
               }}
               title="Copilot AI Drawer"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
+              style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              <span className="hidden xs:inline tracking-wider font-['Montserrat']">COPILOT</span>
+              <span className="hidden xs:inline tracking-wider font-montserrat" style={{ fontFamily: "'Montserrat', sans-serif" }}>COPILOT</span>
               <img
                 src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
                 onError={(e) => {
@@ -4927,9 +4934,10 @@ export default function App() {
                 setActiveSettingSection(null);
               }}
               title="Tìm kiếm (Search)"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
+              style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              <span className="hidden xs:inline tracking-wider font-['Montserrat']">SEARCH</span>
+              <span className="hidden xs:inline tracking-wider font-montserrat" style={{ fontFamily: "'Montserrat', sans-serif" }}>SEARCH</span>
               <Search className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
             </button>
           </div>
@@ -4941,15 +4949,18 @@ export default function App() {
             {/* Mobile backdrop to close sidebar */}
             {!isSidebarCollapsed && (
               <div 
-                className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[54] md:hidden cursor-pointer"
+                className="fixed inset-0 bg-black/30 z-[54] md:hidden cursor-pointer"
                 onClick={() => setIsSidebarCollapsed(true)}
               />
             )}
-            <aside className={`fixed top-12 left-2 md:left-3 h-[calc(100vh-3.5rem)] z-[55] flex flex-col border border-white/20 shadow-2xl transition-all duration-200 select-none rounded-none overflow-hidden ${
-              isSidebarCollapsed 
-                ? "-translate-x-[120%] w-0 opacity-0 pointer-events-none md:translate-x-0 md:w-20 md:opacity-100 md:pointer-events-auto" 
-                : "translate-x-0 w-[calc(100vw-1rem)] md:w-72 md:translate-x-0 md:opacity-100 md:pointer-events-auto"
-            } bg-black/50 backdrop-blur-md text-white flex`}>
+            <aside 
+              className={`fixed top-12 left-2 md:left-3 h-[calc(100vh-3.5rem)] z-[55] flex flex-col border border-white/20 shadow-2xl transition-all duration-200 select-none rounded-none overflow-hidden ${
+                isSidebarCollapsed 
+                  ? "-translate-x-[120%] w-0 opacity-0 pointer-events-none md:translate-x-0 md:w-20 md:opacity-100 md:pointer-events-auto" 
+                  : "translate-x-0 w-[calc(100vw-1rem)] md:w-72 md:translate-x-0 md:opacity-100 md:pointer-events-auto"
+              } text-white flex`}
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.7)", backdropFilter: "none", WebkitBackdropFilter: "none" }}
+            >
 
             {/* Navigation Body */}
             <div className="flex-1 p-2 space-y-1 overflow-y-auto custom-scrollbar">
@@ -5016,34 +5027,6 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Copilot Link (Placed next to Spotlight Search) */}
-              <button
-                onClick={() => {
-                  setIsCopilotDrawerOpen(prev => !prev);
-                  setActiveSettingSection(null);
-                }}
-                title="Copilot AI Drawer"
-                className={(() => {
-                  const isActive = isCopilotDrawerOpen || activeTab === "copilot";
-                  const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none";
-                  const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
-                  const themeColors = isActive
-                    ? "bg-transparent text-white font-bold"
-                    : "text-zinc-300 bg-transparent hover:text-white";
-                  return `${base} ${alignment} ${themeColors}`;
-                })()}
-              >
-                <img
-                  src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-                  }}
-                  className="w-5 h-5 shrink-0 object-contain filter drop-shadow-[0_0_6px_rgba(99,102,241,0.5)]"
-                  referrerPolicy="no-referrer"
-                  alt="Copilot"
-                />
-                {!isSidebarCollapsed && <span>Copilot</span>}
-              </button>
 
               {/* Notifications Link */}
               <button
@@ -6008,15 +5991,7 @@ export default function App() {
               </button>
             )}
 
-            {/* Brand Logo on the Left */}
-            <div onClick={() => setActiveTab("home")} className="flex items-center gap-2 cursor-pointer group">
-              <img 
-                src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
-                alt="Vplay Brand Logo"
-                referrerPolicy="no-referrer"
-                className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
+            {/* Brand Logo on the Left - Removed as requested */}
 
             {/* Real-time Ticking Digital Clock */}
             {showClock && (
@@ -6504,15 +6479,15 @@ export default function App() {
         </header>
       )}
 
-      {/* Main Container */}
+      {/* Main Container - Floating page card matching sidebar layout */}
       <main id="player-anchor" className={
         activeTab === "home" 
-          ? "w-full pt-0 z-10 relative overflow-hidden active-tab-home" 
+          ? "mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none z-10 relative overflow-hidden min-h-[calc(100vh-4.5rem)] active-tab-home text-white" 
           : activeTab === "shorts"
-            ? "w-full max-w-7xl mx-auto px-4 pt-14 lg:pt-16 pb-4 z-10 relative overflow-hidden active-tab-shorts"
+            ? "mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none max-w-7xl lg:mx-auto z-10 relative overflow-hidden min-h-[calc(100vh-4.5rem)] active-tab-shorts text-white"
             : activeTab === "vbox"
-              ? "w-full pt-0 pb-8 z-10 relative active-tab-vbox"
-              : `w-full max-w-7xl mx-auto px-4 pt-24 lg:pt-28 pb-8 z-10 relative overflow-hidden active-tab-${activeTab}`
+              ? "mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none z-10 relative min-h-[calc(100vh-4.5rem)] active-tab-vbox text-white"
+              : `mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none max-w-7xl lg:mx-auto z-10 relative overflow-hidden min-h-[calc(100vh-4.5rem)] active-tab-${activeTab} text-white`
       }>
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
@@ -7040,7 +7015,7 @@ export default function App() {
                       }
                       setActiveTab("live");
                     }}
-                    className="h-10 px-6 rounded-lg font-mono font-bold text-xs uppercase tracking-wider text-white bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-[0_4px_12px_rgba(32,139,58,0.4)] flex items-center justify-center gap-2 cursor-pointer transition-all duration-150"
+                    className="h-10 px-6 rounded-none font-mono font-bold text-xs uppercase tracking-wider text-white bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-[0_4px_12px_rgba(32,139,58,0.4)] flex items-center justify-center gap-2 cursor-pointer transition-all duration-150"
                   >
                     {homeSlides[currentSlide].btnIcon === "compass" ? (
                       <Compass className="w-4 h-4 text-white" />
@@ -7054,14 +7029,14 @@ export default function App() {
                   <div className="flex items-center gap-2 ml-2">
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev - 1 + homeSlides.length) % homeSlides.length)}
-                      className="w-10 h-10 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center cursor-pointer transition-all shadow-md"
+                      className="w-10 h-10 rounded-none bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center cursor-pointer transition-all shadow-md"
                       title="Previous"
                     >
                       <ChevronLeft className="w-4 h-4 text-emerald-400" />
                     </button>
                     <button 
                       onClick={() => setCurrentSlide(prev => (prev + 1) % homeSlides.length)}
-                      className="w-10 h-10 rounded-lg bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center cursor-pointer transition-all shadow-md"
+                      className="w-10 h-10 rounded-none bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white flex items-center justify-center cursor-pointer transition-all shadow-md"
                       title="Next"
                     >
                       <ChevronRight className="w-4 h-4 text-emerald-400" />
@@ -10728,69 +10703,7 @@ export default function App() {
                 )}
               </div>
 
-              {/* Separate Search Button */}
-              <button
-                id="vplay-search-dock-btn"
-                onClick={() => {
-                  setActiveTab("search");
-                }}
-                className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
-                  isWinUI3Active
-                    ? "rounded-[15px] bg-[#202020] border border-[#2d2d2d] shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white hover:bg-[#2c2c2c] hover:border-[#3a3a3a]"
-                    : isMaterialDesignActive
-                    ? "bg-[#290a36] hover:bg-[#3d154f] text-white border border-white/5 shadow-lg rounded-[20px] duration-200"
-                    : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
-                }`}
-              >
-                {/* Premium Custom Tooltip */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                  Tìm kiếm
-                </div>
-                {isMaterialDesignActive ? (
-                  <img
-                    src="https://static.wikia.nocookie.net/ep-deo/images/6/6a/Search_100dp_000000_FILL0_wght400_GRAD0_opsz48.png/revision/latest?cb=20260629081314"
-                    className="w-6.5 h-6.5 transition-transform duration-300 pointer-events-none object-contain"
-                    style={{ filter: "brightness(0) invert(1)" }}
-                    referrerPolicy="no-referrer"
-                    alt="Search"
-                  />
-                ) : (
-                  <img 
-                    src="https://static.wikia.nocookie.net/ftv/images/d/dc/Ass_glass.svg/revision/latest?cb=20260612062405&path-prefix=vi" 
-                    className="w-6.5 h-6.5 brightness-0 invert opacity-95 transition-all duration-300 group-hover:scale-110 pointer-events-none object-contain" 
-                    referrerPolicy="no-referrer"
-                    alt="Search"
-                  />
-                )}
-              </button>
 
-              {/* Separate Copilot Dock Button */}
-              <button
-                id="vplay-copilot-dock-btn"
-                onClick={() => {
-                  setIsCopilotDrawerOpen(prev => !prev);
-                }}
-                className={`relative group w-16 h-16 flex items-center justify-center shrink-0 transform-gpu transition-all ${
-                  isWinUI3Active
-                    ? "rounded-[15px] bg-[#202020] border border-[#2d2d2d] shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white hover:bg-[#2c2c2c] hover:border-[#3a3a3a]"
-                    : isMaterialDesignActive
-                    ? "bg-[#290a36] hover:bg-[#3d154f] text-white border border-white/5 shadow-lg rounded-[20px] duration-200"
-                    : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_25px_50px_-12px_rgba(0,0,0,0.9)] hover:border-white/40 bouncy-btn"
-                }`}
-              >
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                  Copilot AI Drawer
-                </div>
-                <img
-                  src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-                  }}
-                  className="w-7 h-7 object-contain group-hover:scale-110 filter drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]"
-                  referrerPolicy="no-referrer"
-                  alt="Copilot"
-                />
-              </button>
             </motion.div>
           )}
         </AnimatePresence>

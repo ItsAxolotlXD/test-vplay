@@ -222,7 +222,7 @@ export const VArcadeTab: React.FC = () => {
         <div className="flex items-center gap-3 relative z-10 self-end md:self-auto">
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/10 text-white transition-all cursor-pointer flex items-center gap-2 text-xs font-bold"
+            className="px-3 py-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer flex items-center gap-2 text-xs font-bold rounded-none shadow-md"
             title="Bật/Tắt âm thanh"
           >
             {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-rose-400" />}
@@ -266,10 +266,10 @@ export const VArcadeTab: React.FC = () => {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-4 py-2 text-xs font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 rounded-none ${
                 selectedCategory === cat.id
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25 border border-indigo-400/30 scale-105"
-                  : "bg-[#1d1b26] hover:bg-white/10 text-zinc-400 hover:text-white border border-white/5"
+                  ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md"
+                  : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 shadow-sm"
               }`}
             >
               {cat.id === "favorites" && <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />}
@@ -334,7 +334,7 @@ export const VArcadeTab: React.FC = () => {
                   <span className="text-zinc-500 font-mono">{game.difficulty}</span>
                 </div>
 
-                <button className="w-full py-2 bg-indigo-600/20 group-hover:bg-gradient-to-r group-hover:from-indigo-600 group-hover:to-purple-600 text-indigo-300 group-hover:text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer border border-indigo-500/30 flex items-center justify-center gap-1.5">
+                <button className="w-full py-2 bg-[#208b3a] hover:bg-[#2dc653] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md">
                   <Play className="w-3.5 h-3.5 fill-current" /> CHƠI NGAY
                 </button>
               </div>
@@ -361,7 +361,7 @@ export const VArcadeTab: React.FC = () => {
 
               <button
                 onClick={() => setActiveGame(null)}
-                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                className="px-3 py-1.5 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white text-xs font-bold rounded-none shadow-md transition-all cursor-pointer"
               >
                 Đóng (ESC)
               </button>
@@ -510,18 +510,18 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
       {!isPlaying ? (
         <button
           onClick={startGame}
-          className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-lg cursor-pointer uppercase"
+          className="px-6 py-2.5 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none shadow-md cursor-pointer"
         >
           {gameOver ? "Chơi Lại" : "Bắt Đầu Chơi"}
         </button>
       ) : (
         <div className="grid grid-cols-3 gap-2 w-36">
           <div />
-          <button onClick={() => setDir([-1, 0])} className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold">▲</button>
+          <button onClick={() => setDir([-1, 0])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">▲</button>
           <div />
-          <button onClick={() => setDir([0, -1])} className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold">◄</button>
-          <button onClick={() => setDir([1, 0])} className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold">▼</button>
-          <button onClick={() => setDir([0, 1])} className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-bold">►</button>
+          <button onClick={() => setDir([0, -1])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">◄</button>
+          <button onClick={() => setDir([1, 0])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">▼</button>
+          <button onClick={() => setDir([0, 1])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">►</button>
         </div>
       )}
     </div>
@@ -587,7 +587,7 @@ const TicTacToeGame: React.FC = () => {
 
       <button
         onClick={resetGame}
-        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl cursor-pointer"
+        className="px-4 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs rounded-none cursor-pointer uppercase shadow-md"
       >
         Làm Mới Bàn Cờ
       </button>

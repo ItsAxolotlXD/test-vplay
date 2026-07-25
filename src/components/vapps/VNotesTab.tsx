@@ -339,10 +339,10 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={() => handleToggleStick(activeNote.id)}
                   title={stuckIds.includes(activeNote.id) ? "Bỏ ghim khỏi màn hình" : "Stick to screen (Ghim vào màn hình)"}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-none text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     stuckIds.includes(activeNote.id)
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                      : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10"
+                      ? "bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white shadow-md"
+                      : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white shadow-md"
                   }`}
                 >
                   <StickyNote className="w-3.5 h-3.5" />
@@ -352,7 +352,7 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={copyContent}
                   title="Sao chép văn bản"
-                  className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-300 hover:text-white transition-all cursor-pointer"
+                  className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 rounded-none text-white transition-all cursor-pointer shadow-md"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                 </button>
@@ -360,10 +360,10 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={() => handleTogglePin(activeNote.id)}
                   title={activeNote.isPinned ? "Bỏ ghim" : "Ghim lên đầu"}
-                  className={`p-2 rounded-xl transition-all cursor-pointer ${
+                  className={`p-2 rounded-none transition-all cursor-pointer ${
                     activeNote.isPinned
-                      ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
-                      : "bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white"
+                      ? "bg-amber-600 hover:bg-amber-500 border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 text-white shadow-md"
+                      : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white shadow-md"
                   }`}
                 >
                   <Pin className="w-4 h-4" />
@@ -372,7 +372,7 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={() => handleDeleteNote(activeNote.id)}
                   title="Xóa ghi chú"
-                  className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-all cursor-pointer border border-red-500/20"
+                  className="p-2 bg-red-600 hover:bg-red-500 border-b-4 border-red-800 active:border-b-0 active:translate-y-1 text-white rounded-none transition-all cursor-pointer shadow-md"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
