@@ -374,7 +374,7 @@ export default function StartMenu({
             <div className="pl-2 space-y-0.5 border-l border-white/10 ml-1">
               <div><span className="text-white/60">CPU Cores:</span> {navigator.hardwareConcurrency || "4"} logical threads</div>
               <div><span className="text-white/60">GPU WebGL:</span> {window.WebGLRenderingContext ? "Accelerated 2D/3D Canvas" : "Software Rasterizer"}</div>
-              <div><span className="text-white/60">Storage Limit:</span> 3,221,225,472 Bytes (3.00 GB Allocated)</div>
+              <div><span className="text-white/60">Storage Limit:</span> 3,072 MB Allocated (Expandable)</div>
               <div><span className="text-white/60">Active DOM Nodes:</span> {document.getElementsByTagName("*").length} elements</div>
             </div>
           </div>

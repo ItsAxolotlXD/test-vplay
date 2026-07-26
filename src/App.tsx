@@ -108,6 +108,7 @@ import {
   VOfficeTab 
 } from "./components/vapps";
 import { CopilotTab } from "./components/CopilotTab";
+import { OreSettingsTab } from "./components/OreSettingsTab";
 import { FloatingStickyNotes } from "./components/FloatingStickyNotes";
 import { UnderConstructionModal } from "./components/UnderConstructionModal";
 import { UnderConstructionTab } from "./components/UnderConstructionTab";
@@ -2204,7 +2205,7 @@ export default function App() {
         setDuiLogs(prev => [
           ...prev,
           "[Storage Telemetry]",
-          `  Dung lượng lưu trữ đang sử dụng: ${currentStorageUsed.toFixed(2)} GB / 3.00 GB`,
+          `  Dung lượng lưu trữ đang sử dụng: ${Math.round(currentStorageUsed).toLocaleString()} MB / ${maxStorageMB.toLocaleString()} MB`,
           ""
         ]);
       } else if (sub === "clean") {
@@ -2895,30 +2896,44 @@ export default function App() {
     input: "w-full bg-[#2d2d2d] border border-[#3e3e3e] hover:border-[#555555] focus:border-[#43bbfd] px-3 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none rounded-[15px] shadow-sm transition-colors duration-100"
   }), []);
 
-  // Vplay Data Storage Capacity Logic
+  // Purchased Storage MB state
+  const [purchasedStorageMB, setPurchasedStorageMB] = useState<number>(() => {
+    const saved = localStorage.getItem("vplay_purchased_storage_mb");
+    return saved ? parseInt(saved, 10) || 0 : 0;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vplay_purchased_storage_mb", purchasedStorageMB.toString());
+  }, [purchasedStorageMB]);
+
+  const maxStorageMB = useMemo(() => {
+    return 3072 + purchasedStorageMB; // Base capacity is 3072 MB (3 GB)
+  }, [purchasedStorageMB]);
+
+  // Vplay Data Storage Capacity Logic (in MB)
   const currentStorageUsed = useMemo(() => {
-    // If Storage feeder is installed, immediately return 3.00 GB
+    // If Storage feeder is installed, immediately return maxStorageMB
     const sf = plugins.find(p => p.id === "storage_feeder");
     if (sf && sf.status === "installed") {
-      return 3.00;
+      return maxStorageMB;
     }
 
-    let used = 0.15; // base system usage
-    if (dynamicMotion) used += 0.55;
-    if (isMultiviewMode) used += 0.95;
+    let used = 154; // base system usage (~154 MB)
+    if (dynamicMotion) used += 563; // ~563 MB
+    if (isMultiviewMode) used += 973; // ~973 MB
     plugins.forEach(p => {
       if (p.status === "installed") {
         if (p.id === "liquid_glass") {
-          used += 1.20;
+          used += 1229; // ~1229 MB
         } else if (p.id === "remove_shiny_border") {
-          used += 0.35;
+          used += 358; // ~358 MB
         } else {
-          used += 0.45;
+          used += 461; // ~461 MB
         }
       }
     });
-    return Math.min(used, 3.00);
-  }, [dynamicMotion, isMultiviewMode, plugins]);
+    return Math.min(used, maxStorageMB);
+  }, [dynamicMotion, isMultiviewMode, plugins, maxStorageMB]);
 
   // Custom Tab and Modal builder states
   const [customTabs, setCustomTabs] = useState<any[]>(() => {
@@ -2956,45 +2971,45 @@ export default function App() {
   const [cleanTimeRemaining, setCleanTimeRemaining] = useState<number>(120); // 120 seconds = 2 minutes
   const [pendingCleanType, setPendingCleanType] = useState<"quick" | "custom" | "all" | null>(null);
 
-  // Dynamic estimated free space calculation
+  // Dynamic estimated free space calculation (in MB)
   const estimatedFreeSpace = useMemo(() => {
     let saved = 0;
     const isStorageFeederInstalled = plugins.some(p => p.id === "storage_feeder" && p.status === "installed");
     
     if (cleanPlugins) {
       if (isStorageFeederInstalled) {
-        let remaining = 0.15;
-        if (dynamicMotion && !cleanMotion) remaining += 0.55;
-        if (isMultiviewMode && !cleanMultiview) remaining += 0.95;
-        saved += Math.max(0, 3.00 - remaining);
+        let remaining = 154;
+        if (dynamicMotion && !cleanMotion) remaining += 563;
+        if (isMultiviewMode && !cleanMultiview) remaining += 973;
+        saved += Math.max(0, maxStorageMB - remaining);
       } else {
         plugins.forEach(p => {
           if (p.status === "installed") {
-            if (p.id === "liquid_glass") saved += 1.20;
-            else if (p.id === "remove_shiny_border") saved += 0.35;
-            else saved += 0.45;
+            if (p.id === "liquid_glass") saved += 1229;
+            else if (p.id === "remove_shiny_border") saved += 358;
+            else saved += 461;
           }
         });
       }
     }
 
     if (!isStorageFeederInstalled || cleanPlugins) {
-      if (cleanMultiview && isMultiviewMode) saved += 0.95;
-      if (cleanMotion && dynamicMotion) saved += 0.55;
+      if (cleanMultiview && isMultiviewMode) saved += 973;
+      if (cleanMotion && dynamicMotion) saved += 563;
     }
     
     if (cleanCustomItems && (customTabs.length > 0 || customModals.length > 0)) {
-      saved += 0.20;
+      saved += 205;
     }
 
     return Math.min(saved, currentStorageUsed);
-  }, [cleanPlugins, cleanMultiview, cleanMotion, cleanCustomItems, plugins, isMultiviewMode, dynamicMotion, customTabs, customModals, currentStorageUsed]);
+  }, [cleanPlugins, cleanMultiview, cleanMotion, cleanCustomItems, plugins, isMultiviewMode, dynamicMotion, customTabs, customModals, currentStorageUsed, maxStorageMB]);
 
   useEffect(() => {
-    if (currentStorageUsed >= 3.00) {
+    if (currentStorageUsed >= maxStorageMB) {
       setShowFullPopup(true);
       setShowNearFullPopup(false);
-    } else if (currentStorageUsed >= 2.00) {
+    } else if (currentStorageUsed >= Math.round(maxStorageMB * 0.67)) {
       setShowFullPopup(false);
       if (!hasDismissedNearFull) {
         setShowNearFullPopup(true);
@@ -3004,7 +3019,7 @@ export default function App() {
       setShowNearFullPopup(false);
       setHasDismissedNearFull(false);
     }
-  }, [currentStorageUsed, hasDismissedNearFull]);
+  }, [currentStorageUsed, maxStorageMB, hasDismissedNearFull]);
 
   const handleCleanStorage = () => {
     setShowCleanModal(true);
@@ -3962,190 +3977,189 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
-            className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[200] flex items-center justify-center p-4 overflow-y-auto select-none" : "fixed inset-0 bg-black/75 backdrop-blur-[20px] z-[200] flex items-center justify-center p-4 overflow-y-auto"}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 bg-black/75 backdrop-blur-xs z-[9999999] flex items-center justify-center p-4 overflow-y-auto select-none"
           >
             <motion.div
-              initial={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0, y: 0 } : { opacity: 0, scale: 0.95, y: 0 })}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={isWinUI3Active ? { opacity: 0, scale: 0.98, y: 0 } : (isMaterialDesignActive ? { opacity: 0, y: 0 } : { opacity: 0, scale: 0.95, y: 0 })}
-              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.45, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
-              className={isWinUI3Active ? `w-full max-w-[430px] relative text-left transform-gpu ${winui.card}` : `w-full max-w-[430px] relative text-left transform-gpu ${
-                isMaterialDesignActive
-                  ? "rounded-[28px] bg-[#211f26] p-5 shadow-2xl border border-white/5 text-[#e6e1e5]"
-                  : "rounded-[28px] bg-[#1c1c1e]/98 p-5 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.6)] border border-white/10 text-white"
-              }`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              style={{ borderRadius: "0px" }}
+              className="w-full max-w-lg bg-[#3a3a3a] border-2 border-[#1e1e1e] shadow-[0_20px_60px_rgba(0,0,0,0.9)] rounded-none overflow-hidden text-left font-sans text-white relative"
             >
               {/* Header */}
-              <div className={isWinUI3Active ? "flex items-center justify-between mb-4 bg-white" : "flex items-center justify-between mb-4"}>
-                <div className="flex items-center gap-2">
-                  <div className={isWinUI3Active ? "p-1.5 rounded-md bg-neutral-100 text-[#005fb8]" : "p-1.5 rounded-lg bg-indigo-500/15 text-indigo-400"}>
-                    <Trash2 className="w-4.5 h-4.5" />
-                  </div>
-                  <div>
-                    <h3 className={isWinUI3Active ? "text-[16px] font-bold tracking-tight text-neutral-900 leading-none" : `text-[16px] font-bold tracking-tight leading-none ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
-                      Bộ dọn dẹp ổ cứng Vplay
-                    </h3>
-                    <span className={isWinUI3Active ? "text-[10px] text-neutral-500 block mt-0.5" : "text-[10px] opacity-50 block mt-0.5"}>Giải phóng dung lượng nhanh chóng</span>
-                  </div>
-                </div>
+              <div className="bg-[#2d2d2d] border-b-2 border-[#1e1e1e] px-4 py-3 flex items-center justify-between relative">
                 <button
+                  type="button"
                   onClick={() => setShowCleanModal(false)}
-                  className={isWinUI3Active ? "p-1.5 rounded-md hover:bg-neutral-100 text-neutral-500 hover:text-neutral-800 transition-colors" : `p-1.5 rounded-full transition-colors ${
-                    isMaterialDesignActive ? "hover:bg-white/5 text-[#e6e1e5]" : "hover:bg-white/10 text-white/70"
-                  }`}
+                  style={{ borderRadius: "0px" }}
+                  className="text-zinc-300 hover:text-white p-1 cursor-pointer transition-none rounded-none active:translate-y-0.5"
+                  title="Back"
                 >
-                  <X className="w-4 h-4" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-              </div>
 
-              {/* Storage capacity indicator */}
-              <div className={isWinUI3Active ? "p-3 rounded-[4px] mb-4 border bg-neutral-50 border-neutral-200" : `p-3 rounded-xl mb-4 border ${
-                isMaterialDesignActive ? "bg-white/5 border-white/10" : "bg-white/[0.03] border-white/5"
-              }`}>
-                <div className="flex items-center justify-between text-[11px] mb-1.5">
-                  <span className={isWinUI3Active ? "opacity-90 text-neutral-800" : "opacity-70"}>Bộ nhớ đã sử dụng:</span>
-                  <span className={isWinUI3Active ? "font-mono font-bold text-neutral-900" : "font-mono font-bold"}>{currentStorageUsed.toFixed(2)} GB / 3.00 GB</span>
-                </div>
-                <div className={isWinUI3Active ? "w-full h-1.5 bg-neutral-200 rounded-full overflow-hidden" : "w-full h-1.5 bg-white/10 rounded-full overflow-hidden"}>
-                  <div 
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      currentStorageUsed >= 2.8 
-                        ? "bg-red-500" 
-                        : currentStorageUsed >= 2.0 
-                          ? "bg-amber-500" 
-                          : (isWinUI3Active ? "bg-[#005fb8]" : "bg-indigo-500")
-                    }`}
-                    style={{ width: `${(currentStorageUsed / 3.00) * 100}%` }}
-                  />
-                </div>
-              </div>
+                <h3 className="text-base sm:text-lg font-bold text-white tracking-wide text-center font-mono uppercase">
+                  Bộ Dọn Dẹp Ổ Cứng Vplay
+                </h3>
 
-              {/* Options selection in 2x2 grid */}
-              <div className="mb-4">
-                <span className={isWinUI3Active ? "text-[11px] font-bold text-[#005fb8] block mb-2 uppercase tracking-wider" : "text-[11px] font-bold text-indigo-400 block mb-2 uppercase tracking-wider"}>Tùy chọn giải phóng:</span>
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Option 1: Plugins */}
-                  <label className={isWinUI3Active ? `p-2.5 rounded-[4px] border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanPlugins 
-                      ? "bg-indigo-50 border-indigo-200 text-neutral-900" 
-                      : "bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50"
-                  }` : `p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanPlugins 
-                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
-                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
-                  }`}>
-                    <input 
-                      type="checkbox"
-                      checked={cleanPlugins}
-                      onChange={(e) => setCleanPlugins(e.target.checked)}
-                      className={isWinUI3Active ? "mt-0.5 accent-[#005fb8] rounded cursor-pointer" : "mt-0.5 accent-indigo-500 rounded cursor-pointer"}
-                    />
-                    <div className="text-left">
-                      <span className={isWinUI3Active ? "font-bold text-[11px] block text-neutral-900" : "font-bold text-[11px] block"}>Gỡ Plugins</span>
-                      <span className={isWinUI3Active ? "text-[9px] text-neutral-500 block mt-0.5 leading-snug" : "text-[9px] opacity-60 block mt-0.5 leading-snug"}>Gỡ Liquid Glass & Storage Feeder</span>
-                    </div>
-                  </label>
-
-                  {/* Option 2: Multiview */}
-                  <label className={isWinUI3Active ? `p-2.5 rounded-[4px] border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanMultiview 
-                      ? "bg-indigo-50 border-indigo-200 text-neutral-900" 
-                      : "bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50"
-                  }` : `p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanMultiview 
-                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
-                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
-                  }`}>
-                    <input 
-                      type="checkbox"
-                      checked={cleanMultiview}
-                      onChange={(e) => setCleanMultiview(e.target.checked)}
-                      className={isWinUI3Active ? "mt-0.5 accent-[#005fb8] rounded cursor-pointer" : "mt-0.5 accent-indigo-500 rounded cursor-pointer"}
-                    />
-                    <div className="text-left">
-                      <span className={isWinUI3Active ? "font-bold text-[11px] block text-neutral-900" : "font-bold text-[11px] block"}>Xóa Multiview</span>
-                      <span className={isWinUI3Active ? "text-[9px] text-neutral-500 block mt-0.5 leading-snug" : "text-[9px] opacity-60 block mt-0.5 leading-snug"}>Đóng kênh phụ, giải phóng cache</span>
-                    </div>
-                  </label>
-
-                  {/* Option 3: Motion */}
-                  <label className={isWinUI3Active ? `p-2.5 rounded-[4px] border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanMotion 
-                      ? "bg-indigo-50 border-indigo-200 text-neutral-900" 
-                      : "bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50"
-                  }` : `p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanMotion 
-                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
-                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
-                  }`}>
-                    <input 
-                      type="checkbox"
-                      checked={cleanMotion}
-                      onChange={(e) => setCleanMotion(e.target.checked)}
-                      className={isWinUI3Active ? "mt-0.5 accent-[#005fb8] rounded cursor-pointer" : "mt-0.5 accent-indigo-500 rounded cursor-pointer"}
-                    />
-                    <div className="text-left">
-                      <span className={isWinUI3Active ? "font-bold text-[11px] block text-neutral-900" : "font-bold text-[11px] block"}>Tắt Motion</span>
-                      <span className={isWinUI3Active ? "text-[9px] text-neutral-500 block mt-0.5 leading-snug" : "text-[9px] opacity-60 block mt-0.5 leading-snug"}>Tắt hiệu ứng chuyển cảnh mượt</span>
-                    </div>
-                  </label>
-
-                  {/* Option 4: Custom channels/tabs */}
-                  <label className={isWinUI3Active ? `p-2.5 rounded-[4px] border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanCustomItems 
-                      ? "bg-indigo-50 border-indigo-200 text-neutral-900" 
-                      : "bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50"
-                  }` : `p-2.5 rounded-xl border cursor-pointer select-none transition-all duration-200 flex items-start gap-2 ${
-                    cleanCustomItems 
-                      ? "bg-indigo-500/10 border-indigo-500/40 text-white" 
-                      : "bg-white/[0.02] border-white/5 text-white/50 hover:border-white/10"
-                  }`}>
-                    <input 
-                      type="checkbox"
-                      checked={cleanCustomItems}
-                      onChange={(e) => setCleanCustomItems(e.target.checked)}
-                      className={isWinUI3Active ? "mt-0.5 accent-[#005fb8] rounded cursor-pointer" : "mt-0.5 accent-indigo-500 rounded cursor-pointer"}
-                    />
-                    <div className="text-left">
-                      <span className={isWinUI3Active ? "font-bold text-[11px] block text-neutral-900" : "font-bold text-[11px] block"}>Xóa Custom</span>
-                      <span className={isWinUI3Active ? "text-[9px] text-neutral-500 block mt-0.5 leading-snug" : "text-[9px] opacity-60 block mt-0.5 leading-snug"}>Xóa kênh/cửa sổ tự thiết kế</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Estimated space backplate */}
-              <div className={isWinUI3Active ? "flex items-center justify-between px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-[4px] mb-4 text-xs" : "flex items-center justify-between px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl mb-4 text-xs"}>
-                <span className={isWinUI3Active ? "text-emerald-700 font-medium flex items-center gap-1 text-[11px]" : "text-emerald-400 font-medium flex items-center gap-1 text-[11px]"}>
-                  <span>🍃</span> Dung lượng ước tính giải phóng:
-                </span>
-                <span className={isWinUI3Active ? "font-bold font-mono text-emerald-700" : "font-bold font-mono text-emerald-400"}>-{estimatedFreeSpace.toFixed(2)} GB</span>
-              </div>
-
-              {/* Combined Actions */}
-              <div className="space-y-2">
                 <button
-                  onClick={handleExecuteCustomClean}
-                  disabled={!cleanPlugins && !cleanMultiview && !cleanMotion && !cleanCustomItems}
-                  className={isWinUI3Active ? `${winui.btnPrimary} w-full rounded-[4px] py-2 text-xs` : "w-full py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[12px] font-bold transition-all active:scale-95 shadow-md cursor-default text-center"}
+                  type="button"
+                  onClick={() => setShowCleanModal(false)}
+                  style={{ borderRadius: "0px" }}
+                  className="text-zinc-300 hover:text-white p-1 cursor-pointer transition-none rounded-none active:translate-y-0.5"
+                  title="Close"
                 >
-                  Bắt đầu dọn dẹp đã chọn (2 phút)
+                  <X className="w-5 h-5" />
                 </button>
+              </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-1">
+              {/* Modal Body */}
+              <div className="p-4 sm:p-5 space-y-4">
+                {/* Storage capacity indicator */}
+                <div className="p-3 bg-[#2d2d2d] border border-[#222222] rounded-none space-y-2" style={{ borderRadius: "0px" }}>
+                  <div className="flex items-center justify-between text-xs font-mono font-bold">
+                    <span className="text-zinc-300">Bộ nhớ đã sử dụng:</span>
+                    <span className="text-emerald-400">{Math.round(currentStorageUsed).toLocaleString()} MB / {maxStorageMB.toLocaleString()} MB</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-[#181818] border border-[#101010] rounded-none overflow-hidden" style={{ borderRadius: "0px" }}>
+                    <div 
+                      className="h-full bg-[#388e3c] transition-all duration-300"
+                      style={{ width: `${Math.min(100, (currentStorageUsed / maxStorageMB) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Options selection in 2x2 grid */}
+                <div className="space-y-2">
+                  <span className="text-xs font-mono font-bold text-zinc-300 block uppercase tracking-wider">Tùy chọn giải phóng dung lượng:</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Option 1: Plugins */}
+                    <label 
+                      style={{ borderRadius: "0px" }}
+                      className={`p-2.5 border cursor-pointer select-none flex items-start gap-2.5 rounded-none transition-none ${
+                        cleanPlugins 
+                          ? "bg-[#2d2d2d] border-[#388e3c] text-white" 
+                          : "bg-[#242424] border-[#181818] text-zinc-400 hover:border-zinc-600"
+                      }`}
+                    >
+                      <input 
+                        type="checkbox"
+                        checked={cleanPlugins}
+                        onChange={(e) => setCleanPlugins(e.target.checked)}
+                        style={{ borderRadius: "0px" }}
+                        className="mt-0.5 accent-[#388e3c] cursor-pointer rounded-none"
+                      />
+                      <div className="text-left">
+                        <span className="font-bold text-xs block text-white">Gỡ Plugins</span>
+                        <span className="text-[10px] text-zinc-400 block mt-0.5 leading-snug">Gỡ Liquid Glass & Storage Feeder</span>
+                      </div>
+                    </label>
+
+                    {/* Option 2: Multiview */}
+                    <label 
+                      style={{ borderRadius: "0px" }}
+                      className={`p-2.5 border cursor-pointer select-none flex items-start gap-2.5 rounded-none transition-none ${
+                        cleanMultiview 
+                          ? "bg-[#2d2d2d] border-[#388e3c] text-white" 
+                          : "bg-[#242424] border-[#181818] text-zinc-400 hover:border-zinc-600"
+                      }`}
+                    >
+                      <input 
+                        type="checkbox"
+                        checked={cleanMultiview}
+                        onChange={(e) => setCleanMultiview(e.target.checked)}
+                        style={{ borderRadius: "0px" }}
+                        className="mt-0.5 accent-[#388e3c] cursor-pointer rounded-none"
+                      />
+                      <div className="text-left">
+                        <span className="font-bold text-xs block text-white">Xóa Multiview</span>
+                        <span className="text-[10px] text-zinc-400 block mt-0.5 leading-snug">Đóng kênh phụ, giải phóng cache</span>
+                      </div>
+                    </label>
+
+                    {/* Option 3: Motion */}
+                    <label 
+                      style={{ borderRadius: "0px" }}
+                      className={`p-2.5 border cursor-pointer select-none flex items-start gap-2.5 rounded-none transition-none ${
+                        cleanMotion 
+                          ? "bg-[#2d2d2d] border-[#388e3c] text-white" 
+                          : "bg-[#242424] border-[#181818] text-zinc-400 hover:border-zinc-600"
+                      }`}
+                    >
+                      <input 
+                        type="checkbox"
+                        checked={cleanMotion}
+                        onChange={(e) => setCleanMotion(e.target.checked)}
+                        style={{ borderRadius: "0px" }}
+                        className="mt-0.5 accent-[#388e3c] cursor-pointer rounded-none"
+                      />
+                      <div className="text-left">
+                        <span className="font-bold text-xs block text-white">Tắt Motion</span>
+                        <span className="text-[10px] text-zinc-400 block mt-0.5 leading-snug">Tắt hiệu ứng chuyển cảnh mượt</span>
+                      </div>
+                    </label>
+
+                    {/* Option 4: Custom channels */}
+                    <label 
+                      style={{ borderRadius: "0px" }}
+                      className={`p-2.5 border cursor-pointer select-none flex items-start gap-2.5 rounded-none transition-none ${
+                        cleanCustomItems 
+                          ? "bg-[#2d2d2d] border-[#388e3c] text-white" 
+                          : "bg-[#242424] border-[#181818] text-zinc-400 hover:border-zinc-600"
+                      }`}
+                    >
+                      <input 
+                        type="checkbox"
+                        checked={cleanCustomItems}
+                        onChange={(e) => setCleanCustomItems(e.target.checked)}
+                        style={{ borderRadius: "0px" }}
+                        className="mt-0.5 accent-[#388e3c] cursor-pointer rounded-none"
+                      />
+                      <div className="text-left">
+                        <span className="font-bold text-xs block text-white">Xóa Custom</span>
+                        <span className="text-[10px] text-zinc-400 block mt-0.5 leading-snug">Xóa kênh/cửa sổ tự thiết kế</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Estimated space */}
+                <div className="flex items-center justify-between px-3 py-2 bg-[#2d2d2d] border border-[#222222] rounded-none text-xs" style={{ borderRadius: "0px" }}>
+                  <span className="text-emerald-400 font-mono font-bold flex items-center gap-1.5">
+                    <span>🍃</span> Dung lượng ước tính giải phóng:
+                  </span>
+                  <span className="font-bold font-mono text-emerald-400">-{Math.round(estimatedFreeSpace).toLocaleString()} MB</span>
+                </div>
+
+                {/* Combined Actions */}
+                <div className="space-y-2.5 pt-1">
                   <button
-                    onClick={handleQuickClean}
-                    className={isWinUI3Active ? `${winui.btnSecondary} rounded-[4px] py-1.5 text-xs` : "py-1.5 px-3 rounded-full bg-white/5 hover:bg-white/10 text-white text-[11px] font-semibold text-center transition-all cursor-default"}
+                    onClick={handleExecuteCustomClean}
+                    disabled={!cleanPlugins && !cleanMultiview && !cleanMotion && !cleanCustomItems}
+                    style={{ borderRadius: "0px" }}
+                    className="ore-btn-green w-full py-2.5 px-4 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    ⚡ Dọn dẹp nhanh
+                    <span>Bắt đầu dọn dẹp đã chọn (2 phút)</span>
                   </button>
-                  <button
-                    onClick={handleCleanAllStorage}
-                    className={isWinUI3Active ? `${winui.btnDanger} rounded-[4px] py-1.5 text-xs` : "py-1.5 px-3 rounded-full bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/10 hover:border-red-500/20 text-[11px] font-bold text-center transition-all cursor-default"}
-                  >
-                    🚨 Khôi phục cài đặt gốc
-                  </button>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={handleQuickClean}
+                      style={{ borderRadius: "0px" }}
+                      className="ore-btn-white py-2 px-3 text-xs font-bold text-center cursor-pointer shadow-md"
+                    >
+                      ⚡ Dọn dẹp nhanh
+                    </button>
+                    <button
+                      onClick={handleCleanAllStorage}
+                      style={{ borderRadius: "0px" }}
+                      className="bg-[#b71c1c] text-white hover:bg-[#c62828] border-b-4 border-[#5f0909] active:border-b-0 active:translate-y-1 py-2 px-3 text-xs font-bold text-center cursor-pointer shadow-md rounded-none"
+                    >
+                      🚨 Khôi phục cài đặt gốc
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -4295,7 +4309,7 @@ export default function App() {
     );
   }
 
-  if (isManualCrash || currentStorageUsed >= 3.00) {
+  if (isManualCrash || currentStorageUsed >= maxStorageMB) {
     if (isDuiMode) {
       const getTerminalColors = () => {
         switch (duiTerminalTheme) {
@@ -4487,8 +4501,8 @@ export default function App() {
                   <div className="space-y-1.5">
                     <div className="flex justify-between">
                       <span className="text-neutral-500">Storage Used:</span>
-                      <span className={currentStorageUsed >= 2.8 ? "text-rose-400 font-bold animate-pulse" : `${termColors.accentText} font-semibold`}>
-                        {currentStorageUsed.toFixed(2)} GB / 3.00 GB
+                      <span className={currentStorageUsed >= maxStorageMB ? "text-rose-400 font-bold animate-pulse" : `${termColors.accentText} font-semibold`}>
+                        {Math.round(currentStorageUsed).toLocaleString()} MB / {maxStorageMB.toLocaleString()} MB
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -4526,14 +4540,14 @@ export default function App() {
           setIsDuiMonitorActive(false);
         }}
         onCleanStorage={handleCleanAllStorage}
-        storageOverlimit={currentStorageUsed >= 3.00}
+        storageOverlimit={currentStorageUsed >= maxStorageMB}
         onResetCount={() => {
           setCrashClickCount(prev => {
             const next = prev + 1;
             if (next >= 10) {
               localStorage.removeItem("vplay_manual_crash");
               setIsManualCrash(false);
-              if (currentStorageUsed >= 3.00) {
+              if (currentStorageUsed >= maxStorageMB) {
                 handleCleanAllStorage();
               }
               return 0;
@@ -4545,237 +4559,7 @@ export default function App() {
     );
   }
 
-  if (showSplash || roleSelection === null || isDelayingTransition || showWelcomeSplash) {
-    return (
-      <div className={`fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google ${isDelayingTransition ? "cursor-wait" : ""}`}>
-        {/* Background ambient light */}
-        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-
-        {showSplash ? (
-          <div className="flex flex-col items-center justify-center">
-            <WindowsSpinner size={56} className="mb-6" />
-            <div className="text-white/40 text-xs tracking-widest uppercase font-google font-medium animate-pulse">Connecting to services...</div>
-          </div>
-        ) : isDelayingTransition ? (
-          <div className="flex flex-col items-center justify-center cursor-wait pointer-events-auto">
-            <WindowsSpinner size={48} className="mb-6 cursor-wait" />
-            <div className="text-white/50 text-xs tracking-widest uppercase font-mono font-medium animate-pulse cursor-wait">
-              Initializing secure workspace...
-            </div>
-          </div>
-        ) : showWelcomeSplash ? (
-          <div className="flex flex-col items-center justify-center text-center max-w-xl z-10 space-y-6 animate-fade-in">
-            <img 
-              src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
-              alt="Vplay Brand Logo"
-              referrerPolicy="no-referrer"
-              className="h-14 sm:h-16 w-auto object-contain mx-auto transition-transform duration-300 hover:scale-105 animate-pulse"
-            />
-            <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight uppercase bg-gradient-to-r from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent">
-                {pendingRole === "admin" ? "XIN CHÀO NHÀ PHÁT TRIỂN" : "CHÀO MỪNG BẠN ĐẾN VỚI VPLAY"}
-              </h1>
-              <p className="text-[11px] sm:text-xs text-indigo-300/60 uppercase tracking-widest font-mono">
-                {pendingRole === "admin" ? "Quyền quản trị tối cao đã được xác thực" : "Hệ thống truyền hình giải trí đỉnh cao"}
-              </p>
-            </div>
-            
-            <div className="pt-4 flex justify-center">
-              <WindowsSpinner size={42} className="opacity-80" />
-            </div>
-          </div>
-        ) : roleSelection === null ? (
-          <div className="flex flex-col items-center gap-6 w-full max-w-lg z-10">
-            {/* Elegant Large Digital Clock & Calendar */}
-            <div className="text-center space-y-1 mb-2 animate-fade-in">
-              <div className="text-5xl sm:text-6xl font-black tracking-tighter bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-lg font-sans">
-                {formatTimeBig(loginTime)}
-              </div>
-              <div className="text-[11px] sm:text-xs font-semibold text-indigo-300/80 uppercase tracking-widest">
-                {formatDateBig(loginTime)}
-              </div>
-            </div>
-
-            {/* Who are you Selection Card */}
-            <div className="w-full max-w-md p-8 bg-[#121118]/85 backdrop-blur-2xl border border-white/10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.8)] relative overflow-hidden rounded-[28px] animate-fade-in hover:border-white/15 transition-all text-white font-google">
-            {/* Ambient subtle glow background */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-
-            <div className="relative z-10 space-y-6">
-              {!showAdminPassModal ? (
-                <>
-                  <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-white tracking-wide uppercase">BẠN LÀ AI?</h2>
-                    <p className="text-xs text-white/45 uppercase tracking-wider">Vui lòng chọn vai trò để tiếp tục</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 pt-2">
-                    {/* User Option Button */}
-                    <button
-                      onClick={() => {
-                        handleSelectRole("user");
-                      }}
-                      className="group flex items-center justify-between p-4 bg-white/[0.03] hover:bg-indigo-600/10 border border-white/10 hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-left rounded-2xl relative cursor-default"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-300 transition-colors">
-                          <User className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="font-bold text-xs text-white uppercase tracking-wider">Người trải nghiệm</div>
-                          <div className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors">Khám phá Vplay lập tức</div>
-                        </div>
-                      </div>
-                      <span className="text-[10px] text-indigo-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">SELECT &rarr;</span>
-                    </button>
-
-                    {/* Admin Option Button */}
-                    <button
-                      onClick={() => {
-                        setShowAdminPassModal(true);
-                        setAdminError("");
-                        setAdminPasswordInput("");
-                      }}
-                      className="group flex items-center justify-between p-4 bg-white/[0.03] hover:bg-purple-600/10 border border-white/10 hover:border-purple-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-left rounded-2xl relative cursor-default"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-colors">
-                          <Cpu className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="font-bold text-xs text-white uppercase tracking-wider">Nhà phát triển</div>
-                          <div className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors font-medium">Yêu cầu mã khóa bảo mật</div>
-                        </div>
-                      </div>
-                      <span className="text-[10px] text-purple-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">AUTH &rarr;</span>
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-5 animate-fade-in text-left">
-                  <div className="text-center space-y-1">
-                    <h3 className="text-sm font-bold uppercase text-purple-400 tracking-wide">XÁC THỰC ADMIN</h3>
-                    <p className="text-xs text-white/40 uppercase tracking-wider">Nhập mã khóa bảo mật để cấp quyền</p>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] text-white/50 uppercase tracking-wider font-semibold">MẬT MÃ TRUY CẬP</label>
-                    <input
-                      type="password"
-                      value={adminPasswordInput}
-                      onChange={(e) => setAdminPasswordInput(e.target.value)}
-                      placeholder="Mật khẩu của Admin..."
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          if (adminPasswordInput === "3667") {
-                            handleSelectRole("admin");
-                            setShowAdminPassModal(false);
-                          } else {
-                            setAdminError("Mật khẩu không chính xác!");
-                          }
-                        }
-                      }}
-                      className="w-full bg-black/40 border border-white/10 focus:border-purple-500/50 px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none rounded-xl font-mono tracking-widest"
-                      autoFocus
-                    />
-                  </div>
-
-                  {adminError && (
-                    <div className="text-[10px] text-red-400 font-bold uppercase tracking-wider font-mono text-center">
-                      ⚠ {adminError}
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 pt-2">
-                    <button
-                      onClick={() => {
-                        if (adminPasswordInput === "3667") {
-                          handleSelectRole("admin");
-                          setShowAdminPassModal(false);
-                        } else {
-                          setAdminError("Mật khẩu không chính xác!");
-                        }
-                      }}
-                      className="flex-1 bg-purple-600 hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.3)] text-white font-bold py-2.5 text-xs uppercase tracking-wider rounded-xl transition-all cursor-default text-center"
-                    >
-                      Xác nhận
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowAdminPassModal(false);
-                        setAdminError("");
-                        setAdminPasswordInput("");
-                      }}
-                      className="flex-1 bg-white/5 hover:bg-white/10 text-white/60 font-bold py-2.5 text-xs uppercase tracking-wider rounded-xl transition-all cursor-default text-center"
-                    >
-                      Quay lại
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          </div>
-        ) : (
-          <div className="text-white">Kiểm tra tính toàn vẹn...</div>
-        )}
-
-        {currentStorageUsed >= 3.00 && showFullPopup && !isCleaning && (
-          <div className="fixed inset-0 bg-black/85 backdrop-blur-[25px] z-[150] flex items-center justify-center p-4">
-            <motion.div
-              initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-              animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-              exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-              transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
-              className={`w-full max-w-[420px] relative text-left transform-gpu ${
-                isMaterialDesignActive
-                  ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
-                  : "rounded-[30px] bg-[#1c1c1e]/95 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 text-white"
-              }`}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2.5 rounded-full bg-red-500/10 text-red-400 animate-pulse">
-                  <HardDrive className="w-6 h-6" />
-                </div>
-                <h3 className={`text-[19px] font-bold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
-                  Ổ cứng đã đầy (3.00GB)
-                </h3>
-              </div>
-              <p className={`text-[13px] mb-6 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/70"}`}>
-                Ứng dụng dùng thử nghiệm Vplay chỉ hỗ trợ lưu trữ tối đa 3GB dữ liệu rác. Do ổ cứng đã đầy hoàn toàn, Vplay sẽ bị khóa cho đến khi được giải phóng bộ nhớ.
-              </p>
-              
-              <div className="space-y-2.5">
-                <button
-                  onClick={handleCleanStorage}
-                  className={`w-full py-3 px-4 rounded-full font-bold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
-                    isMaterialDesignActive
-                      ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
-                      : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-lg"
-                  }`}
-                >
-                  Dọn dẹp ổ cứng ngay (Mất 2 phút)
-                </button>
-                <button
-                  onClick={() => window.location.reload()}
-                  className={`w-full py-3 px-4 rounded-full font-semibold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
-                    isMaterialDesignActive
-                      ? "bg-white/5 hover:bg-white/10 text-[#e6e1e5] border border-white/10"
-                      : "bg-white/10 hover:bg-white/15 text-white"
-                  }`}
-                >
-                  Thử tải lại trang
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-        {renderCleanupModal()}
-      {renderFocusChannelsModal()}
-      </div>
-    );
-  }
+  const isSplashActive = showSplash || roleSelection === null || isDelayingTransition || showWelcomeSplash;
 
   const getPageTitleUpper = () => {
     // Check open modals first
@@ -4846,102 +4630,342 @@ export default function App() {
   };
 
   return (
-    <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
-      <div className={`min-h-screen ${appThemeMode === "light" ? "text-slate-800 light-theme" : "text-white/95"} pb-32 pt-4 transition-colors duration-1000 overflow-x-clip ${dockToSidebar ? (isSidebarCollapsed ? "md:pl-24" : "md:pl-80") : ""} ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""} ${isPanoramaActive ? "panorama-active-mode" : ""}`}>
-        
-        {/* PANORAMA 360 MINECRAFT BACKGROUND PLUGIN */}
-        {isPanoramaActive && <PanoramaBackground />}
-
-        {/* ALWAYS ON TOP PAGE TITLE HEADER BAR */}
-        <div 
-          className="fixed top-0 left-0 right-0 h-10 z-[99999] bg-[#e5e5e5] text-black font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between px-1 sm:px-2 pointer-events-auto select-none font-montserrat"
-          style={{ boxShadow: "0px 5px 0px 0px #808080", fontFamily: "'Montserrat', sans-serif" }}
-        >
-          {/* Left section: Back button & Sidebar toggle button */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            <button
-              onClick={handleHeaderBack}
-              title="Quay lại (Back)"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              <ArrowLeft className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
-              <span className="hidden xs:inline tracking-wider font-montserrat" style={{ fontFamily: "'Montserrat', sans-serif" }}>BACK</span>
-            </button>
-
-            {dockToSidebar && (
-              <button
-                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                title={isSidebarCollapsed ? "Mở rộng Sidebar" : "Thu gọn Sidebar"}
-                className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
-                style={{ fontFamily: "'Montserrat', sans-serif" }}
-              >
-                <Menu className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
-              </button>
-            )}
-          </div>
-
-          {/* Page Title in exact Sidebar form using Montserrat font */}
-          <span 
-            className="truncate px-2 font-black text-center tracking-wider text-xs sm:text-sm uppercase font-montserrat"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
+    <div className="bg-[#06040a] min-h-screen w-full overflow-hidden text-white">
+      <MotionConfig transition={dynamicMotion ? undefined : { type: "tween", duration: 0 }}>
+        <AnimatePresence mode="popLayout">
+        {isSplashActive ? (
+          <motion.div
+            key="splash-screen-layer"
+            initial={{ x: 0 }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className={`fixed inset-0 bg-[#06040a] flex flex-col items-center justify-center z-[99999] p-4 select-none font-google overflow-hidden ${isDelayingTransition ? "cursor-wait" : ""}`}
           >
-            {getPageTitleUpper()}
-          </span>
+            {/* Real 360° Minecraft Panorama Canvas Background in Splash Screen */}
+            <PanoramaBackground />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/75 pointer-events-none z-0" />
 
-          {/* Right section: V-Pearls counter & Search button */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            {/* V-Pearls Count (black icon, black text) */}
-            <button
-              onClick={() => {
-                setActiveTab("verified");
-                setActiveSettingSection(null);
-              }}
-              title="Số dư V-pearls"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-black text-xs sm:text-sm cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
+            {showSplash ? (
+              <div className="flex flex-col items-center justify-center relative z-10">
+                <WindowsSpinner size={56} className="mb-6" />
+                <div className="text-white/40 text-xs tracking-widest uppercase font-google font-medium animate-pulse">Connecting to services...</div>
+              </div>
+            ) : isDelayingTransition ? (
+              <div className="flex flex-col items-center justify-center cursor-wait pointer-events-auto relative z-10">
+                <WindowsSpinner size={48} className="mb-6 cursor-wait" />
+                <div className="text-white/50 text-xs tracking-widest uppercase font-mono font-medium animate-pulse cursor-wait">
+                  Initializing secure workspace...
+                </div>
+              </div>
+            ) : showWelcomeSplash ? (
+              <div className="flex flex-col items-center justify-center text-center max-w-xl z-10 space-y-6 animate-fade-in relative">
+                <img 
+                  src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
+                  alt="Vplay Brand Logo"
+                  referrerPolicy="no-referrer"
+                  className="h-14 sm:h-16 w-auto object-contain mx-auto transition-transform duration-300 hover:scale-105 animate-pulse"
+                />
+                <div className="space-y-2">
+                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight uppercase bg-gradient-to-r from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent">
+                    {pendingRole === "admin" ? "XIN CHÀO NHÀ PHÁT TRIỂN" : "CHÀO MỪNG BẠN ĐẾN VỚI VPLAY"}
+                  </h1>
+                  <p className="text-[11px] sm:text-xs text-indigo-300/60 uppercase tracking-widest font-mono">
+                    {pendingRole === "admin" ? "Quyền quản trị tối cao đã được xác thực" : "Hệ thống truyền hình giải trí đỉnh cao"}
+                  </p>
+                </div>
+                
+                <div className="pt-4 flex justify-center">
+                  <WindowsSpinner size={42} className="opacity-80" />
+                </div>
+              </div>
+            ) : roleSelection === null ? (
+              <div className="flex flex-col items-center gap-6 w-full max-w-lg z-10">
+                {/* Elegant Large Digital Clock & Calendar */}
+                <div className="text-center space-y-1 mb-2 animate-fade-in">
+                  <div className="text-5xl sm:text-6xl font-black tracking-tighter bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-lg font-sans">
+                    {formatTimeBig(loginTime)}
+                  </div>
+                  <div className="text-[11px] sm:text-xs font-semibold text-indigo-300/80 uppercase tracking-widest">
+                    {formatDateBig(loginTime)}
+                  </div>
+                </div>
+
+                {/* Who are you Selection Card */}
+                <div className="w-full max-w-md p-8 bg-[#121118]/90 border border-white/10 text-center shadow-[0_24px_60px_rgba(0,0,0,0.8)] relative overflow-hidden rounded-[28px] animate-fade-in hover:border-white/15 transition-all text-white font-google">
+                <div className="relative z-10 space-y-6">
+                  {!showAdminPassModal ? (
+                    <>
+                      <div className="space-y-1">
+                        <h2 className="text-lg font-bold text-white tracking-wide uppercase">BẠN LÀ AI?</h2>
+                        <p className="text-xs text-white/45 uppercase tracking-wider">Vui lòng chọn vai trò để tiếp tục</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 pt-2">
+                        {/* User Option Button */}
+                        <button
+                          onClick={() => {
+                            handleSelectRole("user");
+                          }}
+                          className="group flex items-center justify-between p-4 bg-white/[0.03] hover:bg-indigo-600/10 border border-white/10 hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-left rounded-2xl relative cursor-default"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-300 transition-colors">
+                              <User className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-xs text-white uppercase tracking-wider">Người trải nghiệm</div>
+                              <div className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors">Khám phá Vplay lập tức</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] text-indigo-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">SELECT &rarr;</span>
+                        </button>
+
+                        {/* Admin Option Button */}
+                        <button
+                          onClick={() => {
+                            setShowAdminPassModal(true);
+                            setAdminError("");
+                            setAdminPasswordInput("");
+                          }}
+                          className="group flex items-center justify-between p-4 bg-white/[0.03] hover:bg-purple-600/10 border border-white/10 hover:border-purple-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-left rounded-2xl relative cursor-default"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-colors">
+                              <Cpu className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <div className="font-bold text-xs text-white uppercase tracking-wider">Nhà phát triển</div>
+                              <div className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors font-medium">Yêu cầu mã khóa bảo mật</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] text-purple-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">AUTH &rarr;</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-5 animate-fade-in text-left">
+                      <div className="text-center space-y-1">
+                        <h3 className="text-sm font-bold uppercase text-purple-400 tracking-wide">XÁC THỰC ADMIN</h3>
+                        <p className="text-xs text-white/40 uppercase tracking-wider">Nhập mã khóa bảo mật để cấp quyền</p>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-white/50 uppercase tracking-wider font-semibold">MẬT MÃ TRUY CẬP</label>
+                        <input
+                          type="password"
+                          value={adminPasswordInput}
+                          onChange={(e) => setAdminPasswordInput(e.target.value)}
+                          placeholder="Mật khẩu của Admin..."
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              if (adminPasswordInput === "3667") {
+                                handleSelectRole("admin");
+                                setShowAdminPassModal(false);
+                              } else {
+                                setAdminError("Mật khẩu không chính xác!");
+                              }
+                            }
+                          }}
+                          className="w-full bg-black/40 border border-white/10 focus:border-purple-500/50 px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none rounded-xl font-mono tracking-widest"
+                          autoFocus
+                        />
+                      </div>
+
+                      {adminError && (
+                        <div className="text-[10px] text-red-400 font-bold uppercase tracking-wider font-mono text-center">
+                          ⚠ {adminError}
+                        </div>
+                      )}
+
+                      <div className="flex gap-2 pt-2">
+                        <button
+                          onClick={() => {
+                            if (adminPasswordInput === "3667") {
+                              handleSelectRole("admin");
+                              setShowAdminPassModal(false);
+                            } else {
+                              setAdminError("Mật khẩu không chính xác!");
+                            }
+                          }}
+                          className="flex-1 bg-purple-600 hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.3)] text-white font-bold py-2.5 text-xs uppercase tracking-wider rounded-xl transition-all cursor-default text-center"
+                        >
+                          Xác nhận
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowAdminPassModal(false);
+                            setAdminError("");
+                            setAdminPasswordInput("");
+                          }}
+                          className="flex-1 bg-white/5 hover:bg-white/10 text-white/60 font-bold py-2.5 text-xs uppercase tracking-wider rounded-xl transition-all cursor-default text-center"
+                        >
+                          Quay lại
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              </div>
+            ) : (
+              <div className="text-white">Kiểm tra tính toàn vẹn...</div>
+            )}
+
+            {currentStorageUsed >= maxStorageMB && showFullPopup && !isCleaning && (
+              <div className="fixed inset-0 bg-black/85 backdrop-blur-[25px] z-[150] flex items-center justify-center p-4">
+                <motion.div
+                  initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                  animate={isMaterialDesignActive ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                  exit={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                  transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
+                  className={`w-full max-w-[420px] relative text-left transform-gpu ${
+                    isMaterialDesignActive
+                      ? "rounded-[28px] bg-[#211f26] p-6 shadow-2xl border-0 text-[#e6e1e5]"
+                      : "rounded-[30px] bg-[#1c1c1e]/95 p-6 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15),0_24px_48px_rgba(0,0,0,0.5)] border border-white/10 text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2.5 rounded-full bg-red-500/10 text-red-400 animate-pulse">
+                      <HardDrive className="w-6 h-6" />
+                    </div>
+                    <h3 className={`text-[19px] font-bold tracking-tight leading-snug ${isMaterialDesignActive ? "text-[#e6e1e5]" : "text-white"}`}>
+                      Ổ cứng đã đầy ({maxStorageMB.toLocaleString()} MB)
+                    </h3>
+                  </div>
+                  <p className={`text-[13px] mb-6 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/70"}`}>
+                    Ứng dụng dùng thử nghiệm Vplay hỗ trợ lưu trữ tối đa {maxStorageMB.toLocaleString()} MB dữ liệu. Do ổ cứng đã đầy hoàn toàn, Vplay sẽ bị khóa cho đến khi được giải phóng bộ nhớ hoặc mua thêm Storage.
+                  </p>
+                  
+                  <div className="space-y-2.5">
+                    <button
+                      onClick={handleCleanStorage}
+                      className={`w-full py-3 px-4 rounded-full font-bold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                        isMaterialDesignActive
+                          ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
+                          : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-lg"
+                      }`}
+                    >
+                      Dọn dẹp ổ cứng ngay (Mất 2 phút)
+                    </button>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className={`w-full py-3 px-4 rounded-full font-semibold text-[14px] text-center cursor-default transform-gpu active:scale-95 transition-all duration-300 ${
+                        isMaterialDesignActive
+                          ? "bg-white/5 hover:bg-white/10 text-[#e6e1e5] border border-white/10"
+                          : "bg-white/10 hover:bg-white/15 text-white"
+                      }`}
+                    >
+                      Thử tải lại trang
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+            {renderCleanupModal()}
+            {renderFocusChannelsModal()}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="main-app-layer"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className={`min-h-screen ${appThemeMode === "light" ? "text-slate-800 light-theme" : "text-white/95"} pb-32 pt-4 transition-colors duration-1000 overflow-x-clip ${dockToSidebar ? (isSidebarCollapsed ? "md:pl-24" : "md:pl-80") : ""} ${getBgGradient()} ${!liquidGlass || isMaterialDesignActive ? "no-liquid-glass" : ""} ${isMaterialDesignActive ? "material-design-3" : ""} ${isWinUI3Active ? "winui-3-active" : ""} ${isRemoveShinyBorderActive ? "remove-shiny-border" : ""} ${!dynamicMotion ? "no-dynamic-motion" : ""} ${isPanoramaActive ? "panorama-active-mode" : ""}`}
+          >
+            {/* PANORAMA 360 MINECRAFT BACKGROUND PLUGIN */}
+            {isPanoramaActive && <PanoramaBackground />}
+
+            {/* ALWAYS ON TOP PAGE TITLE HEADER BAR */}
+            <div 
+              className="fixed top-0 left-0 right-0 h-10 z-[99999] bg-[#e5e5e5] text-black font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-between px-1 sm:px-2 pointer-events-auto select-none font-kanit"
+              style={{ boxShadow: "0px 5px 0px 0px #808080", fontFamily: "'Kanit', sans-serif" }}
             >
-              <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0 stroke-[2.5]" />
-              <span className="font-mono font-black text-black tracking-tight">
-                {vCoins.toLocaleString()}
+              {/* Left section: Back button & Sidebar toggle button */}
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                <button
+                  onClick={handleHeaderBack}
+                  title="Quay lại (Back)"
+                  className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-kanit"
+                  style={{ fontFamily: "'Kanit', sans-serif" }}
+                >
+                  <ArrowLeft className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
+                  <span className="hidden xs:inline tracking-wider font-kanit" style={{ fontFamily: "'Kanit', sans-serif" }}>BACK</span>
+                </button>
+
+                {dockToSidebar && (
+                  <button
+                    onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                    title={isSidebarCollapsed ? "Mở rộng Sidebar" : "Thu gọn Sidebar"}
+                    className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-kanit"
+                    style={{ fontFamily: "'Kanit', sans-serif" }}
+                  >
+                    <Menu className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
+                  </button>
+                )}
+              </div>
+
+              {/* Page Title in exact Sidebar form using Kanit font */}
+              <span 
+                className="truncate px-2 font-black text-center tracking-wider text-xs sm:text-sm uppercase font-kanit"
+                style={{ fontFamily: "'Kanit', sans-serif" }}
+              >
+                {getPageTitleUpper()}
               </span>
-            </button>
 
-            {/* Copilot button */}
-            <button
-              onClick={() => {
-                setIsCopilotDrawerOpen(prev => !prev);
-              }}
-              title="Copilot AI Drawer"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              <span className="hidden xs:inline tracking-wider font-montserrat" style={{ fontFamily: "'Montserrat', sans-serif" }}>COPILOT</span>
-              <img
-                src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-                }}
-                alt="Copilot"
-                className="w-5 h-5 shrink-0 object-contain"
-              />
-            </button>
+              {/* Right section: V-Pearls counter & Search button */}
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                {/* V-Pearls Count (black icon, black text) */}
+                <button
+                  onClick={() => {
+                    setActiveTab("verified");
+                    setActiveSettingSection(null);
+                  }}
+                  title="Số dư V-pearls"
+                  className="flex items-center gap-1 p-1 bg-transparent text-black font-black text-xs sm:text-sm cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-kanit"
+                  style={{ fontFamily: "'Kanit', sans-serif" }}
+                >
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0 stroke-[2.5]" />
+                  <span className="font-mono font-black text-black tracking-tight">
+                    {vCoins.toLocaleString()}
+                  </span>
+                </button>
 
-            {/* Search button */}
-            <button
-              onClick={() => {
-                setActiveTab("search");
-                setActiveSettingSection(null);
-              }}
-              title="Tìm kiếm (Search)"
-              className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-montserrat"
-              style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-              <span className="hidden xs:inline tracking-wider font-montserrat" style={{ fontFamily: "'Montserrat', sans-serif" }}>SEARCH</span>
-              <Search className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
-            </button>
-          </div>
-        </div>
+                {/* Copilot button */}
+                <button
+                  onClick={() => {
+                    setIsCopilotDrawerOpen(prev => !prev);
+                  }}
+                  title="Copilot AI Drawer"
+                  className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-kanit"
+                  style={{ fontFamily: "'Kanit', sans-serif" }}
+                >
+                  <span className="hidden xs:inline tracking-wider font-kanit" style={{ fontFamily: "'Kanit', sans-serif" }}>COPILOT</span>
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                    }}
+                    alt="Copilot"
+                    className="w-5 h-5 shrink-0 object-contain"
+                  />
+                </button>
+
+                {/* Search button */}
+                <button
+                  onClick={() => {
+                    setActiveTab("search");
+                    setActiveSettingSection(null);
+                  }}
+                  title="Tìm kiếm (Search)"
+                  className="flex items-center gap-1 p-1 bg-transparent text-black font-extrabold text-xs cursor-pointer shrink-0 hover:opacity-70 transition-opacity font-kanit"
+                  style={{ fontFamily: "'Kanit', sans-serif" }}
+                >
+                  <span className="hidden xs:inline tracking-wider font-kanit" style={{ fontFamily: "'Kanit', sans-serif" }}>SEARCH</span>
+                  <Search className="w-5 h-5 text-black shrink-0 stroke-[2.5]" />
+                </button>
+              </div>
+            </div>
 
         {/* LEFT SIDEBAR (Visible when Dock to Sidebar is active) */}
         {dockToSidebar && (
@@ -4963,7 +4987,7 @@ export default function App() {
             >
 
             {/* Navigation Body */}
-            <div className="flex-1 p-2 space-y-1 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 px-0 py-2 space-y-0.5 overflow-y-auto custom-scrollbar">
               
               {/* Home Link */}
               <button
@@ -4977,8 +5001,8 @@ export default function App() {
                   const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none";
                   const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
                   const themeColors = isActive
-                    ? "bg-transparent text-white font-bold"
-                    : "text-zinc-300 bg-transparent hover:text-white";
+                    ? "bg-[#3f4144] text-white font-semibold"
+                    : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
@@ -4986,7 +5010,7 @@ export default function App() {
                   <img
                     src="https://static.wikia.nocookie.net/ep-deo/images/f/f5/Home-02b3e27c45a2cdc76560.png/revision/latest?cb=20260723030207"
                     className="w-5 h-5 shrink-0 object-contain"
-                    style={{ filter: activeTab === "home" ? "brightness(0) invert(1)" : "brightness(0) invert(0.9)" }}
+                    style={{ filter: "brightness(0) invert(1)" }}
                     referrerPolicy="no-referrer"
                     alt="Home"
                   />
@@ -5009,8 +5033,8 @@ export default function App() {
                     const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none";
                     const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
                     const themeColors = isActive
-                      ? "bg-transparent text-white font-bold"
-                      : "text-zinc-300 bg-transparent hover:text-white";
+                      ? "bg-[#3f4144] text-white font-semibold"
+                      : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                     return `${base} ${alignment} ${themeColors}`;
                   })()}
                 >
@@ -5019,7 +5043,7 @@ export default function App() {
                       ? "https://static.wikia.nocookie.net/ep-deo/images/c/c8/MagnifyingGlass-52f96e5f47f42e682a00.png/revision/latest?cb=20260723030208"
                       : "https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"}
                     className="w-5 h-5 shrink-0 object-contain"
-                    style={{ filter: activeTab === "search" ? "brightness(0) invert(1)" : (isMinecraftOreActive ? "brightness(0) invert(0.9)" : "brightness(0) invert(1)") }}
+                    style={{ filter: "brightness(0) invert(1)" }}
                     referrerPolicy="no-referrer"
                     alt="Search"
                   />
@@ -5040,8 +5064,8 @@ export default function App() {
                   const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center justify-between font-semibold text-sm select-none relative";
                   const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
                   const themeColors = isActive
-                    ? "bg-transparent text-white font-bold"
-                    : "text-zinc-300 bg-transparent hover:text-white";
+                    ? "bg-[#3f4144] text-white font-semibold"
+                    : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
@@ -5071,8 +5095,8 @@ export default function App() {
                   const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none";
                   const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
                   const themeColors = isActive
-                    ? "bg-transparent text-white font-bold"
-                    : "text-zinc-300 bg-transparent hover:text-white";
+                    ? "bg-[#3f4144] text-white font-semibold"
+                    : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
@@ -5092,14 +5116,15 @@ export default function App() {
                   const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none";
                   const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
                   const themeColors = isActive 
-                    ? "bg-transparent text-amber-300 font-bold" 
-                    : "text-amber-400 bg-transparent hover:text-amber-300";
+                    ? "bg-[#3f4144] text-white font-semibold" 
+                    : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
                 <img
                   src="https://static.wikia.nocookie.net/ep-deo/images/3/37/Load_not_done.png/revision/latest?cb=20260724133427"
                   referrerPolicy="no-referrer"
+                  style={{ filter: "brightness(0) invert(1)" }}
                   className="w-5 h-5 shrink-0 object-contain [image-rendering:pixelated]"
                   alt="Coming soon"
                 />
@@ -5118,8 +5143,8 @@ export default function App() {
                     const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center justify-between font-semibold text-sm select-none";
                     const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
                     const themeColors = isActive
-                      ? "bg-transparent text-white font-bold"
-                      : "text-zinc-300 bg-transparent hover:text-white";
+                      ? "bg-[#3f4144] text-white font-semibold"
+                      : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                     return `${base} ${alignment} ${themeColors}`;
                   })()}
                 >
@@ -5137,13 +5162,7 @@ export default function App() {
                 </button>
 
                 {isVAppsSidebarOpen && (
-                  <div
-                    className={`flex flex-col gap-1 pt-1 pb-2 transition-none duration-0 ${
-                      isSidebarCollapsed
-                        ? "items-center px-2"
-                        : "pl-5 ml-5 border-l border-white/10"
-                    }`}
-                  >
+                  <div className="flex flex-col gap-0.5 pt-0.5 pb-1 transition-none duration-0 w-full">
                     {/* 0. Live TV (mục con trong V-Apps) */}
                     <button
                       onClick={() => {
@@ -5151,11 +5170,11 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="Truyền hình Live TV"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "live" ? "text-red-400 font-bold underline underline-offset-4 decoration-red-500" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "live" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <Radio className="w-3.5 h-3.5 text-red-500 shrink-0 animate-pulse" />
+                      <Radio className="w-3.5 h-3.5 text-white shrink-0 animate-pulse" />
                       {!isSidebarCollapsed && <span>Truyền hình Live TV</span>}
                     </button>
                     {/* 1. Explore Vietnam */}
@@ -5165,11 +5184,11 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="Explore Vietnam"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "explore_vietnam" ? "text-emerald-300 font-bold underline underline-offset-4 decoration-emerald-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "explore_vietnam" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <Compass className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <Compass className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>Explore Vietnam</span>}
                     </button>
 
@@ -5177,11 +5196,11 @@ export default function App() {
                     <button
                       onClick={() => { setActiveTab("v_arcade"); setActiveSettingSection(null); }}
                       title="V-Arcade"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "v_arcade" ? "text-indigo-300 font-bold underline underline-offset-4 decoration-indigo-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "v_arcade" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <Gamepad2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      <Gamepad2 className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>V-Arcade</span>}
                     </button>
 
@@ -5189,11 +5208,11 @@ export default function App() {
                     <button
                       onClick={() => { setActiveTab("v_books"); setActiveSettingSection(null); }}
                       title="V-Books"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "v_books" ? "text-purple-300 font-bold underline underline-offset-4 decoration-purple-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "v_books" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <BookOpenCheck className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      <BookOpenCheck className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>V-Books</span>}
                     </button>
 
@@ -5204,20 +5223,20 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="V-Box Feedback Hub"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "vbox" ? "text-cyan-300 font-bold underline underline-offset-4 decoration-cyan-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "vbox" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
                       {isMinecraftOreActive ? (
                         <img
                           src="https://static.wikia.nocookie.net/ep-deo/images/3/36/Cube-c5d0fbf870d415a0c44a.png/revision/latest?cb=20260723030206"
                           className="w-3.5 h-3.5 shrink-0 object-contain"
-                          style={{ filter: activeTab === "vbox" ? "brightness(0) invert(1)" : "brightness(0)" }}
+                          style={{ filter: "brightness(0) invert(1)" }}
                           referrerPolicy="no-referrer"
                           alt="Vbox"
                         />
                       ) : (
-                        <Box className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <Box className="w-3.5 h-3.5 text-white shrink-0" />
                       )}
                       {!isSidebarCollapsed && <span>V-Box</span>}
                     </button>
@@ -5226,16 +5245,16 @@ export default function App() {
                     <button
                       onClick={() => { setActiveTab("v_calc"); setActiveSettingSection(null); }}
                       title="V-Calc"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "v_calc" ? "text-teal-300 font-bold underline underline-offset-4 decoration-teal-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "v_calc" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <Calculator className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                      <Calculator className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>V-Calc</span>}
                     </button>
 
                     {/* 6. V-Learn (Accordion inside V-Apps) */}
-                    <div className="space-y-1 w-full">
+                    <div className="space-y-0.5 w-full">
                       <button
                         onClick={() => {
                           setActiveTab("v_study");
@@ -5243,17 +5262,17 @@ export default function App() {
                           setActiveSettingSection(null);
                         }}
                         title="V-Learn Học Tập"
-                        className={`text-xs font-semibold transition-all cursor-pointer flex items-center justify-between bg-transparent ${
-                          isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white"
-                        } ${activeTab === "v_study" ? "text-red-300 font-bold underline underline-offset-4 decoration-red-400" : "text-zinc-300"}`}
+                        className={`text-xs font-semibold transition-all cursor-pointer flex items-center justify-between rounded-none ${
+                          isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white"
+                        } ${activeTab === "v_study" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                       >
-                        <div className="flex items-center gap-2">
-                          <GraduationCap className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                        <div className="flex items-center gap-2.5">
+                          <GraduationCap className="w-3.5 h-3.5 text-white shrink-0" />
                           {!isSidebarCollapsed && <span>V-Learn</span>}
                         </div>
                         {!isSidebarCollapsed && (
                           <ChevronDown
-                            className={`w-3.5 h-3.5 transition-transform duration-200 text-zinc-300 ${
+                            className={`w-3.5 h-3.5 transition-transform duration-200 text-white ${
                               isVStudySidebarOpen ? "rotate-180" : ""
                             }`}
                           />
@@ -5261,13 +5280,7 @@ export default function App() {
                       </button>
 
                       {isVStudySidebarOpen && (
-                        <div
-                          className={`flex flex-col gap-1 pt-1 pb-1 transition-none duration-0 ${
-                            isSidebarCollapsed
-                              ? "items-center px-1"
-                              : "pl-4 ml-3 border-l border-white/10"
-                          }`}
-                        >
+                        <div className="flex flex-col gap-0.5 pt-0.5 pb-1 transition-none duration-0 w-full">
                           {/* Sub-item A: Khóa học */}
                           <button
                             onClick={() => {
@@ -5276,12 +5289,12 @@ export default function App() {
                               setActiveSettingSection(null);
                             }}
                             title="Khóa học"
-                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                              isSidebarCollapsed ? "w-full py-1.5 justify-center px-0 hover:text-white" : "w-full text-left py-1.5 pl-12 pr-4 hover:text-white gap-2"
                             } ${
                               activeTab === "v_study" && vstudySubFilter === "all"
-                                ? "text-white font-bold underline underline-offset-4 decoration-red-500"
-                                : "text-zinc-400"
+                                ? "bg-[#3f4144] text-white font-semibold"
+                                : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                             }`}
                           >
                             <BookOpen className="w-3 h-3 text-white shrink-0" />
@@ -5296,12 +5309,12 @@ export default function App() {
                               setActiveSettingSection(null);
                             }}
                             title="Bài Kiểm Tra Siêu Tổng Hợp (100 Câu - 2 Giờ)"
-                            className={`text-[11px] font-bold transition-all cursor-pointer flex items-center bg-transparent ${
-                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            className={`text-[11px] font-bold transition-all cursor-pointer flex items-center rounded-none ${
+                              isSidebarCollapsed ? "w-full py-1.5 justify-center px-0 hover:text-white" : "w-full text-left py-1.5 pl-12 pr-4 hover:text-white gap-2"
                             } ${
                               activeTab === "v_study" && vstudySubFilter === "super_exam"
-                                ? "text-white font-black underline underline-offset-4 decoration-red-500"
-                                : "text-zinc-400"
+                                ? "bg-[#3f4144] text-white font-semibold"
+                                : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                             }`}
                           >
                             <Zap className="w-3 h-3 text-white shrink-0" />
@@ -5320,12 +5333,12 @@ export default function App() {
                               setActiveSettingSection(null);
                             }}
                             title="Tra cứu học bạ"
-                            className={`text-[11px] font-bold transition-all cursor-pointer flex items-center bg-transparent ${
-                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            className={`text-[11px] font-bold transition-all cursor-pointer flex items-center rounded-none ${
+                              isSidebarCollapsed ? "w-full py-1.5 justify-center px-0 hover:text-white" : "w-full text-left py-1.5 pl-12 pr-4 hover:text-white gap-2"
                             } ${
                               activeTab === "v_study" && vstudySubFilter === "hoc_ba"
-                                ? "text-white font-black underline underline-offset-4 decoration-amber-400"
-                                : "text-zinc-400"
+                                ? "bg-[#3f4144] text-white font-semibold"
+                                : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                             }`}
                           >
                             <Search className="w-3 h-3 text-white shrink-0" />
@@ -5344,12 +5357,12 @@ export default function App() {
                               setActiveSettingSection(null);
                             }}
                             title="V-Learn THCS"
-                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                              isSidebarCollapsed ? "w-full py-1.5 justify-center px-0 hover:text-white" : "w-full text-left py-1.5 pl-12 pr-4 hover:text-white gap-2"
                             } ${
                               activeTab === "v_study" && vstudySubFilter === "thcs"
-                                ? "text-white font-bold underline underline-offset-4 decoration-blue-400"
-                                : "text-zinc-400"
+                                ? "bg-[#3f4144] text-white font-semibold"
+                                : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                             }`}
                           >
                             <School className="w-3 h-3 text-white shrink-0" />
@@ -5364,12 +5377,12 @@ export default function App() {
                               setActiveSettingSection(null);
                             }}
                             title="V-Learn THPT"
-                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                              isSidebarCollapsed ? "w-full py-1.5 justify-center px-0 hover:text-white" : "w-full text-left py-1.5 pl-12 pr-4 hover:text-white gap-2"
                             } ${
                               activeTab === "v_study" && vstudySubFilter === "thpt"
-                                ? "text-white font-bold underline underline-offset-4 decoration-emerald-400"
-                                : "text-zinc-400"
+                                ? "bg-[#3f4144] text-white font-semibold"
+                                : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                             }`}
                           >
                             <GraduationCap className="w-3 h-3 text-white shrink-0" />
@@ -5384,12 +5397,12 @@ export default function App() {
                               setActiveSettingSection(null);
                             }}
                             title="V-Learn Tiểu học"
-                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                              isSidebarCollapsed ? "w-8 h-8 justify-center p-0 hover:text-white" : "w-full text-left py-1.5 px-2.5 hover:text-white gap-2"
+                            className={`text-[11px] font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                              isSidebarCollapsed ? "w-full py-1.5 justify-center px-0 hover:text-white" : "w-full text-left py-1.5 pl-12 pr-4 hover:text-white gap-2"
                             } ${
                               activeTab === "v_study" && vstudySubFilter === "tieu_hoc"
-                                ? "text-white font-bold underline underline-offset-4 decoration-amber-400"
-                                : "text-zinc-400"
+                                ? "bg-[#3f4144] text-white font-semibold"
+                                : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                             }`}
                           >
                             <Baby className="w-3 h-3 text-white shrink-0" />
@@ -5403,11 +5416,11 @@ export default function App() {
                     <button
                       onClick={() => { setActiveTab("v_notes"); setActiveSettingSection(null); }}
                       title="V-Notes"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "v_notes" ? "text-amber-300 font-bold underline underline-offset-4 decoration-amber-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "v_notes" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <Notebook className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <Notebook className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>V-Notes</span>}
                     </button>
 
@@ -5415,11 +5428,11 @@ export default function App() {
                     <button
                       onClick={() => { setActiveTab("v_office"); setActiveSettingSection(null); }}
                       title="V-Office"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "v_office" ? "text-sky-300 font-bold underline underline-offset-4 decoration-sky-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "v_office" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <Briefcase className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                      <Briefcase className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>V-Office</span>}
                     </button>
 
@@ -5427,11 +5440,11 @@ export default function App() {
                     <button
                       onClick={() => { setActiveTab("v_recorder"); setActiveSettingSection(null); }}
                       title="V-Recorder"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "v_recorder" ? "text-red-300 font-bold underline underline-offset-4 decoration-red-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "v_recorder" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <Mic className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                      <Mic className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>V-Recorder</span>}
                     </button>
 
@@ -5439,18 +5452,18 @@ export default function App() {
                     <button
                       onClick={() => { setActiveTab("v_reminders"); setActiveSettingSection(null); }}
                       title="V-Reminders"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent ${
-                        isSidebarCollapsed ? "w-9 h-9 justify-center p-0 hover:text-white" : "w-full text-left py-2 px-3 hover:text-white gap-2"
-                      } ${activeTab === "v_reminders" ? "text-rose-300 font-bold underline underline-offset-4 decoration-rose-400" : "text-zinc-300"}`}
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
+                        isSidebarCollapsed ? "w-full py-2 justify-center px-0 hover:text-white" : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
+                      } ${activeTab === "v_reminders" ? "bg-[#3f4144] text-white font-semibold" : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"}`}
                     >
-                      <CalendarCheck className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                      <CalendarCheck className="w-3.5 h-3.5 text-white shrink-0" />
                       {!isSidebarCollapsed && <span>V-Reminders</span>}
                     </button>
                   </div>
                 )}
               </div>
 
-              {/* Verified Exclusive Accordion Menu with Sub-categories sorted alphabetically */}
+              {/* Verified Exclusive Accordion Menu */}
               <div className="space-y-1">
                 <button
                   onClick={() => {
@@ -5462,18 +5475,18 @@ export default function App() {
                     const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center justify-between font-semibold text-sm select-none";
                     const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4";
                     const themeColors = isActive
-                      ? "bg-transparent text-amber-300 font-bold"
-                      : "text-amber-300 bg-transparent hover:text-amber-200";
+                      ? "bg-[#3f4144] text-white font-semibold"
+                      : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                     return `${base} ${alignment} ${themeColors}`;
                   })()}
                 >
                   <div className={`flex items-center ${isSidebarCollapsed ? "" : "gap-3.5"}`}>
-                    <Crown className="w-5 h-5 shrink-0 text-amber-400" />
+                    <Crown className="w-5 h-5 shrink-0 text-white" />
                     {!isSidebarCollapsed && <span>Verified Exclusive</span>}
                   </div>
                   {!isSidebarCollapsed && (
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 text-amber-300 ${
+                      className={`w-4 h-4 transition-transform duration-200 text-white ${
                         isVerifiedExclusiveOpen ? "rotate-180" : ""
                       }`}
                     />
@@ -5481,13 +5494,7 @@ export default function App() {
                 </button>
 
                 {isVerifiedExclusiveOpen && (
-                  <div
-                    className={`flex flex-col gap-1 pt-1 pb-2 transition-none duration-0 ${
-                      isSidebarCollapsed
-                        ? "items-center px-2"
-                        : "pl-5 ml-5 border-l border-amber-500/30"
-                    }`}
-                  >
+                  <div className="flex flex-col gap-0.5 pt-0.5 pb-1 transition-none duration-0 w-full">
                     {/* Sub-item 1: Mua Storage */}
                     <button
                       onClick={() => {
@@ -5496,21 +5503,21 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="Mua Storage Cloud VIP"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent rounded-none ${
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
                         isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                          ? "w-full py-2 justify-center px-0 hover:text-white"
+                          : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
                       } ${
                         activeTab === "verified" && verifiedInitialSection === "storage"
-                          ? "bg-transparent text-cyan-300 font-bold"
-                          : "text-zinc-300"
+                          ? "bg-[#3f4144] text-white font-semibold"
+                          : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                       }`}
                     >
-                      <HardDrive className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <HardDrive className="w-4 h-4 text-white shrink-0" />
                       {!isSidebarCollapsed && (
                         <div className="flex items-center justify-between w-full pr-1">
                           <span>Mua Storage</span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-none bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-extrabold uppercase">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-none bg-white/20 text-white font-extrabold uppercase">
                             CLOUD
                           </span>
                         </div>
@@ -5524,21 +5531,21 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="Ngân Hàng V-Bank"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent rounded-none ${
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
                         isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                          ? "w-full py-2 justify-center px-0 hover:text-white"
+                          : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
                       } ${
                         activeTab === "v_bank"
-                          ? "bg-transparent text-emerald-300 font-bold"
-                          : "text-zinc-300"
+                          ? "bg-[#3f4144] text-white font-semibold"
+                          : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                       }`}
                     >
-                      <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <Building2 className="w-4 h-4 text-white shrink-0" />
                       {!isSidebarCollapsed && (
                         <div className="flex items-center justify-between w-full pr-1">
                           <span>V-Bank</span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-none bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-extrabold uppercase">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-none bg-white/20 text-white font-extrabold uppercase">
                             VIP
                           </span>
                         </div>
@@ -5552,17 +5559,17 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="Mạng Xã Hội V-Flow"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent rounded-none ${
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
                         isSidebarCollapsed
-                          ? "w-9 h-9 justify-center p-0 hover:text-white"
-                          : "w-full text-left py-2 px-3 hover:text-white gap-2"
+                          ? "w-full py-2 justify-center px-0 hover:text-white"
+                          : "w-full text-left py-2 pl-8 pr-4 hover:text-white gap-2.5"
                       } ${
                         activeTab === "vflow"
-                          ? "bg-transparent text-amber-300 font-bold"
-                          : "text-zinc-300"
+                          ? "bg-[#3f4144] text-white font-semibold"
+                          : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                       }`}
                     >
-                      <Globe className="w-4 h-4 text-amber-400 shrink-0" />
+                      <Globe className="w-4 h-4 text-white shrink-0" />
                       {!isSidebarCollapsed && (
                         <div className="flex items-center justify-between w-full pr-1">
                           <span>V-Flow</span>
@@ -5578,22 +5585,22 @@ export default function App() {
                         setActiveSettingSection(null);
                       }}
                       title="Vplay Verified VIP"
-                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center bg-transparent rounded-none ${
+                      className={`text-xs font-semibold transition-all cursor-pointer flex items-center rounded-none ${
                         isSidebarCollapsed
                           ? "w-9 h-9 justify-center p-0 hover:text-white"
                           : "w-full text-left py-2 px-3 hover:text-white gap-2"
                       } ${
                         activeTab === "verified" && verifiedInitialSection !== "storage"
-                          ? "bg-transparent text-amber-300 font-bold"
-                          : "text-zinc-300"
+                          ? "bg-[#3f4144] text-white font-semibold"
+                          : "text-zinc-300 bg-transparent hover:bg-white/[0.05]"
                       }`}
                     >
-                      <BadgeCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                      <BadgeCheck className="w-4 h-4 text-white shrink-0" />
                       {!isSidebarCollapsed && (
                         <div className="flex items-center justify-between w-full pr-1">
                           <span>Verified</span>
                           {verifiedSub.plan !== "none" && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-none bg-amber-400 text-black font-extrabold uppercase">
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-none bg-white/20 text-white font-extrabold uppercase">
                               PRO
                             </span>
                           )}
@@ -5615,8 +5622,8 @@ export default function App() {
                         const isActive = showDropdownMenu;
                         const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none justify-center px-0";
                         const themeColors = isActive
-                          ? "bg-transparent text-white"
-                          : "text-zinc-300 bg-transparent hover:text-white";
+                          ? "bg-[#3f4144] text-white"
+                          : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                         return `${base} ${themeColors}`;
                       })()}
                     >
@@ -5682,7 +5689,7 @@ export default function App() {
                     <button
                       onClick={() => setIsSidebarVolumeOpen(!isSidebarVolumeOpen)}
                       title="Tùy chỉnh Âm lượng"
-                      className={`w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center justify-between px-4 text-zinc-300 bg-transparent hover:text-white`}
+                      className={`w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center justify-between px-4 text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]`}
                     >
                       <div className="flex items-center gap-3.5 font-semibold text-sm">
                         <Volume2 className="w-5 h-5 shrink-0 text-white" />
@@ -5752,8 +5759,8 @@ export default function App() {
                         const isActive = isPowerMenuOpen;
                         const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none justify-center px-0";
                         const themeColors = isActive
-                          ? "bg-transparent text-white"
-                          : "text-zinc-300 bg-transparent hover:text-white";
+                          ? "bg-[#3f4144] text-white"
+                          : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                         return `${base} ${themeColors}`;
                       })()}
                     >
@@ -5765,7 +5772,7 @@ export default function App() {
                     <button
                       onClick={() => setIsSidebarPowerOpen(!isSidebarPowerOpen)}
                       title="Nguồn hệ thống"
-                      className={`w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center justify-between px-4 text-zinc-300 bg-transparent hover:text-white`}
+                      className={`w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center justify-between px-4 text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]`}
                     >
                       <div className="flex items-center gap-3.5 font-semibold text-sm">
                         <Power className="w-5 h-5 shrink-0 text-white" />
@@ -5775,14 +5782,14 @@ export default function App() {
                     </button>
                     
                     {isSidebarPowerOpen && (
-                      <div className="flex flex-col gap-1.5 pt-1 pb-2 pl-6 ml-6 border-l border-white/20">
+                      <div className="flex flex-col gap-0.5 pt-0.5 pb-1 w-full">
                         <button
                           onClick={() => {
                             setSelectedPowerAction("shutdown");
                             setIsPowerMenuOpen(true);
                           }}
                           title="Tắt ứng dụng"
-                          className="w-full text-left py-1.5 px-3 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2 bg-transparent"
+                          className="w-full text-left py-2 pl-8 pr-4 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2.5 bg-transparent hover:bg-white/[0.05]"
                         >
                           <span className="w-1.5 h-1.5 bg-red-500 rounded-full shrink-0" />
                           <span>Tắt ứng dụng</span>
@@ -5792,7 +5799,7 @@ export default function App() {
                             window.location.reload();
                           }}
                           title="Khởi động lại"
-                          className="w-full text-left py-1.5 px-3 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2 bg-transparent"
+                          className="w-full text-left py-2 pl-8 pr-4 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2.5 bg-transparent hover:bg-white/[0.05]"
                         >
                           <span className="w-1.5 h-1.5 bg-amber-500 rounded-full shrink-0" />
                           <span>Khởi động lại</span>
@@ -5802,7 +5809,7 @@ export default function App() {
                             handleSignOut();
                           }}
                           title="Đăng xuất"
-                          className="w-full text-left py-1.5 px-3 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2 bg-transparent"
+                          className="w-full text-left py-2 pl-8 pr-4 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2.5 bg-transparent hover:bg-white/[0.05]"
                         >
                           <span className="w-1.5 h-1.5 bg-teal-500 rounded-full shrink-0" />
                           <span>Đăng xuất</span>
@@ -5815,7 +5822,7 @@ export default function App() {
                             }
                           }}
                           title="Khôi phục cài đặt"
-                          className="w-full text-left py-1.5 px-3 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2 bg-transparent"
+                          className="w-full text-left py-2 pl-8 pr-4 hover:text-white text-xs font-semibold rounded-none text-zinc-300 cursor-pointer transition-all duration-150 flex items-center gap-2.5 bg-transparent hover:bg-white/[0.05]"
                         >
                           <span className="w-1.5 h-1.5 bg-purple-500 rounded-full shrink-0" />
                           <span>Khôi phục cài đặt</span>
@@ -5838,8 +5845,8 @@ export default function App() {
                   const base = "w-full py-3 transition-all duration-150 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none";
                   const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
                   const themeColors = isActive
-                    ? "bg-transparent text-white font-bold"
-                    : "text-zinc-300 bg-transparent hover:text-white";
+                    ? "bg-[#3f4144] text-white font-semibold"
+                    : "text-zinc-300 bg-transparent hover:text-white hover:bg-white/[0.05]";
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
@@ -5847,7 +5854,7 @@ export default function App() {
                   <img
                     src="https://static.wikia.nocookie.net/ep-deo/images/2/22/Settings-8f90a7636bfd4c817e7b.png/revision/latest?cb=20260723030208"
                     className="w-5 h-5 shrink-0 object-contain"
-                    style={{ filter: (activeTab === "settings" && activeSettingSection === null) ? "brightness(0) invert(1)" : "brightness(0) invert(0.9)" }}
+                    style={{ filter: "brightness(0) invert(1)" }}
                     referrerPolicy="no-referrer"
                     alt="Preferences"
                   />
@@ -5864,11 +5871,11 @@ export default function App() {
                 className={(() => {
                   const base = "w-full py-3 transition-none duration-0 cursor-pointer rounded-none flex items-center font-semibold text-sm select-none";
                   const alignment = isSidebarCollapsed ? "justify-center px-0" : "px-4 gap-3.5";
-                  const themeColors = "text-zinc-200 bg-transparent hover:bg-[#3d3f46] hover:text-white";
+                  const themeColors = "text-zinc-300 bg-transparent hover:bg-white/[0.05] hover:text-white";
                   return `${base} ${alignment} ${themeColors}`;
                 })()}
               >
-                <RefreshCw className="w-5 h-5 shrink-0 text-sky-400" />
+                <RefreshCw className="w-5 h-5 shrink-0 text-white" />
                 {!isSidebarCollapsed && <span>Check for Update</span>}
               </button>
 
@@ -6033,52 +6040,56 @@ export default function App() {
             </button>
 
             {/* Spotlight search icon button */}
-            <div className="relative header-spotlight-container">
-              <button
-                onClick={() => {
-                  setActiveTab("search");
-                  setIsPowerMenuOpen(false);
-                }}
-                className={`relative group p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-                  activeTab === "search"
-                    ? "bg-white/20 text-white shadow-lg scale-95" 
-                    : "bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white hover:scale-105"
-                }`}
-              >
-                <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                  Spotlight Search
-                </div>
-              </button>
-            </div>
+            {!dockToSidebar && (
+              <div className="relative header-spotlight-container">
+                <button
+                  onClick={() => {
+                    setActiveTab("search");
+                    setIsPowerMenuOpen(false);
+                  }}
+                  className={`relative group p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                    activeTab === "search"
+                      ? "bg-white/20 text-white shadow-lg scale-95" 
+                      : "bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white hover:scale-105"
+                  }`}
+                >
+                  <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                    Spotlight Search
+                  </div>
+                </button>
+              </div>
+            )}
 
             {/* Copilot icon button (opens Drawer next to Search) */}
-            <div className="relative header-copilot-container">
-              <button
-                onClick={() => {
-                  setIsCopilotDrawerOpen(prev => !prev);
-                  setIsPowerMenuOpen(false);
-                }}
-                className={`relative group p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-                  isCopilotDrawerOpen
-                    ? "bg-indigo-600/30 border-indigo-500/50 text-white shadow-lg scale-95" 
-                    : "bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white hover:scale-105"
-                }`}
-              >
-                <img
-                  src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+            {!dockToSidebar && (
+              <div className="relative header-copilot-container">
+                <button
+                  onClick={() => {
+                    setIsCopilotDrawerOpen(prev => !prev);
+                    setIsPowerMenuOpen(false);
                   }}
-                  className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain filter drop-shadow-[0_0_6px_rgba(99,102,241,0.5)]"
-                  referrerPolicy="no-referrer"
-                  alt="Copilot"
-                />
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
-                  Copilot AI Drawer
-                </div>
-              </button>
-            </div>
+                  className={`relative group p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
+                    isCopilotDrawerOpen
+                      ? "bg-indigo-600/30 border-indigo-500/50 text-white shadow-lg scale-95" 
+                      : "bg-white/5 border border-white/10 hover:bg-white/15 text-white/85 hover:text-white hover:scale-105"
+                  }`}
+                >
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                    }}
+                    className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain filter drop-shadow-[0_0_6px_rgba(99,102,241,0.5)]"
+                    referrerPolicy="no-referrer"
+                    alt="Copilot"
+                  />
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1.5 bg-black/95 backdrop-blur-md border border-white/10 text-white text-[10px] sm:text-[11px] font-medium rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-150 whitespace-nowrap z-50 shadow-xl scale-95 group-hover:scale-100">
+                    Copilot AI Drawer
+                  </div>
+                </button>
+              </div>
+            )}
 
             {/* Power icon button */}
             <div className={`relative header-power-container ${dockToSidebar ? "md:hidden" : ""}`}>
@@ -6487,7 +6498,9 @@ export default function App() {
             ? "mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none max-w-7xl lg:mx-auto z-10 relative overflow-hidden min-h-[calc(100vh-4.5rem)] active-tab-shorts text-white"
             : activeTab === "vbox"
               ? "mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none z-10 relative min-h-[calc(100vh-4.5rem)] active-tab-vbox text-white"
-              : `mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none max-w-7xl lg:mx-auto z-10 relative overflow-hidden min-h-[calc(100vh-4.5rem)] active-tab-${activeTab} text-white`
+              : (activeTab === "under_construction" || activeTab === "coming_soon" || activeTab === "v_arcade")
+                ? "mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-4 sm:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none max-w-3xl lg:mx-auto z-10 relative overflow-hidden active-tab-under_construction text-white my-4"
+                : `mt-12 mb-6 mx-2 sm:mx-4 md:mx-6 p-2 sm:p-4 md:p-6 border border-white/20 bg-black/30 shadow-2xl rounded-none max-w-7xl lg:mx-auto z-10 relative overflow-hidden min-h-[calc(100vh-4.5rem)] active-tab-${activeTab} text-white`
       }>
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
@@ -7413,1752 +7426,28 @@ export default function App() {
 
         {/* VIEW: SETTINGS PAGE */}
         {activeTab === "settings" && (
-          <div className="max-w-5xl mx-auto py-4 animate-fade-in font-sans">
-            <AnimatePresence mode="wait">
-              <div className="space-y-6">
-                {/* Category Navigation Pills */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                  {[
-                    { id: null, label: "Tất cả Cài đặt", icon: Settings },
-                    { id: "appearance", label: "Giao diện & Theme", icon: Palette },
-                    { id: "plugin_store", label: "Cửa hàng Plugin", icon: ShoppingBag },
-                    { id: "profile", label: "Tài khoản & Dữ liệu", icon: User },
-                    { id: "accessibility", label: "Trợ năng & Hệ thống", icon: Sliders },
-                    { id: "custom_tab", label: "Tùy chọn Developer", icon: Cpu },
-                    { id: "design_system", label: "Design System", icon: Layers },
-                  ].map((cat) => {
-                    const IconC = cat.icon;
-                    const isCatActive = activeSettingSection === cat.id;
-                    return (
-                      <button
-                        key={cat.id ?? "all"}
-                        onClick={() => setActiveSettingSection(cat.id)}
-                        className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
-                          isCatActive
-                            ? "bg-[#cc1827] text-white shadow-md shadow-red-900/30"
-                            : "bg-white/10 hover:bg-white/15 text-white/70 hover:text-white border border-white/10"
-                        }`}
-                      >
-                        <IconC className="w-3.5 h-3.5" />
-                        <span>{cat.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Storage Info Bar */}
-                <div className={`p-5 rounded-[15px] border ${
-                  isMaterialDesignActive 
-                    ? "bg-[#211f26] border-[#49454f] text-[#e6e1e5]" 
-                    : "bg-white/5 border-white/10 backdrop-blur-[20px] text-white"
-                }`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <HardDrive className={`w-5 h-5 ${currentStorageUsed >= 2.8 ? "text-red-400 animate-pulse" : currentStorageUsed >= 2.0 ? "text-amber-400" : "text-indigo-400"}`} />
-                      <span className="font-semibold text-sm">Ổ cứng lưu trữ Vplay</span>
-                    </div>
-                    <span className="text-xs font-mono font-medium opacity-90">
-                      {currentStorageUsed.toFixed(2)} GB / 3.00 GB
-                    </span>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-4 relative">
-                    <div 
-                      className={`h-full transition-all duration-500 ease-out rounded-full ${
-                        currentStorageUsed >= 2.8 
-                          ? "bg-gradient-to-r from-red-500 to-rose-600" 
-                          : currentStorageUsed >= 2.0 
-                            ? "bg-gradient-to-r from-amber-500 to-orange-600" 
-                            : "bg-gradient-to-r from-indigo-500 to-purple-600"
-                      }`}
-                      style={{ width: `${(currentStorageUsed / 3.00) * 100}%` }}
-                    />
-                  </div>
-
-                  {/* Storage Breakdowns & Action */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-white/5">
-                    <div className="text-[11px] opacity-70 space-y-0.5">
-                      <span className="block font-medium">Chi tiết sử dụng:</span>
-                      <div className="flex flex-wrap gap-x-3 gap-y-1">
-                        <span>Hệ thống: 0.15GB</span>
-                        {dynamicMotion && <span className="text-indigo-300">Dynamic Motion: 0.55GB</span>}
-                        {isMultiviewMode && <span className="text-purple-300">Multiview: 0.95GB</span>}
-                        {plugins.map(p => {
-                          if (p.status === "installed") {
-                            const weight = p.id === "liquid_glass" ? 1.20 : p.id === "remove_shiny_border" ? 0.35 : 0.45;
-                            return <span key={p.id} className="text-emerald-300">{p.name}: {weight}GB</span>;
-                          }
-                          return null;
-                        })}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={handleCleanStorage}
-                      className={`px-4 py-2 rounded-full font-semibold text-xs transition-all active:scale-95 cursor-default flex items-center gap-1.5 shrink-0 ${
-                        isMaterialDesignActive
-                          ? "bg-[#d0bcff] hover:bg-[#bfa8eb] text-[#381e72]"
-                          : "bg-[#007aff] hover:bg-[#0066d6] text-white shadow-md"
-                      }`}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Dọn dẹp ổ cứng
-                    </button>
-                  </div>
-                </div>
-
-                {/* Project Details Banner */}
-                <div className="bg-white/10 backdrop-blur-[20px] rounded-[15px] p-5 sm:p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] border border-white/10 flex flex-col gap-4 relative overflow-hidden mb-4">
-                  <div className="space-y-3 z-10 w-full">
-                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-none">
-                      Project Vplay Refresh
-                    </h2>
-                    <div className="flex flex-col gap-2.5 text-xs sm:text-sm text-white/80">
-                      <div className="flex items-center gap-2">
-                        <Pen className="w-4 h-4 text-emerald-400 shrink-0 stroke-[2.5]" />
-                        <span className="font-normal text-white/70">Version: <strong className="text-white font-semibold">26.8.1 (Beta)</strong></span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Crown className="w-4 h-4 text-amber-400 shrink-0 stroke-[2.5]" />
-                        <span className="font-normal text-white/70">Author: <strong className="text-white font-semibold">VNRT</strong></span>
-                      </div>
-                      <div className="flex items-start gap-2 leading-relaxed">
-                        <Heart className="w-4 h-4 text-rose-400 shrink-0 mt-0.5 fill-rose-500/15 stroke-[2.5]" />
-                        <span className="text-white/70">
-                          Supporters: <strong className="text-white font-medium">FTV OFFICIAL, HMG, DHA, - Bsod999, Myyer, Nquinanh, TV Archive Official</strong>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute right-0 bottom-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-                </div>
-
-                {/* CATEGORY SECTIONS CONTAINER */}
-                <div className="space-y-8">
-                  {(!activeSettingSection || activeSettingSection === "plugin_store") && (
-                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
-                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-indigo-400">
-                          <ShoppingBag className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">{t("settings.sections.PluginStore.title")}</h3>
-                          <p className="text-xs text-white/60">{t("settings.sections.PluginStore.subtitle")}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4">
-                        {plugins.map((plugin) => {
-                          return (
-                            <div
-                              key={plugin.id}
-                              className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-white/10"
-                            >
-                              <div className="flex-1 space-y-1.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-bold text-base text-white">{plugin.name}</span>
-                                  {plugin.status === "installed" && (
-                                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-400 text-[10px] font-semibold uppercase tracking-wider">
-                                      Installed
-                                    </span>
-                                  )}
-                                  {plugin.status === "installing" && (
-                                    <span className="px-2 py-0.5 rounded-full bg-amber-500/25 text-amber-400 text-[10px] font-semibold uppercase tracking-wider animate-pulse">
-                                      Installing... {plugin.progress}%
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-white/60 leading-relaxed max-w-xl font-normal">
-                                  {plugin.desc}
-                                </p>
-                                {plugin.status === "installing" && (
-                                  <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mt-3">
-                                    <div
-                                      className="h-full bg-indigo-500 transition-all duration-1000 ease-out"
-                                      style={{ width: `${plugin.progress}%` }}
-                                    />
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="shrink-0 flex items-center gap-3 self-end sm:self-center">
-                                {plugin.status === "idle" && (
-                                  <button
-                                    onClick={() => handleInstallPluginWithConflictCheck(plugin.id)}
-                                    className="px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
-                                  >
-                                    Install (30s)
-                                  </button>
-                                )}
-
-                                {plugin.status === "installed" && (
-                                  <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-xs text-white/50 font-medium font-sans">Activate:</span>
-                                      {isMaterialDesignActive ? (
-                                        <button
-                                          onClick={() => {
-                                            handleTogglePluginWithConflictCheck(plugin.id, plugin.isActive);
-                                          }}
-                                          className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
-                                            plugin.isActive ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
-                                          }`}
-                                        >
-                                          <motion.div
-                                            animate={{ x: plugin.isActive ? 20 : 0 }}
-                                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                            className={`rounded-full flex items-center justify-center transition-all duration-300 ${
-                                              plugin.isActive ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
-                                            }`}
-                                          >
-                                            {plugin.isActive && (
-                                              <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                              </svg>
-                                            )}
-                                          </motion.div>
-                                        </button>
-                                      ) : (
-                                        <button
-                                          onClick={() => {
-                                            handleTogglePluginWithConflictCheck(plugin.id, plugin.isActive);
-                                          }}
-                                          className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                            plugin.isActive ? "bg-[#34c759]" : "bg-white/20"
-                                          }`}
-                                        >
-                                          <motion.div
-                                            animate={{ x: plugin.isActive ? 20 : 0 }}
-                                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                            className="w-5 h-5 rounded-full bg-white shadow-md"
-                                          />
-                                        </button>
-                                      )}
-                                    </div>
-                                    <button
-                                      onClick={() => {
-                                        setPlugins(prev => prev.map(p => p.id === plugin.id ? { ...p, status: "idle", progress: 0, isActive: false } : p));
-                                      }}
-                                      className="p-2 rounded-full bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer"
-                                      title="Uninstall plugin"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {(!activeSettingSection || activeSettingSection === "appearance") && (
-                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
-                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-amber-400">
-                          <Palette className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">Giao diện & Theme</h3>
-                          <p className="text-xs text-white/60">Tùy chỉnh màu nền, chế độ tối AMOLED, thanh điều hướng và giao diện ứng dụng.</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <label className="text-sm font-semibold block text-white/90">Màu hiệu ứng nền (Backdrop Glow)</label>
-                        <div className="grid grid-cols-2 gap-2.5">
-                          {[
-                            { id: "cosmic", name: "Cosmic Glow", color: "from-pink-600 to-indigo-800" },
-                            { id: "deep", name: "Minimalist", color: "from-neutral-800 to-slate-900" },
-                            { id: "aurora", name: "Aurora Borealis", color: "from-teal-600 to-lime-900" },
-                            { id: "sunset", name: "Sunset View", color: "from-rose-600 to-amber-900" },
-                          ].map((item) => (
-                            <button
-                              key={item.id}
-                              onClick={() => setBgColor(item.id as any)}
-                              className={`p-4 rounded-xl text-left text-xs font-bold relative overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-98 cursor-default border ${
-                                bgColor === item.id 
-                                  ? "border-white bg-white/15" 
-                                  : "border-white/10 hover:border-white/20 bg-white/5"
-                              }`}
-                            >
-                              <div className="flex flex-col h-full justify-between">
-                                <span className="text-white font-bold mb-2">{item.name}</span>
-                                <div className={`w-full h-2 rounded bg-gradient-to-r ${item.color} opacity-80`} />
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* AMOLED Dark Mode Toggle */}
-                      <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                        <div className="flex-1 pr-4">
-                          <h4 className="text-sm font-semibold text-white">settings.appearance.AmoledDark.title</h4>
-                          <p className="text-xs text-white/60 mt-0.5">settings.appearance.AmoledDark.subtitle</p>
-                          {isPanoramaActive && (
-                            <span className="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 mt-1 inline-block">
-                              Đã bị khóa do Plugin Panorama đang bật
-                            </span>
-                          )}
-                        </div>
-                        {isMaterialDesignActive ? (
-                          <button
-                            disabled={isPanoramaActive}
-                            onClick={() => !isPanoramaActive && setAmoledDark(!amoledDark)}
-                            className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative flex items-center shrink-0 border-2 ${
-                              isPanoramaActive
-                                ? "opacity-40 cursor-not-allowed bg-[#1d1b20] border-[#938f99]"
-                                : amoledDark ? "bg-[#381e72] border-transparent cursor-pointer" : "bg-[#1d1b20] border-[#938f99] cursor-pointer"
-                            }`}
-                          >
-                            <motion.div
-                              animate={{ x: effectiveAmoledDark ? 20 : 0 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                              className={`rounded-full flex items-center justify-center transition-all duration-300 ${
-                                effectiveAmoledDark ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
-                              }`}
-                            >
-                              {effectiveAmoledDark && (
-                                <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            </motion.div>
-                          </button>
-                        ) : (
-                          <button
-                            disabled={isPanoramaActive}
-                            onClick={() => !isPanoramaActive && setAmoledDark(!amoledDark)}
-                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative flex items-center ${
-                              isPanoramaActive
-                                ? "opacity-40 cursor-not-allowed bg-white/10"
-                                : amoledDark ? "bg-[#34c759] cursor-pointer" : "bg-white/20 cursor-pointer"
-                            }`}
-                          >
-                            <motion.div
-                              animate={{ x: effectiveAmoledDark ? 20 : 0 }}
-                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                              className="relative w-6 h-5 flex items-center justify-center group"
-                            >
-                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                              <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                            </motion.div>
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Dock to Sidebar Toggle */}
-                      <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                        <div className="flex-1 pr-4">
-                          <h4 className="text-sm font-semibold text-white">Dock to Sidebar</h4>
-                          <p className="text-xs text-white/60 mt-0.5">Khi bật, thanh dock điều hướng ở phía dưới sẽ được chuyển sang thanh sidebar bên trái màn hình như VTVGo/TV360</p>
-                        </div>
-                        <button
-                          onClick={() => setDockToSidebar(!dockToSidebar)}
-                          className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                            dockToSidebar ? "bg-[#34c759]" : "bg-white/20"
-                          }`}
-                        >
-                          <motion.div
-                            animate={{ x: dockToSidebar ? 20 : 0 }}
-                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                            className="relative w-6 h-5 flex items-center justify-center group"
-                          >
-                            <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                            <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                          </motion.div>
-                        </button>
-                      </div>
-
-                      {/* Switch App Theme Mode */}
-                      <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                        <div className="flex-1 pr-4">
-                          <h4 className="text-sm font-semibold text-white">Switch App Theme Mode</h4>
-                          <p className="text-xs text-white/60 mt-0.5">Lựa chọn chế độ sáng (Light Mode) thanh lịch hoặc tối (Dark Mode) chìm đắm cho giao diện</p>
-                        </div>
-                        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
-                          <button
-                            onClick={() => setAppThemeMode("light")}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                              appThemeMode === "light"
-                                ? "bg-white text-slate-900 shadow-md"
-                                : "text-white/60 hover:text-white"
-                            }`}
-                          >
-                            Light
-                          </button>
-                          <button
-                            onClick={() => setAppThemeMode("dark")}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                              appThemeMode === "dark"
-                                ? "bg-[#cc1827] text-white shadow-md"
-                                : "text-white/60 hover:text-white"
-                            }`}
-                          >
-                            Dark
-                          </button>
-                        </div>
-                      </div>
-
-                    </div>
-                  )}
-
-                  {(!activeSettingSection || activeSettingSection === "profile") && (
-                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
-                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-emerald-400">
-                          <User className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">Tài khoản & Dữ liệu</h3>
-                          <p className="text-xs text-white/60">Quản lý danh sách kênh yêu thích, kênh tùy chỉnh và bộ nhớ cá nhân.</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3.5 text-xs text-white/80">
-                          <div className="flex items-center justify-between">
-                            <span>Kênh đã lưu vào Yêu thích:</span>
-                            <span className="font-bold text-white">{favorites.length} kênh</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span>Kênh tùy chỉnh đã thêm:</span>
-                            <span className="font-bold text-white">{customChannels.length} kênh</span>
-                          </div>
-                          <div className="pt-2 border-t border-white/10 flex justify-end">
-                            <button
-                              onClick={() => {
-                                if (confirm("Bạn có chắc chắn muốn xóa toàn bộ kênh Yêu thích?")) {
-                                  setFavorites([]);
-                                }
-                              }}
-                              className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              Xóa danh sách Yêu thích
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {(!activeSettingSection || activeSettingSection === "accessibility") && (
-                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6">
-                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-cyan-400">
-                          <Sliders className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">Trợ năng & Trải nghiệm</h3>
-                          <p className="text-xs text-white/60">Cấu hình tự động trượt banner và hiệu ứng chuyển động ứng dụng.</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        {/* Option: Auto slide banner */}
-                        <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
-                          <div className="space-y-1">
-                            <h4 className="text-sm font-semibold text-white">Tự động trượt Banner Trang chủ</h4>
-                            <p className="text-xs text-white/60 leading-relaxed">Tự động xoay chuyển slide banner ở trang chủ sau mỗi 5 giây</p>
-                          </div>
-                          
-                          <div className="flex items-center">
-                            {isMaterialDesignActive ? (
-                              <button
-                                onClick={() => setAutoSlide(!autoSlide)}
-                                className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
-                                  autoSlide ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
-                                }`}
-                              >
-                                <motion.div
-                                  animate={{ x: autoSlide ? 20 : 0 }}
-                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
-                                  className={`rounded-full flex items-center justify-center transition-all duration-300 ${
-                                    autoSlide ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
-                                  }`}
-                                >
-                                  {autoSlide && (
-                                    <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  )}
-                                </motion.div>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => setAutoSlide(!autoSlide)}
-                                className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                  autoSlide ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                                }`}
-                              >
-                                <motion.div
-                                  animate={{ x: autoSlide ? 20 : 0 }}
-                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
-                                  className="relative w-6 h-5 flex items-center justify-center group"
-                                >
-                                  <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                  <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                                </motion.div>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Option: Dynamic Motion */}
-                        <div className="p-5 rounded-[15px] bg-white/5 border border-white/10 space-y-4">
-                          <div className="space-y-1">
-                            <h4 className="text-sm font-semibold text-white">Dynamic Motion (Tắt hiệu ứng chuyển động)</h4>
-                            <p className="text-xs text-white/60 leading-relaxed">Tắt toàn bộ hiệu ứng hoạt họa và chuyển cảnh để tối ưu tốc độ phản hồi tức thì.</p>
-                          </div>
-                          
-                          <div className="flex items-center">
-                            {isMaterialDesignActive ? (
-                              <button
-                                onClick={() => setDynamicMotion(!dynamicMotion)}
-                                className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
-                                  dynamicMotion ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
-                                }`}
-                              >
-                                <motion.div
-                                  animate={{ x: dynamicMotion ? 20 : 0 }}
-                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
-                                  className={`rounded-full flex items-center justify-center transition-all duration-300 ${
-                                    dynamicMotion ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
-                                  }`}
-                                >
-                                  {dynamicMotion && (
-                                    <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  )}
-                                </motion.div>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => setDynamicMotion(!dynamicMotion)}
-                                className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                  dynamicMotion ? "bg-[#34c759]" : "bg-[#3a3a3c]"
-                                }`}
-                              >
-                                <motion.div
-                                  animate={{ x: dynamicMotion ? 20 : 0 }}
-                                  transition={dynamicMotion ? { type: "spring", stiffness: 500, damping: 30 } : { duration: 0 }}
-                                  className="relative w-6 h-5 flex items-center justify-center group"
-                                >
-                                  <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                  <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                                </motion.div>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {(!activeSettingSection || activeSettingSection === "custom_tab") && (
-                    <div className="p-6 bg-white/10 backdrop-blur-[10px] rounded-[15px] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6 text-left">
-                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center bg-indigo-500/10 rounded-2xl border border-indigo-500/20 text-indigo-400">
-                          <Plus className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">Create custom tab</h3>
-                          <p className="text-xs text-white/60">Create personalized tabs with custom Icons, Names, HTML interfaces, and JavaScript event handlers.</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        {/* Left: Saved Tabs List */}
-                        <div className="lg:col-span-5 space-y-4">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">Created Tabs List ({customTabs.length})</h4>
-                          {customTabs.length === 0 ? (
-                            <div className="p-6 rounded-[15px] bg-white/5 border border-dashed border-white/10 text-center text-xs text-white/40">
-                              No custom tabs created yet. Use the form on the right to start creating!
-                            </div>
-                          ) : (
-                            <div className="space-y-2 max-h-[480px] overflow-y-auto scrollbar-thin">
-                              {customTabs.map((t) => {
-                                const TabIconComp = ICON_REGISTRY[t.iconName] || Sparkles;
-                                return (
-                                  <div key={t.id} className="p-4 rounded-[15px] bg-white/5 border border-white/10 flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-3 min-w-0">
-                                      <div className="w-9 h-9 flex items-center justify-center bg-white/5 rounded-xl text-white">
-                                        <TabIconComp className="w-5 h-5" />
-                                      </div>
-                                      <div className="min-w-0">
-                                        <div className="text-sm font-semibold text-white truncate">{t.name}</div>
-                                        <div className="text-[10px] text-white/40 font-mono truncate">{t.id}</div>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                      <button
-                                        onClick={() => {
-                                          setTabEditId(t.id);
-                                          setTabNameInput(t.name);
-                                          setTabIconInput(t.iconName);
-                                          setTabCodeInput(t.code);
-                                          setTabHtmlInput(t.htmlContent || "");
-                                        }}
-                                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"
-                                        title="Edit"
-                                      >
-                                        <Pen className="w-3.5 h-3.5" />
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          if (confirm(`Are you sure you want to delete the tab "${t.name}"?`)) {
-                                            setCustomTabs(prev => prev.filter(item => item.id !== t.id));
-                                            if (tabEditId === t.id) {
-                                              setTabEditId(null);
-                                              setTabNameInput("");
-                                              setTabIconInput("Sparkles");
-                                              setTabCodeInput("");
-                                              setTabHtmlInput("");
-                                            }
-                                          }
-                                        }}
-                                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/15 transition-colors"
-                                        title="Delete"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Right: Form Builder */}
-                        <div className="lg:col-span-7 p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">
-                            {tabEditId ? "Edit Custom Tab" : "Design New Tab"}
-                          </h4>
-
-                          {/* Tab Name */}
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-white/80 block">Tab Display Name</label>
-                            <input
-                              type="text"
-                              value={tabNameInput}
-                              onChange={(e) => setTabNameInput(e.target.value)}
-                              placeholder="e.g. My Live channels, Private TV..."
-                              className="w-full px-4 py-2.5 rounded-[12px] bg-white/10 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-                            />
-                          </div>
-
-                          {/* Icon Selection */}
-                          <div className="space-y-2">
-                            <label className="text-xs font-semibold text-white/80 block">Select Icon</label>
-                            <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-2.5 rounded-xl bg-black/25 border border-white/5 max-h-36 overflow-y-auto scrollbar-thin">
-                              {Object.keys(ICON_REGISTRY).map((iconKey) => {
-                                const IconTemp = ICON_REGISTRY[iconKey];
-                                const isSelected = tabIconInput === iconKey;
-                                return (
-                                  <button
-                                    key={iconKey}
-                                    type="button"
-                                    onClick={() => setTabIconInput(iconKey)}
-                                    className={`p-2 rounded-lg flex items-center justify-center transition-all ${
-                                      isSelected 
-                                        ? "bg-indigo-600 text-white scale-110 shadow-md shadow-indigo-600/30 border border-white/20" 
-                                        : "bg-white/5 hover:bg-white/10 text-white/60 hover:text-white"
-                                    }`}
-                                    title={iconKey}
-                                  >
-                                    <IconTemp className="w-4 h-4" />
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
-
-                          {/* HTML View Content */}
-                          <div className="space-y-1.5">
-                            <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">Tab UI Layout (Optional HTML)</label>
-                              <span className="text-[10px] text-white/40">Supports basic HTML tags</span>
-                            </div>
-                            <textarea
-                              value={tabHtmlInput}
-                              onChange={(e) => setTabHtmlInput(e.target.value)}
-                              placeholder="Enter custom HTML layout..."
-                              className="w-full h-24 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30 resize-none"
-                            />
-                          </div>
-
-                          {/* Script Logic */}
-                          <div className="space-y-1.5">
-                            <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">JavaScript Handler Code</label>
-                              <span className="text-[10px] text-amber-300 font-semibold">Runs on opening Tab or on action trigger</span>
-                            </div>
-                            <textarea
-                              value={tabCodeInput}
-                              onChange={(e) => setTabCodeInput(e.target.value)}
-                              placeholder="Enter JavaScript code..."
-                              className="w-full h-36 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-                            />
-                          </div>
-
-                          {/* Form Buttons */}
-                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setTabEditId(null);
-                                setTabNameInput("");
-                                setTabIconInput("Sparkles");
-                                setTabCodeInput("/* Enter JavaScript code logic here */\n");
-                                setTabHtmlInput("");
-                              }}
-                              className="px-4 py-2.5 rounded-[12px] bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-colors"
-                            >
-                              Reset
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!tabNameInput.trim()) {
-                                  alert("Please enter a Tab display name!");
-                                  return;
-                                }
-                                if (tabEditId) {
-                                  /* Update */
-                                  setCustomTabs(prev => prev.map(t => t.id === tabEditId ? {
-                                    ...t,
-                                    name: tabNameInput,
-                                    iconName: tabIconInput,
-                                    code: tabCodeInput,
-                                    htmlContent: tabHtmlInput
-                                  } : t));
-                                } else {
-                                  /* Create */
-                                  const newId = `custom_tab_${Date.now()}`;
-                                  setCustomTabs(prev => [...prev, {
-                                    id: newId,
-                                    name: tabNameInput,
-                                    iconName: tabIconInput,
-                                    code: tabCodeInput,
-                                    htmlContent: tabHtmlInput
-                                  }]);
-                                }
-                                /* Reset form */
-                                setTabEditId(null);
-                                setTabNameInput("");
-                                setTabIconInput("Sparkles");
-                                setTabCodeInput("/* Enter JavaScript code logic here */\n");
-                                setTabHtmlInput("");
-                              }}
-                              className="px-5 py-2.5 rounded-[12px] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-lg shadow-indigo-600/25 flex items-center gap-1.5"
-                            >
-                              <Check className="w-3.5 h-3.5" />
-                              Save Tab
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeSettingSection === "custom_modal" && (
-                    <div className="space-y-6 text-left">
-                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center bg-indigo-500/10 rounded-2xl border border-indigo-500/20 text-indigo-400">
-                          <Sparkles className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">Create custom modal</h3>
-                          <p className="text-xs text-white/60">Build custom pop-up alert dialog boxes with custom Icons, HTML layouts, and tailored JavaScript event logic.</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        {/* Left: Saved Modals List */}
-                        <div className="lg:col-span-5 space-y-4">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">Created Modals List ({customModals.length})</h4>
-                          {customModals.length === 0 ? (
-                            <div className="p-6 rounded-[15px] bg-white/5 border border-dashed border-white/10 text-center text-xs text-white/40">
-                              No custom modals created yet. Design one using the form on the right!
-                            </div>
-                          ) : (
-                            <div className="space-y-2 max-h-[480px] overflow-y-auto scrollbar-thin">
-                              {customModals.map((m) => {
-                                const ModalIconComp = ICON_REGISTRY[m.iconName] || Sparkles;
-                                return (
-                                  <div key={m.id} className="p-4 rounded-[15px] bg-white/5 border border-white/10 flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-3 min-w-0">
-                                      <div className="w-9 h-9 flex items-center justify-center bg-white/5 rounded-xl text-white">
-                                        <ModalIconComp className="w-5 h-5" />
-                                      </div>
-                                      <div className="min-w-0">
-                                        <div className="text-sm font-semibold text-white truncate">{m.name}</div>
-                                        <div className="text-[10px] text-white/40 font-mono truncate">{m.id}</div>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                      <button
-                                        onClick={() => {
-                                          setCustomModals(prev => prev.map(item => item.id === m.id ? { ...item, isOpen: true } : item));
-                                        }}
-                                        className="p-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/15 transition-colors"
-                                        title="Trigger/Preview"
-                                      >
-                                        <Play className="w-3.5 h-3.5 fill-indigo-300" />
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          setModalEditId(m.id);
-                                          setModalNameInput(m.name);
-                                          setModalIconInput(m.iconName);
-                                          setModalCodeInput(m.code);
-                                          setModalHtmlInput(m.htmlContent || "");
-                                        }}
-                                        className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"
-                                        title="Edit"
-                                      >
-                                        <Pen className="w-3.5 h-3.5" />
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          if (confirm(`Are you sure you want to delete the modal "${m.name}"?`)) {
-                                            setCustomModals(prev => prev.filter(item => item.id !== m.id));
-                                            if (modalEditId === m.id) {
-                                              setModalEditId(null);
-                                              setModalNameInput("");
-                                              setModalIconInput("Sparkles");
-                                              setModalCodeInput("");
-                                              setModalHtmlInput("");
-                                            }
-                                          }
-                                        }}
-                                        className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/15 transition-colors"
-                                        title="Delete"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Right: Form Builder */}
-                        <div className="lg:col-span-7 p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50">
-                            {modalEditId ? "Edit Custom Modal" : "Design New Modal"}
-                          </h4>
-
-                          {/* Modal Name */}
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-white/80 block">Modal Title</label>
-                            <input
-                              type="text"
-                              value={modalNameInput}
-                              onChange={(e) => setModalNameInput(e.target.value)}
-                              placeholder="e.g. TV Notice, Public Announcement..."
-                              className="w-full px-4 py-2.5 rounded-[12px] bg-white/10 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-                            />
-                          </div>
-
-                          {/* Icon Selection */}
-                          <div className="space-y-2">
-                            <label className="text-xs font-semibold text-white/80 block">Select Icon</label>
-                            <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-2.5 rounded-xl bg-black/25 border border-white/5 max-h-36 overflow-y-auto scrollbar-thin">
-                              {Object.keys(ICON_REGISTRY).map((iconKey) => {
-                                const IconTemp = ICON_REGISTRY[iconKey];
-                                const isSelected = modalIconInput === iconKey;
-                                return (
-                                  <button
-                                    key={iconKey}
-                                    type="button"
-                                    onClick={() => setModalIconInput(iconKey)}
-                                    className={`p-2 rounded-lg flex items-center justify-center transition-all ${
-                                      isSelected 
-                                        ? "bg-indigo-600 text-white scale-110 shadow-md shadow-indigo-600/30 border border-white/20" 
-                                        : "bg-white/5 hover:bg-white/10 text-white/60 hover:text-white"
-                                    }`}
-                                    title={iconKey}
-                                  >
-                                    <IconTemp className="w-4 h-4" />
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
-
-                          {/* HTML View Content */}
-                          <div className="space-y-1.5">
-                            <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">Modal Inner UI (Optional HTML)</label>
-                              <span className="text-[10px] text-white/40">Inner layout content</span>
-                            </div>
-                            <textarea
-                              value={modalHtmlInput}
-                              onChange={(e) => setModalHtmlInput(e.target.value)}
-                              placeholder="Enter HTML layout..."
-                              className="w-full h-24 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30 resize-none"
-                            />
-                          </div>
-
-                          {/* Script Logic */}
-                          <div className="space-y-1.5">
-                            <div className="flex justify-between items-center">
-                              <label className="text-xs font-semibold text-white/80 block">JavaScript Main Button Event Handler</label>
-                              <span className="text-[10px] text-amber-300 font-semibold font-mono">Runs on 'Run Function' click</span>
-                            </div>
-                            <textarea
-                              value={modalCodeInput}
-                              onChange={(e) => setModalCodeInput(e.target.value)}
-                              placeholder="Enter JavaScript code..."
-                              className="w-full h-36 p-3 rounded-[12px] bg-white/10 border border-white/10 text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-                            />
-                          </div>
-
-                          {/* Form Buttons */}
-                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setModalEditId(null);
-                                setModalNameInput("");
-                                setModalIconInput("Sparkles");
-                                setModalCodeInput("/* Enter JavaScript code logic here */\n");
-                                setModalHtmlInput("");
-                              }}
-                              className="px-4 py-2.5 rounded-[12px] bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-colors"
-                            >
-                              Reset
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!modalNameInput.trim()) {
-                                  alert("Please enter a Modal title!");
-                                  return;
-                                }
-                                if (modalEditId) {
-                                  // Update
-                                  setCustomModals(prev => prev.map(m => m.id === modalEditId ? {
-                                    ...m,
-                                    name: modalNameInput,
-                                    iconName: modalIconInput,
-                                    code: modalCodeInput,
-                                    htmlContent: modalHtmlInput
-                                  } : m));
-                                } else {
-                                  // Create
-                                  const newId = `custom_modal_${Date.now()}`;
-                                  setCustomModals(prev => [...prev, {
-                                    id: newId,
-                                    name: modalNameInput,
-                                    iconName: modalIconInput,
-                                    code: modalCodeInput,
-                                    htmlContent: modalHtmlInput,
-                                    isOpen: false
-                                  }]);
-                                }
-                                // Reset form
-                                setModalEditId(null);
-                                setModalNameInput("");
-                                setModalIconInput("Sparkles");
-                                setModalCodeInput("/* Enter JavaScript code logic here */\n");
-                                setModalHtmlInput("");
-                              }}
-                              className="px-5 py-2.5 rounded-[12px] bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors shadow-lg shadow-indigo-600/25 flex items-center gap-1.5"
-                            >
-                              <Check className="w-3.5 h-3.5" />
-                              Save Modal
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {(!activeSettingSection || activeSettingSection === "design_system") && (
-                    <div className="space-y-8 animate-fade-in pb-12">
-                      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
-                          <Layers className="w-6 h-6 animate-pulse" />
-                        </div>
-                        <div className="text-left">
-                          <h3 className="text-lg font-semibold text-white">Vplay Design System</h3>
-                          <p className="text-xs text-white/60">Hệ thống ngôn ngữ thiết kế, tương tác và thành phần giao diện của Vplay.</p>
-                        </div>
-                      </div>
-
-                      {/* Design System Elements Showcase */}
-                      <div className="space-y-8">
-                        
-                        {/* 1. BUTTONS */}
-                        <div className={isMaterialDesignActive
-                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
-                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
-                        }>
-                          <div className={isMaterialDesignActive
-                            ? "space-y-4 text-[#e6e1e5]"
-                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
-                          }>
-                            <div className="text-left">
-                              <h4 className={isMaterialDesignActive
-                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
-                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
-                              }>Button</h4>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
-                              {/* State: Default */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <span className={isMaterialDesignActive 
-                                      ? "px-5 py-2.5 rounded-[20px] bg-[#381e72] border-0 text-xs font-semibold text-[#d0bcff] select-none shadow-md"
-                                      : "px-5 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)]"
-                                    }>
-                                      Placeholder
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Hover */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <span className={isMaterialDesignActive
-                                      ? "px-5 py-2.5 rounded-[20px] bg-[#4f378b] border-0 text-xs font-semibold text-[#d0bcff] select-none shadow-lg scale-[1.18] transition-all duration-300"
-                                      : "px-5 py-2.5 rounded-full bg-white/20 border border-white/20 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.85),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.4),0_8px_20px_rgba(255,255,255,0.15)] scale-[1.18] transition-all duration-300"
-                                    }>
-                                      Placeholder
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Pressed */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <span className={isMaterialDesignActive
-                                      ? "px-5 py-2.5 rounded-[20px] bg-[#6750a4] border-0 text-xs font-semibold text-[#e6e1e5] select-none shadow-lg scale-[1.28] transition-all duration-300"
-                                      : "px-5 py-2.5 rounded-full bg-white/30 border border-white/30 text-xs font-semibold text-white select-none shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.9),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.5)] scale-[1.28] transition-all duration-300"
-                                    }>
-                                      Placeholder
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Live Playground */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
-                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <button className={isMaterialDesignActive
-                                      ? "px-5 py-2.5 rounded-[20px] bg-[#381e72] hover:bg-[#4f378b] active:bg-[#6750a4] border-0 text-xs font-semibold text-[#d0bcff] shadow-md cursor-pointer bouncy-btn transition-all duration-150"
-                                      : "px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/15 text-xs font-semibold text-white shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3)] cursor-pointer bouncy-btn"
-                                    }>
-                                      Interact me
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 2. SLIDER */}
-                        <div className={isMaterialDesignActive
-                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
-                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
-                        }>
-                          <div className={isMaterialDesignActive
-                            ? "space-y-4 text-[#e6e1e5]"
-                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
-                          }>
-                            <div className="text-left">
-                              <h4 className={isMaterialDesignActive
-                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
-                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
-                              }>Slider</h4>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
-                              {/* State: Default */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
-                                  <div className="flex items-center justify-center h-full px-2">
-                                    <div className="relative w-full h-1 bg-white/10 rounded-full">
-                                      <div className={isMaterialDesignActive ? "bg-[#d0bcff] h-full w-[45%] rounded-full" : "bg-[#0084ff] h-full w-[45%] rounded-full"} />
-                                      <div className="absolute top-1/2 left-[45%] -translate-y-1/2 -translate-x-1/2 w-6 h-2 rounded-full bg-white shadow-md border border-white/70" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Hover */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
-                                  <div className="flex items-center justify-center h-full px-2">
-                                    <div className="relative w-full h-1 bg-white/15 rounded-full">
-                                      <div className={isMaterialDesignActive ? "bg-[#d0bcff] h-full w-[45%] rounded-full" : "bg-[#0084ff] h-full w-[45%] rounded-full"} />
-                                      <div className="absolute top-1/2 left-[45%] -translate-y-1/2 -translate-x-1/2 w-7 h-2.5 rounded-full bg-white shadow-lg scale-110 transition-all" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Pressed */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
-                                  <div className="flex items-center justify-center h-full px-2">
-                                    <div className="relative w-full h-1 bg-white/20 rounded-full">
-                                      <div className={isMaterialDesignActive ? "bg-[#d0bcff] h-full w-[45%] rounded-full" : "bg-[#0084ff] h-full w-[45%] rounded-full"} />
-                                      <div className="absolute top-1/2 left-[45%] -translate-y-1/2 -translate-x-1/2 w-8 h-3 rounded-full bg-white shadow-2xl scale-120 transition-all" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Live Playground */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
-                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <div className="flex items-center w-full justify-center px-2">
-                                      <input
-                                        type="range"
-                                        min="0"
-                                        max="1"
-                                        step="0.01"
-                                        value={demoSliderVal}
-                                        onChange={(e) => setDemoSliderVal(Number(e.target.value))}
-                                        className="w-full h-1 rounded-lg appearance-none cursor-default transition-all range-slider-pill outline-none"
-                                        style={{
-                                          background: isWinUI3Active
-                                            ? `linear-gradient(to right, #43bbfd ${demoSliderVal * 100}%, #4d4d4d ${demoSliderVal * 100}%)`
-                                            : isMaterialDesignActive
-                                            ? `linear-gradient(to right, #d0bcff ${demoSliderVal * 100}%, rgba(255, 255, 255, 0.2) ${demoSliderVal * 100}%)`
-                                            : `linear-gradient(to right, #0084ff ${demoSliderVal * 100}%, rgba(255, 255, 255, 0.2) ${demoSliderVal * 100}%)`
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 3. TOGGLE SWITCH */}
-                        <div className={isMaterialDesignActive
-                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
-                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
-                        }>
-                          <div className={isMaterialDesignActive
-                            ? "space-y-4 text-[#e6e1e5]"
-                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
-                          }>
-                            <div className="text-left">
-                              <h4 className={isMaterialDesignActive
-                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
-                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
-                              }>Toggle Switch</h4>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
-                              {/* State: Default / Off */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <div className={isMaterialDesignActive
-                                      ? "w-12 h-7 rounded-full p-[3px] bg-[#1d1b20] border-2 border-[#938f99] flex items-center"
-                                      : "w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center"
-                                    }>
-                                      <div className={isMaterialDesignActive
-                                        ? "w-3.5 h-3.5 rounded-full bg-[#938f99]"
-                                        : "relative w-6 h-5 flex items-center justify-center"
-                                      }>
-                                        {!isMaterialDesignActive && <div className="w-full h-full rounded-full bg-white shadow-md" />}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Hover */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                               : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <div className={isMaterialDesignActive
-                                      ? "w-12 h-7 rounded-full p-[3px] bg-[#2a2831] border-2 border-[#ccc8d3] flex items-center"
-                                      : "w-12 h-6 rounded-full p-0.5 bg-[#3a3a3c] flex items-center"
-                                    }>
-                                      <div className={isMaterialDesignActive
-                                        ? "w-3.5 h-3.5 rounded-full bg-[#ccc8d3] relative flex items-center justify-center"
-                                        : "relative w-6 h-5 flex items-center justify-center scale-110 transition-all"
-                                      }>
-                                        {isMaterialDesignActive ? (
-                                          <div className="absolute -inset-2 rounded-full bg-[#ccc8d3]/15 scale-110" />
-                                        ) : (
-                                          <>
-                                            <div className="absolute -inset-2 rounded-full bg-white/15 scale-100 transition-all pointer-events-none" />
-                                            <div className="w-full h-full rounded-full bg-transparent border-white border backdrop-blur-md shadow-md" />
-                                          </>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Pressed / On */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <div className={isMaterialDesignActive
-                                      ? "w-12 h-7 rounded-full p-[3px] bg-[#381e72] flex items-center justify-end"
-                                      : "w-12 h-6 rounded-full p-0.5 bg-[#34c759] flex items-center justify-end"
-                                    }>
-                                      <div className={isMaterialDesignActive
-                                        ? "w-4.5 h-4.5 rounded-full bg-[#d0bcff] flex items-center justify-center text-[#381e72]"
-                                        : "relative w-6 h-5 flex items-center justify-center"
-                                      }>
-                                        {isMaterialDesignActive ? (
-                                          <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                          </svg>
-                                        ) : (
-                                          <div className="w-full h-full rounded-full bg-white shadow-md" />
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Live Playground */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
-                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    {isMaterialDesignActive ? (
-                                      <button
-                                        onClick={() => setDemoToggleState(!demoToggleState)}
-                                        className={`w-12 h-7 rounded-full p-[3px] transition-all duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 border-2 ${
-                                          demoToggleState ? "bg-[#381e72] border-transparent" : "bg-[#1d1b20] border-[#938f99]"
-                                        }`}
-                                      >
-                                        <motion.div
-                                          animate={{ x: demoToggleState ? 20 : 0 }}
-                                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                          className={`rounded-full flex items-center justify-center transition-all duration-300 ${
-                                            demoToggleState ? "w-4.5 h-4.5 bg-[#d0bcff] text-[#381e72]" : "w-3.5 h-3.5 bg-[#938f99] text-transparent"
-                                          }`}
-                                        >
-                                          {demoToggleState && (
-                                            <svg className="w-3 h-3 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                          )}
-                                        </motion.div>
-                                      </button>
-                                    ) : (
-                                      <button
-                                        onClick={() => setDemoToggleState(!demoToggleState)}
-                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                          demoToggleState 
-                                            ? "bg-[#34c759]"
-                                            : "bg-[#3a3a3c]"
-                                        }`}
-                                      >
-                                        <motion.div
-                                          animate={{ x: demoToggleState ? 24 : 0 }}
-                                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                          className="relative w-5 h-5 flex items-center justify-center group"
-                                        >
-                                          <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                          <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                                        </motion.div>
-                                      </button>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 4. DROPDOWN MENU */}
-                        <div className={isMaterialDesignActive
-                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
-                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
-                        }>
-                          <div className={isMaterialDesignActive
-                            ? "space-y-4 text-[#e6e1e5]"
-                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
-                          }>
-                            <div className="text-left">
-                              <h4 className={isMaterialDesignActive
-                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
-                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
-                              }>Dropdown Menu</h4>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
-                              {/* State: Default */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
-                                  <div className={isMaterialDesignActive
-                                    ? "py-2.5 px-4 rounded-xl bg-[#313033]/40 text-xs text-[#e6e1e5] flex items-center gap-3.5 select-none text-left mt-2"
-                                    : "py-2.5 px-4 rounded-xl bg-white/5 text-xs text-white/80 flex items-center gap-2.5 select-none text-left mt-2"
-                                  }>
-                                    <Clock className="w-4 h-4 text-[#cac4d0]" />
-                                    <span>Placeholder Item</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Hover */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
-                                  <div className={isMaterialDesignActive
-                                    ? "py-2.5 px-4 rounded-xl bg-[#313033] text-xs text-[#e6e1e5] flex items-center justify-between gap-3.5 select-none text-left mt-2"
-                                    : "py-2.5 px-4 rounded-xl bg-white/15 text-xs text-white flex items-center justify-between gap-2.5 select-none shadow-sm text-left mt-2"
-                                  }>
-                                    <div className="flex items-center gap-3.5">
-                                      <Clock className="w-4 h-4 text-[#cac4d0]" />
-                                      <span>Placeholder Item</span>
-                                    </div>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-[#d0bcff]" />
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Pressed */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
-                                  <div className={isMaterialDesignActive
-                                    ? "py-2.5 px-4 rounded-xl bg-[#49454f]/60 text-xs text-[#e6e1e5]/70 flex items-center gap-3.5 select-none text-left mt-2"
-                                    : "py-2.5 px-4 rounded-xl bg-white/25 text-xs text-white/70 flex items-center gap-2.5 scale-97 select-none text-left mt-2"
-                                  }>
-                                    <Clock className="w-4 h-4 text-[#cac4d0]/60" />
-                                    <span>Placeholder Item</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Live Playground */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
-                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
-                                  <div className="relative group mt-2">
-                                    <button className={isMaterialDesignActive
-                                      ? "w-full py-2.5 px-4 rounded-xl bg-[#313033]/60 hover:bg-[#313033] active:bg-[#49454f] text-xs text-[#e6e1e5] flex items-center justify-between gap-3.5 transition-all duration-150 active:scale-97 cursor-pointer text-left border-0"
-                                      : "w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/15 active:bg-white/25 text-xs text-white/95 hover:text-white flex items-center justify-between gap-2.5 transition-all duration-150 active:scale-97 cursor-pointer text-left"
-                                    }>
-                                      <span className="flex items-center gap-3.5">
-                                        <Clock className={isMaterialDesignActive ? "w-4 h-4 text-[#cac4d0]" : "w-4 h-4 text-indigo-300"} />
-                                        <span>Placeholder Item</span>
-                                      </span>
-                                      <span className={isMaterialDesignActive
-                                        ? "w-1.5 h-1.5 rounded-full bg-[#d0bcff] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                                        : "w-4 h-4 text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                                      } />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 5. DOCK */}
-                        <div className={isMaterialDesignActive
-                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
-                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
-                        }>
-                          <div className={isMaterialDesignActive
-                            ? "space-y-4 text-[#e6e1e5]"
-                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
-                          }>
-                            <div className="text-left">
-                              <h4 className={isMaterialDesignActive
-                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
-                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
-                              }>Dock</h4>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
-                              {/* State: Default */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
-                                  <div className="flex items-center justify-center py-2 h-full">
-                                    <div className="relative flex flex-col items-center justify-center h-12 w-20 text-[#cac4d0]">
-                                      <Home className="w-6 h-6 stroke-[1.8]" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Hover */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
-                                  <div className="flex items-center justify-center py-2 h-full">
-                                    <div className="relative flex flex-col items-center justify-center h-12 w-20 text-white scale-[1.18] transition-transform duration-300">
-                                      <Home className="w-6 h-6 stroke-[2]" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Pressed */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
-                                  <div className="flex items-center justify-center py-2 h-full">
-                                    <div className={`relative flex flex-col items-center justify-center h-12 w-20 z-10 scale-[1.05] transition-all ${isMaterialDesignActive ? "text-[#d0bcff]" : "text-indigo-950 font-medium"}`}>
-                                      <div className={isMaterialDesignActive
-                                        ? "absolute w-14 h-8 bg-[#381e72] rounded-[20px] -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-none border-0"
-                                        : "absolute inset-0 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
-                                      } />
-                                      <Home className="w-6 h-6 stroke-[2.2]" />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Live Playground */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between min-h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between min-h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
-                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <div className={`h-14 flex items-center justify-around px-2 py-1 relative w-full max-w-[200px] ${
-                                      isMaterialDesignActive
-                                        ? "rounded-[28px] bg-[#211f26] border border-[#313033] shadow-lg"
-                                        : "rounded-full bg-white/[0.12] backdrop-blur-[25px] saturate-[185%] border border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.65),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_10px_30px_rgba(0,0,0,0.3)]"
-                                    }`}>
-                                      {[
-                                        { id: "home", icon: Home, label: "Home" },
-                                        { id: "live", icon: Radio, label: "Live" }
-                                      ].map((tab) => {
-                                        const isActive = activeDockDemoTab === tab.id;
-                                        const Icon = tab.icon;
-                                        return (
-                                          <button
-                                            key={tab.id}
-                                            onClick={() => setActiveDockDemoTab(tab.id)}
-                                            className={`relative flex flex-col items-center justify-center flex-1 h-full cursor-pointer z-10 bouncy-btn px-2 transition-all duration-300 ${
-                                              isActive 
-                                                ? (isMaterialDesignActive ? "text-[#e6e1e5] font-normal" : "text-indigo-950 font-normal") 
-                                                : (isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/65 hover:text-white")
-                                            }`}
-                                          >
-                                            {isActive && (
-                                              <motion.div
-                                                layoutId="demoActiveTabPill"
-                                                transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                                                className={isMaterialDesignActive
-                                                  ? "absolute w-14 h-8 bg-[#381e72] rounded-[20px] -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-none border-0"
-                                                  : "absolute inset-y-1 inset-x-1 bg-white/50 rounded-full shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.8),inset_-0.5px_-0.5px_0px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.15)] -z-10"
-                                                }
-                                              />
-                                            )}
-                                            <Icon className="w-5.5 h-5.5" />
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 6. CHECKBOX */}
-                        <div className={isMaterialDesignActive
-                          ? "rounded-[28px] bg-[#211f26] border border-[#313033] p-6 shadow-lg text-[#e6e1e5]"
-                          : "relative rounded-[20px] p-[1.5px] bg-gradient-to-br from-white/35 via-white/5 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4),0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
-                        }>
-                          <div className={isMaterialDesignActive
-                            ? "space-y-4 text-[#e6e1e5]"
-                            : "rounded-[18.5px] bg-[#07050f]/60 p-6 space-y-4"
-                          }>
-                            <div className="text-left">
-                              <h4 className={isMaterialDesignActive
-                                ? "text-sm font-semibold text-white tracking-wide border-b border-[#313033] pb-2"
-                                : "text-sm font-semibold text-white tracking-wide border-b border-white/5 pb-2"
-                              }>Checkbox</h4>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
-                              {/* State: Default */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-white/50 text-left">Default</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    {isMaterialDesignActive ? (
-                                      <div className="relative w-[18px] h-[18px] rounded-[4px] border-2 border-[#c4c6cf]" />
-                                    ) : (
-                                      <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-white/40 to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)]">
-                                        <div className="w-full h-full rounded-[5px] bg-[#07050f]/40" />
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Hover */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-teal-400 text-left">Hover</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    {isMaterialDesignActive ? (
-                                      <div className="relative w-[18px] h-[18px] rounded-[4px] border-2 border-[#d0bcff] bg-[#d0bcff]/10 scale-110 transition-all" />
-                                    ) : (
-                                      <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-teal-400/50 to-white/25 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] scale-110 transition-all">
-                                        <div className="w-full h-full rounded-[5px] bg-[#07050f]/20" />
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* State: Pressed */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-white/20 via-transparent to-white/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.15)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between"
-                                  : "p-4 bg-white/5 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-400 text-left">Pressed</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    {isMaterialDesignActive ? (
-                                      <div className="relative w-[18px] h-[18px] rounded-[4px] bg-[#d0bcff] flex items-center justify-center border-0">
-                                        <Check className="w-3 h-3 text-[#381e72] stroke-[4]" />
-                                      </div>
-                                    ) : (
-                                      <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)]">
-                                        <div className="w-full h-full rounded-[5px] bg-indigo-500 flex items-center justify-center">
-                                          <Check className="w-3.5 h-3.5 text-white stroke-[3.5]" />
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Live Playground */}
-                              <div className={isMaterialDesignActive
-                                ? "rounded-2xl bg-[#1d1b20] border border-[#313033] flex flex-col justify-between h-28 overflow-hidden"
-                                : "relative rounded-[12px] p-[1px] bg-gradient-to-br from-indigo-500/30 via-transparent to-indigo-500/10 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] flex flex-col justify-between h-28 overflow-hidden backdrop-blur-md"
-                              }>
-                                <div className={isMaterialDesignActive
-                                  ? "p-4 h-full flex flex-col justify-between bg-[#381e72]/5"
-                                  : "p-4 bg-indigo-500/10 rounded-[11px] h-full flex flex-col justify-between"
-                                }>
-                                  <span className="text-[11px] font-semibold text-indigo-300 text-left">Live interaction</span>
-                                  <div className="flex items-center justify-center h-full">
-                                    <button 
-                                      onClick={() => setExpCache(!expCache)}
-                                      className="focus:outline-none transition-all flex items-center justify-center cursor-pointer relative"
-                                    >
-                                      {isMaterialDesignActive ? (
-                                        <div className={`relative w-[18px] h-[18px] rounded-[4px] border-2 transition-all flex items-center justify-center ${
-                                          expCache ? "border-[#d0bcff] bg-[#d0bcff]" : "border-[#c4c6cf]"
-                                        }`}>
-                                          {expCache && (
-                                            <motion.div
-                                              initial={{ scale: 0.5, opacity: 0 }}
-                                              animate={{ scale: 1, opacity: 1 }}
-                                            >
-                                              <Check className="w-3 h-3 text-[#381e72] stroke-[4]" />
-                                            </motion.div>
-                                          )}
-                                        </div>
-                                      ) : (
-                                        <div className="relative w-5 h-5 rounded-md p-[1px] bg-gradient-to-br from-indigo-400 to-indigo-600 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)]">
-                                          <div className="w-full h-full rounded-[5px] bg-[#07050f]/40 flex items-center justify-center">
-                                            {expCache && (
-                                              <motion.div
-                                                initial={{ scale: 0.5, opacity: 0 }}
-                                                animate={{ scale: 1, opacity: 1 }}
-                                                className="absolute inset-0 bg-indigo-500 rounded-[3px] flex items-center justify-center"
-                                              >
-                                                <Check className="w-3.5 h-3.5 text-white stroke-[3.5]" />
-                                              </motion.div>
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-              </div>
-            </AnimatePresence>
-          </div>
+          <OreSettingsTab
+            onOpenFeedback={() => setIsUnderConstructionOpen(true)}
+            onBackToHome={() => setActiveTab("home")}
+            currentStorageUsed={currentStorageUsed}
+            maxStorageMB={maxStorageMB}
+            purchasedStorageMB={purchasedStorageMB}
+            setPurchasedStorageMB={setPurchasedStorageMB}
+            vCoins={vCoins}
+            setVCoins={setVCoins}
+            handleCleanStorage={handleCleanStorage}
+            amoledDark={amoledDark}
+            setAmoledDark={setAmoledDark}
+            dynamicMotion={dynamicMotion}
+            setDynamicMotion={setDynamicMotion}
+            isPanoramaActive={isPanoramaActive}
+            plugins={plugins}
+            handleInstallPluginWithConflictCheck={handleInstallPluginWithConflictCheck}
+            handleTogglePluginWithConflictCheck={handleTogglePluginWithConflictCheck}
+            setPlugins={setPlugins}
+            activeSettingSection={activeSettingSection}
+            setActiveSettingSection={setActiveSettingSection}
+          />
         )}
 
         {/* VIEW: FANDOM LOGOS GENERATOR PAGE */}
@@ -9285,8 +7574,8 @@ export default function App() {
           />
         )}
 
-        {/* VIEW: UNDER CONSTRUCTION / COMING SOON PAGE */}
-        {(activeTab === "under_construction" || activeTab === "coming_soon") && (
+        {/* VIEW: UNDER CONSTRUCTION / COMING SOON / V-ARCADE PAGE */}
+        {(activeTab === "under_construction" || activeTab === "coming_soon" || activeTab === "v_arcade") && (
           <UnderConstructionTab
             onClose={() => setActiveTab("home")}
           />
@@ -11024,7 +9313,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={isMaterialDesignActive ? { duration: 0.25 } : (dynamicMotion ? { duration: 0.35, ease: [0.16, 1, 0.3, 1] } : { duration: 0 })}
-            className="fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/25 backdrop-blur-[20px] z-[999999] flex items-center justify-center p-4"
           >
             <motion.div
               initial={isMaterialDesignActive ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
@@ -11165,7 +9454,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4 font-google select-none"
+            className="fixed inset-0 bg-black/60 backdrop-blur-[20px] z-[999999] flex items-center justify-center p-4 font-google select-none"
             onClick={() => setShowLogoAdjustModal(false)}
           >
             <motion.div
@@ -11280,7 +9569,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[120] flex items-center justify-center p-4 font-sans select-none" : "fixed inset-0 bg-black/60 backdrop-blur-[20px] z-[120] flex items-center justify-center p-4 font-google select-none"}
+            className={isWinUI3Active ? "fixed inset-0 bg-neutral-900/30 backdrop-blur-[6px] z-[999999] flex items-center justify-center p-4 font-sans select-none" : "fixed inset-0 bg-black/60 backdrop-blur-[20px] z-[999999] flex items-center justify-center p-4 font-google select-none"}
             onClick={() => setShowYouTubeToolModal(false)}
           >
             <motion.div
@@ -11650,7 +9939,7 @@ export default function App() {
                 </h3>
               </div>
               <p className={isWinUI3Active ? "text-[13px] mb-6 leading-relaxed text-neutral-600" : `text-[13px] mb-6 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/70"}`}>
-                Test Vplay là một ứng dụng dùng cho mục đích thử nghiệm và chỉ hỗ trợ sử dụng tối đa 3GB dữ liệu. Hãy dọn dẹp ổ cứng Vplay của bạn để sử dụng ứng dụng Test Vplay một cách mượt mà nhất
+                Test Vplay là một ứng dụng dùng cho mục đích thử nghiệm và chỉ hỗ trợ sử dụng tối đa {maxStorageMB.toLocaleString()} MB dữ liệu. Hãy dọn dẹp hoặc mua thêm storage để tiếp tục sử dụng mượt mà nhất.
               </p>
               
               <div className="space-y-2.5">
@@ -11709,7 +9998,7 @@ export default function App() {
                 </h3>
               </div>
               <p className={isWinUI3Active ? "text-[13px] mb-6 leading-relaxed text-neutral-600" : `text-[13px] mb-6 leading-relaxed ${isMaterialDesignActive ? "text-[#cac4d0]" : "text-white/70"}`}>
-                Test Vplay là một ứng dụng dùng cho mục đích thử nghiệm và chỉ hỗ trợ sử dụng tối đa 3GB dữ liệu. Hãy dọn dẹp ổ cứng Vplay của bạn để tiếp tục sử dụng ứng dụng Test Vplay. Quyền sử dụng Vplay sẽ tạm thời bị khóa cho đến khi ổ cứng của bạn được dọn dẹp.
+                Test Vplay là một ứng dụng dùng cho mục đích thử nghiệm và chỉ hỗ trợ sử dụng tối đa {maxStorageMB.toLocaleString()} MB dữ liệu. Hãy dọn dẹp hoặc mua thêm storage để tiếp tục sử dụng ứng dụng Test Vplay. Quyền sử dụng Vplay sẽ tạm thời bị khóa cho đến khi ổ cứng của bạn được giải phóng bộ nhớ.
               </p>
               
               <div className="space-y-2.5">
@@ -12625,7 +10914,10 @@ export default function App() {
         )}
       </AnimatePresence>
 
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MotionConfig>
+    </div>
   );
 }

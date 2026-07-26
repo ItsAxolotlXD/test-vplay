@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap');
 @import "tailwindcss";
 
@@ -6,6 +7,7 @@
   --font-mono: "Montserrat", sans-serif;
   --font-google: "Montserrat", sans-serif;
   --font-montserrat: "Montserrat", sans-serif;
+  --font-kanit: "Montserrat", sans-serif;
 }
 
 *, html, body, button, input, select, textarea {
@@ -649,7 +651,7 @@ body.material-design-3 .range-slider-pill:active::-moz-range-thumb,
 .winui-3-active .rounded-\[28px\],
 .winui-3-active .rounded-\[30px\],
 .winui-3-active [class*="rounded-"] {
-  &:not(.rounded-full):not([class*="rounded-full"]):not([class*="w-2.5"]):not([class*="h-2.5"]):not([class*="w-2"]):not([class*="h-2"]):not([class*="w-3"]):not([class*="h-3"]):not(.w-12):not(.h-6):not(.h-7):not([class*="w-12"]):not([class*="h-6"]):not([class*="h-7"]) {
+  &:not(aside button):not(.rounded-full):not([class*="rounded-full"]):not([class*="w-2.5"]):not([class*="h-2.5"]):not([class*="w-2"]):not([class*="h-2"]):not([class*="w-3"]):not([class*="h-3"]):not(.w-12):not(.h-6):not(.h-7):not([class*="w-12"]):not([class*="h-6"]):not([class*="h-7"]) {
     border-radius: 15px !important;
   }
 }
@@ -1280,15 +1282,128 @@ body.minecraft-ore-active .bg-[#07050f] {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Font Montserrat Utility Override */
-.font-montserrat, .font-montserrat * {
+/* Font Montserrat Utility Overrides */
+.font-kanit, .font-kanit *, .font-montserrat, .font-montserrat *, .font-google, .font-google * {
   font-family: 'Montserrat', sans-serif !important;
 }
 
-/* Default Montserrat font family across body elements */
-html, body {
+/* Default Montserrat font family across body elements & dark background to prevent white flash */
+html, body, #root {
   font-family: 'Montserrat', sans-serif !important;
+  background-color: #06040a !important;
+  color: #ffffff;
 }
+
+/* ORE UI Minecraft style buttons: instant snap press (lún thẳng, không animate) & 0px border radius */
+/* Global Button Style Overrides: corner = 0px for all buttons */
+button, input[type="button"], input[type="submit"] {
+  border-radius: 0px !important;
+}
+
+.ore-btn-white {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-bottom: 4px solid #a1a1aa !important;
+  border-radius: 0px !important;
+  transition: none !important;
+}
+.ore-btn-white:hover {
+  background-color: #f4f4f5 !important;
+}
+.ore-btn-white:active {
+  background-color: #e4e4e7 !important;
+  border-bottom-width: 0px !important;
+  transform: translateY(4px) !important;
+  transition: none !important;
+}
+
+.ore-btn-green {
+  background-color: #388e3c !important;
+  color: #ffffff !important;
+  border-bottom: 4px solid #1b5e20 !important;
+  border-radius: 0px !important;
+  transition: none !important;
+}
+.ore-btn-green:hover {
+  background-color: #2e7d32 !important;
+}
+.ore-btn-green:active {
+  background-color: #1b5e20 !important;
+  border-bottom-width: 0px !important;
+  transform: translateY(4px) !important;
+  transition: none !important;
+}
+
+/* All buttons font-normal and no uppercase transform */
+button, button *, [role="button"], [role="button"] * {
+  text-transform: none !important;
+  font-weight: 400 !important;
+}
+
+/* Sidebar Tabs - Clear background on unselected tabs; apply background only to select/hover/pressed */
+aside button,
+aside button *,
+.winui-3-active aside button,
+.winui-3-active aside button * {
+  border-radius: 0px !important;
+}
+
+aside button {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-shadow: none !important;
+  border-radius: 0px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+}
+
+aside button[class*="bg-[#3f4144]"] {
+  background-color: #3f4144 !important;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+}
+
+aside button:hover:not([class*="bg-[#3f4144]"]) {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+}
+
+aside button[class*="bg-[#3f4144]"]:hover {
+  background-color: #4d4f53 !important;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+}
+
+aside button:active {
+  background-color: #3f4144 !important;
+  color: #ffffff !important;
+  border-radius: 0px !important;
+  transform: none !important;
+}
+
+/* Splash Screen Panorama Background Animation */
+@keyframes panoramaPan {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-panorama-bg {
+  background-size: 200% auto;
+  animation: panoramaPan 45s ease-in-out infinite;
+}
+
 
 
 
