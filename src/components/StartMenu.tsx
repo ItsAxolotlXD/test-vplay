@@ -643,7 +643,7 @@ export default function StartMenu({
                   className="p-1 rounded-md hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
                   title="Tìm kiếm & Tiện ích Vplay"
                 >
-                  <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-4 h-4 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+                  <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="w-4 h-4 object-contain" referrerPolicy="no-referrer" alt="Search" />
                 </button>
               </div>
 

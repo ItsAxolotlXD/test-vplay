@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { ExternalLink, ChevronLeft, Trash2, ShoppingBag, Palette, User, Sliders, Cpu, Layers, HardDrive, RefreshCw, X, Check, Plus } from "lucide-react";
+import { VplayToggleSwitch } from "./ui/VplayToggleSwitch";
 
 interface OreSettingsTabProps {
   onOpenFeedback: () => void;
@@ -122,31 +123,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
   // Helper toggle component matching Minecraft / Ore UI style
   const OreToggle = ({ value, onChange, disabled = false }: { value: boolean; onChange: (v: boolean) => void; disabled?: boolean }) => (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={() => !disabled && onChange(!value)}
-      style={{ borderRadius: "0px" }}
-      className={`w-14 h-7 border-2 select-none flex items-center justify-between p-0.5 cursor-pointer rounded-none relative transition-none ${
-        disabled
-          ? "opacity-40 cursor-not-allowed bg-[#1f1f1f] border-[#111111]"
-          : value
-          ? "bg-[#388e3c] border-[#1b5e20] text-white"
-          : "bg-[#222222] border-[#121212] text-zinc-400"
-      }`}
-    >
-      {value ? (
-        <>
-          <span className="font-mono font-bold text-xs pl-1.5 select-none text-white">I</span>
-          <div className="w-5 h-5 bg-white border border-black shadow shrink-0 rounded-none" style={{ borderRadius: "0px" }} />
-        </>
-      ) : (
-        <>
-          <div className="w-5 h-5 bg-white border border-black shadow shrink-0 rounded-none" style={{ borderRadius: "0px" }} />
-          <span className="font-mono font-bold text-xs pr-1.5 select-none text-zinc-400">O</span>
-        </>
-      )}
-    </button>
+    <VplayToggleSwitch checked={value} onChange={onChange} disabled={disabled} />
   );
 
   // Helper slider component matching Minecraft / Ore UI style

@@ -331,7 +331,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
           
           {/* Main Search Bar */}
           <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 shadow-md">
-            <img src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751" className="w-5 h-5 shrink-0 object-contain" style={{ filter: "brightness(0) invert(1)" }} referrerPolicy="no-referrer" alt="Search" />
+            <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="w-5 h-5 shrink-0 object-contain" referrerPolicy="no-referrer" alt="Search" />
             <input
               type="text"
               placeholder="Nhập tên người dùng, username hoặc mã ID (ví dụ: V123456)..."

@@ -418,7 +418,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
           
           {/* Search bar */}
           <div className="flex items-center gap-3 bg-[#18181c] border border-white/10 rounded-3xl px-4 py-3.5 shadow-xl">
-            <Search className="w-5 h-5 text-zinc-400 shrink-0" />
+            <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="w-5 h-5 shrink-0 object-contain" referrerPolicy="no-referrer" alt="Search" />
             <input
               type="text"
               placeholder={`Tìm kiếm tiêu đề, mã hiệu hoặc nội dung trong ${activeSubTab === "community" ? "Community Box" : "Your Box"}...`}

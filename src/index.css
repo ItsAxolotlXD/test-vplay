@@ -1,1412 +1,315 @@
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap');
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Montserrat", sans-serif;
-  --font-mono: "Montserrat", sans-serif;
-  --font-google: "Montserrat", sans-serif;
-  --font-montserrat: "Montserrat", sans-serif;
-  --font-kanit: "Montserrat", sans-serif;
+@layer utilities {
+  .font-jura {
+    font-family: 'Jura', sans-serif;
+  }
+  .font-montserrat {
+    font-family: 'Jura', sans-serif;
+  }
+  .font-pixel {
+    font-family: 'Jura', 'Pixelify Sans', sans-serif;
+  }
+  .font-press-start {
+    font-family: 'Jura', sans-serif;
+    font-weight: 700;
+  }
+  .font-silkscreen {
+    font-family: 'Jura', sans-serif;
+  }
+  .font-vt323 {
+    font-family: 'Jura', sans-serif;
+  }
 }
 
-*, html, body, button, input, select, textarea {
-  font-family: "Montserrat", sans-serif !important;
+/* Custom Pixel Art Bevel & Border styles */
+.pixel-border-dark {
+  border: 2px solid #141414;
 }
 
-/* Custom gorgeous scrollbar for glassmorphic style */
+.pixel-[#418a28] {
+  background-color: #418a28;
+}
+
+.pixel-shadow-hero {
+  box-shadow: inset 0 2px 0 #6cc34b, inset 0 -3px 0 #1e4511;
+}
+
+.pixel-shadow-hero-hover {
+  box-shadow: inset 0 2px 0 #89dc69, inset 0 -3px 0 #285718;
+}
+
+.pixel-shadow-hero-pressed {
+  box-shadow: inset 0 3px 0 #18370d, inset 0 -1px 0 #418a28;
+}
+
+.pixel-shadow-hero-disabled {
+  box-shadow: inset 0 2px 0 #e2e5e8, inset 0 -3px 0 #9ca0a4;
+}
+
+/* Minecraft Bedrock JSON UI Authentic Button Classes */
+.mc-button-primary {
+  background-color: #418a28;
+  color: #ffffff;
+  border: 2px solid #141414;
+  box-shadow: inset 0 2px 0 #6bc34b, inset 0 -3px 0 #1e4511;
+  font-family: 'Jura', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  user-select: none;
+  cursor: default;
+  transition: background-color 0.05s ease, color 0.05s ease, border-color 0.05s ease;
+}
+.mc-button-primary:hover {
+  background-color: #51a233;
+  border-color: #ffffff;
+  box-shadow: inset 0 2px 0 #89dc69, inset 0 -2px 0 #285718;
+}
+.mc-button-primary:active {
+  background-color: #2b611a;
+  border-color: #ffffff;
+  box-shadow: inset 0 3px 0 #18370d, inset 0 -1px 0 #418a28;
+  transform: translateY(2px);
+}
+.mc-button-primary:disabled {
+  background-color: #7a7e82;
+  color: #4d5053;
+  border-color: #141414;
+  box-shadow: inset 0 2px 0 #a0a4a8, inset 0 -3px 0 #505356;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mc-button-secondary {
+  background-color: #c6c6c6;
+  color: #404040;
+  border: 2px solid #141414;
+  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #898d91;
+  font-family: 'Jura', sans-serif;
+  font-weight: 700;
+  user-select: none;
+  cursor: default;
+  transition: background-color 0.05s ease, color 0.05s ease, border-color 0.05s ease;
+}
+.mc-button-secondary:hover {
+  background-color: #28960b;
+  color: #d0d0d0;
+  border-color: #ffffff;
+  box-shadow: inset 2px 2px 0 #89dc69, inset -2px -2px 0 #1b5e20;
+}
+.mc-button-secondary:active {
+  background-color: #2b611a;
+  color: #b0b0b0;
+  border-color: #ffffff;
+  box-shadow: inset 2px 2px 0 #18370d, inset -2px -2px 0 #418a28;
+  transform: translateY(1px);
+}
+.mc-button-secondary:disabled {
+  background-color: #7a7e82;
+  color: #4d5053;
+  border-color: #141414;
+  box-shadow: inset 2px 2px 0 #a0a4a8, inset -2px -2px 0 #505356;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Minecraft Bedrock JSON UI Authentic Input / Search Box */
+.mc-input-box {
+  background-color: #4c4c4c;
+  color: #ffffff;
+  border: 2px solid #141414;
+  box-shadow: inset 2px 2px 0 #202020, inset -2px -2px 0 #808080;
+  font-family: 'Jura', sans-serif;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.05s ease, background-color 0.05s ease;
+}
+.mc-input-box::placeholder {
+  color: #a0a0a0;
+}
+.mc-input-box:hover,
+.mc-input-box:focus {
+  background-color: #555555;
+  border-color: #ffffff !important;
+  box-shadow: inset 2px 2px 0 #181818, inset -2px -2px 0 #909090;
+}
+
+/* Global Default Arrow Cursor Override for all UI Controls (Buttons, Inputs, Sliders, Toggles) */
+button,
+input,
+select,
+textarea,
+label,
+a,
+[role="button"],
+.cursor-pointer,
+.cursor-text,
+input[type="range"],
+input[type="checkbox"],
+button:hover,
+input:hover,
+.btn-press-effect,
+.btn-press-effect:hover {
+  cursor: default !important;
+}
+
+/* Universal hover border for buttons and inputs */
+button:hover:not(:disabled),
+input:hover:not(:disabled),
+input:focus {
+  border-color: #ffffff !important;
+}
+
+/* Remove fade transition on hover for all buttons, input boxes, and controls */
+button,
+input,
+select,
+textarea,
+.mc-button-primary,
+.mc-button-secondary,
+.mc-input-box,
+.btn-press-effect {
+  transition: none !important;
+}
+
+.mc-button-danger {
+  background-color: #b82222;
+  color: #ffffff;
+  border: 2px solid #141414;
+  box-shadow: inset 0 2px 0 #e65c5c, inset 0 -3px 0 #6b1010;
+  font-family: 'Jura', sans-serif;
+  font-weight: 700;
+  user-select: none;
+  cursor: pointer;
+  transition: background-color 0.05s ease, color 0.05s ease;
+}
+.mc-button-danger:hover {
+  background-color: #d92b2b;
+  box-shadow: inset 0 2px 0 #ff8080, inset 0 -2px 0 #821414;
+}
+.mc-button-danger:active {
+  background-color: #821414;
+  box-shadow: inset 0 3px 0 #420a0a, inset 0 -1px 0 #b82222;
+  transform: translateY(2px);
+}
+.mc-button-danger:disabled {
+  background-color: #7a7e82;
+  color: #4d5053;
+  box-shadow: inset 0 2px 0 #a0a4a8, inset 0 -3px 0 #505356;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Button Press Down Motion - Instant snappy response without animation */
+.btn-press-effect {
+  transition: background-color 0.05s ease, color 0.05s ease !important;
+}
+.btn-press-effect:active, .btn-pressed {
+  transform: translateY(2px) !important;
+  transition: none !important;
+}
+
+/* Slide in from left to right animation */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Scanline FX for TV screen */
+.crt-scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+}
+
+/* Minecraft Panorama Scrolling Keyframes - 3D accelerated for maximum smoothness */
+@keyframes minecraft-panorama-scroll {
+  0% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-panorama {
+  animation: minecraft-panorama-scroll 75s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.bg-radial-vignette {
+  background: radial-gradient(circle at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%);
+}
+
+/* Custom Ore UI / Secondary Button Styled Native Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 999px;
+  background: #1e2022;
+  border: 2px solid #141414;
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.4);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
+  background: #cdd1d4;
+  border: 2px solid #141414;
+  box-shadow: inset 0 1px 0 #f4f6f8, inset 0 -2px 0 #9ea2a6;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #f4f6f8;
+  box-shadow: inset 0 1px 0 #ffffff, inset 0 -2px 0 #b5b9bd;
 }
 
-/* Glassmorphism utility classes */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+::-webkit-scrollbar-thumb:active {
+  background: #abafb3;
+  box-shadow: inset 0 2px 0 #898d91, inset 0 -1px 0 #cdd1d4;
 }
 
-.glass-panel-deep {
-  background: rgba(15, 10, 25, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+::-webkit-scrollbar-corner {
+  background: #141414;
 }
 
-/* Progressive blur disabled across app */
-.progressive-blur-header,
-.progressive-blur-dock,
-.progressive-blur-player {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+/* Firefox scrollbar support */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #cdd1d4 #1e2022;
 }
 
-/* Range slider custom pill shape values (Horizontal Pill) */
-.range-slider-pill::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 32px;
-  height: 18px;
-  border-radius: 9999px;
-  background: #ffffff;
-  cursor: default;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  transition: transform 0.4s cubic-bezier(0.175, 1.85, 0.35, 1.45), background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-.range-slider-pill::-moz-range-thumb {
-  width: 32px;
-  height: 18px;
-  border-radius: 9999px;
-  background: #ffffff;
-  cursor: default;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  transition: transform 0.4s cubic-bezier(0.175, 1.85, 0.35, 1.45), background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-.range-slider-pill:hover::-webkit-slider-thumb {
-  transform: scale(1.35);
-  background: rgba(255, 255, 255, 0) !important;
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-}
-.range-slider-pill:hover::-moz-range-thumb {
-  transform: scale(1.35);
-  background: rgba(255, 255, 255, 0) !important;
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-}
-.range-slider-pill:active::-webkit-slider-thumb {
-  transform: scale(1.6);
-  background: rgba(255, 255, 255, 0) !important;
-  border-color: #ffffff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-}
-.range-slider-pill:active::-moz-range-thumb {
-  transform: scale(1.6);
-  background: rgba(255, 255, 255, 0) !important;
-  border-color: #ffffff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-}
-
-.bouncy-btn {
-  transition: transform 0.45s cubic-bezier(0.175, 2.1, 0.32, 1.35), background-color 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
-}
-
-.bouncy-btn:hover {
-  transform: scale(1.18);
-}
-
-.bouncy-btn:active {
-  transform: scale(1.28);
-}
-
-.glass-pill {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.glass-pill-active {
-  background: rgb(255, 255, 255);
-  color: rgb(15, 10, 25);
-  box-shadow: 0 4px 14px 0 rgba(255, 255, 255, 0.25);
-}
-
-.glass-input {
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.glass-input:focus {
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-}
-
-/* Accessibility: Liquid Glass Disabled Overrides */
-.no-liquid-glass * {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  filter: none !important;
-}
-
-.no-liquid-glass .progressive-blur-header,
-.no-liquid-glass .progressive-blur-dock,
-.no-liquid-glass .progressive-blur-player {
-  opacity: 0 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-.no-liquid-glass .glass-panel,
-.no-liquid-glass .glass-panel-deep,
-.no-liquid-glass .glass-pill,
-.no-liquid-glass .glass-input,
-.no-liquid-glass .bg-white\/10,
-.no-liquid-glass .bg-white\/5,
-.no-liquid-glass .bg-white\/12,
-.no-liquid-glass .bg-white\/15,
-.no-liquid-glass .bg-black\/25,
-.no-liquid-glass .bg-black\/50,
-.no-liquid-glass .bg-black\/55,
-.no-liquid-glass .bg-black\/60,
-.no-liquid-glass .bg-black\/75,
-.no-liquid-glass .bg-[#07050f],
-.no-liquid-glass .bg-[#07050f]\/80 {
-  background-color: #1a1a1c !important; /* 100% dark gray */
-  opacity: 1 !important;
-  background-image: none !important;
-  border: none !important; /* Bỏ toàn bộ shiny border */
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-/* Plugin: Material Design 3 of Google */
-.material-design-3,
-.material-design-3 * {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  font-family: 'Google Sans', 'Product Sans', 'Inter', sans-serif !important;
-}
-
-.material-design-3 .progressive-blur-header,
-.material-design-3 .progressive-blur-dock,
-.material-design-3 .progressive-blur-player {
-  opacity: 0 !important;
-}
-
-.material-design-3 .glass-panel,
-.material-design-3 .glass-panel-deep,
-.material-design-3 .bg-white\/10,
-.material-design-3 .bg-white\/5,
-.material-design-3 .bg-white\/12,
-.material-design-3 .bg-white\/15,
-.material-design-3 .bg-black\/25,
-.material-design-3 .bg-black\/50,
-.material-design-3 .bg-black\/55,
-.material-design-3 .bg-black\/60,
-.material-design-3 .bg-black\/75,
-.material-design-3 .bg-black\/95,
-.material-design-3 .bg-[#07050f],
-.material-design-3 .bg-[#07050f]\/80 {
-  background-color: #290a36 !important; /* Google M3 Dark Surface Container */
-  background-image: none !important;
-  border: none !important;
-  border-color: transparent !important;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4) !important; /* Google M3 Shadow */
-  border-radius: 24px !important; /* Google M3 generous rounded corner layout */
-}
-
-.material-design-3 button,
-.material-design-3 .glass-pill {
-  border-radius: 20px !important; /* Changed to 20px for Material Design button spec requested by user */
-}
-
-.material-design-3 input,
-.material-design-3 select {
-  border-radius: 12px !important; /* MD3 text fields generally have rounded-xl or rounded-lg */
-}
-
-.material-design-3 .bg-[#007aff] {
-  background-color: #d0bcff !important; /* M3 Lavender primary */
-  color: #381e72 !important; /* M3 text colour on purple */
-}
-
-.material-design-3 .text-[#007aff] {
-  color: #d0bcff !important;
-}
-
-.material-design-3 .border-[#007aff] {
-  border-color: #d0bcff !important;
-}
-
-/* Accessibility: Dynamic Motion Disabled Overrides */
-.no-dynamic-motion * {
-  transition: none !important;
-  transition-duration: 0s !important;
-  animation: none !important;
-  animation-duration: 0s !important;
-}
-
-/* Material Design 3 Bouncy Button Hover Overrides */
-body.material-design-3 .bouncy-btn,
-.material-design-3 .bouncy-btn,
-body.material-design-3 button,
-.material-design-3 button,
-body.material-design-3 a,
-.material-design-3 a,
-body.material-design-3 [role="button"],
-.material-design-3 [role="button"] {
-  transform: none !important;
-  scale: none !important;
-  transition: background-color 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
-}
-
-body.material-design-3 .bouncy-btn:hover,
-.material-design-3 .bouncy-btn:hover,
-body.material-design-3 button:hover,
-.material-design-3 button:hover,
-body.material-design-3 a:hover,
-.material-design-3 a:hover,
-body.material-design-3 [role="button"]:hover,
-.material-design-3 [role="button"]:hover {
-  transform: none !important;
-  scale: none !important;
-}
-
-body.material-design-3 .bouncy-btn:active,
-.material-design-3 .bouncy-btn:active,
-body.material-design-3 button:active,
-.material-design-3 button:active,
-body.material-design-3 a:active,
-.material-design-3 a:active,
-body.material-design-3 [role="button"]:active,
-.material-design-3 [role="button"]:active {
-  transform: none !important;
-  scale: none !important;
-}
-
-/* MD3 Range Slider Override */
-body.material-design-3 .range-slider-pill,
-.material-design-3 .range-slider-pill {
-  height: 16px !important;
-  border-radius: 9999px !important;
-}
-
-body.material-design-3 .range-slider-pill::-webkit-slider-thumb,
-.material-design-3 .range-slider-pill::-webkit-slider-thumb {
-  width: 4px !important;
-  height: 24px !important;
-  border-radius: 2px !important;
-  background: #ffffff !important;
-  border: 1px solid #381e72 !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
-  transform: none !important;
-}
-
-body.material-design-3 .range-slider-pill::-moz-range-thumb,
-.material-design-3 .range-slider-pill::-moz-range-thumb {
-  width: 4px !important;
-  height: 24px !important;
-  border-radius: 2px !important;
-  background: #ffffff !important;
-  border: 1px solid #381e72 !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
-  transform: none !important;
-}
-
-body.material-design-3 .range-slider-pill:hover::-webkit-slider-thumb,
-.material-design-3 .range-slider-pill:hover::-webkit-slider-thumb {
-  transform: scaleY(1.1) !important;
-  background: #ffffff !important;
-  border-color: #381e72 !important;
-}
-
-body.material-design-3 .range-slider-pill:hover::-moz-range-thumb,
-.material-design-3 .range-slider-pill:hover::-moz-range-thumb {
-  transform: scaleY(1.1) !important;
-  background: #ffffff !important;
-  border-color: #381e72 !important;
-}
-
-body.material-design-3 .range-slider-pill:active::-webkit-slider-thumb,
-.material-design-3 .range-slider-pill:active::-webkit-slider-thumb {
-  transform: scaleY(1.2) !important;
-  background: #ffffff !important;
-  border-color: #381e72 !important;
-}
-
-body.material-design-3 .range-slider-pill:active::-moz-range-thumb,
-.material-design-3 .range-slider-pill:active::-moz-range-thumb {
-  transform: scaleY(1.2) !important;
-  background: #ffffff !important;
-  border-color: #381e72 !important;
-}
-
-/* WinUI 3 Plugin Overrides */
-.winui-3-active {
-  --accent-color: #43bbfd;
-}
-
-/* Ensure modal overlays have a modern dark translucent background */
-.winui-3-active .bg-neutral-900\/30,
-.winui-3-active .bg-neutral-900\/40,
-.winui-3-active .bg-neutral-900\/60,
-.winui-3-active .bg-black\/60,
-.winui-3-active .bg-black\/80 {
-  background-color: rgba(12, 12, 12, 0.65) !important;
-  backdrop-filter: blur(12px) !important;
-}
-
-/* Override inline text and backgrounds in dark-mode WinUI 3 dialogs */
-.winui-3-active .text-neutral-900,
-.winui-3-active .text-neutral-800,
-.winui-3-active .text-neutral-700 {
-  color: #ffffff !important;
-}
-
-.winui-3-active .text-neutral-600,
-.winui-3-active .text-neutral-500,
-.winui-3-active .text-neutral-400 {
-  color: #a3a3a3 !important;
-}
-
-.winui-3-active .bg-white {
-  background-color: #202020 !important;
-}
-
-.winui-3-active .bg-neutral-50,
-.winui-3-active .bg-neutral-100 {
-  background-color: #1a1a1a !important;
-}
-
-.winui-3-active .border-neutral-200,
-.winui-3-active .border-neutral-300 {
-  border-color: #2d2d2d !important;
-}
-
-.winui-3-active .divide-neutral-200 > * + * {
-  border-color: #2d2d2d !important;
-}
-
-.winui-3-active .divide-y {
-  border-color: #2d2d2d !important;
-}
-
-/* Range slider custom styling for WinUI 3 */
-.winui-3-active .range-slider-pill,
-.winui-3-active input[type="range"] {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  height: 4px !important;
-  border-radius: 9999px !important;
-  outline: none !important;
-  background-color: #4d4d4d !important;
-}
-
-/* WebKit (Chrome, Safari, Edge) Range Slider track/thumb overrides */
-.winui-3-active .range-slider-pill::-webkit-slider-runnable-track,
-.winui-3-active input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px !important;
-  border-radius: 9999px !important;
-  background-color: #4d4d4d !important;
-}
-
-.winui-3-active .range-slider-pill::-webkit-slider-thumb,
-.winui-3-active input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 16px !important;
-  height: 16px !important;
-  border-radius: 50% !important;
-  background-color: #43bbfd !important; /* Inner blue dot */
-  border: 4px solid #2d2d2d !important; /* Outer grey ring */
-  box-shadow: 0 0 0 1px #555555, 0 1px 3px rgba(0, 0, 0, 0.4) !important;
-  cursor: pointer !important;
-  margin-top: -6px !important;
-  transform: none !important;
-  transition: transform 0.1s ease !important;
-}
-
-.winui-3-active .range-slider-pill:hover::-webkit-slider-thumb,
-.winui-3-active input[type="range"]:hover::-webkit-slider-thumb {
-  transform: scale(1.15) !important;
-}
-
-/* Mozilla Firefox Range Slider track/thumb overrides */
-.winui-3-active .range-slider-pill::-moz-range-track,
-.winui-3-active input[type="range"]::-moz-range-track {
-  height: 4px !important;
-  border-radius: 9999px !important;
-  background-color: #4d4d4d !important;
-}
-
-.winui-3-active .range-slider-pill::-moz-range-progress,
-.winui-3-active input[type="range"]::-moz-range-progress {
-  height: 4px !important;
-  border-radius: 9999px !important;
-  background-color: #43bbfd !important; /* Blue active progress */
-}
-
-.winui-3-active .range-slider-pill::-moz-range-thumb,
-.winui-3-active input[type="range"]::-moz-range-thumb {
-  width: 16px !important;
-  height: 16px !important;
-  border-radius: 50% !important;
-  background-color: #43bbfd !important;
-  border: 4px solid #2d2d2d !important;
-  box-shadow: 0 0 0 1px #555555, 0 1px 3px rgba(0, 0, 0, 0.4) !important;
-  cursor: pointer !important;
-  transform: none !important;
-}
-
-/* WinUI 3 Toggle Switch Overrides */
-.winui-3-active button.w-12.h-6,
-.winui-3-active button.w-12.h-7 {
-  width: 40px !important;
-  height: 20px !important;
-  border-radius: 9999px !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  transition: all 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0) !important;
-  cursor: pointer !important;
-  position: relative !important;
-  box-shadow: none !important;
-}
-
-/* OFF State Track background & border */
-.winui-3-active button.w-12.h-6[class*="bg-[#3a3a3c]"],
-.winui-3-active button.w-12.h-6[class*="bg-[#1d1b20]"],
-.winui-3-active button.w-12.h-6[class*="bg-white/20"],
-.winui-3-active button.w-12.h-7[class*="bg-[#3a3a3c]"],
-.winui-3-active button.w-12.h-7[class*="bg-[#1d1b20]"],
-.winui-3-active button.w-12.h-7[class*="bg-white/20"] {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.44) !important;
-}
-
-.winui-3-active button.w-12.h-6[class*="bg-[#3a3a3c]"]:hover,
-.winui-3-active button.w-12.h-6[class*="bg-[#1d1b20]"]:hover,
-.winui-3-active button.w-12.h-7[class*="bg-[#3a3a3c]"]:hover,
-.winui-3-active button.w-12.h-7[class*="bg-[#1d1b20]"]:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
-}
-
-/* ON State Track background & border */
-.winui-3-active button.w-12.h-6[class*="bg-[#34c759]"],
-.winui-3-active button.w-12.h-6[class*="bg-[#381e72]"],
-.winui-3-active button.w-12.h-7[class*="bg-[#34c759]"],
-.winui-3-active button.w-12.h-7[class*="bg-[#381e72]"] {
-  background-color: #43bbfd !important;
-  border: 1px solid #43bbfd !important;
-}
-
-.winui-3-active button.w-12.h-6[class*="bg-[#34c759]"]:hover,
-.winui-3-active button.w-12.h-6[class*="bg-[#381e72]"]:hover,
-.winui-3-active button.w-12.h-7[class*="bg-[#34c759]"]:hover,
-.winui-3-active button.w-12.h-7[class*="bg-[#381e72]"]:hover {
-  background-color: #5fc5fe !important;
-  border-color: #5fc5fe !important;
-}
-
-/* Disable default absolute/shadow wrappers on toggle switch */
-.winui-3-active button.w-12.h-6 .absolute,
-.winui-3-active button.w-12.h-7 .absolute {
-  display: none !important;
-}
-
-/* WinUI 3 Knob styling and transition */
-.winui-3-active button.w-12.h-6 div,
-.winui-3-active button.w-12.h-7 div {
-  width: 12px !important;
-  height: 12px !important;
-  border-radius: 50% !important;
-  position: absolute !important;
-  top: 3px !important;
-  transition: all 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0) !important;
-  box-shadow: none !important;
-  border: none !important;
-  background-image: none !important;
-}
-
-/* Knob OFF position & color */
-.winui-3-active button.w-12.h-6[class*="bg-[#3a3a3c]"] div,
-.winui-3-active button.w-12.h-6[class*="bg-[#1d1b20]"] div,
-.winui-3-active button.w-12.h-6[class*="bg-white/20"] div,
-.winui-3-active button.w-12.h-7[class*="bg-[#3a3a3c]"] div,
-.winui-3-active button.w-12.h-7[class*="bg-[#1d1b20]"] div,
-.winui-3-active button.w-12.h-7[class*="bg-white/20"] div {
-  left: 4px !important;
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  transform: none !important;
-}
-
-/* Knob ON position & color */
-.winui-3-active button.w-12.h-6[class*="bg-[#34c759]"] div,
-.winui-3-active button.w-12.h-6[class*="bg-[#381e72]"] div,
-.winui-3-active button.w-12.h-7[class*="bg-[#34c759]"] div,
-.winui-3-active button.w-12.h-7[class*="bg-[#381e72]"] div {
-  left: 22px !important;
-  background-color: #121212 !important;
-  transform: none !important;
-}
-
-/* WinUI 3 Button Styling Overrides (Home, Live TV, Vplay Vertical, Settings) */
-.winui-3-active button {
-  font-family: var(--font-sans), sans-serif !important;
-}
-
-/* Accent/Colored Buttons (Primary) */
-.winui-3-active button[class*="bg-indigo-65"],
-.winui-3-active button[class*="bg-indigo-60"],
-.winui-3-active button[class*="bg-indigo-50"],
-.winui-3-active button[class*="bg-indigo-600"],
-.winui-3-active button[class*="bg-red-600"],
-.winui-3-active button[class*="bg-[#005fb8]"],
-.winui-3-active button[class*="bg-teal-"],
-.winui-3-active button[class*="bg-[#d0bcff]"],
-.winui-3-active button.bg-accent-winui {
-  background-color: #43bbfd !important;
-  color: #121212 !important;
-  border: 1px solid #43bbfd !important;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.2) !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
-}
-
-.winui-3-active button[class*="bg-indigo-600"]:hover,
-.winui-3-active button[class*="bg-red-600"]:hover,
-.winui-3-active button[class*="bg-[#005fb8]"]:hover,
-.winui-3-active button[class*="bg-teal-"]:hover,
-.winui-3-active button[class*="bg-[#d0bcff]"]:hover {
-  background-color: #5fc5fe !important;
-  border-color: #5fc5fe !important;
-}
-
-.winui-3-active button[class*="bg-indigo-600"]:active,
-.winui-3-active button[class*="bg-red-600"]:active,
-.winui-3-active button[class*="bg-[#005fb8]"]:active,
-.winui-3-active button[class*="bg-[#d0bcff]"]:active {
-  background-color: #2ea3e4 !important;
-  border-color: #2ea3e4 !important;
-}
-
-/* Standard/Neutral Buttons (Secondary) */
-.winui-3-active button[class*="bg-white/"],
-.winui-3-active button[class*="bg-white/[0.0"],
-.winui-3-active button[class*="bg-neutral-"],
-.winui-3-active button[class*="bg-black/40"],
-.winui-3-active button[class*="bg-black/60"],
-.winui-3-active button[class*="bg-black/10"],
-.winui-3-active button[class*="bg-black/20"],
-.winui-3-active button[class*="bg-white/10"],
-.winui-3-active button[class*="bg-white/5"] {
-  background-color: #2d2d2d !important;
-  color: #ffffff !important;
-  border: 1px solid #3e3e3e !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12) !important;
-}
-
-.winui-3-active button[class*="bg-white/"]:hover,
-.winui-3-active button[class*="bg-white/[0.0"]:hover,
-.winui-3-active button[class*="bg-neutral-"]:hover,
-.winui-3-active button[class*="bg-black/"]:hover,
-.winui-3-active button[class*="bg-white/10"]:hover,
-.winui-3-active button[class*="bg-white/5"]:hover {
-  background-color: #383838 !important;
-  border-color: #4c4c4c !important;
-}
-
-.winui-3-active button[class*="bg-white/"]:active,
-.winui-3-active button[class*="bg-white/[0.0"]:active,
-.winui-3-active button[class*="bg-neutral-"]:active,
-.winui-3-active button[class*="bg-black/"]:active,
-.winui-3-active button[class*="bg-white/10"]:active,
-.winui-3-active button[class*="bg-white/5"]:active {
-  background-color: #252525 !important;
-  border-color: #3e3e3e !important;
-}
-
-/* WinUI 3 global border-radius override to 15px */
-.winui-3-active button,
-.winui-3-active input,
-.winui-3-active textarea,
-.winui-3-active select,
-.winui-3-active .rounded-sm,
-.winui-3-active .rounded,
-.winui-3-active .rounded-md,
-.winui-3-active .rounded-lg,
-.winui-3-active .rounded-xl,
-.winui-3-active .rounded-2xl,
-.winui-3-active .rounded-3xl,
-.winui-3-active .rounded-\[4px\],
-.winui-3-active .rounded-\[8px\],
-.winui-3-active .rounded-\[11px\],
-.winui-3-active .rounded-\[12px\],
-.winui-3-active .rounded-\[28px\],
-.winui-3-active .rounded-\[30px\],
-.winui-3-active [class*="rounded-"] {
-  &:not(aside button):not(.rounded-full):not([class*="rounded-full"]):not([class*="w-2.5"]):not([class*="h-2.5"]):not([class*="w-2"]):not([class*="h-2"]):not([class*="w-3"]):not([class*="h-3"]):not(.w-12):not(.h-6):not(.h-7):not([class*="w-12"]):not([class*="h-6"]):not([class*="h-7"]) {
-    border-radius: 15px !important;
-  }
-}
-
-/* WinUI 3 Dropdown Menu Animations & Overrides */
-@keyframes winui-slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.winui-3-active div[class*="z-[110]"] {
-  animation: winui-slide-down 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0) forwards !important;
-  transform-origin: top left !important;
-  background-color: rgba(32, 32, 32, 0.95) !important;
-  backdrop-filter: blur(40px) saturate(140%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-top-color: rgba(255, 255, 255, 0.15) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-  padding: 5px !important;
-  min-width: 180px !important;
-}
-
-/* Standard and WinUI dropdown buttons styling */
-div[class*="bg-[#121118]"] button,
-div[class*="bg-[#0c0819]"] button,
-.winui-3-active div[class*="z-[110]"] button {
-  border-radius: 15px !important;
-  cursor: default !important;
-  margin: 1.5px 4px !important;
-  width: calc(100% - 8px) !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button {
-  position: relative !important;
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
-  padding-left: 28px !important;
-  padding-right: 12px !important;
-  font-size: 11.5px !important;
-  font-family: var(--font-sans), sans-serif !important;
-  font-weight: 400 !important;
-  height: auto !important;
-  color: rgba(255, 255, 255, 0.85) !important;
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  text-align: left !important;
-  transition: background-color 0.1s ease, color 0.1s ease !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button:hover {
-  background-color: rgba(255, 255, 255, 0.07) !important;
-  color: #ffffff !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button:active {
-  background-color: rgba(255, 255, 255, 0.04) !important;
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button::before {
-  content: "" !important;
-  position: absolute !important;
-  left: 10px !important;
-  top: 50% !important;
-  transform: translateY(-50%) scaleY(0) !important;
-  width: 3px !important;
-  height: 12px !important;
-  background-color: #43bbfd !important;
-  border-radius: 9999px !important;
-  opacity: 0 !important;
-  transition: transform 0.15s cubic-bezier(0.1, 0.9, 0.2, 1.0), opacity 0.15s ease !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button:hover::before {
-  transform: translateY(-50%) scaleY(1) !important;
-  opacity: 1 !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button:has(.lucide-check),
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-indigo-400"]),
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-emerald-400"]),
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-rose-400"]),
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-lime-400"]) {
-  color: #ffffff !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button:has(.lucide-check)::before,
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-indigo-400"])::before,
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-emerald-400"])::before,
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-rose-400"])::before,
-.winui-3-active div[class*="z-[110]"] button:has(svg[class*="text-lime-400"])::before {
-  transform: translateY(-50%) scaleY(1) !important;
-  opacity: 1 !important;
-}
-
-.winui-3-active div[class*="z-[110]"] button svg.lucide-check {
-  display: none !important;
-}
-
-.winui-3-active div[class*="z-[110]"] div {
-  font-family: var(--font-sans), sans-serif !important;
-}
-
-.winui-3-active div[class*="z-[110]"] div[class*="text-[9px]"],
-.winui-3-active div[class*="z-[110]"] div[class*="text-[11px]"] {
-  font-size: 9.5px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
-  padding-left: 28px !important;
-  color: rgba(255, 255, 255, 0.45) !important;
-  margin-top: 6px !important;
-  margin-bottom: 4px !important;
-}
-
-.winui-3-active div[class*="z-[110]"] div[class*="text-xs"] {
-  padding-left: 28px !important;
-  font-size: 11px !important;
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-.winui-3-active div[class*="z-[110]"] .border-t {
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-  margin: 5px 0 !important;
-}
-
-/* Custom styling for select elements in WinUI 3 */
-.winui-3-active select {
-  background-color: #2c2c2c !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
-  border-radius: 6px !important;
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-}
-
-.winui-3-active select option {
-  background-color: #2c2c2c !important;
-  color: #ffffff !important;
-}
-
-/* WinUI 3 Settings Option Layout Padding Reduction */
-.winui-3-active div[class*="p-5"].rounded-\[15px\],
-.winui-3-active div[class*="p-5"].rounded-2xl {
-  padding: 12px 16px !important;
-  border-radius: 12px !important;
-}
-
-.winui-3-active div.space-y-4 > div.pt-4.border-t.border-white\/10 {
-  padding-top: 8px !important;
-  margin-top: 8px !important;
-}
-
-/* Custom 15px border radius for all buttons in Home, LiveTV, Settings, and Vplay Vertical tabs */
-.active-tab-home button,
-.active-tab-live button,
-.active-tab-settings button,
-.active-tab-shorts button,
-#player-anchor.active-tab-home button,
-#player-anchor.active-tab-live button,
-#player-anchor.active-tab-settings button,
-#player-anchor.active-tab-shorts button {
-  border-radius: 15px !important;
-}
-
-/* --- Light Mode Refined Theme Override Styles --- */
-.light-theme {
-  color: #1e293b !important;
-}
-
-.light-theme .glass-panel {
-  background: rgba(255, 255, 255, 0.75) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08) !important;
-}
-
-.light-theme .glass-panel-deep {
-  background: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12) !important;
-}
-
-.light-theme .progressive-blur-header {
-  background: linear-gradient(to bottom, rgba(241, 245, 249, 0.98) 0%, rgba(241, 245, 249, 0.85) 35%, rgba(241, 245, 249, 0.4) 75%, rgba(241, 245, 249, 0) 100%) !important;
-  border-bottom-color: rgba(15, 23, 42, 0.05) !important;
-}
-
-.light-theme ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.02) !important;
-}
-
-.light-theme ::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.12) !important;
-}
-
-.light-theme ::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 23, 42, 0.25) !important;
-}
-
-/* Light theme overrides for sub-components, headings and lists */
-.light-theme h1, 
-.light-theme h2, 
-.light-theme h3, 
-.light-theme h4, 
-.light-theme h5, 
-.light-theme h6 {
-  color: #0f172a !important;
-}
-
-.light-theme p,
-.light-theme span,
-.light-theme label {
-  color: #334155 !important;
-}
-
-.light-theme input,
-.light-theme select,
-.light-theme textarea {
-  background-color: rgba(15, 23, 42, 0.04) !important;
-  color: #0f172a !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
-}
-
-.light-theme input::placeholder {
-  color: #94a3b8 !important;
-}
-
-.light-theme button:not([class*="bg-red-"]):not([class*="bg-[#cc1827]"]):not([class*="bg-teal-"]):not([class*="bg-indigo-"]) {
-  color: #334155 !important;
-}
-
-.light-theme button:hover:not([class*="bg-red-"]):not([class*="bg-[#cc1827]"]):not([class*="bg-teal-"]):not([class*="bg-indigo-"]) {
-  background-color: rgba(15, 23, 42, 0.05) !important;
-}
-
-/* --- Minecraft Ore UI Design Theme Plugin Overrides --- */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-.minecraft-font {
-  font-family: 'Press Start 2P', monospace, sans-serif !important;
-}
-
-/* Retain standard app font (Google Sans) when Minecraft Ore UI is active */
-body.minecraft-ore-active,
-.minecraft-ore-active,
-.minecraft-ore-active * {
-  image-rendering: pixelated !important;
-}
-
-body.minecraft-ore-active p,
-body.minecraft-ore-active span,
-body.minecraft-ore-active div {
-  letter-spacing: 0px !important;
-}
-
-/* Force pixel sharp square corners on all buttons, inputs, cards, badges */
-body.minecraft-ore-active button,
-body.minecraft-ore-active button *,
-body.minecraft-ore-active input:not([type="checkbox"]):not([type="range"]),
-body.minecraft-ore-active select,
-body.minecraft-ore-active textarea,
-body.minecraft-ore-active div[role="button"],
-body.minecraft-ore-active a[role="button"],
-body.minecraft-ore-active .rounded-sm,
-body.minecraft-ore-active .rounded,
-body.minecraft-ore-active .rounded-md,
-body.minecraft-ore-active .rounded-lg,
-body.minecraft-ore-active .rounded-xl,
-body.minecraft-ore-active .rounded-2xl,
-body.minecraft-ore-active .rounded-3xl,
-body.minecraft-ore-active .rounded-full,
-body.minecraft-ore-active [class*="rounded-"] {
-  border-radius: 0px !important;
-}
-
-/* Disable glassmorphism and smooth rounded gradients in Minecraft mode */
-body.minecraft-ore-active .glass-panel,
-body.minecraft-ore-active .glass-panel-deep,
-body.minecraft-ore-active .progressive-blur-header,
-body.minecraft-ore-active .progressive-blur-dock,
-body.minecraft-ore-active .progressive-blur-player {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Primary Green Buttons (Minecraft Ore Style) */
-body.minecraft-ore-active button[class*="bg-indigo-"],
-body.minecraft-ore-active button[class*="bg-emerald-"],
-body.minecraft-ore-active button[class*="bg-teal-"],
-body.minecraft-ore-active button[class*="bg-[#cc1827]"],
-body.minecraft-ore-active button[class*="bg-red-"],
-body.minecraft-ore-active button.bg-accent-winui,
-body.minecraft-ore-active .minecraft-btn-primary {
-  background-color: #388726 !important;
-  color: #ffffff !important;
-  border-top: 3px solid #5abf43 !important;
-  border-left: 3px solid #5abf43 !important;
-  border-bottom: 3px solid #1c4813 !important;
-  border-right: 3px solid #1c4813 !important;
-  outline: 2px solid #111111 !important;
-  /* Bottom Shadow 100% Opacity, 0% Blur (Dark Green) */
-  box-shadow: 0 4px 0 0 #12320b !important;
-  font-weight: 700 !important;
-}
-
-body.minecraft-ore-active button[class*="bg-indigo-"]:hover,
-body.minecraft-ore-active button[class*="bg-emerald-"]:hover,
-body.minecraft-ore-active button[class*="bg-teal-"]:hover,
-body.minecraft-ore-active button[class*="bg-[#cc1827]"]:hover,
-body.minecraft-ore-active button[class*="bg-red-"]:hover,
-body.minecraft-ore-active .minecraft-btn-primary:hover {
-  background-color: #47a030 !important;
-  border-top-color: #6ed055 !important;
-  border-left-color: #6ed055 !important;
-  box-shadow: 0 5px 0 0 #12320b !important;
-}
-
-body.minecraft-ore-active button[class*="bg-indigo-"]:focus,
-body.minecraft-ore-active button[class*="bg-emerald-"]:focus,
-body.minecraft-ore-active button[class*="bg-teal-"]:focus,
-body.minecraft-ore-active button[class*="bg-[#cc1827]"]:focus,
-body.minecraft-ore-active button[class*="bg-red-"]:focus,
-body.minecraft-ore-active button:focus {
-  outline: 2px solid #ffffff !important;
-  outline-offset: 2px !important;
-}
-
-body.minecraft-ore-active button[class*="bg-indigo-"]:active,
-body.minecraft-ore-active button[class*="bg-emerald-"]:active,
-body.minecraft-ore-active button[class*="bg-teal-"]:active,
-body.minecraft-ore-active button[class*="bg-[#cc1827]"]:active,
-body.minecraft-ore-active button[class*="bg-red-"]:active {
-  background-color: #255e19 !important;
-  border-top-color: #1c4813 !important;
-  border-left-color: #1c4813 !important;
-  border-bottom-color: #5abf43 !important;
-  border-right-color: #5abf43 !important;
-  box-shadow: 0 1px 0 0 #12320b !important;
-  transform: translateY(3px) !important;
-}
-
-/* Secondary Gray / Silver Buttons (Minecraft Stone/GUI Style) */
-body.minecraft-ore-active button:not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-teal-"]):not([class*="bg-[#cc1827]"]):not([class*="bg-red-"]):not([class*="bg-amber-"]) {
-  background-color: #c6c6c6 !important;
-  color: #1a1a1a !important;
-  border-top: 3px solid #ffffff !important;
-  border-left: 3px solid #ffffff !important;
-  border-bottom: 3px solid #555555 !important;
-  border-right: 3px solid #555555 !important;
-  outline: 2px solid #111111 !important;
-  /* Bottom Shadow 100% Opacity, 0% Blur (Dark Gray) */
-  box-shadow: 0 4px 0 0 #222222 !important;
-  text-shadow: none !important;
-  font-weight: 700 !important;
-}
-
-body.minecraft-ore-active button:not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-teal-"]):not([class*="bg-[#cc1827]"]):not([class*="bg-red-"]):not([class*="bg-amber-"]):hover {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-bottom-color: #777777 !important;
-  border-right-color: #777777 !important;
-  box-shadow: 0 5px 0 0 #222222 !important;
-}
-
-body.minecraft-ore-active button:not([class*="bg-indigo-"]):not([class*="bg-emerald-"]):not([class*="bg-teal-"]):not([class*="bg-[#cc1827]"]):not([class*="bg-red-"]):not([class*="bg-amber-"]):active {
-  background-color: #a0a0a0 !important;
-  border-top-color: #555555 !important;
-  border-left-color: #555555 !important;
-  border-bottom-color: #ffffff !important;
-  border-right-color: #ffffff !important;
-  box-shadow: 0 1px 0 0 #222222 !important;
-  transform: translateY(3px) !important;
-}
-
-/* Disabled Buttons */
-body.minecraft-ore-active button:disabled,
-body.minecraft-ore-active button[disabled] {
-  background-color: #a0a0a0 !important;
-  color: #555555 !important;
-  border-top: 3px solid #c6c6c6 !important;
-  border-left: 3px solid #c6c6c6 !important;
-  border-bottom: 3px solid #777777 !important;
-  border-right: 3px solid #777777 !important;
-  outline: 2px solid #333333 !important;
-  box-shadow: none !important;
-  cursor: not-allowed !important;
-}
 
-/* Fix Input Box Layout Bug: Transparent inputs inside search containers remain borderless & backgroundless */
-body.minecraft-ore-active input.bg-transparent,
-body.minecraft-ore-active input[class*="bg-transparent"] {
-  background-color: transparent !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  padding: 0 8px !important;
+/* High quality smooth rendering for TV channel logos */
+.tv-logo-high-quality, img.tv-logo-high-quality {
+  image-rendering: auto;
+  image-rendering: smooth;
 }
-
-/* Standalone Input Fields & Input Search Wrappers (Dark inset box) */
-body.minecraft-ore-active .focus-within\:border-red-500,
-body.minecraft-ore-active input:not(.bg-transparent):not([type="checkbox"]):not([type="range"]),
-body.minecraft-ore-active textarea,
-body.minecraft-ore-active select {
-  background-color: #222225 !important;
-  color: #ffffff !important;
-  border-top: 3px solid #101012 !important;
-  border-left: 3px solid #101012 !important;
-  border-bottom: 3px solid #3a3a40 !important;
-  border-right: 3px solid #3a3a40 !important;
-  outline: 2px solid #08080a !important;
-  box-shadow: inset 2px 2px 0px #111114 !important;
-  padding: 8px 12px !important;
-  border-radius: 0px !important;
-}
-
-body.minecraft-ore-active input:focus,
-body.minecraft-ore-active textarea:focus,
-body.minecraft-ore-active select:focus {
-  outline: 2px solid #ffffff !important;
-  outline-offset: 1px !important;
-}
-
-/* Checkboxes (Square pixel checkmark) */
-body.minecraft-ore-active input[type="checkbox"] {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 20px !important;
-  height: 20px !important;
-  background-color: #313238 !important;
-  border-top: 2px solid #18181a !important;
-  border-left: 2px solid #18181a !important;
-  border-bottom: 2px solid #4a4b54 !important;
-  border-right: 2px solid #4a4b54 !important;
-  outline: 2px solid #111111 !important;
-  cursor: pointer !important;
-  position: relative !important;
-  border-radius: 0px !important;
-  margin: 0 !important;
-  display: inline-block !important;
-  vertical-align: middle !important;
-}
-
-body.minecraft-ore-active input[type="checkbox"]:checked {
-  background-color: #388726 !important;
-  border-top-color: #52a53d !important;
-  border-left-color: #52a53d !important;
-  border-bottom-color: #1e4a13 !important;
-  border-right-color: #1e4a13 !important;
-}
-
-body.minecraft-ore-active input[type="checkbox"]:checked::after {
-  content: "✓" !important;
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  color: #ffffff !important;
-  font-size: 11px !important;
-  font-weight: bold !important;
-}
-
-body.minecraft-ore-active input[type="checkbox"]:focus {
-  outline: 2px solid #ffffff !important;
-  outline-offset: 1px !important;
-}
-
-/* Sliders (Minecraft Range Track & Square Thumb) */
-body.minecraft-ore-active input[type="range"] {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  height: 10px !important;
-  background: #555555 !important;
-  border-top: 2px solid #2b2b2b !important;
-  border-bottom: 2px solid #888888 !important;
-  outline: 2px solid #111111 !important;
-  border-radius: 0px !important;
-}
-
-body.minecraft-ore-active input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 16px !important;
-  height: 22px !important;
-  background-color: #c6c6c6 !important;
-  border-top: 2px solid #ffffff !important;
-  border-left: 2px solid #ffffff !important;
-  border-bottom: 2px solid #555555 !important;
-  border-right: 2px solid #555555 !important;
-  outline: 2px solid #111111 !important;
-  cursor: pointer !important;
-  border-radius: 0px !important;
-  transform: none !important;
-}
-
-body.minecraft-ore-active input[type="range"]::-moz-range-thumb {
-  width: 16px !important;
-  height: 22px !important;
-  background-color: #c6c6c6 !important;
-  border-top: 2px solid #ffffff !important;
-  border-left: 2px solid #ffffff !important;
-  border-bottom: 2px solid #555555 !important;
-  border-right: 2px solid #555555 !important;
-  outline: 2px solid #111111 !important;
-  cursor: pointer !important;
-  border-radius: 0px !important;
-  transform: none !important;
-}
-
-body.minecraft-ore-active input[type="range"]:focus::-webkit-slider-thumb {
-  outline: 2px solid #ffffff !important;
-  outline-offset: 1px !important;
-}
-
-/* Toggle Switches (Minecraft I/O Box) */
-body.minecraft-ore-active button.w-12.h-6,
-body.minecraft-ore-active button.w-12.h-7 {
-  border-radius: 0px !important;
-  outline: 2px solid #111111 !important;
-  border: 2px solid #1a1a1a !important;
-}
-
-body.minecraft-ore-active button.w-12.h-6 div,
-body.minecraft-ore-active button.w-12.h-7 div {
-  border-radius: 0px !important;
-  border: 1px solid #111111 !important;
-}
-
-/* Dark Minecraft Container Cards */
-body.minecraft-ore-active .bg-[#1a1a1c],
-body.minecraft-ore-active .bg-[#202020],
-body.minecraft-ore-active .bg-[#121118],
-body.minecraft-ore-active .bg-[#07050f] {
-  background-color: #313238 !important;
-  border: 2px solid #18181a !important;
-  outline: 2px solid #111111 !important;
-  box-shadow: inset 2px 2px 0px #43444c, inset -2px -2px 0px #1e1e22 !important;
-}
-
-@keyframes win10Dots {
-  0% {
-    transform: rotate(0deg);
-    opacity: 0.2;
-  }
-  6% {
-    opacity: 1;
-  }
-  32% {
-    transform: rotate(210deg);
-    opacity: 1;
-  }
-  50% {
-    transform: rotate(300deg);
-    opacity: 1;
-  }
-  80% {
-    transform: rotate(670deg);
-    opacity: 1;
-  }
-  94% {
-    opacity: 0.2;
-  }
-  100% {
-    transform: rotate(720deg);
-    opacity: 0.2;
-  }
-}
-
-.animate-win-dot {
-  animation: win10Dots 3.2s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
-  transform-origin: center center;
-  will-change: transform, opacity;
-}
-
-/* --- Panorama 360 Mode Overrides: Solid Gray for all transparent / opacity-0 elements --- */
-.panorama-active-mode .bg-transparent:not(button):not(a):not(input):not(select):not(svg):not(path),
-.panorama-active-mode .bg-black\/0,
-.panorama-active-mode .bg-white\/0,
-.panorama-active-mode .bg-slate-900\/0,
-.panorama-active-mode .bg-zinc-900\/0,
-.panorama-active-mode .bg-black\/5,
-.panorama-active-mode .bg-black\/10,
-.panorama-active-mode .bg-black\/15,
-.panorama-active-mode .bg-black\/20,
-.panorama-active-mode .bg-black\/25,
-.panorama-active-mode .bg-black\/30,
-.panorama-active-mode .bg-black\/40,
-.panorama-active-mode .bg-black\/50,
-.panorama-active-mode .bg-black\/60,
-.panorama-active-mode .bg-black\/70,
-.panorama-active-mode .bg-black\/80,
-.panorama-active-mode .bg-black\/90,
-.panorama-active-mode .bg-white\/5,
-.panorama-active-mode .bg-white\/10,
-.panorama-active-mode .glass-panel,
-.panorama-active-mode .glass-panel-deep {
-  background-color: #272732 !important;
-  opacity: 1 !important;
-}
-
-.panorama-active-mode .opacity-0:not(button):not(a):not(input):not(select):not(svg):not(path) {
-  opacity: 1 !important;
-  background-color: #272732 !important;
-}
-
-.panorama-active-mode .progressive-blur-header,
-.panorama-active-mode .progressive-blur-dock,
-.panorama-active-mode .progressive-blur-player {
-  background: #1e1e28 !important;
-  opacity: 1 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Font Montserrat Utility Overrides */
-.font-kanit, .font-kanit *, .font-montserrat, .font-montserrat *, .font-google, .font-google * {
-  font-family: 'Montserrat', sans-serif !important;
-}
-
-/* Default Montserrat font family across body elements & dark background to prevent white flash */
-html, body, #root {
-  font-family: 'Montserrat', sans-serif !important;
-  background-color: #06040a !important;
-  color: #ffffff;
-}
-
-/* ORE UI Minecraft style buttons: instant snap press (lún thẳng, không animate) & 0px border radius */
-/* Global Button Style Overrides: corner = 0px for all buttons */
-button, input[type="button"], input[type="submit"] {
-  border-radius: 0px !important;
-}
-
-.ore-btn-white {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-bottom: 4px solid #a1a1aa !important;
-  border-radius: 0px !important;
-  transition: none !important;
-}
-.ore-btn-white:hover {
-  background-color: #f4f4f5 !important;
-}
-.ore-btn-white:active {
-  background-color: #e4e4e7 !important;
-  border-bottom-width: 0px !important;
-  transform: translateY(4px) !important;
-  transition: none !important;
-}
-
-.ore-btn-green {
-  background-color: #388e3c !important;
-  color: #ffffff !important;
-  border-bottom: 4px solid #1b5e20 !important;
-  border-radius: 0px !important;
-  transition: none !important;
-}
-.ore-btn-green:hover {
-  background-color: #2e7d32 !important;
-}
-.ore-btn-green:active {
-  background-color: #1b5e20 !important;
-  border-bottom-width: 0px !important;
-  transform: translateY(4px) !important;
-  transition: none !important;
-}
-
-/* All buttons font-normal and no uppercase transform */
-button, button *, [role="button"], [role="button"] * {
-  text-transform: none !important;
-  font-weight: 400 !important;
-}
-
-/* Sidebar Tabs - Clear background on unselected tabs; apply background only to select/hover/pressed */
-aside button,
-aside button *,
-.winui-3-active aside button,
-.winui-3-active aside button * {
-  border-radius: 0px !important;
-}
-
-aside button {
-  background-color: transparent !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-  text-shadow: none !important;
-  border-radius: 0px !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  width: 100% !important;
-}
-
-aside button[class*="bg-[#3f4144]"] {
-  background-color: #3f4144 !important;
-  color: #ffffff !important;
-  border-radius: 0px !important;
-}
-
-aside button:hover:not([class*="bg-[#3f4144]"]) {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-  border-radius: 0px !important;
-}
-
-aside button[class*="bg-[#3f4144]"]:hover {
-  background-color: #4d4f53 !important;
-  color: #ffffff !important;
-  border-radius: 0px !important;
-}
-
-aside button:active {
-  background-color: #3f4144 !important;
-  color: #ffffff !important;
-  border-radius: 0px !important;
-  transform: none !important;
-}
-
-/* Splash Screen Panorama Background Animation */
-@keyframes panoramaPan {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-panorama-bg {
-  background-size: 200% auto;
-  animation: panoramaPan 45s ease-in-out infinite;
-}
-
-
-
-
-
-
 

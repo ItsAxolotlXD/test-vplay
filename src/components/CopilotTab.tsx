@@ -335,7 +335,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
             onChange={(e) => setVIntelQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder={vIntelMode === "chat" ? "Hỏi Copilot AI... (ví dụ: 'Mở VTV3', 'Thời tiết hôm nay')" : "Nhập kênh hoặc thể loại bạn muốn tìm..."}
-            className="flex-1 bg-white/5 border-2 border-[#33384f] focus:border-indigo-500 px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none transition-all"
+            className="flex-1 mc-input-box px-4 py-3 text-xs sm:text-sm cursor-default"
           />
           <button
             onClick={() => handleSend()}
