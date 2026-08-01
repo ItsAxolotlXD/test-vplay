@@ -2,11 +2,13 @@ import React from 'react';
 import { playPopSound } from '../utils/sound';
 import { useLang } from '../context/LanguageContext';
 import { VplaySecondaryButton } from './ui/VplaySecondaryButton';
+import { Users } from 'lucide-react';
 
 interface HeaderBarProps {
   title?: string;
   onBack?: () => void;
   onSearchClick?: () => void;
+  onFriendsClick?: () => void;
   searchValue?: string;
   onSearchChange?: (val: string) => void;
 }
@@ -15,6 +17,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   title = 'HOME',
   onBack,
   onSearchClick,
+  onFriendsClick,
 }) => {
   const { t } = useLang();
 
@@ -26,6 +29,11 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   const handleSearchClick = () => {
     playPopSound();
     onSearchClick?.();
+  };
+
+  const handleFriendsClick = () => {
+    playPopSound();
+    onFriendsClick?.();
   };
 
   // Map known titles to keys
@@ -63,8 +71,19 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         {displayTitle()}
       </div>
 
-      {/* Right controls: Square Secondary Search Button */}
-      <div className="flex items-center gap-1">
+      {/* Right controls: Friends & Search Buttons */}
+      <div className="flex items-center gap-1.5">
+        <VplaySecondaryButton
+          onClick={handleFriendsClick}
+          aria-label="Friends"
+          title="Danh sách bạn bè (Friends)"
+          fullWidth={false}
+          size="sm"
+          className="!w-7 !h-7 sm:!w-8 sm:!h-8 !p-0"
+        >
+          <Users className="w-4 h-4 text-[#141414]" />
+        </VplaySecondaryButton>
+
         <VplaySecondaryButton
           onClick={handleSearchClick}
           aria-label="Search"

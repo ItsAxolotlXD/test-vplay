@@ -13,6 +13,7 @@ import { HomeBannerSlider } from './components/HomeBannerSlider';
 import { FeedbackModal } from './components/FeedbackModal';
 import { CreateChannelModal } from './components/CreateChannelModal';
 import { DebugLanguageModal } from './components/DebugLanguageModal';
+import { FriendsDrawer } from './components/FriendsDrawer';
 import { useLang } from './context/LanguageContext';
 import { playPopSound } from './utils/sound';
 
@@ -35,6 +36,7 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
+  const [isFriendsOpen, setIsFriendsOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [settings, setSettings] = useState<UserSettings>({
@@ -141,6 +143,7 @@ export default function App() {
               setIsSettingsOpen(false);
               setSidebarItem('search');
             }}
+            onFriendsClick={() => setIsFriendsOpen(true)}
             searchValue={searchQuery}
             onSearchChange={(q) => {
               setSearchQuery(q);
@@ -539,6 +542,7 @@ export default function App() {
                   setSidebarItem(activeTab);
                 }}
                 onSearchClick={() => {}}
+                onFriendsClick={() => setIsFriendsOpen(true)}
                 searchValue={searchQuery}
                 onSearchChange={(q) => setSearchQuery(q)}
               />
@@ -588,6 +592,22 @@ export default function App() {
 
       {/* DEBUG MODE VPLAY.LANG FILE EDITOR MODAL */}
       <DebugLanguageModal />
+
+      {/* FRIENDS DRAWER */}
+      <FriendsDrawer
+        isOpen={isFriendsOpen}
+        onClose={() => setIsFriendsOpen(false)}
+        onSelectUserChannel={(channelName) => {
+          setIsFriendsOpen(false);
+          // Find matching channel or switch to live tv tab
+          const found = channelsList.find((c) => c.name.toLowerCase().includes(channelName.toLowerCase()));
+          if (found) {
+            handleSelectChannel(found);
+          }
+          setSidebarItem('live_tv');
+          setActiveTab('live_tv');
+        }}
+      />
 
     </div>
   );
