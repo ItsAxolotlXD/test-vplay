@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={handlePrevTab}
           title="Previous Tab"
           aria-label="Previous Tab"
-          className="hidden sm:flex items-center justify-center bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-[#d0d0d0] font-bold font-jura text-xs px-2.5 py-2 border-2 border-[#141414] hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] flex-shrink-0 cursor-default active:translate-y-[1px]"
+          className="hidden sm:flex items-center justify-center bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-white font-bold font-jura text-xs px-2.5 py-2 border-2 border-[#141414] hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] flex-shrink-0 cursor-default active:translate-y-[1px]"
         >
           [
         </button>
@@ -86,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={handleNextTab}
           title="Next Tab"
           aria-label="Next Tab"
-          className="hidden sm:flex items-center justify-center bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-[#d0d0d0] font-bold font-jura text-xs px-2.5 py-2 border-2 border-[#141414] hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] flex-shrink-0 cursor-default active:translate-y-[1px]"
+          className="hidden sm:flex items-center justify-center bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-white font-bold font-jura text-xs px-2.5 py-2 border-2 border-[#141414] hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] flex-shrink-0 cursor-default active:translate-y-[1px]"
         >
           ]
         </button>

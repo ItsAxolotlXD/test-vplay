@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { ExternalLink, X, ChevronLeft, Check, Send } from "lucide-react";
+import { VplaySecondaryButton } from "./ui/VplaySecondaryButton";
 
 interface UnderConstructionTabProps {
   onClose: () => void;
@@ -70,23 +71,23 @@ export const UnderConstructionTab: React.FC<UnderConstructionTabProps> = ({
           We are still working incredibly hard on this feature. Check back soon for updates!
         </p>
 
-        {/* 2-Button Action Row - White buttons with 0px border radius and instant snap on press */}
+        {/* 2-Button Action Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full max-w-lg mt-3">
-          <button
+          <VplaySecondaryButton
             onClick={handleOpenFeedback}
-            className="ore-btn-white w-full h-12 py-3 px-6 text-black font-normal text-sm sm:text-base rounded-none flex items-center justify-center gap-2.5 cursor-pointer shadow-md"
+            fullWidth={true}
           >
-            <ExternalLink className="w-5 h-5 text-black shrink-0" />
-            <span className="text-black font-normal">Give Feedback</span>
-          </button>
+            <ExternalLink className="w-5 h-5 shrink-0" />
+            <span>Give Feedback</span>
+          </VplaySecondaryButton>
 
-          <button
+          <VplaySecondaryButton
             onClick={onClose}
-            className="ore-btn-white w-full h-12 py-3 px-6 text-black font-normal text-sm sm:text-base rounded-none flex items-center justify-center gap-2.5 cursor-pointer shadow-md"
+            fullWidth={true}
           >
-            <X className="w-5 h-5 text-black shrink-0" />
-            <span className="text-black font-normal">Close</span>
-          </button>
+            <X className="w-5 h-5 shrink-0" />
+            <span>Close</span>
+          </VplaySecondaryButton>
         </div>
       </div>
 

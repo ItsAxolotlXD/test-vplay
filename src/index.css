@@ -58,7 +58,7 @@
   text-transform: uppercase;
   user-select: none;
   cursor: default;
-  transition: background-color 0.05s ease, color 0.05s ease, border-color 0.05s ease;
+  transition: none !important;
 }
 .mc-button-primary:hover {
   background-color: #51a233;
@@ -89,17 +89,17 @@
   font-weight: 700;
   user-select: none;
   cursor: default;
-  transition: background-color 0.05s ease, color 0.05s ease, border-color 0.05s ease;
+  transition: none !important;
 }
 .mc-button-secondary:hover {
   background-color: #28960b;
-  color: #d0d0d0;
+  color: #ffffff;
   border-color: #ffffff;
   box-shadow: inset 2px 2px 0 #89dc69, inset -2px -2px 0 #1b5e20;
 }
 .mc-button-secondary:active {
   background-color: #2b611a;
-  color: #b0b0b0;
+  color: #ffffff;
   border-color: #ffffff;
   box-shadow: inset 2px 2px 0 #18370d, inset -2px -2px 0 #418a28;
   transform: translateY(1px);
@@ -122,7 +122,7 @@
   font-family: 'Jura', sans-serif;
   font-weight: 600;
   outline: none;
-  transition: border-color 0.05s ease, background-color 0.05s ease;
+  transition: none !important;
 }
 .mc-input-box::placeholder {
   color: #a0a0a0;
@@ -160,18 +160,6 @@ input:focus {
   border-color: #ffffff !important;
 }
 
-/* Remove fade transition on hover for all buttons, input boxes, and controls */
-button,
-input,
-select,
-textarea,
-.mc-button-primary,
-.mc-button-secondary,
-.mc-input-box,
-.btn-press-effect {
-  transition: none !important;
-}
-
 .mc-button-danger {
   background-color: #b82222;
   color: #ffffff;
@@ -181,7 +169,7 @@ textarea,
   font-weight: 700;
   user-select: none;
   cursor: pointer;
-  transition: background-color 0.05s ease, color 0.05s ease;
+  transition: none !important;
 }
 .mc-button-danger:hover {
   background-color: #d92b2b;
@@ -202,10 +190,27 @@ textarea,
 
 /* Button Press Down Motion - Instant snappy response without animation */
 .btn-press-effect {
-  transition: background-color 0.05s ease, color 0.05s ease !important;
+  transition: none !important;
 }
 .btn-press-effect:active, .btn-pressed {
   transform: translateY(2px) !important;
+  transition: none !important;
+}
+
+/* Remove fade transition on hover for all buttons, input boxes, and controls */
+button,
+button *,
+input,
+select,
+textarea,
+a,
+[role="button"],
+.mc-button-primary,
+.mc-button-secondary,
+.mc-button-danger,
+.mc-input-box,
+.btn-press-effect,
+.btn-pressed {
   transition: none !important;
 }
 

@@ -43,7 +43,7 @@ export const VplayTab: React.FC<VplayTabProps> = ({
     case 'hovered':
       tabBg = isActive
         ? 'bg-[#31aa0e] text-white shadow-[inset_2px_2px_0_#a2f283,inset_-2px_-2px_0_#1b5e20]'
-        : 'bg-[#28960b] text-[#d0d0d0] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]';
+        : 'bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]';
       borderClass = 'border-2 border-white';
       break;
     case 'pressed':
@@ -75,7 +75,7 @@ export const VplayTab: React.FC<VplayTabProps> = ({
       onMouseUp={() => setIsPressed(false)}
       className={`
         relative px-4 py-2 min-w-[100px] flex items-center justify-center text-center font-jura font-bold text-xs sm:text-sm select-none
-        rounded-none outline-none cursor-default btn-press-effect active:translate-y-[1px] transition-all duration-75
+        rounded-none outline-none cursor-default btn-press-effect active:translate-y-[1px] transition-none
         ${borderClass} ${tabBg} ${transformClass} ${className}
       `}
     >

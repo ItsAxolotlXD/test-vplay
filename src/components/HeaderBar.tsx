@@ -1,6 +1,7 @@
 import React from 'react';
 import { playPopSound } from '../utils/sound';
 import { useLang } from '../context/LanguageContext';
+import { VplaySecondaryButton } from './ui/VplaySecondaryButton';
 
 interface HeaderBarProps {
   title?: string;
@@ -62,21 +63,23 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         {displayTitle()}
       </div>
 
-      {/* Right controls: Custom Search Magnifying Glass Icon */}
+      {/* Right controls: Square Secondary Search Button */}
       <div className="flex items-center gap-1">
-        <button
+        <VplaySecondaryButton
           onClick={handleSearchClick}
           aria-label="Search"
-          className="p-1 hover:bg-[#cecece] active:bg-[#bebebe] active:translate-y-[1px] btn-press-effect text-[#141414] cursor-pointer rounded-none flex items-center justify-center"
           title="Tìm kiếm"
+          fullWidth={false}
+          size="sm"
+          className="!w-7 !h-7 sm:!w-8 sm:!h-8 !p-0"
         >
           <img
             src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531"
             alt="Search"
             referrerPolicy="no-referrer"
-            className="w-4 h-4 sm:w-4.5 sm:h-4.5 object-contain filter brightness-0"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain"
           />
-        </button>
+        </VplaySecondaryButton>
       </div>
     </div>
   );

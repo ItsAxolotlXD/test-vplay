@@ -44,17 +44,19 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
             {t('home.tab.DesignPreview.desc', 'Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Ore UI. Chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi.')}
           </p>
         </div>
-        <button
+        <VplaySecondaryButton
+          size="sm"
+          fullWidth={false}
           onClick={() => {
             playPopSound();
             if (onOpenFeedback) onOpenFeedback();
             else alert('Cảm ơn bạn đã đóng góp ý kiến về giao diện Vplay JSON UI!');
           }}
-          className="flex items-center gap-2 bg-[#dcdfe2] hover:bg-white text-[#141414] font-extrabold text-xs sm:text-sm px-4 py-2 border-2 border-[#141414] cursor-pointer active:translate-y-[1px] btn-press-effect flex-shrink-0 shadow-[inset_0_1px_0_#ffffff]"
+          className="flex-shrink-0"
         >
           <ExternalLink className="w-4 h-4" />
           Give feedback
-        </button>
+        </VplaySecondaryButton>
       </div>
 
       {/* Header bar */}

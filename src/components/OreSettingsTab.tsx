@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { ExternalLink, ChevronLeft, Trash2, ShoppingBag, Palette, User, Sliders, Cpu, Layers, HardDrive, RefreshCw, X, Check, Plus } from "lucide-react";
 import { VplayToggleSwitch } from "./ui/VplayToggleSwitch";
+import { VplaySecondaryButton } from "./ui/VplaySecondaryButton";
 
 interface OreSettingsTabProps {
   onOpenFeedback: () => void;
@@ -222,14 +223,15 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
           </p>
         </div>
 
-        <button
-          type="button"
+        <VplaySecondaryButton
+          size="sm"
+          fullWidth={false}
           onClick={onOpenFeedback}
-          className="ore-btn-white px-5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shrink-0 shadow-md rounded-none"
+          className="shrink-0"
         >
-          <ExternalLink className="w-4 h-4 text-black shrink-0" />
-          <span className="text-black font-semibold">Give feedback</span>
-        </button>
+          <ExternalLink className="w-4 h-4 shrink-0" />
+          <span>Give feedback</span>
+        </VplaySecondaryButton>
       </div>
 
       {/* MAIN SETTINGS PANEL - Stacked Sections */}

@@ -35,11 +35,11 @@ export const VplaySecondaryButton: React.FC<VplaySecondaryButtonProps> = ({
 
   switch (state) {
     case 'hovered':
-      bgClass = 'bg-[#28960b] text-[#d0d0d0]';
+      bgClass = 'bg-[#28960b] text-white';
       shadowClass = 'shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]';
       break;
     case 'pressed':
-      bgClass = 'bg-[#2b611a] text-[#b0b0b0]';
+      bgClass = 'bg-[#2b611a] text-white';
       shadowClass = 'shadow-[inset_2px_2px_0_#18370d,inset_-2px_-2px_0_#418a28]';
       transformClass = 'translate-y-[1px]';
       break;
@@ -82,7 +82,7 @@ export const VplaySecondaryButton: React.FC<VplaySecondaryButtonProps> = ({
       className={`
         relative select-none font-montserrat
         flex items-center justify-center active:translate-y-[2px] btn-press-effect
-        border-2 border-[#181818] rounded-none cursor-pointer transition-colors duration-75
+        border-2 border-[#181818] rounded-none cursor-pointer transition-none
         ${sizeClasses}
         ${bgClass} ${shadowClass} ${transformClass}
         ${fullWidth ? 'w-full' : ''}

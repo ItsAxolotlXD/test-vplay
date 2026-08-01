@@ -16,12 +16,7 @@ interface SettingsViewProps {
   onOpenDesignSystem?: () => void;
 }
 
-const SettingsDivider = () => (
-  <div className="w-full flex flex-col select-none pointer-events-none">
-    <div className="w-full h-[1px] bg-[#18191b]" />
-    <div className="w-full h-[1px] bg-[#5e6266]" />
-  </div>
-);
+const SettingsDivider = () => null;
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
   settings,
@@ -504,7 +499,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   playPopSound();
                   setShowComingSoonModal(false);
                 }}
-                className="w-full py-2.5 sm:py-3 px-4 bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-[#d0d0d0] font-bold text-xs sm:text-sm uppercase tracking-wide font-jura border-2 border-[#141414] shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-default flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-2.5 sm:py-3 px-4 bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-white font-bold text-xs sm:text-sm uppercase tracking-wide font-jura border-2 border-[#141414] shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-default flex items-center justify-center gap-2 transition-none"
               >
                 Đã hiểu (Understood)
               </button>
@@ -515,7 +510,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   playPopSound();
                   setShowComingSoonModal(false);
                 }}
-                className="w-full py-2.5 sm:py-3 px-4 bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-[#d0d0d0] font-bold text-xs sm:text-sm uppercase tracking-wide font-jura border-2 border-[#141414] shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-default flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-2.5 sm:py-3 px-4 bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#404040] hover:text-white font-bold text-xs sm:text-sm uppercase tracking-wide font-jura border-2 border-[#141414] shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-default flex items-center justify-center gap-2 transition-none"
               >
                 Đóng (Close)
               </button>

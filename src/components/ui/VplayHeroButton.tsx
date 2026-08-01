@@ -29,28 +29,28 @@ export const VplayHeroButton: React.FC<VplayHeroButtonProps> = ({
     isHovered ? 'hovered' : 'normal'
   );
 
-  let bgClass = 'bg-[#418a28] text-white';
-  let shadowClass = 'shadow-[inset_0_2px_0_#6bc34b,inset_0_-3px_0_#1e4511]';
+  let bgClass = 'bg-[#28960b] text-white';
+  let shadowClass = 'shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]';
   let transformClass = '';
 
   switch (state) {
     case 'hovered':
-      bgClass = 'bg-[#51a233] text-white';
-      shadowClass = 'shadow-[inset_0_2px_0_#89dc69,inset_0_-3px_0_#285718]';
+      bgClass = 'bg-[#2eb00d] text-white';
+      shadowClass = 'shadow-[inset_2px_2px_0_#a2f285,inset_-2px_-2px_0_#1f6e24]';
       break;
     case 'pressed':
       bgClass = 'bg-[#2b611a] text-white';
-      shadowClass = 'shadow-[inset_0_3px_0_#18370d,inset_0_-1px_0_#418a28]';
+      shadowClass = 'shadow-[inset_2px_2px_0_#18370d,inset_-2px_-2px_0_#418a28]';
       transformClass = 'translate-y-[2px]';
       break;
     case 'disabled':
       bgClass = 'bg-[#7a7e82] text-[#4d5053] cursor-not-allowed';
-      shadowClass = 'shadow-[inset_0_2px_0_#a0a4a8,inset_0_-3px_0_#505356]';
+      shadowClass = 'shadow-[inset_2px_2px_0_#a0a4a8,inset_-2px_-2px_0_#505356]';
       break;
     case 'normal':
     default:
-      bgClass = 'bg-[#418a28] text-white';
-      shadowClass = 'shadow-[inset_0_2px_0_#6bc34b,inset_0_-3px_0_#1e4511]';
+      bgClass = 'bg-[#28960b] text-white';
+      shadowClass = 'shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]';
       break;
   }
 

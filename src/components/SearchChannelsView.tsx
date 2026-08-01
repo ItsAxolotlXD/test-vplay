@@ -3,6 +3,7 @@ import { Search, ChevronDown, ChevronUp, Check, Share2, Copy, Play, Download, Bu
 import { TvChannel } from '../types';
 import { playPopSound } from '../utils/sound';
 import { useLang } from '../context/LanguageContext';
+import { VplaySecondaryButton } from './ui/VplaySecondaryButton';
 
 interface SearchChannelsViewProps {
   channels: TvChannel[];
@@ -111,29 +112,29 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
 
           {/* Action Buttons */}
           <div className="w-full space-y-2.5">
-            <button
+            <VplaySecondaryButton
               onClick={handleShare}
-              className="w-full bg-[#418a28] hover:bg-[#4ea230] active:bg-[#367320] text-white font-black text-xs uppercase border-2 border-[#141414] py-2.5 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_0_#141414] active:translate-y-[1px] btn-press-effect cursor-pointer flex items-center justify-center gap-2"
+              size="sm"
             >
               <Share2 className="w-4 h-4" />
-              {shared ? t('search.shared', 'ĐÃ CHIA SẺ!') : t('search.share', 'SHARE')}
-            </button>
+              <span>{shared ? t('search.shared', 'ĐÃ CHIA SẺ!') : t('search.share', 'SHARE')}</span>
+            </VplaySecondaryButton>
 
-            <button
+            <VplaySecondaryButton
               onClick={handleExportChannels}
-              className="w-full bg-[#7b2cbf] hover:bg-[#8f39df] active:bg-[#5f1eb0] text-white font-black text-xs uppercase border-2 border-[#141414] py-2.5 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_0_#141414] active:translate-y-[1px] btn-press-effect cursor-pointer flex items-center justify-center gap-2"
+              size="sm"
             >
               <Download className="w-4 h-4" />
-              {exported ? t('search.exported', 'ĐÃ TẢI FILE M3U8!') : t('search.export', 'EXPORT CHANNELS (.M3U8)')}
-            </button>
+              <span>{exported ? t('search.exported', 'ĐÃ TẢI FILE M3U8!') : t('search.export', 'EXPORT CHANNELS (.M3U8)')}</span>
+            </VplaySecondaryButton>
 
-            <button
+            <VplaySecondaryButton
               onClick={handleCopyLink}
-              className="w-full bg-[#dcdfe2] hover:bg-white active:bg-[#bebebe] text-[#141414] font-bold text-xs uppercase border-2 border-[#141414] py-2.5 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_0_#141414] active:translate-y-[1px] btn-press-effect cursor-pointer flex items-center justify-center gap-2"
+              size="sm"
             >
               <Copy className="w-3.5 h-3.5" />
-              {copiedLink ? t('search.copied', 'ĐÃ COPY LINK!') : t('search.copy', 'COPY LINK')}
-            </button>
+              <span>{copiedLink ? t('search.copied', 'ĐÃ COPY LINK!') : t('search.copy', 'COPY LINK')}</span>
+            </VplaySecondaryButton>
           </div>
         </div>
 
@@ -188,11 +189,11 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                         playPopSound();
                         onSelectChannel(ch);
                       }}
-                      className="bg-[#292b2e] border border-[#141414] p-2 sm:p-2.5 flex items-center justify-between gap-3 hover:bg-[#34373a] transition-colors cursor-pointer group"
+                      className="bg-[#c6c6c6] text-[#181818] border-2 border-[#181818] hover:bg-[#28960b] hover:text-white hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] p-2 sm:p-2.5 flex items-center justify-between gap-3 cursor-pointer group select-none active:translate-y-[1px] btn-press-effect rounded-none transition-none"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Channel Logo Square Box */}
-                        <div className="w-10 h-10 bg-black border border-[#141414] flex-shrink-0 flex items-center justify-center p-1 overflow-hidden">
+                        <div className="w-10 h-10 bg-transparent border border-[#141414]/20 flex-shrink-0 flex items-center justify-center p-1 overflow-hidden">
                           {ch.logo ? (
                             <img
                               src={ch.logo}
@@ -213,11 +214,11 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                             <span className="bg-[#ffe866] text-[#141414] px-1 py-0.2 text-[9px] font-bold font-montserrat border border-[#141414] flex-shrink-0">
                               {String(channels.findIndex((item) => item.id === ch.id) + 1).padStart(3, '0')}
                             </span>
-                            <h4 className="font-bold text-xs text-white uppercase group-hover:text-[#89dc69] transition-colors truncate">
+                            <h4 className="font-bold text-xs text-[#181818] uppercase group-hover:text-white transition-colors truncate">
                               {ch.name}
                             </h4>
                           </div>
-                          <p className="text-[10px] text-gray-400 truncate mt-0.5">
+                          <p className="text-[10px] text-[#404040] group-hover:text-white/90 truncate mt-0.5">
                             {ch.groupTitle} • {ch.currentProgram}
                           </p>
                         </div>
@@ -229,7 +230,7 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                           playPopSound();
                           onSelectChannel(ch);
                         }}
-                        className="bg-[#418a28] hover:bg-[#4ea230] text-white font-bold text-[10px] px-2.5 py-1 border border-[#141414] flex items-center gap-1 flex-shrink-0 active:translate-y-[1px]"
+                        className="bg-[#28960b] hover:bg-[#2eb00d] text-white font-bold text-[10px] px-2.5 py-1 border border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] flex items-center gap-1 flex-shrink-0 active:translate-y-[1px]"
                       >
                         <Play className="w-3 h-3 fill-white" /> XEM
                       </button>
@@ -270,10 +271,10 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                           playPopSound();
                           onSelectChannel(ch);
                         }}
-                        className="bg-[#27292c] border border-[#141414] p-2 flex items-center justify-between gap-3 hover:bg-[#323538] transition-colors cursor-pointer group"
+                        className="bg-[#c6c6c6] text-[#181818] border-2 border-[#181818] hover:bg-[#28960b] hover:text-white hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] p-2 flex items-center justify-between gap-3 cursor-pointer group select-none active:translate-y-[1px] btn-press-effect rounded-none transition-none"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 bg-black border border-[#141414] flex-shrink-0 flex items-center justify-center p-1">
+                          <div className="w-9 h-9 bg-transparent border border-[#141414]/20 flex-shrink-0 flex items-center justify-center p-1">
                             {ch.logo ? (
                               <img
                                 src={ch.logo}
@@ -285,14 +286,14 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                                 }}
                               />
                             ) : (
-                              <span className="text-[9px] font-bold text-[#89dc69]">{ch.name}</span>
+                              <span className="text-[9px] font-bold text-[#181818] group-hover:text-white">{ch.name}</span>
                             )}
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-bold text-xs text-white uppercase group-hover:text-[#89dc69] truncate">
+                            <h4 className="font-bold text-xs text-[#181818] uppercase group-hover:text-white truncate">
                               {ch.name}
                             </h4>
-                            <p className="text-[10px] text-gray-400 truncate">{ch.groupTitle}</p>
+                            <p className="text-[10px] text-[#404040] group-hover:text-white/90 truncate">{ch.groupTitle}</p>
                           </div>
                         </div>
 
@@ -303,7 +304,7 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                               playPopSound();
                               onSelectChannel(ch);
                             }}
-                            className="bg-[#418a28] hover:bg-[#4ea230] text-white font-bold text-[10px] px-2.5 py-1 border border-[#141414] flex items-center gap-1 active:translate-y-[1px]"
+                            className="bg-[#28960b] hover:bg-[#2eb00d] text-white font-bold text-[10px] px-2.5 py-1 border border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] flex items-center gap-1 active:translate-y-[1px]"
                           >
                             <Play className="w-2.5 h-2.5 fill-white" /> XEM
                           </button>
@@ -340,10 +341,10 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                           playPopSound();
                           onSelectChannel(ch);
                         }}
-                        className="bg-[#27292c] border border-[#141414] p-2 flex items-center justify-between gap-3 hover:bg-[#323538] transition-colors cursor-pointer group"
+                        className="bg-[#c6c6c6] text-[#181818] border-2 border-[#181818] hover:bg-[#28960b] hover:text-white hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] p-2 flex items-center justify-between gap-3 cursor-pointer group select-none active:translate-y-[1px] btn-press-effect rounded-none transition-none"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 bg-black border border-[#141414] flex-shrink-0 flex items-center justify-center p-1">
+                          <div className="w-9 h-9 bg-transparent border border-[#141414]/20 flex-shrink-0 flex items-center justify-center p-1">
                             {ch.logo ? (
                               <img
                                 src={ch.logo}
@@ -355,19 +356,19 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
                                 }}
                               />
                             ) : (
-                              <span className="text-[9px] font-bold text-[#89dc69]">{ch.name}</span>
+                              <span className="text-[9px] font-bold text-[#181818] group-hover:text-white">{ch.name}</span>
                             )}
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-bold text-xs text-white uppercase group-hover:text-[#89dc69] truncate">
+                            <h4 className="font-bold text-xs text-[#181818] uppercase group-hover:text-white truncate">
                               {ch.name}
                             </h4>
-                            <p className="text-[10px] text-gray-400 truncate">{ch.currentProgram}</p>
+                            <p className="text-[10px] text-[#404040] group-hover:text-white/90 truncate">{ch.currentProgram}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-gray-300 text-[10px] font-semibold flex-shrink-0">
-                          <Check className="w-3.5 h-3.5 text-[#89dc69]" />
+                        <div className="flex items-center gap-1.5 text-[#181818] group-hover:text-white text-[10px] font-semibold flex-shrink-0">
+                          <Check className="w-3.5 h-3.5 text-[#1b5e20] group-hover:text-white" />
                           <span>Watched</span>
                         </div>
                       </div>

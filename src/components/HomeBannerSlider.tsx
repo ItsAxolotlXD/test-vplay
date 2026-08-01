@@ -100,9 +100,12 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({
               {/* 2 BUTTONS CENTERED */}
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <div className="w-auto">
-                  <VplayHeroButton onClick={onExploreDesignSystem}>
-                    {t('home.banner.exploreOreUI', 'KHÁM PHÁ JSON UI')}
-                  </VplayHeroButton>
+                  <VplaySecondaryButton
+                    fullWidth={false}
+                    onClick={onExploreDesignSystem}
+                  >
+                    {t('home.banner.exploreOreUI', 'KHÁM PHÁ ORE UI')}
+                  </VplaySecondaryButton>
                 </div>
                 <div className="w-auto">
                   <VplaySecondaryButton
