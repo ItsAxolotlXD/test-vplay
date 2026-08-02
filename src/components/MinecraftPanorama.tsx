@@ -7,10 +7,10 @@ interface MinecraftPanoramaProps {
 }
 
 export const BEDROCK_PANORAMA_IMAGES = [
-  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Preview_panorama_0.png/800px-Bedrock_Edition_Preview_panorama_0.png?3cd35',
-  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Preview_panorama_1.png/800px-Bedrock_Edition_Preview_panorama_1.png?4b9bd',
-  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Preview_panorama_2.png/800px-Bedrock_Edition_Preview_panorama_2.png?956f4',
-  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Preview_panorama_3.png/800px-Bedrock_Edition_Preview_panorama_3.png?5b298',
+  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Beta_panorama_0.png/800px-Bedrock_Edition_Beta_panorama_0.png?e7ce5',
+  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Beta_panorama_1.png/800px-Bedrock_Edition_Beta_panorama_1.png?e45c',
+  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Beta_panorama_2.png/800px-Bedrock_Edition_Beta_panorama_2.png?9f477',
+  'https://minecraft.wiki/images/thumb/Bedrock_Edition_Beta_panorama_3.png/800px-Bedrock_Edition_Beta_panorama_3.png?da416',
 ];
 
 export const MinecraftPanorama: React.FC<MinecraftPanoramaProps> = ({
