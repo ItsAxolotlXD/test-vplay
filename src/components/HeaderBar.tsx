@@ -2,7 +2,6 @@ import React from 'react';
 import { playPopSound } from '../utils/sound';
 import { useLang } from '../context/LanguageContext';
 import { VplaySecondaryButton } from './ui/VplaySecondaryButton';
-import { Users } from 'lucide-react';
 
 interface HeaderBarProps {
   title?: string;
@@ -16,7 +15,6 @@ interface HeaderBarProps {
 export const HeaderBar: React.FC<HeaderBarProps> = ({
   title = 'HOME',
   onBack,
-  onSearchClick,
   onFriendsClick,
 }) => {
   const { t } = useLang();
@@ -24,11 +22,6 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   const handleBack = () => {
     playPopSound();
     onBack?.();
-  };
-
-  const handleSearchClick = () => {
-    playPopSound();
-    onSearchClick?.();
   };
 
   const handleFriendsClick = () => {
@@ -71,33 +64,26 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         {displayTitle()}
       </div>
 
-      {/* Right controls: Friends & Search Buttons */}
+      {/* Right controls: People / Friends Search Button */}
       <div className="flex items-center gap-1.5">
         <VplaySecondaryButton
           onClick={handleFriendsClick}
-          aria-label="Friends"
-          title="Danh sách bạn bè (Friends)"
+          aria-label="Search for people"
+          title="Search for people"
           fullWidth={false}
           size="sm"
-          className="!w-7 !h-7 sm:!w-8 sm:!h-8 !p-0"
-        >
-          <Users className="w-4 h-4 text-[#141414]" />
-        </VplaySecondaryButton>
-
-        <VplaySecondaryButton
-          onClick={handleSearchClick}
-          aria-label="Search"
-          title="Tìm kiếm"
-          fullWidth={false}
-          size="sm"
-          className="!w-7 !h-7 sm:!w-8 sm:!h-8 !p-0"
+          className="!h-7 sm:!h-8 !px-2 sm:!px-2.5"
         >
           <img
-            src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531"
-            alt="Search"
+            src="https://static.wikia.nocookie.net/ep-deo/images/c/c8/MagnifyingGlass-52f96e5f47f42e682a00.png/revision/latest?cb=20260723030208"
+            alt="Search for people"
             referrerPolicy="no-referrer"
             className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain"
+            style={{ filter: 'brightness(0)' }}
           />
+          <span className="normal-case font-semibold text-xs whitespace-nowrap">
+            Search for people
+          </span>
         </VplaySecondaryButton>
       </div>
     </div>
