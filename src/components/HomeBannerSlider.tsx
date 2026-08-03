@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Vote } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { VplayHeroButton } from './ui/VplayHeroButton';
 import { VplaySecondaryButton } from './ui/VplaySecondaryButton';
@@ -10,12 +10,14 @@ interface HomeBannerSliderProps {
   onExploreDesignSystem: () => void;
   onWatchNow: () => void;
   onOpenFeedback?: () => void;
+  onOpenFeatureVote?: () => void;
 }
 
 export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({
   onExploreDesignSystem,
   onWatchNow,
   onOpenFeedback,
+  onOpenFeatureVote,
 }) => {
   const { t } = useLang();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -97,7 +99,7 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({
                 </p>
               </div>
 
-              {/* 2 BUTTONS CENTERED */}
+              {/* 3 BUTTONS CENTERED */}
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <div className="w-auto">
                   <VplaySecondaryButton
@@ -105,6 +107,20 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({
                     onClick={onExploreDesignSystem}
                   >
                     {t('home.banner.exploreOreUI', 'KHÁM PHÁ ORE UI')}
+                  </VplaySecondaryButton>
+                </div>
+                <div className="w-auto">
+                  <VplaySecondaryButton
+                    fullWidth={false}
+                    onClick={() => {
+                      playPopSound();
+                      if (onOpenFeatureVote) onOpenFeatureVote();
+                    }}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <Vote className="w-4 h-4 text-[#141414]" />
+                      <span>Features Vote</span>
+                    </span>
                   </VplaySecondaryButton>
                 </div>
                 <div className="w-auto">

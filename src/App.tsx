@@ -11,6 +11,7 @@ import { HeaderBar } from './components/HeaderBar';
 import { MinecraftPanorama } from './components/MinecraftPanorama';
 import { HomeBannerSlider } from './components/HomeBannerSlider';
 import { FeedbackModal } from './components/FeedbackModal';
+import { FeatureVoteModal } from './components/FeatureVoteModal';
 import { CreateChannelModal } from './components/CreateChannelModal';
 import { DebugLanguageModal } from './components/DebugLanguageModal';
 import { FriendsDrawer } from './components/FriendsDrawer';
@@ -35,6 +36,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isFeatureVoteOpen, setIsFeatureVoteOpen] = useState(false);
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
   const [isFriendsOpen, setIsFriendsOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -220,7 +222,38 @@ export default function App() {
                     setActiveTab('live_tv');
                   }}
                   onOpenFeedback={() => setIsFeedbackOpen(true)}
+                  onOpenFeatureVote={() => setIsFeatureVoteOpen(true)}
                 />
+
+                {/* FEATURE VOTE SECONDARY BUTTON ACTION BAR */}
+                <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_1px_1px_0_#89dc69]">
+                      ★
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xs sm:text-sm text-white font-jura uppercase">
+                        Help us choose the next feature
+                      </h3>
+                      <p className="text-[11px] text-zinc-300 font-jura">
+                        Vote for the feature you want to see most in Vplay!
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="w-full sm:w-auto shrink-0">
+                    <VplaySecondaryButton
+                      onClick={() => {
+                        playPopSound();
+                        setIsFeatureVoteOpen(true);
+                      }}
+                      fullWidth={false}
+                      className="!py-2.5 !px-5 text-xs sm:text-sm font-bold"
+                    >
+                      Features Vote
+                    </VplaySecondaryButton>
+                  </div>
+                </div>
 
                 {/* RECOMMENDED CHANNELS SECTION */}
                 <div className="bg-[#35383b] border-2 border-[#141414] p-4 sm:p-5 shadow-xl space-y-4">
@@ -580,6 +613,12 @@ export default function App() {
       <FeedbackModal
         isOpen={isFeedbackOpen}
         onClose={() => setIsFeedbackOpen(false)}
+      />
+
+      {/* FEATURE VOTE MODAL */}
+      <FeatureVoteModal
+        isOpen={isFeatureVoteOpen}
+        onClose={() => setIsFeatureVoteOpen(false)}
       />
 
       {/* CREATE CUSTOM CHANNEL MODAL */}
