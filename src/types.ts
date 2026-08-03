@@ -41,4 +41,6 @@ export interface UserSettings {
   disablePanorama?: boolean;
   lockPanoramaScroll?: boolean;
   panoramaScrollSpeed?: number;
+  showFps?: boolean;
+  showFrameLatency?: boolean;
 }

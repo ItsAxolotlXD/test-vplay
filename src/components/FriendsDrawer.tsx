@@ -90,7 +90,7 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
         onClick={handleClose}
       />
 
-      {/* Main Drawer Container - Authentic Minecraft Bedrock JSON UI Panel */}
+      {/* Main Drawer Container - Authentic Minecraft Bedrock Ore UI Panel */}
       <div className="relative w-full max-w-[360px] sm:max-w-[400px] h-full bg-[#3c3e41] text-white border-l-4 border-[#141414] shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#222325] flex flex-col z-10 overflow-hidden">
         
         {/* TOP BAR: Search Input & Close Button */}
@@ -130,7 +130,7 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
           </VplaySecondaryButton>
         </div>
 
-        {/* SUB-NAVIGATION TABS (Minecraft Bedrock JSON UI Bracket Style) */}
+        {/* SUB-NAVIGATION TABS (Minecraft Bedrock Ore UI Bracket Style) */}
         <div className="bg-[#242628] border-b-2 border-[#141414] px-1 flex items-center justify-between text-xs font-bold font-jura shrink-0">
           <div className="flex items-center gap-1 w-full">
             {/* People Tab */}
@@ -506,7 +506,7 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
         {/* BOTTOM FOOTER COUNT */}
         <div className="p-2 bg-[#222426] border-t-2 border-[#141414] text-[10px] font-jura text-zinc-400 flex items-center justify-between shrink-0">
           <span>Vplay Online: {joinableFriends.length + onlineFriends.length + 1}/101</span>
-          <span className="text-[#89dc69] font-bold">JSON UI Bedrock</span>
+          <span className="text-[#89dc69] font-bold">Ore UI Bedrock</span>
         </div>
       </div>
 

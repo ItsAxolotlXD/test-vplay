@@ -47,7 +47,7 @@
   box-shadow: inset 0 2px 0 #e2e5e8, inset 0 -3px 0 #9ca0a4;
 }
 
-/* Minecraft Bedrock JSON UI Authentic Button Classes */
+/* Minecraft Bedrock Ore UI Authentic Button Classes */
 .mc-button-primary {
   background-color: #418a28;
   color: #ffffff;
@@ -113,7 +113,7 @@
   transform: none;
 }
 
-/* Minecraft Bedrock JSON UI Authentic Input / Search Box */
+/* Minecraft Bedrock Ore UI Authentic Input / Search Box */
 .mc-input-box {
   background-color: #4c4c4c;
   color: #ffffff;

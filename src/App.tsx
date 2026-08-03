@@ -15,6 +15,7 @@ import { FeatureVoteModal } from './components/FeatureVoteModal';
 import { CreateChannelModal } from './components/CreateChannelModal';
 import { DebugLanguageModal } from './components/DebugLanguageModal';
 import { FriendsDrawer } from './components/FriendsDrawer';
+import { DevStatsOverlay } from './components/DevStatsOverlay';
 import { useLang } from './context/LanguageContext';
 import { playPopSound } from './utils/sound';
 
@@ -646,6 +647,12 @@ export default function App() {
           setSidebarItem('live_tv');
           setActiveTab('live_tv');
         }}
+      />
+
+      {/* DEV STATS OVERLAY (FPS & FRAME LATENCY) */}
+      <DevStatsOverlay
+        showFps={settings.showFps}
+        showFrameLatency={settings.showFrameLatency}
       />
 
     </div>

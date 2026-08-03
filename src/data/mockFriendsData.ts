@@ -51,7 +51,7 @@ const ACTIVITIES_JOINABLE = [
 const ACTIVITIES_ONLINE = [
   "Đang ở Trang chủ Vplay", "In the Menus", "Đang lướt VFlow Shorts", "Đang nghe VOV3 Music",
   "Đang đọc tin tức Vplay", "Đang xem danh sách kênh HD", "Đang thiết lập Cài đặt Vplay",
-  "Online - Sẵn sàng trò chuyện", "Đang trải nghiệm JSON UI Minecraft"
+  "Online - Sẵn sàng trò chuyện", "Đang trải nghiệm Ore UI Minecraft"
 ];
 
 const ACTIVITIES_OFFLINE = [

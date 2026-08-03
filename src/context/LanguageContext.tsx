@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 
 export const DEFAULT_VPLAY_LANG = `# ========================================================
 # VPLAY LANGUAGE FILE (vplay.lang)
-# File cấu hình ngôn ngữ toàn bộ ứng dụng Vplay (JSON UI)
+# File cấu hình ngôn ngữ toàn bộ ứng dụng Vplay (Ore UI)
 # Định dạng: key=value
 # Chỉnh sửa nội dung dưới đây để thay đổi văn bản trong app
 # ========================================================
@@ -23,7 +23,7 @@ sidebar.channels=Danh sách kênh
 sidebar.exploreVietnam=Khám phá Việt Nam
 sidebar.fandomLogos=Fandom & Đội bóng
 sidebar.aiThumbnail=Vplay Intelligence
-sidebar.oreSettings=Cài đặt giao diện JSON UI
+sidebar.oreSettings=Cài đặt giao diện Ore UI
 sidebar.search=Tìm kiếm kênh
 sidebar.copilot=Vplay Copilot
 sidebar.vstudy=Vstudy
@@ -41,8 +41,8 @@ startMenu.vplayApps=Vplay Suite Apps
 
 # --- HOME TAB & BANNER SLIDER ---
 home.tab.DesignPreview.name=WELCOME TO A DESIGN PREVIEW
-home.tab.DesignPreview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Bedrock JSON UI, chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi. JSON UI hứa hẹn sẽ đem đến cho bạn một trải nghiệm Vplay đẹp mắt, trực quan và mượt mà nhất.
-home.banner.exploreOreUI=KHÁM PHÁ JSON UI
+home.tab.DesignPreview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Ore UI, chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi. Ore UI hứa hẹn sẽ đem đến cho bạn một trải nghiệm Vplay đẹp mắt, trực quan và mượt mà nhất.
+home.banner.exploreOreUI=KHÁM PHÁ ORE UI
 home.banner.giveFeedback=Give Feedback
 home.banner.vtv6Title=Vì một Việt Nam khỏe mạnh
 home.banner.vtv6Desc=VTV6 là kênh truyền hình chuyên biệt về thể thao của Đài Truyền hình Việt Nam. Nội dung chính của kênh bao gồm các bản tin, chuyên mục và chương trình tường thuật về thể thao trong nước và quốc tế do Trung tâm Truyền hình Thể thao sản xuất chính, với mục tiêu thúc đẩy phong trào thể thao quần chúng, thể thao học đường, thể thao chuyên nghiệp phát triển tại Việt Nam cũng như hướng đến rèn luyện, nâng cao sức khỏe cộng đồng và xây dựng con người phát triển toàn diện.
@@ -123,12 +123,12 @@ toggle.off=TẮT
 slider.volume=Âm lượng
 slider.speed=Tốc độ quay Panorama
 
-# --- JSON UI DESIGN SYSTEM VIEWER ---
+# --- ORE UI DESIGN SYSTEM VIEWER ---
 design.preview.title=WELCOME TO A DESIGN PREVIEW
-design.preview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Bedrock JSON UI. Chúng tôi rất muốn nghe ý kiến của bạn.
+design.preview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Ore UI. Chúng tôi rất muốn nghe ý kiến của bạn.
 
 # --- FOOTER & MISC ---
-app.footer=Vplay TV © 2026 - JSON UI Minecraft Edition
+app.footer=Vplay TV © 2026 - Ore UI Minecraft Edition
 app.debugAlert=Vplay Debug Mode is Active!
 `;
 

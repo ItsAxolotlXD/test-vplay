@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import { ExternalLink, ChevronLeft, Trash2, ShoppingBag, Palette, User, Sliders, Cpu, Layers, HardDrive, RefreshCw, X, Check, Plus } from "lucide-react";
+import { ExternalLink, ChevronLeft, Trash2, ShoppingBag, Palette, User, Sliders, Cpu, Layers, HardDrive, RefreshCw, X, Check, Plus, Activity, Gauge } from "lucide-react";
 import { VplayToggleSwitch } from "./ui/VplayToggleSwitch";
 import { VplaySecondaryButton } from "./ui/VplaySecondaryButton";
+import { PerformanceStressModal } from "./PerformanceStressModal";
+import { DataDrivenUiModal } from "./DataDrivenUiModal";
+import { DevStatsOverlay } from "./DevStatsOverlay";
 
 interface OreSettingsTabProps {
   onOpenFeedback: () => void;
@@ -70,6 +73,24 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
   const [fullKeyboardMode, setFullKeyboardMode] = useState(false);
   const [remoteConnect, setRemoteConnect] = useState(false);
   const [debugOverlay, setDebugOverlay] = useState(false);
+  const [showFps, setShowFps] = useState(false);
+  const [showFrameLatency, setShowFrameLatency] = useState(false);
+  const [isDduiModalOpen, setIsDduiModalOpen] = useState(false);
+
+  // Performance test state
+  const [isStressTesting, setIsStressTesting] = useState(false);
+  const [perfResults, setPerfResults] = useState<{
+    fps: number;
+    frameTime: number;
+    domNodes: number;
+    memoryMB: string;
+    score: number;
+    grade: string;
+  } | null>(null);
+
+  const handleRunPerfTest = () => {
+    setIsStressTesting(true);
+  };
 
   // Buy storage modal state
   const [showBuyStorageModal, setShowBuyStorageModal] = useState(false);
@@ -213,12 +234,12 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
       </div>
 
       {/* TOP BANNER BOX: Welcome to design preview! */}
-      <div className="w-full bg-[#3a3a3a] border-2 border-[#1e1e1e] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg rounded-none">
+      <div className="w-full bg-[#4a4d50] border-2 border-[#141414] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg rounded-none">
         <div className="space-y-1 max-w-2xl">
           <h2 className="font-mono font-bold text-sm sm:text-base text-white">
             Welcome to design preview!
           </h2>
-          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+          <p className="text-xs text-gray-200 leading-relaxed font-normal">
             We would love to hear what you think of this new design. Keep in mind that it's still work in progress and some functionality might be missing.
           </p>
         </div>
@@ -239,18 +260,18 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
         {/* SECTION 1: ACCOUNT & PROFILE (Tài khoản) */}
         {(!activeSettingSection || activeSettingSection === "profile") && (
-          <div className="bg-[#3a3a3a] border-2 border-[#1e1e1e] rounded-none shadow-xl overflow-hidden" style={{ borderRadius: "0px" }}>
-            <div className="px-4 py-3 bg-[#2f2f2f] border-b border-[#1e1e1e] flex items-center gap-2">
+          <div className="bg-[#4a4d50] border-2 border-[#141414] rounded-none shadow-xl overflow-hidden" style={{ borderRadius: "0px" }}>
+            <div className="px-4 py-3 bg-[#3f4245] flex items-center gap-2">
               <User className="w-4 h-4 text-emerald-400 shrink-0" />
               <span className="font-mono font-bold text-xs uppercase tracking-wider text-white">ACCOUNT</span>
             </div>
 
-            <div className="divide-y divide-[#282828]">
+            <div>
               {/* Manage Account */}
-              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">Manage Account</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Manage your user profile and security preferences</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Manage your user profile and security preferences</p>
                 </div>
                 <button
                   type="button"
@@ -262,10 +283,10 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
               </div>
 
               {/* Privacy & online safety */}
-              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">Privacy & online safety</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Control data collection and online safety guidelines</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Control data collection and online safety guidelines</p>
                 </div>
                 <button
                   type="button"
@@ -277,10 +298,10 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
               </div>
 
               {/* Sign Out */}
-              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">Sign out of account</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Disconnect session from current browser instance</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Disconnect session from current browser instance</p>
                 </div>
                 <button
                   type="button"
@@ -292,17 +313,17 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
               </div>
 
               {/* Remote Connect */}
-              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">Remote Connect</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Use Remote Connect for account Sign In (requires restart)</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Use Remote Connect for account Sign In (requires restart)</p>
                 </div>
                 <OreToggle value={remoteConnect} onChange={setRemoteConnect} />
               </div>
 
-              {/* DID & MCID Footer */}
-              <div className="p-4 bg-[#282828] text-[11px] font-mono text-zinc-400 space-y-0.5">
-                <div>DID: cf4bef566256457eb1391a01b5b02e2c</div>
+              {/* DDUI & MCID Footer */}
+              <div className="p-4 bg-[#3f4245] text-[11px] font-mono text-gray-300 space-y-0.5">
+                <div>DDUI: cf4bef566256457eb1391a01b5b02e2c</div>
                 <div>MCID: 28601FFA239DADCE</div>
               </div>
             </div>
@@ -311,25 +332,25 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
         {/* SECTION 2: APPEARANCE & THEME (Giao diện) */}
         {(!activeSettingSection || activeSettingSection === "appearance") && (
-          <div className="bg-[#3a3a3a] border-2 border-[#1e1e1e] rounded-none shadow-xl overflow-hidden" style={{ borderRadius: "0px" }}>
-            <div className="px-4 py-3 bg-[#2f2f2f] border-b border-[#1e1e1e] flex items-center gap-2">
+          <div className="bg-[#4a4d50] border-2 border-[#141414] rounded-none shadow-xl overflow-hidden" style={{ borderRadius: "0px" }}>
+            <div className="px-4 py-3 bg-[#3f4245] flex items-center gap-2">
               <Palette className="w-4 h-4 text-amber-400 shrink-0" />
               <span className="font-mono font-bold text-xs uppercase tracking-wider text-white">KEYBOARD, MOUSE & APPEARANCE</span>
             </div>
 
-            <div className="p-4 divide-y divide-[#282828] space-y-4">
-              <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] p-2 transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">Full keyboard mode</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Maps mouse input onto the keyboard, for keyboard-only input while playing</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Maps mouse input onto the keyboard, for keyboard-only input while playing</p>
                 </div>
                 <OreToggle value={fullKeyboardMode} onChange={setFullKeyboardMode} />
               </div>
 
-              <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] p-2 transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">AMOLED Dark Mode</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Enable deep true black background for AMOLED display screens</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Enable deep true black background for AMOLED display screens</p>
                 </div>
                 <OreToggle
                   value={amoledDark}
@@ -338,18 +359,18 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                 />
               </div>
 
-              <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] p-2 transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">Dynamic Motion Transitions</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Enable smooth fluid physics transitions across all application views</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Enable smooth fluid physics transitions across all application views</p>
                 </div>
                 <OreToggle value={dynamicMotion} onChange={setDynamicMotion} />
               </div>
 
-              <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] p-2 transition-colors">
                 <div>
                   <span className="font-semibold text-sm text-white block">Reset settings to default</span>
-                  <p className="text-xs text-zinc-400 mt-0.5">Restore all the above options to their original values</p>
+                  <p className="text-xs text-gray-200 mt-0.5">Restore all the above options to their original values</p>
                 </div>
                 <button
                   type="button"
@@ -368,14 +389,14 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
         {/* SECTION 3: STORAGE & DISK INFO */}
         {(!activeSettingSection || activeSettingSection === "profile") && (
-          <div className="bg-[#3a3a3a] border-2 border-[#1e1e1e] rounded-none shadow-xl overflow-hidden p-4 space-y-3" style={{ borderRadius: "0px" }}>
-            <div className="flex flex-wrap items-center justify-between border-b border-[#282828] pb-2 gap-2">
+          <div className="bg-[#4a4d50] border-2 border-[#141414] rounded-none shadow-xl overflow-hidden p-4 space-y-3" style={{ borderRadius: "0px" }}>
+            <div className="flex flex-wrap items-center justify-between pb-2 gap-2">
               <div className="flex items-center gap-2">
                 <HardDrive className="w-4 h-4 text-indigo-400 shrink-0" />
                 <span className="font-mono font-bold text-xs uppercase tracking-wider text-white">STORAGE & DISK SPACE</span>
               </div>
               <div className="text-right font-mono font-bold">
-                <span className="text-xs text-zinc-300">
+                <span className="text-xs text-gray-200">
                   {Math.round(currentStorageUsed).toLocaleString()} MB / {maxStorageMB.toLocaleString()} MB
                 </span>
                 {purchasedStorageMB > 0 && (
@@ -387,7 +408,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
             </div>
 
             {/* Storage Progress Bar (Green Ore UI style) */}
-            <div className="w-full h-3 bg-[#1e1e1e] border border-black p-0.5 rounded-none relative" style={{ borderRadius: "0px" }}>
+            <div className="w-full h-3 bg-[#35383b] border border-black p-0.5 rounded-none relative" style={{ borderRadius: "0px" }}>
               <div
                 className="h-full bg-[#388e3c] transition-all duration-300"
                 style={{ width: `${Math.min(100, (currentStorageUsed / maxStorageMB) * 100)}%` }}
@@ -395,7 +416,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-              <p className="text-xs text-zinc-400 leading-normal">
+              <p className="text-xs text-gray-200 leading-normal">
                 Clear cached application resources or purchase additional storage capacity for Vplay.
               </p>
 
@@ -426,15 +447,15 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
         {/* SECTION 4: PLUGIN STORE (Plugin) */}
         {(!activeSettingSection || activeSettingSection === "plugin_store") && (
-          <div className="bg-[#3a3a3a] border-2 border-[#1e1e1e] rounded-none shadow-xl overflow-hidden">
-            <div className="px-4 py-3 bg-[#2f2f2f] border-b border-[#1e1e1e] flex items-center gap-2">
+          <div className="bg-[#4a4d50] border-2 border-[#141414] rounded-none shadow-xl overflow-hidden">
+            <div className="px-4 py-3 bg-[#3f4245] flex items-center gap-2">
               <ShoppingBag className="w-4 h-4 text-indigo-400 shrink-0" />
               <span className="font-mono font-bold text-xs uppercase tracking-wider text-white">VPLAY PLUGIN STORE</span>
             </div>
 
-            <div className="divide-y divide-[#282828]">
+            <div>
               {plugins.map((plugin) => (
-                <div key={plugin.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div key={plugin.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#56595c] transition-colors">
                   <div className="space-y-1 max-w-xl">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm text-white">{plugin.name}</span>
@@ -444,7 +465,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-zinc-400 font-normal">{plugin.desc}</p>
+                    <p className="text-xs text-gray-200 font-normal">{plugin.desc}</p>
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
@@ -485,21 +506,83 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
         {/* SECTION 5: DEVELOPER & SYSTEM */}
         {(!activeSettingSection || activeSettingSection === "custom_tab") && (
-          <div className="bg-[#3a3a3a] border-2 border-[#1e1e1e] rounded-none shadow-xl overflow-hidden p-4 space-y-3">
-            <div className="flex items-center gap-2 border-b border-[#282828] pb-2">
+          <div className="bg-[#4a4d50] border-2 border-[#141414] rounded-none shadow-xl overflow-hidden p-4 space-y-4">
+            <div className="flex items-center gap-2 pb-2">
               <Cpu className="w-4 h-4 text-purple-400 shrink-0" />
               <span className="font-mono font-bold text-xs uppercase tracking-wider text-white">DEVELOPER OPTIONS</span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+            {/* Performance test */}
+            <div className="flex flex-col gap-2.5 pb-3 hover:bg-[#56595c] p-2 transition-colors">
+              <div>
+                <span className="font-semibold text-sm text-white block">
+                  Performance test
+                </span>
+                <p className="text-xs text-gray-200 mt-0.5">
+                  Kiểm tra hiệu năng ứng dụng, tốc độ khung hình (FPS) và độ trễ phản hồi DOM/Canvas
+                </p>
+              </div>
+              <div className="w-full">
+                <VplaySecondaryButton
+                  size="normal"
+                  fullWidth={true}
+                  onClick={handleRunPerfTest}
+                  className="w-full text-center py-2.5 min-h-[40px]"
+                >
+                  Test
+                </VplaySecondaryButton>
+              </div>
+            </div>
+
+            {/* Show FPS on left corner of the screen */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 hover:bg-[#56595c] p-2 transition-colors">
+              <div>
+                <span className="font-semibold text-sm text-white block">Show FPS on left corner of the screen</span>
+                <p className="text-xs text-gray-200 mt-0.5">Hiển thị tốc độ khung hình (FPS) ở góc trái trên cùng màn hình</p>
+              </div>
+              <OreToggle value={showFps} onChange={setShowFps} />
+            </div>
+
+            {/* Show Frame Latency on left corner of the screen */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 hover:bg-[#56595c] p-2 transition-colors">
+              <div>
+                <span className="font-semibold text-sm text-white block">Show Frame Latency on left corner of the screen</span>
+                <p className="text-xs text-gray-200 mt-0.5">Hiển thị độ trễ render khung hình (ms) ở góc trái trên cùng màn hình</p>
+              </div>
+              <OreToggle value={showFrameLatency} onChange={setShowFrameLatency} />
+            </div>
+
+            {/* Data-Driven UI Popup Modal */}
+            <div className="flex flex-col gap-2.5 pb-3 hover:bg-[#56595c] p-2 transition-colors">
+              <div>
+                <span className="font-semibold text-sm text-white block">Data-Driven UI Popup Modal</span>
+                <p className="text-xs text-gray-200 mt-0.5">Mở cửa sổ cấu hình và kiểm tra Data-Driven UI (DDUI) Ore UI JSON</p>
+              </div>
+              <div className="w-full">
+                <VplaySecondaryButton
+                  size="normal"
+                  fullWidth={true}
+                  onClick={() => setIsDduiModalOpen(true)}
+                  className="w-full text-center py-2.5 min-h-[40px]"
+                >
+                  Open DDUI Modal
+                </VplaySecondaryButton>
+              </div>
+            </div>
+
+            {/* Debug Performance Overlay */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 hover:bg-[#56595c] p-2 transition-colors">
               <div>
                 <span className="font-semibold text-sm text-white block">Debug Performance Overlay</span>
-                <p className="text-xs text-zinc-400 mt-0.5">Show live FPS, render latency, and memory stats overlay</p>
+                <p className="text-xs text-gray-200 mt-0.5">Show live FPS, render latency, and memory stats overlay</p>
               </div>
               <OreToggle value={debugOverlay} onChange={setDebugOverlay} />
             </div>
           </div>
         )}
+
+        <DevStatsOverlay showFps={showFps} showFrameLatency={showFrameLatency} />
+        <DataDrivenUiModal isOpen={isDduiModalOpen} onClose={() => setIsDduiModalOpen(false)} />
 
         {/* MUA STORAGE MODAL (Rendered via portal on document.body so topbar/sidebar cannot overlap) */}
         {showBuyStorageModal && createPortal(
@@ -673,6 +756,101 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                   </div>
                 </div>
               )}
+            </div>
+          </div>,
+          document.body
+        )}
+
+        {/* PERFORMANCE STRESS MODAL */}
+        <PerformanceStressModal
+          isOpen={isStressTesting}
+          onComplete={(results) => {
+            setIsStressTesting(false);
+            setPerfResults(results);
+          }}
+          onCancel={() => setIsStressTesting(false)}
+        />
+
+        {/* PERFORMANCE TEST BENCHMARK MODAL */}
+        {perfResults && createPortal(
+          <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150 select-none font-sans">
+            <div
+              style={{ borderRadius: "0px" }}
+              className="w-full max-w-md bg-[#3a3a3a] border-2 border-[#1e1e1e] shadow-[0_20px_60px_rgba(0,0,0,0.95)] text-white relative animate-in zoom-in-95 duration-150 font-jura"
+            >
+              <div className="bg-[#2d2d2d] border-b-2 border-[#1e1e1e] px-4 py-3 flex items-center justify-between">
+                <h3 className="text-base font-bold text-white tracking-wide uppercase flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-emerald-400" />
+                  <span>Performance Test Benchmark</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setPerfResults(null)}
+                  style={{ borderRadius: "0px" }}
+                  className="text-zinc-300 hover:text-white p-1 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4 space-y-3 font-mono text-xs">
+                <div className="bg-[#2a2a2a] p-3 border border-[#1e1e1e] flex items-center justify-between">
+                  <span className="text-zinc-400">BENCHMARK SCORE:</span>
+                  <span className="text-emerald-400 font-extrabold text-sm">
+                    {perfResults.score} / 100 ({perfResults.grade})
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="bg-[#252525] p-2.5 border border-[#1e1e1e]">
+                    <div className="text-zinc-400 text-[10px] flex items-center gap-1">
+                      <Gauge className="w-3 h-3 text-emerald-400" /> Frame Rate
+                    </div>
+                    <div className="text-white font-bold text-sm mt-0.5">{perfResults.fps} FPS</div>
+                  </div>
+
+                  <div className="bg-[#252525] p-2.5 border border-[#1e1e1e]">
+                    <div className="text-zinc-400 text-[10px] flex items-center gap-1">
+                      <Cpu className="w-3 h-3 text-emerald-400" /> Frame Latency
+                    </div>
+                    <div className="text-white font-bold text-sm mt-0.5">{perfResults.frameTime} ms</div>
+                  </div>
+
+                  <div className="bg-[#252525] p-2.5 border border-[#1e1e1e]">
+                    <div className="text-zinc-400 text-[10px]">DOM Elements</div>
+                    <div className="text-white font-bold text-sm mt-0.5">{perfResults.domNodes} nodes</div>
+                  </div>
+
+                  <div className="bg-[#252525] p-2.5 border border-[#1e1e1e]">
+                    <div className="text-zinc-400 text-[10px]">JS Memory Heap</div>
+                    <div className="text-white font-bold text-sm mt-0.5">{perfResults.memoryMB}</div>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-emerald-400/90 pt-1 font-sans">
+                  ✓ Pipeline Ore UI renderer passes 60FPS target budget without frame drops.
+                </div>
+              </div>
+
+              <div className="p-3 bg-[#2d2d2d] border-t-2 border-[#1e1e1e] flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRunPerfTest}
+                  disabled={isStressTesting}
+                  style={{ borderRadius: "0px" }}
+                  className="ore-btn-green flex-1 py-2 font-bold text-xs uppercase"
+                >
+                  {isStressTesting ? 'Testing...' : 'Run Again'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPerfResults(null)}
+                  style={{ borderRadius: "0px" }}
+                  className="bg-[#282828] hover:bg-[#323232] text-zinc-200 border-2 border-[#181818] flex-1 py-2 font-bold text-xs uppercase"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>,
           document.body

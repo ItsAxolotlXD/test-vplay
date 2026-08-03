@@ -50,7 +50,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
           onClick={() => {
             playPopSound();
             if (onOpenFeedback) onOpenFeedback();
-            else alert('Cảm ơn bạn đã đóng góp ý kiến về giao diện Vplay JSON UI!');
+            else alert('Cảm ơn bạn đã đóng góp ý kiến về giao diện Vplay Ore UI!');
           }}
           className="flex-shrink-0"
         >
@@ -65,7 +65,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 bg-[#418a28] animate-pulse border border-[#141414]" />
             <h1 className="text-xl sm:text-2xl font-extrabold text-[#51a233] tracking-tight">
-              VPLAY JSON UI
+              VPLAY ORE UI
             </h1>
           </div>
           <p className="text-gray-400 text-xs sm:text-sm mt-2 font-montserrat">
