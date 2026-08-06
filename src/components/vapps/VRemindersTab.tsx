@@ -116,22 +116,22 @@ export const VRemindersTab: React.FC = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
-      {/* Banner Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-orange-950/70 via-zinc-900 to-black border border-orange-500/30 shadow-2xl">
-        <div className="flex items-center gap-4">
-          <div className="p-3.5 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl shadow-lg shadow-orange-500/20 text-white font-black">
-            <Bell className="w-8 h-8" />
+      {/* Banner Header - Ore UI Style */}
+      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
+            <Bell className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-orange-300 uppercase">
-                V-Reminders
+              <h1 className="text-sm sm:text-base font-black text-white uppercase tracking-wider font-jura">
+                V-REMINDERS (NHẮC NHỞ & CÔNG VIỆC)
               </h1>
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-orange-500 text-white font-black uppercase tracking-wider">
-                Nhắc Nhở & Công Việc
+              <span className="bg-[#89dc69] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
+                Ore UI Task
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-[11px] text-zinc-300 font-jura">
               Quản lý danh sách việc cần làm, đặt lịch thông báo và theo dõi tiến độ hoàn thành.
             </p>
           </div>
@@ -139,7 +139,7 @@ export const VRemindersTab: React.FC = () => {
 
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-5 py-3 bg-amber-500 hover:bg-amber-400 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 text-slate-950 font-black text-xs uppercase tracking-wider rounded-none shadow-md transition-all cursor-pointer shrink-0"
+          className="flex items-center gap-2 px-4 py-2 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-bold text-xs uppercase font-jura tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" /> Thêm Nhắc Nhở Mới
         </button>
@@ -149,31 +149,31 @@ export const VRemindersTab: React.FC = () => {
       {showAddForm && (
         <form
           onSubmit={handleAddReminder}
-          className="bg-[#18181c] border border-orange-500/40 rounded-3xl p-6 mb-6 shadow-2xl space-y-4"
+          className="bg-[#2d2f32] border-2 border-[#141414] p-5 mb-6 shadow-2xl space-y-4 font-jura"
         >
-          <h3 className="text-sm font-black text-orange-300 uppercase tracking-wider border-b border-white/10 pb-3">
-            Tạo Nhắc Nhở Mới
+          <h3 className="text-xs font-bold text-white uppercase tracking-wider border-b-2 border-[#141414] pb-2 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#89dc69]" /> Tạo Nhắc Nhở Mới
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-zinc-400 mb-1 uppercase">Tiêu đề việc cần làm</label>
+              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Tiêu đề việc cần làm</label>
               <input
                 type="text"
                 required
                 placeholder="Nhập công việc..."
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-none px-4 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1 uppercase">Danh mục</label>
+              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Danh mục</label>
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as any)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-none px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
+                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none cursor-pointer"
               >
                 <option value="Công việc">Công việc</option>
                 <option value="Học tập">Học tập</option>
@@ -184,11 +184,11 @@ export const VRemindersTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1 uppercase">Mức độ ưu tiên</label>
+              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Mức độ ưu tiên</label>
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value as any)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-none px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
+                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none cursor-pointer"
               >
                 <option value="High">Cao (Quan trọng)</option>
                 <option value="Medium">Trung bình</option>
@@ -197,37 +197,37 @@ export const VRemindersTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1 uppercase">Ngày nhắc</label>
+              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Ngày nhắc</label>
               <input
                 type="date"
                 value={newDueDate}
                 onChange={(e) => setNewDueDate(e.target.value)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-none px-4 py-2.5 text-xs text-white focus:outline-none"
+                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-1 uppercase">Giờ nhắc</label>
+              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Giờ nhắc</label>
               <input
                 type="time"
                 value={newDueTime}
                 onChange={(e) => setNewDueTime(e.target.value)}
-                className="w-full bg-zinc-900 border border-white/10 rounded-none px-4 py-2.5 text-xs text-white focus:outline-none"
+                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-2 border-t-2 border-[#141414]">
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white text-xs font-bold rounded-none shadow-md cursor-pointer"
+              className="px-4 py-1.5 bg-[#383b3e] hover:bg-[#4a4d50] border-2 border-[#141414] text-zinc-200 text-xs font-bold cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-extrabold text-xs uppercase rounded-none shadow-md cursor-pointer"
+              className="px-4 py-1.5 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white text-xs font-bold uppercase shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] cursor-pointer"
             >
               Lưu Nhắc Nhở
             </button>
@@ -236,27 +236,27 @@ export const VRemindersTab: React.FC = () => {
       )}
 
       {/* Filter Bar */}
-      <div className="bg-[#18181c] border border-white/10 rounded-3xl p-4 mb-6 shadow-xl flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 mb-6 shadow-xl flex flex-wrap items-center justify-between gap-3 font-jura">
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Tìm kiếm nhắc nhở..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-zinc-900 border border-white/10 rounded-none pl-10 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500"
+            className="w-full bg-[#1f2022] border-2 border-[#141414] pl-9 pr-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none"
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1">
           {["all", "pending", "completed"].map((st) => (
             <button
               key={st}
               onClick={() => setFilterStatus(st as any)}
-              className={`px-3.5 py-1.5 rounded-none text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold transition-all cursor-pointer border-2 border-[#141414] ${
                 filterStatus === st
-                  ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 font-black shadow-md"
-                  : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                  ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                  : "bg-[#383b3e] text-zinc-300 hover:text-white"
               }`}
             >
               {st === "all" ? "Tất cả" : st === "pending" ? "Đang chờ" : "Đã hoàn thành"}
@@ -266,28 +266,28 @@ export const VRemindersTab: React.FC = () => {
       </div>
 
       {/* Reminders List */}
-      <div className="space-y-3">
+      <div className="space-y-3 font-jura">
         {filteredReminders.length === 0 ? (
-          <div className="bg-[#18181c] border border-white/10 rounded-3xl p-12 text-center text-zinc-500 text-xs">
+          <div className="bg-[#2d2f32] border-2 border-[#141414] p-10 text-center text-zinc-400 text-xs">
             Không có nhắc nhở nào khớp với bộ lọc.
           </div>
         ) : (
           filteredReminders.map((item) => (
             <div
               key={item.id}
-              className={`p-4 rounded-3xl border transition-all flex items-start justify-between gap-4 shadow-lg ${
+              className={`p-4 border-2 border-[#141414] transition-all flex items-start justify-between gap-4 shadow-lg ${
                 item.isCompleted
-                  ? "bg-zinc-900/40 border-white/5 opacity-60"
-                  : "bg-[#18181c] border-white/10 hover:border-orange-500/40"
+                  ? "bg-[#232528] opacity-60"
+                  : "bg-[#2d2f32]"
               }`}
             >
-              <div className="flex items-start gap-3.5 flex-1">
+              <div className="flex items-start gap-3 flex-1">
                 <button
                   onClick={() => handleToggleComplete(item.id)}
-                  className="mt-0.5 text-zinc-400 hover:text-orange-400 transition-colors cursor-pointer"
+                  className="mt-0.5 text-zinc-400 hover:text-[#89dc69] transition-colors cursor-pointer"
                 >
                   {item.isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <CheckCircle2 className="w-5 h-5 text-[#89dc69]" />
                   ) : (
                     <Circle className="w-5 h-5" />
                   )}
@@ -296,7 +296,7 @@ export const VRemindersTab: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3
-                      className={`text-sm font-bold text-white ${
+                      className={`text-xs sm:text-sm font-bold text-white ${
                         item.isCompleted ? "line-through text-zinc-500" : ""
                       }`}
                     >
@@ -304,28 +304,28 @@ export const VRemindersTab: React.FC = () => {
                     </h3>
 
                     <span
-                      className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+                      className={`text-[9px] px-2 py-0.5 font-bold uppercase border border-[#141414] ${
                         item.priority === "High"
-                          ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                          ? "bg-[#cc1827] text-white"
                           : item.priority === "Medium"
-                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                          : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                          ? "bg-amber-600 text-white"
+                          : "bg-blue-600 text-white"
                       }`}
                     >
                       {item.priority} Priority
                     </span>
                   </div>
 
-                  {item.notes && <p className="text-xs text-zinc-400 mb-2">{item.notes}</p>}
+                  {item.notes && <p className="text-xs text-zinc-300 mb-2 font-sans">{item.notes}</p>}
 
-                  <div className="flex items-center gap-4 text-[11px] text-zinc-500 flex-wrap">
+                  <div className="flex items-center gap-3 text-[11px] text-zinc-400 flex-wrap font-mono">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-orange-400" /> {item.dueDate}
+                      <Calendar className="w-3.5 h-3.5 text-[#89dc69]" /> {item.dueDate}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-orange-400" /> {item.dueTime}
+                      <Clock className="w-3.5 h-3.5 text-[#89dc69]" /> {item.dueTime}
                     </span>
-                    <span className="px-2 py-0.5 rounded-md bg-white/5 text-zinc-400 font-semibold">
+                    <span className="px-2 py-0.5 bg-[#1f2022] border border-[#141414] text-zinc-300 font-bold">
                       {item.category}
                     </span>
                   </div>
@@ -334,7 +334,8 @@ export const VRemindersTab: React.FC = () => {
 
               <button
                 onClick={() => handleDeleteReminder(item.id)}
-                className="p-2 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 rounded-xl transition-all cursor-pointer"
+                className="p-1.5 border border-[#141414] bg-[#383b3e] hover:bg-[#cc1827] text-zinc-300 hover:text-white transition-all cursor-pointer"
+                title="Xóa"
               >
                 <Trash2 className="w-4 h-4" />
               </button>

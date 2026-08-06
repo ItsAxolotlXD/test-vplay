@@ -10,6 +10,9 @@ export const DEFAULT_VPLAY_LANG = `# ===========================================
 # --- HEADER BAR & NAVIGATION ---
 header.home=HOME
 header.live=TRỰC TIẾP
+header.vapps=V-Apps
+header.vpremium=V-Premium
+header.vnotes=V-Notes
 header.explore=Khám phá
 header.copilot=Copilot
 header.vstudy=Vstudy
@@ -20,6 +23,7 @@ header.settings=Cài đặt
 # --- SIDEBAR & MENU ---
 sidebar.home=Trang chủ
 sidebar.channels=Danh sách kênh
+sidebar.vnotes=Sổ tay V-Notes
 sidebar.exploreVietnam=Khám phá Việt Nam
 sidebar.fandomLogos=Fandom & Đội bóng
 sidebar.aiThumbnail=Vplay Intelligence

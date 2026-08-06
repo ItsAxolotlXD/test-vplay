@@ -443,6 +443,56 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           )}
 
+          {/* Item 5: Use mouse cursor */}
+          {(matchesSearch('Use mouse cursor') ||
+            matchesSearch('Con trỏ chuột') ||
+            matchesSearch('Mouse cursor')) && (
+            <div className="px-3 sm:px-4 py-3 hover:bg-[#56595c] transition-colors flex items-center justify-between gap-3">
+              <div>
+                <div className="font-bold text-xs text-white">
+                  Use mouse cursor
+                </div>
+                <div className="text-[10px] text-gray-200 font-normal">
+                  Tắt chạm trực tiếp trên mobile, di chuyển con trỏ chuột ảo và nhấn đúp vào màn hình để click.
+                </div>
+              </div>
+              <VplayToggleSwitch
+                checked={temp.useMouseCursor || false}
+                onChange={() => {
+                  const val = !temp.useMouseCursor;
+                  const updated = { ...temp, useMouseCursor: val };
+                  setTemp(updated);
+                  if (onChangeLiveSettings) onChangeLiveSettings(updated);
+                }}
+              />
+            </div>
+          )}
+
+          {/* Item 6: Use arrow keys */}
+          {(matchesSearch('Use arrow keys') ||
+            matchesSearch('Phím mũi tên') ||
+            matchesSearch('Arrow keys')) && (
+            <div className="px-3 sm:px-4 py-3 hover:bg-[#56595c] transition-colors flex items-center justify-between gap-3">
+              <div>
+                <div className="font-bold text-xs text-white">
+                  Use arrow keys
+                </div>
+                <div className="text-[10px] text-gray-200 font-normal">
+                  Hiển thị con trỏ chuột ảo, disable touch. Sử dụng các nút phím mũi tên để di chuyển con trỏ, đè SHIFT để tăng tốc độ di chuyển.
+                </div>
+              </div>
+              <VplayToggleSwitch
+                checked={temp.useArrowKeysCursor || false}
+                onChange={() => {
+                  const val = !temp.useArrowKeysCursor;
+                  const updated = { ...temp, useArrowKeysCursor: val };
+                  setTemp(updated);
+                  if (onChangeLiveSettings) onChangeLiveSettings(updated);
+                }}
+              />
+            </div>
+          )}
+
           {/* Item 5: Data-Driven UI Popup Modal */}
           {(matchesSearch('Data-Driven UI Popup Modal') ||
             matchesSearch('Data-Driven UI') ||

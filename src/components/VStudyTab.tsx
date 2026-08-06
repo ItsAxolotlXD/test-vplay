@@ -157,7 +157,7 @@ interface ChatMessage {
 }
 
 interface VStudyTabProps {
-  onBack: () => void;
+  onBack?: () => void;
   subFilter?: "all" | "tieu_hoc" | "thcs" | "thpt" | "super_exam" | "hoc_ba";
   onSelectSubFilter?: (filter: "all" | "tieu_hoc" | "thcs" | "thpt" | "super_exam" | "hoc_ba") => void;
 }
@@ -699,29 +699,31 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
   return (
     <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
       
-      {/* Banner Header - V-Notes style */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-emerald-950/80 via-zinc-900/90 to-zinc-950 border border-emerald-500/30 shadow-2xl backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="p-3 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer shrink-0 rounded-none shadow-md"
-            title="Trở về"
-          >
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </button>
-          <div className="p-3.5 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl shadow-lg shadow-emerald-600/30 text-white font-black shrink-0">
-            <GraduationCap className="w-8 h-8" />
+      {/* Banner Header - Ore UI style */}
+      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 font-jura">
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="p-2 bg-[#383b3e] hover:bg-[#4a4d50] border-2 border-[#141414] text-white transition-all cursor-pointer shrink-0"
+              title="Trở về"
+            >
+              <ArrowLeft className="w-5 h-5 text-white" />
+            </button>
+          )}
+          <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
+            <GraduationCap className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-black tracking-tight text-white uppercase">
-                V-Learn Học Tập & Ôn Thi
+              <h1 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+                V-LEARN (HỌC TẬP & ÔN THI)
               </h1>
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-black uppercase tracking-wider">
-                100+ Đề Thi & Bài Tập Trắc Nghiệm
+              <span className="bg-[#89dc69] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
+                100+ Đề Thi & Bài Tập
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-[11px] text-zinc-300">
               Hệ thống luyện thi trắc nghiệm trực tuyến toàn cấp (Tiểu Học, THCS, THPT), luyện nói Tiếng Anh CEFR và tra cứu học bạ điện tử.
             </p>
           </div>
@@ -729,12 +731,12 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
 
         {/* Global Student Stats Badge */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="px-4 py-2.5 rounded-2xl bg-zinc-900/80 border border-white/10 flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+          <div className="px-3 py-1.5 bg-[#1f2022] border-2 border-[#141414] flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#89dc69]">
               <Flame className="w-4 h-4 text-amber-500" />
               <span>Streak: {streak} ngày</span>
             </div>
-            <div className="w-px h-4 bg-white/10" />
+            <div className="w-0.5 h-4 bg-[#141414]" />
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
               <Zap className="w-4 h-4 text-amber-400" />
               <span>{xp} XP</span>
@@ -743,79 +745,79 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
         </div>
       </div>
 
-        {/* Global Student Stats Cards & Tra Cứu Học Bạ */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-zinc-900/60 p-2.5 rounded-2xl border border-white/5 shadow-md mb-6">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Level Progress */}
-            <div className="px-3 py-1.5 bg-zinc-950 rounded-xl flex items-center gap-2 border border-white/5">
-              <div className="w-7 h-7 rounded-lg bg-[#cc1827]/10 border border-[#cc1827]/30 flex items-center justify-center text-xs font-black text-[#cc1827]">
-                Cấp {level}
-              </div>
-              <div className="text-left">
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Kinh Nghiệm</p>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#cc1827]" style={{ width: `${(xp / (level * 100)) * 100}%` }} />
-                  </div>
-                  <span className="text-[10px] text-white/90 font-mono font-bold">{xp}/{level * 100}</span>
+      {/* Global Student Stats Cards & Tra Cứu Học Bạ */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#2d2f32] border-2 border-[#141414] p-3 shadow-md mb-6 font-jura">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Level Progress */}
+          <div className="px-2.5 py-1.5 bg-[#1f2022] border-2 border-[#141414] flex items-center gap-2">
+            <div className="w-7 h-7 bg-[#cc1827] border border-[#141414] flex items-center justify-center text-xs font-black text-white">
+              C3
+            </div>
+            <div className="text-left">
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Cấp {level}</p>
+              <div className="flex items-center gap-1.5">
+                <div className="w-16 h-2 bg-[#141414] overflow-hidden border border-[#141414]">
+                  <div className="h-full bg-[#89dc69]" style={{ width: `${(xp / (level * 100)) * 100}%` }} />
                 </div>
-              </div>
-            </div>
-
-            {/* Daily Streak */}
-            <div className="px-3 py-1.5 bg-zinc-950 rounded-xl flex items-center gap-2.5 border border-white/5">
-              <Flame className="w-5 h-5 text-amber-500 fill-amber-500 animate-pulse" />
-              <div className="text-left">
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Chuỗi Ngày</p>
-                <p className="text-xs font-black text-white">{streak} Ngày Liên Tiếp</p>
-              </div>
-            </div>
-
-            {/* Total Score / Điểm Tích Lũy */}
-            <div className="px-3 py-1.5 bg-zinc-950 rounded-xl flex items-center gap-2.5 border border-white/5">
-              <Zap className="w-5 h-5 text-yellow-400 fill-yellow-400/20 animate-pulse" />
-              <div className="text-left">
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Tổng Điểm</p>
-                <p className="text-xs font-black text-amber-400">{totalScore} Điểm</p>
-              </div>
-            </div>
-
-            {/* Total Quizzes Done */}
-            <div className="px-3 py-1.5 bg-zinc-950 rounded-xl flex items-center gap-2.5 border border-white/5">
-              <Award className="w-5 h-5 text-emerald-400" />
-              <div className="text-left">
-                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Bài Đã Thi</p>
-                <p className="text-xs font-black text-white">{completedQuizzes} Đề Luyện</p>
+                <span className="text-[10px] text-white font-mono font-bold">{xp}/{level * 100}</span>
               </div>
             </div>
           </div>
 
-          {/* TRA CỨU HỌC BẠ BUTTON */}
-          <button
-            onClick={() => {
-              if (onSelectSubFilter) {
-                onSelectSubFilter(subFilter === "hoc_ba" ? "all" : "hoc_ba");
-              }
-            }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-amber-500 hover:bg-amber-400 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 text-slate-950 font-black text-xs rounded-none shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 uppercase tracking-wider"
-          >
-            <GraduationCap className="w-4 h-4 text-slate-950" />
-            <span>{subFilter === "hoc_ba" ? "Quay Lại Danh Sách Môn" : "Tra Cứu Học Bạ"}</span>
-          </button>
+          {/* Daily Streak */}
+          <div className="px-2.5 py-1.5 bg-[#1f2022] border-2 border-[#141414] flex items-center gap-2">
+            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+            <div className="text-left">
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Chuỗi Ngày</p>
+              <p className="text-xs font-bold text-white">{streak} Ngày</p>
+            </div>
+          </div>
+
+          {/* Total Score / Điểm Tích Lũy */}
+          <div className="px-2.5 py-1.5 bg-[#1f2022] border-2 border-[#141414] flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+            <div className="text-left">
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Tổng Điểm</p>
+              <p className="text-xs font-bold text-amber-400">{totalScore} Điểm</p>
+            </div>
+          </div>
+
+          {/* Total Quizzes Done */}
+          <div className="px-2.5 py-1.5 bg-[#1f2022] border-2 border-[#141414] flex items-center gap-2">
+            <Award className="w-4 h-4 text-[#89dc69]" />
+            <div className="text-left">
+              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Bài Đã Thi</p>
+              <p className="text-xs font-bold text-white">{completedQuizzes} Đề Luyện</p>
+            </div>
+          </div>
         </div>
+
+        {/* TRA CỨU HỌC BẠ BUTTON */}
+        <button
+          onClick={() => {
+            if (onSelectSubFilter) {
+              onSelectSubFilter(subFilter === "hoc_ba" ? "all" : "hoc_ba");
+            }
+          }}
+          className="w-full sm:w-auto px-4 py-2 bg-[#d97706] hover:bg-[#f59e0b] border-2 border-[#141414] text-white font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#fbbf24,inset_-2px_-2px_0_#78350f] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2"
+        >
+          <GraduationCap className="w-4 h-4 text-white" />
+          <span>{subFilter === "hoc_ba" ? "Quay Lại Danh Sách Môn" : "Tra Cứu Học Bạ"}</span>
+        </button>
+      </div>
 
       {/* MODULE MODE SELECTION TABS */}
       {!isQuizActive && (
-        <div className="flex flex-wrap items-center gap-2 p-2 rounded-none bg-zinc-900/80 border border-white/10 shadow-lg">
+        <div className="flex flex-wrap items-center gap-1.5 p-2 bg-[#2d2f32] border-2 border-[#141414] shadow-lg mb-6 font-jura">
           <button
             onClick={() => {
               setModeTab("quizzes");
               if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-3.5 py-2 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#141414] ${
               modeTab === "quizzes"
-                ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md"
-                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                : "bg-[#383b3e] text-zinc-300 hover:text-white"
             }`}
           >
             <BookOpen className="w-4 h-4 text-white" />
@@ -827,15 +829,15 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               setModeTab("english_cefr");
               if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-3.5 py-2 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#141414] ${
               modeTab === "english_cefr"
-                ? "bg-[#2563eb] hover:bg-[#3b82f6] text-white border-b-4 border-[#1d4ed8] active:border-b-0 active:translate-y-1 shadow-md"
-                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                : "bg-[#383b3e] text-zinc-300 hover:text-white"
             }`}
           >
             <Languages className="w-4 h-4 text-blue-300" />
             <span>2. Tiếng Anh (A2, B1, B1+, B2)</span>
-            <span className="px-1.5 py-0.5 rounded-none bg-blue-500/20 text-blue-300 text-[10px]">4 Kỹ Năng</span>
+            <span className="px-1.5 py-0.5 bg-[#1f2022] text-[#89dc69] text-[10px] border border-[#141414]">4 Kỹ Năng</span>
           </button>
 
           <button
@@ -843,15 +845,15 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               setModeTab("literature_writing");
               if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-3.5 py-2 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#141414] ${
               modeTab === "literature_writing"
-                ? "bg-emerald-600 hover:bg-emerald-500 text-white border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 shadow-md"
-                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                : "bg-[#383b3e] text-zinc-300 hover:text-white"
             }`}
           >
             <PenTool className="w-4 h-4 text-emerald-300" />
             <span>3. Luyện Viết Văn THCS/THPT</span>
-            <span className="px-1.5 py-0.5 rounded-none bg-emerald-500/20 text-emerald-300 text-[10px]">AI Chấm Điểm</span>
+            <span className="px-1.5 py-0.5 bg-[#1f2022] text-[#89dc69] text-[10px] border border-[#141414]">AI Chấm Điểm</span>
           </button>
 
           <button
@@ -859,13 +861,13 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               setModeTab("hoc_ba");
               if (onSelectSubFilter) onSelectSubFilter("hoc_ba");
             }}
-            className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-none font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 sm:flex-initial px-3.5 py-2 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#141414] ${
               modeTab === "hoc_ba"
-                ? "bg-amber-500 hover:bg-amber-400 text-slate-950 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 shadow-md"
-                : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                ? "bg-[#d97706] text-white shadow-[inset_2px_2px_0_#fbbf24,inset_-2px_-2px_0_#78350f]"
+                : "bg-[#383b3e] text-zinc-300 hover:text-white"
             }`}
           >
-            <GraduationCap className="w-4 h-4 text-slate-950" />
+            <GraduationCap className="w-4 h-4 text-white" />
             <span>4. Tra Cứu Học Bạ</span>
           </button>
         </div>
@@ -1185,38 +1187,34 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
         <div className="space-y-6 text-left">
           
           {/* HERO BANNER: BÀI KIỂM TRA SIÊU TỔNG HỢP 100 CÂU - 2 TIẾNG */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-950/90 via-amber-950/60 to-zinc-950 border border-amber-500/30 p-6 md:p-8 shadow-2xl">
-            {/* Background Glow */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 blur-3xl rounded-full pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-red-600/15 blur-3xl rounded-full pointer-events-none" />
-
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div className="bg-[#2d2f32] border-2 border-[#141414] p-5 shadow-2xl font-jura">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
               <div className="space-y-3 max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-amber-500 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-red-900/40">
-                  <Zap className="w-4 h-4 text-yellow-300 animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#cc1827] border border-[#141414] text-white font-bold text-[10px] uppercase tracking-wider">
+                  <Zap className="w-3.5 h-3.5 text-yellow-300" />
                   <span>KỲ THI QUỐC GIA MÔ PHỎNG V-STUDY</span>
                 </div>
 
-                <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
+                <h2 className="text-xl md:text-2xl font-black text-white tracking-wide uppercase">
                   BÀI KIỂM TRA SIÊU TỔNG HỢP (100 CÂU HỎI • 2 TIẾNG)
                 </h2>
 
-                <p className="text-xs md:text-sm text-zinc-300 leading-relaxed font-sans">
+                <p className="text-xs text-zinc-300 leading-relaxed font-sans">
                   Bài thi tổng hợp toàn bộ câu hỏi trắc nghiệm của tất cả môn học từ <strong>Lớp 1 đến Lớp 12</strong> (Tiểu Học, THCS, THPT). Đánh giá toàn diện kiến thức, rèn luyện áp lực thời gian chuẩn 120 phút.
                 </p>
 
                 {/* Features Badges */}
-                <div className="flex flex-wrap items-center gap-3 pt-2">
-                  <div className="px-3 py-1.5 rounded-xl bg-black/40 border border-amber-500/20 text-amber-300 text-xs font-bold flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <div className="px-2.5 py-1 bg-[#1f2022] border border-[#141414] text-amber-300 text-[11px] font-bold flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-amber-400" />
                     <span>Thời gian: 120 phút (2 tiếng)</span>
                   </div>
-                  <div className="px-3 py-1.5 rounded-xl bg-black/40 border border-red-500/20 text-red-300 text-xs font-bold flex items-center gap-2">
+                  <div className="px-2.5 py-1 bg-[#1f2022] border border-[#141414] text-red-300 text-[11px] font-bold flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5 text-red-400" />
                     <span>Ngân hàng 100 câu trắc nghiệm</span>
                   </div>
-                  <div className="px-3 py-1.5 rounded-xl bg-black/40 border border-emerald-500/20 text-emerald-300 text-xs font-bold flex items-center gap-2">
-                    <Grid className="w-3.5 h-3.5 text-emerald-400" />
+                  <div className="px-2.5 py-1 bg-[#1f2022] border border-[#141414] text-[#89dc69] text-[11px] font-bold flex items-center gap-1.5">
+                    <Grid className="w-3.5 h-3.5 text-[#89dc69]" />
                     <span>Bảng 100 câu & Đánh dấu review</span>
                   </div>
                 </div>
@@ -1226,9 +1224,9 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               <div className="w-full lg:w-auto shrink-0 pt-2 lg:pt-0">
                 <button
                   onClick={handleStartSuperExam}
-                  className="w-full lg:w-auto px-8 py-4 bg-amber-500 hover:bg-amber-400 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 text-slate-950 font-black text-sm rounded-none shadow-md transition-all cursor-pointer flex items-center justify-center gap-3 uppercase tracking-wider"
+                  className="w-full lg:w-auto px-6 py-3 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-black text-xs uppercase shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2"
                 >
-                  <Play className="w-5 h-5 fill-slate-950" />
+                  <Play className="w-4 h-4 fill-white text-white" />
                   <span>Vào Thi Siêu Tổng Hợp Ngay</span>
                 </button>
               </div>
@@ -1236,65 +1234,65 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
           </div>
 
           {/* Sub-Category Navigation & Search Controls */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-zinc-900/40 p-2.5 rounded-none border border-white/5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-[#2d2f32] border-2 border-[#141414] p-3 shadow-md font-jura">
             {/* Level Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
               <button
                 onClick={() => { setActiveLevel("all"); if (onSelectSubFilter) onSelectSubFilter("all"); }}
-                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer border-2 border-[#141414] ${
                   activeLevel === "all" && subFilter !== "super_exam"
-                    ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md"
-                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                    ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                    : "bg-[#383b3e] text-zinc-300 hover:text-white"
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Khóa học</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
+                <span className="text-[10px] px-1 bg-[#1f2022] font-mono border border-[#141414]">
                   {subjectsData.length}
                 </span>
               </button>
 
               <button
                 onClick={() => { setActiveLevel("tieu_hoc"); if (onSelectSubFilter) onSelectSubFilter("tieu_hoc"); }}
-                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer border-2 border-[#141414] ${
                   activeLevel === "tieu_hoc"
-                    ? "bg-amber-600 hover:bg-amber-500 text-white border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 shadow-md"
-                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                    ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                    : "bg-[#383b3e] text-zinc-300 hover:text-white"
                 }`}
               >
                 <Baby className="w-3.5 h-3.5 text-amber-400" />
                 <span>V-Study Tiểu học</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
+                <span className="text-[10px] px-1 bg-[#1f2022] font-mono border border-[#141414]">
                   {subjectsData.filter((s) => s.level === "tieu_hoc").length} môn
                 </span>
               </button>
 
               <button
                 onClick={() => { setActiveLevel("thcs"); if (onSelectSubFilter) onSelectSubFilter("thcs"); }}
-                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer border-2 border-[#141414] ${
                   activeLevel === "thcs"
-                    ? "bg-[#2563eb] hover:bg-[#3b82f6] text-white border-b-4 border-[#1d4ed8] active:border-b-0 active:translate-y-1 shadow-md"
-                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                    ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                    : "bg-[#383b3e] text-zinc-300 hover:text-white"
                 }`}
               >
                 <School className="w-3.5 h-3.5 text-blue-400" />
                 <span>V-Study THCS</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
+                <span className="text-[10px] px-1 bg-[#1f2022] font-mono border border-[#141414]">
                   {subjectsData.filter((s) => s.level === "thcs").length} môn
                 </span>
               </button>
 
               <button
                 onClick={() => { setActiveLevel("thpt"); if (onSelectSubFilter) onSelectSubFilter("thpt"); }}
-                className={`px-3.5 py-2 rounded-none text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer border-2 border-[#141414] ${
                   activeLevel === "thpt"
-                    ? "bg-emerald-600 hover:bg-emerald-500 text-white border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 shadow-md"
-                    : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1"
+                    ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                    : "bg-[#383b3e] text-zinc-300 hover:text-white"
                 }`}
               >
-                <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
+                <GraduationCap className="w-3.5 h-3.5 text-[#89dc69]" />
                 <span>V-Study THPT</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-black/30 rounded-none font-mono">
+                <span className="text-[10px] px-1 bg-[#1f2022] font-mono border border-[#141414]">
                   {subjectsData.filter((s) => s.level === "thpt").length} môn
                 </span>
               </button>
@@ -1302,29 +1300,29 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
               {/* Super Exam Quick Tab */}
               <button
                 onClick={handleStartSuperExam}
-                className="px-3.5 py-2 rounded-none text-xs font-extrabold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer bg-red-600 hover:bg-red-500 border-b-4 border-red-800 active:border-b-0 active:translate-y-1 text-white shadow-md"
+                className="px-3 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer bg-[#cc1827] hover:bg-[#e02030] text-white border-2 border-[#141414] shadow-[inset_2px_2px_0_#ff6b6b,inset_-2px_-2px_0_#7a0000]"
               >
-                <Zap className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
+                <Zap className="w-3.5 h-3.5 text-yellow-300" />
                 <span>⚡ Kiểm Tra Siêu Tổng Hợp (100 câu)</span>
               </button>
             </div>
 
             {/* Keyword Search Input */}
-            <div className="relative min-w-[220px]">
-              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative min-w-[200px]">
+              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Tìm môn học hoặc lớp..."
+                placeholder="Tìm môn học..."
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 text-white placeholder-zinc-500 text-xs rounded-xl pl-8 pr-3 py-2 focus:outline-none focus:border-[#cc1827] transition-all"
+                className="w-full bg-[#1f2022] border-2 border-[#141414] text-white placeholder-zinc-400 text-xs pl-8 pr-3 py-1.5 focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
-              <BookOpenCheck className="w-5 h-5 text-red-500" />
+          <div className="flex items-center justify-between font-jura">
+            <h2 className="text-sm sm:text-base font-bold text-white tracking-wide uppercase flex items-center gap-2">
+              <BookOpenCheck className="w-4 h-4 text-[#89dc69]" />
               <span>
                 {activeLevel === "all" && "Tất Cả Danh Mục Môn Học (Hơn 100+ Câu Hỏi)"}
                 {activeLevel === "tieu_hoc" && "Danh Mục V-Study Tiểu Học (Lớp 1 - 5)"}
@@ -1332,56 +1330,54 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
                 {activeLevel === "thpt" && "Danh Mục V-Study THPT (Lớp 10 - 12)"}
               </span>
             </h2>
-            <span className="text-xs text-zinc-500 font-mono">
-              Hiển thị {filteredSubjects.length} môn học
+            <span className="text-xs text-zinc-400 font-mono">
+              {filteredSubjects.length} môn học
             </span>
           </div>
 
           {/* Grid of Subjects */}
           {filteredSubjects.length === 0 ? (
-            <div className="p-12 text-center bg-zinc-900/20 rounded-3xl border border-white/5 space-y-2">
-              <p className="text-zinc-400 text-sm font-bold">Không tìm thấy môn học nào phù hợp với từ khóa "{searchKeyword}".</p>
+            <div className="p-10 text-center bg-[#2d2f32] border-2 border-[#141414] font-jura space-y-2">
+              <p className="text-zinc-300 text-xs">Không tìm thấy môn học nào phù hợp với từ khóa "{searchKeyword}".</p>
               <button
                 onClick={() => { setSearchKeyword(""); setActiveLevel("all"); }}
-                className="text-xs text-[#cc1827] hover:underline cursor-pointer"
+                className="text-xs text-[#89dc69] hover:underline cursor-pointer font-bold"
               >
                 Xóa bộ lọc tìm kiếm
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 font-jura">
               {filteredSubjects.map((subj) => (
                 <div
                   key={subj.id}
                   onClick={() => handleStartQuiz(subj)}
-                  className="group relative rounded-2xl border border-white/5 bg-zinc-900/30 overflow-hidden hover:border-[#cc1827]/40 hover:bg-zinc-900/60 p-5 transition-all duration-300 cursor-pointer flex flex-col justify-between min-h-[190px] shadow-lg hover:shadow-[0_8px_30px_rgba(204,24,39,0.08)]"
+                  className="group relative border-2 border-[#141414] bg-[#2d2f32] p-4 transition-all duration-200 cursor-pointer flex flex-col justify-between min-h-[180px] shadow-lg hover:border-[#89dc69]"
                 >
-                  <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${subj.color}`} />
-                  
-                  <div className="space-y-2.5">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-3xl filter drop-shadow-md">{subj.icon}</span>
-                      <span className="text-[10px] font-black uppercase bg-white/5 text-zinc-300 px-2.5 py-0.5 rounded-full border border-white/10">
+                      <span className="text-2xl">{subj.icon}</span>
+                      <span className="text-[10px] font-bold uppercase bg-[#1f2022] text-zinc-200 px-2 py-0.5 border border-[#141414]">
                         {subj.grade}
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-base font-black text-white group-hover:text-[#cc1827] transition-colors">
+                      <h3 className="text-sm font-bold text-white group-hover:text-[#89dc69] transition-colors">
                         {subj.name}
                       </h3>
-                      <p className="text-xs text-zinc-400 font-medium font-sans mt-1 line-clamp-2">
+                      <p className="text-xs text-zinc-300 mt-1 line-clamp-2">
                         {subj.description}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs font-bold text-zinc-500 group-hover:text-white transition-all mt-4 pt-2.5 border-t border-white/5">
-                    <span className="text-emerald-400 font-mono text-[11px] bg-emerald-950/50 px-2 py-0.5 rounded-md border border-emerald-800/30">
+                  <div className="flex items-center justify-between text-xs font-bold text-zinc-400 transition-all mt-4 pt-2 border-t border-[#141414]">
+                    <span className="text-[#89dc69] font-mono text-[11px] bg-[#1f2022] px-2 py-0.5 border border-[#141414]">
                       {subj.questions.length} Câu Hỏi
                     </span>
-                    <div className="flex items-center gap-1 text-[#cc1827] font-extrabold">
+                    <div className="flex items-center gap-1 text-white group-hover:text-[#89dc69]">
                       <span>Vào học</span>
-                      <Play className="w-3.5 h-3.5 fill-[#cc1827] text-[#cc1827]" />
+                      <Play className="w-3.5 h-3.5 fill-current" />
                     </div>
                   </div>
                 </div>

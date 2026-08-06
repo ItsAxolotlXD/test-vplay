@@ -16,6 +16,10 @@ import { CreateChannelModal } from './components/CreateChannelModal';
 import { DebugLanguageModal } from './components/DebugLanguageModal';
 import { FriendsDrawer } from './components/FriendsDrawer';
 import { DevStatsOverlay } from './components/DevStatsOverlay';
+import { VirtualMouseCursorOverlay } from './components/VirtualMouseCursorOverlay';
+import { VNotesView } from './components/VNotesView';
+import { VAppsView } from './components/VAppsView';
+import { VPremiumView } from './components/VPremiumView';
 import { useLang } from './context/LanguageContext';
 import { playPopSound } from './utils/sound';
 
@@ -109,6 +113,9 @@ export default function App() {
     switch (activeTab) {
       case 'home': return 'TRANG CHỦ';
       case 'live_tv': return 'TRUYỀN HÌNH';
+      case 'v_apps': return 'V-APPS';
+      case 'v_premium': return 'V-PREMIUM';
+      case 'v_notes': return 'V-NOTES';
       case 'settings': return 'CÀI ĐẶT';
       case 'design_system': return 'ORE UI';
       default: return 'CÀI ĐẶT';
@@ -193,6 +200,12 @@ export default function App() {
               />
             ) : activeTab === 'design_system' ? (
               <DesignSystemViewer onOpenFeedback={() => setIsFeedbackOpen(true)} />
+            ) : activeTab === 'v_apps' ? (
+              <VAppsView />
+            ) : activeTab === 'v_premium' ? (
+              <VPremiumView />
+            ) : activeTab === 'v_notes' ? (
+              <VNotesView />
             ) : activeTab === 'home' ? (
               /* HOME DASHBOARD VIEW */
               <div className="space-y-3">
@@ -653,6 +666,12 @@ export default function App() {
       <DevStatsOverlay
         showFps={settings.showFps}
         showFrameLatency={settings.showFrameLatency}
+      />
+
+      {/* VIRTUAL MOUSE CURSOR OVERLAY (MOBILE VIRTUAL CURSOR CONTROL) */}
+      <VirtualMouseCursorOverlay
+        useMouseCursor={settings.useMouseCursor}
+        useArrowKeysCursor={settings.useArrowKeysCursor}
       />
 
     </div>

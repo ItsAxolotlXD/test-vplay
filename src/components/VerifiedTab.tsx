@@ -36,24 +36,37 @@ export interface VerifiedSubState {
 }
 
 interface VerifiedTabProps {
-  onBack: () => void;
-  vCoins: number;
-  setVCoins: React.Dispatch<React.SetStateAction<number>>;
-  verifiedSub: VerifiedSubState;
-  setVerifiedSub: React.Dispatch<React.SetStateAction<VerifiedSubState>>;
-  onNavigateToTab: (tab: string) => void;
+  onBack?: () => void;
+  vCoins?: number;
+  setVCoins?: React.Dispatch<React.SetStateAction<number>>;
+  verifiedSub?: VerifiedSubState;
+  setVerifiedSub?: React.Dispatch<React.SetStateAction<VerifiedSubState>>;
+  onNavigateToTab?: (tab: string) => void;
   initialSection?: "plans" | "comparison" | "earning" | "storage";
 }
 
 export default function VerifiedTab({
   onBack,
-  vCoins,
-  setVCoins,
-  verifiedSub,
-  setVerifiedSub,
+  vCoins: externalVCoins,
+  setVCoins: externalSetVCoins,
+  verifiedSub: externalVerifiedSub,
+  setVerifiedSub: externalSetVerifiedSub,
   onNavigateToTab,
   initialSection = "plans"
 }: VerifiedTabProps) {
+  const [internalVCoins, setInternalVCoins] = useState<number>(1000);
+  const [internalVerifiedSub, setInternalVerifiedSub] = useState<VerifiedSubState>({
+    activeTier: "none",
+    expiresAt: null,
+    registeredPhone: "",
+    registeredEmail: "",
+    isAuthenSuccess: false,
+  });
+
+  const vCoins = externalVCoins ?? internalVCoins;
+  const setVCoins = externalSetVCoins ?? setInternalVCoins;
+  const verifiedSub = externalVerifiedSub ?? internalVerifiedSub;
+  const setVerifiedSub = externalSetVerifiedSub ?? setInternalVerifiedSub;
   const [confirmModal, setConfirmModal] = useState<"verified_basic" | "verified_standard" | "verified" | "verified_plus" | null>(null);
   const [errorModal, setErrorModal] = useState<{ required: number; current: number } | null>(null);
   const [successModal, setSuccessModal] = useState<"verified_basic" | "verified_standard" | "verified" | "verified_plus" | null>(null);

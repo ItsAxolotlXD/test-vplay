@@ -7,7 +7,11 @@ import { PerformanceStressModal } from "./PerformanceStressModal";
 import { DataDrivenUiModal } from "./DataDrivenUiModal";
 import { DevStatsOverlay } from "./DevStatsOverlay";
 
+import { UserSettings } from "../types";
+
 interface OreSettingsTabProps {
+  settings?: UserSettings;
+  onUpdateSettings?: (newSettings: UserSettings) => void;
   onOpenFeedback: () => void;
   onBackToHome?: () => void;
   // Storage
@@ -47,6 +51,8 @@ interface OreSettingsTabProps {
 }
 
 export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
+  settings,
+  onUpdateSettings,
   onOpenFeedback,
   onBackToHome,
   currentStorageUsed,
@@ -75,6 +81,8 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
   const [debugOverlay, setDebugOverlay] = useState(false);
   const [showFps, setShowFps] = useState(false);
   const [showFrameLatency, setShowFrameLatency] = useState(false);
+  const [useMouseCursor, setUseMouseCursor] = useState(settings?.useMouseCursor || false);
+  const [useArrowKeysCursor, setUseArrowKeysCursor] = useState(settings?.useArrowKeysCursor || false);
   const [isDduiModalOpen, setIsDduiModalOpen] = useState(false);
 
   // Performance test state
@@ -550,6 +558,40 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                 <p className="text-xs text-gray-200 mt-0.5">Hiển thị độ trễ render khung hình (ms) ở góc trái trên cùng màn hình</p>
               </div>
               <OreToggle value={showFrameLatency} onChange={setShowFrameLatency} />
+            </div>
+
+            {/* Use mouse cursor */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 hover:bg-[#56595c] p-2 transition-colors">
+              <div>
+                <span className="font-semibold text-sm text-white block">Use mouse cursor</span>
+                <p className="text-xs text-gray-200 mt-0.5">Tắt chạm trực tiếp trên mobile, di chuyển con trỏ chuột ảo và nhấn đúp vào màn hình để click</p>
+              </div>
+              <OreToggle
+                value={settings ? !!settings.useMouseCursor : useMouseCursor}
+                onChange={(val) => {
+                  setUseMouseCursor(val);
+                  if (settings && onUpdateSettings) {
+                    onUpdateSettings({ ...settings, useMouseCursor: val });
+                  }
+                }}
+              />
+            </div>
+
+            {/* Use arrow keys */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 hover:bg-[#56595c] p-2 transition-colors">
+              <div>
+                <span className="font-semibold text-sm text-white block">Use arrow keys</span>
+                <p className="text-xs text-gray-200 mt-0.5">Hiển thị con trỏ chuột ảo, disable touch. Sử dụng các nút phím mũi tên (keyboard/D-pad) để di chuyển, đè SHIFT để tăng tốc độ</p>
+              </div>
+              <OreToggle
+                value={settings ? !!settings.useArrowKeysCursor : useArrowKeysCursor}
+                onChange={(val) => {
+                  setUseArrowKeysCursor(val);
+                  if (settings && onUpdateSettings) {
+                    onUpdateSettings({ ...settings, useArrowKeysCursor: val });
+                  }
+                }}
+              />
             </div>
 
             {/* Data-Driven UI Popup Modal */}

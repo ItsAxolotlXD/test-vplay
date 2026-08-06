@@ -43,4 +43,6 @@ export interface UserSettings {
   panoramaScrollSpeed?: number;
   showFps?: boolean;
   showFrameLatency?: boolean;
+  useMouseCursor?: boolean;
+  useArrowKeysCursor?: boolean;
 }

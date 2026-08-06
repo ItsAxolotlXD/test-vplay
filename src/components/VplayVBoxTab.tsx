@@ -35,7 +35,7 @@ export interface VBoxFeedback {
 }
 
 interface VplayVBoxTabProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
@@ -307,37 +307,39 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans text-left">
-      {/* Banner Header - V-Notes style */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-red-950/80 via-zinc-900/90 to-zinc-950 border border-red-500/30 shadow-2xl backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={onBack}
-            className="p-3 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer shrink-0 rounded-none shadow-md"
-            title="Trở về"
-          >
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </button>
-          <div className="p-3.5 bg-gradient-to-br from-red-600 to-rose-800 rounded-2xl shadow-lg shadow-red-600/30 text-white font-black shrink-0">
-            <Box className="w-8 h-8" />
+      {/* Banner Header - Ore UI Header Bar */}
+      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="bg-[#c6c6c6] hover:bg-[#383b3e] hover:text-white text-[#141414] p-2 border-2 border-[#141414] shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] active:translate-y-[1px] shrink-0"
+              title="Trở về"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
+          <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
+            <Box className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-black tracking-tight text-white uppercase">
-                V-Box Feedback Hub
+              <h1 className="text-sm sm:text-base font-black text-white uppercase tracking-wider font-jura">
+                V-BOX FEEDBACK HUB
               </h1>
-              <span className="text-[10px] px-2.5 py-0.5 bg-[#208b3a] text-white font-black uppercase tracking-wider rounded-none">
-                Đóng Góp Ý Kiến & Hòm Thư
+              <span className="bg-[#89dc69] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
+                Hòm thư & Ý kiến
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-1">
-              Hòm thư đóng góp ý kiến, phản hồi lỗi và đặt câu hỏi cho đội ngũ Vplay Developers.
+            <p className="text-[11px] text-zinc-300 font-jura">
+              Đóng góp ý kiến, phản hồi lỗi và đặt câu hỏi cho đội ngũ Vplay Developers.
             </p>
           </div>
         </div>
 
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-5 py-3 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 active:translate-y-0.5 text-white font-bold text-xs uppercase tracking-wider rounded-none shadow-lg transition-all cursor-pointer shrink-0 active:scale-95"
+          className="flex items-center gap-2 px-4 py-2 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-bold text-xs uppercase font-jura tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" /> Tạo Phản Hồi Mới
         </button>
@@ -350,28 +352,28 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
         <div className="lg:col-span-1 space-y-4">
           
           {/* Sub-Tabs Selector */}
-          <div className="bg-[#18181c] rounded-3xl p-2 border border-white/10 flex gap-1 shadow-xl">
+          <div className="bg-[#2d2f32] p-2 border-2 border-[#141414] flex gap-1 shadow-xl">
             <button
               onClick={() => setActiveSubTab("community")}
-              className={`flex-1 py-2.5 rounded-none text-xs font-extrabold transition-all cursor-pointer ${
+              className={`flex-1 py-2 text-xs font-bold font-jura uppercase transition-all cursor-pointer border-2 border-[#141414] ${
                 activeSubTab === "community"
-                  ? "bg-[#208b3a] text-white shadow-md"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                  : "bg-[#383b3e] text-zinc-300 hover:text-white"
               }`}
             >
               Community Box
             </button>
             <button
               onClick={() => setActiveSubTab("your")}
-              className={`flex-1 py-2.5 rounded-none text-xs font-extrabold transition-all cursor-pointer relative ${
+              className={`flex-1 py-2 text-xs font-bold font-jura uppercase transition-all cursor-pointer border-2 border-[#141414] relative ${
                 activeSubTab === "your"
-                  ? "bg-[#208b3a] text-white shadow-md"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                  : "bg-[#383b3e] text-zinc-300 hover:text-white"
               }`}
             >
               Your Box
               {userFeedbacks.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-amber-500 text-zinc-950 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-zinc-900">
+                <span className="absolute -top-1 -right-1 bg-amber-500 text-zinc-950 text-[9px] font-bold w-4 h-4 border border-[#141414] flex items-center justify-center font-mono">
                   {userFeedbacks.length}
                 </span>
               )}
@@ -379,35 +381,35 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
           </div>
 
           {/* Quick Filters */}
-          <div className="bg-[#18181c] rounded-3xl p-5 border border-white/10 space-y-4 shadow-xl">
-            <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5 border-b border-zinc-800 pb-2.5">
-              <Filter className="w-3.5 h-3.5 text-red-500" />
+          <div className="bg-[#2d2f32] p-4 border-2 border-[#141414] space-y-3 shadow-xl">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-jura flex items-center gap-1.5 border-b-2 border-[#141414] pb-2">
+              <Filter className="w-3.5 h-3.5 text-[#89dc69]" />
               Lọc theo Mã hiệu
             </h3>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 font-jura">
               {[
-                { id: "All", label: "Tất cả phản hồi", color: "bg-zinc-800 text-zinc-300" },
-                { id: "VFQ", label: "VFQ - Câu hỏi", color: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" },
-                { id: "VFS", label: "VFS - Góp ý", color: "bg-amber-500/10 text-amber-400 border border-amber-500/20" },
-                { id: "VFI", label: "VFI - Báo lỗi", color: "bg-rose-500/10 text-rose-400 border border-rose-500/20" }
+                { id: "All", label: "Tất cả phản hồi" },
+                { id: "VFQ", label: "VFQ - Câu hỏi" },
+                { id: "VFS", label: "VFS - Góp ý" },
+                { id: "VFI", label: "VFI - Báo lỗi" }
               ].map((filter) => (
                 <button
                   key={filter.id}
                   onClick={() => setTypeFilter(filter.id as any)}
-                  className={`px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between cursor-pointer ${
+                  className={`px-3 py-2 text-xs font-bold border-2 border-[#141414] transition-all text-left flex items-center justify-between cursor-pointer ${
                     typeFilter === filter.id
-                      ? "bg-[#cc1827] text-white shadow-md shadow-red-900/20"
-                      : "bg-zinc-800 hover:bg-zinc-750 text-zinc-300"
+                      ? "bg-[#cc1827] text-white shadow-[inset_2px_2px_0_#ff6b6b,inset_-2px_-2px_0_#7a0000]"
+                      : "bg-[#383b3e] hover:bg-[#4a4d50] text-zinc-200"
                   }`}
                 >
                   <span>{filter.label}</span>
-                  {typeFilter === filter.id && <CheckCircle2 className="w-3.5 h-3.5" />}
+                  {typeFilter === filter.id && <CheckCircle2 className="w-3 h-3" />}
                 </button>
               ))}
             </div>
 
-            <div className="pt-3 border-t border-zinc-800 text-[11px] text-zinc-500 leading-relaxed font-medium">
+            <div className="pt-2 border-t border-zinc-700/50 text-[11px] text-zinc-400 leading-relaxed font-jura">
               * Hệ thống V-Box hiển thị tối đa 100 phản hồi ngẫu nhiên từ cộng đồng mỗi lần bạn truy cập trang.
             </div>
           </div>
@@ -417,14 +419,14 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
         <div className="lg:col-span-3 space-y-4">
           
           {/* Search bar */}
-          <div className="flex items-center gap-3 bg-[#18181c] border border-white/10 rounded-3xl px-4 py-3.5 shadow-xl">
-            <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="w-5 h-5 shrink-0 object-contain" referrerPolicy="no-referrer" alt="Search" />
+          <div className="flex items-center gap-2 bg-[#2d2f32] border-2 border-[#141414] px-3 py-2 shadow-xl">
+            <Search className="w-4 h-4 text-zinc-400 shrink-0" />
             <input
               type="text"
               placeholder={`Tìm kiếm tiêu đề, mã hiệu hoặc nội dung trong ${activeSubTab === "community" ? "Community Box" : "Your Box"}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none font-medium"
+              className="flex-1 bg-transparent border-none text-xs text-white placeholder-zinc-400 focus:outline-none font-jura"
             />
             {searchQuery && (
               <button 
@@ -438,65 +440,53 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
           {/* Feedback Feed Cards */}
           {filteredFeedbacks.length === 0 ? (
-            <div className="bg-[#18181c] rounded-3xl border border-white/10 py-16 text-center flex flex-col items-center justify-center p-6 shadow-xl">
-              <Box className="w-14 h-14 text-zinc-800 mb-3" />
-              <h3 className="text-sm font-bold text-zinc-300">Không tìm thấy phản hồi nào</h3>
-              <p className="text-xs text-zinc-400 max-w-sm mt-1">Điều chỉnh bộ lọc hoặc từ khóa tìm kiếm để khám phá thêm các ý kiến khác.</p>
+            <div className="bg-[#2d2f32] border-2 border-[#141414] py-12 text-center flex flex-col items-center justify-center p-6 shadow-xl">
+              <Box className="w-12 h-12 text-zinc-500 mb-2" />
+              <h3 className="text-xs font-bold text-zinc-200 font-jura uppercase">Không tìm thấy phản hồi nào</h3>
+              <p className="text-[11px] text-zinc-400 max-w-sm mt-1 font-jura">Điều chỉnh bộ lọc hoặc từ khóa tìm kiếm để khám phá thêm các ý kiến khác.</p>
               {activeSubTab === "your" && (
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="mt-4 px-4 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-all shadow-md cursor-pointer"
+                  className="mt-4 px-4 py-2 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-bold text-xs uppercase font-jura tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] cursor-pointer"
                 >
                   Gửi phản hồi đầu tiên của bạn
                 </button>
               )}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {filteredFeedbacks.map((feedback) => (
                 <div 
                   key={feedback.id}
-                  className="bg-[#18181c] rounded-3xl border border-white/10 p-5 hover:border-white/20 transition-all text-left flex flex-col gap-4 relative shadow-xl"
+                  className="bg-[#2d2f32] border-2 border-[#141414] p-4 text-left flex flex-col gap-3 relative shadow-xl font-jura"
                 >
                   {/* Card Top: Code badges & Date */}
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full border ${
-                        feedback.id.startsWith("VFQ")
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : feedback.id.startsWith("VFS")
-                            ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                            : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                      }`}>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 border border-[#141414] bg-[#1a1b1d] text-[#89dc69]">
                         {feedback.id}
                       </span>
 
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase flex items-center gap-1 ${
-                        feedback.type === "Question"
-                          ? "bg-emerald-950/40 text-emerald-400"
-                          : feedback.type === "Suggestion"
-                            ? "bg-amber-950/40 text-amber-400"
-                            : "bg-rose-950/40 text-rose-400"
-                      }`}>
-                        {feedback.type === "Question" && <HelpCircle className="w-3 h-3" />}
-                        {feedback.type === "Suggestion" && <Lightbulb className="w-3 h-3" />}
-                        {feedback.type === "Issue" && <AlertCircle className="w-3 h-3" />}
-                        {feedback.type === "Question" ? "Question" : feedback.type === "Suggestion" ? "Suggestion" : "Issue"}
+                      <span className="text-[9px] font-bold px-2 py-0.5 border border-[#141414] uppercase flex items-center gap-1 bg-[#383b3e] text-zinc-200">
+                        {feedback.type === "Question" && <HelpCircle className="w-3 h-3 text-[#89dc69]" />}
+                        {feedback.type === "Suggestion" && <Lightbulb className="w-3 h-3 text-amber-400" />}
+                        {feedback.type === "Issue" && <AlertCircle className="w-3 h-3 text-rose-400" />}
+                        {feedback.type}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-zinc-500 text-xs font-medium">
-                      <Clock className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1 text-zinc-400 text-[11px] font-mono">
+                      <Clock className="w-3 h-3" />
                       <span>{feedback.dateCreated}</span>
                     </div>
                   </div>
 
                   {/* Title & Description */}
-                  <div className="space-y-1.5">
-                    <h4 className="text-sm sm:text-base font-extrabold text-white leading-snug">
+                  <div className="space-y-1">
+                    <h4 className="text-xs sm:text-sm font-bold text-white leading-snug">
                       {feedback.title}
                     </h4>
-                    <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                    <p className="text-xs text-zinc-300 leading-relaxed font-sans">
                       {feedback.description}
                     </p>
                   </div>
@@ -504,14 +494,14 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
                   {/* Ratings (Only for VFS / VFI) */}
                   {feedback.rating !== undefined && (
                     <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mr-1">Mức độ ưu tiên:</span>
+                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mr-1">Mức độ ưu tiên:</span>
                       {Array.from({ length: 5 }).map((_, index) => (
                         <Star 
                           key={index} 
-                          className={`w-3.5 h-3.5 ${
+                          className={`w-3 h-3 ${
                             index < (feedback.rating || 0) 
-                              ? "text-amber-500 fill-current" 
-                              : "text-zinc-700"
+                              ? "text-amber-400 fill-current" 
+                              : "text-zinc-600"
                           }`} 
                         />
                       ))}
@@ -520,37 +510,35 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
                   {/* Developer Response Block */}
                   {feedback.response && (
-                    <div className="bg-zinc-950 rounded-xl p-4 border border-zinc-800/50 flex flex-col gap-2 relative">
-                      <div className="absolute top-0 left-6 -translate-y-1/2 w-3 h-3 bg-zinc-950 rotate-45 border-t border-l border-zinc-800/50" />
-                      
-                      <div className="flex items-center justify-between text-[11px] border-b border-zinc-800 pb-1.5 mb-0.5">
-                        <span className="font-extrabold text-[#cc1827] uppercase tracking-wider flex items-center gap-1">
-                          <MessageCircle className="w-3.5 h-3.5 text-red-500" />
+                    <div className="bg-[#1f2022] p-3 border-2 border-[#141414] flex flex-col gap-1.5 relative">
+                      <div className="flex items-center justify-between text-[11px] border-b border-[#141414] pb-1">
+                        <span className="font-bold text-[#89dc69] uppercase tracking-wider flex items-center gap-1">
+                          <MessageCircle className="w-3.5 h-3.5 text-[#89dc69]" />
                           Phản hồi của {feedback.response.employee} (Developer)
                         </span>
-                        <span className="text-zinc-500 font-mono font-medium">{feedback.response.date}</span>
+                        <span className="text-zinc-400 font-mono text-[10px]">{feedback.response.date}</span>
                       </div>
-                      <p className="text-xs text-zinc-300 leading-relaxed italic">
+                      <p className="text-xs text-zinc-300 leading-relaxed italic font-sans">
                         "{feedback.response.content}"
                       </p>
                     </div>
                   )}
 
                   {/* Card Bottom: Upvote buttons */}
-                  <div className="border-t border-zinc-800/60 pt-3.5 flex justify-between items-center mt-1">
+                  <div className="border-t-2 border-[#141414] pt-2.5 flex justify-between items-center mt-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400">
-                        <User className="w-3.5 h-3.5 text-zinc-300" />
+                      <div className="w-6 h-6 border border-[#141414] bg-[#383b3e] flex items-center justify-center text-zinc-300">
+                        <User className="w-3 h-3" />
                       </div>
-                      <span className="text-xs text-zinc-400 font-medium">Ẩn danh</span>
+                      <span className="text-xs text-zinc-400 font-jura">Ẩn danh</span>
                     </div>
 
                     <button
                       onClick={() => handleVote(feedback.id, activeSubTab === "your")}
-                      className={`px-3 py-1.5 rounded-none text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      className={`px-3 py-1 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border-2 border-[#141414] font-jura ${
                         feedback.userVoted
-                          ? "bg-red-600 hover:bg-red-500 text-white border-b-4 border-red-800 active:border-b-0 active:translate-y-1 shadow-md"
-                          : "bg-[#2a2d36] hover:bg-[#383c48] text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 shadow-md"
+                          ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                          : "bg-[#383b3e] hover:bg-[#4a4d50] text-zinc-200"
                       }`}
                     >
                       <ThumbsUp className={`w-3.5 h-3.5 ${feedback.userVoted ? "fill-current text-white" : ""}`} />
@@ -566,43 +554,43 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
       {/* CREATE FEEDBACK MODAL DIALOG */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-          <div className="bg-zinc-900 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-zinc-800 flex flex-col animate-fade-in text-left">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-[#2d2f32] border-4 border-[#141414] w-full max-w-lg overflow-hidden shadow-2xl flex flex-col text-left font-jura">
             
             {/* Modal Header */}
-            <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
-              <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                <Box className="w-5 h-5 text-red-500" />
+            <div className="p-4 bg-[#1f2022] border-b-2 border-[#141414] flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Box className="w-4 h-4 text-[#89dc69]" />
                 Gửi ý kiến đóng góp Vplay
               </h3>
               <button 
                 onClick={() => setShowCreateModal(false)}
-                className="p-1.5 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                className="p-1 border border-[#141414] bg-[#383b3e] hover:bg-[#4a4d50] text-zinc-300 hover:text-white cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Body / Form */}
-            <form onSubmit={handleCreateFeedback} className="p-6 space-y-4.5">
+            <form onSubmit={handleCreateFeedback} className="p-4 space-y-4">
               
               {/* Type Switch */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider block">Loại phản hồi</label>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider block">Loại phản hồi</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { type: "Suggestion", label: "Góp ý (VFS)", color: "border-amber-500/40 text-amber-400" },
-                    { type: "Issue", label: "Báo lỗi (VFI)", color: "border-rose-500/40 text-rose-400" },
-                    { type: "Question", label: "Câu hỏi (VFQ)", color: "border-emerald-500/40 text-emerald-400" }
+                    { type: "Suggestion", label: "Góp ý (VFS)" },
+                    { type: "Issue", label: "Báo lỗi (VFI)" },
+                    { type: "Question", label: "Câu hỏi (VFQ)" }
                   ].map((btn) => (
                     <button
                       key={btn.type}
                       type="button"
                       onClick={() => setNewType(btn.type as any)}
-                      className={`py-2 px-1 rounded-xl text-xs font-black border transition-all text-center cursor-pointer ${
+                      className={`py-1.5 px-1 text-xs font-bold border-2 border-[#141414] transition-all text-center cursor-pointer ${
                         newType === btn.type
-                          ? "bg-[#cc1827] text-white border-transparent shadow-md"
-                          : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700"
+                          ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                          : "bg-[#383b3e] text-zinc-300 hover:bg-[#4a4d50]"
                       }`}
                     >
                       {btn.label}
@@ -612,53 +600,53 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
               </div>
 
               {/* Title Input */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider block">Tiêu đề ngắn gọn</label>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider block">Tiêu đề ngắn gọn</label>
                 <input
                   type="text"
                   placeholder="Ví dụ: Lỗi gián đoạn khi xem VTV3 tối thứ bảy..."
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                  className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
                   maxLength={100}
                   required
                 />
               </div>
 
               {/* Description Input */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider block">Nội dung mô tả chi tiết</label>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider block">Nội dung mô tả chi tiết</label>
                 <textarea
-                  placeholder="Hãy mô tả rõ hơn về lỗi gặp phải, các bước gây lỗi, hoặc tính năng mong muốn được bổ sung nâng cấp..."
+                  placeholder="Hãy mô tả rõ hơn về lỗi gặp phải, các bước gây lỗi, hoặc tính năng mong muốn bổ sung..."
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500/20 h-28 resize-none"
+                  className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none h-24 resize-none"
                   required
                 />
               </div>
 
               {/* Rating Star Selector (Only for Suggestion or Issue) */}
               {newType !== "Question" && (
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-extrabold text-zinc-400 uppercase tracking-wider block">Mức độ khẩn cấp / Ưu tiên</label>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider block">Mức độ khẩn cấp / Ưu tiên</label>
                   <div className="flex items-center gap-1.5">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <button
                         key={index}
                         type="button"
                         onClick={() => setNewRating(index + 1)}
-                        className="p-1 hover:scale-110 transition-transform cursor-pointer"
+                        className="p-1 cursor-pointer"
                       >
                         <Star 
-                          className={`w-6 h-6 ${
+                          className={`w-5 h-5 ${
                             index < newRating 
-                              ? "text-amber-500 fill-current" 
-                              : "text-zinc-700"
+                              ? "text-amber-400 fill-current" 
+                              : "text-zinc-600"
                           }`} 
                         />
                       </button>
                     ))}
-                    <span className="text-xs text-zinc-400 font-extrabold ml-2">
+                    <span className="text-xs text-zinc-300 font-bold ml-2">
                       {newRating === 1 ? "Rất thấp" : newRating === 2 ? "Thấp" : newRating === 3 ? "Bình thường" : newRating === 4 ? "Cao" : "Rất khẩn cấp!"}
                     </span>
                   </div>
@@ -666,17 +654,17 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
               )}
 
               {/* Buttons */}
-              <div className="flex gap-2.5 pt-3 border-t border-zinc-800 mt-2">
+              <div className="flex gap-2.5 pt-3 border-t-2 border-[#141414] mt-2">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="flex-1 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-black rounded-xl transition-all cursor-pointer text-center"
+                  className="flex-1 py-2 bg-[#383b3e] hover:bg-[#4a4d50] text-zinc-200 text-xs font-bold border-2 border-[#141414] cursor-pointer text-center"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 text-white text-xs font-black rounded-none uppercase tracking-wider transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-md"
+                  className="flex-1 py-2 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white text-xs font-bold uppercase tracking-wider cursor-pointer text-center flex items-center justify-center gap-2 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
                 >
                   <Send className="w-3.5 h-3.5" />
                   Gửi phản hồi
