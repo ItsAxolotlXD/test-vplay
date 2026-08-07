@@ -7,3 +7,4 @@ export { VArcadeTab } from "./VArcadeTab";
 export { VRecorderTab } from "./VRecorderTab";
 export { VOfficeTab } from "./VOfficeTab";
 export { VXploreTab } from "./VXploreTab";
+export { VFurnitureTab } from "./VFurnitureTab";

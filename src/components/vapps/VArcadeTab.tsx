@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Gamepad2,
   Trophy,
@@ -20,8 +20,23 @@ import {
   BarChart2,
   Cpu,
   RefreshCw,
-  Coins
+  Coins,
+  Bot,
+  Users,
+  User,
+  Shuffle,
+  Check,
+  X,
+  Timer,
+  Scissors,
+  Globe,
+  Swords,
+  Send,
+  ListOrdered,
+  AlertTriangle
 } from "lucide-react";
+import { playPopSound } from "../../utils/sound";
+import { MOCK_100_FRIENDS, VplayUser } from "../../data/mockFriendsData";
 
 export interface GameItem {
   id: string;
@@ -37,13 +52,66 @@ export interface GameItem {
   difficulty: "Dễ" | "Trung bình" | "Khó" | "Cực khó";
 }
 
-// 100 DISTINCT GAMES
+// 100 DISTINCT GAMES WITH HIGHLIGHTED INTERACTIVE GAMES
 const ALL_GAMES: GameItem[] = [
-  // --- CỔ ĐIỂN & RETRO (1-18) ---
+  // --- FEATURED INTERACTIVE GAMES (1-4) ---
+  {
+    id: "tic_tac_toe",
+    title: "Cờ Caro XO (Tic-Tac-Toe)",
+    category: "classic",
+    categoryLabel: "Cổ điển",
+    description: "Đánh X/O đấu trí đỉnh cao cùng NPC ngẫu nhiên (Search for people) hoặc 2 người chơi.",
+    rating: 4.95,
+    plays: "280K",
+    color: "from-purple-600 to-indigo-800",
+    iconName: "xo",
+    isInteractive: true,
+    difficulty: "Dễ"
+  },
+  {
+    id: "rock_paper_scissors",
+    title: "Oẳn Tù Tì (Kéo Búa Bao)",
+    category: "classic",
+    categoryLabel: "Cổ điển",
+    description: "Trò chơi Oẳn Tù Tì thử phản xạ và may mắn cùng đối thủ NPC hoặc chơi 2 người pass & play.",
+    rating: 4.9,
+    plays: "250K",
+    color: "from-rose-600 to-amber-700",
+    iconName: "scissors",
+    isInteractive: true,
+    difficulty: "Dễ"
+  },
+  {
+    id: "word_chain",
+    title: "Nối Từ Tiếng Việt & Tiếng Anh",
+    category: "puzzle",
+    categoryLabel: "Đố vui",
+    description: "Thử thách Nối Từ ghép Tiếng Việt & chữ cái Tiếng Anh cùng NPC từ Search for people hoặc bạn bè.",
+    rating: 4.98,
+    plays: "310K",
+    color: "from-emerald-600 to-teal-800",
+    iconName: "word",
+    isInteractive: true,
+    difficulty: "Trung bình"
+  },
+  {
+    id: "counting_game",
+    title: "Đếm Số 1 -> N (Phá Chuỗi Reset)",
+    category: "puzzle",
+    categoryLabel: "Đố vui",
+    description: "Đếm số nối tiếp từ 1 đến N. Nếu ai đếm sai hay quá giờ sẽ phá chuỗi và bắt đầu lại từ 1!",
+    rating: 4.92,
+    plays: "240K",
+    color: "from-blue-600 to-cyan-800",
+    iconName: "numbers",
+    isInteractive: true,
+    difficulty: "Dễ"
+  },
+
+  // --- CỔ ĐIỂN & RETRO ---
   { id: "snake", title: "Rắn Săn Mồi (Retro Snake)", category: "classic", categoryLabel: "Cổ điển", description: "Điều khiển chú rắn ăn mồi và tránh va chạm tường hay chính thân mình.", rating: 4.9, plays: "128K", color: "from-emerald-600 to-green-800", iconName: "snake", isInteractive: true, difficulty: "Trung bình" },
   { id: "tetris", title: "Xếp Hình Tetris Block", category: "classic", categoryLabel: "Cổ điển", description: "Xoay và xếp các khối gạch rơi xuống thành hàng ngang hoàn chỉnh.", rating: 4.95, plays: "210K", color: "from-blue-600 to-indigo-800", iconName: "tetris", isInteractive: true, difficulty: "Khó" },
   { id: "flappy", title: "Flappy V-Bird", category: "classic", categoryLabel: "Cổ điển", description: "Nhấn chèo lái chú chim vỗ cánh vượt qua hàng cột ống nước hiểm hóc.", rating: 4.8, plays: "180K", color: "from-amber-500 to-orange-700", iconName: "bird", isInteractive: true, difficulty: "Khó" },
-  { id: "tic_tac_toe", title: "Cờ Caro XO (Tic-Tac-Toe)", category: "classic", categoryLabel: "Cổ điển", description: "Đánh X/O đấu trí cùng máy AI thông minh hoặc chơi với bạn bè.", rating: 4.7, plays: "95K", color: "from-purple-600 to-pink-800", iconName: "xo", isInteractive: true, difficulty: "Dễ" },
   { id: "pong", title: "Bóng Bàn Pong 1972", category: "classic", categoryLabel: "Cổ điển", description: "Game bóng bàn 2 thanh gạt huyền thoại khai sinh ngành game thế giới.", rating: 4.6, plays: "64K", color: "from-teal-600 to-cyan-800", iconName: "pong", isInteractive: true, difficulty: "Dễ" },
   { id: "brick_breaker", title: "Phá Gạch Brick Breaker", category: "classic", categoryLabel: "Cổ điển", description: "Bắn bóng nảy thanh đỡ để đập vỡ toàn bộ các viên gạch sắc màu.", rating: 4.85, plays: "142K", color: "from-rose-600 to-red-800", iconName: "brick", isInteractive: true, difficulty: "Trung bình" },
   { id: "dino", title: "Khủng Long Chạy Vượt Rào", category: "classic", categoryLabel: "Cổ điển", description: "Nhảy né cây xương rồng và chim bay giống game Offline Chrome.", rating: 4.9, plays: "175K", color: "from-yellow-600 to-amber-800", iconName: "dino", isInteractive: true, difficulty: "Dễ" },
@@ -51,126 +119,43 @@ const ALL_GAMES: GameItem[] = [
   { id: "simon", title: "Ghi Nhớ Chuỗi Màu Simon", category: "classic", categoryLabel: "Cổ điển", description: "Ghi nhớ và bấm lại đúng thứ tự đèn màu phát sáng tăng dần.", rating: 4.65, plays: "52K", color: "from-violet-600 to-purple-800", iconName: "simon", isInteractive: true, difficulty: "Trung bình" },
   { id: "pacman_mini", title: "Pac-Man V-Maze", category: "classic", categoryLabel: "Cổ điển", description: "Ăn hết hạt đậu thần và tránh né các chú ma ngộ nghĩnh.", rating: 4.9, plays: "160K", color: "from-amber-400 to-yellow-600", iconName: "pacman", isInteractive: false, difficulty: "Khó" },
   { id: "space_invaders", title: "Bắn Ruồi Vũ Trụ Retro", category: "classic", categoryLabel: "Cổ điển", description: "Trạm phi thuyền di chuyển ngang tiêu diệt làn sóng quái vật ngoài hành tinh.", rating: 4.8, plays: "115K", color: "from-indigo-600 to-purple-900", iconName: "invaders", isInteractive: true, difficulty: "Khó" },
-  { id: "connect4", title: "Cờ 4 Hàng (Connect 4)", category: "classic", categoryLabel: "Cổ điển", description: "Thả các đồng xu màu sao cho nối đủ 4 xu liên tiếp theo hàng.", rating: 4.7, plays: "73K", color: "from-cyan-600 to-blue-700", iconName: "grid", isInteractive: false, difficulty: "Trung bình" },
-  { id: "asteroids", title: "Bắn Thiên Thạch Asteroids", category: "classic", categoryLabel: "Cổ điển", description: "Xoay tàu vũ trụ bắn vỡ các tảng đá thiên thạch đang trôi dạt.", rating: 4.6, plays: "48K", color: "from-zinc-600 to-slate-900", iconName: "rock", isInteractive: false, difficulty: "Khó" },
-  { id: "frogger", title: "Chú Ếch Băng Qua Đường", category: "classic", categoryLabel: "Cổ điển", description: "Giúp chú ếch nhỏ nhảy qua dòng xe đông đúc và dòng sông trôi.", rating: 4.75, plays: "82K", color: "from-emerald-500 to-green-700", iconName: "frog", isInteractive: false, difficulty: "Trung bình" },
-  { id: "galaga", title: "Phi Đội Bắn Máy Bay 1942", category: "classic", categoryLabel: "Cổ điển", description: "Chữa cháy bầu trời chống lại lực lượng không quân địch.", rating: 4.8, plays: "91K", color: "from-blue-700 to-slate-900", iconName: "plane", isInteractive: false, difficulty: "Khó" },
-  { id: "pinball", title: "Pinball 3D Bắn Bóng", category: "classic", categoryLabel: "Cổ điển", description: "Bắn bóng nảy tích điểm số kỷ lục trên bàn pinball cổ điển.", rating: 4.85, plays: "105K", color: "from-fuchsia-600 to-pink-800", iconName: "pinball", isInteractive: false, difficulty: "Dễ" },
-  { id: "duck_hunt", title: "Bắn Vịt Duck Hunt", category: "classic", categoryLabel: "Cổ điển", description: "Thử tài ngắm bắn vịt bay ra từ bụi cỏ trước khi chúng tẩu thoát.", rating: 4.7, plays: "67K", color: "from-orange-600 to-red-800", iconName: "duck", isInteractive: false, difficulty: "Dễ" },
-  { id: "breakout_advance", title: "Breakout Super 3D", category: "classic", categoryLabel: "Cổ điển", description: "Biến thể đập gạch với nhiều vật phẩm bổ trợ và gạch rơi đặc biệt.", rating: 4.75, plays: "59K", color: "from-teal-700 to-emerald-900", iconName: "brick2", isInteractive: false, difficulty: "Trung bình" },
 
-  // --- ĐỐ VUI & PUZZLE (19-36) ---
+  // --- ĐỐ VUI & PUZZLE ---
   { id: "game_2048", title: "Trò Chơi 2048 Tile", category: "puzzle", categoryLabel: "Đố vui", description: "Vuốt trượt ghép các số trùng nhau để tạo nên viên gạch huyền thoại 2048.", rating: 4.9, plays: "195K", color: "from-amber-600 to-yellow-800", iconName: "2048", isInteractive: true, difficulty: "Trung bình" },
   { id: "memory_card", title: "Lật Hình Ghép Cặp (Memory)", category: "puzzle", categoryLabel: "Đố vui", description: "Thử thách trí nhớ tìm cặp hình giống nhau trong thời gian ngắn nhất.", rating: 4.8, plays: "110K", color: "from-emerald-600 to-teal-800", iconName: "cards", isInteractive: true, difficulty: "Dễ" },
   { id: "math_quiz", title: "Toán Siêu Tốc (Math Rush)", category: "puzzle", categoryLabel: "Đố vui", description: "Giải các phép tính cộng trừ nhân chia liên tục trong 3 giây mỗi câu.", rating: 4.75, plays: "85K", color: "from-blue-600 to-cyan-800", iconName: "math", isInteractive: true, difficulty: "Trung bình" },
   { id: "sudoku", title: "Điền Số Sudoku Express", category: "puzzle", categoryLabel: "Đố vui", description: "Điền các con số từ 1 đến 9 vào lưới mà không trùng hàng, cột hay ô 3x3.", rating: 4.85, plays: "130K", color: "from-violet-600 to-indigo-800", iconName: "sudoku", isInteractive: true, difficulty: "Khó" },
-  { id: "wordle_vi", title: "Đoán Từ Đoán Chữ (Wordle VI)", category: "puzzle", categoryLabel: "Đố vui", description: "Thử tài đoán từ ngữ Tiếng Việt có 5 chữ cái trong 6 lượt thử.", rating: 4.9, plays: "140K", color: "from-green-600 to-emerald-800", iconName: "word", isInteractive: false, difficulty: "Trung bình" },
-  { id: "maze_runner", title: "Mê Cung Kỳ Bí (Labyrinth)", category: "puzzle", categoryLabel: "Đố vui", description: "Điều khiển bóng thoát khỏi mê cung chật hẹp đầy bẫy ngầm.", rating: 4.65, plays: "61K", color: "from-zinc-700 to-slate-900", iconName: "maze", isInteractive: false, difficulty: "Khó" },
-  { id: "water_sort", title: "Rót Nước Đổi Màu (Water Sort)", category: "puzzle", categoryLabel: "Đố vui", description: "Phân loại chất dịch màu sắc vào các ống nghiệm sao cho mỗi ống đồng màu.", rating: 4.85, plays: "155K", color: "from-sky-500 to-blue-700", iconName: "water", isInteractive: false, difficulty: "Trung bình" },
-  { id: "pipe_connect", title: "Nối Ống Nước (Plumber)", category: "puzzle", categoryLabel: "Đố vui", description: "Xoay các đoạn ống nối liền dòng chảy từ nguồn đến điểm đích.", rating: 4.7, plays: "78K", color: "from-amber-700 to-orange-900", iconName: "pipe", isInteractive: false, difficulty: "Trung bình" },
-  { id: "slide_puzzle", title: "Xếp Hình Trượt 15-Puzzle", category: "puzzle", categoryLabel: "Đố vui", description: "Trượt các ô vuông số từ 1 đến 15 theo đúng thứ tự tăng dần.", rating: 4.6, plays: "45K", color: "from-rose-600 to-pink-800", iconName: "slide", isInteractive: false, difficulty: "Khó" },
-  { id: "nonogram", title: "Giải Mã Bức Tranh Nonogram", category: "puzzle", categoryLabel: "Đố vui", description: "Tô đen các ô vuông theo manh mối con số ở viền để hiện bức tranh.", rating: 4.8, plays: "69K", color: "from-purple-700 to-indigo-900", iconName: "grid2", isInteractive: false, difficulty: "Khó" },
-  { id: "lights_out", title: "Tắt Đèn Lưới (Lights Out)", category: "puzzle", categoryLabel: "Đố vui", description: "Nhiệm vụ tắt toàn bộ hệ thống bóng đèn khi mỗi lần bấm đảo trạng thái ô xung quanh.", rating: 4.65, plays: "38K", color: "from-yellow-500 to-amber-700", iconName: "light", isInteractive: false, difficulty: "Cực khó" },
-  { id: "tower_of_hanoi", title: "Tháp Hà Nội (Hanoi Tower)", category: "puzzle", categoryLabel: "Đố vui", description: "Chuyển đĩa từ cọc này sang cọc khác với quy tắc đĩa lớn luôn ở dưới.", rating: 4.75, plays: "56K", color: "from-orange-600 to-red-800", iconName: "hanoi", isInteractive: false, difficulty: "Khó" },
-  { id: "tangram", title: "Xếp Hình Sáng Tạo Tangram", category: "puzzle", categoryLabel: "Đố vui", description: "Ghép 7 mảnh gỗ phẳng thành các hình dáng động vật và đồ vật.", rating: 4.7, plays: "49K", color: "from-teal-600 to-emerald-800", iconName: "shape", isInteractive: false, difficulty: "Trung bình" },
-  { id: "geo_quiz", title: "Đố Vui Cờ & Quốc Gia", category: "puzzle", categoryLabel: "Đố vui", description: "Đoán tên quốc gia thông qua hình ảnh lá cờ và bản đồ thế giới.", rating: 4.8, plays: "102K", color: "from-blue-500 to-indigo-700", iconName: "flag", isInteractive: false, difficulty: "Dễ" },
-  { id: "block_match3", title: "Kim Cương Match 3 Jewel", category: "puzzle", categoryLabel: "Đố vui", description: "Xếp ít nhất 3 viên kim cương cùng màu để ăn điểm nổ tung.", rating: 4.9, plays: "185K", color: "from-fuchsia-500 to-purple-800", iconName: "gem", isInteractive: false, difficulty: "Dễ" },
-  { id: "crossword_vi", title: "Ô Chữ Tri Thức Tiếng Việt", category: "puzzle", categoryLabel: "Đố vui", description: "Giải đáp các gợi ý hàng ngang để tìm ra từ khóa hàng dọc bí ẩn.", rating: 4.85, plays: "92K", color: "from-amber-600 to-yellow-700", iconName: "crossword", isInteractive: false, difficulty: "Trung bình" },
-  { id: "color_sort", title: "Xếp Hạt Cườm Màu", category: "puzzle", categoryLabel: "Đố vui", description: "Sắp xếp chuỗi hạt màu phân tách theo đúng quy luật phòng thí nghiệm.", rating: 4.75, plays: "64K", color: "from-cyan-500 to-teal-700", iconName: "dots", isInteractive: false, difficulty: "Dễ" },
-  { id: "physics_drop", title: "Vẽ Đường Cho Bóng Trôi", category: "puzzle", categoryLabel: "Đố vui", description: "Dùng bút vẽ các thanh chắn vật lý dẫn bóng lăn vào chiếc cúp.", rating: 4.8, plays: "89K", color: "from-indigo-500 to-violet-800", iconName: "pencil", isInteractive: false, difficulty: "Khó" },
 
-  // --- HÀNH ĐỘNG & ARCADE (37-55) ---
+  // --- HÀNH ĐỘNG & ARCADE ---
   { id: "whack_a_mole", title: "Đập Chuột Túi (Whack-A-Mole)", category: "action", categoryLabel: "Hành động", description: "Phản xạ nhanh tay đập các chú chuột nhô lên khỏi hang gạch.", rating: 4.85, plays: "125K", color: "from-amber-600 to-orange-800", iconName: "hammer", isInteractive: true, difficulty: "Dễ" },
   { id: "target_shoot", title: "Bắn Bia Tập Bắn (Target Archery)", category: "action", categoryLabel: "Hành động", description: "Căn góc gió và thời điểm thả cung tên trúng hồng tâm 10 điểm.", rating: 4.8, plays: "112K", color: "from-rose-600 to-red-800", iconName: "target", isInteractive: true, difficulty: "Trung bình" },
-  { id: "knife_hit", title: "Phi Dao Ván Gỗ (Knife Hit)", category: "action", categoryLabel: "Hành động", description: "Cắm toàn bộ dao vào thớt gỗ đang xoay mà không cắm trúng dao khác.", rating: 4.85, plays: "148K", color: "from-zinc-600 to-neutral-900", iconName: "knife", isInteractive: false, difficulty: "Trung bình" },
-  { id: "fruit_ninja", title: "Chém Hoa Quả Fruit Slice", category: "action", categoryLabel: "Hành động", description: "Lướt ngón tay chém ngọt các quả trái cây bay lên và tránh né bom.", rating: 4.95, plays: "230K", color: "from-green-500 to-emerald-700", iconName: "slice", isInteractive: false, difficulty: "Trung bình" },
-  { id: "space_shooter_pro", title: "Chiến Cơ Vũ Trụ Galaxy", category: "action", categoryLabel: "Hành động", description: "Nâng cấp đạn pháo chiến hạm chống lại các Trùm trạm không gian.", rating: 4.9, plays: "170K", color: "from-purple-600 to-indigo-900", iconName: "rocket", isInteractive: false, difficulty: "Khó" },
-  { id: "bullet_dodge", title: "Né Đạn Ma Trận (Bullet Dodge)", category: "action", categoryLabel: "Hành động", description: "Điều khiển nhân vật luồn lách né tránh cơn mưa đạn lao tới.", rating: 4.7, plays: "58K", color: "from-red-600 to-rose-900", iconName: "shield", isInteractive: false, difficulty: "Cực khó" },
-  { id: "karate_chop", title: "Chặt Gỗ Ninja Fast Chop", category: "action", categoryLabel: "Hành động", description: "Chặt thân cây cổ thụ sang trái phải tránh cành cối nhanh thoắt ẩn.", rating: 4.75, plays: "81K", color: "from-amber-700 to-yellow-900", iconName: "axe", isInteractive: false, difficulty: "Trung bình" },
-  { id: "dunk_shot", title: "Bóng Rổ Căn Lực Dunk Shot", category: "action", categoryLabel: "Hành động", description: "Bắn bóng rổ nảy lướt vào rổ tạo chuỗi Combo ngọn lửa.", rating: 4.85, plays: "135K", color: "from-orange-500 to-amber-700", iconName: "basketball", isInteractive: false, difficulty: "Dễ" },
-  { id: "jetpack_run", title: "Phản Lực Bay Jetpack Dash", category: "action", categoryLabel: "Hành động", description: "Bay cao bằng động cơ phản lực thu thập tiền vàng và né tia laser.", rating: 4.8, plays: "98K", color: "from-blue-600 to-cyan-800", iconName: "fire", isInteractive: false, difficulty: "Khó" },
-  { id: "bomb_defuser", title: "Gỡ Bom Siêu Tốc 10s", category: "action", categoryLabel: "Hành động", description: "Nhìn sơ đồ dây điện cắt đúng dây gỡ bom trước khi đồng hồ về 0.", rating: 4.65, plays: "42K", color: "from-stone-700 to-zinc-900", iconName: "bomb", isInteractive: false, difficulty: "Cực khó" },
-  { id: "helix_jump", title: "Tháp Xoắn Helix Jump", category: "action", categoryLabel: "Hành động", description: "Xoay cột tháp dẫn quả bóng nảy rớt qua các khe hở an toàn.", rating: 4.85, plays: "162K", color: "from-pink-500 to-rose-700", iconName: "tower", isInteractive: false, difficulty: "Trung bình" },
-  { id: "stack_tower", title: "Xếp Chồng Khối Băng Stack", category: "action", categoryLabel: "Hành động", description: "Căn nhịp thả các khối vuông xếp chồng cao vút tới tận mây xanh.", rating: 4.8, plays: "108K", color: "from-indigo-500 to-purple-800", iconName: "layers", isInteractive: false, difficulty: "Dễ" },
-  { id: "air_hockey", title: "Khúc Côn Cầu Bàn Băng Air Hockey", category: "action", categoryLabel: "Hành động", description: "Đánh dĩa tròn bắn vào lưới đối phương trên mặt bàn đệm khí.", rating: 4.75, plays: "87K", color: "from-teal-500 to-cyan-700", iconName: "hockey", isInteractive: false, difficulty: "Trung bình" },
-  { id: "subway_runner", title: "Chạy Trên Đường Săn Vàng", category: "action", categoryLabel: "Hành động", description: "Nhảy lên nóc tàu hỏa luồn lách né rào chắn cảnh sát đuổi theo.", rating: 4.95, plays: "240K", color: "from-yellow-500 to-orange-700", iconName: "train", isInteractive: false, difficulty: "Khó" },
-  { id: "bubble_shooter", title: "Bắn Bóng Bong Bóng Match", category: "action", categoryLabel: "Hành động", description: "Ngắm bắn các bong bóng cùng màu để làm nổ chùm bóng rực rỡ.", rating: 4.9, plays: "190K", color: "from-purple-500 to-pink-700", iconName: "bubbles", isInteractive: false, difficulty: "Dễ" },
-  { id: "paper_plane", title: "Máy Bay Giấy Lượn Gió", category: "action", categoryLabel: "Hành động", description: "Giữ thăng bằng cho chiếc máy bay giấy lướt qua các khe cửa.", rating: 4.6, plays: "39K", color: "from-blue-400 to-indigo-600", iconName: "paperplane", isInteractive: false, difficulty: "Dễ" },
-  { id: "color_switch", title: "Nhảy Đổi Màu Color Switch", category: "action", categoryLabel: "Hành động", description: "Nhảy bóng qua các vòng xoay chỉ khi màu bóng trùng màu rào.", rating: 4.8, plays: "115K", color: "from-fuchsia-600 to-purple-900", iconName: "colorcircle", isInteractive: false, difficulty: "Khó" },
-  { id: "pin_pull", title: "Kéo Chốt Cứu Công Chúa", category: "action", categoryLabel: "Hành động", description: "Suy tính thứ tự rút chốt sắt để lấy kho báu và diệt quái dung nham.", rating: 4.75, plays: "94K", color: "from-amber-600 to-red-700", iconName: "pin", isInteractive: false, difficulty: "Trung bình" },
-  { id: "endless_stairs", title: "Leo Cầu Thang Vô Tận", category: "action", categoryLabel: "Hành động", description: "Bấm đổi hướng và nhảy liên tục lên các bậc thang không bao giờ dừng.", rating: 4.7, plays: "63K", color: "from-emerald-600 to-teal-800", iconName: "stairs", isInteractive: false, difficulty: "Khó" },
 
-  // --- CHIẾN THUẬT & BÀI (56-72) ---
-  { id: "chess_ai", title: "Cờ Vua Đấu Trí AI (Chess)", category: "strategy", categoryLabel: "Chiến thuật", description: "Thi đấu cờ vua quốc tế cùng máy tính nhiều cấp độ từ Dễ tới Đại sư.", rating: 4.9, plays: "165K", color: "from-slate-700 to-zinc-900", iconName: "king", isInteractive: false, difficulty: "Cực khó" },
-  { id: "checkers", title: "Cờ Nhảy Checkers Classic", category: "strategy", categoryLabel: "Chiến thuật", description: "Ăn quân đối phương bằng các bước nhảy chéo phong Vua trên bàn 8x8.", rating: 4.7, plays: "72K", color: "from-stone-600 to-neutral-800", iconName: "crown", isInteractive: false, difficulty: "Trung bình" },
-  { id: "solitaire", title: "Xếp Bài Solitaire Nhện", category: "strategy", categoryLabel: "Chiến thuật", description: "Sắp xếp bộ bài Tây 52 lá theo thứ tự từ K đến A đồng chất.", rating: 4.85, plays: "150K", color: "from-emerald-700 to-green-900", iconName: "spade", isInteractive: false, difficulty: "Trung bình" },
-  { id: "blackjack_21", title: "Xì Dách Blackjack 21 Point", category: "strategy", categoryLabel: "Chiến thuật", description: "Rút bài tính toán tổng điểm sao cho sát nốt 21 mà không bị quắc.", rating: 4.8, plays: "128K", color: "from-red-700 to-rose-950", iconName: "heart2", isInteractive: false, difficulty: "Trung bình" },
-  { id: "uno_card", title: "Bài Uno 4 Màu Vui Nhộn", category: "strategy", categoryLabel: "Chiến thuật", description: "Đánh bài trùng màu hoặc số, sử dụng lá +2, +4, Đổi chiều đè đối thủ.", rating: 4.95, plays: "220K", color: "from-yellow-500 to-red-600", iconName: "uno", isInteractive: false, difficulty: "Dễ" },
-  { id: "reversi", title: "Cờ Lật Reversi Othello", category: "strategy", categoryLabel: "Chiến thuật", description: "Đặt quân cờ kẹp giữa hai quân đối phương để bao vây đổi màu toàn bộ.", rating: 4.75, plays: "61K", color: "from-zinc-800 to-black", iconName: "reversi", isInteractive: false, difficulty: "Khó" },
-  { id: "tower_defense", title: "Tháp Phòng Thủ Tower Defense", category: "strategy", categoryLabel: "Chiến thuật", description: "Xây dựng các trụ pháo nỏ thần chặn đứng từng đợt tấn công quái quỷ.", rating: 4.85, plays: "140K", color: "from-amber-700 to-orange-900", iconName: "castle", isInteractive: false, difficulty: "Khó" },
-  { id: "battleship", title: "Thủy Chiến Bắn Tàu Battleship", category: "strategy", categoryLabel: "Chiến thuật", description: "Bố trí hạm đội trên tọa độ biển bí mật và đoán điểm bắn chìm tàu địch.", rating: 4.8, plays: "99K", color: "from-blue-700 to-cyan-900", iconName: "ship", isInteractive: false, difficulty: "Trung bình" },
-  { id: "mahjong", title: "Xếp Bài Mạt Chược Mahjong", category: "strategy", categoryLabel: "Chiến thuật", description: "Tìm các cặp quân bài mạt chược trống hai bên để dọn sạch bàn.", rating: 4.85, plays: "118K", color: "from-teal-700 to-emerald-900", iconName: "tile", isInteractive: false, difficulty: "Trung bình" },
-  { id: "domino", title: "Xếp Xương Dominoes Deluxe", category: "strategy", categoryLabel: "Chiến thuật", description: "Nối các đầu quân bài domino có cùng số chấm tròn thắng tuyệt đối.", rating: 4.7, plays: "68K", color: "from-slate-600 to-zinc-800", iconName: "domino", isInteractive: false, difficulty: "Dễ" },
-  { id: "co_ca_ngua", title: "Cờ Cá Ngựa Vui Nhộn (Ludo)", category: "strategy", categoryLabel: "Chiến thuật", description: "Xúc xắc xuất quân cá ngựa đá đối thủ về chuồng đua về đích.", rating: 4.9, plays: "180K", color: "from-rose-500 to-amber-600", iconName: "horse", isInteractive: false, difficulty: "Dễ" },
-  { id: "risk_mini", title: "Chinh Phục Lãnh Thổ Mini", category: "strategy", categoryLabel: "Chiến thuật", description: "Điều quân chiếm đóng các vùng đất mở rộng đế chế toàn cầu.", rating: 4.75, plays: "54K", color: "from-red-800 to-zinc-900", iconName: "globe", isInteractive: false, difficulty: "Khó" },
-  { id: "kingdom_tycoon", title: "Xây Vương Quốc Kingdom", category: "strategy", categoryLabel: "Chiến thuật", description: "Quản lý ngân sách tài nguyên nông trại và mở rộng bờ cõi.", rating: 4.8, plays: "83K", color: "from-yellow-600 to-amber-800", iconName: "coin", isInteractive: false, difficulty: "Trung bình" },
-  { id: "poker_memory", title: "Poker Ghép Bộ Bài Tây", category: "strategy", categoryLabel: "Chiến thuật", description: "Tạo các bộ sảnh, thùng, cù lũ từ các lá bài trên lưới 5x5.", rating: 4.65, plays: "47K", color: "from-emerald-800 to-teal-950", iconName: "diamond", isInteractive: false, difficulty: "Khó" },
-  { id: "co_tuong", title: "Cờ Tướng Việt Nam (Xiangqi)", category: "strategy", categoryLabel: "Chiến thuật", description: "Điều khiển Xe, Pháo, Mã, Tướng vượt sông đấu trí kỳ nghệ.", rating: 4.95, plays: "210K", color: "from-red-700 to-amber-900", iconName: "xiangqi", isInteractive: false, difficulty: "Cực khó" },
-  { id: "goboard", title: "Cờ Thế Vây Cổ Điển (Go)", category: "strategy", categoryLabel: "Chiến thuật", description: "Đặt quân đen trắng chiếm đất tạo mắt vây bắt cờ đối thủ.", rating: 4.8, plays: "52K", color: "from-zinc-700 to-black", iconName: "goboard", isInteractive: false, difficulty: "Cực khó" },
-  { id: "war_cards", title: "Chiến Tranh Lá Bài (War)", category: "strategy", categoryLabel: "Chiến thuật", description: "So sánh lá bài lớn nhỏ đoạt lấy toàn bộ bộ bài của đối phương.", rating: 4.6, plays: "35K", color: "from-indigo-700 to-purple-900", iconName: "swords", isInteractive: false, difficulty: "Dễ" },
-
-  // --- THỂ THAO & TỐC ĐỘ (73-87) ---
-  { id: "penalty_shoot", title: "Sút Penalty World Cup", category: "sports", categoryLabel: "Thể thao", description: "Căn lực và xoáy góc sút bóng đá hạ gục thủ môn đối phương.", rating: 4.9, plays: "195K", color: "from-green-600 to-teal-800", iconName: "football", isInteractive: false, difficulty: "Dễ" },
-  { id: "retro_racer", title: "Đua Xe F1 Retro Racer", category: "sports", categoryLabel: "Thể thao", description: "Điều khiển siêu xe F1 vượt mặt các đối thủ trên đường đua rượt đuổi.", rating: 4.85, plays: "145K", color: "from-red-600 to-orange-700", iconName: "car", isInteractive: false, difficulty: "Trung bình" },
-  { id: "billiards_8ball", title: "Bida 8 Lỗ (8-Ball Pool)", category: "sports", categoryLabel: "Thể thao", description: "Thao tác gậy cơ điều hướng bi cái ăn bi sọc/trơn vào lỗ mượt mà.", rating: 4.95, plays: "250K", color: "from-emerald-700 to-zinc-900", iconName: "pool", isInteractive: false, difficulty: "Khó" },
-  { id: "mini_golf", title: "Sân Golf Mini 3D", category: "sports", categoryLabel: "Thể thao", description: "Đánh bóng golf vượt qua chướng ngại vật dốc nghiêng vào lỗ gôn.", rating: 4.8, plays: "92K", color: "from-teal-600 to-green-800", iconName: "flag2", isInteractive: false, difficulty: "Dễ" },
-  { id: "bowling_strike", title: "Bowling Strike 10 Pin", category: "sports", categoryLabel: "Thể thao", description: "Ném bóng xoáy nảy đổ sạch 10 con ki bowling giành cú Strike hoàn hảo.", rating: 4.85, plays: "115K", color: "from-blue-600 to-indigo-800", iconName: "bowling", isInteractive: false, difficulty: "Dễ" },
-  { id: "table_tennis", title: "Bóng Bàn Siêu Cúp Ping Pong", category: "sports", categoryLabel: "Thể thao", description: "Mặt vợt giao bóng và đập bóng xoáy nhanh trên bàn thi đấu.", rating: 4.75, plays: "88K", color: "from-amber-600 to-red-700", iconName: "paddle", isInteractive: false, difficulty: "Trung bình" },
-  { id: "skate_jump", title: "Trượt Ván Street Skate", category: "sports", categoryLabel: "Thể thao", description: "Trượt ván phố nhảy qua tay vịn và làm các kỹ thuật Kickflip điểm cao.", rating: 4.7, plays: "74K", color: "from-purple-600 to-pink-800", iconName: "skate", isInteractive: false, difficulty: "Trung bình" },
-  { id: "darts_master", title: "Bắn Phi Tiêu Darts 501", category: "sports", categoryLabel: "Thể thao", description: "Phi tiêu chính xác vào tâm Bullseye trừ dần điểm từ 501 về đúng 0.", rating: 4.8, plays: "81K", color: "from-zinc-600 to-neutral-800", iconName: "dart", isInteractive: false, difficulty: "Khó" },
-  { id: "boxing_tap", title: "Đấu Võ Boxing Knockout", category: "sports", categoryLabel: "Thể thao", description: "Né đòn móc gạt và ra cú đấm thẳng đoạt đai vô địch hạng nặng.", rating: 4.75, plays: "66K", color: "from-rose-700 to-red-900", iconName: "glove", isInteractive: false, difficulty: "Trung bình" },
-  { id: "track_sprint", title: "Chạy Điền Kinh 100m Dash", category: "sports", categoryLabel: "Thể thao", description: "Bấm nút chạy cực nhanh bứt phá cán đích đầu tiên trên đường chạy.", rating: 4.65, plays: "53K", color: "from-amber-500 to-orange-700", iconName: "runner", isInteractive: false, difficulty: "Dễ" },
-  { id: "bike_stunt", title: "Mô Tô Địa Hình Stunt Bike", category: "sports", categoryLabel: "Thể thao", description: "Giữ thăng bằng xe cào cào bay qua đồi núi dốc đứng hiểm hóc.", rating: 4.8, plays: "104K", color: "from-slate-700 to-zinc-900", iconName: "bike", isInteractive: false, difficulty: "Khó" },
-  { id: "high_jump", title: "Nhảy Cao Fosbury Flop", category: "sports", categoryLabel: "Thể thao", description: "Căn nhịp giậm nhảy và ưỡn lưng vượt xà cao kỷ lục thế giới.", rating: 4.6, plays: "37K", color: "from-cyan-600 to-blue-800", iconName: "jump", isInteractive: false, difficulty: "Khó" },
-  { id: "drag_racing", title: "Đua Xe Tốc Độ Drag Race", category: "sports", categoryLabel: "Thể thao", description: "Nhấn ga và gạt cần số chuẩn xác để bứt tốc thắng chặng đua 400m.", rating: 4.85, plays: "122K", color: "from-red-600 to-amber-700", iconName: "gauge", isInteractive: false, difficulty: "Dễ" },
-  { id: "badminton_pro", title: "Cầu Lông Đơn Badminton", category: "sports", categoryLabel: "Thể thao", description: "Nảy cầu, bỏ nhỏ và đập cầu uy lực vượt lưới sang sân đối phương.", rating: 4.75, plays: "79K", color: "from-emerald-600 to-teal-800", iconName: "shuttle", isInteractive: false, difficulty: "Trung bình" },
-  { id: "swimming_rush", title: "Bơi Lội Tự Do 200m", category: "sports", categoryLabel: "Thể thao", description: "Quạt tay bơi đạp nước nhịp nhàng duy trì thể lực vượt qua làn bơi.", rating: 4.65, plays: "41K", color: "from-sky-600 to-blue-800", iconName: "swim", isInteractive: false, difficulty: "Dễ" },
-
-  // --- NGHỆ THUẬT & GIẢI TRÍ (88-100) ---
+  // --- GIẢI TRÍ & ÂM NHẠC ---
   { id: "piano_tiles", title: "Bím Piano Tốc Độ (Piano Tiles)", category: "arcade", categoryLabel: "Giải trí", description: "Bấm các phím đàn màu đen rơi xuống theo giai điệu bản nhạc du dương.", rating: 4.95, plays: "260K", color: "from-slate-800 to-black", iconName: "piano", isInteractive: true, difficulty: "Trung bình" },
   { id: "cookie_clicker", title: "Đào Bánh Cookie / V-Coins Clicker", category: "arcade", categoryLabel: "Giải trí", description: "Chạm liên tục để sản xuất hàng triệu chiếc bánh ngọt và nâng cấp nhà máy.", rating: 4.85, plays: "180K", color: "from-amber-500 to-yellow-700", iconName: "cookie", isInteractive: true, difficulty: "Dễ" },
-  { id: "slot_machine", title: "Vòng Quay Slot Machine V-Spin", category: "arcade", categoryLabel: "Giải trí", description: "Quay 3 hũ may mắn trúng độc đắc Jackpot tích lũy V-Coins cực khủng.", rating: 4.9, plays: "205K", color: "from-red-600 to-amber-600", iconName: "slot", isInteractive: true, difficulty: "Dễ" },
-  { id: "plinko", title: "Thả Bóng Zic-Zac Plinko", category: "arcade", categoryLabel: "Giải trí", description: "Thả quả bóng rớt qua các cây đinh nảy ngẫu nhiên vào ô nhân thưởng x100.", rating: 4.8, plays: "138K", color: "from-purple-600 to-pink-700", iconName: "dots2", isInteractive: false, difficulty: "Dễ" },
-  { id: "wheel_of_fortune", title: "Chiếc Nón Kỳ Diệu Wheel", category: "arcade", categoryLabel: "Giải trí", description: "Quay bánh xe nhận quà tặng phần thưởng bất ngờ mỗi ngày.", rating: 4.9, plays: "190K", color: "from-emerald-500 to-teal-700", iconName: "wheel", isInteractive: false, difficulty: "Dễ" },
-  { id: "pop_balloon", title: "Bắn Bong Bóng Nổ Pop", category: "arcade", categoryLabel: "Giải trí", description: "Chạm nổ các quả bóng bay sắc màu trước khi chúng chạm trần nhà.", rating: 4.75, plays: "91K", color: "from-pink-500 to-rose-600", iconName: "balloon", isInteractive: false, difficulty: "Dễ" },
-  { id: "idle_miner", title: "Thợ Mỏ Đào Vàng Idle Miner", category: "arcade", categoryLabel: "Giải trí", description: "Thả móc kéo kim cương, vàng ròng và rương kho báu dưới lòng đất.", rating: 4.85, plays: "150K", color: "from-yellow-600 to-amber-800", iconName: "shovel", isInteractive: false, difficulty: "Dễ" },
-  { id: "rhythm_tap", title: "Vũ Điệu Nhịp Điệu Rhythm", category: "arcade", categoryLabel: "Giải trí", description: "Bấm chính xác các mũi tên rơi theo điệu nhạc EDM sôi động.", rating: 4.8, plays: "110K", color: "from-violet-600 to-fuchsia-800", iconName: "music", isInteractive: false, difficulty: "Khó" },
-  { id: "pet_simulator", title: "Nuôi Thú Cưng Ngộ Nghĩnh", category: "arcade", categoryLabel: "Giải trí", description: "Chăm sóc, cho ăn và chơi đùa cùng chú mèo con đáng yêu.", rating: 4.85, plays: "130K", color: "from-sky-400 to-indigo-600", iconName: "paw", isInteractive: false, difficulty: "Dễ" },
-  { id: "roller_splat", title: "Lăn Sơn Tô Màu Roller Splat", category: "arcade", categoryLabel: "Giải trí", description: "Lăn con lăn sơn phủ kín toàn bộ sàn nhà màu trắng tinh.", rating: 4.7, plays: "77K", color: "from-emerald-500 to-cyan-600", iconName: "paint", isInteractive: false, difficulty: "Dễ" },
-  { id: "fireboy_watergirl", title: "Cậu Bé Lửa & Cô Bé Nước", category: "arcade", categoryLabel: "Giải trí", description: "Phối hợp 2 nhân vật Lửa và Nước thu thập kim cương vượt đền cấm.", rating: 4.95, plays: "215K", color: "from-blue-600 to-red-600", iconName: "firewater", isInteractive: false, difficulty: "Khó" },
-  { id: "coin_catcher", title: "Hứng Tiền Mưa Vàng", category: "arcade", categoryLabel: "Giải trí", description: "Di chuyển hũ vàng hứng cơn mưa đồng xu từ trên trời rơi xuống.", rating: 4.8, plays: "105K", color: "from-amber-400 to-yellow-600", iconName: "bucket", isInteractive: false, difficulty: "Dễ" },
-  { id: "portal_dash", title: "Thần Thoại Cổng Dịch Chuyển", category: "arcade", categoryLabel: "Giải trí", description: "Nhảy qua cổng không gian xoay chuyển trọng lực thách thức.", rating: 4.7, plays: "65K", color: "from-indigo-600 to-violet-900", iconName: "portal", isInteractive: false, difficulty: "Cực khó" }
+  { id: "slot_machine", title: "Vòng Quay Slot Machine V-Spin", category: "arcade", categoryLabel: "Giải trí", description: "Quay 3 hũ may mắn trúng độc đắc Jackpot tích lũy V-Coins cực khủng.", rating: 4.9, plays: "205K", color: "from-red-600 to-amber-600", iconName: "slot", isInteractive: true, difficulty: "Dễ" }
 ];
 
 export const VArcadeTab: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeGame, setActiveGame] = useState<GameItem | null>(null);
-  const [favoriteGames, setFavoriteGames] = useState<string[]>(["snake", "tetris", "flappy", "game_2048", "slot_machine"]);
+  const [favoriteGames, setFavoriteGames] = useState<string[]>([
+    "tic_tac_toe",
+    "rock_paper_scissors",
+    "word_chain",
+    "counting_game",
+    "snake"
+  ]);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  // Interactivity engine states for playable mini-games
-  const [gameScore, setGameScore] = useState(0);
   const [highScores, setHighScores] = useState<Record<string, number>>({
+    tic_tac_toe: 12,
+    rock_paper_scissors: 8,
+    word_chain: 15,
+    counting_game: 32,
     snake: 120,
-    tetris: 2400,
-    flappy: 18,
-    tic_tac_toe: 5,
     game_2048: 1024,
-    whack_a_mole: 42,
-    target_shoot: 85,
-    piano_tiles: 156,
-    cookie_clicker: 850,
     slot_machine: 5000
   });
 
@@ -199,7 +184,7 @@ export const VArcadeTab: React.FC = () => {
       {/* Top Banner Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-black border border-indigo-500/30 shadow-2xl relative overflow-hidden">
         <div className="absolute -right-12 -top-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        
+
         <div className="flex items-center gap-4 relative z-10">
           <div className="p-4 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-2xl shadow-lg shadow-indigo-500/30 text-white font-black animate-pulse">
             <Gamepad2 className="w-8 h-8" />
@@ -207,21 +192,24 @@ export const VArcadeTab: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
-                V-Arcade Hub
+                V-Arcade Gaming Zone
               </h1>
               <span className="text-[10px] px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-extrabold uppercase tracking-widest shadow-md border border-white/20">
-                100 Trò Chơi Giải Trí
+                Đấu NPC & 2 Người Chơi
               </span>
             </div>
             <p className="text-xs text-zinc-300 mt-1 max-w-xl">
-              Trung tâm game Arcade thế hệ mới tích hợp 100 trò chơi cổ điển, câu đố logic, hành động tốc độ và thể thao tương tác mượt mà!
+              Thách đấu cùng NPC ngẫu nhiên trong danh sách <span className="text-indigo-300 font-bold">Search for people</span> hoặc chơi 2 người pass & play với Tic-Tac-Toe, Oẳn tù tì, Nối từ Tiếng Việt / Anh, Đếm số phá chuỗi!
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 relative z-10 self-end md:self-auto">
           <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
+            onClick={() => {
+              setSoundEnabled(!soundEnabled);
+              playPopSound();
+            }}
             className="px-3 py-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer flex items-center gap-2 text-xs font-bold rounded-none shadow-md"
             title="Bật/Tắt âm thanh"
           >
@@ -238,34 +226,34 @@ export const VArcadeTab: React.FC = () => {
             <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Tìm kiếm trong 100 game Arcade..."
+              placeholder="Tìm kiếm trò chơi V-Arcade..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
-          {/* Quick Count Badge */}
           <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 shrink-0">
-            <span className="text-indigo-400 font-bold">{filteredGames.length}</span> / 100 trò chơi khả dụng
+            <span className="text-indigo-400 font-bold">{filteredGames.length}</span> trò chơi tương tác
           </div>
         </div>
 
         {/* Categories Bar */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           {[
-            { id: "all", label: "Tất Cả (100)" },
+            { id: "all", label: "Tất Cả Trò Chơi" },
             { id: "favorites", label: `Yêu Thích (${favoriteGames.length})` },
             { id: "classic", label: "Cổ Điển & Retro" },
-            { id: "puzzle", label: "Đố Vui & Puzzle" },
-            { id: "action", label: "Hành Động & Arcade" },
-            { id: "strategy", label: "Chiến Thuật & Bài" },
-            { id: "sports", label: "Thể Thao & Tốc Độ" },
-            { id: "arcade", label: "Giải Trí & Âm Nhạc" }
+            { id: "puzzle", label: "Đố Vui & Logic" },
+            { id: "action", label: "Hành Động" },
+            { id: "arcade", label: "Giải Trí" }
           ].map((cat) => (
             <button
               key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => {
+                setSelectedCategory(cat.id);
+                playPopSound();
+              }}
               className={`px-4 py-2 text-xs font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 rounded-none ${
                 selectedCategory === cat.id
                   ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md"
@@ -279,18 +267,17 @@ export const VArcadeTab: React.FC = () => {
         </div>
       </div>
 
-      {/* 100 Game Cards Grid */}
+      {/* Game Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredGames.map((game) => {
           const isFav = favoriteGames.includes(game.id);
-          const topScore = highScores[game.id] || 0;
 
           return (
             <div
               key={game.id}
               onClick={() => {
                 setActiveGame(game);
-                setGameScore(0);
+                playPopSound();
               }}
               className="group relative bg-[#181722] border border-white/10 hover:border-indigo-500/50 rounded-2xl p-4 flex flex-col justify-between shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-200 cursor-pointer hover:-translate-y-1 overflow-hidden"
             >
@@ -302,7 +289,7 @@ export const VArcadeTab: React.FC = () => {
                 <div className="flex items-center gap-1.5">
                   {game.isInteractive && (
                     <span className="text-[9px] px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-black uppercase tracking-wider">
-                      Chơi Tương Tác
+                      NPC & 2P
                     </span>
                   )}
                   <button
@@ -330,7 +317,7 @@ export const VArcadeTab: React.FC = () => {
                   <span className="flex items-center gap-1 text-amber-400 font-bold">
                     <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {game.rating}
                   </span>
-                  <span>{game.plays} lượt chơi</span>
+                  <span>{game.plays} lượt</span>
                   <span className="text-zinc-500 font-mono">{game.difficulty}</span>
                 </div>
 
@@ -345,73 +332,92 @@ export const VArcadeTab: React.FC = () => {
 
       {/* GAME MODAL POPUP FOR PLAYING */}
       {activeGame && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-2xl bg-[#14131d] border border-indigo-500/40 rounded-3xl p-6 shadow-2xl relative text-white flex flex-col max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-2xl bg-[#14131d] border border-indigo-500/40 rounded-3xl p-4 sm:p-6 shadow-2xl relative text-white flex flex-col max-h-[92vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
               <div className="flex items-center gap-3">
                 <div className={`p-2.5 rounded-xl bg-gradient-to-br ${activeGame.color} text-white`}>
                   <Gamepad2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-indigo-300">{activeGame.title}</h2>
+                  <h2 className="text-base sm:text-lg font-black text-indigo-300">{activeGame.title}</h2>
                   <span className="text-xs text-zinc-400">{activeGame.categoryLabel} • {activeGame.difficulty}</span>
                 </div>
               </div>
 
               <button
-                onClick={() => setActiveGame(null)}
+                onClick={() => {
+                  setActiveGame(null);
+                  playPopSound();
+                }}
                 className="px-3 py-1.5 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white text-xs font-bold rounded-none shadow-md transition-all cursor-pointer"
               >
                 Đóng (ESC)
               </button>
             </div>
 
-            {/* Game Canvas Container */}
-            <div className="w-full bg-zinc-950 border border-white/10 rounded-2xl p-4 min-h-[300px] flex flex-col items-center justify-center relative overflow-hidden">
-              {/* PLAYABLE ENGINE 1: SNAKE */}
-              {activeGame.id === "snake" && (
-                <SnakeGame
+            {/* Game Container */}
+            <div className="w-full bg-zinc-950 border border-white/10 rounded-2xl p-4 min-h-[320px] flex flex-col items-center justify-center relative overflow-hidden">
+              {/* 1. TIC TAC TOE */}
+              {activeGame.id === "tic_tac_toe" && (
+                <TicTacToeGame
                   soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => {
-                    setGameScore(s);
-                    setHighScores((prev) => ({ ...prev, snake: Math.max(prev.snake || 0, s) }));
-                  }}
+                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, tic_tac_toe: Math.max(prev.tic_tac_toe || 0, s) }))}
                 />
               )}
 
-              {/* PLAYABLE ENGINE 2: TIC TAC TOE */}
-              {activeGame.id === "tic_tac_toe" && (
-                <TicTacToeGame />
+              {/* 2. ROCK PAPER SCISSORS (OẲN TÙ TÌ) */}
+              {activeGame.id === "rock_paper_scissors" && (
+                <RockPaperScissorsGame
+                  soundEnabled={soundEnabled}
+                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, rock_paper_scissors: Math.max(prev.rock_paper_scissors || 0, s) }))}
+                />
               )}
 
-              {/* PLAYABLE ENGINE 3: MEMORY MATCH */}
-              {activeGame.id === "memory_card" && (
-                <MemoryMatchGame />
+              {/* 3. WORD CHAIN (NỐI TỪ VN & EN) */}
+              {activeGame.id === "word_chain" && (
+                <WordChainGame
+                  soundEnabled={soundEnabled}
+                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, word_chain: Math.max(prev.word_chain || 0, s) }))}
+                />
               )}
 
-              {/* PLAYABLE ENGINE 4: MATH QUIZ */}
-              {activeGame.id === "math_quiz" && (
-                <MathQuizGame />
+              {/* 4. COUNTING GAME (ĐẾM SỐ 1 -> N) */}
+              {activeGame.id === "counting_game" && (
+                <CountingGame
+                  soundEnabled={soundEnabled}
+                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, counting_game: Math.max(prev.counting_game || 0, s) }))}
+                />
               )}
 
-              {/* PLAYABLE ENGINE 5: COOKIE CLICKER */}
-              {activeGame.id === "cookie_clicker" && (
-                <CookieClickerGame />
+              {/* 5. SNAKE */}
+              {activeGame.id === "snake" && (
+                <SnakeGame
+                  soundEnabled={soundEnabled}
+                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, snake: Math.max(prev.snake || 0, s) }))}
+                />
               )}
 
-              {/* PLAYABLE ENGINE 6: SLOT MACHINE */}
-              {activeGame.id === "slot_machine" && (
-                <SlotMachineGame />
-              )}
+              {/* 6. MEMORY MATCH */}
+              {activeGame.id === "memory_card" && <MemoryMatchGame />}
 
-              {/* GENERIC INTERACTIVE GAME SIMULATOR FOR ALL OTHER GAMES */}
-              {!["snake", "tic_tac_toe", "memory_card", "math_quiz", "cookie_clicker", "slot_machine"].includes(activeGame.id) && (
+              {/* 7. MATH QUIZ */}
+              {activeGame.id === "math_quiz" && <MathQuizGame />}
+
+              {/* 8. COOKIE CLICKER */}
+              {activeGame.id === "cookie_clicker" && <CookieClickerGame />}
+
+              {/* 9. SLOT MACHINE */}
+              {activeGame.id === "slot_machine" && <SlotMachineGame />}
+
+              {/* GENERIC SIMULATOR FOR OTHERS */}
+              {!["tic_tac_toe", "rock_paper_scissors", "word_chain", "counting_game", "snake", "memory_card", "math_quiz", "cookie_clicker", "slot_machine"].includes(activeGame.id) && (
                 <GenericGameSimulator game={activeGame} />
               )}
             </div>
 
-            {/* Game Instructions & Controls */}
+            {/* Game Instructions */}
             <div className="mt-4 p-3 bg-white/5 border border-white/5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-300">
               <div className="flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-indigo-400 shrink-0" />
@@ -428,9 +434,1157 @@ export const VArcadeTab: React.FC = () => {
   );
 };
 
-/* --- MINI GAME ENGINE 1: SNAKE --- */
-const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) => void }> = ({ onScoreUpdate }) => {
-  const [snake, setSnake] = useState<[number, number][]>([[5, 5], [5, 4], [5, 3]]);
+/* =========================================================================
+   OPPONENT SELECTOR BAR (VS NPC from Search for people OR 2 Players)
+   ========================================================================= */
+interface OpponentBarProps {
+  gameMode: "npc" | "pvp";
+  setGameMode: (m: "npc" | "pvp") => void;
+  selectedNpc: VplayUser;
+  setSelectedNpc: (user: VplayUser) => void;
+}
+
+const OpponentBar: React.FC<OpponentBarProps> = ({
+  gameMode,
+  setGameMode,
+  selectedNpc,
+  setSelectedNpc
+}) => {
+  const [showNpcPicker, setShowNpcPicker] = useState(false);
+  const [pickerSearch, setPickerSearch] = useState("");
+
+  const filteredNpcs = useMemo(() => {
+    if (!pickerSearch.trim()) return MOCK_100_FRIENDS.slice(0, 16);
+    return MOCK_100_FRIENDS.filter(
+      (f) =>
+        f.name.toLowerCase().includes(pickerSearch.toLowerCase()) ||
+        f.tag.toLowerCase().includes(pickerSearch.toLowerCase())
+    ).slice(0, 20);
+  }, [pickerSearch]);
+
+  const handleRandomize = () => {
+    const random = MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)];
+    setSelectedNpc(random);
+    playPopSound();
+  };
+
+  return (
+    <div className="w-full mb-4 p-3 bg-zinc-900 border border-white/10 rounded-2xl flex flex-col gap-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Mode Buttons */}
+        <div className="flex items-center gap-1.5 bg-black/50 p-1 rounded-xl border border-white/10">
+          <button
+            type="button"
+            onClick={() => {
+              setGameMode("npc");
+              playPopSound();
+            }}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+              gameMode === "npc"
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            <Bot className="w-3.5 h-3.5" /> Chơi Với NPC
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setGameMode("pvp");
+              playPopSound();
+            }}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+              gameMode === "pvp"
+                ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" /> 2 Người Chơi
+          </button>
+        </div>
+
+        {/* NPC Profile Tag */}
+        {gameMode === "npc" && (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-indigo-950/80 border border-indigo-500/40 px-3 py-1 rounded-xl">
+              <img
+                src={selectedNpc.avatar}
+                alt={selectedNpc.name}
+                className="w-6 h-6 rounded-full border border-indigo-400 object-cover shrink-0"
+              />
+              <div className="text-left">
+                <div className="text-xs font-bold text-indigo-200 leading-tight max-w-[130px] truncate">
+                  {selectedNpc.name}
+                </div>
+                <div className="text-[10px] text-zinc-400 font-mono">{selectedNpc.tag}</div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleRandomize}
+              className="px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs text-indigo-300 font-bold rounded-xl border border-white/10 flex items-center gap-1 cursor-pointer"
+              title="Chọn ngẫu nhiên 1 người trong Search for people"
+            >
+              <Shuffle className="w-3.5 h-3.5" /> 🎲
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowNpcPicker(!showNpcPicker)}
+              className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-xs text-white font-bold rounded-xl flex items-center gap-1 cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5" /> Chọn NPC
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* NPC Search Drawer Dropdown */}
+      {showNpcPicker && gameMode === "npc" && (
+        <div className="bg-zinc-950 border border-indigo-500/40 rounded-xl p-3 mt-1 shadow-2xl animate-fade-in">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-indigo-300">
+              Chọn NPC đấu cùng (Danh sách Search for people):
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowNpcPicker(false)}
+              className="text-zinc-400 hover:text-white text-xs px-2 py-0.5 rounded"
+            >
+              ✕
+            </button>
+          </div>
+          <input
+            type="text"
+            placeholder="Gõ tên tìm người..."
+            value={pickerSearch}
+            onChange={(e) => setPickerSearch(e.target.value)}
+            className="w-full bg-zinc-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white mb-2 focus:outline-none focus:border-indigo-500"
+          />
+          <div className="max-h-40 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-1.5 pr-1">
+            {filteredNpcs.map((npc) => (
+              <button
+                type="button"
+                key={npc.id}
+                onClick={() => {
+                  setSelectedNpc(npc);
+                  setShowNpcPicker(false);
+                  playPopSound();
+                }}
+                className={`p-2 rounded-lg border text-left flex items-center gap-2 cursor-pointer transition-all ${
+                  selectedNpc.id === npc.id
+                    ? "bg-indigo-600/40 border-indigo-500 text-white"
+                    : "bg-zinc-900 border-white/5 text-zinc-300 hover:bg-zinc-800"
+                }`}
+              >
+                <img src={npc.avatar} alt={npc.name} className="w-6 h-6 rounded-full shrink-0" />
+                <div className="truncate text-xs font-bold">{npc.name}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* =========================================================================
+   1. GAME ENGINE: TIC TAC TOE (CỜ CARO XO)
+   ========================================================================= */
+const TicTacToeGame: React.FC<{
+  soundEnabled: boolean;
+  onScoreUpdate: (score: number) => void;
+}> = ({ soundEnabled, onScoreUpdate }) => {
+  const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
+  const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
+    () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
+  );
+  const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
+  const [turn, setTurn] = useState<"X" | "O">("X");
+  const [winner, setWinner] = useState<string | null>(null);
+  const [scores, setScores] = useState({ p1: 0, p2Npc: 0, ties: 0 });
+
+  const checkWinner = (b: (string | null)[]) => {
+    const lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+    for (const [a, bIdx, c] of lines) {
+      if (b[a] && b[a] === b[bIdx] && b[a] === b[c]) return b[a];
+    }
+    if (b.every((cell) => cell !== null)) return "Tie";
+    return null;
+  };
+
+  const handleCellClick = (idx: number) => {
+    if (board[idx] || winner) return;
+    if (soundEnabled) playPopSound();
+
+    const newBoard = [...board];
+    newBoard[idx] = turn;
+    setBoard(newBoard);
+
+    const win = checkWinner(newBoard);
+    if (win) {
+      handleGameOver(win);
+    } else {
+      const nextTurn = turn === "X" ? "O" : "X";
+      setTurn(nextTurn);
+    }
+  };
+
+  // NPC Turn Trigger
+  useEffect(() => {
+    if (gameMode === "npc" && turn === "O" && !winner) {
+      const timer = setTimeout(() => {
+        makeNpcMove();
+      }, 450);
+      return () => clearTimeout(timer);
+    }
+  }, [board, turn, winner, gameMode]);
+
+  const makeNpcMove = () => {
+    const emptyIndices = board
+      .map((val, idx) => (val === null ? idx : null))
+      .filter((v): v is number => v !== null);
+
+    if (emptyIndices.length === 0) return;
+
+    // Smart move check
+    let targetIndex = -1;
+
+    // 1. Can NPC win?
+    for (const idx of emptyIndices) {
+      const testBoard = [...board];
+      testBoard[idx] = "O";
+      if (checkWinner(testBoard) === "O") {
+        targetIndex = idx;
+        break;
+      }
+    }
+
+    // 2. Can block Player X?
+    if (targetIndex === -1) {
+      for (const idx of emptyIndices) {
+        const testBoard = [...board];
+        testBoard[idx] = "X";
+        if (checkWinner(testBoard) === "X") {
+          targetIndex = idx;
+          break;
+        }
+      }
+    }
+
+    // 3. Take center
+    if (targetIndex === -1 && emptyIndices.includes(4)) {
+      targetIndex = 4;
+    }
+
+    // 4. Take random
+    if (targetIndex === -1) {
+      targetIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+    }
+
+    const newBoard = [...board];
+    newBoard[targetIndex] = "O";
+    setBoard(newBoard);
+
+    const win = checkWinner(newBoard);
+    if (win) {
+      handleGameOver(win);
+    } else {
+      setTurn("X");
+    }
+  };
+
+  const handleGameOver = (winResult: string) => {
+    setWinner(winResult);
+    if (winResult === "X") {
+      setScores((s) => {
+        const updated = { ...s, p1: s.p1 + 1 };
+        onScoreUpdate(updated.p1 * 10);
+        return updated;
+      });
+    } else if (winResult === "O") {
+      setScores((s) => ({ ...s, p2Npc: s.p2Npc + 1 }));
+    } else {
+      setScores((s) => ({ ...s, ties: s.ties + 1 }));
+    }
+  };
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setTurn("X");
+    setWinner(null);
+    if (soundEnabled) playPopSound();
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full max-w-md">
+      <OpponentBar
+        gameMode={gameMode}
+        setGameMode={(m) => {
+          setGameMode(m);
+          resetGame();
+        }}
+        selectedNpc={selectedNpc}
+        setSelectedNpc={setSelectedNpc}
+      />
+
+      {/* Turn Indicator */}
+      <div className="mb-3 text-center">
+        {winner ? (
+          <div className="text-sm font-black text-amber-400 animate-bounce">
+            {winner === "Tie"
+              ? "🤝 Trận đấu Hòa nhau!"
+              : winner === "X"
+              ? "🎉 Bạn (X) Thắng Cuộc!"
+              : gameMode === "npc"
+              ? `🤖 ${selectedNpc.name} (O) Thắng!`
+              : "🎉 Người chơi 2 (O) Thắng!"}
+          </div>
+        ) : (
+          <div className="text-xs font-bold text-indigo-300 flex items-center justify-center gap-1.5">
+            <span>Lượt của:</span>
+            <span
+              className={`px-2 py-0.5 rounded-md font-black ${
+                turn === "X"
+                  ? "bg-purple-600 text-white"
+                  : "bg-amber-600 text-white"
+              }`}
+            >
+              {turn === "X"
+                ? "Bạn (X)"
+                : gameMode === "npc"
+                ? `${selectedNpc.name} (O)`
+                : "Người chơi 2 (O)"}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Grid Board */}
+      <div className="grid grid-cols-3 gap-2.5 bg-zinc-900 p-3.5 rounded-2xl border border-indigo-500/30 shadow-xl w-56 h-56">
+        {board.map((cell, i) => (
+          <button
+            type="button"
+            key={i}
+            onClick={() => handleCellClick(i)}
+            disabled={!!cell || !!winner || (gameMode === "npc" && turn === "O")}
+            className={`rounded-xl text-2xl font-black flex items-center justify-center transition-all cursor-pointer ${
+              cell === "X"
+                ? "bg-purple-600/30 text-purple-300 border border-purple-500"
+                : cell === "O"
+                ? "bg-amber-600/30 text-amber-300 border border-amber-500"
+                : "bg-zinc-800 hover:bg-zinc-700 text-transparent border border-white/5 active:scale-95"
+            }`}
+          >
+            {cell || ""}
+          </button>
+        ))}
+      </div>
+
+      {/* Scores & Reset */}
+      <div className="flex items-center justify-between w-full mt-4 text-xs font-mono bg-zinc-900 p-2.5 rounded-xl border border-white/10">
+        <div className="text-purple-300 font-bold">Bạn (X): {scores.p1}</div>
+        <div className="text-zinc-400">Hòa: {scores.ties}</div>
+        <div className="text-amber-400 font-bold">
+          {gameMode === "npc" ? `${selectedNpc.name.split(" ")[0]} (O)` : "P2 (O)"}: {scores.p2Npc}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={resetGame}
+        className="mt-3 px-5 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none cursor-pointer shadow-md flex items-center gap-1.5"
+      >
+        <RotateCcw className="w-3.5 h-3.5" /> Chơi Ván Mới
+      </button>
+    </div>
+  );
+};
+
+/* =========================================================================
+   2. GAME ENGINE: ROCK PAPER SCISSORS (OẲN TÙ TÌ)
+   ========================================================================= */
+const RockPaperScissorsGame: React.FC<{
+  soundEnabled: boolean;
+  onScoreUpdate: (score: number) => void;
+}> = ({ soundEnabled, onScoreUpdate }) => {
+  const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
+  const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
+    () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
+  );
+
+  const [p1Choice, setP1Choice] = useState<string | null>(null);
+  const [p2Choice, setP2Choice] = useState<string | null>(null);
+  const [pvpPhase, setPvpPhase] = useState<"p1" | "p2" | "result">("p1");
+  const [resultMsg, setResultMsg] = useState("Chọn Kéo, Búa hoặc Bao để đấu!");
+  const [scores, setScores] = useState({ p1: 0, p2Npc: 0, ties: 0 });
+  const [streak, setStreak] = useState(0);
+
+  const OPTIONS = [
+    { id: "scissors", label: "Kéo", emoji: "✂️" },
+    { id: "rock", label: "Búa", emoji: "🪨" },
+    { id: "paper", label: "Bao", emoji: "📄" }
+  ];
+
+  const handleSelectChoice = (choiceId: string) => {
+    if (soundEnabled) playPopSound();
+
+    if (gameMode === "npc") {
+      setP1Choice(choiceId);
+      // NPC choice
+      const npcChoiceObj = OPTIONS[Math.floor(Math.random() * OPTIONS.length)].id;
+      setP2Choice(npcChoiceObj);
+      evaluateWinner(choiceId, npcChoiceObj);
+    } else {
+      // 2 Players Mode
+      if (pvpPhase === "p1") {
+        setP1Choice(choiceId);
+        setPvpPhase("p2");
+        setResultMsg("Đã ghi nhận P1. Mời Người chơi 2 chọn!");
+      } else if (pvpPhase === "p2") {
+        setP2Choice(choiceId);
+        setPvpPhase("result");
+        evaluateWinner(p1Choice!, choiceId);
+      }
+    }
+  };
+
+  const evaluateWinner = (c1: string, c2: string) => {
+    if (c1 === c2) {
+      setResultMsg("🤝 Hòa nhau!");
+      setScores((s) => ({ ...s, ties: s.ties + 1 }));
+    } else if (
+      (c1 === "rock" && c2 === "scissors") ||
+      (c1 === "scissors" && c2 === "paper") ||
+      (c1 === "paper" && c2 === "rock")
+    ) {
+      setResultMsg("🎉 Người chơi 1 Thắng Ván Này!");
+      setScores((s) => {
+        const updated = { ...s, p1: s.p1 + 1 };
+        onScoreUpdate(updated.p1 * 10);
+        return updated;
+      });
+      setStreak((st) => st + 1);
+    } else {
+      setResultMsg(
+        gameMode === "npc"
+          ? `🤖 ${selectedNpc.name} Thắng Ván Này!`
+          : "🎉 Người chơi 2 Thắng Ván Này!"
+      );
+      setScores((s) => ({ ...s, p2Npc: s.p2Npc + 1 }));
+      setStreak(0);
+    }
+  };
+
+  const resetGame = () => {
+    setP1Choice(null);
+    setP2Choice(null);
+    setPvpPhase("p1");
+    setResultMsg("Chọn Kéo, Búa hoặc Bao để đấu!");
+    if (soundEnabled) playPopSound();
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full max-w-md">
+      <OpponentBar
+        gameMode={gameMode}
+        setGameMode={(m) => {
+          setGameMode(m);
+          resetGame();
+        }}
+        selectedNpc={selectedNpc}
+        setSelectedNpc={setSelectedNpc}
+      />
+
+      {/* Game Stage Area */}
+      <div className="flex items-center justify-around w-full bg-zinc-900 border border-indigo-500/30 p-4 rounded-2xl mb-3">
+        <div className="flex flex-col items-center">
+          <span className="text-xs font-bold text-purple-300 mb-1">Bạn (P1)</span>
+          <div className="w-16 h-16 rounded-2xl bg-zinc-800 border-2 border-purple-500 flex items-center justify-center text-3xl shadow-lg">
+            {p1Choice ? OPTIONS.find((o) => o.id === p1Choice)?.emoji : "❓"}
+          </div>
+        </div>
+
+        <div className="text-xl font-black text-amber-400">VS</div>
+
+        <div className="flex flex-col items-center">
+          <span className="text-xs font-bold text-amber-300 mb-1">
+            {gameMode === "npc" ? selectedNpc.name.split(" ")[0] : "Người chơi 2"}
+          </span>
+          <div className="w-16 h-16 rounded-2xl bg-zinc-800 border-2 border-amber-500 flex items-center justify-center text-3xl shadow-lg">
+            {gameMode === "pvp" && pvpPhase === "p2" ? (
+              "🙈"
+            ) : p2Choice ? (
+              OPTIONS.find((o) => o.id === p2Choice)?.emoji
+            ) : (
+              "❓"
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Result Msg Banner */}
+      <div className="text-xs font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-500/30 px-4 py-2 rounded-xl mb-4 text-center w-full">
+        {resultMsg}
+      </div>
+
+      {/* Options Selector Buttons */}
+      <div className="grid grid-cols-3 gap-3 w-full mb-3">
+        {OPTIONS.map((opt) => (
+          <button
+            type="button"
+            key={opt.id}
+            onClick={() => handleSelectChoice(opt.id)}
+            disabled={gameMode === "pvp" && pvpPhase === "result"}
+            className="py-3 px-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white font-black text-xs rounded-none shadow-md flex flex-col items-center gap-1 cursor-pointer"
+          >
+            <span className="text-2xl">{opt.emoji}</span>
+            <span>{opt.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Score Stats */}
+      <div className="flex items-center justify-between w-full text-xs font-mono bg-zinc-900 p-2.5 rounded-xl border border-white/10">
+        <span className="text-purple-300 font-bold">Thắng: {scores.p1}</span>
+        <span className="text-zinc-400">Hòa: {scores.ties}</span>
+        <span className="text-amber-400 font-bold">Thua: {scores.p2Npc}</span>
+        <span className="text-emerald-400 font-bold">Chuỗi: 🔥{streak}</span>
+      </div>
+
+      <button
+        type="button"
+        onClick={resetGame}
+        className="mt-3 px-5 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none cursor-pointer shadow-md flex items-center gap-1.5"
+      >
+        <RotateCcw className="w-3.5 h-3.5" /> Chơi Lại Ván Mới
+      </button>
+    </div>
+  );
+};
+
+/* =========================================================================
+   3. GAME ENGINE: WORD CHAIN (NỐI TỪ TIẾNG VIỆT & TIẾNG ANH)
+   ========================================================================= */
+
+// Dictionary maps for NPC auto-play
+const VN_WORD_DICT: Record<string, string[]> = {
+  tập: ["tập viết", "tập gym", "tập học", "tập thể", "tập làm", "tập hát", "tập trung"],
+  viết: ["viết bài", "viết thư", "viết lách", "viết chữ", "viết nhật ký"],
+  bài: ["bài học", "bài ca", "bài thơ", "bài tập", "bài viết", "bài hát"],
+  học: ["học sinh", "học tập", "học hỏi", "học hành", "học đường"],
+  hành: ["hành động", "hành trình", "hành trang", "hành tỏi", "hành vi"],
+  trình: ["trình bày", "trình chiếu", "trình độ", "trình làng"],
+  trang: ["trang trí", "trang web", "trang phục", "trang điểm", "trang nhã"],
+  điểm: ["điểm số", "điểm danh", "điểm tựa", "điểm nhấn", "điểm hẹn"],
+  nhấn: ["nhấn mạnh", "nhấn nút", "nhấn ga"],
+  mạnh: ["mạnh mẽ", "mạnh khỏe", "mạnh dạn", "mạnh tay"],
+  khỏe: ["khỏe mạnh", "khỏe khoắn"],
+  sinh: ["sinh hoạt", "sinh nhật", "sinh sống", "sinh thái", "sinh viên"],
+  viên: ["viên đạn", "viên ngọc", "viên mãn", "viên chức"],
+  vật: ["vật lý", "vật chất", "vật dụng", "vật kỷ niệm"],
+  dụng: ["dụng cụ", "dụng ý", "dụng tâm"],
+  cụ: ["cụ thể", "cụ già", "cụ ông"],
+  thể: ["thể thao", "thể dục", "thể hiện", "thể chất"],
+  thao: ["thao trường", "thao thức", "thao tác"],
+  tác: ["tác phẩm", "tác giả", "tác phong", "tác động"],
+  động: ["động lực", "động vật", "động viên", "động não"],
+  lực: ["lực lượng", "lực sĩ", "lực hấp dẫn"],
+  tâm: ["tâm hồn", "tâm trí", "tâm sự", "tâm trạng"],
+  trạng: ["trạng thái", "trạng nguyên", "trạng từ"],
+  thái: ["thái độ", "thái bình", "thái dương"]
+};
+
+const EN_WORD_DICT: Record<string, string[]> = {
+  a: ["apple", "animal", "actor", "action", "anchor", "angel"],
+  b: ["banana", "balloon", "butterfly", "basket", "bridge", "bottle"],
+  c: ["cat", "castle", "camera", "cookie", "cactus", "cloud"],
+  d: ["dog", "dolphin", "dragon", "diamond", "desert", "doctor"],
+  e: ["elephant", "eagle", "engine", "earth", "energy", "emperor"],
+  f: ["fish", "forest", "flower", "falcon", "feather", "fountain"],
+  g: ["giraffe", "guitar", "galaxy", "garden", "gorilla", "gold"],
+  h: ["horse", "house", "hero", "hammer", "island", "honey"],
+  i: ["ice", "island", "iron", "igloo", "image", "insect"],
+  j: ["jungle", "jaguar", "jellyfish", "journal", "journey", "juice"],
+  k: ["kangaroo", "kingdom", "kite", "keyboard", "king", "koala"],
+  l: ["lion", "lemon", "lantern", "leopard", "library"],
+  m: ["monkey", "mountain", "moon", "mirror", "museum", "music"],
+  n: ["night", "nature", "needle", "nest", "network", "ninja"],
+  o: ["orange", "ocean", "owl", "orchid", "oxygen", "oasis"],
+  p: ["panda", "parrot", "penguin", "planet", "pyramid", "puzzle"],
+  q: ["queen", "quartz", "quiver", "quest"],
+  r: ["rabbit", "rocket", "river", "robot", "rainbow", "ring"],
+  s: ["sun", "star", "snake", "spider", "storm", "silver"],
+  t: ["tiger", "tower", "turtle", "thunder", "temple", "treasure"],
+  u: ["umbrella", "universe", "unicorn", "ukulele"],
+  v: ["violin", "volcano", "village", "valley", "vessel"],
+  w: ["water", "wolf", "window", "whisper", "wizard"],
+  y: ["yellow", "yacht", "yak", "yeti", "yogurt"],
+  z: ["zebra", "zucchini", "zipper", "zodiac"]
+};
+
+const WordChainGame: React.FC<{
+  soundEnabled: boolean;
+  onScoreUpdate: (score: number) => void;
+}> = ({ soundEnabled, onScoreUpdate }) => {
+  const [language, setLanguage] = useState<"vi" | "en">("vi");
+  const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
+  const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
+    () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
+  );
+
+  const [wordHistory, setWordHistory] = useState<
+    { word: string; player: string; isNpc?: boolean }[]
+  >([{ word: "học tập", player: "Hệ thống" }]);
+
+  const [usedWords, setUsedWords] = useState<Set<string>>(new Set(["học tập"]));
+  const [inputVal, setInputVal] = useState("");
+  const [turn, setTurn] = useState<1 | 2>(1); // 1 = P1, 2 = P2/NPC
+  const [timer, setTimer] = useState(15);
+  const [gameOver, setGameOver] = useState(false);
+  const [gameMsg, setGameMsg] = useState("");
+  const [scoreCount, setScoreCount] = useState(0);
+
+  const lastEntry = wordHistory[wordHistory.length - 1]?.word || "";
+
+  // Get required target prefix/letter
+  const targetRequirement = useMemo(() => {
+    if (!lastEntry) return "";
+    if (language === "vi") {
+      const parts = lastEntry.trim().split(/\s+/);
+      return parts[parts.length - 1].toLowerCase(); // last syllable
+    } else {
+      return lastEntry.trim().slice(-1).toLowerCase(); // last letter
+    }
+  }, [lastEntry, language]);
+
+  // Turn Countdown Timer
+  useEffect(() => {
+    if (gameOver) return;
+    const interval = setInterval(() => {
+      setTimer((t) => {
+        if (t <= 1) {
+          clearInterval(interval);
+          handleTimeOut();
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [turn, gameOver]);
+
+  const handleTimeOut = () => {
+    setGameOver(true);
+    setGameMsg(
+      turn === 1
+        ? "⏰ Hết giờ! Bạn đã bị thua lượt nối từ!"
+        : gameMode === "npc"
+        ? `🎉 ${selectedNpc.name} bị hết giờ! Bạn đã giành chiến thắng!`
+        : "⏰ Hết giờ! Người chơi 2 đã bị thua lượt!"
+    );
+  };
+
+  // Handle Player Input Submit
+  const handleSubmitWord = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (gameOver) return;
+
+    const trimmed = inputVal.trim().toLowerCase();
+    if (!trimmed) return;
+
+    // Check 1: Duplicate check
+    if (usedWords.has(trimmed)) {
+      setGameMsg(`❌ Từ "${trimmed}" đã được sử dụng rồi!`);
+      return;
+    }
+
+    // Check 2: Matching requirement
+    if (language === "vi") {
+      const parts = trimmed.split(/\s+/);
+      if (parts.length < 2) {
+        setGameMsg("❌ Tiếng Việt cần từ ghép có ít nhất 2 tiếng (ví dụ: 'tập viết')!");
+        return;
+      }
+      if (parts[0].toLowerCase() !== targetRequirement) {
+        setGameMsg(`❌ Từ phải bắt đầu bằng chữ "${targetRequirement}"!`);
+        return;
+      }
+    } else {
+      if (trimmed[0].toLowerCase() !== targetRequirement) {
+        setGameMsg(`❌ Từ Tiếng Anh phải bắt đầu bằng chữ cái '${targetRequirement.toUpperCase()}'!`);
+        return;
+      }
+    }
+
+    if (soundEnabled) playPopSound();
+
+    // Valid word accepted!
+    const currentPlayerName = turn === 1 ? "Bạn" : "Người chơi 2";
+    setWordHistory((prev) => [...prev, { word: trimmed, player: currentPlayerName }]);
+    setUsedWords((prev) => new Set([...prev, trimmed]));
+    setInputVal("");
+    setGameMsg("");
+    setTimer(15);
+
+    const nextScore = scoreCount + 1;
+    setScoreCount(nextScore);
+    onScoreUpdate(nextScore * 10);
+
+    // Switch turn
+    if (gameMode === "npc") {
+      setTurn(2);
+    } else {
+      setTurn(turn === 1 ? 2 : 1);
+    }
+  };
+
+  // Trigger NPC Response
+  useEffect(() => {
+    if (gameMode === "npc" && turn === 2 && !gameOver) {
+      const npcTimeout = setTimeout(() => {
+        makeNpcWordResponse();
+      }, 1000);
+      return () => clearTimeout(npcTimeout);
+    }
+  }, [turn, gameMode, gameOver, targetRequirement]);
+
+  const makeNpcWordResponse = () => {
+    let npcWord = "";
+
+    if (language === "vi") {
+      const pool = VN_WORD_DICT[targetRequirement] || [];
+      const validPool = pool.filter((w) => !usedWords.has(w));
+      if (validPool.length > 0) {
+        npcWord = validPool[Math.floor(Math.random() * validPool.length)];
+      } else {
+        // Fallback generator
+        const adjectives = ["vẻ", "mẽ", "đẽ", "mắn", "tràng", "sức", "lực", "thái", "độ"];
+        for (const adj of adjectives) {
+          const gen = `${targetRequirement} ${adj}`;
+          if (!usedWords.has(gen)) {
+            npcWord = gen;
+            break;
+          }
+        }
+      }
+    } else {
+      const pool = EN_WORD_DICT[targetRequirement] || [];
+      const validPool = pool.filter((w) => !usedWords.has(w));
+      if (validPool.length > 0) {
+        npcWord = validPool[Math.floor(Math.random() * validPool.length)];
+      }
+    }
+
+    if (npcWord) {
+      setWordHistory((prev) => [
+        ...prev,
+        { word: npcWord, player: selectedNpc.name, isNpc: true }
+      ]);
+      setUsedWords((prev) => new Set([...prev, npcWord]));
+      setTimer(15);
+      setTurn(1);
+    } else {
+      setGameOver(true);
+      setGameMsg(`🎉 ${selectedNpc.name} không nghĩ ra từ tiếp theo! Bạn chiến thắng!`);
+    }
+  };
+
+  const restartGame = () => {
+    const init = language === "vi" ? "học tập" : "apple";
+    setWordHistory([{ word: init, player: "Hệ thống" }]);
+    setUsedWords(new Set([init]));
+    setInputVal("");
+    setTurn(1);
+    setTimer(15);
+    setGameOver(false);
+    setGameMsg("");
+    setScoreCount(0);
+    if (soundEnabled) playPopSound();
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full max-w-lg">
+      <OpponentBar
+        gameMode={gameMode}
+        setGameMode={(m) => {
+          setGameMode(m);
+          restartGame();
+        }}
+        selectedNpc={selectedNpc}
+        setSelectedNpc={setSelectedNpc}
+      />
+
+      {/* Language Switcher Bar */}
+      <div className="flex items-center gap-2 mb-3 bg-zinc-900 border border-white/10 p-1.5 rounded-xl w-full justify-between">
+        <span className="text-xs font-bold text-zinc-300 pl-2">Ngôn ngữ nối từ:</span>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              setLanguage("vi");
+              restartGame();
+            }}
+            className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+              language === "vi"
+                ? "bg-emerald-600 text-white shadow-md"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            🇻🇳 Tiếng Việt
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setLanguage("en");
+              restartGame();
+            }}
+            className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+              language === "en"
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            🇬🇧 Tiếng Anh
+          </button>
+        </div>
+      </div>
+
+      {/* Required Target Badge */}
+      <div className="w-full bg-gradient-to-r from-indigo-950 via-purple-950 to-zinc-900 border border-indigo-500/40 p-3 rounded-2xl mb-3 flex items-center justify-between">
+        <div>
+          <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">
+            Từ nối tiếp phải bắt đầu bằng:
+          </span>
+          <span className="text-lg font-black text-amber-300 font-mono uppercase">
+            "{targetRequirement}"
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 bg-black/50 px-3 py-1.5 rounded-xl border border-white/10 text-xs font-mono">
+          <Timer className="w-4 h-4 text-emerald-400 animate-pulse" />
+          <span className="text-emerald-300 font-bold">{timer}s</span>
+        </div>
+      </div>
+
+      {/* Chat Word Log */}
+      <div className="w-full bg-zinc-900 border border-white/10 rounded-2xl p-3 h-44 overflow-y-auto space-y-2 mb-3 flex flex-col-reverse">
+        {[...wordHistory].reverse().map((item, idx) => (
+          <div
+            key={idx}
+            className={`p-2 rounded-xl text-xs flex items-center justify-between ${
+              item.isNpc
+                ? "bg-indigo-950/60 border border-indigo-500/30 text-indigo-200 self-start"
+                : "bg-purple-950/60 border border-purple-500/30 text-purple-200 self-end"
+            }`}
+          >
+            <span className="font-bold">{item.player}:</span>
+            <span className="font-black text-white text-sm font-mono uppercase">{item.word}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Error / Status Msg */}
+      {gameMsg && (
+        <div className="w-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold p-2 rounded-xl mb-3 text-center">
+          {gameMsg}
+        </div>
+      )}
+
+      {/* Input Form */}
+      <form onSubmit={handleSubmitWord} className="flex gap-2 w-full mb-3">
+        <input
+          type="text"
+          value={inputVal}
+          onChange={(e) => setInputVal(e.target.value)}
+          disabled={gameOver || (gameMode === "npc" && turn === 2)}
+          placeholder={
+            language === "vi"
+              ? `Nhập từ ghép bắt đầu bằng '${targetRequirement}'...`
+              : `Nhập từ tiếng Anh bắt đầu bằng '${targetRequirement}'...`
+          }
+          className="flex-1 bg-zinc-900 border border-white/20 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
+        />
+        <button
+          type="submit"
+          disabled={gameOver || (gameMode === "npc" && turn === 2)}
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center gap-1 cursor-pointer shrink-0"
+        >
+          <Send className="w-3.5 h-3.5" /> Gửi
+        </button>
+      </form>
+
+      {/* Restart */}
+      <div className="flex items-center justify-between w-full">
+        <span className="text-xs font-mono text-emerald-400 font-bold">Chuỗi Nối Từ: {scoreCount}</span>
+        <button
+          type="button"
+          onClick={restartGame}
+          className="px-4 py-1.5 bg-[#208b3a] hover:bg-[#2dc653] text-white font-mono font-bold text-xs uppercase rounded-none border-b-4 border-[#125322] cursor-pointer shadow-md flex items-center gap-1"
+        >
+          <RotateCcw className="w-3.5 h-3.5" /> Chơi Lại
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* =========================================================================
+   4. GAME ENGINE: COUNTING GAME (ĐẾM SỐ 1 -> N, PHÁ CHUỖI ĐẾM LẠI)
+   ========================================================================= */
+const CountingGame: React.FC<{
+  soundEnabled: boolean;
+  onScoreUpdate: (score: number) => void;
+}> = ({ soundEnabled, onScoreUpdate }) => {
+  const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
+  const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
+    () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
+  );
+
+  const [currentNum, setCurrentNum] = useState(1);
+  const [turn, setTurn] = useState<1 | 2>(1); // 1 = P1, 2 = P2/NPC
+  const [timer, setTimer] = useState(10);
+  const [userInput, setUserInput] = useState("");
+  const [maxStreak, setMaxStreak] = useState(0);
+  const [alertMsg, setAlertMsg] = useState("");
+  const [history, setHistory] = useState<{ num: number; player: string }[]>([]);
+
+  // Timer per number
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer((t) => {
+        if (t <= 1) {
+          clearInterval(interval);
+          handleBreakChain("⏰ Quá 10 giây không đếm số tiếp theo!");
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentNum, turn]);
+
+  const handleBreakChain = (reason: string) => {
+    const brokenAt = currentNum;
+    setAlertMsg(`💥 PHÁ CHUỖI! ${reason} Đã đếm sai ở mốc ${brokenAt}. Đếm lại từ 1!`);
+    setMaxStreak((m) => Math.max(m, brokenAt - 1));
+    setCurrentNum(1);
+    setTimer(10);
+    setTurn(1);
+    setUserInput("");
+    if (soundEnabled) playPopSound();
+  };
+
+  const handleSendNumber = (e?: React.FormEvent, directValue?: number) => {
+    if (e) e.preventDefault();
+
+    const val = directValue !== undefined ? directValue : parseInt(userInput, 10);
+    if (isNaN(val)) return;
+
+    if (soundEnabled) playPopSound();
+
+    if (val !== currentNum) {
+      handleBreakChain(`Đã nhập số ${val} trong khi số đúng là ${currentNum}.`);
+      return;
+    }
+
+    // Correct entry!
+    const pName = turn === 1 ? "Bạn" : "Người chơi 2";
+    setHistory((prev) => [...prev.slice(-10), { num: val, player: pName }]);
+    const nextVal = val + 1;
+    setCurrentNum(nextVal);
+    setMaxStreak((m) => Math.max(m, val));
+    onScoreUpdate(val * 10);
+    setUserInput("");
+    setAlertMsg("");
+    setTimer(10);
+
+    // Switch turn
+    setTurn(turn === 1 ? 2 : 1);
+  };
+
+  // NPC Turn Trigger
+  useEffect(() => {
+    if (gameMode === "npc" && turn === 2) {
+      const npcTimer = setTimeout(() => {
+        makeNpcCount();
+      }, 750);
+      return () => clearTimeout(npcTimer);
+    }
+  }, [turn, gameMode, currentNum]);
+
+  const makeNpcCount = () => {
+    // 5% chance NPC makes a mistake at higher numbers (>15) to break the chain for fun
+    let choice = currentNum;
+    if (currentNum > 15 && Math.random() < 0.08) {
+      choice = currentNum + 1; // Intentional error
+    }
+
+    if (choice !== currentNum) {
+      handleBreakChain(`🤖 ${selectedNpc.name} đã lỡ tay đếm nhầm số ${choice}!`);
+    } else {
+      setHistory((prev) => [...prev.slice(-10), { num: choice, player: selectedNpc.name }]);
+      const nextVal = choice + 1;
+      setCurrentNum(nextVal);
+      setMaxStreak((m) => Math.max(m, choice));
+      onScoreUpdate(choice * 10);
+      setTimer(10);
+      setTurn(1);
+    }
+  };
+
+  const resetAll = () => {
+    setCurrentNum(1);
+    setTurn(1);
+    setTimer(10);
+    setUserInput("");
+    setAlertMsg("");
+    setHistory([]);
+    if (soundEnabled) playPopSound();
+  };
+
+  return (
+    <div className="flex flex-col items-center w-full max-w-lg">
+      <OpponentBar
+        gameMode={gameMode}
+        setGameMode={(m) => {
+          setGameMode(m);
+          resetAll();
+        }}
+        selectedNpc={selectedNpc}
+        setSelectedNpc={setSelectedNpc}
+      />
+
+      {/* Target Large Badge */}
+      <div className="w-full bg-gradient-to-r from-blue-950 via-indigo-950 to-zinc-900 border border-blue-500/40 p-4 rounded-2xl mb-3 flex items-center justify-between shadow-xl">
+        <div>
+          <span className="text-[10px] text-zinc-400 uppercase tracking-widest block font-bold">
+            Số tiếp theo cần đếm:
+          </span>
+          <span className="text-3xl font-black text-cyan-300 font-mono tracking-wider">
+            {currentNum}
+          </span>
+        </div>
+
+        <div className="flex flex-col items-end">
+          <div className="flex items-center gap-1.5 bg-black/60 px-3 py-1 rounded-xl border border-white/10 text-xs font-mono mb-1">
+            <Timer className="w-4 h-4 text-emerald-400 animate-spin" />
+            <span className="text-emerald-300 font-bold">{timer}s</span>
+          </div>
+          <span className="text-[10px] text-zinc-400 font-mono">
+            Lượt: {turn === 1 ? "Bạn" : gameMode === "npc" ? selectedNpc.name : "Người chơi 2"}
+          </span>
+        </div>
+      </div>
+
+      {/* Alert Warning Box */}
+      {alertMsg && (
+        <div className="w-full bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-bold p-3 rounded-2xl mb-3 flex items-center gap-2 animate-bounce">
+          <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+          <span>{alertMsg}</span>
+        </div>
+      )}
+
+      {/* Recent Count Log */}
+      <div className="w-full bg-zinc-900 border border-white/10 rounded-2xl p-3 h-32 overflow-y-auto mb-3 flex flex-wrap gap-2 items-center">
+        {history.length === 0 ? (
+          <span className="text-xs text-zinc-500 italic mx-auto">Chưa có số nào được đếm...</span>
+        ) : (
+          history.map((h, i) => (
+            <div
+              key={i}
+              className="px-2.5 py-1 bg-zinc-800 border border-white/10 rounded-xl text-xs flex items-center gap-1.5 font-mono"
+            >
+              <span className="text-zinc-400 text-[10px]">{h.player}:</span>
+              <span className="font-bold text-cyan-300">{h.num}</span>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Quick Tap Buttons + Manual Input */}
+      <div className="w-full space-y-3 mb-3">
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => handleSendNumber(undefined, currentNum)}
+            disabled={gameMode === "npc" && turn === 2}
+            className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-xl cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center"
+          >
+            <span className="text-[10px] font-normal uppercase opacity-80">Đúng số:</span>
+            <span>{currentNum}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleSendNumber(undefined, currentNum + 1)}
+            disabled={gameMode === "npc" && turn === 2}
+            className="py-3 bg-rose-700/80 hover:bg-rose-600 text-rose-200 font-black text-sm rounded-xl cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center"
+          >
+            <span className="text-[10px] font-normal uppercase opacity-80">Gài bẫy sai:</span>
+            <span>{currentNum + 1}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleSendNumber(undefined, Math.max(1, currentNum - 1))}
+            disabled={gameMode === "npc" && turn === 2}
+            className="py-3 bg-amber-700/80 hover:bg-amber-600 text-amber-200 font-black text-sm rounded-xl cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center"
+          >
+            <span className="text-[10px] font-normal uppercase opacity-80">Đếm lùi sai:</span>
+            <span>{Math.max(1, currentNum - 1)}</span>
+          </button>
+        </div>
+
+        <form onSubmit={(e) => handleSendNumber(e)} className="flex gap-2">
+          <input
+            type="number"
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            disabled={gameMode === "npc" && turn === 2}
+            placeholder={`Nhập số ${currentNum}...`}
+            className="flex-1 bg-zinc-900 border border-white/20 focus:border-cyan-500 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={gameMode === "npc" && turn === 2}
+            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-xl flex items-center gap-1 cursor-pointer shrink-0"
+          >
+            <Send className="w-3.5 h-3.5" /> Gửi
+          </button>
+        </form>
+      </div>
+
+      {/* Footer Stats */}
+      <div className="flex items-center justify-between w-full font-mono text-xs text-zinc-300">
+        <span className="text-amber-400 font-bold">Kỷ lục đếm: 🔥 {maxStreak}</span>
+        <button
+          type="button"
+          onClick={resetAll}
+          className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg cursor-pointer"
+        >
+          Reset Trận
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* --- MINI GAME ENGINE 5: SNAKE --- */
+const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) => void }> = ({
+  soundEnabled,
+  onScoreUpdate
+}) => {
+  const [snake, setSnake] = useState<[number, number][]>([
+    [5, 5],
+    [5, 4],
+    [5, 3]
+  ]);
   const [food, setFood] = useState<[number, number]>([10, 10]);
   const [dir, setDir] = useState<[number, number]>([0, 1]);
   const [score, setScore] = useState(0);
@@ -438,35 +1592,40 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
   const [isPlaying, setIsPlaying] = useState(false);
 
   const startGame = () => {
-    setSnake([[5, 5], [5, 4], [5, 3]]);
+    setSnake([
+      [5, 5],
+      [5, 4],
+      [5, 3]
+    ]);
     setFood([Math.floor(Math.random() * 15), Math.floor(Math.random() * 15)]);
     setDir([0, 1]);
     setScore(0);
     setGameOver(false);
     setIsPlaying(true);
+    if (soundEnabled) playPopSound();
   };
 
   useEffect(() => {
     if (!isPlaying || gameOver) return;
-    const interval = setInterval(() => {
-      setSnake((prev) => {
-        const head = [prev[0][0] + dir[0], prev[0][1] + dir[1]] as [number, number];
+    const timer = setInterval(() => {
+      setSnake((prevSnake) => {
+        const head = [prevSnake[0][0] + dir[0], prevSnake[0][1] + dir[1]] as [number, number];
 
         // Wall collision
         if (head[0] < 0 || head[0] >= 15 || head[1] < 0 || head[1] >= 15) {
           setGameOver(true);
-          return prev;
+          return prevSnake;
         }
 
         // Self collision
-        for (const part of prev) {
-          if (part[0] === head[0] && part[1] === head[1]) {
-            setGameOver(true);
-            return prev;
-          }
+        if (prevSnake.some((segment) => segment[0] === head[0] && segment[1] === head[1])) {
+          setGameOver(true);
+          return prevSnake;
         }
 
-        const newSnake = [head, ...prev];
+        const newSnake = [head, ...prevSnake];
+
+        // Eat food
         if (head[0] === food[0] && head[1] === food[1]) {
           const newScore = score + 10;
           setScore(newScore);
@@ -475,25 +1634,25 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
         } else {
           newSnake.pop();
         }
+
         return newSnake;
       });
     }, 150);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, [isPlaying, gameOver, dir, food, score]);
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="flex items-center justify-between w-full px-2 text-xs font-mono">
-        <span className="text-emerald-400 font-bold">Điểm số: {score}</span>
-        <span className="text-zinc-400">Điều khiển: Nút bấm bên dưới</span>
+      <div className="text-xs font-mono text-emerald-400 font-bold">
+        {gameOver ? "Game Over! Kết quả: " + score + " pts" : "Điểm: " + score}
       </div>
 
-      <div className="grid grid-cols-15 gap-0.5 bg-zinc-900 p-2 rounded-xl border border-white/10 w-64 h-64">
+      <div className="grid grid-cols-15 gap-0.5 bg-zinc-900 p-2 rounded-2xl border border-white/10 w-60 h-60">
         {Array.from({ length: 225 }).map((_, i) => {
           const r = Math.floor(i / 15);
           const c = i % 15;
-          const isSnake = snake.some((p) => p[0] === r && p[1] === c);
+          const isSnake = snake.some((s) => s[0] === r && s[1] === c);
           const isFood = food[0] === r && food[1] === c;
 
           return (
@@ -509,96 +1668,56 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
 
       {!isPlaying ? (
         <button
+          type="button"
           onClick={startGame}
           className="px-6 py-2.5 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none shadow-md cursor-pointer"
         >
-          {gameOver ? "Chơi Lại" : "Bắt Đầu Chơi"}
+          {gameOver ? "Chơi Lại" : "Bắt Đầu Rắn Săn Mồi"}
         </button>
       ) : (
         <div className="grid grid-cols-3 gap-2 w-36">
           <div />
-          <button onClick={() => setDir([-1, 0])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">▲</button>
+          <button
+            type="button"
+            onClick={() => setDir([-1, 0])}
+            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+          >
+            ▲
+          </button>
           <div />
-          <button onClick={() => setDir([0, -1])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">◄</button>
-          <button onClick={() => setDir([1, 0])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">▼</button>
-          <button onClick={() => setDir([0, 1])} className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white rounded-none text-xs font-bold">►</button>
+          <button
+            type="button"
+            onClick={() => setDir([0, -1])}
+            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+          >
+            ◄
+          </button>
+          <button
+            type="button"
+            onClick={() => setDir([1, 0])}
+            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+          >
+            ▼
+          </button>
+          <button
+            type="button"
+            onClick={() => setDir([0, 1])}
+            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+          >
+            ►
+          </button>
         </div>
       )}
     </div>
   );
 };
 
-/* --- MINI GAME ENGINE 2: TIC TAC TOE --- */
-const TicTacToeGame: React.FC = () => {
-  const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
-  const [turn, setTurn] = useState<"X" | "O">("X");
-  const [winner, setWinner] = useState<string | null>(null);
-
-  const checkWinner = (b: (string | null)[]) => {
-    const lines = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8],
-      [0, 3, 6], [1, 4, 7], [2, 5, 8],
-      [0, 4, 8], [2, 4, 6]
-    ];
-    for (const [a, bIdx, c] of lines) {
-      if (b[a] && b[a] === b[bIdx] && b[a] === b[c]) return b[a];
-    }
-    if (b.every((cell) => cell !== null)) return "Tie";
-    return null;
-  };
-
-  const handleClick = (idx: number) => {
-    if (board[idx] || winner) return;
-    const newBoard = [...board];
-    newBoard[idx] = turn;
-    setBoard(newBoard);
-
-    const win = checkWinner(newBoard);
-    if (win) {
-      setWinner(win);
-    } else {
-      setTurn(turn === "X" ? "O" : "X");
-    }
-  };
-
-  const resetGame = () => {
-    setBoard(Array(9).fill(null));
-    setTurn("X");
-    setWinner(null);
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="text-xs font-bold text-indigo-300">
-        {winner ? (winner === "Tie" ? "Hòa nhau!" : `Chiến thắng: Người chơi ${winner}`) : `Lượt chơi: ${turn}`}
-      </div>
-
-      <div className="grid grid-cols-3 gap-2 bg-zinc-900 p-3 rounded-2xl border border-white/10 w-48 h-48">
-        {board.map((val, i) => (
-          <button
-            key={i}
-            onClick={() => handleClick(i)}
-            className="w-12 h-12 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-xl font-black text-indigo-300 flex items-center justify-center cursor-pointer transition-all"
-          >
-            {val}
-          </button>
-        ))}
-      </div>
-
-      <button
-        onClick={resetGame}
-        className="px-4 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs rounded-none cursor-pointer uppercase shadow-md"
-      >
-        Làm Mới Bàn Cờ
-      </button>
-    </div>
-  );
-};
-
-/* --- MINI GAME ENGINE 3: MEMORY MATCH --- */
+/* --- MINI GAME ENGINE 6: MEMORY MATCH --- */
 const MemoryMatchGame: React.FC = () => {
   const ICONS = ["🎮", "🚀", "💎", "⭐", "🔥", "⚽"];
-  const [cards, setCards] = useState<{ id: number; icon: string; flipped: boolean; matched: boolean }[]>([]);
+  const [cards, setCards] = useState<
+    { id: number; icon: string; flipped: boolean; matched: boolean }[]
+  >([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
 
   const initGame = () => {
@@ -646,6 +1765,7 @@ const MemoryMatchGame: React.FC = () => {
       <div className="grid grid-cols-4 gap-2 bg-zinc-900 p-3 rounded-2xl border border-white/10">
         {cards.map((c, i) => (
           <button
+            type="button"
             key={i}
             onClick={() => handleCardClick(i)}
             className={`w-12 h-12 rounded-xl text-lg font-bold flex items-center justify-center cursor-pointer transition-all ${
@@ -658,6 +1778,7 @@ const MemoryMatchGame: React.FC = () => {
       </div>
 
       <button
+        type="button"
         onClick={initGame}
         className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl cursor-pointer"
       >
@@ -667,7 +1788,7 @@ const MemoryMatchGame: React.FC = () => {
   );
 };
 
-/* --- MINI GAME ENGINE 4: MATH QUIZ --- */
+/* --- MINI GAME ENGINE 7: MATH QUIZ --- */
 const MathQuizGame: React.FC = () => {
   const [num1, setNum1] = useState(12);
   const [num2, setNum2] = useState(8);
@@ -691,7 +1812,7 @@ const MathQuizGame: React.FC = () => {
     if (op === "-") correct = num1 - num2;
     if (op === "×") correct = num1 * num2;
 
-    if (parseInt(userAns) === correct) {
+    if (parseInt(userAns, 10) === correct) {
       setScore((s) => s + 10);
       nextQuestion();
     } else {
@@ -716,7 +1837,10 @@ const MathQuizGame: React.FC = () => {
           placeholder="Đáp án..."
           className="bg-zinc-800 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white w-28 text-center focus:outline-none"
         />
-        <button type="submit" className="px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl cursor-pointer">
+        <button
+          type="submit"
+          className="px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl cursor-pointer"
+        >
           Gửi
         </button>
       </form>
@@ -724,14 +1848,15 @@ const MathQuizGame: React.FC = () => {
   );
 };
 
-/* --- MINI GAME ENGINE 5: COOKIE CLICKER --- */
+/* --- MINI GAME ENGINE 8: COOKIE CLICKER --- */
 const CookieClickerGame: React.FC = () => {
   const [cookies, setCookies] = useState(0);
 
   return (
     <div className="flex flex-col items-center gap-4 p-4">
-      <div className="text-sm font-bold text-amber-400">Tổng Số Bánh Bánh Bánh: {cookies}</div>
+      <div className="text-sm font-bold text-amber-400">Tổng Số Bánh: {cookies}</div>
       <button
+        type="button"
         onClick={() => setCookies((c) => c + 1)}
         className="w-24 h-24 rounded-full bg-amber-600 hover:bg-amber-500 text-4xl flex items-center justify-center shadow-2xl transition-transform active:scale-90 cursor-pointer border-4 border-amber-300"
       >
@@ -742,7 +1867,7 @@ const CookieClickerGame: React.FC = () => {
   );
 };
 
-/* --- MINI GAME ENGINE 6: SLOT MACHINE --- */
+/* --- MINI GAME ENGINE 9: SLOT MACHINE --- */
 const SlotMachineGame: React.FC = () => {
   const REELS = ["7️⃣", "💎", "🍒", "🔔", "🍋", "⭐"];
   const [r1, setR1] = useState("🎰");
@@ -778,6 +1903,7 @@ const SlotMachineGame: React.FC = () => {
       <div className="text-xs font-bold text-amber-300">{resultMsg}</div>
 
       <button
+        type="button"
         onClick={spin}
         className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-red-600 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg cursor-pointer"
       >
@@ -808,6 +1934,7 @@ const GenericGameSimulator: React.FC<{ game: GameItem }> = ({ game }) => {
       </div>
 
       <button
+        type="button"
         onClick={() => {
           setSimPlaying(true);
           setSimScore((s) => s + Math.floor(Math.random() * 50) + 10);

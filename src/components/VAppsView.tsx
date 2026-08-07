@@ -6,7 +6,7 @@ import { VplayTab } from './ui/VplayTab';
 import ExploreVietnamTab from './ExploreVietnamTab';
 import VplayVBoxTab from './VplayVBoxTab';
 import VStudyTab from './VStudyTab';
-import { VCalcTab, VRemindersTab, VXploreTab } from './vapps';
+import { VCalcTab, VRemindersTab, VXploreTab, VFurnitureTab } from './vapps';
 import { VNotesView } from './VNotesView';
 import {
   Grid,
@@ -17,6 +17,7 @@ import {
   Bell,
   StickyNote,
   Folder,
+  Armchair,
   X,
   Sparkles,
   ExternalLink,
@@ -24,7 +25,7 @@ import {
   Compass,
 } from 'lucide-react';
 
-export type VAppId = 'v_xplore' | 'explore_vietnam' | 'v_box' | 'v_learn' | 'v_calc' | 'v_reminders' | 'v_notes';
+export type VAppId = 'v_xplore' | 'explore_vietnam' | 'v_box' | 'v_learn' | 'v_calc' | 'v_reminders' | 'v_notes' | 'v_furniture';
 
 interface VAppDefinition {
   id: VAppId;
@@ -100,6 +101,15 @@ const VAPPS_LIST: VAppDefinition[] = [
     color: 'border-emerald-400 bg-emerald-900/40',
     badge: 'So Tay',
   },
+  {
+    id: 'v_furniture',
+    name: 'V-Furniture',
+    tagline: 'Gia dụng online bằng Ore',
+    description: 'Cửa hàng đồ gia dụng online Vplay, mua sắm nội thất & điện máy bằng Khoáng Thạch Ore.',
+    icon: <Armchair className="w-6 h-6 text-amber-400" />,
+    color: 'border-amber-500 bg-amber-950/40',
+    badge: 'Gia Dung',
+  },
 ];
 
 interface VAppsViewProps {
@@ -121,7 +131,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_xplore' })
   return (
     <div className="space-y-4 select-none">
       {/* QUICK HORIZONTAL SUB-APP SELECTOR TABS */}
-      <div className="bg-[#35383b] border-2 border-[#141414] p-2 shadow-md flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <div className="bg-[#35383b] border-2 border-[#141414] p-2 pb-2.5 shadow-md flex items-center gap-1.5 overflow-x-auto">
         {VAPPS_LIST.map((app) => (
           <VplayTab
             key={app.id}
@@ -149,6 +159,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_xplore' })
         {activeApp === 'v_calc' && <VCalcTab />}
         {activeApp === 'v_reminders' && <VRemindersTab />}
         {activeApp === 'v_notes' && <VNotesView />}
+        {activeApp === 'v_furniture' && <VFurnitureTab />}
       </div>
 
 
