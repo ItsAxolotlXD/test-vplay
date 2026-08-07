@@ -22,7 +22,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-export type VPremiumSubTab = 'storage' | 'vbank' | 'verified';
+export type VPremiumSubTab = 'vbank' | 'verified';
 
 interface StoragePlan {
   id: string;
@@ -88,7 +88,7 @@ const STORAGE_PLANS: StoragePlan[] = [
 ];
 
 export const VPremiumView: React.FC = () => {
-  const [activeSubTab, setActiveSubTab] = useState<VPremiumSubTab>('storage');
+  const [activeSubTab, setActiveSubTab] = useState<VPremiumSubTab>('vbank');
   const [currentUsageGb, setCurrentUsageGb] = useState<number>(8.4);
   const [maxCapacityGb, setMaxCapacityGb] = useState<number>(15);
   const [selectedPlan, setSelectedPlan] = useState<StoragePlan | null>(null);
@@ -125,40 +125,26 @@ export const VPremiumView: React.FC = () => {
       <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         {/* Title */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-amber-600 border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#fbbf24,inset_-2px_-2px_0_#78350f]">
-            <Crown className="w-5 h-5 text-amber-200" />
+          <div className="w-10 h-10 bg-purple-600 border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#c084fc,inset_-2px_-2px_0_#581c87]">
+            <Crown className="w-5 h-5 text-purple-200" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-sm sm:text-base font-black text-white uppercase tracking-wider font-jura">
                 VPLAY PREMIUM SUITE
               </h2>
-              <span className="bg-amber-400 text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
+              <span className="bg-purple-500 text-white px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
                 VIP MEMBER
               </span>
             </div>
             <p className="text-[11px] text-zinc-300 font-jura">
-              Trọn bộ dịch vụ cao cấp: Nâng cấp Storage, Tài khoản V-Bank & Xác minh Vplay Verified.
+              Trọn bộ dịch vụ cao cấp: Tài khoản V-Bank & Xác minh Vplay Verified tím.
             </p>
           </div>
         </div>
 
         {/* Sub-tab buttons */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-          <VplayTab
-            active={activeSubTab === 'storage'}
-            onClick={() => {
-              playPopSound();
-              setActiveSubTab('storage');
-            }}
-            className="!py-2 !px-3 text-xs shrink-0"
-          >
-            <span className="flex items-center gap-1.5">
-              <HardDrive className="w-4 h-4 text-sky-400" />
-              <span>Mua Storage</span>
-            </span>
-          </VplayTab>
-
           <VplayTab
             active={activeSubTab === 'vbank'}
             onClick={() => {
@@ -182,7 +168,7 @@ export const VPremiumView: React.FC = () => {
             className="!py-2 !px-3 text-xs shrink-0"
           >
             <span className="flex items-center gap-1.5">
-              <BadgeCheck className="w-4 h-4 text-emerald-400" />
+              <BadgeCheck className="w-4 h-4 text-purple-400" />
               <span>Verified</span>
             </span>
           </VplayTab>

@@ -126,7 +126,7 @@ export const VCalcTab: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-jura select-none">
       {/* Banner - Ore UI Header Bar */}
       <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">

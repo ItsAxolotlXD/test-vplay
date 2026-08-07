@@ -6,3 +6,4 @@ export { VRemindersTab } from "./VRemindersTab";
 export { VArcadeTab } from "./VArcadeTab";
 export { VRecorderTab } from "./VRecorderTab";
 export { VOfficeTab } from "./VOfficeTab";
+export { VXploreTab } from "./VXploreTab";

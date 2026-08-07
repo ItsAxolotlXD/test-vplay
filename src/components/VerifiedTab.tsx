@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  ArrowLeft,
   BadgeCheck,
   Coins,
   Sparkles,
@@ -10,25 +9,17 @@ import {
   Tv,
   Film,
   Gift,
-  ShieldCheck,
   AlertCircle,
-  Clock,
-  Star,
   CheckCircle2,
   X,
-  Lock,
-  Flame,
-  Award,
-  ChevronRight,
-  TrendingUp,
-  Sliders,
-  Shield,
-  Layers,
-  Sparkle,
   HardDrive,
-  Database,
-  Cloud
+  Cloud,
+  ChevronLeft
 } from "lucide-react";
+import { VplayPrimaryButton } from "./ui/VplayPrimaryButton";
+import { VplaySecondaryButton } from "./ui/VplaySecondaryButton";
+import { VplayTab } from "./ui/VplayTab";
+import { playPopSound } from "../utils/sound";
 
 export interface VerifiedSubState {
   plan: "none" | "verified_basic" | "verified_standard" | "verified" | "verified_plus";
@@ -56,11 +47,8 @@ export default function VerifiedTab({
 }: VerifiedTabProps) {
   const [internalVCoins, setInternalVCoins] = useState<number>(1000);
   const [internalVerifiedSub, setInternalVerifiedSub] = useState<VerifiedSubState>({
-    activeTier: "none",
+    plan: "none",
     expiresAt: null,
-    registeredPhone: "",
-    registeredEmail: "",
-    isAuthenSuccess: false,
   });
 
   const vCoins = externalVCoins ?? internalVCoins;
@@ -91,12 +79,12 @@ export default function VerifiedTab({
     }
   }, [initialSection]);
 
-  // Package Prices
+  // Package Prices in Khoáng Thạch
   const PLAN_PRICES = {
-    verified_basic: 10000,      // 10,000 V-pearls / 5 ngày
-    verified_standard: 100000,   // 100,000 V-pearls / 10 ngày
-    verified: 1000000,          // 1,000,000 V-pearls / 30 ngày
-    verified_plus: 5000000,     // 5,000,000 V-pearls / 365 ngày
+    verified_basic: 10000,      // 10,000 Khoáng Thạch / 5 ngày
+    verified_standard: 100000,   // 100,000 Khoáng Thạch / 10 ngày
+    verified: 1000000,          // 1,000,000 Khoáng Thạch / 30 ngày
+    verified_plus: 5000000,     // 5,000,000 Khoáng Thạch / 365 ngày
   };
 
   const PLAN_NAMES: Record<string, string> = {
@@ -108,6 +96,7 @@ export default function VerifiedTab({
 
   const handleClaimDaily = () => {
     if (dailyClaimed) return;
+    playPopSound();
     const bonus = 50;
     setVCoins((prev) => prev + bonus);
     const today = new Date().toDateString();
@@ -120,6 +109,7 @@ export default function VerifiedTab({
   };
 
   const handlePurchase = (plan: "verified_basic" | "verified_standard" | "verified" | "verified_plus") => {
+    playPopSound();
     const price = PLAN_PRICES[plan];
     if (vCoins < price) {
       setErrorModal({ required: price, current: vCoins });
@@ -129,6 +119,7 @@ export default function VerifiedTab({
   };
 
   const handleBuyStorage = (gb: number, price: number, name: string) => {
+    playPopSound();
     if (vCoins < price) {
       setErrorModal({ required: price, current: vCoins });
       return;
@@ -141,6 +132,7 @@ export default function VerifiedTab({
 
   const executePurchase = () => {
     if (!confirmModal) return;
+    playPopSound();
     const plan = confirmModal;
     const price = PLAN_PRICES[plan];
 
@@ -150,10 +142,9 @@ export default function VerifiedTab({
       return;
     }
 
-    // Deduct ngọc
+    // Deduct Khoáng Thạch
     setVCoins((prev) => prev - price);
 
-    // Calculate expiration: Basic=5 days, Standard=10 days, Verified=30 days, Plus=365 days
     const durationDays = plan === "verified_basic" ? 5 : plan === "verified_standard" ? 10 : plan === "verified" ? 30 : 365;
     const now = Date.now();
     const newExpiresAt =
@@ -171,7 +162,7 @@ export default function VerifiedTab({
   };
 
   const formatDate = (timestamp: number | null) => {
-    if (!timestamp) return "N/A";
+    if (!timestamp) return "Chưa kích hoạt";
     const date = new Date(timestamp);
     return date.toLocaleDateString("vi-VN", {
       day: "2-digit",
@@ -181,167 +172,142 @@ export default function VerifiedTab({
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#07080a] text-white p-4 sm:p-6 md:p-10 font-sans selection:bg-amber-400 selection:text-black relative overflow-x-hidden">
-      {/* Ambient Royal Background Lighting */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-amber-500/15 via-yellow-600/5 to-transparent blur-[120px] pointer-events-none -z-0" />
-      <div className="absolute top-[600px] right-0 w-[500px] h-[500px] bg-amber-600/10 rounded-full blur-[140px] pointer-events-none -z-0" />
-
+    <div className="w-full min-h-screen bg-[#242628] text-white p-2 sm:p-4 md:p-6 font-jura select-none space-y-4">
       {/* Daily Claim Toast */}
       {dailyBonusToast && (
-        <div className="fixed top-6 right-6 z-[9999] bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black px-6 py-3.5 rounded-2xl shadow-[0_10px_30px_rgba(245,158,11,0.5)] font-black flex items-center gap-3 animate-bounce">
-          <Coins className="w-6 h-6 shrink-0 fill-black" />
+        <div className="fixed top-4 right-4 z-[9999] bg-[#28960b] text-white border-2 border-[#141414] px-4 py-2.5 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] flex items-center gap-2.5 font-bold">
+          <Coins className="w-5 h-5 shrink-0 text-amber-300" />
           <div>
-            <div className="text-[10px] uppercase tracking-wider opacity-80 font-bold">Thành Công</div>
-            <div className="text-sm">+50 V-pearls Điểm Danh Hàng Ngày!</div>
+            <div className="text-[10px] uppercase font-mono tracking-wider opacity-90">THÀNH CÔNG</div>
+            <div className="text-xs">+50 Khoáng Thạch Điểm Danh Hàng Ngày!</div>
           </div>
         </div>
       )}
 
-      {/* Top Header Bar */}
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-amber-500/20 relative z-10">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="w-11 h-11 rounded-2xl bg-white/5 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-400 flex items-center justify-center transition-all cursor-pointer group shadow-lg"
-            title="Quay lại"
-          >
-            <ArrowLeft className="w-5 h-5 text-amber-300 group-hover:-translate-x-1 transition-transform" />
-          </button>
+      {/* Top Header Bar - Authentic Minecraft Bedrock Ore UI Panel */}
+      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <VplaySecondaryButton
+              onClick={() => {
+                playPopSound();
+                onBack();
+              }}
+              title="Quay lại"
+              fullWidth={false}
+              size="sm"
+              className="!w-9 !h-9 !p-0 shrink-0"
+            >
+              <ChevronLeft className="w-5 h-5 text-[#141414]" />
+            </VplaySecondaryButton>
+          )}
+
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/40 text-[11px] font-black uppercase text-amber-300 tracking-wider">
+            <div className="flex items-center gap-2">
+              <span className="bg-[#a855f7] text-white px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
                 VPLAY OFFICIAL VIP
               </span>
-              <BadgeCheck className="w-6 h-6 text-amber-400 fill-amber-400/20 shrink-0" />
+              <BadgeCheck className="w-5 h-5 text-purple-400 shrink-0" />
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent mt-0.5">
-              Vplay Verified Membership
+            <h1 className="text-lg sm:text-2xl font-black uppercase text-white font-jura tracking-wider mt-0.5">
+              VPLAY VERIFIED MEMBERSHIP
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-0.5">
-              Gói dịch vụ đặc quyền cao cấp sử dụng 100% V-pearls tích lũy hoàn toàn miễn phí
+            <p className="text-xs text-zinc-300 font-jura mt-0.5">
+              Gói dịch vụ đặc quyền cao cấp với huy hiệu Tích Tím chính chủ và nhiều ưu đãi VIP
             </p>
           </div>
         </div>
 
         {/* Current Balance & Daily Bonus Pill */}
-        <div className="flex items-center gap-3 bg-gradient-to-r from-amber-500/15 via-yellow-500/20 to-amber-600/15 border border-amber-500/40 px-4 py-2.5 rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.2)] w-full sm:w-auto justify-between sm:justify-start backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-md shrink-0">
-              <div className="w-full h-full rounded-[10px] bg-black flex items-center justify-center">
-                <Coins className="w-5 h-5 text-amber-400 animate-pulse" />
-              </div>
-            </div>
+        <div className="flex items-center gap-3 bg-[#1e2022] border-2 border-[#141414] px-3.5 py-2 shadow-[inset_2px_2px_0_#101112] w-full md:w-auto justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <Coins className="w-5 h-5 text-purple-400 shrink-0 animate-pulse" />
             <div>
-              <div className="text-[10px] uppercase font-extrabold text-amber-300/80 tracking-wider">Số dư V-pearls</div>
-              <div className="text-base sm:text-lg font-black text-amber-300 font-mono tracking-tight">
-                {vCoins.toLocaleString()} <span className="text-xs text-amber-400/80 font-sans">V-pearls</span>
+              <div className="text-[9px] uppercase font-mono text-zinc-400 font-bold">Số dư Khoáng Thạch</div>
+              <div className="text-sm sm:text-base font-extrabold text-purple-300 font-mono">
+                {vCoins.toLocaleString()} <span className="text-xs text-purple-400/80 font-jura">Khoáng Thạch</span>
               </div>
             </div>
           </div>
-          <button
+          <VplayPrimaryButton
             onClick={handleClaimDaily}
             disabled={dailyClaimed}
-            className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shrink-0 shadow-lg ${
-              dailyClaimed
-                ? "bg-zinc-800/80 text-zinc-500 border border-zinc-700/60 cursor-not-allowed"
-                : "bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 hover:from-amber-300 hover:to-yellow-200 text-black shadow-amber-500/30 cursor-pointer active:scale-95"
-            }`}
+            className="!py-1.5 !px-3 text-xs font-bold shrink-0"
           >
-            <Gift className="w-4 h-4" />
-            <span>{dailyClaimed ? "Đã điểm danh" : "+50 Free"}</span>
-          </button>
+            <Gift className="w-3.5 h-3.5 inline mr-1" />
+            <span>{dailyClaimed ? "Đã nhận" : "+50 Free"}</span>
+          </VplayPrimaryButton>
         </div>
       </div>
 
       {/* Main Container */}
-      <div className="max-w-6xl mx-auto py-8 space-y-12 relative z-10">
+      <div className="space-y-4">
 
-        {/* 1. HOLOGRAPHIC VIP MEMBER CARD & STATUS BANNER */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        {/* 1. ORE UI VIP MEMBER CARD & HERO BANNER */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
           
-          {/* HOLOGRAPHIC ROYAL CARD */}
-          <div className="lg:col-span-5 relative group">
-            <div className="absolute -inset-1 rounded-[32px] bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 opacity-70 blur-xl group-hover:opacity-100 transition duration-500" />
-            
-            <div className="relative rounded-[28px] bg-gradient-to-br from-zinc-950 via-zinc-900 to-amber-950/80 border-2 border-amber-500/60 p-6 sm:p-7 shadow-2xl overflow-hidden flex flex-col justify-between min-h-[260px] sm:min-h-[280px]">
+          {/* ORE UI VIP MEMBER CARD */}
+          <div className="lg:col-span-5 relative">
+            <div className="bg-[#2d2f32] border-4 border-purple-500 p-4 sm:p-5 shadow-[inset_2px_2px_0_#c084fc,inset_-2px_-2px_0_#581c87] flex flex-col justify-between min-h-[220px] h-full">
               
-              {/* Card Background Pattern */}
-              <div className="absolute -right-12 -bottom-12 w-60 h-60 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
-
-              {/* Card Top */}
-              <div className="flex items-center justify-between relative z-10">
+              {/* Card Header */}
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center font-black text-black text-xs shadow-md">
+                  <div className="w-7 h-7 bg-purple-600 border-2 border-[#141414] flex items-center justify-center font-black text-white text-xs font-mono shadow-[inset_1px_1px_0_#c084fc]">
                     VP
                   </div>
-                  <span className="font-black text-sm tracking-wider uppercase text-amber-300">
-                    VPLAY VIP PASS
+                  <span className="font-extrabold text-xs tracking-wider uppercase text-purple-300 font-jura">
+                    VPLAY VIP PURPLE PASS
                   </span>
                 </div>
                 {verifiedSub.plan === "verified_plus" ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 text-black font-black text-[10px] uppercase shadow-md">
-                    <Crown className="w-3.5 h-3.5 fill-black" />
+                  <span className="bg-[#a855f7] text-white font-black text-[10px] uppercase px-2 py-0.5 border border-[#141414] flex items-center gap-1 font-mono">
+                    <Crown className="w-3 h-3 fill-white" />
                     <span>VERIFIED PLUS</span>
-                  </div>
-                ) : verifiedSub.plan === "verified" ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/30 border border-amber-400/50 text-amber-300 font-bold text-[10px] uppercase">
-                    <BadgeCheck className="w-3.5 h-3.5 text-amber-400" />
+                  </span>
+                ) : verifiedSub.plan !== "none" ? (
+                  <span className="bg-purple-600 text-white font-bold text-[10px] uppercase px-2 py-0.5 border border-[#141414] flex items-center gap-1 font-mono">
+                    <BadgeCheck className="w-3 h-3" />
                     <span>VERIFIED MEMBER</span>
-                  </div>
-                ) : verifiedSub.plan === "verified_standard" ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/30 border border-amber-400/50 text-amber-300 font-bold text-[10px] uppercase">
-                    <BadgeCheck className="w-3.5 h-3.5 text-amber-400" />
-                    <span>VERIFIED STANDARD</span>
-                  </div>
-                ) : verifiedSub.plan === "verified_basic" ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold text-[10px] uppercase">
-                    <BadgeCheck className="w-3.5 h-3.5 text-amber-400" />
-                    <span>VERIFIED BASIC</span>
-                  </div>
+                  </span>
                 ) : (
-                  <div className="px-2.5 py-0.5 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-400 text-[10px] font-bold uppercase">
+                  <span className="bg-[#383b3e] text-zinc-400 text-[10px] font-bold uppercase px-2 py-0.5 border border-[#141414] font-mono">
                     STANDARD MEMBER
-                  </div>
+                  </span>
                 )}
               </div>
 
               {/* Card Chip & Hologram Icon */}
-              <div className="my-6 flex items-center justify-between relative z-10">
-                {/* Metallic Gold Chip */}
-                <div className="w-12 h-9 rounded-lg bg-gradient-to-tr from-amber-300 via-yellow-400 to-amber-600 p-0.5 shadow-md">
-                  <div className="w-full h-full bg-zinc-950/80 rounded-[6px] border border-amber-300/40 grid grid-cols-2 gap-0.5 p-1">
-                    <div className="border border-amber-400/30 rounded-xs" />
-                    <div className="border border-amber-400/30 rounded-xs" />
-                    <div className="border border-amber-400/30 rounded-xs" />
-                    <div className="border border-amber-400/30 rounded-xs" />
-                  </div>
+              <div className="my-4 flex items-center justify-between">
+                <div className="w-11 h-8 bg-purple-500 border-2 border-[#141414] p-1 grid grid-cols-2 gap-0.5 shadow-[inset_1px_1px_0_#e9d5ff]">
+                  <div className="border border-black/40 bg-purple-700/50" />
+                  <div className="border border-black/40 bg-purple-700/50" />
+                  <div className="border border-black/40 bg-purple-700/50" />
+                  <div className="border border-black/40 bg-purple-700/50" />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <BadgeCheck className="w-10 h-10 text-amber-400 fill-amber-400/20 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]" />
-                </div>
+                <BadgeCheck className="w-9 h-9 text-purple-400" />
               </div>
 
-              {/* Card Bottom: User Info */}
-              <div className="relative z-10 pt-2 border-t border-white/10 flex items-end justify-between">
+              {/* Card Footer: User Info */}
+              <div className="pt-2 border-t-2 border-[#141414] flex items-end justify-between">
                 <div>
-                  <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-widest">Tên Tài Khoản</div>
-                  <div className="text-base font-black text-white flex items-center gap-2 mt-0.5">
+                  <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-widest">Chủ Thẻ VIP</div>
+                  <div className="text-sm font-extrabold text-white flex items-center gap-1.5 mt-0.5 font-jura">
                     <span>Vplay Member</span>
                     {verifiedSub.plan !== "none" && (
-                      <BadgeCheck className="w-4 h-4 text-amber-400 inline shrink-0" />
+                      <BadgeCheck className="w-4 h-4 text-purple-400 inline shrink-0" />
                     )}
                   </div>
-                  <div className="text-[10px] font-mono text-amber-400/80 mt-0.5">
+                  <div className="text-[10px] font-mono text-purple-300 mt-0.5">
                     ID: 888-VP-VERIFIED-VIP
                   </div>
                 </div>
 
                 <div className="text-right">
                   <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-widest">Hạn Thẻ</div>
-                  <div className="text-xs font-mono font-bold text-amber-300 mt-0.5">
-                    {verifiedSub.expiresAt ? formatDate(verifiedSub.expiresAt) : "Chưa kích hoạt"}
+                  <div className="text-xs font-mono font-bold text-purple-300 mt-0.5">
+                    {formatDate(verifiedSub.expiresAt)}
                   </div>
                 </div>
               </div>
@@ -350,305 +316,301 @@ export default function VerifiedTab({
           </div>
 
           {/* RIGHT SIDE HERO DESCRIPTION */}
-          <div className="lg:col-span-7 space-y-5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold">
-              <Sparkles className="w-3.5 h-3.5 fill-amber-400" />
-              <span>Thế Hệ Tài Khoản VIP Đỉnh Cao Vplay</span>
+          <div className="lg:col-span-7 bg-[#2d2f32] border-4 border-[#141414] p-4 sm:p-5 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#1e2022] border border-[#141414] text-purple-300 text-xs font-bold font-mono">
+                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                <span>Thế Hệ Tài Khoản VIP Đỉnh Cao Vplay</span>
+              </div>
+
+              <h2 className="text-base sm:text-xl font-black text-white leading-snug uppercase font-jura">
+                Tối Ưu Trải Nghiệm Giải Trí Với <span className="text-purple-400">Đặc Quyền Verified Tím</span>
+              </h2>
+
+              <p className="text-xs text-zinc-300 leading-relaxed font-jura">
+                Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến Vplay. Tự do sở hữu huy hiệu tích tím uy tín, thưởng thức Live TV Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày Khoáng Thạch mỗi ngày!
+              </p>
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
-              Tối Ưu Trải Nghiệm Giải Trí Với <span className="bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">Đặc Quyền Verified</span>
-            </h2>
-
-            <p className="text-sm text-zinc-300 leading-relaxed">
-              Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến Vplay. Tự do sở hữu huy hiệu tích vàng uy tín, thưởng thức Live TV Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày V-pearls mỗi ngày!
-            </p>
-
             {/* Quick stats pills */}
-            <div className="grid grid-cols-3 gap-3 pt-2">
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
-                <div className="text-lg font-black text-amber-400 font-mono">0 VNĐ</div>
-                <div className="text-[10px] text-zinc-400 font-bold uppercase mt-0.5">Không Tốn Phí</div>
+            <div className="grid grid-cols-3 gap-2 pt-2">
+              <div className="p-2 bg-[#1f2123] border-2 border-[#141414] text-center">
+                <div className="text-sm font-extrabold text-amber-300 font-mono">0 VNĐ</div>
+                <div className="text-[9px] text-zinc-400 font-bold uppercase mt-0.5 font-jura">Không Tốn Phí</div>
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
-                <div className="text-lg font-black text-amber-400 font-mono">4K Ultra</div>
-                <div className="text-[10px] text-zinc-400 font-bold uppercase mt-0.5">Server VIP</div>
+              <div className="p-2 bg-[#1f2123] border-2 border-[#141414] text-center">
+                <div className="text-sm font-extrabold text-amber-300 font-mono">4K Ultra</div>
+                <div className="text-[9px] text-zinc-400 font-bold uppercase mt-0.5 font-jura">Server VIP</div>
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
-                <div className="text-lg font-black text-amber-400 font-mono">X2 V-pearls</div>
-                <div className="text-[10px] text-zinc-400 font-bold uppercase mt-0.5">Tốc Độ Cày</div>
+              <div className="p-2 bg-[#1f2123] border-2 border-[#141414] text-center">
+                <div className="text-sm font-extrabold text-amber-300 font-mono">x2 Tốc Độ</div>
+                <div className="text-[9px] text-zinc-400 font-bold uppercase mt-0.5 font-jura">Cày Khoáng Thạch</div>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* TAB SWITCHER SECTIONS */}
-        <div className="flex items-center justify-center gap-2 p-1.5 rounded-2xl bg-zinc-900/90 border border-white/10 max-w-xl mx-auto shadow-xl">
-          <button
-            onClick={() => setActiveTabSection("plans")}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-              activeTabSection === "plans"
-                ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-md"
-                : "text-zinc-400 hover:text-white"
-            }`}
+        {/* TAB SWITCHER SECTIONS (Ore UI Horizontal Tabs) */}
+        <div className="bg-[#2a2c2e] border-2 border-[#141414] p-1 shadow-lg flex items-center justify-center gap-1.5 overflow-x-auto no-scrollbar">
+          <VplayTab
+            active={activeTabSection === "plans"}
+            onClick={() => {
+              playPopSound();
+              setActiveTabSection("plans");
+            }}
+            className="flex-1 !py-2 text-xs font-bold"
           >
             Các Gói Verified
-          </button>
-          <button
-            onClick={() => setActiveTabSection("comparison")}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-              activeTabSection === "comparison"
-                ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-md"
-                : "text-zinc-400 hover:text-white"
-            }`}
+          </VplayTab>
+
+          <VplayTab
+            active={activeTabSection === "comparison"}
+            onClick={() => {
+              playPopSound();
+              setActiveTabSection("comparison");
+            }}
+            className="flex-1 !py-2 text-xs font-bold"
           >
             Bảng So Sánh
-          </button>
-          <button
-            onClick={() => setActiveTabSection("earning")}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-              activeTabSection === "earning"
-                ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-md"
-                : "text-zinc-400 hover:text-white"
-            }`}
+          </VplayTab>
+
+          <VplayTab
+            active={activeTabSection === "earning"}
+            onClick={() => {
+              playPopSound();
+              setActiveTabSection("earning");
+            }}
+            className="flex-1 !py-2 text-xs font-bold"
           >
-            Tích V-pearls
-          </button>
-          <button
-            onClick={() => setActiveTabSection("storage")}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              activeTabSection === "storage"
-                ? "bg-gradient-to-r from-cyan-500 via-sky-400 to-blue-500 text-black shadow-md"
-                : "text-zinc-400 hover:text-white"
-            }`}
+            Tích Khoáng Thạch
+          </VplayTab>
+
+          <VplayTab
+            active={activeTabSection === "storage"}
+            onClick={() => {
+              playPopSound();
+              setActiveTabSection("storage");
+            }}
+            className="flex-1 !py-2 text-xs font-bold"
           >
-            <HardDrive className="w-3.5 h-3.5" />
-            <span>Mua Storage</span>
-          </button>
+            <span className="flex items-center justify-center gap-1">
+              <HardDrive className="w-3.5 h-3.5 text-sky-400" />
+              <span>Mua Storage</span>
+            </span>
+          </VplayTab>
         </div>
 
         {/* SECTION 1: PLANS CARDS (4 PACKAGES) */}
         {activeTabSection === "plans" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* PLAN 1: VERIFIED BASIC - 5 DAYS TRIAL (10,000 V-PEARLS) */}
-            <div className="relative rounded-3xl bg-zinc-950/90 border border-zinc-700/60 hover:border-amber-400/60 p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_10px_30px_rgba(245,158,11,0.15)] group">
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase">
+            {/* PLAN 1: VERIFIED BASIC - 5 DAYS TRIAL (10,000 KHOÁNG THẠCH) */}
+            <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022]">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="bg-[#1e2022] text-purple-300 border border-[#141414] text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
                     Thử Nghiệm 5 Ngày
-                  </div>
-                  <BadgeCheck className="w-6 h-6 text-amber-400/80" />
+                  </span>
+                  <BadgeCheck className="w-5 h-5 text-purple-400" />
                 </div>
 
-                <h3 className="text-xl font-black text-white">Verified Basic</h3>
-                <p className="text-xs text-zinc-400 mt-1">Trải nghiệm nhanh đặc quyền Tích Xanh 5 ngày</p>
+                <div>
+                  <h3 className="text-base font-extrabold text-white uppercase font-jura">Verified Basic</h3>
+                  <p className="text-[11px] text-zinc-300 font-jura">Trải nghiệm nhanh đặc quyền Tích Tím 5 ngày</p>
+                </div>
 
-                <div className="my-4 pb-4 border-b border-white/10">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl sm:text-3xl font-black text-amber-300 font-mono">10,000</span>
-                    <span className="text-xs font-bold text-zinc-400">V-pearls / 5 ngày</span>
+                <div className="py-2 border-y-2 border-[#141414]">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-extrabold text-purple-300 font-mono">10.000</span>
+                    <span className="text-xs font-bold text-zinc-300 font-jura">Khoáng Thạch / 5 ngày</span>
                   </div>
-                  <p className="text-[10px] text-zinc-400 mt-1">Cực kỳ dễ tích lũy cho người mới bắt đầu</p>
+                  <p className="text-[10px] text-zinc-400 mt-0.5 font-jura">Dễ tích lũy cho người mới bắt đầu</p>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span>Huy hiệu <strong>Tích Xanh Verified</strong> (5 ngày)</span>
+                <div className="space-y-2 text-xs text-zinc-200 font-jura">
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                    <span>Huy hiệu <strong>Tích Tím Verified</strong> (5 ngày)</span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                     <span>Xem Live TV chất lượng <strong>Full HD 1080p</strong></span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                     <span>Giảm thiểu quảng cáo che màn hình</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span>Trải nghiệm Mạng Xã Hội V-Flow</span>
                   </div>
                 </div>
               </div>
 
-              <button
+              <VplayPrimaryButton
                 onClick={() => handlePurchase("verified_basic")}
-                className="w-full py-3 rounded-2xl bg-zinc-900 hover:bg-amber-400 hover:text-black text-white font-black text-xs border border-amber-500/30 hover:border-amber-300 transition-all cursor-pointer flex items-center justify-center gap-2 group-hover:bg-amber-400 group-hover:text-black shadow-md"
+                variant="purple"
+                className="!py-2 text-xs font-bold w-full"
               >
-                <Coins className="w-4 h-4" />
-                <span>Basic (10.000 V-pearls)</span>
-              </button>
+                <Coins className="w-3.5 h-3.5 inline mr-1" /> Basic (10.000 ore)
+              </VplayPrimaryButton>
             </div>
 
-            {/* PLAN 2: VERIFIED STANDARD - 10 DAYS TRIAL (100,000 V-PEARLS) */}
-            <div className="relative rounded-3xl bg-zinc-950/90 border border-amber-500/40 hover:border-amber-400/80 p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_10px_35px_rgba(245,158,11,0.2)] group">
-              {/* Highlight Ribbon */}
-              <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-amber-500 text-black text-[10px] font-black uppercase tracking-wider shadow-md">
+            {/* PLAN 2: VERIFIED STANDARD - 10 DAYS TRIAL (100,000 KHOÁNG THẠCH) */}
+            <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] relative">
+              <div className="absolute -top-3 right-3 bg-purple-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 border border-[#141414] font-mono">
                 HOT 10 Ngày
               </div>
 
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-black uppercase">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="bg-[#1e2022] text-purple-300 border border-[#141414] text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
                     Thử Nghiệm 10 Ngày
-                  </div>
-                  <BadgeCheck className="w-6 h-6 text-amber-400" />
+                  </span>
+                  <BadgeCheck className="w-5 h-5 text-purple-400" />
                 </div>
 
-                <h3 className="text-xl font-black text-white">Verified Standard</h3>
-                <p className="text-xs text-zinc-400 mt-1">Trải nghiệm chuẩn mực 10 ngày với Tích Xanh & Server 4K</p>
+                <div>
+                  <h3 className="text-base font-extrabold text-white uppercase font-jura">Verified Standard</h3>
+                  <p className="text-[11px] text-zinc-300 font-jura">Trải nghiệm chuẩn mực 10 ngày với Tích Tím & Server 4K</p>
+                </div>
 
-                <div className="my-4 pb-4 border-b border-white/10">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl sm:text-3xl font-black text-amber-300 font-mono">100,000</span>
-                    <span className="text-xs font-bold text-zinc-400">V-pearls / 10 ngày</span>
+                <div className="py-2 border-y-2 border-[#141414]">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-extrabold text-purple-300 font-mono">100.000</span>
+                    <span className="text-xs font-bold text-zinc-300 font-jura">Khoáng Thạch / 10 ngày</span>
                   </div>
-                  <p className="text-[10px] text-amber-300/80 mt-1">Tiết kiệm và đầy đủ đặc quyền 10 ngày</p>
+                  <p className="text-[10px] text-purple-300 mt-0.5 font-jura">Tiết kiệm và đầy đủ đặc quyền 10 ngày</p>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span>Huy hiệu <strong>Tích Xanh VIP</strong> chính chủ (10 ngày)</span>
+                <div className="space-y-2 text-xs text-zinc-200 font-jura">
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                    <span>Huy hiệu <strong>Tích Tím VIP</strong> chính chủ</span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                     <span>Xem Live TV & Shorts <strong>Server 4K Ultra HD</strong></span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                     <span><strong>Loại bỏ 100% quảng cáo</strong> gây phiền phức</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span>Tốc độ phát truyền hình mượt mà không delay</span>
                   </div>
                 </div>
               </div>
 
-              <button
+              <VplayPrimaryButton
                 onClick={() => handlePurchase("verified_standard")}
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-400 hover:to-yellow-300 text-amber-300 hover:text-black font-black text-xs border border-amber-400/50 hover:border-amber-300 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                variant="purple"
+                className="!py-2 text-xs font-bold w-full"
               >
-                <Coins className="w-4 h-4" />
-                <span>Standard (100.000 V-pearls)</span>
-              </button>
+                <Coins className="w-3.5 h-3.5 inline mr-1" /> Standard (100.000 ore)
+              </VplayPrimaryButton>
             </div>
 
-            {/* PLAN 3: VERIFIED 1 MONTH (1,000,000 V-PEARLS) */}
-            <div className="relative rounded-3xl bg-zinc-950/90 border border-amber-500/50 hover:border-amber-400 p-5 sm:p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_10px_40px_rgba(245,158,11,0.25)] group">
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase">
-                    Gói 1 Tháng Phổ Biến
-                  </div>
-                  <BadgeCheck className="w-7 h-7 text-amber-400" />
+            {/* PLAN 3: VERIFIED 1 MONTH (1,000,000 KHOÁNG THẠCH) */}
+            <div className="bg-[#2d2f32] border-4 border-purple-600 p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#c084fc,inset_-2px_-2px_0_#581c87]">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="bg-purple-900/60 text-purple-200 border border-purple-500 text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
+                    Gói 1 Tháng VIP
+                  </span>
+                  <BadgeCheck className="w-5 h-5 text-purple-400" />
                 </div>
 
-                <h3 className="text-xl font-black text-white">Verified 1 Tháng</h3>
-                <p className="text-xs text-zinc-400 mt-1">Trọn vẹn 30 ngày trải nghiệm chuẩn 4K Ultra HD</p>
+                <div>
+                  <h3 className="text-base font-extrabold text-white uppercase font-jura">Verified 1 Tháng</h3>
+                  <p className="text-[11px] text-zinc-300 font-jura">Trọn vẹn 30 ngày trải nghiệm chuẩn 4K Ultra HD</p>
+                </div>
 
-                <div className="my-4 pb-4 border-b border-white/10">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl sm:text-3xl font-black text-amber-300 font-mono">1,000,000</span>
-                    <span className="text-xs font-bold text-zinc-400">V-pearls / 30 ngày</span>
+                <div className="py-2 border-y-2 border-[#141414]">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-extrabold text-purple-300 font-mono">1.000.000</span>
+                    <span className="text-xs font-bold text-zinc-300 font-jura">Khoáng Thạch / 30 ngày</span>
                   </div>
-                  <p className="text-[10px] text-zinc-400 mt-1">Đầy đủ tính năng cao cấp không giới hạn</p>
+                  <p className="text-[10px] text-zinc-400 mt-0.5 font-jura">Đầy đủ tính năng cao cấp không giới hạn</p>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span>Huy hiệu <strong>Tích Xanh Verified VIP</strong> chính chủ</span>
+                <div className="space-y-2 text-xs text-zinc-200 font-jura">
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                    <span>Huy hiệu <strong>Tích Tím Verified VIP</strong> chính chủ</span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                     <span>Xem Live TV & Shorts <strong>Server 4K Ultra HD Low-Latency</strong></span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                     <span><strong>Loại bỏ 100% quảng cáo</strong> che mắt</span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-200">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span>Đăng bài & chia sẻ trên Mạng Xã Hội V-Flow</span>
-                  </div>
                 </div>
               </div>
 
-              <button
+              <VplayPrimaryButton
                 onClick={() => handlePurchase("verified")}
-                className="w-full py-3 rounded-2xl bg-zinc-900 hover:bg-amber-400 hover:text-black text-white font-black text-xs border border-amber-500/40 hover:border-amber-300 transition-all cursor-pointer flex items-center justify-center gap-2 group-hover:bg-amber-400 group-hover:text-black group-hover:shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+                variant="purple"
+                className="!py-2 text-xs font-bold w-full"
               >
-                <Coins className="w-4 h-4" />
-                <span>Verified (1.000.000 V-pearls)</span>
-              </button>
+                <Coins className="w-3.5 h-3.5 inline mr-1" /> Verified (1.000.000 ore)
+              </VplayPrimaryButton>
             </div>
 
-            {/* PLAN 4: VERIFIED PLUS 1 YEAR (5,000,000 V-PEARLS) */}
-            <div className="relative rounded-3xl bg-gradient-to-b from-amber-950/40 via-zinc-950 to-zinc-950 border-2 border-amber-400 p-5 sm:p-6 flex flex-col justify-between shadow-[0_15px_50px_rgba(245,158,11,0.25)]">
-              {/* Gold Crown Ribbon */}
-              <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1 animate-pulse">
-                <Crown className="w-3.5 h-3.5 fill-black" />
-                <span>Khuyên Dùng - Rẻ Hơn 58%</span>
+            {/* PLAN 4: VERIFIED PLUS 1 YEAR (5,000,000 KHOÁNG THẠCH) */}
+            <div className="bg-[#3b1d54] border-4 border-purple-400 p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#e9d5ff,inset_-2px_-2px_0_#581c87] relative">
+              <div className="absolute -top-3 right-3 bg-purple-500 text-white text-[10px] font-black uppercase px-2 py-0.5 border border-[#141414] font-mono flex items-center gap-1">
+                <Crown className="w-3 h-3 fill-white" />
+                <span>Rẻ Hơn 58%</span>
               </div>
 
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-black border border-amber-400/50">
-                    Đặc Quyền Hoàng Gia 1 Năm
-                  </div>
-                  <Crown className="w-7 h-7 text-amber-400" />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="bg-[#1e2022] text-purple-300 border border-[#141414] text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
+                    Hoàng Gia 1 Năm
+                  </span>
+                  <Crown className="w-6 h-6 text-purple-300" />
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
-                  Verified PLUS (1 Năm)
-                </h3>
-                <p className="text-xs text-amber-200/80 mt-1">Trọn bộ đặc quyền cao cấp nhất cùng Tích Vàng Hoàng Gia</p>
+                <div>
+                  <h3 className="text-base font-black text-purple-200 uppercase font-jura">Verified PLUS (1 Năm)</h3>
+                  <p className="text-[11px] text-purple-200/80 font-jura">Trọn bộ đặc quyền cao cấp nhất cùng Tích Tím VIP</p>
+                </div>
 
-                <div className="my-4 pb-4 border-b border-amber-500/30">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl sm:text-3xl font-black text-amber-300 font-mono">5,000,000</span>
-                    <span className="text-xs font-bold text-amber-200">V-pearls / 365 ngày</span>
+                <div className="py-2 border-y-2 border-[#141414]">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl font-extrabold text-purple-200 font-mono">5.000.000</span>
+                    <span className="text-xs font-bold text-purple-200 font-jura">Khoáng Thạch / 365 ngày</span>
                   </div>
-                  <div className="text-[10px] text-emerald-400 font-bold mt-1 flex items-center gap-1">
-                    <Zap className="w-3 h-3 fill-emerald-400" />
+                  <div className="text-[10px] text-emerald-400 font-bold mt-0.5 flex items-center gap-1 font-jura">
+                    <Zap className="w-3 h-3 text-emerald-400" />
                     <span>Tiết kiệm 58% so với gia hạn hàng tháng!</span>
                   </div>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-2 text-xs text-amber-100 font-bold bg-amber-500/10 p-2 rounded-xl border border-amber-500/20">
-                    <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5 fill-amber-400" />
-                    <span><strong>X2 Tốc độ cày V-pearls</strong> (+20 V-pearls/phút khi xem phim & live)</span>
+                <div className="space-y-2 text-xs text-purple-100 font-jura">
+                  <div className="flex items-start gap-1.5 bg-[#1e2022]/60 p-1.5 border border-purple-400/30">
+                    <Zap className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
+                    <span><strong>x2 Tốc độ cày Khoáng Thạch</strong> (+20 Khoáng Thạch/phút)</span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-100">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span><strong>Huy hiệu Tích Vàng VIP Hoàng Gia</strong></span>
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-300 shrink-0 mt-0.5" />
+                    <span><strong>Huy hiệu Tích Tím VIP Hoàng Gia</strong></span>
                   </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-100">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-purple-300 shrink-0 mt-0.5" />
                     <span>Ưu tiên Server truyền hình riêng biệt tốc độ cực cao</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-xs text-zinc-100">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <span>Hỗ trợ kỹ thuật riêng & chăm sóc VIP 24/7</span>
                   </div>
                 </div>
               </div>
 
               <button
+                type="button"
                 onClick={() => handlePurchase("verified_plus")}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 hover:from-amber-300 hover:to-yellow-200 text-black font-black text-xs shadow-[0_10px_25px_rgba(245,158,11,0.5)] transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-black text-xs border-2 border-[#141414] shadow-[inset_2px_2px_0_#c084fc,inset_-2px_-2px_0_#3b0764] flex items-center justify-center gap-1.5 uppercase font-jura active:translate-y-[1px] cursor-default"
               >
-                <Crown className="w-4 h-4 fill-black" />
-                <span>Nâng Cấp PLUS (5.000.000 V-pearls)</span>
+                <Crown className="w-4 h-4 fill-white" />
+                <span>Nâng Cấp PLUS (5.000.000 ore)</span>
               </button>
             </div>
 
@@ -657,71 +619,63 @@ export default function VerifiedTab({
 
         {/* SECTION 2: COMPARISON MATRIX */}
         {activeTabSection === "comparison" && (
-          <div className="rounded-3xl bg-zinc-950/80 border border-amber-500/30 overflow-hidden shadow-2xl p-6 sm:p-8">
-            <h3 className="text-xl font-black text-white text-center mb-6">
+          <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 sm:p-5 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] space-y-4">
+            <h3 className="text-base font-extrabold text-white text-center uppercase font-jura">
               So Sánh Chi Tiết Quyền Lợi Hội Viên Vplay
             </h3>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[700px]">
+              <table className="w-full text-left border-collapse min-w-[650px] font-jura text-xs">
                 <thead>
-                  <tr className="border-b border-white/10 text-xs uppercase text-zinc-400">
-                    <th className="py-4 px-4 font-bold">Tính Năng / Đặc Quyền</th>
-                    <th className="py-4 px-3 font-bold text-center">Standard (Free)</th>
-                    <th className="py-4 px-3 font-bold text-center text-amber-200">Basic (5 ngày)</th>
-                    <th className="py-4 px-3 font-bold text-center text-amber-300">Standard (10 ngày)</th>
-                    <th className="py-4 px-3 font-bold text-center text-amber-400">Verified (1T)</th>
-                    <th className="py-4 px-3 font-bold text-center text-amber-300 bg-amber-500/10 rounded-t-xl">PLUS (1N)</th>
+                  <tr className="bg-[#1f2022] border-2 border-[#141414] text-zinc-300 uppercase font-mono">
+                    <th className="py-2.5 px-3 font-bold">Tính Năng / Đặc Quyền</th>
+                    <th className="py-2.5 px-2 font-bold text-center">Standard</th>
+                    <th className="py-2.5 px-2 font-bold text-center text-purple-200">Basic (5 ngày)</th>
+                    <th className="py-2.5 px-2 font-bold text-center text-purple-300">Standard (10 ngày)</th>
+                    <th className="py-2.5 px-2 font-bold text-center text-purple-400">Verified (1T)</th>
+                    <th className="py-2.5 px-2 font-bold text-center text-purple-300 bg-[#3b1d54]">PLUS (1N)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-xs sm:text-sm">
-                  <tr>
-                    <td className="py-4 px-4 font-semibold text-white">Huy hiệu Tích xanh / Tích vàng</td>
-                    <td className="py-4 px-3 text-center text-zinc-500">—</td>
-                    <td className="py-4 px-3 text-center text-amber-300">Tích Xanh</td>
-                    <td className="py-4 px-3 text-center text-amber-300">Tích Xanh</td>
-                    <td className="py-4 px-3 text-center text-amber-400 font-bold">Tích Xanh VIP</td>
-                    <td className="py-4 px-3 text-center text-amber-300 font-black bg-amber-500/10">Tích Vàng Hoàng Gia</td>
+                <tbody className="divide-y-2 divide-[#141414] text-xs">
+                  <tr className="bg-[#27292c]">
+                    <td className="py-2.5 px-3 font-bold text-white">Huy hiệu Tích Tím / VIP</td>
+                    <td className="py-2.5 px-2 text-center text-zinc-500">—</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300">Tích Tím</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300">Tích Tím</td>
+                    <td className="py-2.5 px-2 text-center text-purple-400 font-bold">Tích Tím VIP</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300 font-black bg-[#3b1d54]">Tích Tím Hoàng Gia</td>
                   </tr>
-                  <tr>
-                    <td className="py-4 px-4 font-semibold text-white">Chất lượng phát Live TV & Shorts</td>
-                    <td className="py-4 px-3 text-center text-zinc-400">720p HD</td>
-                    <td className="py-4 px-3 text-center text-amber-200">1080p Full HD</td>
-                    <td className="py-4 px-3 text-center text-amber-300">4K Ultra HD</td>
-                    <td className="py-4 px-3 text-center text-amber-300 font-bold">4K Ultra HD</td>
-                    <td className="py-4 px-3 text-center text-amber-300 font-black bg-amber-500/10">4K Ultra HD VIP</td>
+                  <tr className="bg-[#2d2f32]">
+                    <td className="py-2.5 px-3 font-bold text-white">Chất lượng phát Live TV & Shorts</td>
+                    <td className="py-2.5 px-2 text-center text-zinc-400">720p HD</td>
+                    <td className="py-2.5 px-2 text-center text-purple-200">1080p Full HD</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300">4K Ultra HD</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300 font-bold">4K Ultra HD</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300 font-black bg-[#3b1d54]">4K Ultra HD VIP</td>
                   </tr>
-                  <tr>
-                    <td className="py-4 px-4 font-semibold text-white">Trải nghiệm xem phim</td>
-                    <td className="py-4 px-3 text-center text-zinc-400">Có quảng cáo</td>
-                    <td className="py-4 px-3 text-center text-emerald-300">Giảm QC</td>
-                    <td className="py-4 px-3 text-center text-emerald-400">Tắt Quảng Cáo</td>
-                    <td className="py-4 px-3 text-center text-emerald-400 font-bold">Tắt Quảng Cáo</td>
-                    <td className="py-4 px-3 text-center text-emerald-400 font-black bg-amber-500/10">Tắt Quảng Cáo 100%</td>
+                  <tr className="bg-[#27292c]">
+                    <td className="py-2.5 px-3 font-bold text-white">Trải nghiệm xem phim</td>
+                    <td className="py-2.5 px-2 text-center text-zinc-400">Có quảng cáo</td>
+                    <td className="py-2.5 px-2 text-center text-emerald-300">Giảm QC</td>
+                    <td className="py-2.5 px-2 text-center text-emerald-400">Tắt Quảng Cáo</td>
+                    <td className="py-2.5 px-2 text-center text-emerald-400 font-bold">Tắt Quảng Cáo</td>
+                    <td className="py-2.5 px-2 text-center text-emerald-400 font-black bg-[#3b1d54]">Tắt Quảng Cáo 100%</td>
                   </tr>
-                  <tr>
-                    <td className="py-4 px-4 font-semibold text-white">Tốc độ cày V-pearls khi giải trí</td>
-                    <td className="py-4 px-3 text-center text-zinc-300">10 V-pearls / phút</td>
-                    <td className="py-4 px-3 text-center text-amber-200">10 V-pearls / phút</td>
-                    <td className="py-4 px-3 text-center text-amber-300">10 V-pearls / phút</td>
-                    <td className="py-4 px-3 text-center text-amber-300 font-bold">10 V-pearls / phút</td>
-                    <td className="py-4 px-3 text-center text-amber-400 font-black bg-amber-500/10">20 V-pearls / phút (X2)</td>
+                  <tr className="bg-[#2d2f32]">
+                    <td className="py-2.5 px-3 font-bold text-white">Tốc độ cày Khoáng Thạch khi giải trí</td>
+                    <td className="py-2.5 px-2 text-center text-zinc-300">10 Khoáng Thạch / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-200">10 Khoáng Thạch / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300">10 Khoáng Thạch / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300 font-bold">10 Khoáng Thạch / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-400 font-black bg-[#3b1d54]">20 Khoáng Thạch / phút (x2)</td>
                   </tr>
-                  <tr>
-                    <td className="py-4 px-4 font-semibold text-white">Server đường truyền ưu tiên</td>
-                    <td className="py-4 px-3 text-center text-zinc-500">Mặc định</td>
-                    <td className="py-4 px-3 text-center text-zinc-300">Tiêu chuẩn</td>
-                    <td className="py-4 px-3 text-center text-amber-200">Tốc Độ Cao</td>
-                    <td className="py-4 px-3 text-center text-amber-300 font-bold">Tốc Độ Cao</td>
-                    <td className="py-4 px-3 text-center text-amber-300 font-black bg-amber-500/10">Server VIP Độc Quyền</td>
-                  </tr>
-                  <tr>
-                    <td className="py-4 px-4 font-semibold text-white">Mạng xã hội V-Flow VIP</td>
-                    <td className="py-4 px-3 text-center text-zinc-500">Chỉ xem</td>
-                    <td className="py-4 px-3 text-center text-emerald-400">Đăng & Bình luận</td>
-                    <td className="py-4 px-3 text-center text-emerald-400">Đăng & Bình luận</td>
-                    <td className="py-4 px-3 text-center text-emerald-400 font-bold">Đăng & Bình luận</td>
-                    <td className="py-4 px-3 text-center text-amber-300 font-black bg-amber-500/10">Ưu Tiên Hiển Thị</td>
+                  <tr className="bg-[#27292c]">
+                    <td className="py-2.5 px-3 font-bold text-white">Server đường truyền ưu tiên</td>
+                    <td className="py-2.5 px-2 text-center text-zinc-500">Mặc định</td>
+                    <td className="py-2.5 px-2 text-center text-zinc-300">Tiêu chuẩn</td>
+                    <td className="py-2.5 px-2 text-center text-purple-200">Tốc Độ Cao</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300 font-bold">Tốc Độ Cao</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300 font-black bg-[#3b1d54]">Server VIP Độc Quyền</td>
                   </tr>
                 </tbody>
               </table>
@@ -731,83 +685,79 @@ export default function VerifiedTab({
 
         {/* SECTION 3: EARNING GUIDE */}
         {activeTabSection === "earning" && (
-          <div className="space-y-6">
+          <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 sm:p-5 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] space-y-4">
             <div className="text-center max-w-xl mx-auto">
-              <h3 className="text-2xl font-black text-white">
-                Kiếm V-pearls Miễn Phí Rất Đơn Giản
+              <h3 className="text-base font-black text-white uppercase font-jura">
+                Tích Khoáng Thạch Miễn Phí Rất Đơn Giản
               </h3>
-              <p className="text-xs text-zinc-400 mt-1">
-                Không cần nạp tiền thật! Chỉ cần thưởng thức truyền hình và video ngắn trên Vplay để cày V-pearls
+              <p className="text-xs text-zinc-300 mt-1 font-jura">
+                Không cần nạp tiền thật! Chỉ cần thưởng thức truyền hình và video ngắn trên Vplay để cày Khoáng Thạch
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               
-              <div className="p-6 rounded-3xl bg-zinc-950/80 border border-white/10 hover:border-red-500/50 transition-all flex flex-col justify-between space-y-4">
-                <div className="space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
-                    <Tv className="w-6 h-6" />
+              <div className="p-4 bg-[#1f2123] border-2 border-[#141414] flex flex-col justify-between space-y-3">
+                <div className="space-y-2">
+                  <div className="w-10 h-10 bg-[#cc1827] border-2 border-[#141414] flex items-center justify-center text-white font-bold">
+                    <Tv className="w-5 h-5" />
                   </div>
-                  <h4 className="text-base font-black text-white">Xem Truyền Hình Live TV</h4>
-                  <p className="text-xs text-zinc-400">
-                    Mỗi phút xem trực tiếp các kênh VTV, HTV, Thể thao... sẽ tự động nhận V-pearls
+                  <h4 className="text-sm font-extrabold text-white font-jura">Xem Truyền Hình Live TV</h4>
+                  <p className="text-xs text-zinc-300 font-jura">
+                    Mỗi phút xem trực tiếp các kênh VTV, HTV, Thể thao... sẽ tự động nhận Khoáng Thạch
                   </p>
                 </div>
                 <div>
-                  <div className="text-base font-black text-amber-400 font-mono">+10 V-pearls/phút</div>
-                  <button
-                    onClick={() => onNavigateToTab("live")}
-                    className="mt-3 w-full py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold text-xs transition-all cursor-pointer"
+                  <div className="text-sm font-extrabold text-amber-400 font-mono">+10 Khoáng Thạch / phút</div>
+                  <VplaySecondaryButton
+                    onClick={() => onNavigateToTab?.("live_tv")}
+                    className="mt-2 w-full text-xs py-1.5"
                   >
                     Mở Live TV Ngay
-                  </button>
+                  </VplaySecondaryButton>
                 </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-zinc-950/80 border border-white/10 hover:border-purple-500/50 transition-all flex flex-col justify-between space-y-4">
-                <div className="space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
-                    <Film className="w-6 h-6" />
+              <div className="p-4 bg-[#1f2123] border-2 border-[#141414] flex flex-col justify-between space-y-3">
+                <div className="space-y-2">
+                  <div className="w-10 h-10 bg-purple-600 border-2 border-[#141414] flex items-center justify-center text-white font-bold">
+                    <Film className="w-5 h-5" />
                   </div>
-                  <h4 className="text-base font-black text-white">Xem Video Ngắn Vertical</h4>
-                  <p className="text-xs text-zinc-400">
-                    Lướt video giải trí ngắn chuẩn Shorts/TikTok cực cuốn nhận V-pearls tự động
+                  <h4 className="text-sm font-extrabold text-white font-jura">Xem Video Vertical</h4>
+                  <p className="text-xs text-zinc-300 font-jura">
+                    Lướt video giải trí ngắn chuẩn Shorts/TikTok cực cuốn nhận Khoáng Thạch tự động
                   </p>
                 </div>
                 <div>
-                  <div className="text-base font-black text-amber-400 font-mono">+10 V-pearls/phút</div>
-                  <button
-                    onClick={() => onNavigateToTab("shorts")}
-                    className="mt-3 w-full py-2.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 font-bold text-xs transition-all cursor-pointer"
+                  <div className="text-sm font-extrabold text-amber-400 font-mono">+10 Khoáng Thạch / phút</div>
+                  <VplaySecondaryButton
+                    onClick={() => onNavigateToTab?.("vertical")}
+                    className="mt-2 w-full text-xs py-1.5"
                   >
                     Mở Vertical Shorts
-                  </button>
+                  </VplaySecondaryButton>
                 </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-zinc-950/80 border border-white/10 hover:border-amber-500/50 transition-all flex flex-col justify-between space-y-4">
-                <div className="space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                    <Gift className="w-6 h-6" />
+              <div className="p-4 bg-[#1f2123] border-2 border-[#141414] flex flex-col justify-between space-y-3">
+                <div className="space-y-2">
+                  <div className="w-10 h-10 bg-amber-600 border-2 border-[#141414] flex items-center justify-center text-white font-bold">
+                    <Gift className="w-5 h-5 text-amber-200" />
                   </div>
-                  <h4 className="text-base font-black text-white">Điểm Danh Mỗi Ngày</h4>
-                  <p className="text-xs text-zinc-400">
+                  <h4 className="text-sm font-extrabold text-white font-jura">Điểm Danh Mỗi Ngày</h4>
+                  <p className="text-xs text-zinc-300 font-jura">
                     Bấm nhận quà điểm danh hàng ngày hoàn toàn free chỉ với 1 click
                   </p>
                 </div>
                 <div>
-                  <div className="text-base font-black text-amber-400 font-mono">+50 V-pearls/ngày</div>
-                  <button
+                  <div className="text-sm font-extrabold text-amber-400 font-mono">+50 Khoáng Thạch / ngày</div>
+                  <VplayPrimaryButton
                     onClick={handleClaimDaily}
                     disabled={dailyClaimed}
-                    className={`mt-3 w-full py-2.5 rounded-xl text-xs font-bold transition-all ${
-                      dailyClaimed
-                        ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                        : "bg-amber-500 text-black hover:bg-amber-400 cursor-pointer"
-                    }`}
+                    className="mt-2 w-full text-xs py-1.5"
                   >
-                    {dailyClaimed ? "Đã Nhận Hôm Nay" : "Nhận 50 V-pearls Free"}
-                  </button>
+                    {dailyClaimed ? "Đã Nhận Hôm Nay" : "Nhận 50 ore Free"}
+                  </VplayPrimaryButton>
                 </div>
               </div>
 
@@ -817,217 +767,170 @@ export default function VerifiedTab({
 
         {/* SECTION 4: MUA STORAGE CLOUD */}
         {activeTabSection === "storage" && (
-          <div className="space-y-8 pt-2">
+          <div className="space-y-4">
             {/* Current Storage Usage Banner */}
-            <div className="relative rounded-3xl bg-gradient-to-r from-zinc-950 via-cyan-950/40 to-zinc-950 border border-cyan-500/40 p-6 sm:p-8 shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              
-              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 sm:p-5 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022]">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300">
-                      <HardDrive className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                    <HardDrive className="w-5 h-5 text-sky-400" />
+                    <span className="text-xs font-bold text-sky-400 uppercase font-mono">
                       Dung Lượng Lưu Trữ Hiện Tại
                     </span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-black text-white mt-2">
+                  <h2 className="text-lg sm:text-2xl font-black text-white font-jura mt-1">
                     {userStorageGb} GB Cloud Storage VIP
                   </h2>
-                  <p className="text-xs text-zinc-300 mt-1 max-w-xl">
-                    Lưu trữ video 4K, bản sao lưu truyền hình, tài liệu học tập V-Study và dữ liệu Mạng Xã Hội V-Flow với tốc độ siêu nhanh.
+                  <p className="text-xs text-zinc-300 mt-0.5 font-jura">
+                    Lưu trữ video 4K, bản sao lưu truyền hình, tài liệu học tập V-Study và dữ liệu Mạng Xã Hội với tốc độ siêu nhanh.
                   </p>
                 </div>
 
-                <div className="bg-zinc-900/80 border border-cyan-500/30 rounded-2xl p-4 w-full md:w-72 shrink-0">
-                  <div className="flex items-center justify-between text-xs font-bold mb-2">
-                    <span className="text-zinc-400">Đã sử dụng: 2.8 GB</span>
-                    <span className="text-cyan-300 font-mono">{userStorageGb} GB</span>
+                <div className="bg-[#1f2022] border-2 border-[#141414] p-3 w-full md:w-64 shrink-0">
+                  <div className="flex items-center justify-between text-xs font-mono font-bold mb-1.5">
+                    <span className="text-zinc-400">Đã dùng: 2.8 GB</span>
+                    <span className="text-sky-300">{userStorageGb} GB</span>
                   </div>
-                  <div className="w-full h-3 rounded-full bg-zinc-800 overflow-hidden p-0.5 border border-cyan-500/20">
+                  <div className="w-full h-4 bg-[#141414] border border-[#141414] p-0.5">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-sky-300 transition-all duration-500"
+                      className="h-full bg-sky-400"
                       style={{ width: `${Math.min(100, (2.8 / userStorageGb) * 100)}%` }}
                     />
-                  </div>
-                  <div className="text-[10px] text-zinc-400 mt-2 text-right">
-                    Server Băng Thông CDN 1 Gbps
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Storage Package Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Package 1: 100 GB */}
-              <div className="rounded-3xl bg-zinc-950/90 border border-zinc-800 hover:border-cyan-400/60 p-6 flex flex-col justify-between transition-all group">
-                <div>
-                  <div className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-black uppercase w-fit mb-3">
+              <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022]">
+                <div className="space-y-3">
+                  <span className="bg-[#1e2022] text-sky-400 border border-[#141414] text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
                     Lưu Trữ Cơ Bản
+                  </span>
+                  <h3 className="text-base font-extrabold text-white font-jura">Cloud Basic 100 GB</h3>
+                  <div className="py-2 border-y-2 border-[#141414]">
+                    <div className="text-lg font-extrabold text-sky-300 font-mono">5.000 Khoáng Thạch</div>
+                    <div className="text-[10px] text-zinc-400 font-jura">Thanh toán theo tháng</div>
                   </div>
-                  <h3 className="text-xl font-black text-white">Cloud Basic 100 GB</h3>
-                  <p className="text-xs text-zinc-400 mt-1">Lưu trữ hình ảnh, tài liệu cá nhân</p>
-
-                  <div className="my-4 pb-4 border-b border-white/10">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-cyan-300 font-mono">5,000</span>
-                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <div className="space-y-1.5 text-xs text-zinc-300 font-jura">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                       <span>Dung lượng <strong>100 GB</strong> tốc độ cao</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Tự động đồng bộ V-Box & V-Flow</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Bảo mật mã hóa 256-bit AES</span>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                      <span>Tự động đồng bộ V-Box</span>
                     </div>
                   </div>
                 </div>
 
-                <button
+                <VplaySecondaryButton
                   onClick={() => handleBuyStorage(100, 5000, "Cloud Basic 100 GB")}
-                  className="w-full py-3 rounded-2xl bg-zinc-900 hover:bg-cyan-400 hover:text-black text-white font-black text-xs border border-cyan-500/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="!py-2 text-xs font-bold w-full"
                 >
-                  <HardDrive className="w-4 h-4" />
-                  <span>Mua 100 GB (5.000 VP)</span>
-                </button>
+                  <HardDrive className="w-3.5 h-3.5 inline mr-1" /> Mua 100 GB (5.000 ore)
+                </VplaySecondaryButton>
               </div>
 
               {/* Package 2: 500 GB */}
-              <div className="rounded-3xl bg-zinc-950/90 border border-cyan-500/40 hover:border-cyan-400 p-6 flex flex-col justify-between transition-all group relative">
-                <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-cyan-400 text-black text-[10px] font-black uppercase shadow-md">
+              <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] relative">
+                <div className="absolute -top-3 right-3 bg-sky-400 text-black text-[10px] font-bold uppercase px-2 py-0.5 border border-[#141414] font-mono">
                   Phổ Biến
                 </div>
-                <div>
-                  <div className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[10px] font-black uppercase w-fit mb-3">
+                <div className="space-y-3">
+                  <span className="bg-[#1e2022] text-sky-400 border border-[#141414] text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
                     Lưu Trữ Chuẩn
+                  </span>
+                  <h3 className="text-base font-extrabold text-white font-jura">Cloud Standard 500 GB</h3>
+                  <div className="py-2 border-y-2 border-[#141414]">
+                    <div className="text-lg font-extrabold text-sky-300 font-mono">18.000 Khoáng Thạch</div>
+                    <div className="text-[10px] text-zinc-400 font-jura">Thanh toán theo tháng</div>
                   </div>
-                  <h3 className="text-xl font-black text-white">Cloud Standard 500 GB</h3>
-                  <p className="text-xs text-zinc-400 mt-1">Lưu trữ video Full HD & ảnh chất lượng gốc</p>
-
-                  <div className="my-4 pb-4 border-b border-white/10">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-cyan-300 font-mono">18,000</span>
-                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <div className="space-y-1.5 text-xs text-zinc-300 font-jura">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                       <span>Dung lượng <strong>500 GB</strong> tốc độ cao</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                       <span>Lưu kho video Live TV & V-Box</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                      <span>Chia sẻ link tốc độ cao</span>
                     </div>
                   </div>
                 </div>
 
-                <button
+                <VplayPrimaryButton
                   onClick={() => handleBuyStorage(500, 18000, "Cloud Standard 500 GB")}
-                  className="w-full py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
+                  className="!py-2 text-xs font-bold w-full"
                 >
-                  <HardDrive className="w-4 h-4" />
-                  <span>Mua 500 GB (18.000 VP)</span>
-                </button>
+                  <HardDrive className="w-3.5 h-3.5 inline mr-1" /> Mua 500 GB (18.000 ore)
+                </VplayPrimaryButton>
               </div>
 
               {/* Package 3: 1 TB */}
-              <div className="rounded-3xl bg-zinc-950/90 border border-amber-500/50 hover:border-amber-400 p-6 flex flex-col justify-between transition-all group relative">
-                <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-amber-400 text-black text-[10px] font-black uppercase shadow-md">
+              <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] relative">
+                <div className="absolute -top-3 right-3 bg-amber-400 text-black text-[10px] font-bold uppercase px-2 py-0.5 border border-[#141414] font-mono">
                   BESTSELLER
                 </div>
-                <div>
-                  <div className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-black uppercase w-fit mb-3">
+                <div className="space-y-3">
+                  <span className="bg-[#1e2022] text-amber-300 border border-[#141414] text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
                     Đẳng Cấp Pro
+                  </span>
+                  <h3 className="text-base font-extrabold text-white font-jura">Cloud Pro 1 TB</h3>
+                  <div className="py-2 border-y-2 border-[#141414]">
+                    <div className="text-lg font-extrabold text-amber-300 font-mono">35.000 Khoáng Thạch</div>
+                    <div className="text-[10px] text-zinc-400 font-jura">Thanh toán theo tháng</div>
                   </div>
-                  <h3 className="text-xl font-black text-white">Cloud Pro 1 TB</h3>
-                  <p className="text-xs text-zinc-400 mt-1">Kho phim 4K HDR & Streamer Chuyên Nghiệp</p>
-
-                  <div className="my-4 pb-4 border-b border-white/10">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-amber-300 font-mono">35,000</span>
-                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <div className="space-y-1.5 text-xs text-zinc-300 font-jura">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <span>Dung lượng <strong>1.000 GB (1 TB)</strong></span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <span>Lưu kho phim 4K không nén</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Ưu tiên băng thông CDN Vplay</span>
                     </div>
                   </div>
                 </div>
 
-                <button
+                <VplayPrimaryButton
                   onClick={() => handleBuyStorage(1000, 35000, "Cloud Pro 1 TB")}
-                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-300 text-black font-black text-xs hover:from-amber-300 hover:to-yellow-200 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                  className="!py-2 text-xs font-bold w-full"
                 >
-                  <HardDrive className="w-4 h-4" />
-                  <span>Mua 1 TB (35.000 VP)</span>
-                </button>
+                  <HardDrive className="w-3.5 h-3.5 inline mr-1" /> Mua 1 TB (35.000 ore)
+                </VplayPrimaryButton>
               </div>
 
               {/* Package 4: 2 TB */}
-              <div className="rounded-3xl bg-zinc-950/90 border border-purple-500/40 hover:border-purple-400 p-6 flex flex-col justify-between transition-all group">
-                <div>
-                  <div className="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-black uppercase w-fit mb-3">
+              <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022]">
+                <div className="space-y-3">
+                  <span className="bg-[#1e2022] text-purple-400 border border-[#141414] text-[10px] font-bold uppercase px-2 py-0.5 font-mono">
                     Tối Thượng Ultimate
+                  </span>
+                  <h3 className="text-base font-extrabold text-white font-jura">Cloud Ultimate 2 TB</h3>
+                  <div className="py-2 border-y-2 border-[#141414]">
+                    <div className="text-lg font-extrabold text-purple-300 font-mono">60.000 Khoáng Thạch</div>
+                    <div className="text-[10px] text-zinc-400 font-jura">Thanh toán theo tháng</div>
                   </div>
-                  <h3 className="text-xl font-black text-white">Cloud Ultimate 2 TB</h3>
-                  <p className="text-xs text-zinc-400 mt-1">Dung lượng vô cực cho nhà sáng tạo nội dung</p>
-
-                  <div className="my-4 pb-4 border-b border-white/10">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-purple-300 font-mono">60,000</span>
-                      <span className="text-xs font-bold text-zinc-400">V-pearls / tháng</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2.5 mb-6 text-xs text-zinc-300">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
+                  <div className="space-y-1.5 text-xs text-zinc-300 font-jura">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                       <span>Dung lượng <strong>2.000 GB (2 TB)</strong></span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
-                      <span>Máy chủ riêng biệt Dedicated Cloud</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
-                      <span>Hỗ trợ VIP 24/7 trực tiếp</span>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      <span>Máy chủ Dedicated Cloud</span>
                     </div>
                   </div>
                 </div>
 
-                <button
+                <VplaySecondaryButton
                   onClick={() => handleBuyStorage(2000, 60000, "Cloud Ultimate 2 TB")}
-                  className="w-full py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20"
+                  className="!py-2 text-xs font-bold w-full"
                 >
-                  <HardDrive className="w-4 h-4" />
-                  <span>Mua 2 TB (60.000 VP)</span>
-                </button>
+                  <HardDrive className="w-3.5 h-3.5 inline mr-1" /> Mua 2 TB (60.000 ore)
+                </VplaySecondaryButton>
               </div>
             </div>
           </div>
@@ -1035,24 +938,28 @@ export default function VerifiedTab({
 
       </div>
 
-      {/* MODAL: CONFIRM PURCHASE */}
+      {/* MODAL: CONFIRM PURCHASE (Minecraft Bedrock Ore UI Modal) */}
       {confirmModal && (
-        <div className="fixed inset-0 z-[100000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-3xl bg-zinc-950 border border-amber-500/50 p-6 sm:p-8 text-center space-y-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-[100000] bg-black/80 flex items-center justify-center p-3 font-jura select-none">
+          <div className="w-full max-w-md bg-[#2d2f32] border-4 border-[#141414] p-5 sm:p-6 text-center space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] relative">
             <button
-              onClick={() => setConfirmModal(null)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-2"
+              type="button"
+              onClick={() => {
+                playPopSound();
+                setConfirmModal(null);
+              }}
+              className="absolute top-3 right-3 text-zinc-400 hover:text-white p-1"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center mx-auto text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)]">
-              <BadgeCheck className="w-9 h-9" />
+            <div className="w-14 h-14 bg-amber-500/20 border-2 border-[#141414] flex items-center justify-center mx-auto text-amber-400">
+              <BadgeCheck className="w-8 h-8" />
             </div>
 
             <div>
-              <h3 className="text-xl font-black text-white">Xác Nhận Đăng Ký Verified</h3>
-              <p className="text-xs text-zinc-400 mt-2">
+              <h3 className="text-base font-black text-white uppercase">XÁC NHẬN ĐĂNG KÝ VERIFIED</h3>
+              <p className="text-xs text-zinc-300 mt-1">
                 Bạn sắp nâng cấp tài khoản lên gói{" "}
                 <strong className="text-amber-300">
                   {PLAN_NAMES[confirmModal]}
@@ -1060,107 +967,115 @@ export default function VerifiedTab({
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-2 text-xs text-left">
+            <div className="p-3 bg-[#1e2022] border-2 border-[#141414] space-y-1.5 text-xs text-left font-mono">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Giá gói nâng cấp:</span>
-                <span className="font-mono font-bold text-amber-400">
-                  {PLAN_PRICES[confirmModal].toLocaleString()} V-pearls
+                <span className="text-zinc-400">Giá nâng cấp:</span>
+                <span className="font-bold text-amber-400">
+                  {PLAN_PRICES[confirmModal].toLocaleString()} Khoáng Thạch
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Số dư hiện có:</span>
-                <span className="font-mono font-bold text-white">
-                  {vCoins.toLocaleString()} V-pearls
+                <span className="text-zinc-400">Số dư hiện tại:</span>
+                <span className="font-bold text-white">
+                  {vCoins.toLocaleString()} Khoáng Thạch
                 </span>
               </div>
-              <div className="flex justify-between pt-2 border-t border-white/10">
-                <span className="text-zinc-400">Số dư còn lại:</span>
-                <span className="font-mono font-bold text-emerald-400">
-                  {(vCoins - PLAN_PRICES[confirmModal]).toLocaleString()} V-pearls
+              <div className="flex justify-between pt-1.5 border-t border-[#141414]">
+                <span className="text-zinc-400">Còn lại sau nâng cấp:</span>
+                <span className="font-bold text-emerald-400">
+                  {(vCoins - PLAN_PRICES[confirmModal]).toLocaleString()} Khoáng Thạch
                 </span>
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setConfirmModal(null)}
-                className="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs cursor-pointer"
+            <div className="flex gap-2 pt-1">
+              <VplaySecondaryButton
+                onClick={() => {
+                  playPopSound();
+                  setConfirmModal(null);
+                }}
+                className="flex-1 !py-2 text-xs"
               >
                 Hủy bỏ
-              </button>
-              <button
+              </VplaySecondaryButton>
+              <VplayPrimaryButton
                 onClick={executePurchase}
-                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 text-black font-extrabold text-xs shadow-lg cursor-pointer"
+                className="flex-1 !py-2 text-xs font-bold"
               >
                 Xác Nhận Nâng Cấp
-              </button>
+              </VplayPrimaryButton>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL: ERROR NOT ENOUGH NGỌC */}
+      {/* MODAL: ERROR NOT ENOUGH KHOÁNG THẠCH */}
       {errorModal && (
-        <div className="fixed inset-0 z-[100000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-3xl bg-zinc-950 border border-red-500/50 p-6 sm:p-8 text-center space-y-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-[100000] bg-black/80 flex items-center justify-center p-3 font-jura select-none">
+          <div className="w-full max-w-md bg-[#2d2f32] border-4 border-[#141414] p-5 sm:p-6 text-center space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] relative">
             <button
-              onClick={() => setErrorModal(null)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-2"
+              type="button"
+              onClick={() => {
+                playPopSound();
+                setErrorModal(null);
+              }}
+              className="absolute top-3 right-3 text-zinc-400 hover:text-white p-1"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="w-16 h-16 rounded-full bg-red-500/20 border border-red-500/50 flex items-center justify-center mx-auto text-red-400">
+            <div className="w-14 h-14 bg-[#cc1827]/20 border-2 border-[#141414] flex items-center justify-center mx-auto text-rose-400">
               <AlertCircle className="w-8 h-8" />
             </div>
 
             <div>
-              <h3 className="text-xl font-black text-white">Không Đủ V-pearls</h3>
-              <p className="text-xs text-zinc-400 mt-2">
+              <h3 className="text-base font-black text-white uppercase">KHÔNG ĐỦ KHOÁNG THẠCH</h3>
+              <p className="text-xs text-zinc-300 mt-1">
                 Bạn còn thiếu{" "}
                 <strong className="text-amber-400 font-mono">
-                  {(errorModal.required - errorModal.current).toLocaleString()} V-pearls
+                  {(errorModal.required - errorModal.current).toLocaleString()} Khoáng Thạch
                 </strong>{" "}
                 để đăng ký gói này.
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-2 text-xs">
+            <div className="p-3 bg-[#1e2022] border-2 border-[#141414] space-y-1.5 text-xs text-left font-mono">
               <div className="flex justify-between">
                 <span className="text-zinc-400">Chi phí gói:</span>
-                <span className="font-mono font-bold text-amber-400">
-                  {errorModal.required.toLocaleString()} V-pearls
+                <span className="font-bold text-purple-400">
+                  {errorModal.required.toLocaleString()} Khoáng Thạch
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">Số dư hiện tại:</span>
-                <span className="font-mono font-bold text-red-400">
-                  {errorModal.current.toLocaleString()} V-pearls
+                <span className="font-bold text-rose-400">
+                  {errorModal.current.toLocaleString()} Khoáng Thạch
                 </span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 pt-1">
               {!dailyClaimed && (
-                <button
+                <VplayPrimaryButton
                   onClick={() => {
                     setErrorModal(null);
                     handleClaimDaily();
                   }}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 text-black font-extrabold text-xs shadow-md cursor-pointer"
+                  className="w-full !py-2 text-xs font-bold"
                 >
-                  Nhận Ngay +50 Free V-pearls Điểm Danh
-                </button>
+                  Nhận Ngay +50 Free Khoáng Thạch Điểm Danh
+                </VplayPrimaryButton>
               )}
-              <button
+              <VplaySecondaryButton
                 onClick={() => {
+                  playPopSound();
                   setErrorModal(null);
-                  onNavigateToTab("live");
+                  onNavigateToTab?.("live_tv");
                 }}
-                className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs cursor-pointer"
+                className="w-full !py-2 text-xs"
               >
-                Xem Live TV Để Tích Thêm V-pearls (+10 V-pearls/phút)
-              </button>
+                Xem Live TV Để Tích Thêm Khoáng Thạch (+10 ore/phút)
+              </VplaySecondaryButton>
             </div>
           </div>
         </div>
@@ -1168,84 +1083,76 @@ export default function VerifiedTab({
 
       {/* MODAL: SUCCESS */}
       {successModal && (
-        <div className="fixed inset-0 z-[100000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-3xl bg-gradient-to-b from-zinc-950 via-zinc-950 to-amber-950/60 border-2 border-amber-400 p-6 sm:p-8 text-center space-y-6 shadow-[0_0_60px_rgba(245,158,11,0.4)] relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-200 p-0.5 mx-auto shadow-[0_0_35px_rgba(245,158,11,0.6)]">
-              <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center text-amber-400">
-                <Crown className="w-10 h-10 animate-bounce" />
-              </div>
+        <div className="fixed inset-0 z-[100000] bg-black/85 flex items-center justify-center p-3 font-jura select-none">
+          <div className="w-full max-w-md bg-[#2d2f32] border-4 border-purple-500 p-5 sm:p-6 text-center space-y-4 shadow-[inset_2px_2px_0_#c084fc,inset_-2px_-2px_0_#581c87] relative">
+            <div className="w-16 h-16 bg-purple-600/20 border-2 border-[#141414] flex items-center justify-center mx-auto text-purple-400">
+              <Crown className="w-9 h-9 animate-bounce" />
             </div>
 
             <div>
-              <div className="inline-block px-3.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-black uppercase tracking-wider mb-2">
-                KÍCH HOẠT HỘI VIÊN VIP
-              </div>
-              <h3 className="text-2xl font-black text-white">Đăng Ký Verified Thành Công!</h3>
-              <p className="text-xs text-zinc-300 mt-2">
+              <span className="bg-[#a855f7] text-white text-[10px] font-bold uppercase px-2.5 py-0.5 border border-[#141414] font-mono">
+                KÍCH HOẠT HỘI VIÊN VIP TÍM
+              </span>
+              <h3 className="text-lg font-black text-white uppercase mt-2">Đăng Ký Verified Thành Công!</h3>
+              <p className="text-xs text-zinc-300 mt-1">
                 Tài khoản Vplay của bạn đã được nâng cấp chính thức lên gói{" "}
-                <strong className="text-amber-400">
+                <strong className="text-purple-300">
                   {PLAN_NAMES[successModal]}
                 </strong>
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 text-left space-y-1.5">
-              <div className="flex items-center gap-2 font-black text-amber-300">
-                <BadgeCheck className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Đã kích hoạt Tích vàng & Server 4K Ultra HD!</span>
+            <div className="p-3 bg-[#1e2022] border-2 border-[#141414] text-xs text-purple-200 text-left space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-purple-300">
+                <BadgeCheck className="w-4 h-4 text-purple-400 shrink-0" />
+                <span>Đã kích hoạt Tích Tím & Server 4K Ultra HD!</span>
               </div>
-              <p className="text-[11px] text-zinc-400 pl-6">
+              <p className="text-[11px] text-zinc-400 pl-5 font-jura">
                 Tận hưởng trọn vẹn toàn bộ dịch vụ truyền hình và giải trí không giới hạn ngay bây giờ.
               </p>
             </div>
 
-            <button
-              onClick={() => setSuccessModal(null)}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black font-black text-sm shadow-[0_10px_30px_rgba(245,158,11,0.4)] cursor-pointer"
+            <VplayPrimaryButton
+              onClick={() => {
+                playPopSound();
+                setSuccessModal(null);
+              }}
+              className="w-full !py-2.5 text-xs font-bold"
             >
               Trải Nghiệm Ngay
-            </button>
+            </VplayPrimaryButton>
           </div>
         </div>
       )}
 
       {/* MODAL: STORAGE SUCCESS */}
       {storageSuccessModal && (
-        <div className="fixed inset-0 z-[100000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-3xl bg-gradient-to-b from-zinc-950 via-zinc-950 to-cyan-950/60 border-2 border-cyan-400 p-6 sm:p-8 text-center space-y-6 shadow-[0_0_60px_rgba(6,182,212,0.4)] relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-cyan-400 to-sky-200 p-0.5 mx-auto shadow-[0_0_35px_rgba(6,182,212,0.6)]">
-              <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center text-cyan-400">
-                <HardDrive className="w-10 h-10 animate-pulse" />
-              </div>
+        <div className="fixed inset-0 z-[100000] bg-black/85 flex items-center justify-center p-3 font-jura select-none">
+          <div className="w-full max-w-md bg-[#2d2f32] border-4 border-sky-400 p-5 sm:p-6 text-center space-y-4 shadow-[inset_2px_2px_0_#7dd3fc,inset_-2px_-2px_0_#075985] relative">
+            <div className="w-16 h-16 bg-sky-500/20 border-2 border-[#141414] flex items-center justify-center mx-auto text-sky-400">
+              <HardDrive className="w-9 h-9 animate-pulse" />
             </div>
 
             <div>
-              <div className="inline-block px-3.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-black uppercase tracking-wider mb-2">
+              <span className="bg-sky-400 text-[#141414] text-[10px] font-bold uppercase px-2.5 py-0.5 border border-[#141414] font-mono">
                 KÍCH HOẠT DUNG LƯỢNG CLOUD
-              </div>
-              <h3 className="text-2xl font-black text-white">Mua Storage Thành Công!</h3>
-              <p className="text-xs text-zinc-300 mt-2">
+              </span>
+              <h3 className="text-lg font-black text-white uppercase mt-2">Mua Storage Thành Công!</h3>
+              <p className="text-xs text-zinc-300 mt-1">
                 Dung lượng lưu trữ của bạn đã được nâng lên{" "}
-                <strong className="text-cyan-400">{storageSuccessModal.gb} GB Cloud Storage VIP</strong>
+                <strong className="text-sky-300">{storageSuccessModal.gb} GB Cloud Storage VIP</strong>
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-200 text-left space-y-1.5">
-              <div className="flex items-center gap-2 font-black text-cyan-300">
-                <HardDrive className="w-4 h-4 text-cyan-400 shrink-0" />
-                <span>Băng thông CDN VIP 1 Gbps đã sẵn sàng!</span>
-              </div>
-              <p className="text-[11px] text-zinc-400 pl-6">
-                Bạn có thể sao lưu video 4K, lưu trữ tài liệu V-Study và chia sẻ hình ảnh V-Flow thoải mái.
-              </p>
-            </div>
-
-            <button
-              onClick={() => setStorageSuccessModal(null)}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 text-black font-black text-sm shadow-[0_10px_30px_rgba(6,182,212,0.4)] cursor-pointer"
+            <VplayPrimaryButton
+              onClick={() => {
+                playPopSound();
+                setStorageSuccessModal(null);
+              }}
+              className="w-full !py-2.5 text-xs font-bold"
             >
               Hoàn Tất & Sử Dụng
-            </button>
+            </VplayPrimaryButton>
           </div>
         </div>
       )}

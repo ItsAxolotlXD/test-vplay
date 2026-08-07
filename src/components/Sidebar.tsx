@@ -26,7 +26,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'live_tv', label: t('header.live', 'Live TV'), badge: `(${channelCount})` },
     { id: 'v_apps', label: t('header.vapps', 'V-Apps') },
     { id: 'v_premium', label: t('header.vpremium', 'V-Premium'), badge: '★' },
-    { id: 'v_notes', label: t('header.vnotes', 'V-Notes') },
     { id: 'settings', label: t('header.settings', 'Settings') },
   ];
 

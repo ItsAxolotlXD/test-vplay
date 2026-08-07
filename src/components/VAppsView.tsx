@@ -6,7 +6,7 @@ import { VplayTab } from './ui/VplayTab';
 import ExploreVietnamTab from './ExploreVietnamTab';
 import VplayVBoxTab from './VplayVBoxTab';
 import VStudyTab from './VStudyTab';
-import { VCalcTab, VRemindersTab } from './vapps';
+import { VCalcTab, VRemindersTab, VXploreTab } from './vapps';
 import { VNotesView } from './VNotesView';
 import {
   Grid,
@@ -16,6 +16,7 @@ import {
   Calculator,
   Bell,
   StickyNote,
+  Folder,
   X,
   Sparkles,
   ExternalLink,
@@ -23,7 +24,7 @@ import {
   Compass,
 } from 'lucide-react';
 
-export type VAppId = 'explore_vietnam' | 'v_box' | 'v_learn' | 'v_calc' | 'v_reminders' | 'v_notes';
+export type VAppId = 'v_xplore' | 'explore_vietnam' | 'v_box' | 'v_learn' | 'v_calc' | 'v_reminders' | 'v_notes';
 
 interface VAppDefinition {
   id: VAppId;
@@ -36,6 +37,15 @@ interface VAppDefinition {
 }
 
 const VAPPS_LIST: VAppDefinition[] = [
+  {
+    id: 'v_xplore',
+    name: 'V-Xplore',
+    tagline: 'File Explorer Ore UI',
+    description: 'Quản lý tệp phong cách Windows Explorer, xem trước media, sao lưu M3U8 và V-Cloud.',
+    icon: <Folder className="w-6 h-6 text-purple-400" />,
+    color: 'border-purple-500 bg-purple-950/40',
+    badge: 'Explorer',
+  },
   {
     id: 'explore_vietnam',
     name: 'Explore Vietnam',
@@ -96,9 +106,9 @@ interface VAppsViewProps {
   initialApp?: VAppId;
 }
 
-export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_notes' }) => {
+export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_xplore' }) => {
   const [activeApp, setActiveApp] = useState<VAppId>(initialApp);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(true); // Open modal on initial launch
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const currentApp = VAPPS_LIST.find((a) => a.id === activeApp) || VAPPS_LIST[0];
 
@@ -108,15 +118,10 @@ export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_notes' }) 
     setIsModalOpen(false);
   };
 
-  const handleOpenModal = () => {
-    playPopSound();
-    setIsModalOpen(true);
-  };
-
   return (
     <div className="space-y-4 select-none">
-      {/* TOP CONTROL BAR: APP LAUNCHER SELECTOR & QUICK TABS */}
-      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      {/* TOP CONTROL BAR: APP HEADER BADGE */}
+      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 shadow-xl flex items-center justify-between gap-3">
         {/* Left: Current Active App Badge */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
@@ -133,17 +138,6 @@ export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_notes' }) 
             </div>
             <p className="text-[11px] text-zinc-300 font-jura">{currentApp.tagline}</p>
           </div>
-        </div>
-
-        {/* Right: Launcher Button + Quick Tabs */}
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          <VplayPrimaryButton
-            onClick={handleOpenModal}
-            className="!py-2 !px-3 text-xs font-bold whitespace-nowrap flex items-center gap-1.5 shrink-0"
-          >
-            <Grid className="w-4 h-4 text-emerald-300" />
-            <span>Mở Menu V-Apps</span>
-          </VplayPrimaryButton>
         </div>
       </div>
 
@@ -169,6 +163,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_notes' }) 
 
       {/* MAIN RENDER AREA FOR SELECTED APP */}
       <div className="min-h-[500px]">
+        {activeApp === 'v_xplore' && <VXploreTab />}
         {activeApp === 'explore_vietnam' && <ExploreVietnamTab />}
         {activeApp === 'v_box' && <VplayVBoxTab />}
         {activeApp === 'v_learn' && <VStudyTab />}
@@ -176,6 +171,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_notes' }) 
         {activeApp === 'v_reminders' && <VRemindersTab />}
         {activeApp === 'v_notes' && <VNotesView />}
       </div>
+
 
       {/* ORE UI POPUP MODAL FOR SELECTING V-APPS */}
       {isModalOpen && (

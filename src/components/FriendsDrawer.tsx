@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, MoreVertical, MessageSquare, Tv, UserCheck, UserX, Check, Users, Radio, Bell } from 'lucide-react';
+import { Search, X, MoreVertical, MessageSquare, Tv, UserCheck, UserX, Check, Users, Radio, Bell, Coins } from 'lucide-react';
 import { playPopSound } from '../utils/sound';
 import {
   VplayUser,
@@ -177,10 +177,14 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
         </div>
 
         {/* HEADER SECTION TITLE: PEOPLE */}
-        <div className="bg-[#2e3033] border-b-2 border-[#141414] py-1.5 px-3 text-center shrink-0">
+        <div className="bg-[#2e3033] border-b-2 border-[#141414] py-1.5 px-3 flex items-center justify-between shrink-0">
           <h2 className="font-jura font-black text-sm tracking-widest text-white uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             {activeTab === 'people' ? 'PEOPLE' : 'FRIEND REQUESTS'}
           </h2>
+          <div className="flex items-center gap-1.5 bg-[#18191b] border-2 border-[#141414] px-2 py-0.5 shadow-[inset_1px_1px_0_#101112]">
+            <Coins className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="text-amber-300 font-bold font-mono text-[11px]">1.000 Khoáng Thạch</span>
+          </div>
         </div>
 
         {/* CONTENT SCROLLABLE AREA */}
@@ -505,8 +509,11 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
 
         {/* BOTTOM FOOTER COUNT */}
         <div className="p-2 bg-[#222426] border-t-2 border-[#141414] text-[10px] font-jura text-zinc-400 flex items-center justify-between shrink-0">
-          <span>Vplay Online: {joinableFriends.length + onlineFriends.length + 1}/101</span>
-          <span className="text-[#89dc69] font-bold">Ore UI Bedrock</span>
+          <div className="flex items-center gap-1.5 text-amber-300 font-bold font-mono">
+            <Coins className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span>1.000 Khoáng Thạch</span>
+          </div>
+          <span>Online: {joinableFriends.length + onlineFriends.length + 1}/101</span>
         </div>
       </div>
 
