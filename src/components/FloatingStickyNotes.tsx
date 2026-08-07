@@ -3,18 +3,55 @@ import { StickyNote, X, Minimize2, Maximize2, Pin, GripHorizontal, Check } from 
 import { motion, AnimatePresence } from "motion/react";
 import { Note } from "./vapps/VNotesTab";
 
+const COLOR_HEX: Record<string, string> = {
+  emerald: "#28960b",
+  redstone: "#b91c1c",
+  lapis: "#1d4ed8",
+  gold: "#b45309",
+  diamond: "#0f766e",
+};
+
 export const FloatingStickyNotes: React.FC = () => {
   const [stuckNotes, setStuckNotes] = useState<Note[]>([]);
   const [minimizedNotes, setMinimizedNotes] = useState<Record<string, boolean>>({});
 
   const reloadStuckNotes = () => {
     try {
-      const allNotesSaved = localStorage.getItem("vnotes_list");
+      const vnotesListSaved = localStorage.getItem("vnotes_list");
+      const vplayItemsSaved = localStorage.getItem("vplay_vnotes_items_v1");
       const stuckIdsSaved = localStorage.getItem("vnotes_stuck_ids");
-      if (allNotesSaved && stuckIdsSaved) {
-        const allNotes: Note[] = JSON.parse(allNotesSaved);
+
+      let allNotes: any[] = [];
+      if (vnotesListSaved) {
+        try { allNotes = [...allNotes, ...JSON.parse(vnotesListSaved)]; } catch (e) {}
+      }
+      if (vplayItemsSaved) {
+        try { allNotes = [...allNotes, ...JSON.parse(vplayItemsSaved)]; } catch (e) {}
+      }
+
+      if (allNotes.length > 0 && stuckIdsSaved) {
         const stuckIds: string[] = JSON.parse(stuckIdsSaved);
-        const found = allNotes.filter((n) => stuckIds.includes(n.id));
+        const uniqueMap = new Map<string, Note>();
+        allNotes.forEach((n: any) => {
+          if (!uniqueMap.has(n.id)) {
+            const colorHex = n.color || (n.colorTag ? COLOR_HEX[n.colorTag] : undefined) || "#28960b";
+            const formattedContent = n.content
+              ? (n.content.includes("<") ? n.content : n.content.replace(/\n/g, "<br/>"))
+              : "<p class='text-slate-500 italic'>Chưa có nội dung...</p>";
+
+            uniqueMap.set(n.id, {
+              id: n.id,
+              title: n.title,
+              content: formattedContent,
+              category: n.category,
+              isPinned: n.isPinned,
+              color: colorHex,
+              updatedAt: n.updatedAt || n.createdAt || "V-Notes",
+              tags: n.tags || [n.category || "V-Notes"]
+            });
+          }
+        });
+        const found = stuckIds.map((id) => uniqueMap.get(id)).filter((item): item is Note => Boolean(item));
         setStuckNotes(found);
       } else {
         setStuckNotes([]);

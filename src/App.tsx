@@ -17,6 +17,7 @@ import { DebugLanguageModal } from './components/DebugLanguageModal';
 import { FriendsDrawer } from './components/FriendsDrawer';
 import { DevStatsOverlay } from './components/DevStatsOverlay';
 import { VirtualMouseCursorOverlay } from './components/VirtualMouseCursorOverlay';
+import { FloatingStickyNotes } from './components/FloatingStickyNotes';
 import { VNotesView } from './components/VNotesView';
 import { VAppsView } from './components/VAppsView';
 import { VPremiumView } from './components/VPremiumView';
@@ -673,6 +674,9 @@ export default function App() {
         useMouseCursor={settings.useMouseCursor}
         useArrowKeysCursor={settings.useArrowKeysCursor}
       />
+
+      {/* FLOATING STICKY NOTES OVERLAY */}
+      <FloatingStickyNotes />
 
     </div>
   );

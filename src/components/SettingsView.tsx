@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserSettings } from '../types';
-import { ExternalLink, Search, Activity, Cpu, Gauge, X } from 'lucide-react';
+import { ExternalLink, Search, Activity, Cpu, Gauge, X, HardDrive } from 'lucide-react';
 import { playPopSound } from '../utils/sound';
 import { VplayToggleSwitch } from './ui/VplayToggleSwitch';
 import { VplaySecondaryButton } from './ui/VplaySecondaryButton';
@@ -45,6 +45,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [settingSearch, setSettingSearch] = useState('');
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
   const [isDduiModalOpen, setIsDduiModalOpen] = useState(false);
+
+  // Storage capacity state synced with Mua Storage (VerifiedTab)
+  const [cloudStorageGb] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('vplay_user_cloud_storage');
+      if (saved) {
+        const val = parseFloat(saved);
+        if (!isNaN(val) && val > 0) return val;
+      }
+    } catch (e) {}
+    return 105.51;
+  });
 
   // Performance test state
   const [isStressTesting, setIsStressTesting] = useState(false);
@@ -129,6 +141,30 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   return (
     <div className="w-full max-w-3xl mx-auto my-2 sm:my-4 bg-[#4a4d50] border-2 border-[#141414] text-white font-montserrat shadow-2xl rounded-none overflow-hidden select-none">
       
+      {/* 1. LOCAL STORAGE BAR (TOP OF SETTINGS PAGE) */}
+      <div className="p-3 sm:p-4 bg-[#3a3d40] border-b-2 border-[#141414]">
+        <div className="bg-[#242628] border-2 border-[#141414] p-3 shadow-inner">
+          <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-white mb-2 font-mono">
+            <div className="flex items-center gap-2">
+              <HardDrive className="w-4 h-4 text-white shrink-0" />
+              <span className="tracking-wide">Local storage</span>
+            </div>
+            <div className="text-[11px] sm:text-xs text-zinc-300 font-normal font-mono">
+              63.08GB of {cloudStorageGb > 105.51 ? `${cloudStorageGb.toFixed(2)}GB` : '105.51GB'} used
+            </div>
+          </div>
+          {/* Blue progress line */}
+          <div className="w-full h-1.5 sm:h-2 bg-[#141414] border border-[#141414] overflow-hidden">
+            <div
+              className="h-full bg-[#2563eb] transition-all duration-300"
+              style={{
+                width: `${Math.min(100, (63.08 / (cloudStorageGb || 105.51)) * 100)}%`,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* SEARCH BAR AT THE TOP OF SETTINGS */}
       <div className="p-3 sm:p-4 bg-[#4a4d50]">
         <div className="relative flex items-center w-full">

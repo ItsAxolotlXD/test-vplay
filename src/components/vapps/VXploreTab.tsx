@@ -317,7 +317,7 @@ export const VXploreTab: React.FC = () => {
           </div>
           <div>
             <h2 className="font-black text-xs sm:text-sm text-white uppercase tracking-wider font-jura flex items-center gap-2">
-              <span>V-XPLORE FILE MANAGER</span>
+              <span>V-FILES FILE MANAGER</span>
               <span className="bg-[#a855f7] text-white px-2 py-0.5 text-[9px] font-bold font-mono border border-[#141414]">
                 WINDOWS EXPLORER ORE UI
               </span>
@@ -456,7 +456,7 @@ export const VXploreTab: React.FC = () => {
           <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
           <input
             type="text"
-            placeholder="Tìm kiếm tệp V-Xplore..."
+            placeholder="Tìm kiếm tệp V-Files..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#141414] border-2 border-[#141414] pl-8 pr-3 py-1 text-xs text-white placeholder-zinc-500 font-mono focus:outline-none focus:border-purple-500"
@@ -732,7 +732,7 @@ export const VXploreTab: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-          <span>V-Xplore Ore UI v2.5 • Windows Explorer Experience</span>
+          <span>V-Files Ore UI v2.5 • Windows Explorer Experience</span>
         </div>
       </div>
 

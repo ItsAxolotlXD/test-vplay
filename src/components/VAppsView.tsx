@@ -39,12 +39,12 @@ interface VAppDefinition {
 const VAPPS_LIST: VAppDefinition[] = [
   {
     id: 'v_xplore',
-    name: 'V-Xplore',
+    name: 'V-Files',
     tagline: 'File Explorer Ore UI',
     description: 'Quản lý tệp phong cách Windows Explorer, xem trước media, sao lưu M3U8 và V-Cloud.',
     icon: <Folder className="w-6 h-6 text-purple-400" />,
     color: 'border-purple-500 bg-purple-950/40',
-    badge: 'Explorer',
+    badge: 'Files',
   },
   {
     id: 'explore_vietnam',
@@ -120,27 +120,6 @@ export const VAppsView: React.FC<VAppsViewProps> = ({ initialApp = 'v_xplore' })
 
   return (
     <div className="space-y-4 select-none">
-      {/* TOP CONTROL BAR: APP HEADER BADGE */}
-      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 shadow-xl flex items-center justify-between gap-3">
-        {/* Left: Current Active App Badge */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
-            {currentApp.icon}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm sm:text-base font-black text-white uppercase tracking-wider font-jura">
-                V-APPS: {currentApp.name.toUpperCase()}
-              </h2>
-              <span className="bg-[#89dc69] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
-                {currentApp.badge}
-              </span>
-            </div>
-            <p className="text-[11px] text-zinc-300 font-jura">{currentApp.tagline}</p>
-          </div>
-        </div>
-      </div>
-
       {/* QUICK HORIZONTAL SUB-APP SELECTOR TABS */}
       <div className="bg-[#35383b] border-2 border-[#141414] p-2 shadow-md flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         {VAPPS_LIST.map((app) => (

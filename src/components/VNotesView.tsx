@@ -20,6 +20,10 @@ import {
   FileText,
   RotateCcw,
   ListFilter,
+  Eye,
+  Folder,
+  HardDrive,
+  X,
 } from 'lucide-react';
 
 export interface NoteItem {
@@ -95,6 +99,32 @@ export const VNotesView: React.FC = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<boolean>(false);
 
+  // Context Menu state
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    note: NoteItem;
+  } | null>(null);
+
+  // Floating sticky note ids (screen pinned)
+  const [stuckIds, setStuckIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('vnotes_stuck_ids');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [];
+  });
+
+  // Toast notification
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage((prev) => (prev === msg ? null : prev));
+    }, 3200);
+  };
+
   // Form state for current selected/edited note
   const [editTitle, setEditTitle] = useState<string>('');
   const [editContent, setEditContent] = useState<string>('');
@@ -105,10 +135,45 @@ export const VNotesView: React.FC = () => {
   useEffect(() => {
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+      localStorage.setItem('vnotes_list', JSON.stringify(notes));
     } catch (e) {
       console.error('Failed to save notes to localStorage', e);
     }
   }, [notes]);
+
+  // Sync stuck notes listener
+  useEffect(() => {
+    const syncStuck = () => {
+      try {
+        const saved = localStorage.getItem('vnotes_stuck_ids');
+        if (saved) setStuckIds(JSON.parse(saved));
+      } catch (e) {}
+    };
+    window.addEventListener('vnotes_stuck_updated', syncStuck);
+    window.addEventListener('storage', syncStuck);
+    return () => {
+      window.removeEventListener('vnotes_stuck_updated', syncStuck);
+      window.removeEventListener('storage', syncStuck);
+    };
+  }, []);
+
+  // Click outside to dismiss context menu
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setContextMenu(null);
+    };
+    if (contextMenu) {
+      window.addEventListener('click', handleClickOutside);
+      window.addEventListener('contextmenu', handleClickOutside);
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('contextmenu', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [contextMenu]);
 
   // Selected note object
   const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
@@ -184,6 +249,7 @@ export const VNotesView: React.FC = () => {
     if (selectedNoteId === id) {
       setSelectedNoteId(updated[0]?.id || null);
     }
+    showToast('Đã xóa ghi chú!');
   };
 
   const handleTogglePin = (id: string, e: React.MouseEvent) => {
@@ -192,6 +258,70 @@ export const VNotesView: React.FC = () => {
     setNotes((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isPinned: !n.isPinned } : n))
     );
+  };
+
+  const handleToggleStickyNote = (note: NoteItem) => {
+    playPopSound();
+    let updated: string[];
+    if (stuckIds.includes(note.id)) {
+      updated = stuckIds.filter((id) => id !== note.id);
+      showToast(`Đã bỏ ghim Sticky Note "${note.title}" khỏi màn hình!`);
+    } else {
+      updated = [...stuckIds, note.id];
+      showToast(`Đã ghim Sticky Note "${note.title}" lên màn hình!`);
+    }
+    setStuckIds(updated);
+    localStorage.setItem('vnotes_stuck_ids', JSON.stringify(updated));
+    localStorage.setItem('vnotes_list', JSON.stringify(notes));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+    window.dispatchEvent(new Event('vnotes_stuck_updated'));
+    window.dispatchEvent(new Event('storage'));
+  };
+
+  const handleSaveToVXplore = (note: NoteItem) => {
+    playPopSound();
+    try {
+      const existingSaved = localStorage.getItem('vplay_vxplore_files_v1');
+      let files = existingSaved ? JSON.parse(existingSaved) : [];
+
+      const cleanTitle = note.title.replace(/[/\\?%*:|"<>]/g, '_').trim() || 'Ghi_chu';
+      const fileName = cleanTitle.endsWith('.txt') ? cleanTitle : `${cleanTitle}.txt`;
+      const noteBlob = new Blob([note.content], { type: 'text/plain' });
+
+      const newFileItem = {
+        id: `file-vnote-${Date.now()}`,
+        name: fileName,
+        type: 'text',
+        size: `${(noteBlob.size / 1024).toFixed(1)} KB`,
+        sizeBytes: noteBlob.size,
+        dateModified: new Date().toISOString().replace('T', ' ').slice(0, 16),
+        path: 'C:\\Vplay\\Documents',
+        content: note.content,
+        mimeType: 'text/plain',
+      };
+
+      files = [newFileItem, ...files];
+      localStorage.setItem('vplay_vxplore_files_v1', JSON.stringify(files));
+      window.dispatchEvent(new Event('storage'));
+
+      showToast(`Đã lưu "${fileName}" vào V-Files (C:\\Vplay\\Documents)!`);
+    } catch (e) {
+      console.error(e);
+      showToast('Lỗi khi lưu vào V-Files!');
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, note: NoteItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    playPopSound();
+
+    const menuWidth = 230;
+    const menuHeight = 250;
+    const x = Math.min(e.clientX, window.innerWidth - menuWidth);
+    const y = Math.min(e.clientY, window.innerHeight - menuHeight);
+
+    setContextMenu({ x, y, note });
   };
 
   const handleCopyNote = () => {
@@ -225,7 +355,7 @@ export const VNotesView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 select-none">
+    <div className="space-y-4 select-none relative font-jura">
       {/* ORE UI TOP ACTION HEADER BAR */}
       <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         {/* Title & Badge */}
@@ -243,7 +373,7 @@ export const VNotesView: React.FC = () => {
               </span>
             </div>
             <p className="text-[11px] text-zinc-300 font-jura">
-              Lưu trữ danh sách kênh, ghi chú cá nhân và liên kết M3U8 chuẩn giao diện Ore UI.
+              Click chuột phải vào bất kỳ ghi chú nào để Mở, Sửa, Pin Sticky Note lên màn hình, Xóa hoặc Save to V-Files.
             </p>
           </div>
         </div>
@@ -321,7 +451,7 @@ export const VNotesView: React.FC = () => {
 
       {/* MAIN TWO-COLUMN CONTAINER: LEFT NOTE LIST, RIGHT NOTE EDITOR/VIEWER */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LEFT COLUMN: NOTES CARDS LIST (4 cols on lg) */}
+        {/* LEFT COLUMN: NOTES CARDS LIST (5 cols on lg) */}
         <div className="lg:col-span-5 space-y-2.5 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar">
           {sortedNotes.length === 0 ? (
             <div className="bg-[#2a2c2e] border-2 border-[#141414] p-6 text-center space-y-3">
@@ -335,6 +465,7 @@ export const VNotesView: React.FC = () => {
             sortedNotes.map((note) => {
               const isSelected = selectedNoteId === note.id;
               const colorConfig = COLOR_MAP[note.colorTag] || COLOR_MAP.emerald;
+              const isStuckOnScreen = stuckIds.includes(note.id);
 
               return (
                 <div
@@ -344,6 +475,7 @@ export const VNotesView: React.FC = () => {
                     setSelectedNoteId(note.id);
                     setIsEditing(false);
                   }}
+                  onContextMenu={(e) => handleContextMenu(e, note)}
                   className={`
                     group relative border-2 cursor-pointer transition-none p-3 shadow-lg select-none active:translate-y-[1px]
                     ${
@@ -370,14 +502,19 @@ export const VNotesView: React.FC = () => {
                       >
                         {note.category}
                       </span>
+                      {isStuckOnScreen && (
+                        <span className="text-[9px] font-bold font-mono px-1 py-0.5 bg-purple-900/80 text-purple-200 border border-purple-400/50">
+                          STUCK
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-1">
-                      {/* Pin button */}
+                      {/* Pin to top button */}
                       <button
                         onClick={(e) => handleTogglePin(note.id, e)}
                         className={`p-1 rounded hover:bg-black/20 ${note.isPinned ? 'text-amber-300' : 'text-black/40 group-hover:text-white/60'}`}
-                        title={note.isPinned ? 'Bỏ ghim' : 'Ghim lên đầu'}
+                        title={note.isPinned ? 'Bỏ ghim khỏi đầu danh sách' : 'Ghim lên đầu danh sách'}
                       >
                         <Pin className="w-3.5 h-3.5 fill-current" />
                       </button>
@@ -408,7 +545,9 @@ export const VNotesView: React.FC = () => {
                       <Calendar className="w-2.5 h-2.5" />
                       {note.updatedAt}
                     </span>
-                    {note.isPinned && <span className="font-bold text-amber-300">[PINNED]</span>}
+                    <span className="text-[9px] italic opacity-75">
+                      [Chuột phải để chọn menu]
+                    </span>
                   </div>
                 </div>
               );
@@ -450,72 +589,37 @@ export const VNotesView: React.FC = () => {
                       type="text"
                       value={editCategory}
                       onChange={(e) => setEditCategory(e.target.value)}
-                      placeholder="Ví dụ: Vplay, M3U, Cá nhân..."
-                      className="w-full h-9 mc-input-box text-xs px-2.5"
+                      placeholder="Ghi chú, M3U Links, Vplay..."
+                      className="w-full h-9 mc-input-box text-xs"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Màu khoáng thạch (Ore Tag)</label>
-                    <div className="flex items-center gap-1.5 pt-1">
-                      {(Object.keys(COLOR_MAP) as NoteItem['colorTag'][]).map((tag) => {
-                        const cfg = COLOR_MAP[tag];
-                        const isSel = editColorTag === tag;
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => {
-                              playPopSound();
-                              setEditColorTag(tag);
-                            }}
-                            className={`w-6 h-6 border-2 flex items-center justify-center transition-transform ${
-                              cfg.bg
-                            } ${isSel ? 'border-white scale-110 shadow-lg' : 'border-[#141414] opacity-70 hover:opacity-100'}`}
-                            title={cfg.label}
-                          >
-                            {isSel && <Check className="w-3.5 h-3.5 text-white drop-shadow" />}
-                          </button>
-                        );
-                      })}
+                    <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Nhãn màu (Color Tag)</label>
+                    <div className="flex items-center gap-1.5 h-9">
+                      {(Object.keys(COLOR_MAP) as Array<NoteItem['colorTag']>).map((colorKey) => (
+                        <button
+                          key={colorKey}
+                          type="button"
+                          onClick={() => setEditColorTag(colorKey)}
+                          className={`flex-1 h-full border-2 ${COLOR_MAP[colorKey].bg} ${
+                            editColorTag === colorKey ? 'border-white scale-105 shadow-md' : 'border-[#141414] opacity-70 hover:opacity-100'
+                          }`}
+                          title={COLOR_MAP[colorKey].label}
+                        />
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Quick Toolbar */}
-                <div className="flex items-center gap-2 pt-1 border-t border-[#141414]/60 overflow-x-auto">
-                  <span className="text-[10px] text-zinc-400 font-mono">Chèn nhanh:</span>
-                  <button
-                    type="button"
-                    onClick={() => setEditContent((prev) => `${prev}\n#EXTM3U\n#EXTINF:-1 group-title="Group",Channel Name\nhttp://`)}
-                    className="bg-[#3a3d40] hover:bg-[#4a4d50] text-[#89dc69] text-[10px] font-bold px-2 py-1 border border-[#141414]"
-                  >
-                    + M3U Template
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditContent((prev) => `${prev}\n- [ ] `)}
-                    className="bg-[#3a3d40] hover:bg-[#4a4d50] text-amber-300 text-[10px] font-bold px-2 py-1 border border-[#141414]"
-                  >
-                    + Checkbox
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditContent((prev) => `${prev}\n[${new Date().toLocaleTimeString('vi-VN')}] `)}
-                    className="bg-[#3a3d40] hover:bg-[#4a4d50] text-sky-300 text-[10px] font-bold px-2 py-1 border border-[#141414]"
-                  >
-                    + Timestamp
-                  </button>
-                </div>
-
-                {/* Textarea Content */}
+                {/* Content Textarea */}
                 <div className="space-y-1 flex-1 flex flex-col min-h-[180px]">
-                  <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Nội dung ghi chú</label>
+                  <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Nội dung chi tiết</label>
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    placeholder="Nhập nội dung ghi chú ở đây..."
-                    className="w-full flex-1 min-h-[160px] mc-input-box p-3 text-xs font-mono leading-relaxed resize-y"
+                    placeholder="Nhập nội dung ghi chú, liên kết M3U8 hoặc văn bản bất kỳ..."
+                    className="w-full flex-1 min-h-[160px] mc-input-box p-3 font-mono text-xs leading-relaxed resize-y"
                   />
                 </div>
 
@@ -547,7 +651,7 @@ export const VNotesView: React.FC = () => {
                   {/* Top Bar inside View Panel */}
                   <div className="flex items-start justify-between gap-3 border-b border-[#141414] pb-3">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span
                           className={`w-3 h-3 border border-black ${COLOR_MAP[selectedNote.colorTag].bg}`}
                         />
@@ -559,6 +663,11 @@ export const VNotesView: React.FC = () => {
                             ★ PINNED
                           </span>
                         )}
+                        {stuckIds.includes(selectedNote.id) && (
+                          <span className="bg-purple-900/80 text-purple-200 border border-purple-400/50 text-[10px] font-bold px-1.5 py-0.5 font-mono">
+                            STUCK ON SCREEN
+                          </span>
+                        )}
                       </div>
                       <h2 className="text-base sm:text-lg font-black text-white font-jura tracking-wide pt-1">
                         {selectedNote.title}
@@ -566,7 +675,29 @@ export const VNotesView: React.FC = () => {
                     </div>
 
                     {/* View Controls */}
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                      {/* Pin Sticky Note button */}
+                      <button
+                        onClick={() => handleToggleStickyNote(selectedNote)}
+                        className={`p-2 border-2 border-[#141414] shadow active:translate-y-[1px] ${
+                          stuckIds.includes(selectedNote.id)
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-[#3a3d40] hover:bg-[#4a4d50] text-zinc-200'
+                        }`}
+                        title={stuckIds.includes(selectedNote.id) ? 'Bỏ ghim Sticky Note' : 'Ghim Sticky Note (Màn hình)'}
+                      >
+                        <Pin className="w-4 h-4" />
+                      </button>
+
+                      {/* Save to V-Files button */}
+                      <button
+                        onClick={() => handleSaveToVXplore(selectedNote)}
+                        className="bg-[#0e7490] hover:bg-[#0891b2] text-white p-2 border-2 border-[#141414] shadow active:translate-y-[1px]"
+                        title="Save to V-Files"
+                      >
+                        <Folder className="w-4 h-4" />
+                      </button>
+
                       <button
                         onClick={handleCopyNote}
                         className="bg-[#3a3d40] hover:bg-[#4a4d50] text-zinc-200 hover:text-white p-2 border-2 border-[#141414] shadow active:translate-y-[1px]"
@@ -630,6 +761,133 @@ export const VNotesView: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* CONTEXT MENU */}
+      {contextMenu && (
+        <div
+          style={{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }}
+          className="fixed z-[100000] w-60 bg-[#2d2f32] border-2 border-[#141414] shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-1.5 font-jura select-none text-xs text-white divide-y divide-[#141414] animate-in fade-in zoom-in-95 duration-100"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header title */}
+          <div className="px-2.5 py-1.5 font-mono text-[10px] text-zinc-400 flex items-center justify-between">
+            <span className="truncate max-w-[140px] font-bold text-emerald-400">{contextMenu.note.title}</span>
+            <span className="text-zinc-500">V-Notes</span>
+          </div>
+
+          {/* Menu Options */}
+          <div className="py-1 space-y-0.5">
+            {/* 1. Mở Notes */}
+            <button
+              onClick={() => {
+                setSelectedNoteId(contextMenu.note.id);
+                setIsEditing(false);
+                setContextMenu(null);
+                playPopSound();
+              }}
+              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
+            >
+              <Eye className="w-4 h-4 text-emerald-400 group-hover:text-white shrink-0" />
+              <div className="flex flex-col">
+                <span className="font-bold">Mở Notes</span>
+                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">Xem nội dung ghi chú</span>
+              </div>
+            </button>
+
+            {/* 2. Sửa Notes */}
+            <button
+              onClick={() => {
+                setSelectedNoteId(contextMenu.note.id);
+                setIsEditing(true);
+                setContextMenu(null);
+                playPopSound();
+              }}
+              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
+            >
+              <Edit3 className="w-4 h-4 text-amber-400 group-hover:text-white shrink-0" />
+              <div className="flex flex-col">
+                <span className="font-bold">Sửa Notes</span>
+                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">Chỉnh sửa tiêu đề & nội dung</span>
+              </div>
+            </button>
+
+            {/* 3. Pin Notes (Sticky Note) */}
+            <button
+              onClick={() => {
+                const note = contextMenu.note;
+                setContextMenu(null);
+                handleToggleStickyNote(note);
+              }}
+              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
+            >
+              <Pin className={`w-4 h-4 ${stuckIds.includes(contextMenu.note.id) ? 'text-purple-300 fill-purple-300' : 'text-purple-400'} group-hover:text-white shrink-0`} />
+              <div className="flex flex-col">
+                <span className="font-bold">
+                  {stuckIds.includes(contextMenu.note.id) ? 'Bỏ Ghim Sticky Note' : 'Pin Notes (Sticky Note)'}
+                </span>
+                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">
+                  Ghim dạng sticky note nổi trên màn hình
+                </span>
+              </div>
+            </button>
+
+            {/* 4. Save to V-Files */}
+            <button
+              onClick={() => {
+                const note = contextMenu.note;
+                setContextMenu(null);
+                handleSaveToVXplore(note);
+              }}
+              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
+            >
+              <Folder className="w-4 h-4 text-cyan-400 group-hover:text-white shrink-0" />
+              <div className="flex flex-col">
+                <span className="font-bold">Save to V-Files</span>
+                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">
+                  Lưu file TXT vào C:\Vplay\Documents
+                </span>
+              </div>
+            </button>
+          </div>
+
+          {/* 5. Xóa Notes */}
+          <div className="pt-1">
+            <button
+              onClick={() => {
+                const noteId = contextMenu.note.id;
+                setContextMenu(null);
+                handleDeleteNote(noteId);
+              }}
+              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-rose-700 hover:text-white text-rose-300 transition-none group cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4 text-rose-400 group-hover:text-white shrink-0" />
+              <div className="flex flex-col">
+                <span className="font-bold">Xóa Notes</span>
+                <span className="text-[9px] text-rose-300/80 group-hover:text-zinc-100">Xóa vĩnh viễn ghi chú</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST NOTIFICATION */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-[100001] bg-[#1d1f21] border-2 border-[#89dc69] text-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.8)] flex items-center gap-3 max-w-md animate-in slide-in-from-bottom-5 duration-200 font-jura">
+          <div className="w-8 h-8 bg-[#28960b] border border-[#141414] flex items-center justify-center shrink-0 shadow-[inset_1px_1px_0_#89dc69]">
+            <Check className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-white leading-tight">{toastMessage}</p>
+            <p className="text-[10px] text-zinc-400 font-mono mt-0.5">V-Notes Notification</p>
+          </div>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="text-zinc-400 hover:text-white p-1"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
