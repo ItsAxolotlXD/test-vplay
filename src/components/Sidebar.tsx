@@ -3,7 +3,7 @@ import { playPopSound } from '../utils/sound';
 import { VplayTab } from './ui/VplayTab';
 import { useLang } from '../context/LanguageContext';
 
-export type SidebarMenuItem = 'home' | 'live_tv' | 'search' | 'settings' | 'design_system' | 'v_notes' | 'v_apps' | 'v_premium';
+export type SidebarMenuItem = 'home' | 'live_tv' | 'search' | 'settings' | 'design_system' | 'v_notes' | 'v_apps' | 'v_arcade' | 'v_premium';
 
 interface SidebarProps {
   activeItem: SidebarMenuItem;
@@ -25,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'home', label: t('header.home', 'Home') },
     { id: 'live_tv', label: t('header.live', 'Live TV'), badge: `(${channelCount})` },
     { id: 'v_apps', label: t('header.vapps', 'V-Apps') },
+    { id: 'v_arcade', label: 'V-Arcade', badge: '🎮' },
     { id: 'v_premium', label: t('header.vpremium', 'V-Premium'), badge: '★' },
     { id: 'settings', label: t('header.settings', 'Settings') },
   ];

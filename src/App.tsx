@@ -20,6 +20,7 @@ import { VirtualMouseCursorOverlay } from './components/VirtualMouseCursorOverla
 import { FloatingStickyNotes } from './components/FloatingStickyNotes';
 import { VNotesView } from './components/VNotesView';
 import { VAppsView } from './components/VAppsView';
+import { VArcadeTab } from './components/vapps/VArcadeTab';
 import { VPremiumView } from './components/VPremiumView';
 import { useLang } from './context/LanguageContext';
 import { playPopSound } from './utils/sound';
@@ -115,6 +116,7 @@ export default function App() {
       case 'home': return 'TRANG CHỦ';
       case 'live_tv': return 'TRUYỀN HÌNH';
       case 'v_apps': return 'V-APPS';
+      case 'v_arcade': return 'V-ARCADE';
       case 'v_premium': return 'V-PREMIUM';
       case 'v_notes': return 'V-NOTES';
       case 'settings': return 'CÀI ĐẶT';
@@ -203,6 +205,8 @@ export default function App() {
               <DesignSystemViewer onOpenFeedback={() => setIsFeedbackOpen(true)} />
             ) : activeTab === 'v_apps' ? (
               <VAppsView />
+            ) : activeTab === 'v_arcade' ? (
+              <VArcadeTab />
             ) : activeTab === 'v_premium' ? (
               <VPremiumView />
             ) : activeTab === 'v_notes' ? (

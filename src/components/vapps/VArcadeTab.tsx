@@ -1,47 +1,33 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Gamepad2,
-  Trophy,
   Star,
   Search,
-  RotateCcw,
   Volume2,
   VolumeX,
   Play,
-  Maximize2,
-  Sparkles,
-  Flame,
-  ChevronLeft,
-  Award,
-  Zap,
-  Grid,
-  Heart,
-  HelpCircle,
-  BarChart2,
-  Cpu,
-  RefreshCw,
-  Coins,
+  RotateCcw,
   Bot,
   Users,
   User,
   Shuffle,
-  Check,
-  X,
+  HelpCircle,
   Timer,
-  Scissors,
-  Globe,
-  Swords,
   Send,
-  ListOrdered,
-  AlertTriangle
+  AlertTriangle,
+  X
 } from "lucide-react";
 import { playPopSound } from "../../utils/sound";
 import { MOCK_100_FRIENDS, VplayUser } from "../../data/mockFriendsData";
 
-export interface GameItem {
+/* =========================================================================
+   ORE UI V-ARCADE TYPES & STYLES
+   ========================================================================= */
+
+interface GameItem {
   id: string;
   title: string;
-  category: "classic" | "puzzle" | "action" | "strategy" | "sports" | "arcade";
+  category: "classic" | "puzzle" | "action" | "arcade";
   categoryLabel: string;
   description: string;
   rating: number;
@@ -52,9 +38,8 @@ export interface GameItem {
   difficulty: "Dễ" | "Trung bình" | "Khó" | "Cực khó";
 }
 
-// 100 DISTINCT GAMES WITH HIGHLIGHTED INTERACTIVE GAMES
+// STRICTLY 5 GAMES AS REQUESTED BY USER
 const ALL_GAMES: GameItem[] = [
-  // --- FEATURED INTERACTIVE GAMES (1-4) ---
   {
     id: "tic_tac_toe",
     title: "Cờ Caro XO (Tic-Tac-Toe)",
@@ -74,7 +59,7 @@ const ALL_GAMES: GameItem[] = [
     category: "classic",
     categoryLabel: "Cổ điển",
     description: "Trò chơi Oẳn Tù Tì thử phản xạ và may mắn cùng đối thủ NPC hoặc chơi 2 người pass & play.",
-    rating: 4.9,
+    rating: 4.90,
     plays: "250K",
     color: "from-rose-600 to-amber-700",
     iconName: "scissors",
@@ -107,33 +92,19 @@ const ALL_GAMES: GameItem[] = [
     isInteractive: true,
     difficulty: "Dễ"
   },
-
-  // --- CỔ ĐIỂN & RETRO ---
-  { id: "snake", title: "Rắn Săn Mồi (Retro Snake)", category: "classic", categoryLabel: "Cổ điển", description: "Điều khiển chú rắn ăn mồi và tránh va chạm tường hay chính thân mình.", rating: 4.9, plays: "128K", color: "from-emerald-600 to-green-800", iconName: "snake", isInteractive: true, difficulty: "Trung bình" },
-  { id: "tetris", title: "Xếp Hình Tetris Block", category: "classic", categoryLabel: "Cổ điển", description: "Xoay và xếp các khối gạch rơi xuống thành hàng ngang hoàn chỉnh.", rating: 4.95, plays: "210K", color: "from-blue-600 to-indigo-800", iconName: "tetris", isInteractive: true, difficulty: "Khó" },
-  { id: "flappy", title: "Flappy V-Bird", category: "classic", categoryLabel: "Cổ điển", description: "Nhấn chèo lái chú chim vỗ cánh vượt qua hàng cột ống nước hiểm hóc.", rating: 4.8, plays: "180K", color: "from-amber-500 to-orange-700", iconName: "bird", isInteractive: true, difficulty: "Khó" },
-  { id: "pong", title: "Bóng Bàn Pong 1972", category: "classic", categoryLabel: "Cổ điển", description: "Game bóng bàn 2 thanh gạt huyền thoại khai sinh ngành game thế giới.", rating: 4.6, plays: "64K", color: "from-teal-600 to-cyan-800", iconName: "pong", isInteractive: true, difficulty: "Dễ" },
-  { id: "brick_breaker", title: "Phá Gạch Brick Breaker", category: "classic", categoryLabel: "Cổ điển", description: "Bắn bóng nảy thanh đỡ để đập vỡ toàn bộ các viên gạch sắc màu.", rating: 4.85, plays: "142K", color: "from-rose-600 to-red-800", iconName: "brick", isInteractive: true, difficulty: "Trung bình" },
-  { id: "dino", title: "Khủng Long Chạy Vượt Rào", category: "classic", categoryLabel: "Cổ điển", description: "Nhảy né cây xương rồng và chim bay giống game Offline Chrome.", rating: 4.9, plays: "175K", color: "from-yellow-600 to-amber-800", iconName: "dino", isInteractive: true, difficulty: "Dễ" },
-  { id: "minesweeper", title: "Dò Mìn Minesweeper", category: "classic", categoryLabel: "Cổ điển", description: "Sử dụng tư duy logic suy đoán các con số để cắm cờ gỡ mìn an toàn.", rating: 4.75, plays: "88K", color: "from-slate-600 to-zinc-800", iconName: "mine", isInteractive: true, difficulty: "Khó" },
-  { id: "simon", title: "Ghi Nhớ Chuỗi Màu Simon", category: "classic", categoryLabel: "Cổ điển", description: "Ghi nhớ và bấm lại đúng thứ tự đèn màu phát sáng tăng dần.", rating: 4.65, plays: "52K", color: "from-violet-600 to-purple-800", iconName: "simon", isInteractive: true, difficulty: "Trung bình" },
-  { id: "pacman_mini", title: "Pac-Man V-Maze", category: "classic", categoryLabel: "Cổ điển", description: "Ăn hết hạt đậu thần và tránh né các chú ma ngộ nghĩnh.", rating: 4.9, plays: "160K", color: "from-amber-400 to-yellow-600", iconName: "pacman", isInteractive: false, difficulty: "Khó" },
-  { id: "space_invaders", title: "Bắn Ruồi Vũ Trụ Retro", category: "classic", categoryLabel: "Cổ điển", description: "Trạm phi thuyền di chuyển ngang tiêu diệt làn sóng quái vật ngoài hành tinh.", rating: 4.8, plays: "115K", color: "from-indigo-600 to-purple-900", iconName: "invaders", isInteractive: true, difficulty: "Khó" },
-
-  // --- ĐỐ VUI & PUZZLE ---
-  { id: "game_2048", title: "Trò Chơi 2048 Tile", category: "puzzle", categoryLabel: "Đố vui", description: "Vuốt trượt ghép các số trùng nhau để tạo nên viên gạch huyền thoại 2048.", rating: 4.9, plays: "195K", color: "from-amber-600 to-yellow-800", iconName: "2048", isInteractive: true, difficulty: "Trung bình" },
-  { id: "memory_card", title: "Lật Hình Ghép Cặp (Memory)", category: "puzzle", categoryLabel: "Đố vui", description: "Thử thách trí nhớ tìm cặp hình giống nhau trong thời gian ngắn nhất.", rating: 4.8, plays: "110K", color: "from-emerald-600 to-teal-800", iconName: "cards", isInteractive: true, difficulty: "Dễ" },
-  { id: "math_quiz", title: "Toán Siêu Tốc (Math Rush)", category: "puzzle", categoryLabel: "Đố vui", description: "Giải các phép tính cộng trừ nhân chia liên tục trong 3 giây mỗi câu.", rating: 4.75, plays: "85K", color: "from-blue-600 to-cyan-800", iconName: "math", isInteractive: true, difficulty: "Trung bình" },
-  { id: "sudoku", title: "Điền Số Sudoku Express", category: "puzzle", categoryLabel: "Đố vui", description: "Điền các con số từ 1 đến 9 vào lưới mà không trùng hàng, cột hay ô 3x3.", rating: 4.85, plays: "130K", color: "from-violet-600 to-indigo-800", iconName: "sudoku", isInteractive: true, difficulty: "Khó" },
-
-  // --- HÀNH ĐỘNG & ARCADE ---
-  { id: "whack_a_mole", title: "Đập Chuột Túi (Whack-A-Mole)", category: "action", categoryLabel: "Hành động", description: "Phản xạ nhanh tay đập các chú chuột nhô lên khỏi hang gạch.", rating: 4.85, plays: "125K", color: "from-amber-600 to-orange-800", iconName: "hammer", isInteractive: true, difficulty: "Dễ" },
-  { id: "target_shoot", title: "Bắn Bia Tập Bắn (Target Archery)", category: "action", categoryLabel: "Hành động", description: "Căn góc gió và thời điểm thả cung tên trúng hồng tâm 10 điểm.", rating: 4.8, plays: "112K", color: "from-rose-600 to-red-800", iconName: "target", isInteractive: true, difficulty: "Trung bình" },
-
-  // --- GIẢI TRÍ & ÂM NHẠC ---
-  { id: "piano_tiles", title: "Bím Piano Tốc Độ (Piano Tiles)", category: "arcade", categoryLabel: "Giải trí", description: "Bấm các phím đàn màu đen rơi xuống theo giai điệu bản nhạc du dương.", rating: 4.95, plays: "260K", color: "from-slate-800 to-black", iconName: "piano", isInteractive: true, difficulty: "Trung bình" },
-  { id: "cookie_clicker", title: "Đào Bánh Cookie / V-Coins Clicker", category: "arcade", categoryLabel: "Giải trí", description: "Chạm liên tục để sản xuất hàng triệu chiếc bánh ngọt và nâng cấp nhà máy.", rating: 4.85, plays: "180K", color: "from-amber-500 to-yellow-700", iconName: "cookie", isInteractive: true, difficulty: "Dễ" },
-  { id: "slot_machine", title: "Vòng Quay Slot Machine V-Spin", category: "arcade", categoryLabel: "Giải trí", description: "Quay 3 hũ may mắn trúng độc đắc Jackpot tích lũy V-Coins cực khủng.", rating: 4.9, plays: "205K", color: "from-red-600 to-amber-600", iconName: "slot", isInteractive: true, difficulty: "Dễ" }
+  {
+    id: "snake",
+    title: "Rắn Săn Mồi (Retro Snake)",
+    category: "classic",
+    categoryLabel: "Cổ điển",
+    description: "Điều khiển chú rắn ăn mồi và tránh va chạm tường hay chính thân mình.",
+    rating: 4.90,
+    plays: "128K",
+    color: "from-emerald-600 to-green-800",
+    iconName: "snake",
+    isInteractive: true,
+    difficulty: "Trung bình"
+  }
 ];
 
 export const VArcadeTab: React.FC = () => {
@@ -154,99 +125,100 @@ export const VArcadeTab: React.FC = () => {
     rock_paper_scissors: 8,
     word_chain: 15,
     counting_game: 32,
-    snake: 120,
-    game_2048: 1024,
-    slot_machine: 5000
+    snake: 120
   });
 
-  const toggleFavorite = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setFavoriteGames((prev) =>
-      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
-    );
+  const updateHighScore = (gameId: string, score: number) => {
+    setHighScores((prev) => ({
+      ...prev,
+      [gameId]: Math.max(prev[gameId] || 0, score)
+    }));
   };
 
-  const filteredGames = ALL_GAMES.filter((game) => {
+  const toggleFavorite = (gameId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (favoriteGames.includes(gameId)) {
+      setFavoriteGames(favoriteGames.filter((id) => id !== gameId));
+    } else {
+      setFavoriteGames([...favoriteGames, gameId]);
+    }
+    if (soundEnabled) playPopSound();
+  };
+
+  const filteredGames = ALL_GAMES.filter((g) => {
     const matchesSearch =
-      game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      game.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all"
-        ? true
-        : selectedCategory === "favorites"
-        ? favoriteGames.includes(game.id)
-        : game.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+      g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      g.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (selectedCategory === "all") return matchesSearch;
+    if (selectedCategory === "favorites") return favoriteGames.includes(g.id) && matchesSearch;
+    return g.category === selectedCategory && matchesSearch;
   });
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-5 text-white font-sans bg-[#232528] border-2 border-[#141414] shadow-2xl my-2">
       {/* Top Banner Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-black border border-indigo-500/30 shadow-2xl relative overflow-hidden">
-        <div className="absolute -right-12 -top-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="flex items-center gap-4 relative z-10">
-          <div className="p-4 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-2xl shadow-lg shadow-indigo-500/30 text-white font-black animate-pulse">
-            <Gamepad2 className="w-8 h-8" />
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5 p-4 sm:p-5 bg-[#1a1c1e] border-2 border-[#141414] shadow-[inset_1px_1px_0_#383b40,inset_-1px_-1px_0_#101112]">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 bg-[#28960b] border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] text-white">
+            <Gamepad2 className="w-7 h-7" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
-                V-Arcade Gaming Zone
+              <h1 className="text-xl sm:text-2xl font-bold font-jura tracking-wider text-white uppercase">
+                V-ARCADE GAMING ZONE
               </h1>
-              <span className="text-[10px] px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-extrabold uppercase tracking-widest shadow-md border border-white/20">
-                Đấu NPC & 2 Người Chơi
+              <span className="text-[10px] px-2.5 py-1 bg-[#f59e0b] text-[#141414] border border-[#141414] font-bold font-mono uppercase tracking-wider">
+                Ore UI Arcade • 5 Trò Chơi Mới
               </span>
             </div>
-            <p className="text-xs text-zinc-300 mt-1 max-w-xl">
-              Thách đấu cùng NPC ngẫu nhiên trong danh sách <span className="text-indigo-300 font-bold">Search for people</span> hoặc chơi 2 người pass & play với Tic-Tac-Toe, Oẳn tù tì, Nối từ Tiếng Việt / Anh, Đếm số phá chuỗi!
+            <p className="text-xs text-zinc-300 font-montserrat mt-1 max-w-xl">
+              Thách đấu NPC ngẫu nhiên trong danh sách <span className="text-[#89dc69] font-bold">Search for people</span> hoặc chơi 2 người pass & play với Caro, Oẳn Tù Tì, Nối Từ, Đếm Số & Rắn Săn Mồi!
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 relative z-10 self-end md:self-auto">
+        <div className="flex items-center gap-2.5 self-end md:self-auto">
           <button
             onClick={() => {
               setSoundEnabled(!soundEnabled);
               playPopSound();
             }}
-            className="px-3 py-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white transition-all cursor-pointer flex items-center gap-2 text-xs font-bold rounded-none shadow-md"
+            className="px-4 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase shadow-[inset_1px_1px_0_#484c52,inset_-1px_-1px_0_#1a1b1d] active:translate-y-[1px] flex items-center gap-2 cursor-pointer min-h-[42px]"
             title="Bật/Tắt âm thanh"
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-rose-400" />}
-            <span className="hidden sm:inline">{soundEnabled ? "Âm thanh: Bật" : "Âm thanh: Tắt"}</span>
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-[#89dc69]" /> : <VolumeX className="w-4 h-4 text-[#fc8181]" />}
+            <span>{soundEnabled ? "ÂM THANH BẬT" : "ÂM THANH TẮT"}</span>
           </button>
         </div>
       </div>
 
       {/* Category Pills & Search Bar */}
-      <div className="space-y-4 mb-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#16151c] border border-white/10 rounded-2xl p-3 shadow-xl">
+      <div className="space-y-3 mb-5">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#2f3135] border-2 border-[#141414] p-3 shadow-md">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Tìm kiếm trò chơi V-Arcade..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-[#18191b] border-2 border-[#141414] pl-9 pr-3 py-2 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b]"
             />
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 shrink-0">
-            <span className="text-indigo-400 font-bold">{filteredGames.length}</span> trò chơi tương tác
+          <div className="flex items-center gap-2 text-xs font-mono text-zinc-300 shrink-0">
+            <span className="text-[#89dc69] font-bold">{filteredGames.length}</span> / 5 trò chơi Ore UI
           </div>
         </div>
 
         {/* Categories Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           {[
-            { id: "all", label: "Tất Cả Trò Chơi" },
+            { id: "all", label: "Tất Cả 5 Trò Chơi" },
             { id: "favorites", label: `Yêu Thích (${favoriteGames.length})` },
-            { id: "classic", label: "Cổ Điển & Retro" },
-            { id: "puzzle", label: "Đố Vui & Logic" },
-            { id: "action", label: "Hành Động" },
-            { id: "arcade", label: "Giải Trí" }
+            { id: "classic", label: "Cổ Điển" },
+            { id: "puzzle", label: "Đố Vui & Trí Tuệ" }
           ].map((cat) => (
             <button
               key={cat.id}
@@ -254,10 +226,10 @@ export const VArcadeTab: React.FC = () => {
                 setSelectedCategory(cat.id);
                 playPopSound();
               }}
-              className={`px-4 py-2 text-xs font-black whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 rounded-none ${
+              className={`px-4 py-2.5 text-xs font-bold font-jura uppercase tracking-wider whitespace-nowrap border-2 border-[#141414] flex items-center gap-2 cursor-pointer active:translate-y-[1px] min-h-[42px] transition-none ${
                 selectedCategory === cat.id
-                  ? "bg-[#208b3a] hover:bg-[#2dc653] text-white border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 shadow-md"
-                  : "bg-[#2a2d36] hover:bg-[#383c48] text-zinc-300 hover:text-white border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 shadow-sm"
+                  ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                  : "bg-[#2a2c30] hover:bg-[#383a3f] text-zinc-300 shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b]"
               }`}
             >
               {cat.id === "favorites" && <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />}
@@ -267,8 +239,8 @@ export const VArcadeTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Game Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* Grid of 5 Games */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {filteredGames.map((game) => {
           const isFav = favoriteGames.includes(game.id);
 
@@ -279,22 +251,20 @@ export const VArcadeTab: React.FC = () => {
                 setActiveGame(game);
                 playPopSound();
               }}
-              className="group relative bg-[#181722] border border-white/10 hover:border-indigo-500/50 rounded-2xl p-4 flex flex-col justify-between shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-200 cursor-pointer hover:-translate-y-1 overflow-hidden"
+              className="group bg-[#2a2c30] hover:bg-[#31343a] border-2 border-[#141414] p-4 flex flex-col justify-between shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] transition-none cursor-pointer"
             >
               {/* Top Card Banner */}
               <div className="flex items-start justify-between gap-2 mb-3">
-                <div className={`p-3 rounded-2xl bg-gradient-to-br ${game.color} text-white shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                <div className="p-3 bg-[#18191b] border-2 border-[#141414] text-[#89dc69]">
                   <Gamepad2 className="w-6 h-6" />
                 </div>
-                <div className="flex items-center gap-1.5">
-                  {game.isInteractive && (
-                    <span className="text-[9px] px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-black uppercase tracking-wider">
-                      NPC & 2P
-                    </span>
-                  )}
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#f59e0b] text-[#141414] border border-[#141414] uppercase">
+                    NPC & 2P
+                  </span>
                   <button
                     onClick={(e) => toggleFavorite(game.id, e)}
-                    className="p-1.5 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-amber-400 transition-colors"
+                    className="p-1.5 hover:bg-white/10 border border-[#141414] bg-[#18191b] text-zinc-400 hover:text-amber-400"
                   >
                     <Star className={`w-4 h-4 ${isFav ? "fill-amber-400 text-amber-400" : ""}`} />
                   </button>
@@ -302,27 +272,26 @@ export const VArcadeTab: React.FC = () => {
               </div>
 
               {/* Title & Info */}
-              <div>
-                <h3 className="text-sm font-black text-white group-hover:text-indigo-300 line-clamp-1 mb-1 transition-colors">
+              <div className="mb-3">
+                <h3 className="text-base font-bold font-jura text-white group-hover:text-[#89dc69] line-clamp-1 mb-1.5 transition-colors">
                   {game.title}
                 </h3>
-                <p className="text-xs text-zinc-400 line-clamp-2 mb-3 leading-relaxed">
+                <p className="text-xs font-montserrat text-zinc-300 line-clamp-2 leading-relaxed">
                   {game.description}
                 </p>
               </div>
 
               {/* Card Footer Info */}
-              <div className="space-y-2 pt-2 border-t border-white/5">
-                <div className="flex items-center justify-between text-[11px] text-zinc-400 font-medium">
+              <div className="space-y-3 pt-3 border-t border-[#141414]">
+                <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
                   <span className="flex items-center gap-1 text-amber-400 font-bold">
-                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {game.rating}
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {game.rating}
                   </span>
-                  <span>{game.plays} lượt</span>
-                  <span className="text-zinc-500 font-mono">{game.difficulty}</span>
+                  <span className="text-[#89dc69] font-bold">{game.difficulty}</span>
                 </div>
 
-                <button className="w-full py-2 bg-[#208b3a] hover:bg-[#2dc653] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md">
-                  <Play className="w-3.5 h-3.5 fill-current" /> CHƠI NGAY
+                <button className="w-full py-3 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-xs uppercase tracking-wider border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 transition-none min-h-[44px]">
+                  <Play className="w-4 h-4 fill-current" /> CHƠI NGAY
                 </button>
               </div>
             </div>
@@ -332,62 +301,66 @@ export const VArcadeTab: React.FC = () => {
 
       {/* GAME MODAL POPUP FOR PLAYING */}
       {activeGame && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-2xl bg-[#14131d] border border-indigo-500/40 rounded-3xl p-4 sm:p-6 shadow-2xl relative text-white flex flex-col max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-2xl bg-[#232528] border-4 border-[#141414] shadow-[inset_2px_2px_0_#3a3d42,inset_-2px_-2px_0_#121315,0_20px_25px_-5px_rgba(0,0,0,0.8)] p-4 sm:p-6 text-white flex flex-col max-h-[92vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+            <div className="flex items-center justify-between border-b-2 border-[#141414] pb-3 mb-4">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${activeGame.color} text-white`}>
-                  <Gamepad2 className="w-5 h-5" />
+                <div className="p-2.5 bg-[#28960b] border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] text-white">
+                  <Gamepad2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-base sm:text-lg font-black text-indigo-300">{activeGame.title}</h2>
-                  <span className="text-xs text-zinc-400">{activeGame.categoryLabel} • {activeGame.difficulty}</span>
+                  <h2 className="text-base sm:text-xl font-bold font-jura text-[#89dc69] uppercase tracking-wider">{activeGame.title}</h2>
+                  <span className="text-xs font-mono text-zinc-400">{activeGame.categoryLabel} • {activeGame.difficulty}</span>
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  setActiveGame(null);
-                  playPopSound();
-                }}
-                className="px-3 py-1.5 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white text-xs font-bold rounded-none shadow-md transition-all cursor-pointer"
-              >
-                Đóng (ESC)
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setActiveGame(null);
+                    playPopSound();
+                  }}
+                  className="px-3 py-2 bg-[#c53030] hover:bg-[#e53e3e] border-2 border-[#141414] shadow-[inset_1px_1px_0_#fc8181,inset_-1px_-1px_0_#9b2c2c] active:translate-y-[1px] text-white text-xs font-jura font-bold uppercase transition-none cursor-pointer min-h-[42px] flex items-center gap-1.5"
+                  title="Thoát trò chơi (ESC)"
+                >
+                  <X className="w-5 h-5" />
+                  <span className="hidden sm:inline">Đóng (ESC)</span>
+                </button>
+              </div>
             </div>
 
             {/* Game Container */}
-            <div className="w-full bg-zinc-950 border border-white/10 rounded-2xl p-4 min-h-[320px] flex flex-col items-center justify-center relative overflow-hidden">
+            <div className="w-full bg-[#18191b] border-2 border-[#141414] p-4 sm:p-6 min-h-[340px] flex flex-col items-center justify-center relative">
               {/* 1. TIC TAC TOE */}
               {activeGame.id === "tic_tac_toe" && (
                 <TicTacToeGame
                   soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, tic_tac_toe: Math.max(prev.tic_tac_toe || 0, s) }))}
+                  onScoreUpdate={(s) => updateHighScore("tic_tac_toe", s)}
                 />
               )}
 
-              {/* 2. ROCK PAPER SCISSORS (OẲN TÙ TÌ) */}
+              {/* 2. ROCK PAPER SCISSORS */}
               {activeGame.id === "rock_paper_scissors" && (
                 <RockPaperScissorsGame
                   soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, rock_paper_scissors: Math.max(prev.rock_paper_scissors || 0, s) }))}
+                  onScoreUpdate={(s) => updateHighScore("rock_paper_scissors", s)}
                 />
               )}
 
-              {/* 3. WORD CHAIN (NỐI TỪ VN & EN) */}
+              {/* 3. WORD CHAIN */}
               {activeGame.id === "word_chain" && (
                 <WordChainGame
                   soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, word_chain: Math.max(prev.word_chain || 0, s) }))}
+                  onScoreUpdate={(s) => updateHighScore("word_chain", s)}
                 />
               )}
 
-              {/* 4. COUNTING GAME (ĐẾM SỐ 1 -> N) */}
+              {/* 4. COUNTING GAME */}
               {activeGame.id === "counting_game" && (
                 <CountingGame
                   soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, counting_game: Math.max(prev.counting_game || 0, s) }))}
+                  onScoreUpdate={(s) => updateHighScore("counting_game", s)}
                 />
               )}
 
@@ -395,36 +368,21 @@ export const VArcadeTab: React.FC = () => {
               {activeGame.id === "snake" && (
                 <SnakeGame
                   soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => setHighScores((prev) => ({ ...prev, snake: Math.max(prev.snake || 0, s) }))}
+                  onScoreUpdate={(s) => updateHighScore("snake", s)}
                 />
-              )}
-
-              {/* 6. MEMORY MATCH */}
-              {activeGame.id === "memory_card" && <MemoryMatchGame />}
-
-              {/* 7. MATH QUIZ */}
-              {activeGame.id === "math_quiz" && <MathQuizGame />}
-
-              {/* 8. COOKIE CLICKER */}
-              {activeGame.id === "cookie_clicker" && <CookieClickerGame />}
-
-              {/* 9. SLOT MACHINE */}
-              {activeGame.id === "slot_machine" && <SlotMachineGame />}
-
-              {/* GENERIC SIMULATOR FOR OTHERS */}
-              {!["tic_tac_toe", "rock_paper_scissors", "word_chain", "counting_game", "snake", "memory_card", "math_quiz", "cookie_clicker", "slot_machine"].includes(activeGame.id) && (
-                <GenericGameSimulator game={activeGame} />
               )}
             </div>
 
             {/* Game Instructions */}
-            <div className="mt-4 p-3 bg-white/5 border border-white/5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-300">
+            <div className="mt-4 p-3 bg-[#1c1e20] border-2 border-[#141414] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-300 font-montserrat">
               <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-indigo-400 shrink-0" />
+                <HelpCircle className="w-4 h-4 text-[#89dc69] shrink-0" />
                 <span>{activeGame.description}</span>
               </div>
-              <div className="flex items-center gap-3 shrink-0 font-mono text-[11px]">
-                <span className="text-amber-400 font-bold">Kỷ Lục: {highScores[activeGame.id] || 0} pts</span>
+              <div className="flex items-center gap-3 shrink-0 font-mono text-xs">
+                <span className="text-amber-400 font-bold bg-[#f59e0b]/10 border border-[#f59e0b]/40 px-2.5 py-1">
+                  Kỷ Lục: {highScores[activeGame.id] || 0} pts
+                </span>
               </div>
             </div>
           </div>
@@ -435,57 +393,47 @@ export const VArcadeTab: React.FC = () => {
 };
 
 /* =========================================================================
-   OPPONENT SELECTOR BAR (VS NPC from Search for people OR 2 Players)
+   OPPONENT BAR COMPONENT (ORE UI STYLE WITH TALLER BUTTONS)
    ========================================================================= */
-interface OpponentBarProps {
+const OpponentBar: React.FC<{
   gameMode: "npc" | "pvp";
-  setGameMode: (m: "npc" | "pvp") => void;
+  setGameMode: (mode: "npc" | "pvp") => void;
   selectedNpc: VplayUser;
-  setSelectedNpc: (user: VplayUser) => void;
-}
-
-const OpponentBar: React.FC<OpponentBarProps> = ({
-  gameMode,
-  setGameMode,
-  selectedNpc,
-  setSelectedNpc
-}) => {
+  setSelectedNpc: (npc: VplayUser) => void;
+}> = ({ gameMode, setGameMode, selectedNpc, setSelectedNpc }) => {
   const [showNpcPicker, setShowNpcPicker] = useState(false);
   const [pickerSearch, setPickerSearch] = useState("");
 
   const filteredNpcs = useMemo(() => {
-    if (!pickerSearch.trim()) return MOCK_100_FRIENDS.slice(0, 16);
-    return MOCK_100_FRIENDS.filter(
-      (f) =>
-        f.name.toLowerCase().includes(pickerSearch.toLowerCase()) ||
-        f.tag.toLowerCase().includes(pickerSearch.toLowerCase())
-    ).slice(0, 20);
+    return MOCK_100_FRIENDS.filter((friend) =>
+      friend.name.toLowerCase().includes(pickerSearch.toLowerCase())
+    );
   }, [pickerSearch]);
 
   const handleRandomize = () => {
-    const random = MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)];
-    setSelectedNpc(random);
+    const randomNpc = MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)];
+    setSelectedNpc(randomNpc);
     playPopSound();
   };
 
   return (
-    <div className="w-full mb-4 p-3 bg-zinc-900 border border-white/10 rounded-2xl flex flex-col gap-2.5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {/* Mode Buttons */}
-        <div className="flex items-center gap-1.5 bg-black/50 p-1 rounded-xl border border-white/10">
+    <div className="w-full mb-4 p-3.5 bg-[#1c1e20] border-2 border-[#141414] flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Mode Buttons - Ore UI Taller */}
+        <div className="flex items-center gap-2 bg-[#141414] p-1 border border-[#2a2c30]">
           <button
             type="button"
             onClick={() => {
               setGameMode("npc");
               playPopSound();
             }}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-4 py-2.5 text-xs font-jura font-bold uppercase border-2 border-[#141414] transition-none flex items-center gap-2 cursor-pointer min-h-[42px] ${
               gameMode === "npc"
-                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
+                : "bg-[#2a2c30] text-zinc-400 hover:text-white"
             }`}
           >
-            <Bot className="w-3.5 h-3.5" /> Chơi Với NPC
+            <Bot className="w-4 h-4" /> Chơi Với NPC
           </button>
           <button
             type="button"
@@ -493,27 +441,27 @@ const OpponentBar: React.FC<OpponentBarProps> = ({
               setGameMode("pvp");
               playPopSound();
             }}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-4 py-2.5 text-xs font-jura font-bold uppercase border-2 border-[#141414] transition-none flex items-center gap-2 cursor-pointer min-h-[42px] ${
               gameMode === "pvp"
-                ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#f59e0b] text-[#141414] shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309]"
+                : "bg-[#2a2c30] text-zinc-400 hover:text-white"
             }`}
           >
-            <Users className="w-3.5 h-3.5" /> 2 Người Chơi
+            <Users className="w-4 h-4" /> 2 Người Chơi
           </button>
         </div>
 
         {/* NPC Profile Tag */}
         {gameMode === "npc" && (
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-indigo-950/80 border border-indigo-500/40 px-3 py-1 rounded-xl">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2.5 bg-[#282a2e] border-2 border-[#141414] px-3 py-1.5 min-h-[42px]">
               <img
                 src={selectedNpc.avatar}
                 alt={selectedNpc.name}
-                className="w-6 h-6 rounded-full border border-indigo-400 object-cover shrink-0"
+                className="w-7 h-7 border border-[#141414] object-cover shrink-0"
               />
               <div className="text-left">
-                <div className="text-xs font-bold text-indigo-200 leading-tight max-w-[130px] truncate">
+                <div className="text-xs font-bold font-jura text-[#89dc69] leading-tight max-w-[130px] truncate">
                   {selectedNpc.name}
                 </div>
                 <div className="text-[10px] text-zinc-400 font-mono">{selectedNpc.tag}</div>
@@ -523,16 +471,15 @@ const OpponentBar: React.FC<OpponentBarProps> = ({
             <button
               type="button"
               onClick={handleRandomize}
-              className="px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs text-indigo-300 font-bold rounded-xl border border-white/10 flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-xs font-jura text-amber-300 font-bold border-2 border-[#141414] shadow-[inset_1px_1px_0_#484c52,inset_-1px_-1px_0_#1a1b1d] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer min-h-[42px]"
               title="Chọn ngẫu nhiên 1 người trong Search for people"
             >
               <Shuffle className="w-3.5 h-3.5" /> 🎲
             </button>
-
             <button
               type="button"
               onClick={() => setShowNpcPicker(!showNpcPicker)}
-              className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-xs text-white font-bold rounded-xl flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-2.5 bg-[#28960b] hover:bg-[#32b312] text-xs font-jura text-white font-bold border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer min-h-[42px]"
             >
               <User className="w-3.5 h-3.5" /> Chọn NPC
             </button>
@@ -542,15 +489,15 @@ const OpponentBar: React.FC<OpponentBarProps> = ({
 
       {/* NPC Search Drawer Dropdown */}
       {showNpcPicker && gameMode === "npc" && (
-        <div className="bg-zinc-950 border border-indigo-500/40 rounded-xl p-3 mt-1 shadow-2xl animate-fade-in">
+        <div className="bg-[#18191b] border-2 border-[#141414] p-3 mt-1 shadow-2xl animate-fade-in">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-indigo-300">
+            <span className="text-xs font-bold font-jura text-[#89dc69]">
               Chọn NPC đấu cùng (Danh sách Search for people):
             </span>
             <button
               type="button"
               onClick={() => setShowNpcPicker(false)}
-              className="text-zinc-400 hover:text-white text-xs px-2 py-0.5 rounded"
+              className="text-zinc-400 hover:text-white text-xs px-2.5 py-1 border border-[#141414] bg-[#2a2c30]"
             >
               ✕
             </button>
@@ -560,7 +507,7 @@ const OpponentBar: React.FC<OpponentBarProps> = ({
             placeholder="Gõ tên tìm người..."
             value={pickerSearch}
             onChange={(e) => setPickerSearch(e.target.value)}
-            className="w-full bg-zinc-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white mb-2 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-[#232528] border-2 border-[#141414] px-3 py-2 text-xs font-mono text-white mb-2 focus:outline-none focus:border-[#28960b]"
           />
           <div className="max-h-40 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-1.5 pr-1">
             {filteredNpcs.map((npc) => (
@@ -572,14 +519,14 @@ const OpponentBar: React.FC<OpponentBarProps> = ({
                   setShowNpcPicker(false);
                   playPopSound();
                 }}
-                className={`p-2 rounded-lg border text-left flex items-center gap-2 cursor-pointer transition-all ${
+                className={`p-2 border-2 border-[#141414] text-left flex items-center gap-2 cursor-pointer transition-none ${
                   selectedNpc.id === npc.id
-                    ? "bg-indigo-600/40 border-indigo-500 text-white"
-                    : "bg-zinc-900 border-white/5 text-zinc-300 hover:bg-zinc-800"
+                    ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
+                    : "bg-[#232528] text-zinc-300 hover:bg-[#313438]"
                 }`}
               >
-                <img src={npc.avatar} alt={npc.name} className="w-6 h-6 rounded-full shrink-0" />
-                <div className="truncate text-xs font-bold">{npc.name}</div>
+                <img src={npc.avatar} alt={npc.name} className="w-6 h-6 border border-[#141414] shrink-0" />
+                <div className="truncate text-xs font-bold font-jura">{npc.name}</div>
               </button>
             ))}
           </div>
@@ -590,7 +537,7 @@ const OpponentBar: React.FC<OpponentBarProps> = ({
 };
 
 /* =========================================================================
-   1. GAME ENGINE: TIC TAC TOE (CỜ CARO XO)
+   1. GAME ENGINE: TIC TAC TOE (CỜ CARO XO) - ORE UI STYLE
    ========================================================================= */
 const TicTacToeGame: React.FC<{
   soundEnabled: boolean;
@@ -652,10 +599,8 @@ const TicTacToeGame: React.FC<{
 
     if (emptyIndices.length === 0) return;
 
-    // Smart move check
     let targetIndex = -1;
 
-    // 1. Can NPC win?
     for (const idx of emptyIndices) {
       const testBoard = [...board];
       testBoard[idx] = "O";
@@ -665,7 +610,6 @@ const TicTacToeGame: React.FC<{
       }
     }
 
-    // 2. Can block Player X?
     if (targetIndex === -1) {
       for (const idx of emptyIndices) {
         const testBoard = [...board];
@@ -677,12 +621,10 @@ const TicTacToeGame: React.FC<{
       }
     }
 
-    // 3. Take center
     if (targetIndex === -1 && emptyIndices.includes(4)) {
       targetIndex = 4;
     }
 
-    // 4. Take random
     if (targetIndex === -1) {
       targetIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
     }
@@ -734,9 +676,9 @@ const TicTacToeGame: React.FC<{
       />
 
       {/* Turn Indicator */}
-      <div className="mb-3 text-center">
+      <div className="mb-4 text-center">
         {winner ? (
-          <div className="text-sm font-black text-amber-400 animate-bounce">
+          <div className="text-sm font-bold font-jura text-amber-400 bg-amber-400/10 border-2 border-[#141414] px-4 py-2">
             {winner === "Tie"
               ? "🤝 Trận đấu Hòa nhau!"
               : winner === "X"
@@ -746,39 +688,39 @@ const TicTacToeGame: React.FC<{
               : "🎉 Người chơi 2 (O) Thắng!"}
           </div>
         ) : (
-          <div className="text-xs font-bold text-indigo-300 flex items-center justify-center gap-1.5">
-            <span>Lượt của:</span>
+          <div className="text-xs font-bold font-jura text-zinc-300 flex items-center justify-center gap-2">
+            <span>LƯỢT BẮT ĐẦU:</span>
             <span
-              className={`px-2 py-0.5 rounded-md font-black ${
+              className={`px-3 py-1 border border-[#141414] font-mono font-bold ${
                 turn === "X"
-                  ? "bg-purple-600 text-white"
-                  : "bg-amber-600 text-white"
+                  ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
+                  : "bg-[#f59e0b] text-[#141414] shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309]"
               }`}
             >
               {turn === "X"
-                ? "Bạn (X)"
+                ? "BẠN (X)"
                 : gameMode === "npc"
-                ? `${selectedNpc.name} (O)`
-                : "Người chơi 2 (O)"}
+                ? `${selectedNpc.name.toUpperCase()} (O)`
+                : "NGƯỜI CHƠI 2 (O)"}
             </span>
           </div>
         )}
       </div>
 
       {/* Grid Board */}
-      <div className="grid grid-cols-3 gap-2.5 bg-zinc-900 p-3.5 rounded-2xl border border-indigo-500/30 shadow-xl w-56 h-56">
+      <div className="grid grid-cols-3 gap-2.5 bg-[#18191b] p-4 border-2 border-[#141414] shadow-[inset_2px_2px_0_#101112,inset_-2px_-2px_0_#282a2e] mb-4">
         {board.map((cell, i) => (
           <button
             type="button"
             key={i}
             onClick={() => handleCellClick(i)}
             disabled={!!cell || !!winner || (gameMode === "npc" && turn === "O")}
-            className={`rounded-xl text-2xl font-black flex items-center justify-center transition-all cursor-pointer ${
+            className={`w-20 h-20 sm:w-24 sm:h-24 border-2 border-[#141414] font-jura text-3xl font-bold flex items-center justify-center cursor-pointer transition-none active:translate-y-[1px] ${
               cell === "X"
-                ? "bg-purple-600/30 text-purple-300 border border-purple-500"
+                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
                 : cell === "O"
-                ? "bg-amber-600/30 text-amber-300 border border-amber-500"
-                : "bg-zinc-800 hover:bg-zinc-700 text-transparent border border-white/5 active:scale-95"
+                ? "bg-[#f59e0b] text-[#141414] shadow-[inset_2px_2px_0_#fde68a,inset_-2px_-2px_0_#b45309]"
+                : "bg-[#2a2c30] hover:bg-[#383a3f] text-transparent shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b]"
             }`}
           >
             {cell || ""}
@@ -787,8 +729,8 @@ const TicTacToeGame: React.FC<{
       </div>
 
       {/* Scores & Reset */}
-      <div className="flex items-center justify-between w-full mt-4 text-xs font-mono bg-zinc-900 p-2.5 rounded-xl border border-white/10">
-        <div className="text-purple-300 font-bold">Bạn (X): {scores.p1}</div>
+      <div className="flex items-center justify-between w-full text-xs font-mono bg-[#1c1e20] p-3 border-2 border-[#141414] mb-4">
+        <div className="text-[#89dc69] font-bold">Bạn (X): {scores.p1}</div>
         <div className="text-zinc-400">Hòa: {scores.ties}</div>
         <div className="text-amber-400 font-bold">
           {gameMode === "npc" ? `${selectedNpc.name.split(" ")[0]} (O)` : "P2 (O)"}: {scores.p2Npc}
@@ -798,16 +740,16 @@ const TicTacToeGame: React.FC<{
       <button
         type="button"
         onClick={resetGame}
-        className="mt-3 px-5 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none cursor-pointer shadow-md flex items-center gap-1.5"
+        className="w-full py-3 sm:py-3.5 px-6 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 min-h-[46px]"
       >
-        <RotateCcw className="w-3.5 h-3.5" /> Chơi Ván Mới
+        <RotateCcw className="w-4 h-4" /> CHƠI VÁN MỚI
       </button>
     </div>
   );
 };
 
 /* =========================================================================
-   2. GAME ENGINE: ROCK PAPER SCISSORS (OẲN TÙ TÌ)
+   2. GAME ENGINE: ROCK PAPER SCISSORS (OẲN TÙ TÌ) - ORE UI STYLE
    ========================================================================= */
 const RockPaperScissorsGame: React.FC<{
   soundEnabled: boolean;
@@ -826,9 +768,9 @@ const RockPaperScissorsGame: React.FC<{
   const [streak, setStreak] = useState(0);
 
   const OPTIONS = [
-    { id: "scissors", label: "Kéo", emoji: "✂️" },
-    { id: "rock", label: "Búa", emoji: "🪨" },
-    { id: "paper", label: "Bao", emoji: "📄" }
+    { id: "scissors", label: "KÉO", emoji: "✂️" },
+    { id: "rock", label: "BÚA", emoji: "🪨" },
+    { id: "paper", label: "BAO", emoji: "📄" }
   ];
 
   const handleSelectChoice = (choiceId: string) => {
@@ -836,12 +778,10 @@ const RockPaperScissorsGame: React.FC<{
 
     if (gameMode === "npc") {
       setP1Choice(choiceId);
-      // NPC choice
       const npcChoiceObj = OPTIONS[Math.floor(Math.random() * OPTIONS.length)].id;
       setP2Choice(npcChoiceObj);
       evaluateWinner(choiceId, npcChoiceObj);
     } else {
-      // 2 Players Mode
       if (pvpPhase === "p1") {
         setP1Choice(choiceId);
         setPvpPhase("p2");
@@ -863,7 +803,7 @@ const RockPaperScissorsGame: React.FC<{
       (c1 === "scissors" && c2 === "paper") ||
       (c1 === "paper" && c2 === "rock")
     ) {
-      setResultMsg("🎉 Người chơi 1 Thắng Ván Này!");
+      setResultMsg("🎉 Bạn Thắng Ván Này!");
       setScores((s) => {
         const updated = { ...s, p1: s.p1 + 1 };
         onScoreUpdate(updated.p1 * 10);
@@ -902,21 +842,21 @@ const RockPaperScissorsGame: React.FC<{
       />
 
       {/* Game Stage Area */}
-      <div className="flex items-center justify-around w-full bg-zinc-900 border border-indigo-500/30 p-4 rounded-2xl mb-3">
+      <div className="flex items-center justify-around w-full bg-[#1c1e20] border-2 border-[#141414] p-4 mb-4">
         <div className="flex flex-col items-center">
-          <span className="text-xs font-bold text-purple-300 mb-1">Bạn (P1)</span>
-          <div className="w-16 h-16 rounded-2xl bg-zinc-800 border-2 border-purple-500 flex items-center justify-center text-3xl shadow-lg">
+          <span className="text-xs font-bold font-jura text-[#89dc69] mb-2 uppercase">BẠN (P1)</span>
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#18191b] border-2 border-[#141414] shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] flex items-center justify-center text-4xl">
             {p1Choice ? OPTIONS.find((o) => o.id === p1Choice)?.emoji : "❓"}
           </div>
         </div>
 
-        <div className="text-xl font-black text-amber-400">VS</div>
+        <div className="text-xl font-bold font-jura text-amber-400">VS</div>
 
         <div className="flex flex-col items-center">
-          <span className="text-xs font-bold text-amber-300 mb-1">
-            {gameMode === "npc" ? selectedNpc.name.split(" ")[0] : "Người chơi 2"}
+          <span className="text-xs font-bold font-jura text-amber-400 mb-2 uppercase">
+            {gameMode === "npc" ? selectedNpc.name.split(" ")[0] : "P2"}
           </span>
-          <div className="w-16 h-16 rounded-2xl bg-zinc-800 border-2 border-amber-500 flex items-center justify-center text-3xl shadow-lg">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#18191b] border-2 border-[#141414] shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] flex items-center justify-center text-4xl">
             {gameMode === "pvp" && pvpPhase === "p2" ? (
               "🙈"
             ) : p2Choice ? (
@@ -929,19 +869,19 @@ const RockPaperScissorsGame: React.FC<{
       </div>
 
       {/* Result Msg Banner */}
-      <div className="text-xs font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-500/30 px-4 py-2 rounded-xl mb-4 text-center w-full">
+      <div className="text-xs font-bold font-jura text-[#89dc69] bg-[#18191b] border-2 border-[#141414] px-4 py-3 mb-4 text-center w-full">
         {resultMsg}
       </div>
 
-      {/* Options Selector Buttons */}
-      <div className="grid grid-cols-3 gap-3 w-full mb-3">
+      {/* Options Selector Buttons - Taller Ore UI Buttons */}
+      <div className="grid grid-cols-3 gap-3 w-full mb-4">
         {OPTIONS.map((opt) => (
           <button
             type="button"
             key={opt.id}
             onClick={() => handleSelectChoice(opt.id)}
             disabled={gameMode === "pvp" && pvpPhase === "result"}
-            className="py-3 px-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white font-black text-xs rounded-none shadow-md flex flex-col items-center gap-1 cursor-pointer"
+            className="py-3.5 sm:py-4 px-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] active:translate-y-[1px] flex flex-col items-center justify-center gap-1.5 cursor-pointer min-h-[64px]"
           >
             <span className="text-2xl">{opt.emoji}</span>
             <span>{opt.label}</span>
@@ -950,36 +890,35 @@ const RockPaperScissorsGame: React.FC<{
       </div>
 
       {/* Score Stats */}
-      <div className="flex items-center justify-between w-full text-xs font-mono bg-zinc-900 p-2.5 rounded-xl border border-white/10">
-        <span className="text-purple-300 font-bold">Thắng: {scores.p1}</span>
+      <div className="flex items-center justify-between w-full text-xs font-mono bg-[#1c1e20] p-3 border-2 border-[#141414] mb-4">
+        <span className="text-[#89dc69] font-bold">Thắng: {scores.p1}</span>
         <span className="text-zinc-400">Hòa: {scores.ties}</span>
         <span className="text-amber-400 font-bold">Thua: {scores.p2Npc}</span>
-        <span className="text-emerald-400 font-bold">Chuỗi: 🔥{streak}</span>
+        <span className="text-[#89dc69] font-bold">Chuỗi: 🔥{streak}</span>
       </div>
 
       <button
         type="button"
         onClick={resetGame}
-        className="mt-3 px-5 py-2 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none cursor-pointer shadow-md flex items-center gap-1.5"
+        className="w-full py-3 sm:py-3.5 px-6 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 min-h-[46px]"
       >
-        <RotateCcw className="w-3.5 h-3.5" /> Chơi Lại Ván Mới
+        <RotateCcw className="w-4 h-4" /> CHƠI LẠI VÁN MỚI
       </button>
     </div>
   );
 };
 
 /* =========================================================================
-   3. GAME ENGINE: WORD CHAIN (NỐI TỪ TIẾNG VIỆT & TIẾNG ANH)
+   3. GAME ENGINE: WORD CHAIN (NỐI TỪ TIẾNG VIỆT & TIẾNG ANH) - ORE UI
    ========================================================================= */
 
-// Dictionary maps for NPC auto-play
 const VN_WORD_DICT: Record<string, string[]> = {
   tập: ["tập viết", "tập gym", "tập học", "tập thể", "tập làm", "tập hát", "tập trung"],
   viết: ["viết bài", "viết thư", "viết lách", "viết chữ", "viết nhật ký"],
   bài: ["bài học", "bài ca", "bài thơ", "bài tập", "bài viết", "bài hát"],
   học: ["học sinh", "học tập", "học hỏi", "học hành", "học đường"],
   hành: ["hành động", "hành trình", "hành trang", "hành tỏi", "hành vi"],
-  trình: ["trình bày", "trình chiếu", "trình độ", "trình làng"],
+  trình: ["trình trình", "trình bày", "trình chiếu", "trình độ", "trình làng"],
   trang: ["trang trí", "trang web", "trang phục", "trang điểm", "trang nhã"],
   điểm: ["điểm số", "điểm danh", "điểm tựa", "điểm nhấn", "điểm hẹn"],
   nhấn: ["nhấn mạnh", "nhấn nút", "nhấn ga"],
@@ -1044,7 +983,7 @@ const WordChainGame: React.FC<{
 
   const [usedWords, setUsedWords] = useState<Set<string>>(new Set(["học tập"]));
   const [inputVal, setInputVal] = useState("");
-  const [turn, setTurn] = useState<1 | 2>(1); // 1 = P1, 2 = P2/NPC
+  const [turn, setTurn] = useState<1 | 2>(1);
   const [timer, setTimer] = useState(15);
   const [gameOver, setGameOver] = useState(false);
   const [gameMsg, setGameMsg] = useState("");
@@ -1052,18 +991,16 @@ const WordChainGame: React.FC<{
 
   const lastEntry = wordHistory[wordHistory.length - 1]?.word || "";
 
-  // Get required target prefix/letter
   const targetRequirement = useMemo(() => {
     if (!lastEntry) return "";
     if (language === "vi") {
       const parts = lastEntry.trim().split(/\s+/);
-      return parts[parts.length - 1].toLowerCase(); // last syllable
+      return parts[parts.length - 1].toLowerCase();
     } else {
-      return lastEntry.trim().slice(-1).toLowerCase(); // last letter
+      return lastEntry.trim().slice(-1).toLowerCase();
     }
   }, [lastEntry, language]);
 
-  // Turn Countdown Timer
   useEffect(() => {
     if (gameOver) return;
     const interval = setInterval(() => {
@@ -1090,7 +1027,6 @@ const WordChainGame: React.FC<{
     );
   };
 
-  // Handle Player Input Submit
   const handleSubmitWord = (e: React.FormEvent) => {
     e.preventDefault();
     if (gameOver) return;
@@ -1098,13 +1034,11 @@ const WordChainGame: React.FC<{
     const trimmed = inputVal.trim().toLowerCase();
     if (!trimmed) return;
 
-    // Check 1: Duplicate check
     if (usedWords.has(trimmed)) {
       setGameMsg(`❌ Từ "${trimmed}" đã được sử dụng rồi!`);
       return;
     }
 
-    // Check 2: Matching requirement
     if (language === "vi") {
       const parts = trimmed.split(/\s+/);
       if (parts.length < 2) {
@@ -1124,7 +1058,6 @@ const WordChainGame: React.FC<{
 
     if (soundEnabled) playPopSound();
 
-    // Valid word accepted!
     const currentPlayerName = turn === 1 ? "Bạn" : "Người chơi 2";
     setWordHistory((prev) => [...prev, { word: trimmed, player: currentPlayerName }]);
     setUsedWords((prev) => new Set([...prev, trimmed]));
@@ -1136,7 +1069,6 @@ const WordChainGame: React.FC<{
     setScoreCount(nextScore);
     onScoreUpdate(nextScore * 10);
 
-    // Switch turn
     if (gameMode === "npc") {
       setTurn(2);
     } else {
@@ -1144,7 +1076,6 @@ const WordChainGame: React.FC<{
     }
   };
 
-  // Trigger NPC Response
   useEffect(() => {
     if (gameMode === "npc" && turn === 2 && !gameOver) {
       const npcTimeout = setTimeout(() => {
@@ -1163,7 +1094,6 @@ const WordChainGame: React.FC<{
       if (validPool.length > 0) {
         npcWord = validPool[Math.floor(Math.random() * validPool.length)];
       } else {
-        // Fallback generator
         const adjectives = ["vẻ", "mẽ", "đẽ", "mắn", "tràng", "sức", "lực", "thái", "độ"];
         for (const adj of adjectives) {
           const gen = `${targetRequirement} ${adj}`;
@@ -1221,19 +1151,19 @@ const WordChainGame: React.FC<{
       />
 
       {/* Language Switcher Bar */}
-      <div className="flex items-center gap-2 mb-3 bg-zinc-900 border border-white/10 p-1.5 rounded-xl w-full justify-between">
-        <span className="text-xs font-bold text-zinc-300 pl-2">Ngôn ngữ nối từ:</span>
-        <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2 mb-3 bg-[#1c1e20] border-2 border-[#141414] p-2 w-full justify-between">
+        <span className="text-xs font-bold font-jura text-zinc-300 pl-2 uppercase">NGÔN NGỮ NỐI TỪ:</span>
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => {
               setLanguage("vi");
               restartGame();
             }}
-            className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+            className={`px-3.5 py-2 text-xs font-jura font-bold uppercase border-2 border-[#141414] cursor-pointer min-h-[40px] ${
               language === "vi"
-                ? "bg-emerald-600 text-white shadow-md"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
+                : "bg-[#2a2c30] text-zinc-400 hover:text-white"
             }`}
           >
             🇻🇳 Tiếng Việt
@@ -1244,10 +1174,10 @@ const WordChainGame: React.FC<{
               setLanguage("en");
               restartGame();
             }}
-            className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+            className={`px-3.5 py-2 text-xs font-jura font-bold uppercase border-2 border-[#141414] cursor-pointer min-h-[40px] ${
               language === "en"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
+                : "bg-[#2a2c30] text-zinc-400 hover:text-white"
             }`}
           >
             🇬🇧 Tiếng Anh
@@ -1256,47 +1186,47 @@ const WordChainGame: React.FC<{
       </div>
 
       {/* Required Target Badge */}
-      <div className="w-full bg-gradient-to-r from-indigo-950 via-purple-950 to-zinc-900 border border-indigo-500/40 p-3 rounded-2xl mb-3 flex items-center justify-between">
+      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-3.5 mb-3 flex items-center justify-between shadow-inner">
         <div>
-          <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">
+          <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider block">
             Từ nối tiếp phải bắt đầu bằng:
           </span>
-          <span className="text-lg font-black text-amber-300 font-mono uppercase">
+          <span className="text-xl font-bold font-mono text-amber-300 uppercase">
             "{targetRequirement}"
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-black/50 px-3 py-1.5 rounded-xl border border-white/10 text-xs font-mono">
-          <Timer className="w-4 h-4 text-emerald-400 animate-pulse" />
-          <span className="text-emerald-300 font-bold">{timer}s</span>
+        <div className="flex items-center gap-2 bg-[#232528] px-3.5 py-2 border-2 border-[#141414] text-xs font-mono">
+          <Timer className="w-4 h-4 text-[#89dc69] animate-pulse" />
+          <span className="text-[#89dc69] font-bold">{timer}s</span>
         </div>
       </div>
 
       {/* Chat Word Log */}
-      <div className="w-full bg-zinc-900 border border-white/10 rounded-2xl p-3 h-44 overflow-y-auto space-y-2 mb-3 flex flex-col-reverse">
+      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-3 h-44 overflow-y-auto space-y-2 mb-3 flex flex-col-reverse">
         {[...wordHistory].reverse().map((item, idx) => (
           <div
             key={idx}
-            className={`p-2 rounded-xl text-xs flex items-center justify-between ${
+            className={`p-2.5 border-2 border-[#141414] text-xs flex items-center justify-between ${
               item.isNpc
-                ? "bg-indigo-950/60 border border-indigo-500/30 text-indigo-200 self-start"
-                : "bg-purple-950/60 border border-purple-500/30 text-purple-200 self-end"
+                ? "bg-[#2a2c30] text-[#89dc69] self-start"
+                : "bg-[#1f2226] text-white self-end"
             }`}
           >
-            <span className="font-bold">{item.player}:</span>
-            <span className="font-black text-white text-sm font-mono uppercase">{item.word}</span>
+            <span className="font-jura font-bold">{item.player}:</span>
+            <span className="font-mono font-bold text-sm text-amber-300 uppercase pl-3">{item.word}</span>
           </div>
         ))}
       </div>
 
       {/* Error / Status Msg */}
       {gameMsg && (
-        <div className="w-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold p-2 rounded-xl mb-3 text-center">
+        <div className="w-full bg-[#f59e0b]/20 border-2 border-[#141414] text-amber-300 text-xs font-bold font-jura p-3 mb-3 text-center">
           {gameMsg}
         </div>
       )}
 
-      {/* Input Form */}
+      {/* Input Form with Taller Button */}
       <form onSubmit={handleSubmitWord} className="flex gap-2 w-full mb-3">
         <input
           type="text"
@@ -1308,26 +1238,26 @@ const WordChainGame: React.FC<{
               ? `Nhập từ ghép bắt đầu bằng '${targetRequirement}'...`
               : `Nhập từ tiếng Anh bắt đầu bằng '${targetRequirement}'...`
           }
-          className="flex-1 bg-zinc-900 border border-white/20 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
+          className="flex-1 bg-[#18191b] border-2 border-[#141414] px-3.5 py-3 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b]"
         />
         <button
           type="submit"
           disabled={gameOver || (gameMode === "npc" && turn === 2)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center gap-1 cursor-pointer shrink-0"
+          className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] disabled:opacity-50 text-white font-jura font-bold text-xs uppercase tracking-wider border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer shrink-0 min-h-[46px]"
         >
-          <Send className="w-3.5 h-3.5" /> Gửi
+          <Send className="w-4 h-4" /> GỬI
         </button>
       </form>
 
-      {/* Restart */}
+      {/* Restart Button */}
       <div className="flex items-center justify-between w-full">
-        <span className="text-xs font-mono text-emerald-400 font-bold">Chuỗi Nối Từ: {scoreCount}</span>
+        <span className="text-xs font-mono text-[#89dc69] font-bold">Chuỗi Nối Từ: {scoreCount}</span>
         <button
           type="button"
           onClick={restartGame}
-          className="px-4 py-1.5 bg-[#208b3a] hover:bg-[#2dc653] text-white font-mono font-bold text-xs uppercase rounded-none border-b-4 border-[#125322] cursor-pointer shadow-md flex items-center gap-1"
+          className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-xs uppercase tracking-wider border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center gap-1.5 min-h-[44px]"
         >
-          <RotateCcw className="w-3.5 h-3.5" /> Chơi Lại
+          <RotateCcw className="w-4 h-4" /> CHƠI LẠI
         </button>
       </div>
     </div>
@@ -1335,7 +1265,7 @@ const WordChainGame: React.FC<{
 };
 
 /* =========================================================================
-   4. GAME ENGINE: COUNTING GAME (ĐẾM SỐ 1 -> N, PHÁ CHUỖI ĐẾM LẠI)
+   4. GAME ENGINE: COUNTING GAME (ĐẾM SỐ 1 -> N) - ORE UI
    ========================================================================= */
 const CountingGame: React.FC<{
   soundEnabled: boolean;
@@ -1347,14 +1277,13 @@ const CountingGame: React.FC<{
   );
 
   const [currentNum, setCurrentNum] = useState(1);
-  const [turn, setTurn] = useState<1 | 2>(1); // 1 = P1, 2 = P2/NPC
+  const [turn, setTurn] = useState<1 | 2>(1);
   const [timer, setTimer] = useState(10);
   const [userInput, setUserInput] = useState("");
   const [maxStreak, setMaxStreak] = useState(0);
   const [alertMsg, setAlertMsg] = useState("");
   const [history, setHistory] = useState<{ num: number; player: string }[]>([]);
 
-  // Timer per number
   useEffect(() => {
     const interval = setInterval(() => {
       setTimer((t) => {
@@ -1393,7 +1322,6 @@ const CountingGame: React.FC<{
       return;
     }
 
-    // Correct entry!
     const pName = turn === 1 ? "Bạn" : "Người chơi 2";
     setHistory((prev) => [...prev.slice(-10), { num: val, player: pName }]);
     const nextVal = val + 1;
@@ -1404,11 +1332,9 @@ const CountingGame: React.FC<{
     setAlertMsg("");
     setTimer(10);
 
-    // Switch turn
     setTurn(turn === 1 ? 2 : 1);
   };
 
-  // NPC Turn Trigger
   useEffect(() => {
     if (gameMode === "npc" && turn === 2) {
       const npcTimer = setTimeout(() => {
@@ -1419,10 +1345,9 @@ const CountingGame: React.FC<{
   }, [turn, gameMode, currentNum]);
 
   const makeNpcCount = () => {
-    // 5% chance NPC makes a mistake at higher numbers (>15) to break the chain for fun
     let choice = currentNum;
     if (currentNum > 15 && Math.random() < 0.08) {
-      choice = currentNum + 1; // Intentional error
+      choice = currentNum + 1;
     }
 
     if (choice !== currentNum) {
@@ -1461,20 +1386,20 @@ const CountingGame: React.FC<{
       />
 
       {/* Target Large Badge */}
-      <div className="w-full bg-gradient-to-r from-blue-950 via-indigo-950 to-zinc-900 border border-blue-500/40 p-4 rounded-2xl mb-3 flex items-center justify-between shadow-xl">
+      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-4 mb-3 flex items-center justify-between shadow-inner">
         <div>
-          <span className="text-[10px] text-zinc-400 uppercase tracking-widest block font-bold">
-            Số tiếp theo cần đếm:
+          <span className="text-[10px] text-zinc-400 uppercase tracking-wider block font-mono">
+            SỐ TIẾP THEO CẦN ĐẾM:
           </span>
-          <span className="text-3xl font-black text-cyan-300 font-mono tracking-wider">
+          <span className="text-3xl font-bold font-mono text-[#89dc69] tracking-wider">
             {currentNum}
           </span>
         </div>
 
         <div className="flex flex-col items-end">
-          <div className="flex items-center gap-1.5 bg-black/60 px-3 py-1 rounded-xl border border-white/10 text-xs font-mono mb-1">
-            <Timer className="w-4 h-4 text-emerald-400 animate-spin" />
-            <span className="text-emerald-300 font-bold">{timer}s</span>
+          <div className="flex items-center gap-2 bg-[#232528] px-3.5 py-1.5 border-2 border-[#141414] text-xs font-mono mb-1">
+            <Timer className="w-4 h-4 text-[#89dc69] animate-spin" />
+            <span className="text-[#89dc69] font-bold">{timer}s</span>
           </div>
           <span className="text-[10px] text-zinc-400 font-mono">
             Lượt: {turn === 1 ? "Bạn" : gameMode === "npc" ? selectedNpc.name : "Người chơi 2"}
@@ -1484,24 +1409,24 @@ const CountingGame: React.FC<{
 
       {/* Alert Warning Box */}
       {alertMsg && (
-        <div className="w-full bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-bold p-3 rounded-2xl mb-3 flex items-center gap-2 animate-bounce">
+        <div className="w-full bg-[#c53030]/30 border-2 border-[#141414] text-red-200 text-xs font-bold font-jura p-3 mb-3 flex items-center gap-2 animate-bounce">
           <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
           <span>{alertMsg}</span>
         </div>
       )}
 
       {/* Recent Count Log */}
-      <div className="w-full bg-zinc-900 border border-white/10 rounded-2xl p-3 h-32 overflow-y-auto mb-3 flex flex-wrap gap-2 items-center">
+      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-3 h-28 overflow-y-auto mb-3 flex flex-wrap gap-2 items-center">
         {history.length === 0 ? (
-          <span className="text-xs text-zinc-500 italic mx-auto">Chưa có số nào được đếm...</span>
+          <span className="text-xs text-zinc-500 italic mx-auto font-mono">Chưa có số nào được đếm...</span>
         ) : (
           history.map((h, i) => (
             <div
               key={i}
-              className="px-2.5 py-1 bg-zinc-800 border border-white/10 rounded-xl text-xs flex items-center gap-1.5 font-mono"
+              className="px-2.5 py-1 bg-[#232528] border border-[#141414] text-xs flex items-center gap-1.5 font-mono"
             >
               <span className="text-zinc-400 text-[10px]">{h.player}:</span>
-              <span className="font-bold text-cyan-300">{h.num}</span>
+              <span className="font-bold text-[#89dc69]">{h.num}</span>
             </div>
           ))
         )}
@@ -1514,9 +1439,9 @@ const CountingGame: React.FC<{
             type="button"
             onClick={() => handleSendNumber(undefined, currentNum)}
             disabled={gameMode === "npc" && turn === 2}
-            className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-xl cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center"
+            className="py-3.5 sm:py-4 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-sm border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex flex-col items-center justify-center min-h-[56px]"
           >
-            <span className="text-[10px] font-normal uppercase opacity-80">Đúng số:</span>
+            <span className="text-[10px] uppercase opacity-80">Đúng số:</span>
             <span>{currentNum}</span>
           </button>
 
@@ -1524,9 +1449,9 @@ const CountingGame: React.FC<{
             type="button"
             onClick={() => handleSendNumber(undefined, currentNum + 1)}
             disabled={gameMode === "npc" && turn === 2}
-            className="py-3 bg-rose-700/80 hover:bg-rose-600 text-rose-200 font-black text-sm rounded-xl cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center"
+            className="py-3.5 sm:py-4 bg-[#c53030] hover:bg-[#e53e3e] text-white font-jura font-bold text-sm border-2 border-[#141414] shadow-[inset_1px_1px_0_#fc8181,inset_-1px_-1px_0_#9b2c2c] active:translate-y-[1px] cursor-pointer flex flex-col items-center justify-center min-h-[56px]"
           >
-            <span className="text-[10px] font-normal uppercase opacity-80">Gài bẫy sai:</span>
+            <span className="text-[10px] uppercase opacity-80">Gài sai:</span>
             <span>{currentNum + 1}</span>
           </button>
 
@@ -1534,9 +1459,9 @@ const CountingGame: React.FC<{
             type="button"
             onClick={() => handleSendNumber(undefined, Math.max(1, currentNum - 1))}
             disabled={gameMode === "npc" && turn === 2}
-            className="py-3 bg-amber-700/80 hover:bg-amber-600 text-amber-200 font-black text-sm rounded-xl cursor-pointer shadow-lg active:scale-95 transition-all flex flex-col items-center"
+            className="py-3.5 sm:py-4 bg-[#f59e0b] hover:bg-[#d97706] text-[#141414] font-jura font-bold text-sm border-2 border-[#141414] shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309] active:translate-y-[1px] cursor-pointer flex flex-col items-center justify-center min-h-[56px]"
           >
-            <span className="text-[10px] font-normal uppercase opacity-80">Đếm lùi sai:</span>
+            <span className="text-[10px] uppercase opacity-80">Đếm lùi:</span>
             <span>{Math.max(1, currentNum - 1)}</span>
           </button>
         </div>
@@ -1548,34 +1473,36 @@ const CountingGame: React.FC<{
             onChange={(e) => setUserInput(e.target.value)}
             disabled={gameMode === "npc" && turn === 2}
             placeholder={`Nhập số ${currentNum}...`}
-            className="flex-1 bg-zinc-900 border border-white/20 focus:border-cyan-500 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
+            className="flex-1 bg-[#18191b] border-2 border-[#141414] px-3.5 py-3 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b]"
           />
           <button
             type="submit"
             disabled={gameMode === "npc" && turn === 2}
-            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-xl flex items-center gap-1 cursor-pointer shrink-0"
+            className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-xs uppercase border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer shrink-0 min-h-[46px]"
           >
-            <Send className="w-3.5 h-3.5" /> Gửi
+            <Send className="w-4 h-4" /> GỬI
           </button>
         </form>
       </div>
 
       {/* Footer Stats */}
       <div className="flex items-center justify-between w-full font-mono text-xs text-zinc-300">
-        <span className="text-amber-400 font-bold">Kỷ lục đếm: 🔥 {maxStreak}</span>
+        <span className="text-amber-400 font-bold">Kỷ kỷ lục đếm: 🔥 {maxStreak}</span>
         <button
           type="button"
           onClick={resetAll}
-          className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg cursor-pointer"
+          className="px-4 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase cursor-pointer min-h-[40px]"
         >
-          Reset Trận
+          RESET TRẬN
         </button>
       </div>
     </div>
   );
 };
 
-/* --- MINI GAME ENGINE 5: SNAKE --- */
+/* =========================================================================
+   5. GAME ENGINE: RETRO SNAKE - ORE UI
+   ========================================================================= */
 const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) => void }> = ({
   soundEnabled,
   onScoreUpdate
@@ -1611,13 +1538,11 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
       setSnake((prevSnake) => {
         const head = [prevSnake[0][0] + dir[0], prevSnake[0][1] + dir[1]] as [number, number];
 
-        // Wall collision
         if (head[0] < 0 || head[0] >= 15 || head[1] < 0 || head[1] >= 15) {
           setGameOver(true);
           return prevSnake;
         }
 
-        // Self collision
         if (prevSnake.some((segment) => segment[0] === head[0] && segment[1] === head[1])) {
           setGameOver(true);
           return prevSnake;
@@ -1625,7 +1550,6 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
 
         const newSnake = [head, ...prevSnake];
 
-        // Eat food
         if (head[0] === food[0] && head[1] === food[1]) {
           const newScore = score + 10;
           setScore(newScore);
@@ -1643,12 +1567,13 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
   }, [isPlaying, gameOver, dir, food, score]);
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="text-xs font-mono text-emerald-400 font-bold">
-        {gameOver ? "Game Over! Kết quả: " + score + " pts" : "Điểm: " + score}
+    <div className="flex flex-col items-center gap-4">
+      <div className="text-xs font-mono text-[#89dc69] font-bold uppercase tracking-wider bg-[#1c1e20] border-2 border-[#141414] px-4 py-2">
+        {gameOver ? "GAME OVER! KẾT QUẢ: " + score + " PTS" : "ĐIỂM SỐ: " + score}
       </div>
 
-      <div className="grid grid-cols-15 gap-0.5 bg-zinc-900 p-2 rounded-2xl border border-white/10 w-60 h-60">
+      {/* Snake Grid Board */}
+      <div className="grid grid-cols-15 gap-0.5 bg-[#18191b] p-3 border-2 border-[#141414] shadow-inner w-64 h-64">
         {Array.from({ length: 225 }).map((_, i) => {
           const r = Math.floor(i / 15);
           const c = i % 15;
@@ -1658,8 +1583,8 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
           return (
             <div
               key={i}
-              className={`w-3.5 h-3.5 rounded-sm ${
-                isSnake ? "bg-emerald-400" : isFood ? "bg-rose-500 animate-ping" : "bg-zinc-800/40"
+              className={`w-3.5 h-3.5 border border-[#141414] ${
+                isSnake ? "bg-[#28960b]" : isFood ? "bg-[#f59e0b] animate-ping" : "bg-[#232528]"
               }`}
             />
           );
@@ -1670,17 +1595,17 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
         <button
           type="button"
           onClick={startGame}
-          className="px-6 py-2.5 bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none shadow-md cursor-pointer"
+          className="px-6 py-3.5 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer min-h-[46px]"
         >
-          {gameOver ? "Chơi Lại" : "Bắt Đầu Rắn Săn Mồi"}
+          {gameOver ? "CHƠI LẠI RẮN SĂN MỒI" : "BẮT ĐẦU RẮN SĂN MỒI"}
         </button>
       ) : (
-        <div className="grid grid-cols-3 gap-2 w-36">
+        <div className="grid grid-cols-3 gap-2 w-44">
           <div />
           <button
             type="button"
             onClick={() => setDir([-1, 0])}
-            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
           >
             ▲
           </button>
@@ -1688,261 +1613,26 @@ const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) =>
           <button
             type="button"
             onClick={() => setDir([0, -1])}
-            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
           >
             ◄
           </button>
           <button
             type="button"
             onClick={() => setDir([1, 0])}
-            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
           >
             ▼
           </button>
           <button
             type="button"
             onClick={() => setDir([0, 1])}
-            className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] text-white font-bold"
+            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
           >
             ►
           </button>
         </div>
       )}
-    </div>
-  );
-};
-
-/* --- MINI GAME ENGINE 6: MEMORY MATCH --- */
-const MemoryMatchGame: React.FC = () => {
-  const ICONS = ["🎮", "🚀", "💎", "⭐", "🔥", "⚽"];
-  const [cards, setCards] = useState<
-    { id: number; icon: string; flipped: boolean; matched: boolean }[]
-  >([]);
-  const [flippedCards, setFlippedCards] = useState<number[]>([]);
-
-  const initGame = () => {
-    const deck = [...ICONS, ...ICONS]
-      .sort(() => Math.random() - 0.5)
-      .map((icon, id) => ({ id, icon, flipped: false, matched: false }));
-    setCards(deck);
-    setFlippedCards([]);
-  };
-
-  useEffect(() => {
-    initGame();
-  }, []);
-
-  const handleCardClick = (idx: number) => {
-    if (cards[idx].flipped || cards[idx].matched || flippedCards.length >= 2) return;
-
-    const newCards = [...cards];
-    newCards[idx].flipped = true;
-    setCards(newCards);
-
-    const newFlipped = [...flippedCards, idx];
-    setFlippedCards(newFlipped);
-
-    if (newFlipped.length === 2) {
-      const [first, second] = newFlipped;
-      if (cards[first].icon === cards[second].icon) {
-        newCards[first].matched = true;
-        newCards[second].matched = true;
-        setCards(newCards);
-        setFlippedCards([]);
-      } else {
-        setTimeout(() => {
-          newCards[first].flipped = false;
-          newCards[second].flipped = false;
-          setCards(newCards);
-          setFlippedCards([]);
-        }, 800);
-      }
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="grid grid-cols-4 gap-2 bg-zinc-900 p-3 rounded-2xl border border-white/10">
-        {cards.map((c, i) => (
-          <button
-            type="button"
-            key={i}
-            onClick={() => handleCardClick(i)}
-            className={`w-12 h-12 rounded-xl text-lg font-bold flex items-center justify-center cursor-pointer transition-all ${
-              c.flipped || c.matched ? "bg-indigo-600 text-white" : "bg-zinc-800 text-transparent"
-            }`}
-          >
-            {c.flipped || c.matched ? c.icon : "?"}
-          </button>
-        ))}
-      </div>
-
-      <button
-        type="button"
-        onClick={initGame}
-        className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl cursor-pointer"
-      >
-        Chia Bài Lại
-      </button>
-    </div>
-  );
-};
-
-/* --- MINI GAME ENGINE 7: MATH QUIZ --- */
-const MathQuizGame: React.FC = () => {
-  const [num1, setNum1] = useState(12);
-  const [num2, setNum2] = useState(8);
-  const [op, setOp] = useState("+");
-  const [score, setScore] = useState(0);
-  const [userAns, setUserAns] = useState("");
-
-  const nextQuestion = () => {
-    const ops = ["+", "-", "×"];
-    const selectedOp = ops[Math.floor(Math.random() * ops.length)];
-    setOp(selectedOp);
-    setNum1(Math.floor(Math.random() * 20) + 1);
-    setNum2(Math.floor(Math.random() * 10) + 1);
-    setUserAns("");
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    let correct = 0;
-    if (op === "+") correct = num1 + num2;
-    if (op === "-") correct = num1 - num2;
-    if (op === "×") correct = num1 * num2;
-
-    if (parseInt(userAns, 10) === correct) {
-      setScore((s) => s + 10);
-      nextQuestion();
-    } else {
-      alert(`Chưa chính xác! Đáp án đúng là ${correct}`);
-      setScore(0);
-      nextQuestion();
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      <span className="text-xs font-mono text-emerald-400 font-bold">Điểm số: {score}</span>
-      <div className="text-2xl font-black font-mono tracking-widest text-indigo-300">
-        {num1} {op} {num2} = ?
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          type="number"
-          value={userAns}
-          onChange={(e) => setUserAns(e.target.value)}
-          placeholder="Đáp án..."
-          className="bg-zinc-800 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white w-28 text-center focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="px-4 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl cursor-pointer"
-        >
-          Gửi
-        </button>
-      </form>
-    </div>
-  );
-};
-
-/* --- MINI GAME ENGINE 8: COOKIE CLICKER --- */
-const CookieClickerGame: React.FC = () => {
-  const [cookies, setCookies] = useState(0);
-
-  return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      <div className="text-sm font-bold text-amber-400">Tổng Số Bánh: {cookies}</div>
-      <button
-        type="button"
-        onClick={() => setCookies((c) => c + 1)}
-        className="w-24 h-24 rounded-full bg-amber-600 hover:bg-amber-500 text-4xl flex items-center justify-center shadow-2xl transition-transform active:scale-90 cursor-pointer border-4 border-amber-300"
-      >
-        🍪
-      </button>
-      <span className="text-[11px] text-zinc-400">Chạm liên tục để nướng bánh vàng!</span>
-    </div>
-  );
-};
-
-/* --- MINI GAME ENGINE 9: SLOT MACHINE --- */
-const SlotMachineGame: React.FC = () => {
-  const REELS = ["7️⃣", "💎", "🍒", "🔔", "🍋", "⭐"];
-  const [r1, setR1] = useState("🎰");
-  const [r2, setR2] = useState("🎰");
-  const [r3, setR3] = useState("🎰");
-  const [resultMsg, setResultMsg] = useState("Bấm QUAY HŨ để thử vận may!");
-
-  const spin = () => {
-    const s1 = REELS[Math.floor(Math.random() * REELS.length)];
-    const s2 = REELS[Math.floor(Math.random() * REELS.length)];
-    const s3 = REELS[Math.floor(Math.random() * REELS.length)];
-    setR1(s1);
-    setR2(s2);
-    setR3(s3);
-
-    if (s1 === s2 && s2 === s3) {
-      setResultMsg("🎉 JACKPOT! Thưởng lớn 1,000 V-Coins!");
-    } else if (s1 === s2 || s2 === s3 || s1 === s3) {
-      setResultMsg("✨ Trúng 2 biểu tượng! Thưởng 100 V-Coins!");
-    } else {
-      setResultMsg("Chúc bạn may mắn lần sau!");
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-4 p-4">
-      <div className="flex items-center gap-2 bg-zinc-900 border border-amber-500/40 px-6 py-4 rounded-2xl text-3xl">
-        <div className="w-12 h-12 flex items-center justify-center bg-black/50 rounded-xl">{r1}</div>
-        <div className="w-12 h-12 flex items-center justify-center bg-black/50 rounded-xl">{r2}</div>
-        <div className="w-12 h-12 flex items-center justify-center bg-black/50 rounded-xl">{r3}</div>
-      </div>
-
-      <div className="text-xs font-bold text-amber-300">{resultMsg}</div>
-
-      <button
-        type="button"
-        onClick={spin}
-        className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-red-600 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg cursor-pointer"
-      >
-        QUAY HŨ NGAY
-      </button>
-    </div>
-  );
-};
-
-/* --- GENERIC SIMULATOR FOR OTHER GAMES --- */
-const GenericGameSimulator: React.FC<{ game: GameItem }> = ({ game }) => {
-  const [simScore, setSimScore] = useState(100);
-  const [simPlaying, setSimPlaying] = useState(false);
-
-  return (
-    <div className="flex flex-col items-center gap-4 p-6 text-center">
-      <div className={`p-4 rounded-full bg-gradient-to-br ${game.color} text-white shadow-xl`}>
-        <Gamepad2 className="w-10 h-10" />
-      </div>
-
-      <div>
-        <h3 className="text-lg font-black text-indigo-300 mb-1">{game.title}</h3>
-        <p className="text-xs text-zinc-400 max-w-md">{game.description}</p>
-      </div>
-
-      <div className="flex items-center gap-4 py-2 font-mono text-xs">
-        <span className="text-emerald-400 font-bold">Điểm Trực Tuyến: {simScore} pts</span>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => {
-          setSimPlaying(true);
-          setSimScore((s) => s + Math.floor(Math.random() * 50) + 10);
-        }}
-        className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xl cursor-pointer"
-      >
-        {simPlaying ? "Tiếp Tục Lượt Chơi (+Score)" : "Bắt Đầu Trải Nghiệm"}
-      </button>
     </div>
   );
 };
