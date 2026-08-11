@@ -479,6 +479,35 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           )}
 
+          {/* Item: TizenOS UI */}
+          {(matchesSearch('TizenOS UI') ||
+            matchesSearch('TizenOS') ||
+            matchesSearch('Smart TV UI') ||
+            matchesSearch('Samsung TV')) && (
+            <div className="px-3 sm:px-4 py-3 bg-[#383a3d] hover:bg-[#484b4f] transition-colors flex items-center justify-between gap-3 border-l-4 border-[#28960b]">
+              <div>
+                <div className="font-bold text-xs text-white flex items-center gap-2">
+                  <span>VplayTV OS Smart TV UI</span>
+                  <span className="text-[9px] bg-[#06b6d4] text-white px-1.5 py-0.5 rounded font-mono uppercase font-bold">
+                    Dev Option
+                  </span>
+                </div>
+                <div className="text-[10px] text-gray-200 font-normal mt-0.5">
+                  Chuyển toàn bộ ứng dụng sang giao diện VplayTV OS Smart TV với thanh Smart Hub, ô kênh truyền hình phát sinh động & kích hoạt chế độ Remote Control.
+                </div>
+              </div>
+              <VplayToggleSwitch
+                checked={temp.enableTizenOsUi || false}
+                onChange={() => {
+                  const val = !temp.enableTizenOsUi;
+                  const updated = { ...temp, enableTizenOsUi: val };
+                  setTemp(updated);
+                  if (onChangeLiveSettings) onChangeLiveSettings(updated);
+                }}
+              />
+            </div>
+          )}
+
           {/* Item 5: Use mouse cursor */}
           {(matchesSearch('Use mouse cursor') ||
             matchesSearch('Con trỏ chuột') ||

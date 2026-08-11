@@ -22,6 +22,7 @@ import { VNotesView } from './components/VNotesView';
 import { VAppsView } from './components/VAppsView';
 import { VArcadeTab } from './components/vapps/VArcadeTab';
 import { VPremiumView } from './components/VPremiumView';
+import { TizenOsUiMode } from './components/TizenOsUiMode';
 import { useLang } from './context/LanguageContext';
 import { playPopSound } from './utils/sound';
 
@@ -135,6 +136,72 @@ export default function App() {
       setActiveTab('home');
     }
   };
+
+  if (settings.enableTizenOsUi && !isSettingsOpen) {
+    return (
+      <div className="relative min-h-screen text-white font-jura antialiased flex flex-col overflow-x-hidden">
+        {/* Minecraft Panorama Animated Background */}
+        <MinecraftPanorama
+          disablePanorama={settings.disablePanorama}
+          lockPanoramaScroll={settings.lockPanoramaScroll}
+          panoramaScrollSpeed={settings.panoramaScrollSpeed}
+        />
+
+        <TizenOsUiMode
+          channels={channelsList}
+          selectedChannel={selectedChannel}
+          onSelectChannel={handleSelectChannel}
+          onOpenSettings={() => {
+            setIsSettingsOpen(true);
+            setSidebarItem('settings');
+            setActiveTab('settings');
+          }}
+          onDisableTizenOs={() => {
+            setSettings((prev) => ({ ...prev, enableTizenOsUi: false }));
+          }}
+        />
+
+        {/* FEEDBACK MODAL */}
+        <FeedbackModal
+          isOpen={isFeedbackOpen}
+          onClose={() => setIsFeedbackOpen(false)}
+        />
+
+        {/* FEATURE VOTE MODAL */}
+        <FeatureVoteModal
+          isOpen={isFeatureVoteOpen}
+          onClose={() => setIsFeatureVoteOpen(false)}
+        />
+
+        {/* CREATE CUSTOM CHANNEL MODAL */}
+        <CreateChannelModal
+          isOpen={isCreateChannelOpen}
+          onClose={() => setIsCreateChannelOpen(false)}
+          onAddChannel={handleAddChannel}
+          categories={Array.from(new Set(channelsList.map((c) => c.groupTitle)))}
+        />
+
+        {/* FRIENDS DRAWER */}
+        <FriendsDrawer
+          isOpen={isFriendsOpen}
+          onClose={() => setIsFriendsOpen(false)}
+          onSelectUserChannel={(channelName) => {
+            setIsFriendsOpen(false);
+            const found = channelsList.find((c) => c.name.toLowerCase().includes(channelName.toLowerCase()));
+            if (found) {
+              handleSelectChannel(found);
+            }
+          }}
+        />
+
+        {/* DEV STATS OVERLAY */}
+        <DevStatsOverlay
+          showFps={settings.showFps}
+          showFrameLatency={settings.showFrameLatency}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen text-white font-jura antialiased selection:bg-[#418a28] selection:text-white flex flex-col overflow-x-hidden">
