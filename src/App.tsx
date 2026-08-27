@@ -99,6 +99,7 @@ import { VAppsView } from "./components/VAppsView";
 import { VPremiumView } from "./components/VPremiumView";
 import { LocalStorageBar } from "./components/LocalStorageBar";
 import { FeaturesVoteBanner } from "./components/FeaturesVoteBanner";
+import { SpotlightSearchModal } from "./components/SpotlightSearchModal";
 
 const DiscordIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg
@@ -591,18 +592,9 @@ export default function App() {
       },
     ];
   }, []);
-  const [isHeaderSearchExpanded, setIsHeaderSearchExpanded] =
-    useState<boolean>(false);
-  const headerSearchInputRef = useRef<HTMLInputElement>(null);
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState<boolean>(false);
 
-  // Auto-focus header search input when expanded
-  useEffect(() => {
-    if (isHeaderSearchExpanded && headerSearchInputRef.current) {
-      setTimeout(() => {
-        headerSearchInputRef.current?.focus();
-      }, 50);
-    }
-  }, [isHeaderSearchExpanded]);
+
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sidebarFileOpen, setSidebarFileOpen] = useState<boolean>(true);
@@ -1590,6 +1582,26 @@ export default function App() {
     useState<boolean>(false);
   const [showSpotlightDisabledModal, setShowSpotlightDisabledModal] =
     useState<boolean>(false);
+
+  // Global Shortcut for Spotlight Search (Cmd+K / Ctrl+K and ESC)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        if (isSpotlightAllDisabled) {
+          setShowSpotlightDisabledModal(true);
+          return;
+        }
+        setIsSpotlightOpen((prev) => !prev);
+      }
+      if (e.key === "Escape" && isSpotlightOpen) {
+        e.preventDefault();
+        setIsSpotlightOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isSpotlightOpen, isSpotlightAllDisabled]);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [showPowerDropdown, setShowPowerDropdown] = useState<boolean>(false);
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
@@ -4455,7 +4467,7 @@ export default function App() {
             {getHeaderTitle()}
           </div>
 
-          {/* Right: Spotlight Search button & Dropdown */}
+          {/* Right: Spotlight Search button */}
           <div className="relative flex items-center gap-1 group/search">
             <button
               type="button"
@@ -4465,7 +4477,7 @@ export default function App() {
                   setShowSpotlightDisabledModal(true);
                   return;
                 }
-                setIsHeaderSearchExpanded(!isHeaderSearchExpanded);
+                setIsSpotlightOpen(true);
               }}
               className="w-8 h-8 rounded-lg hover:bg-white/10 active:bg-white/15 flex items-center justify-center text-white/90 hover:text-white active:scale-95 transition-all cursor-pointer"
               aria-label="Spotlight Search"
@@ -4478,100 +4490,12 @@ export default function App() {
               />
             </button>
 
-            {/* Glassmorphism Tooltip for Spotlight Search (Larger, 100% Rounded, No Animation) */}
-            {!isHeaderSearchExpanded && (
-              <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/search:block pointer-events-none z-50">
-                Spotlight Search
-              </div>
-            )}
-
-            {/* Spotlight Search Dropdown Menu */}
-            {isHeaderSearchExpanded && (
-              <>
-                {/* Backdrop overlay */}
-                <div
-                  className="fixed inset-0 z-[105]"
-                  onClick={() => setIsHeaderSearchExpanded(false)}
-                />
-
-                <div className="absolute right-0 top-10 z-[110] w-[300px] sm:w-[360px] rounded-2xl bg-[#141218]/95 backdrop-blur-2xl border border-white/15 p-3 shadow-[0_16px_40px_rgba(0,0,0,0.6)] text-white font-sans animate-fade-in space-y-2.5">
-                  {/* Search input field */}
-                  <div className="relative flex items-center w-full">
-                    <input
-                      ref={headerSearchInputRef}
-                      type="text"
-                      placeholder="Spotlight Search..."
-                      value={menubarSearchQuery}
-                      onChange={(e) => setMenubarSearchQuery(e.target.value)}
-                      className="w-full pl-9.5 pr-10 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
-                    />
-                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                      <img
-                        src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
-                        className="w-3.5 h-3.5 brightness-0 invert opacity-70"
-                        referrerPolicy="no-referrer"
-                        alt="Search"
-                      />
-                    </div>
-                    {menubarSearchQuery ? (
-                      <button
-                        type="button"
-                        onClick={() => setMenubarSearchQuery("")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-none cursor-pointer bouncy-btn"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const SpeechRecognition =
-                            (window as any).SpeechRecognition ||
-                            (window as any).webkitSpeechRecognition;
-                          if (SpeechRecognition) {
-                            const recognition = new SpeechRecognition();
-                            recognition.lang = "vi-VN";
-                            recognition.interimResults = false;
-                            recognition.maxAlternatives = 1;
-                            triggerToast("Äang láº¯ng nghe...");
-                            recognition.start();
-                            recognition.onresult = (event: any) => {
-                              const speechResult =
-                                event.results[0][0].transcript;
-                              setMenubarSearchQuery((prev) => {
-                                const prefix = prev.trim() ? prev + " " : "";
-                                return prefix + speechResult;
-                              });
-                              triggerToast("ÄÃ£ nháº­p: " + speechResult);
-                            };
-                            recognition.onerror = (event: any) => {
-                              triggerToast("Lá»—i: " + event.error);
-                            };
-                          } else {
-                            triggerToast(
-                              "TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ nháº­n diá»‡n giá»ng nÃ³i",
-                            );
-                          }
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white hover:text-white/80 transition-none cursor-pointer bouncy-btn"
-                        title="TÃ¬m kiáº¿m báº±ng giá»ng nÃ³i"
-                      >
-                        <Mic className="w-3.5 h-3.5 text-white shrink-0" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Search Results / Suggestions inside Dropdown Menu */}
-                  <div className="max-h-64 overflow-y-auto flex flex-col gap-1 custom-scrollbar pr-1">
-                    {renderSpotlightUnifiedResults(() =>
-                      setIsHeaderSearchExpanded(false),
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
+            {/* Glassmorphism Tooltip for Spotlight Search */}
+            <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/search:block pointer-events-none z-50">
+              Spotlight Search (âŒ˜K)
+            </div>
           </div>
-        </header>
+</header>
       )}
 
       {/* High-Fidelity Sidebar Left Navigation (Inspired by the design) */}
@@ -4700,142 +4624,68 @@ export default function App() {
                   {/* Spotlight Search at the absolute top of sidebar (above Home) */}
                   {!showHeaderBar &&
                     dockItems.find((it) => it.id === "search")?.enabled &&
-                    (sidebarExpanded || isMobile ? (
-                      <div key="sidebar-search-spotlight" className="space-y-1">
-                        <div className="relative flex flex-col gap-2 w-full">
-                          <div className="relative flex items-center w-full">
-                            <input
-                              ref={sidebarSearchRef}
-                              type="text"
-                              placeholder="Spotlight Search..."
-                              value={menubarSearchQuery}
-                              onChange={(e) => {
-                                setMenubarSearchQuery(e.target.value);
-                              }}
-                              onFocus={() => {
-                                if (isSpotlightAllDisabled) {
-                                  setShowSpotlightDisabledModal(true);
-                                  return;
-                                }
-                                setIsSpotlightFocused(true);
-                              }}
-                              onClick={() => {
-                                if (isSpotlightAllDisabled) {
-                                  setShowSpotlightDisabledModal(true);
-                                }
-                              }}
-                              onBlur={() => {
-                                setTimeout(() => {
-                                  setIsSpotlightFocused(false);
-                                }, 250);
-                              }}
-                              className="w-full pl-9.5 pr-10 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
-                            />
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                      (sidebarExpanded || isMobile ? (
+                        <div
+                          key="sidebar-search-spotlight"
+                          className="space-y-1"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playPopSound();
+                              if (isSpotlightAllDisabled) {
+                                setShowSpotlightDisabledModal(true);
+                                return;
+                              }
+                              setIsSpotlightOpen(true);
+                            }}
+                            className="h-10 w-full relative flex items-center justify-between px-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-white/85 hover:text-white border border-white/10 transition-all duration-200 cursor-pointer group/sidebar select-none shadow-sm"
+                          >
+                            <div className="flex items-center gap-3">
                               <img
                                 src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
-                                className="w-3.5 h-3.5 brightness-0 invert opacity-70"
+                                className="w-4 h-4 brightness-0 invert opacity-80 group-hover/sidebar:opacity-100"
                                 referrerPolicy="no-referrer"
                                 alt="Search"
                               />
+                              <span className="text-xs font-semibold tracking-wide font-sans">
+                                Spotlight Search
+                              </span>
                             </div>
-                            {menubarSearchQuery ? (
-                              <button
-                                type="button"
-                                onClick={() => setMenubarSearchQuery("")}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-none cursor-pointer bouncy-btn"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const SpeechRecognition =
-                                    (window as any).SpeechRecognition ||
-                                    (window as any).webkitSpeechRecognition;
-                                  if (SpeechRecognition) {
-                                    const recognition = new SpeechRecognition();
-                                    recognition.lang = "vi-VN";
-                                    recognition.interimResults = false;
-                                    recognition.maxAlternatives = 1;
-                                    triggerToast("Äang láº¯ng nghe...");
-                                    recognition.start();
-                                    recognition.onresult = (event: any) => {
-                                      const speechResult =
-                                        event.results[0][0].transcript;
-                                      setMenubarSearchQuery((prev) => {
-                                        const prefix = prev.trim()
-                                          ? prev + " "
-                                          : "";
-                                        return prefix + speechResult;
-                                      });
-                                      triggerToast("ÄÃ£ nháº­p: " + speechResult);
-                                    };
-                                    recognition.onerror = (event: any) => {
-                                      triggerToast("Lá»—i: " + event.error);
-                                    };
-                                  } else {
-                                    triggerToast(
-                                      "TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ nháº­n diá»‡n giá»ng nÃ³i",
-                                    );
-                                  }
-                                }}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white hover:text-white/80 transition-none cursor-pointer bouncy-btn"
-                                title="TÃ¬m kiáº¿m báº±ng giá»ng nÃ³i"
-                              >
-                                <Mic className="w-3.5 h-3.5 text-white shrink-0" />
-                              </button>
-                            )}
-                          </div>
-                          {(isSpotlightFocused ||
-                            menubarSearchQuery.trim() !== "") && (
-                            <div className="max-h-64 overflow-y-auto flex flex-col gap-1 custom-scrollbar pr-1 mt-1 bg-black/40 p-1.5 rounded-xl border border-white/5">
-                              {renderSpotlightUnifiedResults(
-                                () => setIsSpotlightFocused(false),
-                                true,
-                              )}
-                            </div>
-                          )}
+                            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60 font-mono">
+                              âŒ˜K
+                            </kbd>
+                          </button>
                         </div>
-                      </div>
-                    ) : (
-                      <div
-                        key="sidebar-search-spotlight-collapsed"
-                        className="space-y-1"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isSpotlightAllDisabled) {
-                              setShowSpotlightDisabledModal(true);
-                              return;
-                            }
-                            setSidebarExpanded(true);
-                            setIsSpotlightFocused(true);
-                            setTimeout(() => {
-                              sidebarSearchRef.current?.focus();
-                            }, 150);
-                          }}
-                          className={`h-10 w-full relative flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer group/sidebar select-none box-border ${
-                            isSpotlightFocused ||
-                            menubarSearchQuery.trim() !== ""
-                              ? "bg-[#d946ef] text-white font-bold shadow-lg shadow-fuchsia-500/25 border border-white/20"
-                              : "border border-transparent text-white/75 hover:text-white hover:bg-[#d946ef]"
-                          }`}
+                      ) : (
+                        <div
+                          key="sidebar-search-spotlight-collapsed"
+                          className="space-y-1"
                         >
-                          <div className="absolute left-full ml-3 px-3 py-1.5 bg-[#121116] border border-white/10 text-white text-xs font-sans font-medium rounded-lg opacity-0 scale-95 pointer-events-none group-hover/sidebar:opacity-100 group-hover/sidebar:scale-100 transition-none shadow-xl whitespace-nowrap z-50">
-                            Spotlight Search
-                          </div>
-                          <img
-                            src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
-                            className="w-4.5 h-4.5 brightness-0 invert"
-                            referrerPolicy="no-referrer"
-                            alt="Search"
-                          />
-                        </button>
-                      </div>
-                    ))}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playPopSound();
+                              if (isSpotlightAllDisabled) {
+                                setShowSpotlightDisabledModal(true);
+                                return;
+                              }
+                              setIsSpotlightOpen(true);
+                            }}
+                            className="h-10 w-full relative flex items-center justify-center rounded-xl border border-transparent text-white/75 hover:text-white hover:bg-white/10 transition-all duration-200 cursor-pointer group/sidebar select-none"
+                          >
+                            <div className="absolute left-full ml-3 px-3 py-1.5 bg-[#121116] border border-white/10 text-white text-xs font-sans font-medium rounded-lg opacity-0 scale-95 pointer-events-none group-hover/sidebar:opacity-100 group-hover/sidebar:scale-100 transition-none shadow-xl whitespace-nowrap z-50">
+                              Spotlight Search (âŒ˜K)
+                            </div>
+                            <img
+                              src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
+                              className="w-4.5 h-4.5 brightness-0 invert"
+                              referrerPolicy="no-referrer"
+                              alt="Search"
+                            />
+                          </button>
+                        </div>
+                      ))}
 
                   {dockItems
                     .filter(
@@ -6650,15 +6500,16 @@ export default function App() {
             <div className="relative group/menubartooltip">
               <button
                 onClick={() => {
+                  playPopSound();
                   if (isSpotlightAllDisabled) {
                     setShowSpotlightDisabledModal(true);
                     return;
                   }
-                  setShowSearchDropdown(!showSearchDropdown);
+                  setIsSpotlightOpen(true);
                   setShowPowerDropdown(false);
                   setShowVIntel(false);
                 }}
-                className={`relative flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-all active:scale-95 cursor-pointer ${showSearchDropdown ? "bg-white/10 text-[#38bdf8]" : ""}`}
+                className="relative flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-all active:scale-95 cursor-pointer"
                 aria-label="Spotlight Search"
               >
                 <img
@@ -6669,109 +6520,14 @@ export default function App() {
                   referrerPolicy="no-referrer"
                 />
                 <span
-                  className={`absolute bottom-0 inset-x-1.5 h-0.5 bg-white rounded-full transition-transform duration-200 origin-center ${showSearchDropdown ? "scale-x-100" : "scale-x-0 group-hover/menubartooltip:scale-x-100"}`}
+                  className="absolute bottom-0 inset-x-1.5 h-0.5 bg-white rounded-full transition-transform duration-200 origin-center scale-x-0 group-hover/menubartooltip:scale-x-100"
                 />
               </button>
 
-              {/* Glassmorphism Tooltip (Larger, 100% Rounded, No Animation) */}
-              {!showSearchDropdown && (
-                <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/menubartooltip:block pointer-events-none z-50">
-                  Spotlight Search
-                </div>
-              )}
-
-              <AnimatePresence>
-                {showSearchDropdown && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setShowSearchDropdown(false)}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, y: -16, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -16, scale: 0.95 }}
-                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      className="absolute right-0 top-full mt-2 w-72 rounded-[28px] bg-[#1d1b24]/95 backdrop-blur-md border border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.5)] z-50 p-3 flex flex-col gap-2 font-sans"
-                    >
-                      <div className="relative flex items-center w-full">
-                        <input
-                          type="text"
-                          autoFocus
-                          placeholder="TÃ¬m nhanh kÃªnh..."
-                          value={menubarSearchQuery}
-                          onChange={(e) =>
-                            setMenubarSearchQuery(e.target.value)
-                          }
-                          className="w-full pl-9.5 pr-10 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
-                        />
-                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                          <img
-                            src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
-                            className="w-3.5 h-3.5 brightness-0 invert opacity-70"
-                            referrerPolicy="no-referrer"
-                            alt="Search"
-                          />
-                        </div>
-                        {menubarSearchQuery ? (
-                          <button
-                            type="button"
-                            onClick={() => setMenubarSearchQuery("")}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all cursor-pointer bouncy-btn"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const SpeechRecognition =
-                                (window as any).SpeechRecognition ||
-                                (window as any).webkitSpeechRecognition;
-                              if (SpeechRecognition) {
-                                const recognition = new SpeechRecognition();
-                                recognition.lang = "vi-VN";
-                                recognition.interimResults = false;
-                                recognition.maxAlternatives = 1;
-                                triggerToast("Äang láº¯ng nghe...");
-                                recognition.start();
-                                recognition.onresult = (event: any) => {
-                                  const speechResult =
-                                    event.results[0][0].transcript;
-                                  setMenubarSearchQuery((prev) => {
-                                    const prefix = prev.trim()
-                                      ? prev + " "
-                                      : "";
-                                    return prefix + speechResult;
-                                  });
-                                  triggerToast("ÄÃ£ nháº­p: " + speechResult);
-                                };
-                                recognition.onerror = (event: any) => {
-                                  triggerToast("Lá»—i: " + event.error);
-                                };
-                              } else {
-                                triggerToast(
-                                  "TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ nháº­n diá»‡n giá»ng nÃ³i",
-                                );
-                              }
-                            }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white hover:text-white/80 transition-all cursor-pointer bouncy-btn"
-                            title="TÃ¬m kiáº¿m báº±ng giá»ng nÃ³i"
-                          >
-                            <Mic className="w-3.5 h-3.5 text-white shrink-0" />
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="max-h-64 overflow-y-auto flex flex-col gap-1 custom-scrollbar pr-1">
-                        {renderSpotlightUnifiedResults(() =>
-                          setShowSearchDropdown(false),
-                        )}
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
+              {/* Glassmorphism Tooltip */}
+              <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/menubartooltip:block pointer-events-none z-50">
+                Spotlight Search (âŒ˜K)
+              </div>
             </div>
 
             {/* Real-time Ticking Digital Clock on the far right (replacing User Profile) */}
@@ -8964,1608 +8720,324 @@ export default function App() {
                                         </div>
                                       </div>
 
-                                      {/* 2. Tin tá»©c */}
-                                      <div
-                                        onClick={() => {
-                                          playPopSound();
-                                          setSpotlightSearchSettings(
-                                            (prev) => ({
-                                              ...prev,
-                                              news: !prev.news,
-                                            }),
-                                          );
-                                        }}
-                                        className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                      >
-                                        <div className="space-y-0.5 pr-2">
-                                          <h4 className="text-sm font-semibold text-white">
-                                            Tin tá»©c
-                                          </h4>
-                                          <p className="text-xs text-white/60">
-                                            Hiá»ƒn thá»‹ cÃ¡c bÃ i viáº¿t tin tá»©c, thÃ´ng
-                                            bÃ¡o cá»™ng Ä‘á»“ng vÃ  sá»± kiá»‡n Discord
-                                          </p>
-                                        </div>
-                                        <div
-                                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                            spotlightSearchSettings.news
-                                              ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
-                                              : "bg-white/5 border-white/20 hover:border-white/40"
-                                          }`}
-                                        >
-                                          {spotlightSearchSettings.news && (
-                                            <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                          )}
-                                        </div>
-                                      </div>
+                                       {/* 2. Tin tá»©c */}
+                                       {(matches("tin tá»©c") || matches("news")) && (
+                                         <div
+                                           onClick={() => {
+                                             playPopSound();
+                                             setSpotlightSearchSettings(
+                                               (prev) => ({
+                                                 ...prev,
+                                                 news: !prev.news,
+                                               }),
+                                             );
+                                           }}
+                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                         >
+                                           <div className="space-y-1 pr-2">
+                                             <h4 className="text-sm font-semibold text-white">
+                                               Tin tá»©c & ThÃ´ng bÃ¡o
+                                             </h4>
+                                             <p className="text-xs text-white/60">
+                                               TÃ¬m kiáº¿m cÃ¡c bÃ i viáº¿t tin tá»©c, cáº­p nháº­t vÃ  thÃ´ng bÃ¡o cá»™ng Ä‘á»“ng.
+                                             </p>
+                                           </div>
+                                           <div
+                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                               spotlightSearchSettings.news
+                                                 ? "bg-amber-500 border-amber-400 text-white shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+                                                 : "bg-white/5 border-white/20 hover:border-white/40"
+                                             }`}
+                                           >
+                                             {spotlightSearchSettings.news && (
+                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                             )}
+                                           </div>
+                                         </div>
+                                       )}
 
-                                      {/* 3. Truyá»n hÃ¬nh */}
-                                      <div className="space-y-2">
-                                        <div
-                                          onClick={() => {
-                                            playPopSound();
-                                            setSpotlightSearchSettings(
-                                              (prev) => ({
-                                                ...prev,
-                                                channels: !prev.channels,
-                                              }),
-                                            );
-                                          }}
-                                          className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                        >
-                                          <div className="space-y-0.5 pr-2">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              Truyá»n hÃ¬nh
-                                            </h4>
-                                            <p className="text-xs text-white/60">
-                                              Hiá»ƒn thá»‹ danh sÃ¡ch kÃªnh truyá»n
-                                              hÃ¬nh trá»±c tiáº¿p theo tÃªn hoáº·c nhÃ³m
-                                              kÃªnh
-                                            </p>
-                                          </div>
-                                          <div
-                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                              spotlightSearchSettings.channels
-                                                ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
-                                                : "bg-white/5 border-white/20 hover:border-white/40"
-                                            }`}
-                                          >
-                                            {spotlightSearchSettings.channels && (
-                                              <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                            )}
-                                          </div>
-                                        </div>
+                                       {/* 3. KÃªnh truyá»n hÃ¬nh */}
+                                       {(matches("kÃªnh") || matches("truyá»n hÃ¬nh") || matches("tv") || matches("v-play")) && (
+                                         <div
+                                           onClick={() => {
+                                             playPopSound();
+                                             setSpotlightSearchSettings(
+                                               (prev) => ({
+                                                 ...prev,
+                                                 channels: !prev.channels,
+                                               }),
+                                             );
+                                           }}
+                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                         >
+                                           <div className="space-y-1 pr-2">
+                                             <h4 className="text-sm font-semibold text-white">
+                                               KÃªnh truyá»n hÃ¬nh V-Play
+                                             </h4>
+                                             <p className="text-xs text-white/60">
+                                               TÃ¬m kiáº¿m tÃªn kÃªnh truyá»n hÃ¬nh trá»±c tuyáº¿n trong kho 120+ kÃªnh sÃ³ng.
+                                             </p>
+                                           </div>
+                                           <div
+                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                               spotlightSearchSettings.channels
+                                                 ? "bg-blue-500 border-blue-400 text-white shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+                                                 : "bg-white/5 border-white/20 hover:border-white/40"
+                                             }`}
+                                           >
+                                             {spotlightSearchSettings.channels && (
+                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                             )}
+                                           </div>
+                                         </div>
+                                       )}
 
-                                        {/* 3.1. Má»¥c nhá» cá»§a truyá»n hÃ¬nh: TÃ¬m kÃªnh theo sá»‘ hiá»‡u kÃªnh */}
-                                        <div
-                                          onClick={() => {
-                                            if (
-                                              !spotlightSearchSettings.channels
-                                            )
-                                              return;
-                                            playPopSound();
-                                            setSpotlightSearchSettings(
-                                              (prev) => ({
-                                                ...prev,
-                                                channelNumbers:
-                                                  !prev.channelNumbers,
-                                              }),
-                                            );
-                                          }}
-                                          className={`ml-5 pl-4 pr-3.5 py-3 rounded-xl bg-white/[0.03] border-l-2 border-y border-r border-white/10 flex items-center justify-between gap-3 transition-colors select-none ${
-                                            spotlightSearchSettings.channels
-                                              ? "cursor-pointer hover:bg-white/10 border-l-sky-400"
-                                              : "opacity-40 cursor-not-allowed border-l-white/20"
-                                          }`}
-                                        >
-                                          <div className="space-y-0.5 pr-2">
-                                            <div className="flex items-center gap-2">
-                                              <span className="text-xs font-semibold text-sky-300">
-                                                â†³ TÃ¬m kÃªnh theo sá»‘ hiá»‡u kÃªnh
-                                              </span>
-                                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                                                CH #
-                                              </span>
-                                            </div>
-                                            <p className="text-[11px] text-white/50">
-                                              Cho phÃ©p gÃµ sá»‘ kÃªnh (vÃ­ dá»¥: 1,
-                                              001, #12, kÃªnh 5) Ä‘á»ƒ tÃ¬m nhanh
-                                            </p>
-                                          </div>
-                                          <div
-                                            className={`w-4.5 h-4.5 rounded flex items-center justify-center transition-all shrink-0 border ${
-                                              spotlightSearchSettings.channels &&
-                                              spotlightSearchSettings.channelNumbers
-                                                ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_8px_rgba(56,189,248,0.4)]"
-                                                : "bg-white/5 border-white/20"
-                                            }`}
-                                          >
-                                            {spotlightSearchSettings.channels &&
-                                              spotlightSearchSettings.channelNumbers && (
-                                                <Check className="w-3 h-3 stroke-[3]" />
-                                              )}
-                                          </div>
-                                        </div>
-                                      </div>
+                                       {/* 4. TÃ¬m theo sá»‘ hiá»‡u kÃªnh */}
+                                       {(matches("sá»‘ hiá»‡u") || matches("channel number")) && (
+                                         <div
+                                           onClick={() => {
+                                             playPopSound();
+                                             setSpotlightSearchSettings(
+                                               (prev) => ({
+                                                 ...prev,
+                                                 channelNumbers:
+                                                   !prev.channelNumbers,
+                                               }),
+                                             );
+                                           }}
+                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                         >
+                                           <div className="space-y-1 pr-2">
+                                             <h4 className="text-sm font-semibold text-white">
+                                               TÃ¬m kÃªnh theo sá»‘ hiá»‡u
+                                             </h4>
+                                             <p className="text-xs text-white/60">
+                                               Cho phÃ©p gÃµ sá»‘ hiá»‡u kÃªnh (#1, #2, #55...) Ä‘á»ƒ chuyá»ƒn kÃªnh nhanh.
+                                             </p>
+                                           </div>
+                                           <div
+                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                               spotlightSearchSettings.channelNumbers
+                                                 ? "bg-blue-500 border-blue-400 text-white shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+                                                 : "bg-white/5 border-white/20 hover:border-white/40"
+                                             }`}
+                                           >
+                                             {spotlightSearchSettings.channelNumbers && (
+                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                             )}
+                                           </div>
+                                         </div>
+                                       )}
 
-                                      {/* 4. Toolbox */}
-                                      <div
-                                        onClick={() => {
-                                          playPopSound();
-                                          setSpotlightSearchSettings(
-                                            (prev) => ({
-                                              ...prev,
-                                              toolbox: !prev.toolbox,
-                                            }),
-                                          );
-                                        }}
-                                        className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                      >
-                                        <div className="space-y-0.5 pr-2">
-                                          <h4 className="text-sm font-semibold text-white">
-                                            Toolbox
-                                          </h4>
-                                          <p className="text-xs text-white/60">
-                                            Hiá»ƒn thá»‹ cÃ¡c cÃ´ng cá»¥ tiá»‡n Ã­ch (Xem
-                                            URL, ThÃªm kÃªnh, Nháº­p/Xuáº¥t M3U,
-                                            Multiview,...)
-                                          </p>
-                                        </div>
-                                        <div
-                                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                            spotlightSearchSettings.toolbox
-                                              ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
-                                              : "bg-white/5 border-white/20 hover:border-white/40"
-                                          }`}
-                                        >
-                                          {spotlightSearchSettings.toolbox && (
-                                            <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                          )}
-                                        </div>
-                                      </div>
+                                       {/* 5. Toolbox */}
+                                       {(matches("toolbox") || matches("tiá»‡n Ã­ch")) && (
+                                         <div
+                                           onClick={() => {
+                                             playPopSound();
+                                             setSpotlightSearchSettings(
+                                               (prev) => ({
+                                                 ...prev,
+                                                 toolbox: !prev.toolbox,
+                                               }),
+                                             );
+                                           }}
+                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                         >
+                                           <div className="space-y-1 pr-2">
+                                             <h4 className="text-sm font-semibold text-white">
+                                               Toolbox & Tiá»‡n Ã­ch
+                                             </h4>
+                                             <p className="text-xs text-white/60">
+                                               TÃ¬m kiáº¿m cÃ¡c tiá»‡n Ã­ch má»Ÿ rá»™ng (Multiview, Äá»“ng há»“, Ghi chÃº, ThÃªm luá»“ng m3u8...).
+                                             </p>
+                                           </div>
+                                           <div
+                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                               spotlightSearchSettings.toolbox
+                                                 ? "bg-purple-500 border-purple-400 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]"
+                                                 : "bg-white/5 border-white/20 hover:border-white/40"
+                                             }`}
+                                           >
+                                             {spotlightSearchSettings.toolbox && (
+                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                             )}
+                                           </div>
+                                         </div>
+                                       )}
 
-                                      {/* 5. CÃ i Ä‘áº·t */}
-                                      <div
-                                        onClick={() => {
-                                          playPopSound();
-                                          setSpotlightSearchSettings(
-                                            (prev) => ({
-                                              ...prev,
-                                              settings: !prev.settings,
-                                            }),
-                                          );
-                                        }}
-                                        className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                      >
-                                        <div className="space-y-0.5 pr-2">
-                                          <h4 className="text-sm font-semibold text-white">
-                                            CÃ i Ä‘áº·t
-                                          </h4>
-                                          <p className="text-xs text-white/60">
-                                            Hiá»ƒn thá»‹ cÃ¡c má»¥c cáº¥u hÃ¬nh há»‡ thá»‘ng,
-                                            giao diá»‡n, trá»£ nÄƒng vÃ  tiá»‡n Ã­ch
-                                            trong CÃ i Ä‘áº·t
-                                          </p>
-                                        </div>
-                                        <div
-                                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                            spotlightSearchSettings.settings
-                                              ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
-                                              : "bg-white/5 border-white/20 hover:border-white/40"
-                                          }`}
-                                        >
-                                          {spotlightSearchSettings.settings && (
-                                            <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
+                                       {/* 6. Settings */}
+                                       {(matches("cÃ i Ä‘áº·t") || matches("settings")) && (
+                                         <div
+                                           onClick={() => {
+                                             playPopSound();
+                                             setSpotlightSearchSettings(
+                                               (prev) => ({
+                                                 ...prev,
+                                                 settings: !prev.settings,
+                                               }),
+                                             );
+                                           }}
+                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                         >
+                                           <div className="space-y-1 pr-2">
+                                             <h4 className="text-sm font-semibold text-white">
+                                               CÃ i Ä‘áº·t há»‡ thá»‘ng
+                                             </h4>
+                                             <p className="text-xs text-white/60">
+                                               TÃ¬m kiáº¿m cÃ¡c má»¥c cÃ i Ä‘áº·t há»‡ thá»‘ng (Giao diá»‡n, Spotlight, Trá»£ nÄƒng, TÃ i khoáº£n...).
+                                             </p>
+                                           </div>
+                                           <div
+                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                               spotlightSearchSettings.settings
+                                                 ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
+                                                 : "bg-white/5 border-white/20 hover:border-white/40"
+                                             }`}
+                                           >
+                                             {spotlightSearchSettings.settings && (
+                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                             )}
+                                           </div>
+                                         </div>
+                                       )}
+                                     </div>
+                                   </div>
+                                 )}
+                               </div>
+                             );
+                           })()}
+                          </motion.div>
+                        ) : null}
+                     </AnimatePresence>
+                   </div>
+                 </motion.div>
+               ) : activeTab === "vapps" ? (
+                 <motion.div
+                   key="vapps"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   transition={{ duration: 0.5, ease: "easeOut" }}
+                   className="w-full max-w-7xl mx-auto px-4 pt-14 pb-8"
+                 >
+                   <VAppsView
+                     triggerToast={triggerToast}
+                     onNavigateToChannel={(chId) => {
+                       const ch = processedChannels.find(
+                         (c) => c.id === chId,
+                       );
+                       if (ch) {
+                         handleSelectChannel(ch);
+                         setActiveTab("live");
+                       }
+                     }}
+                   />
+                 </motion.div>
+               ) : activeTab === "vpremium" ? (
+                 <motion.div
+                   key="vpremium"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   transition={{ duration: 0.5, ease: "easeOut" }}
+                   className="w-full max-w-7xl mx-auto px-4 pt-14 pb-8"
+                 >
+                   <VPremiumView />
+                 </motion.div>
+               ) : activeTab === "news" ? (
+                 <motion.div
+                   key="news"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   transition={{ duration: 0.5, ease: "easeOut" }}
+                   className="w-full max-w-7xl mx-auto px-4 pt-14 pb-8"
+                 >
+                   <NewsView
+                     triggerToast={triggerToast}
+                     onSelectChannel={(chId) => {
+                       const ch = processedChannels.find(
+                         (c) => c.id === chId,
+                       );
+                       if (ch) {
+                         handleSelectChannel(ch);
+                         setActiveTab("live");
+                       }
+                     }}
+                   />
+                 </motion.div>
+               ) : null}
+             </AnimatePresence>
+           </motion.div>
+         )}
+       </main>
 
-                                {/* 3. TRá»¢ NÄ‚NG (ACCESSIBILITY) */}
-                                {(matches("trá»£ nÄƒng") ||
-                                  matches("slide") ||
-                                  matches("sidebar") ||
-                                  matches("auto")) && (
-                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
-                                    <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-                                      <Key className="w-5 h-5 text-emerald-400 shrink-0" />
-                                      <div>
-                                        <h3 className="text-base font-bold text-white">
-                                          Trá»£ nÄƒng
-                                        </h3>
-                                        <p className="text-xs text-white/60">
-                                          Äiá»u chá»‰nh tá»± Ä‘á»™ng trÆ°á»£t banner vÃ 
-                                          tÆ°Æ¡ng tÃ¡c menu
-                                        </p>
-                                      </div>
-                                    </div>
+       {/* Unified Spotlight Search Modal */}
+       <SpotlightSearchModal
+         isOpen={isSpotlightOpen}
+         onClose={() => setIsSpotlightOpen(false)}
+         query={menubarSearchQuery}
+         onQueryChange={setMenubarSearchQuery}
+         results={spotlightSearchResults}
+         isAllDisabled={isSpotlightAllDisabled}
+         onOpenSettings={() => {
+           setActiveTab("settings");
+           setActiveSettingSection("search");
+         }}
+         triggerToast={triggerToast}
+         onSelectNews={(id, title) => {
+           setActiveTab("news");
+           triggerToast("Má»Ÿ tin tá»©c: " + title);
+         }}
+         onSelectChannel={(ch) => {
+           handleSelectChannel(ch);
+           triggerToast("Äang phÃ¡t: " + ch.name);
+         }}
+         selectedChannelId={selectedChannel?.id}
+       />
 
-                                    {/* TOGGLE: Auto Slide */}
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                                      <div className="space-y-1 pr-4">
-                                        <h4 className="text-sm font-semibold text-white">
-                                          Tá»± Ä‘á»™ng trÆ°á»£t hÃ¬nh Banner
-                                        </h4>
-                                        <p className="text-xs text-white/60">
-                                          Banner hÃ¬nh áº£nh á»Ÿ trang chá»§ tá»± Ä‘á»™ng
-                                          trÆ°á»£t sau má»—i 5 giÃ¢y
-                                        </p>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          playPopSound();
-                                          setAutoSlide(!autoSlide);
-                                        }}
-                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 relative cursor-pointer flex items-center shrink-0 ${
-                                          autoSlide
-                                            ? "bg-[#34c759]"
-                                            : "bg-[#3a3a3c]"
-                                        }`}
-                                      >
-                                        <motion.div
-                                          animate={{ x: autoSlide ? 20 : 0 }}
-                                          transition={{
-                                            type: "spring",
-                                            stiffness: 500,
-                                            damping: 30,
-                                          }}
-                                          className="w-5 h-5 rounded-full bg-white shadow-md"
-                                        />
-                                      </button>
-                                    </div>
+       {/* Toast Notification Container */}
+       {toastMessage && (
+         <div className="fixed bottom-6 right-6 z-[9999] px-4 py-2.5 rounded-xl bg-[#1d1b24]/90 backdrop-blur-xl border border-white/20 text-white text-xs font-semibold shadow-2xl animate-fade-in flex items-center gap-2">
+           <Sparkles className="w-4 h-4 text-sky-400" />
+           <span>{toastMessage}</span>
+         </div>
+       )}
 
-                                    {/* TOGGLE: Auto Hide Sidebar */}
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                                      <div className="space-y-1 pr-4">
-                                        <h4 className="text-sm font-semibold text-white">
-                                          Tá»± Ä‘á»™ng áº©n Sidebar
-                                        </h4>
-                                        <p className="text-xs text-white/60">
-                                          Tá»± Ä‘á»™ng thu gá»n thanh menu khi khÃ´ng
-                                          di chuá»™t vÃ o
-                                        </p>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          playPopSound();
-                                          setAutoHideSidebar(!autoHideSidebar);
-                                        }}
-                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 relative cursor-pointer flex items-center shrink-0 ${
-                                          autoHideSidebar
-                                            ? "bg-[#34c759]"
-                                            : "bg-[#3a3a3c]"
-                                        }`}
-                                      >
-                                        <motion.div
-                                          animate={{
-                                            x: autoHideSidebar ? 20 : 0,
-                                          }}
-                                          transition={{
-                                            type: "spring",
-                                            stiffness: 500,
-                                            damping: 30,
-                                          }}
-                                          className="w-5 h-5 rounded-full bg-white shadow-md"
-                                        />
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* 4. TIN Tá»¨C (NEWS SETTINGS) */}
-                                {(matches("news") ||
-                                  matches("tin tá»©c") ||
-                                  matches("báº£n tin") ||
-                                  matches("bÃ i viáº¿t") ||
-                                  matches("cá»¡ chá»¯") ||
-                                  matches("font") ||
-                                  matches("chá»¯ to") ||
-                                  matches("chá»¯ nhá»") ||
-                                  matches("size")) && (
-                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
-                                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                                      <div className="flex items-center gap-3">
-                                        <Megaphone className="w-5 h-5 text-rose-400 shrink-0" />
-                                        <div>
-                                          <h3 className="text-base font-bold text-white">
-                                            Tin tá»©c (News)
-                                          </h3>
-                                          <p className="text-xs text-white/60">
-                                            TÃ¹y chá»‰nh cá»¡ chá»¯ Ä‘á»c bÃ i viáº¿t vÃ 
-                                            quáº£n lÃ½ tráº£i nghiá»‡m Ä‘á»c báº£n tin
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          playPopSound();
-                                          setActiveSettingSection("news");
-                                        }}
-                                        className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold shrink-0 active:scale-95 transition-all cursor-pointer shadow-sm bouncy-btn flex items-center gap-1"
-                                      >
-                                        <span>Chi tiáº¿t</span>
-                                        <ChevronRight className="w-3.5 h-3.5" />
-                                      </button>
-                                    </div>
-
-                                    {/* Cá»¡ chá»¯ bÃ i viáº¿t Selector */}
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-3">
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                          <Type className="w-4 h-4 text-rose-300" />
-                                          <h4 className="text-sm font-semibold text-white">
-                                            KÃ­ch thÆ°á»›c cá»¡ chá»¯ Ä‘á»c bÃ i viáº¿t
-                                          </h4>
-                                        </div>
-                                        <span className="text-xs font-medium text-rose-300">
-                                          {newsFontSize === "small"
-                                            ? "Nhá» (14px)"
-                                            : newsFontSize === "normal"
-                                              ? "TiÃªu chuáº©n (16px)"
-                                              : newsFontSize === "large"
-                                                ? "Lá»›n (18px)"
-                                                : "Ráº¥t lá»›n (20px)"}
-                                        </span>
-                                      </div>
-
-                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        {[
-                                          {
-                                            id: "small",
-                                            label: "Nhá»",
-                                            size: "14px",
-                                            sampleClass: "text-xs",
-                                          },
-                                          {
-                                            id: "normal",
-                                            label: "Chuáº©n",
-                                            size: "16px",
-                                            sampleClass: "text-sm",
-                                          },
-                                          {
-                                            id: "large",
-                                            label: "Lá»›n",
-                                            size: "18px",
-                                            sampleClass: "text-base",
-                                          },
-                                          {
-                                            id: "huge",
-                                            label: "Ráº¥t lá»›n",
-                                            size: "20px",
-                                            sampleClass: "text-lg",
-                                          },
-                                        ].map((option) => (
-                                          <button
-                                            key={option.id}
-                                            type="button"
-                                            onClick={() =>
-                                              handleUpdateNewsFontSize(
-                                                option.id as NewsFontSize,
-                                              )
-                                            }
-                                            className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 bouncy-btn ${
-                                              newsFontSize === option.id
-                                                ? "bg-rose-500/25 border-rose-400/80 text-white shadow-[0_0_15px_rgba(244,63,94,0.3)] ring-1 ring-rose-400/50"
-                                                : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white"
-                                            }`}
-                                          >
-                                            <span className="text-xs font-bold">
-                                              {option.label}
-                                            </span>
-                                            <span className="text-[10px] text-white/50">
-                                              {option.size}
-                                            </span>
-                                          </button>
-                                        ))}
-                                      </div>
-
-                                      {/* Interactive Live Preview Box */}
-                                      <div className="mt-2 p-3.5 rounded-xl bg-black/30 border border-white/10 flex flex-col gap-1.5">
-                                        <div className="text-[10px] uppercase font-bold tracking-wider text-white/40">
-                                          Xem trÆ°á»›c trá»±c tiáº¿p
-                                        </div>
-                                        <p
-                                          className={`text-white/90 font-sans transition-all duration-200 ${
-                                            newsFontSize === "small"
-                                              ? "text-xs leading-relaxed"
-                                              : newsFontSize === "normal"
-                                                ? "text-sm leading-relaxed"
-                                                : newsFontSize === "large"
-                                                  ? "text-base leading-relaxed"
-                                                  : "text-lg leading-relaxed"
-                                          }`}
-                                        >
-                                          The Waves â€” Tá»« nhá»¯ng ngÆ°á»i xa láº¡ tÃ¬nh
-                                          cá» gáº·p nhau dÆ°á»›i pháº§n bÃ¬nh luáº­n
-                                          YouTube, má»™t cá»™ng Ä‘á»“ng Ä‘Æ°á»£c hÃ¬nh
-                                          thÃ nh.
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* 5. Cá»¬A HÃ€NG TIá»†N ÃCH (PLUGIN STORE) */}
-                                {(matches("cá»­a hÃ ng tiá»‡n Ã­ch") ||
-                                  matches("plugin") ||
-                                  matches("tiá»‡n Ã­ch")) && (
-                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
-                                    <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-                                      <Puzzle className="w-5 h-5 text-amber-400 shrink-0" />
-                                      <div>
-                                        <h3 className="text-base font-bold text-white">
-                                          Cá»­a hÃ ng tiá»‡n Ã­ch
-                                        </h3>
-                                        <p className="text-xs text-white/60">
-                                          CÃ i Ä‘áº·t vÃ  gá»¡ bá» cÃ¡c gÃ³i tiá»‡n Ã­ch má»Ÿ
-                                          rá»™ng cá»§a Waves Community
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
-                                      {[
-                                        {
-                                          id: "export_stream",
-                                          name: "Xuáº¥t luá»“ng",
-                                          desc: "Xuáº¥t lÆ°u danh sÃ¡ch kÃªnh tá»‡p .m3u8",
-                                        },
-                                        {
-                                          id: "multiview",
-                                          name: "Multiview Grid",
-                                          desc: "Xem tá»‘i Ä‘a 4 kÃªnh cÃ¹ng lÃºc",
-                                        },
-                                        {
-                                          id: "pip",
-                                          name: "Picture in Picture",
-                                          desc: "Cá»­a sá»• ná»•i thu nhá» tiá»‡n lá»£i",
-                                        },
-                                        {
-                                          id: "open_native",
-                                          name: "Má»Ÿ luá»“ng gá»‘c",
-                                          desc: "Má»Ÿ trá»±c tiáº¿p luá»“ng stream hls gá»‘c",
-                                        },
-                                      ].map((p) => {
-                                        const status =
-                                          installedPlugins[p.id] || "idle";
-                                        return (
-                                          <div
-                                            key={p.id}
-                                            className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3"
-                                          >
-                                            <div className="min-w-0">
-                                              <h4 className="text-sm font-semibold text-white truncate">
-                                                {p.name}
-                                              </h4>
-                                              <p className="text-[11px] text-white/50 truncate mt-0.5">
-                                                {p.desc}
-                                              </p>
-                                            </div>
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                playPopSound();
-                                                if (status === "installed") {
-                                                  setPluginToUninstall(p);
-                                                } else {
-                                                  startInstallPlugin(p.id);
-                                                }
-                                              }}
-                                              className={`px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all cursor-pointer ${
-                                                status === "installed"
-                                                  ? "bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20"
-                                                  : "bg-white/10 text-white border border-white/15 hover:bg-white/20"
-                                              }`}
-                                            >
-                                              {status === "installed"
-                                                ? "Gá»¡ bá»"
-                                                : status === "installing"
-                                                  ? "Äang cÃ i..."
-                                                  : "CÃ i Ä‘áº·t"}
-                                            </button>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* 4. TÃ™Y CHá»ŒN NHÃ€ PHÃT TRIá»‚N (DEVELOPER OPTIONS / DESIGN COMPONENTS) */}
-                                {(matches("design") ||
-                                  matches("components") ||
-                                  matches("nhÃ  phÃ¡t triá»ƒn") ||
-                                  matches("thÃ nh pháº§n")) && (
-                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
-                                    <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-                                      <Cpu className="w-5 h-5 text-purple-400 shrink-0" />
-                                      <div>
-                                        <h3 className="text-base font-bold text-white">
-                                          TÃ¹y chá»n nhÃ  phÃ¡t triá»ƒn
-                                        </h3>
-                                        <p className="text-xs text-white/60">
-                                          Kiá»ƒm tra cÃ¡c thÃ nh pháº§n giao diá»‡n vÃ 
-                                          tÃ i nguyÃªn há»‡ thá»‘ng
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-4">
-                                      <div className="space-y-1">
-                                        <h4 className="text-sm font-semibold text-white">
-                                          Waves Community Design components
-                                        </h4>
-                                        <p className="text-xs text-white/60">
-                                          Há»‡ thá»‘ng ngÃ´n ngá»¯ thiáº¿t káº¿, tÆ°Æ¡ng tÃ¡c
-                                          nÃºt báº¥m, hiá»‡u á»©ng bÃ¡m dÃ­nh vÃ  xem thá»­
-                                          thÃ nh pháº§n UI
-                                        </p>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          playPopSound();
-                                          setActiveSettingSection(
-                                            "design_system",
-                                          );
-                                        }}
-                                        className="px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold shrink-0 active:scale-95 transition-all cursor-pointer shadow-md bouncy-btn flex items-center gap-1.5"
-                                      >
-                                        <span>KhÃ¡m phÃ¡ UI</span>
-                                        <ChevronRight className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })()}
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="detail"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className={`mt-16 sm:mt-20 rounded-[15px] p-6 sm:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/10 text-white ${
-                            activeSettingSection === "design_system"
-                              ? "bg-[#211f26] backdrop-blur-[10px]"
-                              : "bg-white/10 backdrop-blur-[10px]"
-                          }`}
-                        >
-                          {activeSettingSection === "appearance" &&
-                            (() => {
-                              const isMatched = (text: string) => {
-                                const q = settingDetailSearchQuery
-                                  .trim()
-                                  .toLowerCase();
-                                if (!q) return true;
-                                return text.toLowerCase().includes(q);
-                              };
-
-                              const matchGlow =
-                                isMatched("MÃ u Sáº¯c Ãnh SÃ¡ng Ná»n") ||
-                                isMatched("Backdrop Glow") ||
-                                isMatched("cosmic") ||
-                                isMatched("sunset") ||
-                                isMatched("aurora") ||
-                                isMatched("tá»‘i giáº£n") ||
-                                isMatched("chá»§ Ä‘á»") ||
-                                isMatched("mÃ u");
-                              const matchAmoled =
-                                isMatched("AMOLED Dark") ||
-                                isMatched("siÃªu tá»‘i") ||
-                                isMatched("báº£o vá»‡ máº¯t") ||
-                                isMatched("tá»‘i");
-                              const matchDockToSidebar =
-                                isMatched("Dock to Sidebar") ||
-                                isMatched("sidebar") ||
-                                isMatched("thanh dock thÃ nh sidebar") ||
-                                isMatched("thanh bÃªn") ||
-                                isMatched("giao diá»‡n sidebar") ||
-                                isMatched("expand") ||
-                                isMatched("collapse");
-                              const matchDock =
-                                isMatched("TÃ¹y biáº¿n thanh Ä‘iá»u hÆ°á»›ng Dock") ||
-                                isMatched("thanh Dock") ||
-                                isMatched("Dock Customizer") ||
-                                isMatched("rearrange") ||
-                                isMatched("trang chá»§") ||
-                                isMatched("trá»±c tiáº¿p") ||
-                                isMatched("cÃ i Ä‘áº·t") ||
-                                isMatched("tÃ¬m kiáº¿m") ||
-                                isMatched("táº£i láº¡i") ||
-                                isMatched("ghim") ||
-                                isMatched("há»“ sÆ¡") ||
-                                isMatched("cá»­a hÃ ng") ||
-                                isMatched("vá» á»©ng dá»¥ng");
-
-                              const hasResults =
-                                matchGlow ||
-                                matchAmoled ||
-                                matchDockToSidebar ||
-                                matchDock;
-
-                              return (
-                                <div className="space-y-6">
-                                  {/* Section Header with Search Bar */}
-                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                                    <div className="flex items-center gap-3 text-left">
-                                      <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
-                                        <Palette className="w-6 h-6" />
-                                      </div>
-                                      <div>
-                                        <h3 className="text-lg font-semibold text-white">
-                                          Giao diá»‡n
-                                        </h3>
-                                        <p className="text-xs text-white/60">
-                                          TÃ¹y biáº¿n dáº£i mÃ u chuyá»ƒn sáº¯c phÃ­a dÆ°á»›i
-                                          lá»›p kÃ­nh má» theo Ä‘Ãºng sá»Ÿ thÃ­ch cá»§a
-                                          báº¡n.
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <div className="relative w-full md:max-w-[280px]">
-                                      <input
-                                        type="text"
-                                        value={settingDetailSearchQuery}
-                                        onChange={(e) =>
-                                          setSettingDetailSearchQuery(
-                                            e.target.value,
-                                          )
-                                        }
-                                        placeholder="TÃ¬m kiáº¿m cÃ i Ä‘áº·t..."
-                                        className="w-full pl-10 pr-10 py-2 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
-                                      />
-                                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                                        <img
-                                          src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
-                                          className="w-4 h-4 brightness-0 invert opacity-60"
-                                          referrerPolicy="no-referrer"
-                                          alt="Search"
-                                        />
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const SpeechRecognition =
-                                            (window as any).SpeechRecognition ||
-                                            (window as any)
-                                              .webkitSpeechRecognition;
-                                          if (SpeechRecognition) {
-                                            const recognition =
-                                              new SpeechRecognition();
-                                            recognition.lang = "vi-VN";
-                                            recognition.interimResults = false;
-                                            recognition.maxAlternatives = 1;
-                                            triggerToast("Äang láº¯ng nghe...");
-                                            recognition.start();
-                                            recognition.onresult = (
-                                              event: any,
-                                            ) => {
-                                              const speechResult =
-                                                event.results[0][0].transcript;
-                                              setSettingDetailSearchQuery(
-                                                (prev) => {
-                                                  const prefix = prev.trim()
-                                                    ? prev + " "
-                                                    : "";
-                                                  return prefix + speechResult;
-                                                },
-                                              );
-                                              triggerToast(
-                                                "ÄÃ£ nháº­p: " + speechResult,
-                                              );
-                                            };
-                                            recognition.onerror = (
-                                              event: any,
-                                            ) => {
-                                              triggerToast(
-                                                "Lá»—i: " + event.error,
-                                              );
-                                            };
-                                          } else {
-                                            triggerToast(
-                                              "TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ nháº­n diá»‡n giá»ng nÃ³i",
-                                            );
-                                          }
-                                        }}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-teal-400 hover:text-teal-300 transition-all cursor-pointer bouncy-btn"
-                                        title="TÃ¬m kiáº¿m báº±ng giá»ng nÃ³i"
-                                      >
-                                        <Mic className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {!hasResults ? (
-                                    <div className="py-12 text-center text-white/50 space-y-2">
-                                      <AlertCircle className="w-10 h-10 mx-auto opacity-40 text-rose-400" />
-                                      <p className="text-sm font-semibold">
-                                        KhÃ´ng tÃ¬m tháº¥y káº¿t quáº£ phÃ¹ há»£p
-                                      </p>
-                                      <p className="text-xs opacity-60">
-                                        HÃ£y thá»­ nháº­p tá»« khÃ³a khÃ¡c Ä‘á»ƒ tÃ¬m kiáº¿m
-                                        láº¡i.
-                                      </p>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      {/* Header bar toggle */}
-                                      <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between mb-4">
-                                        <div className="space-y-1 text-left">
-                                          <div className="flex items-center gap-2">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              Header bar
-                                            </h4>
-                                            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
-                                              Má»›i
-                                            </span>
-                                          </div>
-                                          <p className="text-xs text-white/60">
-                                            Hiá»ƒn thá»‹ thanh Header bar tráº¯ng cá»‘
-                                            Ä‘á»‹nh á»Ÿ Ä‘á»‰nh mÃ n hÃ¬nh (Always on top)
-                                          </p>
-                                        </div>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            playPopSound();
-                                            setShowHeaderBar(!showHeaderBar);
-                                          }}
-                                          className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 relative cursor-pointer flex items-center shrink-0 ${
-                                            showHeaderBar
-                                              ? "bg-[#34c759]"
-                                              : "bg-[#3a3a3c]"
-                                          }`}
-                                        >
-                                          <motion.div
-                                            animate={{
-                                              x: showHeaderBar ? 20 : 0,
-                                            }}
-                                            transition={{
-                                              type: "spring",
-                                              stiffness: 500,
-                                              damping: 30,
-                                            }}
-                                            className="w-5 h-5 rounded-full bg-white shadow-md"
-                                          />
-                                        </button>
-                                      </div>
-
-                                      {/* Backdrop Glow Toggle */}
-                                      {matchGlow && (
-                                        <div className="space-y-3">
-                                          <label className="text-sm font-semibold block text-white/90 text-left">
-                                            MÃ u Sáº¯c Ãnh SÃ¡ng Ná»n (Backdrop Glow)
-                                          </label>
-                                          <div className="grid grid-cols-2 gap-2.5">
-                                            {[
-                                              {
-                                                id: "cosmic",
-                                                name: "Cosmic Glow",
-                                                color:
-                                                  "from-pink-600 to-indigo-800",
-                                              },
-                                              {
-                                                id: "deep",
-                                                name: "Tá»‘i giáº£n",
-                                                color:
-                                                  "from-neutral-800 to-slate-900",
-                                              },
-                                              {
-                                                id: "aurora",
-                                                name: "Cá»±c quang",
-                                                color:
-                                                  "from-teal-600 to-lime-900",
-                                              },
-                                              {
-                                                id: "sunset",
-                                                name: "Sunset View",
-                                                color:
-                                                  "from-rose-600 to-amber-900",
-                                              },
-                                            ].map((item) => (
-                                              <button
-                                                key={item.id}
-                                                onClick={() =>
-                                                  setBgColor(item.id as any)
-                                                }
-                                                className={`p-4 rounded-xl text-left text-xs font-bold relative overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-98 cursor-default border ${
-                                                  bgColor === item.id
-                                                    ? "border-white bg-white/15"
-                                                    : "border-white/10 hover:border-white/20 bg-white/5"
-                                                }`}
-                                              >
-                                                <div className="flex flex-col h-full justify-between">
-                                                  <span className="text-white font-bold mb-2">
-                                                    {item.name}
-                                                  </span>
-                                                  <div
-                                                    className={`w-full h-2 rounded bg-gradient-to-r ${item.color} opacity-80`}
-                                                  />
-                                                </div>
-                                              </button>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* AMOLED Dark Mode Toggle */}
-                                      {matchAmoled && (
-                                        <div className="pt-4 border-t border-white/10 flex items-center justify-between text-left">
-                                          <div className="flex-1 pr-4">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              AMOLED Dark
-                                            </h4>
-                                            <p className="text-xs text-white/60 mt-0.5">
-                                              Cháº¿ Ä‘á»™ siÃªu tá»‘i giÃºp báº£o vá»‡ máº¯t
-                                            </p>
-                                          </div>
-                                          <button
-                                            onClick={() =>
-                                              setAmoledDark(!amoledDark)
-                                            }
-                                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                              amoledDark
-                                                ? "bg-[#34c759]"
-                                                : "bg-white/20"
-                                            }`}
-                                          >
-                                            <motion.div
-                                              animate={{
-                                                x: amoledDark ? 20 : 0,
-                                              }}
-                                              transition={{
-                                                type: "spring",
-                                                stiffness: 500,
-                                                damping: 30,
-                                              }}
-                                              className="relative w-6 h-5 flex items-center justify-center group"
-                                            >
-                                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                              <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                                            </motion.div>
-                                          </button>
-                                        </div>
-                                      )}
-
-                                      {/* Dock to Sidebar Toggle */}
-                                      {matchDockToSidebar && (
-                                        <div className="pt-4 border-t border-white/10 flex items-center justify-between text-left">
-                                          <div className="flex-1 pr-4">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              Dock to Sidebar
-                                            </h4>
-                                            <p className="text-xs text-white/60 mt-0.5">
-                                              Chuyá»ƒn Ä‘á»•i thanh Ä‘iá»u hÆ°á»›ng phÃ­a
-                                              dÆ°á»›i thÃ nh thanh Sidebar dá»c á»Ÿ
-                                              cáº¡nh trÃ¡i mÃ n hÃ¬nh
-                                            </p>
-                                          </div>
-                                          <button
-                                            onClick={() => {
-                                              setDockToSidebar(!dockToSidebar);
-                                              triggerToast(
-                                                !dockToSidebar
-                                                  ? "ÄÃ£ chuyá»ƒn Ä‘á»•i sang Giao diá»‡n Sidebar"
-                                                  : "ÄÃ£ chuyá»ƒn Ä‘á»•i sang Giao diá»‡n Dock",
-                                              );
-                                            }}
-                                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
-                                              dockToSidebar
-                                                ? "bg-[#34c759]"
-                                                : "bg-white/20"
-                                            }`}
-                                          >
-                                            <motion.div
-                                              animate={{
-                                                x: dockToSidebar ? 20 : 0,
-                                              }}
-                                              transition={{
-                                                type: "spring",
-                                                stiffness: 500,
-                                                damping: 30,
-                                              }}
-                                              className="relative w-6 h-5 flex items-center justify-center group"
-                                            >
-                                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                              <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                                            </motion.div>
-                                          </button>
-                                        </div>
-                                      )}
-
-                                      {/* Dock Customizer Section */}
-                                      {matchDock && (
-                                        <div className="pt-6 border-t border-white/10 space-y-4 text-left">
-                                          <div className="flex flex-col gap-1">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              TÃ¹y biáº¿n thanh Ä‘iá»u hÆ°á»›ng Dock
-                                            </h4>
-                                            <p className="text-xs text-white/60">
-                                              Báº­t/táº¯t vÃ  thay Ä‘á»•i thá»© tá»± cÃ¡c nÃºt
-                                              chá»©c nÄƒng xuáº¥t hiá»‡n trÃªn thanh
-                                              Dock bÃªn dÆ°á»›i.
-                                            </p>
-                                          </div>
-
-                                          {/* Miniature live dock preview */}
-                                          <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center">
-                                            <div className="w-full max-w-[340px] h-12 rounded-full bg-white/[0.08] border border-white/10 flex items-center justify-around px-2 py-0.5 relative">
-                                              {dockItems
-                                                .filter((item) => item.enabled)
-                                                .map((item) => {
-                                                  const config =
-                                                    getDockItemConfig(item.id);
-                                                  return (
-                                                    <div
-                                                      key={`preview-${item.id}`}
-                                                      className="flex flex-col items-center justify-center text-white/50 w-8 h-8 animate-fade-in"
-                                                      title={config.label}
-                                                    >
-                                                      {config.isImg ? (
-                                                        <img
-                                                          src={config.icon}
-                                                          className="w-4.5 h-4.5 object-contain opacity-70 filter brightness-0 invert"
-                                                          alt={config.label}
-                                                          referrerPolicy="no-referrer"
-                                                        />
-                                                      ) : (
-                                                        (() => {
-                                                          const IconComponent =
-                                                            config.icon;
-                                                          return (
-                                                            <IconComponent className="w-4.5 h-4.5" />
-                                                          );
-                                                        })()
-                                                      )}
-                                                    </div>
-                                                  );
-                                                })}
-                                            </div>
-                                          </div>
-
-                                          {/* List of dock items with toggle & reorder controls */}
-                                          <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
-                                            {dockItems.map((item, idx) => {
-                                              const config = getDockItemConfig(
-                                                item.id,
-                                              );
-                                              return (
-                                                <div
-                                                  key={item.id}
-                                                  className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-200"
-                                                >
-                                                  <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/80 shrink-0">
-                                                      {config.isImg ? (
-                                                        <img
-                                                          src={config.icon}
-                                                          className="w-5 h-5 object-contain filter brightness-0 invert opacity-80"
-                                                          alt={config.label}
-                                                          referrerPolicy="no-referrer"
-                                                        />
-                                                      ) : (
-                                                        (() => {
-                                                          const IconComponent =
-                                                            config.icon;
-                                                          return (
-                                                            <IconComponent className="w-5 h-5" />
-                                                          );
-                                                        })()
-                                                      )}
-                                                    </div>
-                                                    <div>
-                                                      <div className="text-xs font-bold text-white">
-                                                        {config.label}
-                                                      </div>
-                                                      <div className="text-[9px] text-white/40">
-                                                        ID: {item.id}
-                                                      </div>
-                                                    </div>
-                                                  </div>
-
-                                                  <div className="flex items-center gap-1.5">
-                                                    {/* Up/Down buttons */}
-                                                    <button
-                                                      onClick={() =>
-                                                        moveDockItem(idx, "up")
-                                                      }
-                                                      disabled={idx === 0}
-                                                      className="p-1 rounded bg-white/5 border border-white/5 text-white/60 hover:text-white hover:bg-white/15 disabled:opacity-30 disabled:pointer-events-none transition-all duration-150"
-                                                      title="Di chuyá»ƒn lÃªn"
-                                                    >
-                                                      <ChevronUp className="w-3.5 h-3.5" />
-                                                    </button>
-                                                    <button
-                                                      onClick={() =>
-                                                        moveDockItem(
-                                                          idx,
-                                                          "down",
-                                                        )
-                                                      }
-                                                      disabled={
-                                                        idx ===
-                                                        dockItems.length - 1
-                                                      }
-                                                      className="p-1 rounded bg-white/5 border border-white/5 text-white/60 hover:text-white hover:bg-white/15 disabled:opacity-30 disabled:pointer-events-none transition-all duration-150"
-                                                      title="Di chuyá»ƒn xuá»‘ng"
-                                                    >
-                                                      <ChevronDown className="w-3.5 h-3.5" />
-                                                    </button>
-
-                                                    {/* Toggle active / inactive switch */}
-                                                    <button
-                                                      onClick={() =>
-                                                        toggleDockItem(item.id)
-                                                      }
-                                                      className={`ml-1 px-2.5 py-1 text-[10px] font-semibold rounded-md border transition-all duration-200 cursor-pointer ${
-                                                        item.enabled
-                                                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
-                                                          : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white/60"
-                                                      }`}
-                                                    >
-                                                      {item.enabled
-                                                        ? "Hiá»ƒn thá»‹"
-                                                        : "áº¨n"}
-                                                    </button>
-                                                  </div>
-                                                </div>
-                                              );
-                                            })}
-                                          </div>
-
-                                          {/* Toggle: Merge search into dock */}
-                                          <div className="mt-4 flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-all duration-300">
-                                            <div className="space-y-0.5 text-left">
-                                              <div className="text-xs font-bold text-white">
-                                                Nháº­p nÃºt tÃ¬m kiáº¿m vÃ o thanh dock
-                                              </div>
-                                              <p className="text-[10px] text-white/50">
-                                                TÃ­ch há»£p trá»±c tiáº¿p nÃºt TÃ¬m kiáº¿m
-                                                vÃ o thanh dock thay vÃ¬ tÃ¡ch
-                                                riÃªng ra ngoÃ i.
-                                              </p>
-                                            </div>
-                                            <button
-                                              onClick={() => {
-                                                const searchItem =
-                                                  dockItems.find(
-                                                    (it) => it.id === "search",
-                                                  );
-                                                const searchEnabled =
-                                                  searchItem?.enabled ?? false;
-
-                                                if (!mergeSearchToDock) {
-                                                  // Turning ON. If search is enabled, the new rendered count will include the search item.
-                                                  const otherEnabledCount =
-                                                    dockItems.filter(
-                                                      (it) =>
-                                                        it.enabled &&
-                                                        it.id !== "search",
-                                                    ).length;
-                                                  const newRenderedCount =
-                                                    otherEnabledCount +
-                                                    (searchEnabled ? 1 : 0);
-
-                                                  if (newRenderedCount > 5) {
-                                                    triggerToast(
-                                                      "Thanh dock chá»‰ chá»©a Ä‘Æ°á»£c 5 má»¥c",
-                                                    );
-                                                    return;
-                                                  }
-                                                }
-                                                setMergeSearchToDock(
-                                                  !mergeSearchToDock,
-                                                );
-                                              }}
-                                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
-                                                mergeSearchToDock
-                                                  ? "bg-[#34c759]"
-                                                  : "bg-white/20"
-                                              }`}
-                                            >
-                                              <motion.div
-                                                animate={{
-                                                  x: mergeSearchToDock ? 20 : 0,
-                                                }}
-                                                transition={{
-                                                  type: "spring",
-                                                  stiffness: 500,
-                                                  damping: 30,
-                                                }}
-                                                className="relative w-6 h-5 flex items-center justify-center group"
-                                              >
-                                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
-                                                <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
-                                              </motion.div>
-                                            </button>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              );
-                            })()}
-
-                          {activeSettingSection === "search" &&
-                            (() => {
-                              const isMatched = (text: string) => {
-                                const q = settingDetailSearchQuery
-                                  .trim()
-                                  .toLowerCase();
-                                if (!q) return true;
-                                return text.toLowerCase().includes(q);
-                              };
-
-                              const matchCat =
-                                isMatched("Danh má»¥c") ||
-                                isMatched("Ä‘iá»u hÆ°á»›ng") ||
-                                isMatched("tab") ||
-                                isMatched("menu") ||
-                                isMatched("home") ||
-                                isMatched("live tv");
-                              const matchVApps =
-                                isMatched("V-Apps") ||
-                                isMatched("vapps") ||
-                                isMatched("trÃ² chÆ¡i") ||
-                                isMatched("game") ||
-                                isMatched("arcade") ||
-                                isMatched("caro") ||
-                                isMatched("files") ||
-                                isMatched("learn") ||
-                                isMatched("calc");
-                              const matchVPremium =
-                                isMatched("V-Premium") ||
-                                isMatched("vpremium") ||
-                                isMatched("premium") ||
-                                isMatched("vip") ||
-                                isMatched("vbank") ||
-                                isMatched("storage") ||
-                                isMatched("cloud") ||
-                                isMatched("verified") ||
-                                isMatched("tÃ­ch xanh");
-                              const matchNews =
-                                isMatched("Tin tá»©c") ||
-                                isMatched("news") ||
-                                isMatched("thÃ´ng bÃ¡o") ||
-                                isMatched("discord");
-                              const matchChannels =
-                                isMatched("Truyá»n hÃ¬nh") ||
-                                isMatched("kÃªnh") ||
-                                isMatched("channels") ||
-                                isMatched("live") ||
-                                isMatched("tv");
-                              const matchChannelNumbers =
-                                isMatched("TÃ¬m kÃªnh theo sá»‘ hiá»‡u") ||
-                                isMatched("sá»‘ kÃªnh") ||
-                                isMatched("sá»‘ hiá»‡u") ||
-                                isMatched("channel number") ||
-                                isMatched("ch");
-                              const matchToolbox =
-                                isMatched("Toolbox") ||
-                                isMatched("cÃ´ng cá»¥") ||
-                                isMatched("tiá»‡n Ã­ch") ||
-                                isMatched("multiview") ||
-                                isMatched("m3u8");
-                              const matchSettings =
-                                isMatched("CÃ i Ä‘áº·t") ||
-                                isMatched("settings") ||
-                                isMatched("cáº¥u hÃ¬nh") ||
-                                isMatched("giao diá»‡n");
-
-                              const hasResults =
-                                matchCat ||
-                                matchVApps ||
-                                matchVPremium ||
-                                matchNews ||
-                                matchChannels ||
-                                matchChannelNumbers ||
-                                matchToolbox ||
-                                matchSettings;
-
-                              return (
-                                <div className="space-y-6">
-                                  {/* Section Header with Search Bar */}
-                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                                    <div className="flex items-center gap-3 text-left">
-                                      <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
-                                        <Search className="w-6 h-6 text-sky-400" />
-                                      </div>
-                                      <div>
-                                        <h3 className="text-lg font-semibold text-white">
-                                          TÃ¬m kiáº¿m
-                                        </h3>
-                                        <p className="text-xs text-white/60">
-                                          TÃ¹y biáº¿n cÃ¡c danh má»¥c káº¿t quáº£ hiá»ƒn thá»‹
-                                          trong thanh Spotlight Search (Cmd + K
-                                          / Ctrl + K).
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <div className="relative w-full md:max-w-[280px]">
-                                      <input
-                                        type="text"
-                                        value={settingDetailSearchQuery}
-                                        onChange={(e) =>
-                                          setSettingDetailSearchQuery(
-                                            e.target.value,
-                                          )
-                                        }
-                                        placeholder="TÃ¬m kiáº¿m cÃ i Ä‘áº·t..."
-                                        className="w-full pl-10 pr-10 py-2 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
-                                      />
-                                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                                        <Search className="w-4 h-4 text-white/60" />
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const SpeechRecognition =
-                                            (window as any).SpeechRecognition ||
-                                            (window as any)
-                                              .webkitSpeechRecognition;
-                                          if (SpeechRecognition) {
-                                            const recognition =
-                                              new SpeechRecognition();
-                                            recognition.lang = "vi-VN";
-                                            recognition.interimResults = false;
-                                            recognition.maxAlternatives = 1;
-                                            triggerToast("Äang láº¯ng nghe...");
-                                            recognition.start();
-                                            recognition.onresult = (
-                                              event: any,
-                                            ) => {
-                                              const speechResult =
-                                                event.results[0][0].transcript;
-                                              setSettingDetailSearchQuery(
-                                                (prev) => {
-                                                  const prefix = prev.trim()
-                                                    ? prev + " "
-                                                    : "";
-                                                  return prefix + speechResult;
-                                                },
-                                              );
-                                              triggerToast(
-                                                "ÄÃ£ nháº­p: " + speechResult,
-                                              );
-                                            };
-                                            recognition.onerror = (
-                                              event: any,
-                                            ) => {
-                                              triggerToast(
-                                                "Lá»—i: " + event.error,
-                                              );
-                                            };
-                                          } else {
-                                            triggerToast(
-                                              "TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ nháº­n diá»‡n giá»ng nÃ³i",
-                                            );
-                                          }
-                                        }}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-teal-400 hover:text-teal-300 transition-all cursor-pointer bouncy-btn"
-                                        title="TÃ¬m kiáº¿m báº±ng giá»ng nÃ³i"
-                                      >
-                                        <Mic className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {!hasResults ? (
-                                    <div className="py-12 text-center text-white/50 text-sm">
-                                      KhÃ´ng tÃ¬m tháº¥y tÃ¹y chá»n tÃ¬m kiáº¿m nÃ o phÃ¹
-                                      há»£p vá»›i "{settingDetailSearchQuery}".
-                                    </div>
-                                  ) : (
-                                    <div className="space-y-3.5 text-left">
-                                      {/* 1. Danh má»¥c */}
-                                      {matchCat && (
-                                        <div
-                                          onClick={() => {
-                                            playPopSound();
-                                            setSpotlightSearchSettings(
-                                              (prev) => ({
-                                                ...prev,
-                                                categories: !prev.categories,
-                                              }),
-                                            );
-                                          }}
-                                          className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                        >
-                                          <div className="space-y-1 pr-2">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              Danh má»¥c & Äiá»u hÆ°á»›ng
-                                            </h4>
-                                            <p className="text-xs text-white/60">
-                                              Hiá»ƒn thá»‹ cÃ¡c tab vÃ  Ä‘iá»u hÆ°á»›ng há»‡
-                                              thá»‘ng (Home, V-Play, News, v.v.)
-                                            </p>
-                                          </div>
-                                          <div
-                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                              spotlightSearchSettings.categories
-                                                ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
-                                                : "bg-white/5 border-white/20 hover:border-white/40"
-                                            }`}
-                                          >
-                                            {spotlightSearchSettings.categories && (
-                                              <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* 1.1 V-Apps & 5 TrÃ² chÆ¡i Ore UI */}
-                                      {matchVApps && (
-                                        <div
-                                          onClick={() => {
-                                            playPopSound();
-                                            setSpotlightSearchSettings(
-                                              (prev) => ({
-                                                ...prev,
-                                                vapps: !prev.vapps,
-                                              }),
-                                            );
-                                          }}
-                                          className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                        >
-                                          <div className="space-y-1 pr-2">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              V-Apps & 5 TrÃ² chÆ¡i Ore UI
-                                            </h4>
-                                            <p className="text-xs text-white/60">
-                                              TÃ¬m kiáº¿m V-Arcade 5 games (Caro XO, KÃ©o bÃºa bao, Ná»‘i tá»«, Äáº¿m sá»‘, Ráº¯n), V-Files, Explore VN, V-Learn...
-                                            </p>
-                                          </div>
-                                          <div
-                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                              spotlightSearchSettings.vapps
-                                                ? "bg-emerald-500 border-emerald-400 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]"
-                                                : "bg-white/5 border-white/20 hover:border-white/40"
-                                            }`}
-                                          >
-                                            {spotlightSearchSettings.vapps && (
-                                              <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* 1.2 V-Premium & V-Cloud VIP */}
-                                      {matchVPremium && (
-                                        <div
-                                          onClick={() => {
-                                            playPopSound();
-                                            setSpotlightSearchSettings(
-                                              (prev) => ({
-                                                ...prev,
-                                                vpremium: !prev.vpremium,
-                                              }),
-                                            );
-                                          }}
-                                          className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                        >
-                                          <div className="space-y-1 pr-2">
-                                            <h4 className="text-sm font-semibold text-white">
-                                              V-Premium & V-Cloud VIP
-                                            </h4>
-                                            <p className="text-xs text-white/60">
-                                              TÃ¬m kiáº¿m cÃ¡c gÃ³i V-Cloud Storage (50GB, 200GB, 2TB), NgÃ¢n hÃ ng sá»‘ V-Bank & Verified TÃ­ch Xanh
-                                            </p>
-                                          </div>
-                                          <div
-                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                              spotlightSearchSettings.vpremium
-                                                ? "bg-amber-500 border-amber-400 text-white shadow-[0_0_10px_rgba(245,158,11,0.4)]"
-                                                : "bg-white/5 border-white/20 hover:border-white/40"
-                                            }`}
-                                          >
-                                            {spotlightSearchSettings.vpremium && (
-                                              <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* 2. Tin tá»©c */}
-                                      {matchNews && (
-                                        <div
-                                          onClick={() => {
-                                            playPopSound();
-                                            setSpotlightSearchSettings(
-                                              (prev) => ({
-                                                ...prev,
-                                                news: !prev.news,
-                                              }),
-                                            );
-                                          }}
-                                          className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bgxœì}}oÇÕïÿ÷SL”¶ Z‘â‹h[ªÕÀ–“8ˆí¸–âö`$Ëåˆ»–»›İ¥$>'(î.Š‹Æ¸(Š¢·h\#èí‹‘éƒ¢ŠüA#ßƒı$Ïœ™}%—äœ!%ËòNE¤vfggfÏüÎ™s~§|h˜]­UIài¶o¦c—uÇr<ŸøÔ¢zP¶›.ı"Y~$}%!WÛæÑ-Í÷ïh]º¹ä»šNËır¸^¹¾„iŠ5f¬¥Û
-èQPö»dÏ±Ùÿi×l9V›ğoù##['dÇ´I0<ù£ëÕª±†|wì1üTÇW/UÑ}¿iO~ÆºoO~NôÁ´Ÿ›äÀ z²d³1ø›İam=qˆ><ù5ûıùãáÉÿeÿ?|NüáÉWdŸİúSÙğÓ×¯iµöVÙâÃ.VT‡’Y|øáa¹IöŸçôì6m—»m²gÑ#Âæ³ë—ujÔ#ÿŞós¯}L½šeßğL{¿\%-62ìÏßyˆTßuËìÁ6Õ<İØ¦›ø_±é¡lŠ7ÈR«Sö÷ûåf5êÿ¸Æ>&‹•õZk;‡åİêÕjU÷è¯ÓÒJÍK+µ+ë+õµ++ÕÊÚòyñ•~ñB4£û‹õ*1œêmd¾]«ânòèÃGˆëq/äÃiSA¾÷=RBÇÕ-ƒêûi¹qXnT`ÉÁO?ğœ}ZŞm<X"«¸.cùJ¡.g‘¼òáê÷I£Bv¼^xò‰MŒÁ_lƒ|UöIvµ@7¶Í¶©…œIn/CKÇŞ²L}óai™lşˆ`ƒkiı»»²©´üC¬X¡ÁvşrÆ®bBJ®Gø3”°¥R©@ØmŠÎ÷yš¨DŸñm=ZÆÖAù#Ì;™Ş†–ÜòZ¼YdL€få(Ã„“÷¨)µIGsË¢÷<ßñÊ®cò‹BñÛ)/\bíBæéCL2"µ°İCcÍÓA›#x³­1ùë3ĞiıÁŸØïAøèf…(<†+u†ZxuÙ=¨CÖ.[uÃã¿ãĞ9Û|İ=C7
-q*`N…½àüáÎÉÈ3²
-òúEãÏ3@ XŠSp¨®„~¢rjh‰GU”<QQCÀÍZ…Ü|¡3i2<ù(ÃĞb9‡† ¼İ4½Óë¶¨§0
-âcN0Iˆ¹§°fymáRbY¡zÅÀóbèÅ¢è¹qô\H:ÆÒá¢İPjƒdqxØ–JğxÈÑ˜<»Iw-¶C»ç•‚ˆtûSçõİj¥Úxm6V¹ıÚ~QÇğS!úùÙõgªñà„h@qow˜ª`ĞB¤İØN €È9¤íä&Ñ†Ş¶öIšO–—Šî3ŞäøÂ‚…¤Ò2k›õÏÎÓDrt+˜×FUE-ò¯ÿõ5Ùü¥é" >øÃ“ÇÄ CuOIàO°
-°gwÊ5!ª•z$Ä³ï®»GÄ tÛ¿ñ¡IĞ0ÀÏô@(÷ÑUÕÜºI^?ÃRPšxµqÅv·VƒÑK)·Mµ1Ø2âƒ?º¤3ø/±zÄj*‘6‚¤¦²WU«µòz­¾¶×\æ*?c
-.[±6œø¥‰ÖR‡\jêªk\I€ŸÑ¢Êêì‹ÁğÅ·"¥7RE¾²H]x†6Œo»=â7H9í÷ÔæYM³†’«]ƒn=Ÿf©]«´°U:Å¥µ
-Ùq«å¡’¢zè“$Ä Í¥´Ï£».NoKgUÖW19Ñ±OøÛVÇD2J·¼H§=×•H¬²áH¤s a^8‘9ùÔ&ƒg:CÂ?¥]dÛïß»µBvŒÁŸBİl…Ü1†ÇÏÜÕŸö†Ç_ävã}ì{y»gæIW˜€À™w¢eÎ	7”}¢s1=Šğ!JáT”€€Í
-Ù¯I¦‘ÿ=@ÃÀhJ
-8½¼è‡½€`ô¹@‚<E$˜(vù!¸ÎğZ/<õfûÙ,´÷Øî¬©9¤ÍQå
-wûyJìç?½ËÇrMÙÎÅÚPúN-“ H$Rd8Z^2ô•ğˆ(¯4\h›íIµ5/<Z.Mµ5iÄ4\Ûl+fï=ÙÜÜ$K®çì™]šeö.ÉaKİ±ı€˜şm ¿´M6I	ŞÕXìÖ’øT´ò«®×4ĞLK¬å÷¨×—ü
-»c·$£ÿ3}é–sH½-Í§2|^ûh9t/:»Rt1ìı*¦­[½6õKÍ¼÷£ÎÒ]ÄĞqİã-í€lÎ~˜h®JK;Ã“_²=’m¾Ë"ÿmğ§XgØº´L>şÓZêju_kèJ{Úã1Iì/ÍÇÔ(m±}ÑéâJN ‘n7]1.Å¿·ÑNAWÕyÏÑÕºŞÅ	Á«åôÚÈå—
-, §íƒs÷S;öıîõ‡Çßà‡Xte»oëèªÏtIwğû¾BUZmnÍT¨-"*[Ã“_ã×Tjğ`Ò¤fÍĞü{ÔïY/1k±|ùøãÌ[„!ŸyãP$ÎÆ!“´»KRÊ˜q¢=ï&Õ ŞšAÄvB®k¤Y'×
-~€šKºíş»çÂï3éµT¶Æ4q·U^“ÔËäü³1[t/Ö÷F[>,×êë±3•‹X›PR’¯¾ï³62w¾Än|	+Q¨ï*P1Úê,Æ8°“–zß#7†'_‹{¨!ğ®Ñ@<Ì‚íÏ?KÄ1Øº4¥° Wã¹Ù ÍÑ¶¦¼²¦D»Â•í	}Çîıó
-b¼¤{Ä¢Â\:òšyÔÒ ¬“Ãò^Ïâb¥«•™†[¿ÂÔÛòï¯i»=y+GĞwÃ% ¯ÆhVn>œÒåÕ:Ç†˜‡k«DAG@,°AO¸?NÁ¥•@ó:4¨ğ§ÂtåÏåGÄµØg0YB½Í%áº
-Ë flÁªT*òs•‘§|e¹Vöÿì—c§Sñ×qïê±mjŠ»®°Í¤¢Üñ4a»‰6¦Í¦îƒj¥éE?#ëM½Ù\‰ş«VËàüÊĞî†Ó,Ó¦Â9]|•t³}3bªIYºx½d'”;ù]gäUÖZ¾cõØ8Àİ¸‘$pÜrmµNÊ¼SìEç6êU‰-5´¶—éûìK:BÎ›İæòôÍ%#\cuÕ˜<Ò+‡æ¾©UlGwœ}“Vl¬R·Ü¦ÎªÙÕ:Ô_­¯Ök«âí3ŒŠkwV=z`úlÜWáAı`Õ×5‹–§|h¶£ÌVÍ–Qµú†ŞÚ¬Wë—ª—k—kÚåfcIË,ì5p%%-L_6õ}†ALû€z‰\û/¡Ìtİ£G½»eêıÍ%Û)G_ašÑ¬`sIŒ|µSB;­^8ò&t±/ˆJò}ŸãHR¨#Û.¥ºqêNÇ6…¹
-%ÍK‡¦ÍÑ|¢ÙıåÊx{:Õ”‘¶ÓÊ!mí›ÁX/0`vk`yÜ+F×SWBlz8>;Ø“ãT*ÛùÉ&Y:0Ë÷ï,©·Ã¤ÙµX²§Y¾„enR{v]³X“6ÇcĞ`×XÀÄP‡z;æL¥ÿ“!Ö/Á,Ğ1(lßs“Ë^0Ï¸;¶Ç‡
-Œ´È5Àw¡xß*Á¥bÉúá’=FçğWÄû»Õìß
-ß„uÏtú“…€N(‰ïƒJÜ‚ÖÄyÄfR8´ÊZ¾ÇË¼ò²D”cï°(¡1(|dæßŞ£S¦cy¹ÑıcÒ€©±Â8ÈFläyO›Kf™Á°ãw‘1çäÜüÊÓ"äèó4+e{r\æ•¥{v´İàÓ€ìc½ÁF*rÒ€Ål‡¤Ãş÷`£|m.¦w”¼î-iÇU
-0¤NRáË—™òq9«E;GÍöÌ ı4 šÅµeÑ@ò„vønŒøcµØıõ~¹ àz`ÍÚZÃã¯ØüeæQ²=„^zÛÔs8”¥W¨&¶ËÉS‚<|-urò†¤Xµ¸}°«óYN¯‚(^•à)å®^³˜Ö»ezºEG¬øU°âWI÷¨¬õ‡¤bŞùM=Ç§<„1	ãfäQ9„±â]!ZxôkÀ„Ê}²Ï-»õ†ÇO!÷ wºÒKDŞÄ›kO™äŸâæàiŸ;µ=·y8/ş3ÈM°Š` OEùŠ—Nºq¦E<1eÜÒÏ/ï×ÂPÚB²ìñ{¿J—çciL»ÇÖ¥üc£¾sCŞøQÉ•ªÂ!ÂøñL?ó2DÌôùU¡Œ¥6˜d^]W‹ÄŸê§‚ï®*EAîcr‚şˆ„üòı:Ã×-2÷¨\l±ã¦Ò`<Œİ^*µ;ñH‘ÍBm”XÆúL~DªŠ´cHsfRæ¦¼‚¢H{…)î{¦×U­Î ùu¶°8ø:&àü“€§©ƒÏmq
-Ë‰…‡vêö$&OŠšYk¦LŠOƒ·¢ÕRÚ} À²ãÎë¨Tuş¢7ÆÖ<ö;ğ±Ôª‰Š}1¹Àçq&—øªæ= M÷4°‘åH]Á…‚·ë¨È¥ŸòuÈc8u€m©Å§ š0 ?)hâ@$Eê&Ÿv™ÂïùFÆ9&ƒRšHßk•gPî÷+‰U&»Š bÚm³ãœR«ÉúKWr;^`…2³${wÛys^*È²•Y1ny‰p‹Ãô8{y¼/x‘oøt‚ëSa3ä;ã/!_m£ÆœÔŸj‰Ç¢ZÛ´a%[ÚQÄº^Z¯ªÚuÆğK¼¹¦Û‡7¥Û*×[ªd°¦»Ø­qgğŒ½"6÷ùg©h‡¬sÚ'ÑúóÏ¢ĞòÜ/¶œn·g›AŸ$˜ök<SÕ·<ÕÁŠü$€1f®¤]­CïlTˆöqîßÀúö¯=>_†¾„BŞ†¿ıÆŠ9†ÿqƒ { Wºåèšµ°eÔ¡Ë‡ç" rZ@¤¦ëÔ÷Í–i±¥V„E^¼°Èk½ÀÙ¶Ì6EG~Å1+$¼<ş–‚î  5_uz®Õ$S%-0zİ–ÍÖ*şFù&ëæ6û¯¥ysŒõğø6	›AwWö+ÃñhÙPkÕ;v©İS˜ @«-†SO1Ø/yk¢S¸‘.¢ıŠh?¥h¿wiÿÕöK¨màíEF÷íşÁ¦ŠÁÖÿÍäMÈ™P£±İå˜;9<6	`_pt@4¾o€åGhÁ·ıö	wa÷à´?û£	^Ó€²»Ü}Ñ¶ûlXÄ1™’¸.’…ASKøò&$UÓ/E``XÎl¯œXŠÀÀ"0pB)eJ([ŠÀÀÜ‹‹À@QŠÀÀ‹+qEp`XN)/p Âùû½ç‚èÛ SêÑ	\’sÏ9ÔzşİZ2ÒÊÊKæİ:N…qÎ²`L™%\?O#+Æ¨K >K_m±ïüoÏ~€öáP>=Ã†cåk=ˆìú•IBßä¸©¤´˜c!ì‚Tr›ÏÑŸ)ô±(½¦E¿buh¬Kv6½?Š¿”.ÇOµÓîyÿ,â9ÆNHâ³Ät8?Ò(Çã£ ç‹„»¯7ÖôËÍu¥ŒÄQûGG7Í?Œ>é:\WVÉ™­Ù&ÛØrP1m$3ÃÆ¹^e#UÅGS($ëS­çpÈÀfÕwÁMR) T¨=8ñÙ ÍªÂCÒÖº.»ûiœÍ˜åü_â)~f*‰&$\ìÂWˆ)›tªYæ'¸“Ï›1`®Š¾–…"}[ƒÃ`~$¸½@|Y×rcúy'¢*i±Çİ¡„Ö.ş—ûl#(÷ÒÕ<Ö‰=n$'ßİ6ùP¼ryä[v¿tÛ™?iú~ÛsÜrËêyĞdæit¹åƒ²š0äÖ­s~r@æêi·T%­"í[è§¨[¤gêhY½Éè‘â¸›RáÄÈ†[œEß<Ø32ä¶M¦±ôØİ¸…ƒİG½C+pÀS©T‚òîyP
-åE¦„ÊKJÒ¨Dîr­'ÕÚRn×BgÊ)/ZgJïÒ…æ„,…æ4^
-Í©ĞœP5Ïæ´Ğ6_‚ˆ`zä‚û [2šU_¼€`v[&Øz¥z{ğ7â2ÕåœW BúÁßå 0Àá4>ñãûQeÖ%öI)udØt]KñœĞ nü)>©a!¶j¬n¦®'İ#VOĞQ„§ïaDº×ÛGµ.Î ¾:ËÓa Ğµ<'¦¼?J¸0páßİ–	{,jšŸÖ6;lV>±#3ºã7ú¶Ö5uuãmË9Ä‡‹ÊøQS¹™x`…jmê¨„ôŸÀJ‚œ×ûï0hYf‡‰	,w´ÿ$Ãã§yËô¨Pj¡{¯^3ğÏHÀÀ§‚‚8Çà‡O3ñk‚vM_M74üúk9jNïZZ¿Ã9Rª¥MVŒÆÒ•Óë {~óÖ6	kÒ)üó÷İ†«~{¥üÚ]wßGAazŠÄ)t$Ñ½Ô-{u$£e¯ÏŠ ÙZÉz*ˆ*
-¢
-%¢ŠëTÛUSg¤)Â²ğ"é*ŞgL ^AW‘Á=¡ßğQxG1æI¦Çö9:8)ç§HSáq¢9.œQŠ³0A>7ÂxWPWÔuE¦Ôu…t)¨+Ò¥ ®(¨+rDjÔÙRPWÔ²¥ ®˜V
-êŠ¼RPWL)uÅôRPWŒ—‚º¢ ®(¨+&”‚º¢ ®È+uorş¼Öq`©m”Ã:˜,uB{öqd3“2.(yRi^\ĞÚé‡›Éx"›,9âtŸó»ö6OAúÁaWìóºÀài‘t’rŠ#7om#Û¥N†ªßšlÇ×ì8á 2”(©H3÷,"ÕËæ
-+óiğæ‘›Òk4ı·Lq1ç!Î+v"@|e†	­ÀÍê5W .Ì)x”C¼æğ:ÚÈÎ‡rp:Li¾À®yÃºæêš#¤=RgÎ5o‚ê‹Ê¥È•ÉBßT5L
-$uêl¤¾AR1êE­Ğç7vÊ€~vÀ)‰ÙE6Æ‹\,¿Ã½İtÀî¿ˆœrf:öË½k·ÃñCï¡2ñ$'şàë0½ìWı‰İ»—°ªn*¢¥ òÈs9Ã1<ÿ­€ï“J4BrË"{ˆÄÅvğUK—U¨zÆ-/ªnldb:ñÄkaåWç7vÊ¸zb„/)…!»ÈÓ‹á‚êpä˜PAÕ6híáÉ‚å-·âŠĞUn;ï>ÇÒ¼ñáŒa~ÿ*:¶cúÉğø›˜%tÓ".F¸Upä^`l†±ÃU
-‹”#íÔçoO*Ùq*Pw\^ ½<5!…Á\®Ğ>)´/ }¶¤ }LëõYF€ÚK5–‘/ïˆ·{Ê*!“ˆc°E~V‡¹YGå™ö9p
-WŠx¼İuX-ü¹ù3³uã@ÂZfûÜ„«Â¯ WeWSêÚF•ô\—zºæS[ú>¨‡·cY‡¡ÜüÆD<8VáÉÏT£JŒ5øœiNSB¥Xî¢‰l·kBìÂ'S„Ô×° ›ŒO™h7áİ-8Àà~I¿Ã¶4ß>ô9Ò½Á€û¨1}óøÏì>ß>±W`Ğ½æ‡Afªsâ½…øî/ubq5Sô?ºy‹öà¬ÃÊôPÎ¿©MfÓÃûšE6	¨˜™=Q!ìÍ‘&J¢utHç€ë*Ä‚APšáŠ®”xğ#º8İ/½™åBËËÔ²³x¶Ğ³¥J¡g'¥Ğ³=;[@ÏŞbëĞI3+¢íTÕ˜±hÑÚô9;#›I«IJøàˆ1VÍsxX†©»‚ 3›ªÇÙ|?ğB6]O¦*}î„Çbû±º˜Æ³}Úloè-öÜŒå™‡T,BH6QTØÚD	9Û€I¬ñ÷=»ÏA×&
-ÛSwÒ(eÉ×N;ıQ†\íÊ|ş8vÌä:}V‚ˆåÔˆ×ÙwÅ½&ÊÈb«äÎÀ¼VI‹÷jF¼Ï`_çYo¤ÙÙ&P§ğdĞ&õÁ´ÛfÇ‰ljh¢4Q°Pa‰¾eĞ³3/Š¶Yzuá•°©µAÂ_È¦Rƒ¬gíC£İSJDDˆÍ–kåV¸ˆéˆÜY­ÍÇ.3djípÌ:—åHUì”åtœdiçÍí9Z¹ŞÙPªK¸BŞñØÖÌ@:°Ûµ<²ç9İèmº ß‰>­W«JDòµˆÂ)Š,ª´®J•|v$½¾Uú¶@A\|<ÅÌÖ*-Yì,QìÖ0j;]œ'²5!I¯Dšç c€‚“b *Št<¡^¹§V8©Å¶¯SV¨8ObfÜ3-+ÄúxeönBâÄƒç./BmVÈıáÉ’Ÿ\»ÿæ6Ùzïöí÷ï¼³óo¤tíú{ïïŒ~½ŒQTKéìÃ“OÈ!?,Ğ£Ã9šı¨Œ6v ‰”›ĞZ¶(×BşS2MHN®aÂéS’ª7Â^v`AUàé ÀÒòò|†„¬Ì¤pÍ
-±Üªs¹†¿»á–/••añı4’ıVåzÇŞs²Ò©Ém‘üØpĞ¨8•hH‹>ØÍg£oÁyvr@>—SÀ}xGÎñvú°Î‚9êEÙ‰ßl’~CWHòªàqJ|ûü1ë¾vÇÈêÙ¾ó)ŞÔÏj=FÛ>ÆÜY!ıE$2¬…¸şğœsúê¨š*ÏÄ;'Y»Ã“?r{÷Yçï&ºµø]&÷èG}ã,œ|Nå¾›z‘IıRåJ¥AJ×i -“ıçïÉ{³ÑmrI°Aîß¹·Ã¹“÷ŠOÏO™WvpîŞiUƒŠÅ·(sc $ŞuÜm$X6c(±®˜MGª¢ì†˜S!g;ÚÍbªæØñG/%“3¢bægnˆı"F•Ééd“ÉYaB;9Iÿ¬4OYñÄûáAù)wnî…à$•N\İ2èçØ÷€c4N×8]S8ƒ=wïBÛ|	2!Y2[e›˜-ò)ïimZ¸ÛŠ	B¥T­ÙêÕ(şš7›™¤B'…&ç.‹Ä^] Î)æ×¦0¿º=Ïµ„”cßÍøAXÙ<n;#æ	Ï Kµ³O™V]i>|‘å)jåsMåè˜lüò4ÌÄ: y$çîzÎ¿³7`T‚¢Ğ©¼¹H$:<ùÿ	Ïq#ö™Ÿ³¿Ã½¿‘l4GÒ•ö-—DŠ’«Dö2ièˆ…‹JQN‚‚6ÃGRMHÁ2)(KÎQğf°â¯êèlÒ1°$ø<ˆLj%†øåÛ–Ôá‹Ào?îi}ÁmL¶’|g²¸JøÈ™?ÀüöB¯Ë[È–æµ}ò¶gÊ¸ƒn`¨?àÇ/× ½_ò±.mü€Nİfeò=r­\öÓ©eõ*Î³LrŸbRIvp·näîÏ¿šã.?‹%8ÁÄ(íe-+“°_äìgWd÷³\&õš€ôó£!_ª† ŒÈ$ >H6ä§vu{&¾ŒÕêz=GZÑ—`şwbÛ=)	‰vc(7óZ·ÅÆ’È÷¬ŒçÒ_À¼zİ¤,¶Ÿ"ls ²øé¥]êiV9Á7Efä(
-°%‚!ĞoğEN=NBÛ=×u<¶ùú/7®àYL€*nRÍËÃµÂ›…ßE„-#qFî‘D)ıåÓG|d¸Kê¡§¹‘V@Ü@úüìá®äê_zkç>yooÏÔMÍ’6²/İ¼ı¶üÅ7n^“¿øºï´×××å+Üî÷©'ùz¦­Ù†|6@×<İ€)ü@İ¿ƒß•®æ–J~´äVˆÙ>âZºìù	_ÉÒbtŸö7²[(¥âbÚv]ğ	ÔÔÒUïÖj1í@—¶Í^7õ$»$¿g<Œ‡Uöq1Ä²”M}‘6"yù¦Ù1,°úLC}‹jAÏ£2{É™ï$rûHæİJ®n»š·o‡İ|6’Ô!4±‡'¿ä,ÏF™Íb¦ıÂïÙ/yŠëe9 5>ù\ÿ’İj¥Úx;ûM‚õş¸
-Öy æÎÃº¤e9ú¾b³Tødè!<Œd›é¹=²Ã °œG›RŞAY›¸tï²©R‰˜V -ĞW1Ò…<&OØôEÌ3.yğŸ²àĞî—"c‘ÍúMÄ:i'ˆ\€×bãnÉmÁ‘D8—·{V`˜ôIà»æİ»Øêöà¿Ì0ãÔóÇY#ûƒ?C')±Çzb²,°˜~‘‰$Ã“ßŒÖì3<½)–Ö–Ö¶ë|G'"Õ5ìë1EĞµw^ìòJe-eì°„ÉK`*\:#ªÉæ¯½C:¬†Iÿ„Íö×¦HßÀ­UfHˆT²…®¶·MÍ‰	ßö¥ĞürÍu-J˜š³ô-9–ÓZt[œÿL2ÿÒäËìKÜ€‡nó´bµm›mÚÒØX3i'Ù4[ROLğgşGŸ´L~Ø|“j|ÂXC:œEÃMşbÛ‚U…·@ô÷È5~V«¤% IGbÈ`p )ÿİs¥]N.Æ80@½¥éãõïQöyË±÷L¯{ÛikV)ğzr”PØƒğ(¨™i]"²yT?÷Øï`#KŸˆGßEàğymŒëoôª±³ñé‡àé|Ê˜ÌØ2oÌ»il¬'‡Õ°_Hà{y'½´4)mCğÑ‹^Sü3Ò{ØcÒ9Z‡oOñuÈOO™Šfİ jE¶ÿ¸!ïPrÌ^@H÷‰¹.Qö¬lSßìØø}†>»àa9µ%¹•-‚ùãÈ;²	[Îà$!“{;D+±Ú¾èøh¦%0ó{Ô“ñ'®°;vK2 •À¹åRoKó©Ì‹È	?Z&zNö$è£‹ÙhdïW1mİê±Ù(}4óŞ~8ˆ¡ãÔI×ùôÉæìJ"%E%¹@ËT5{p,ešM87ĞuS/ÿÌQKÉ¶”¶¸!uĞ=3½òütøÁü¾ç¶CW>p¬^W"Ú?=2‡&û‰^İ»»¦e1Ù°ãt:E×Ö…WĞ»¢ëv@ÿA×jÓ®#:»hnXoxÛvmÜÀÆµnS»‡_yÂ”óüñ·Oğo²
-'¾–Aj¥ ?À,èˆ¸QUy2ñ·UªN¿¼3Übøypº.ƒoèz&À İ€Å®µPSÁa(n.DË=üS2pök—`é|bâWã*ÜS³¨‡C º¢éø<ì]l@X4ø'ºªÏ4˜şns`Èç	µ®kíE¢wX}"*â¡‡1`x½È¼GÕ³7ÇÏ’îàğÇÈÉ–s„¨–â‹"ˆñ’ÈTß0rÜ<Àc²°şİgÚİlNr€Ç-	ÁİşğøÊ˜´‚»"Ææ®çt<ê#ß¦¨–*dÆR"Ğm9²l5©J–Ãi9q€Õf²L¹8ÈÖÂ‹'0÷L]D0æã7ƒğ|£5xâàëŠ;"Æç ÅDŠa^å-“Zm¼¾ò7„â™K,NVª Ç¡6ş­zş³˜]1:;c¦‹Ÿ°’‚P‡']
- ò@AÎEÇj¤l„‘CóïQ¿g2'ccè]Zÿ–¾\(¥²—Çj“tĞ!d/UöêÉ^é®‡Û¦ìõñV"=ö‘|•­ ¤‡ìÕá»4se†v³Ù”“¢€®äG€K¢r7îĞh²iD§÷×5¹±iÃpÎÖm'çlì÷Ùä>s‡˜OìSo•lrĞùÌÀñ˜@C)|èê-­şö9ñãÑ"p{–aMD4àhËò‚É­Îb˜’F£Ç…Nœ„®cC*ù^¢8ËÍlt3ìBìPì'øÁ<i0ğ®³zß·<BÇqÄYŒÁçÜñ‰k”Ï„H…e•RÈ…à4ÂÄ2Íö4îKÂ¼LF–µ^à$¯kôS[Ş?…gˆ "Vr—©šì&M ¨7¯ZZ‹Z¹ÉQ&=‚{‡™}ŸuÏ9åœz¤Qx¾™œ‹’ qaA/n”¯°şÅô‰ˆ÷ï®fÑ ÏgM‰N~([HÍ+"Û‰Ó+ğ4+˜×üa;esÚ1h—ò…Q	œ÷!-¡8)“wÀò]Å¥\Ê-ŒìÈRÊY>õjÄ„âw•(„}pÖÂ¦Iû£È¾ÁÇËÏ?+f/Ef9b3>‡ÎúŒó0ÕCş0`ÈÇæÊ÷àÓàFn°ìlÙ8‚6LF	ÌÈäåŒ)£ª©ÌPÙ„KYÁ)?¡ĞÇ7ibO¡'p %­ğl¼©Ü^ÉN»[_9‹ÙÔŞl6”ğõ˜ä¤q–/Èö„>\„W$“l%í¦r–CfSÏeæZeP=şSÍ<é$+Oë‡Ñ|WÜå/ıÕJÓ=Š~²ÿ¼NK+Õ›Í•è¿j¥±ü`rF–48¿Ù…S×‹Õ[ºNAšŒ¿æ±¤ƒû
-\æ¸åÚj”y÷,ĞTûü‹™s^†;a¡ÙÅq°ú¾¹dëo¬®ú“WzåĞÜ7µŠíè³oÒŠMƒUê–ÛÔYeZw‡ú«õÕzmU¼—†QqíÎªGL`ßY…‡õƒUA•8u:0Ê`Çc‹ªZ}ComÖ«õKÕËµËµFír³†ã¿Ì	8oyƒ™ÙÖbÚÔñ^s	™×Á£{Ôó¨w×±L½¿¹d;åè+\Cšl.‰ÂTÄ¬B$5%šW•w.ö[aºŞv)Õ{Tw:¶)œ‘’¿thÚlÑÍ'šİÇ&Ğ"¤2ŞD²‚õá¶öÍ`¬'8b]ğokŸÜILŒ7Ç”H0=>µx~ãT'*pÔn’¥³|ÿÎÒ<-q¹kvã#Â“EÏÓbW;ºf±Fm¡É¶¹€É¶õvà¼°´ôü3xZkxü%7ŸpÂ\ÃÇ¾Ì7íñ!ï`ôŠàÛÜ¼X‚iEfm±ŒıpŠ~£	û]îïV°ZánÍ èéJ,ß‹ÊPJ.ÛÄ‡ŠZÖÈyÄ´&ïµWŞàm%‚Ï.ÊYBQ¤OªòK8?È,5¥¶”’…=:¾öé¤ĞK&ĞOCG6S#£u”óó	>†ïå{sOÕ­áÉ¯L1IBøñ‡?sôˆP¶m£Gh¾ñY
-‰-ÚÿúiÀ	"Drœ_…¡Õ|‘ÛÑYT:şZ9‚Û*CÌU1ÎH4Q>,_fjÛå¬=bô,F–”< šÅí¢ä»Æx&ù‰LÀ˜Í%0‹fí691õò-¢tûÛ¦>o"l„Ó8¡”O³ôğµ”Ó’rv,º§ã³_m&ÜHŠÏkà>¾ezº5r4ÇŠğ£{$NT#;ÄZ5Å¾,‹ëõøüh&„…èİÆÖ/°µÑçgîù¨D£®1øˆ­§®ôú?ìÎu&HYjÌ“ƒ§ı(Å½pS†'±ûµ?ŸèaÖõ yO¥ç<Û²ÇıÒÏ/ŸÆƒVµ…ûH¡Îìkrıı÷îlc²dfüçJÁ8Îe¶ûzM«]ª·ò99j‰‘¹úA­î}°›–«+ünT†q2Æ¹R0ª%rœN¤–gPSLšm:Á)IF•ëøXØLhøl{(.øfè+ÄÈÇ‡U~—)¢š×Ç;¥ä÷5Ig\ÏğMá’‰0Mì'8êØ5í²-†™FU3ˆFıÅÖ™ì’0DN`…Ä6
-IîH<1JIÚğ¾!Q-•Œ¤Ò©ƒÂáù6[±Ø„¬üvbDäRkì¾¾··Ş¬Ö$H¾Ò5íA*¹Æîë´z…Aã¹ÏRşKJ‡z!ÜnÓ=¬l“|«êœÜ$†â*Kèmö¤K_SX@ø¬`¢>!:½hì³ìØíBzÍª…”^q^cuá•ÌL!¾Fo‡_Õêemo/#¾ªÕK—Ú—N[T­5Y5¹
-ZVı¸§ñ¯DX•¶5×¥ì¥sHÃk×ñÃ#ÈBŒåÖBŠ±0‘ß|‚,5m…$½N’µ«-}D’éuíÊŞzˆµªë½µPºí¾Ş¸R£—ë²nLºrjB´œÚ¡^`NRkQH©YµR*
-šCFÅSVH¨ÑÛa$Ô‚³0¦ÅÓ„µ\H­	UĞRëõ¯Çg©Ğ§ÖBŠ§˜fUY:¥§¦P£·Ã¨´¸‰Š¿lÎÅ•[ ¬…VÁË69†2ƒƒ¨.—c-uÏ‘åÜÊ—`­Æ¡õÁè)ÊÈaC=›¸eM9X>¿?Ó¨çë¨ç•$åô ÎÑôN«kUÒƒˆL]óGŸ<…Eıü3H²Ñü–”®[=ét•ñ,B’Í
-[Y]o’®|&·t©~—”ÂóóÁ7L~©Rå^€"Cé=áXpÑa­
-ËğöàóˆÓ—ÉÇìKö]¤+râMÏ|Eòy²‡'ŸØL$ÆÑÛçzM¦ Ò 9DI)Cx:ÉVjhè‡ß„¡¬X¬“nzæ‹õ¾ÉjÈ™¯sJ–)m¦İ'×ùÃ·•›J\.Ş\¢A{•“xåBòœ}ZŞm< 7¾‡Kd	§‚CÙ|#‡U"@ü„y\O£úİòZó»çQŠcC1—OÏ|. .Ô+dûÖ;7Ş¼‡öY9ë
-—µüvÎËš˜¨—Ùemm>—5NO¿An„¶ˆóhè3Êõ+`ßÃïuJÇÍê†D$Z°*YåTlG
-¯Êlæƒ­Í´í?msS2_Ş0ôØ¸²Æ>ÅM™¸cÙƒìÍ0Á
-“oœDa&œzAÜn,â$õÅQ‚,‚F"Qİmç¾—1¾û©PBgèc&„ÍM0¸¾Ú¢&)šGÔğq,Mó•4ëVŸÄ¾‰«C_J­6µv‘…Í]`0¦íW[Ü˜vÛì8sœp,_y‘S/°Í•
-ËS?²"‰S%$Î-X/w-­/°§ rÂ÷8<¸ÎÊœÔßêçMğ4æ<|dÍğ0ÛD{=œ©Z€ğ¿S(…FyÜÔdÁ“=&Evy@¼¨Æ—Ò5íÍ%$cZ\W;Ú\B’¹EÅ¨Ën\©*Ö‰]»°İ×,¼IÊ\Ä•Iá¯©Î¨²Èr§1v¥,‘å2vC5&µ¡'¥„:œò‚¿­ÆV«Ne|oø².û|DË®É¾IóEª®;æ¤$tÌäCèŠÆ‰0Û&¥Àd+$„ä;ÙJ¾g¹¾»Bâ¨’ü¨VêË“j,¨6ÿ(v¨œ0€®P¸&½rG›…k’L‹³õÂ5i.×$ğB‚‘>Iü£Á L±'Ş´ğHzAI!(+]ãîälÁ¢›È	&®+}âMw¦ÙË>Š`X´+Ó¨i(.U2QüëÿıRA'àv5g)lÎá«u~¢²óŞÛoßz“lÿä­›x¿(‘œ³ğ‹ÊoçüøEí8E‰˜¯Â=*rZ%ï±íü•>J|Uœ¤`Æs˜^Ê“¹åj¥)ÄVCcÿèÆ7á…œ(¦0Á©9“íVé®yN¼5ÃıIõ8S#ÿÄÂAêÕrz…Ìd'¤ÅHŸØ±¡,RNä¦hF='ñÎË¥&§°Ò‘wÄÕ<8H¿™ñÛÊ_Ûs\à•óÀ{´¤c%Çù‹á¶óIbQx€M©ueêš~¹¹#S•’ZOëJâS­p;Ò§p›~'EJŸÑlˆjn*Â›H~øö©êOôZ;Ûš‰Š‘ŠëI2³?œ&÷S‘ç÷¢XÖ9ÙecÑ=’f|}GÍ9hdœ§ë²”ŞÓæH‚–V7Tšyô!~•ö®Ãsk±[éa5Ûì²ñV÷é:ÚXĞÜÁìÕ«Ê•7Hõ¼HêR;ğ?ekÍw=Óî ÓZEödóİ l§Tm¥­u]Ö‹Ò8ÛqœKÿTâª¼g®ŸGY{ª¢ÏeAÔ}z»Ğà×³LTë3Ìj/NÇÏ*ô¡^JïŸÔëF’ùœ)şÿ r{äÛ›BæO£¶„ÌÓjìzSá'¢Vèt™{^çÀã£ğò”éoárTxy.”€®X€“nZxw¾ ïN¡ê’ÒÎğøË ¼‘CšÊğøYP,Ù‰7-Ü4/:ë\8àßÜzó»dxò;€§>ºE®’œÇ×éü¸f®UÈ{ïİ½ñŞOîÛoŞyíšyƒi‚Lµ´çÌ	íœçÌxªnS»wq3ÿ  ÿÿì}ÿoÜÆµï¿2Ù&Ò«ö«´²¬Z0l9‰…8¶j)nßó3î.µä—dI®¾DñEğpñP÷ÅEQ\E¿Í}mQ\ÅıA¹ù?ôŸ¼sfHîK.g†+i-ï¶±å9Îœ9sÎ™Ïùœ‰Ÿ×„»©˜C3sîJÛ"Ç”ÆˆVmÈ²IÚqqî}×9;#6Å—]ˆG·S%˜M,Ü‘µm&ª©q›ĞñÛ¶@Å0¡ğ
-[ğ>—V¬ãÚ/u¾æ Å¢å×ÌZ¢9ÈZŒá®ï¦°,èÃ¨r½jt|Šk^M“ë$E:éÌ¼FšeÚ·KÕI× øW¤—Z™vÁ‰v;8¼qÂÊe ¼>`8~UÆØ92nÒ]yXU\>äx©×9Ø\İ.…‚ãz]`pz¡Ø¨í™©™oF·*Y‘yğˆf;.Ûk÷òn¤à³ÃÚ—ƒ>Ë“Ÿª½Z¸4:Ş…j‹Mãüôç6	à¯_›¤oj¶ªéªª€è`¿x}–YI0@3Š—9úãã’p"Æ¢Æ¯wVzZ£ÕæŒõ:©TTŠìhtFúÖñ‘Šs}ÈC~QªÙc®«²Ã¼ú(,qŞj6÷Z«Eac¸UÉ?f¯İÅÕ„İ§­²ûĞxª¨ò+wééR`Údçìe	t"×Ğ®÷İ7Ú4Ú4ğDf8•>Ÿ~n*6ô¬6ĞÜ…TwKÄìáV­$]øQ·Øg_?Ş8Á®¨Á0ñ3£ƒ}¦hz°ÏfùŠØ{öQãñÄúpf›!h„p0µœ(ğ˜M‘²O&ac##ƒSô<]hh@¨bãÕå‚í´LFÕ÷Hö9åF666HCU£Ç½Êˆ-ƒ
-7èŸ©°ƒ²•ŸEUQRÅ†Uz®bNúYs|ëß:Ç·Îñ­×Z ¯7¾µB´SSü÷ıYE9½©‚8Ç¹ÒOi£=—ÓÜ‡ÎÁ­sÒ9éE]Û5rïÑæòøVŒ‰Ï±­ÙíÌ¶¦IR”çÖÜ¾¾öè•×ÒZ˜Oã›Sc®Šà“s8™®¦‰ıZŠU,wßèÉ¸à*%T‰ĞcÍÚš
-~LÕ ™aç@X‘»®Å¢Am°ÆškÏ
-¬ñôÿBxëZ/ï9ªôú J_»Eşô{ËkMıF+U <0ñÊo´ŸMƒV7ºÁ8{Ìùé5:]¬Vœ ¸	]zzZÅÎ©‚ã5MF"90×Rõ¼Ú9pvÒ]WÆl*e%‡pö&ÆD¬PO[m?Ö´PÅ¬a…ğ¬ª•w`¤c93Ü‘ÿ²p¬jÌ@\é"ìí¨zˆñÀ()6El—*YÙ['™2ìÊì:6ºe(¥utºq_½/Ôn+5j¢ïË¢@òËU»O.sìB”\ u(>Nm aü€˜>+>G6‡aª1.GùaµbˆÛ‚ª™½”x-ø‹l°†àGµ¦<Ô™}µ°C6³<¼“ârÈCöj¯/ôğäcc^ÔŒ8S‰ÔHïÀîÖk)°Ù7‰çQ‘˜}¢%_jo“J–×aªPHöY‚cØMõæÕ öø)ƒ¬Œ”lY`eIfâèŞ‚3¶zó³¾Á²Ş6Áˆ,·´§Àà·5&ßèÃ1ú.·•}£OÌìÛj—kJ‘á7úäûàh³ŸPíÈøã%:tH^X¸é—èu2Ã§MÊøçÛ£u;¦íÊäë°òX•„.«˜D/fç’ã&Ò7HÜ1‡._ Ôu‡.c0†,dEhæp¼Ü‡ÎñËÁÏÛz‡F
-Ã˜ô§dµıºÌå0ï¡søòÌÀ—›­¹¾Ì}è¾|İ¹yÙ˜ÆÜ¼aAÒj¼3‹Ëbv Ç«5òá£{wíGÛÕ¶¥!È:=Íº8òl,»ÚØ„lƒ)=t%…ø‚ïXº€lšiÏQŒS§FõJğƒãª6ÂÛ¼‰¨Vx,aL¯2¢]ˆô†*Iç4HcS6nI*Ò¾üH;Ğ}†6n‡tâTz¬Æ÷ª7ñMüÂhq`EJZi®¨øÙàK“Ø}$‡ùç’89¤‡?ÛXwåôÒÉHìÓøò†Nõ¶qšÉ&eáÈˆ"ˆÌ(¸u(6’AnºJ”cÆÂ/0?ı³•-·×Ü#Yó­f*€ùx81öyÅÍ¨¬ãhN:t÷Ót“íDYŞ,¿”F!ç¤r®
-ƒ–Õ—™_>ÛCÏµtr—ÍWK‡£<Õ«]?Ç”Ò^)oEl¸øyˆôÜø9Øà!†F¾b2P¶Ò^,»¾”÷²9Äúª—Õb-ô¤+&,Ş1œCÊ¨ûfßŞ9öá%i`CˆxCE°ñÕ’©Ë˜ğé÷º-mmïæ³_ğ·ğd†”‚ü)éÚËa ¾Ï<$îızäûm;®d?óÍ©gÎ 3p¤tí , Hc™ôĞ9ä¢
-5wã3ƒOI»ñNìSÏe1ï¡s0ÈÕlfGdá>,ML çüÕK“ÖnnĞt‹qÔ­=›ççoªÄÏa%‰^\¬¤9›Ëbv`%7jdkóÑCr÷Î½÷ßİ‘F•ÜÕz}İ¨í}ù“ãB˜ĞtU6Co4ÀäØÒIs…;8óC‹]¢Qİ}rİ©é4m
-qÈÙÙù-QF¹"Rq?d˜¥áövJ¢_,7È˜M2NPË×‡œ¢q’ñ¶‡ô•ŒD-¤ÔËÍ6HÃá-_µê¬šğ(‹Ïe¢–i­“]½k0¥;×2°@9|ág¿µIß¤@¡…û÷äm¹×Lëd)•A¯{˜3ëãº®Ù µ¤bI¨%mÒl¬5¶Éı{×uU/¯“MÏ9´‘1n€nã¿°µAz¦¼²_ı½K~2<f¡pP¯ıÒlPL4'Øpgß~ÕšhRÄ3VQÎ<]Éú[X}+-jB(×O—Ìq8kî`…u¯X“Ä€„‘ºˆ!
-c®4ÀQVĞDWä7P
-"E³ãjŞ¾¥û¹j'~Eµ³ûİ7ß½´û$8{Ùyİ#}Ãu@!Ì±Ÿë=˜×Ï“{èvp1õóª´jŞCô`æÂ—÷Ğ9Î`fH'æ5ó&<t6Ğ3&¥×0À6æh ‘şk5²yÿİÍî>ú±4€NjÇ9šƒ¸;fMÏŒøÈîâ ÌKè”:ÿÊ>ÚÛ›åpÛêUV)YkdÂµTBŞ—€ŞœécéXøg:Ô|1²ÏEŠ‹º‘¢3V;f7—)FÿŒÅZûz^ºgúZÇš¯V¾Ú›Êz†1T~³¼j#7^õ"7¯èø¯pıFï|ùÎ{óº9?ì½6©ü˜Æ9‰”éE5…ÿ­^º¥×&¡?;Æ…§é¸İtšıÓúëÎ0 çñìˆœC×H÷EIÑöËµ¤
-S$6‹â"§|P«‘(5¤\IhL„Û¡¥„&ğÖ¨×#Y§íNôC©©ÆÜ±y•ø¿gE±BŠZ­5]q269e*M£êiƒ(jV¹ª@”‡c4j+eŠî„6´£ŞJ‰²=!Öf*#ÑœÊ8”h¥Ä8L«TÔôÊDq%¢À•)ÓÒ¨<ÔUÈ˜šÎÀÏ»áCê#}¢Ö†R­(uŞÕL:b÷a›ÂZrÃHDÛ0Øöç+R±nç§?·7ôU—Øg_+Š}M^Ÿ¹\îdîfÜÛz²uïİÇÒs÷Ì<§ŸËqwÌÎ¹\4;†ã™Ÿ —‰Eş‰À:LØ†å| ;®k•;®»?hŞø`h‰s»ñá¼º ÊØ`^RGö”i~`!îıA>J£¼;¦†Ï¨ºG„w%¡Zõ2†«÷İ7ç§ÿf^Ò€]bˆ÷I¨¢çÊi
-çªéÁœåØ.ÛÕfP=^2HóÊTÓ!ª&ì9N=Í¤^¢ãÔšSÁ‡ÓòÌkî»áİ¹f£F¶?zÿñ»;ò¤KÛÓ÷tN»Äß1;]4=¯³ë¶\Îu‹%ô®6·‹Ê8m‰\¸ÑVÀ¯_¦eä©%Œí´5ƒ+ä%0Çó‹¡Ğ=´‘aöz0£niÈ§®†V)ˆZ12XßùŞ«ìùÈ@²qrB@OÆ:©€TÔ¢÷×f³ãš¶ZœÜ¡ç^æ¼M)/l|8gYÛ¨(s RSÎ÷º°¾ƒÀõ×ëu?€‘éÖÍ}S«ÙN×qöM½fëA]w«=İ©ÃĞõu¿~£~£UÿĞ+ÏÔ\»_÷ôÓ‡Q­ƒªÒı ÎJ?N•.î*ØV6S£q»ÛÙh5Z«µV»q£µÒlª(Í
-6*­‡G—åp1‡Õ5ô5âtş¢[BÊí˜ÙÁ¹Qy‚§ïé§{Ûev7*¶S¾’on–¡÷s8àu†
-D³eÙ+²uùVQIhNi0Jhó|ü6…íX|¢YıçÆ‹w>Vƒ?(B¦)™œ„ƒ’4Õ1 1Œ¤Ù¾Ôq¼`“ù²¬ÜÉiäÉš¹|¥¦8ß_iIîbª8+û«uµühØ‘>Ô£FZµ—±UDH	ióÎ¬;1vÃE†#›5²óğÎæwïÈãKvl­»ßÑæ şÙ	GÆÓ³ğ¶ó=³Ëüä]Góƒ7^ÂJ*1œ]Ã¨A‰åû\İöÁù«?Ê3™L¹zm‹±³¯d°²
-<¹2^ä¹‰ô†)Z˜ÄZ•ÕŸ4Í(«¦7Ğª µZkTÑX¿ËÑ²Mw.o½š'pW‡ÌAîN…öõÛÿ{ö%Ùã&@§ÏM28{yLºÆùéï.ï öÇ¹ô’áAj{¶3üça†ëf˜é¬C¢æ‡y‡‘òÄôÍ¥œyX¢xğT»¿ktg¨vY=e3|ş‡?{šå+!~Uo…Å©ÉPš:¥ØE²NÃ
-«û,Uò¹°¦3Ï¶œJ6¥U^Nbég_wBk±¡°Ï|v‡Ä¸É¾g9àAÙ}òXG¼",?Û<•ÃÇ[ì˜Mßöt_·»º¤Ó_ù*‰˜e¢¼¥/Ë¥JÂ}ËJ7Æy7åïVP¥‚àå²(U‡V=ÿSa|ô#3¸"ùQ‹äG!n®0@eÏÊŸ9pçËm¥1¥¬^Î˜ñ¦³y„ì7lBƒjk•`ğ¯Ú¬·H•,ÄWèŸ€Ñn<#ñŞQ­c¾­¯µI²ü9–h(´2¼”¬ˆBëÈÊá\m%Ì„Ğ>¨êp…Oƒ	²‚‚Û0`®©š©ÚÊ(gfÓ8ûÂÁœÖ?Âfıíçôàä sQÈ´É’˜a‹Î`0´‘I6
-û09o]^„b8b¦äl”p4®€f`U›$Å’Ç‘{È°kµ$Ô}I´1éXWÎS¤ãRµòU³õ¥ÎoÕ•-í‹<tkÕÈÖÃívÉ{[ï>¸'}î¶e»Ã`~èÆİ1;‡nlnŞ3uKrpÆØJ¦Dl©óÓµòtË¾Ö”NÖ`òY¬,ãìòí8€•¬™Y¯¡äQ×CãüÕ×.ıÊ$½¡İ¯Õj³{$ó#Í£ˆê:y×óœy2LTÛZaâÙ Îè:ˆ
-{§VBTÉ;·
-x¹µğàüô—&±ÙŠ°ğşÊˆÌO''wó;Œ@ÆX'F‰¶ÃDkI1´ÅÆW)z YC}ƒ†Ñ©¹¶í¨¸‰àZšİ‡¦ô²ÎuÜU·Z¯š××ƒ}»Ùö¯]<‚îmTŞ?ûéŸı‰|ûùÙ_`G/°Âò©¶¶@[»^u-ÇtÉğà)¯ëè›vÓkæV]~›¢MØGiÕ‘—$ıê
-{RìU	<ÕãQS‰He,›JEEzÕä7!qZÇw¬!L«gö´ÇMÇ™éFZiO!Œ¤Êí8İP’z0IPş†¡¼—kd÷Ñ£»[ÛÒÁ¦]Ç±Ó‡›¸;f'ÜÎÎëj*‰æ~búCÍ";˜.?w²KÄ›ÂäĞñWãlGpntµ±”=wkõ…ÀÜ#dvNfÖÍF„Ån¶ó°Øq%ŸÄ¥Tùì·ÇÄ:û‚t³W¤o¿úÒTZ·Y£htP{"ÿ˜;¦£êSŠlÿI¯s5Ë¾G…Ú“×£1Ÿã §iPOÖ}óB[M)ğ¡3ôõwñáS8dCtÆÀæËòÊÃ7y kúôß„û_Á~¬ÆM›ºğËéî_ÒQ;sgÄàÃùA‰b€QÆJÏ†÷Ø™’"Yüã³?À&6<?ıU@bœıUßµŒŸW:}h$) ×¢”É4ŠP„¤"3 û”JFŸ«®…2:&êHÜèS¾"K‰qTGèFŸ¹<âgZ5i¢b[ø*ªÜø)ñ*Y®G±-ğ>èütJN]3éÔ%¶;úÙÎ¡§¹ä0Ëœâ¨§lmrîŸaŸ~f“À8?ıl©*›(ûHÈãP£ÏëèOÆ}¿ªŠ?¥M7•˜dªm
-´'ÔVAá‹Å…ÉÁöô†ô=Àä°úÆdccƒT\kØ7íç~àxz¥ØÀL/Æ(²½£é÷´N<ÆŠ›ÅÁÒÉœeƒŞ:ıÙsñçBş‚•œÈ5èfèHh³Ø—gLçHk¶À÷‡?
-#¾á™ö~•÷ ¢[ÛÃO>W!ñÜUJéÍ;7WAXò3ù§$Î=nËã·÷sÃÉÂŞâæùé×1Î¾Àb)ŒSI—½±,Ø{· jÚªxpkóì“fˆüz´ä'CØmbıƒtÏ^vIÿì/&ÿ*˜TòÁ¶=ğ“a ºšCºç¯¾‚^ŸŸşNc)(£„1ã­º;E	¼Œòìêš¯$Ôô„¥G,s_OfÁC30H™3 }œbvsbsE!S‚5EL7ˆÃŠdD!tˆ)v68?êŞ±ØŞ¦òõ`;ıÀ…$ŞG,°&ÖË:g÷ìO²Væ€_Â@hU½‰<=^~²Pè}î‰+÷
-Õ¾§S(ft¢lÚ0 ÏÈïı-·Úí¥è?vÂœÿÉ	%k 7x˜½O
-ç#¶cäYïÔh§=yX”Â]2•](S•àZVâWnÕ[Í:[
-†¡F¯|£y£¹Ü¼Ñ¦WÎa@êPÌfÈ‚9aÚX¼/ŠyToWt2¥|fc"vË4-¡ËÄôòL`óòdAœ¦‹Ü„©qÿ	?o§B'À1{ë¤¢¹€àéÚ@8;0ŒWU~ÖÈW±†ç§¿Èàö‡Ö‚°W¹~úKĞWç§_’#öĞ5„zšm,!ƒ¸ÆÙË€–‡kÂéé~—{ï¾‚>ë?ıßö>-8xÃãóÓŸÚ`Aş	şùíçX@îË.XhFQ
-nü™6¡H€&'Ü»“ƒ‡,©Ã³¿š¤†½¥”©ŸlSÒ;?ı
-ÚêĞş€9ö{°ô^Ñº·NMø­Ğ¶Y'÷@§XÖ½‹Vé•˜‘=Ï`Š¹5ƒ6ãÎ—ãs¢Ğ%‹.l5ßã…ØeRÒ>Z`»™ú¡´¤İIŞ÷ÌŞeI:˜®¥œûös¬„RØ=û”Y9çšî¦†Ù§ÿÂüˆp	³G,Ñ'£XâWüµ	üƒ½ù7“Üë‰¬pâ ^¨`2×v$™‡fm–d®¼RÑtMWZ(·Ín0ôğà˜„?^’`v0·Õ3j)ğ©A{ı+&¾ı+x£ÆI–¬x&h&=b	~ë ¾ÿ½ËâË.
-æW]x´îŞÙßL¸à»o¾{Éj¢¢®Ş}BÏş0DMŒ-®s—PÛ3u¾oĞuF%ú‹9@_¢K»ó÷.î ú9Ô;²²ş@;Ö=ÿB¥V	»>Ğ=ÍêeI{|å•
-»ãêös›!Š¤51Î]¤®ú ÅÕ`9¡göEôdüîß»‘øuP9Ú}°ÌJÙÇH•ê?ŸçŸı†¡Œì°-!ñè¨CÌ„c#B¨eQ7,QV\w.TT]ŒlDÕsüL­_v¥rú“¡Ùİîšx-²‚ºi µø™n–¶æäEŠê]Te 4_˜Æ(I‰çƒMùï &ìĞ¥Ÿ—RÏÁÙ×øNß~†ÖêØƒ#åÜÍ‚¨#]jX‡	¢ØdÀùêë¯ÃËÜ['Fs	şháËKä vP«Õ%ešEÅ/V®‡kñ¶ğŞ°kø¦–)Ü£k¯T¼µ^ï9‹ŠJ÷®qö‡A8O4
-/I	÷Î^ÚÄ2Qİ2JæHı¼¿òz8JTºÌ'„oÿÌ»ƒÔdÎô	=ììß}ƒ&ÉãîÑq»Ú¯‚p€Å´Ãğ¥¬ÂŞ¶†k]p¶3í‘ÉœlîÊé
-ö³ˆ@­ëu²ãxÑ,×Ğ::-Ûm“…;Õÿ±H:ÇLx…c/>4¥÷¢Ğh.ó¬†¿Cã-hK¤#L×j´Ÿ5ËÁ á¦3@¤ÂB‡}»D*fEˆËvQtÌŞ3-ÊâzLÆN„k¶×hìjì7‚CåJ6³Gÿ;
-ÏTé<ûÔÏ,ˆCkóÀ9Ô½MÍ×„I~Í=²ğíì"ñtğÖlÊ
--z{x‹8Ôå(ÑÙšiw­!¨¼…°'Ÿ~*Ñ`¤»% ÉÇËÜXª§¨Ô'¿¹((Dl~„´˜ØŠD9á—SÍÒí~`PÀFcQpqHJKæ}tÎrŒ …${N˜Q(ÓşÀ8û+nŒxZÀşúÕqâØ¶ïÿ l¾nH„ˆ»§pãûÆÙ_4Ö6;	¥İ‘À		‚PÒk87‰9hîÂÓ`*)À-<Ëô_1™·¹@†>ÙÕbpìªzøúO£ÇöÁ
-%³gé™ç´#$ªî@Ô_„/…AöXr›,7È:i6dÀ“è{ğÓÙÛFµ¯ù—¿};z¡U®´DÅ„~a  sâ Â‘
-8ùx<%ºïi=”\zäíèÔ¨|‘wîVÛ$×ÅxaÁlÁxµÓÜäSÆF‘©b“‹€¸>£É|(9u²Éº»eï9Rù|Ğfl@¨US1w»ù®m!£GÅyèPŠà01,˜«ËòeÀÛf·¹"Ã1Bºte r‹pU6p$ùLM$Â8 (¤yèUj3+!´º¶\¬œ@ÏÂÄğ€ÕÖÍF³}³Ñ–G‰'ç¬sÖHWOŞ=‚	à›ÂàÑ‡b ØÛÉß<ÅŠÌ’€îEØV¤E†nÊYc-'—ä“-I…áš’kN:‹X*ªÏ0åA>™8ƒÖ¢Æ}ºZIŠÔ"@)VÈ(ŒÔuyäù[ä8,è3l½'€ËÎì@:óÚ=b$<bÔJ£Úø_.‡¶ÿÓ›q÷hÜ£Ë“M’‹xdèºº×…YSÊñ¤ÅØº#P¬ü°(%yKçadM%5S/~.ùíÔL~5qc\¸À,&qåŠsªÑó€Òyá$2Ì_øòÙW1ÅCûr'9âé›bÀ3‚#îÏKœŞşùéKDGıËk8¹Ô§½„I2ì'Š3ç3fì¿ ­»i|÷6ûjW%m<Wc,q³¾"OFÙQÄTöE„²)&¾F2åäF›X:xï6ªKÃÂ3ƒ@ÚÈ½ÆW/ôÔı¤Ü÷;,î1š‡ä.cÂ(ã¿ÇÎì(5ä°Ú^U.}J ø¤:FËEíc9ç~
-JJ'³$C&ol±“Åb—]vKÕìÙT¬yu™cå›f=i–U9úª%ÀxR	K!çm£J‹é8X²$£œG,í‡EØâŒ2K
-éÒ|[:ŸMRÅÈÓ¶Hm1Ó³êÕ–]Ïôµ¸„— òíÔ‰O¶<óçD9"
-¦í(§Î!ì<I›òBEuÌ·-Ép¹2UÒ˜KÕeJUìÒÌ¶L•	$MÃ:P¨¿ç“î:E+":•­©,Í%#'×‘¿Í›œs.Pj£ÕH‚¨¢ïs—‡°1ÑDP®Ú,m-ìzšo´¦c+¼‡fÙRr^¦A¸Šq†”îWá%ÊÄ$¶~è—!$)ô£Ğ¼±ĞÁç¥ò”Hô^cI¤ôZaE¡´ßL;*ño–ª$iNè­âå—n}¨Ã›”:rŒìä"øL®˜¹„ó‘vMšˆ÷û.YxËDÌa¾ú’İ³ÿ8&“¸İ§@¯À ™Tİ4ÃØùéŸ—P±Ù^_‰2{c~ØÏ»˜`R¸vàQö2»­ÿó€¦Ë°DaĞ0‚ãtD&Å×	ÛYŒ„].²o+Ùb®¥o;î.{Q€+Ølw¨:ßÕ:L‹mW"ÛªAm¤|8C¿Y…oÂX£]¸Ùb f²2zĞ"ÜqäÆ×­½ä‰şK¬4¶`ŞuœıG®n«Û[¬¬5Í³´ÎHİˆÆğE+±Åõ{0GdÇüD'›½göCÌ¹‹TÉ
-û7çò[ÂËüÁ:ÖìÈãxí‹v©MZc!ˆ¬İ7wAä–G7aQË\²ÒˆÜÆ»ÂÿÁ<s4úéjzÊ))ºí	Á0ÄM©í›ğB?Û¾ıÌ·,I_4·L¡GôMLTÂ1õ.í90èhâŞû3Æ &Ô4tñ¥-öÚP…÷É¢Â-°|ùÂ-VŸûçŠ„-|r\+ş váä.^nz(•IïƒÜ>‚Ûš+î‘to‘ÙhAı”&ÌSÜ>lÆw/ñØ“ØXöÚHŠ–¢Äz&®˜Ê‰Ëâqş­ñËv5	B“ÖëÓ¤C&©ûÌ¶ë1ß?Àç^a¥íx0¯²Óºk"rÕ¿ú½­0½«òÓûAJP^œšŸ¡Še=Óéì%¾´%ZÚœzêâtâ×Ÿ3ÛÛ?õg¤ªù} ?³ò¹ÂÉ¤@iÙ¹| ã©2‡kòsød4ü!{£wö¥¹D0·ƒ7dKf"ù,è¬Ñ|Unë$=ü9¤¶<Úùös¶Ş÷ÃˆÚK–ì
-¿9†;†òSzïüô‡Ï¿Â	5†òóù˜±A©Í*&KÈÎêæÈ¾‰é~–P•F	ÉL%[Œö^iÉ¸èÂ	öÎşÿQZSÌ:ŞÇ©ı2N²?Òä§ï~æÓ§šÓË’Ğ’•Ny2ıJ¦®÷ÈA_=ê `ô›¬™=1¿õÂÓpÂŞˆG•Á†f÷,ı#·§úCnPäÎ|ÂşÍ'|#2lşâµÔ$—;ˆÁ$sÖ&×³¢¶_Ú?Oyïœ“ş¶Ì©ÕH¥Fú6©ğÑÔË»aÉT™¨ÜdãykÄº²²´º¼tse©QkµŸ!^MöWÔ–Û“êØ:©ŒÁó¡0|7ëkõ^_\@¢V®ó]kKWá«óJœlE)šÂx‚W­àGG¦…pƒ“EíÉã6é›(ºÂê‡Èfc_G(åÚUjñ²âfŸÔB^á4Zã¿ªË’}øÅ™\{«Òí‰/8öQ;f]´àÉ§>‰`Wià¬l2"Y¼¬ZVüšVeXØ6®|’]<vjŠ.¯ ä¨*]ËúAiÔ©1+7ìÒR'[R×t™õÖ‹óg“F‹´²+¡ê’Š.Ã<ôäUZ–Bã’å”Óh’Û¦¡w÷STÛH´ä{Î¾^}º,[.è"ëÙLX"\Ğ¦ğ:<ÕyŒ\”˜D¶¢š­:¹ãf×Òñ·¨uÉ6æ@ë‡ä®s¤T°aàyaµ1t,0p«.8êQÃN*Í‰áÃœLeÕàò½"•šg1	k×SşÉ0„ÈG”0H@£¯şSğ`F\Óæ¾¦ZEq.ÜÂø^Ï^º!óöúI…TDÈ-Ÿ…ÎÒ“µĞOÆáQ„¹†ü%nYœDÁlY/–†£%=Ìñ‡³à«äöq;¤JŞEê„çºÎ&[P`……[ÜtËóc[Â~ì-£-ø¶¼ÂT	*ËüäúØDöía_Æ ™äÇD W$ş!ÊëêV Ó‡’§‹€ŞÙ¿UÔ¼Õ~÷YaFÒİDBÙ©Ğº
-!÷q…/K%zæßô†n¹
-+"íb^
-X«¹ÌDH'_^Í9ò¯r…øƒ+^!²*‚uBvyO{‰lı…òéÿLƒ_.zÌ‡ ĞßÙ¹OtYx˜'ø wáIÒ/M°é(—à¯í~-"îëB/Ø©?òî2haĞ==K[Bš¾dSİ³—&	P×R‰¤ıóW³…imÿë÷Ø®qş
-ÉÒ5“AN|3¤š†¥‹•áñÀóìÿ‰6L	¬e€İû{Èé)#û_‘pzJ¹½óÓ_˜ØéĞC3Ñ|aa˜p4Ø‰n\wÿBƒÆè'C-Fd oş%Ì¡ ÖtE•¦xÈ#yh³ÌqqYaOµF;®½k‚Qç õ›ğ«4Ëì^™^©N-Ó›Ò±åºÄë\Õ–¦­ƒ+»¼zµûT;šäHÕöêe¨`ışšôÏ_ıñzš¨öíQgÚ$.h¯ßÙ¡şµ!øw†»Ã¾á­èÑ?e?lœq¤÷hË±Šp¨z‹$ŠÃ#§_­Ô%*	Hoá"Ğ\W×À ëRR…‰ÈoÄõœ=Ó*Ó‚Öíê¾ovLËK´åS)Ş®¹ºgt4o‰fz´*ësŸVe-3®re«øPÜ‡Õ&&ÁéD®ZÏ¿Z;ä®m	äLh® `¢˜<7Ó­Wóö-İO¾È¼ÇšPäZt}OHƒ‹%ä%‘X4ºé0V¼ãäĞˆeB	à¼	+ü_G³¢rR¸ËUR±Ï¾8c’±¶f…-/çRg—ÆZÎ¾hŸÚ¤>l1âi!4Å-]ƒÖÑˆò£X-¬ %Š—®-pª) `!nÕª‰Ú„Frn¿U¿Ã–Ó¶§û:èı¬ûsz7é±ÈªE‰QÌÀÚÓì3xn9}‡%¹²/îi–ÉN{kÔzFŸd–l2ã"&ÈÔ¬““ˆÁu4²s¯B­’¸´™}©~d"M"#xuËkí%¢ÃÊÇJ¤ğ×£aPÉna<)Ÿ-¾àGD«e†ÈAìv@Ÿ5“9£éã¢±fGhu9OqùÄ~¸UÑªãHµL:“É¥¦^<À·Ï±t¢Iål‹“SI‡ÉÔ@Ãè•‰G‰Bçhá?GÆ¢ÔM­‰é€Y§­—È'Š œdXSJ¸Ê‡Ú1u Ìü‹'©B<> UNyÈ+„Á
-¢SéV­=ù\º8c¯(z:IjÁ!IÃª%aX-7H.íb1š¬pê^ò t¯«÷ÌÉ;gñÑPáxËhjûº\>²Ä--v~ƒ\€±õ"Â—|2Ú²Šù‘ÁâjN¾	ï;ù|¬Hë¡Ã9dóõ¡ÓÓ¬¬À3AñçmÙY»$?y$#~Ç´6e¾gÂ°èŠ*ĞG#½5¦óğÂ=ÇTûî0OÿL˜µlO"®<?YßĞ5°ëQc6¬çıécˆøeA¢ñde5I`hÍíØÄ2÷õpá®“M”¨¶#uùš³İ´c\q¾’ãMh$ø,	"ü×ñ·zGTVó=Zú`šY€¿/FÃ }ĞÉ..\xßû!Ô†,¾c™=xu[/€Û”7$h+If (¨é²,z÷§ßë5:İ½½gi-ÆaÖ£UÙL…œs°>GËMÇ„sU3Ø¨M4‚êk@Æ0‚26`ÛË,»BKò'Tn²_6 +ö1ò>2†yÇ´P·¤åä‚öıs9+E·ˆ½'êî°„?.«xùŒ:]è®ÒE†M“ïïİT2J$‚ËìØãé÷šİf§Õ|†Èè!ô<Ç…ízè1ªˆq!MZL7©j7‘Ò·úáM£Ô‘5÷èùr˜<²póæR³ÑZj­4—µ&&Lª­“Ø/Â†™ìamÊfP0JÅÑXüh95È_Ì²«ù.®ë0ãœˆ•—‡şz#*ˆ4P¯u±´rxÁ-ún q0œÊtnTÈÄ'c^C†X¸.Ö¢9ÁRz–ØÉÖja·t5—î†Xİ‹3u¡S¥Ë¶Œùæ±÷o°Sµk8E6)ÉtVÃ¥AÍ¡¦X!ñø¨¤o†ûO¤§C×-±iïJD‰$ÀÉ•‘ÊL‘h¥R$ÖÆá-£˜	Uhc Ê¼ c3&vT'ğè<|?õ¥Šls”àè£…—áäp™q%¬ÌĞ‹­ÑaA‘qÜã¢hÒX÷¤8<•¹;míÀìkãÕº–évÍëÕ=xß]™T:ûgöM[³>ò,ñÄS	nĞ ÚïëŞ®£ùR«Ğ4¾†UÎ±Â9_Šãè²Â~Ş}K8ßZ¢×ÂL¦¼v@ÇÔ=âä¬şô‹¯0º™•ë™´’:§1K‘§<˜íä»XKÂ©t¡)x¶©f²ãY£4F…ì&ì™èãe0ö±W-¬Œ(Ëì¸¶~H‰Â„’Ã!X
-¡ÂéÑU Œ%Ø¨<sÏŞ•4ØÁĞHqàİ@fmG¶ÆÜµ]{Œâd´2åE÷ît&ùi§³¬fdñE¤x² 5‰µW`¬[¢hhş±İ%²&AàK‘«nÊt[¦<ÿ!‹å2(ÑÑöc»_«‰S àGŠfœq’xºïÂ:Ù Ú¡fdOº†Ü{¨Û>J]îXN'înÔÿ~+^Ö>ÙôY¸–2û|ôøA­ëéZ ?¢ü{[Rè€…zCîé=§;D?<ìÂ»Ì+_¨hbä¥ÑŸ\Ãí
-F3ùîƒz’ì}Z\¤n&¤æ»–	/[«Èİ©¹» {Óíèy·+‹O¬\¸k÷«…³è^¤ü6ÈÇoDÕ<İµ´®¾PÿŸş÷ëı%Ry^Y|ñüítà6÷:Œø‘ï“æ‹ÚÛ'0'/>–é`,P§w\C¡İÛ4L«·€]—ª.*`¹Õ˜ì‚§ÀPì.NO?pöS‹dMª„f¯ìòš)ç¾ 8÷¯‚·dVİÒÕ@Á’°Ï¥ö™C$æ°†6Şå©gØ¤BKôÂ”z©ıÜÚZ7Ì‹Mz4)á3b}÷œdÿEíú¹œ\?\ØaÊöxv™¯Y±ÅÙ(œŸşôBİa‘k/ó¾8;UĞÀÄ_çµœ{Ótà°KúUä#»;ã·™Ç%‚hFä#½#ç†qü#½ºš÷€|dkê@H$2?ª®" ²E‘Ë«‚ˆÈ'w`DŸ çF8„ğï“üv+şé5ûøEtÍûĞ¥­^æuµ¾5úöE–šÌs8P—’¨¹ LQP¶Ù ò²²3ìÀ¬„¿Ûâ¿†(°LE1 7¿¹" 8¯Hû‰sš¹8öCvÒ£ï:`b²A¾üòå[³{ü¢ó¦dë~xW¾»_ŸLš\˜$Ç²äÍêş_Ù×ó•	r—¼ñ`”­£{òˆ\³îWXQ6ˆB²©‰ÉÙÍÅ“¿ÖÌÑ¹Â›}£ºgötÌZ#®çô=Ìb;ĞÉØ»Úa=Š|q=6 Gî:`pH(x{/Yİãä-ğl÷Af áæ%ó¾R€ƒ‰‰GÒÚ|µk„£zTEØxk„&xU? ûÜ§0òIu¥AŞ>Ii*Ó˜èÁlë,@RÁ„Õ
-Ÿrš½ôyıh4â§G›à¦1aU'¿¾­ñ¯oö6*áãM8"éiäÑ*7FÑVqXm6ëÍŒÊ[İëÃºÒ¼®±ëĞ9‚®àc¶Ğí©íw´Ît=›R	³ŒkzGeñvM·i½QJ¶'=]YCˆ7Èè›ıæÌE»ÁÒì’¤iMOJğÉÀé¡¾ÔÌ4B"ı¼ğ}2¶¢IÅ”}Ìî­Â4²ùyûdlP³R˜¹m
-¶6ì ünB±,¸AÜlg©2nÇb×óûVxofO´sÉ?2¹‡aé*,ƒá"9qn·xÏ†¥°NZkĞXO¸ğøWæ–8nĞd&_Æ”ÍÖ³¶îi«§¯¸›êÕ§Íµö;Ï
-R>Òµğ¼Qƒ{£?cöåv{)ú¯Q[m/.±‹«ìºêÄË——Ï±GÏÛxEq5ìºÆı_íæâ³ˆ5Úö;º%—ÆÓúUD–™v„Ä$æmgüî{ËkŞŞZê·”CúéòØ]ìûè rÁŠ¡MÍ]Æ•\CœZÅ×_¯×±†­Ù­šû¦V³®ãì›zÍÖƒºîV{ºS§ A¿Şª·šu¶r£æÚı:2úĞ™:î-~Pg ¯ÀÁ|À¨bø¸Şl4·»V£µÚ¸Ñ¼Ñ\nŞhgB“åiğÿìxˆ9Fñ¥{ÊîÑÒ@xı'U¡¬½%WXÙÀIIÜÂõ*lÆe"˜¶;Ì*¡ÄêËax&ë14`n8HMô8ÒkÅÖ­L»ú@³† q˜ºûáP÷³LÇŞ„6úhJêq¢Æè–½ÆÎòk´¹L«r@ª€CFG«›NÏc¬_w†Å«Ñ«¸wEö1MÚ 1Äİ–9°[¾‡­‰L?2yyì“l3\¸q«äYà	ø`3U“[„¾='÷âÇr‘Âü [F¿ó‡¡¨$¢¤Áí¸ºŞ5ë]§o›¬mƒ±ÀÂ0ÈbmüÎO?¼õPïì›ÁXÙ>Š¹GÆ.Í?şˆ¦¹¢x±&ò˜¸›k²c<Æ¬>y˜{pÇßA 9x¬ûC+ğáŞ=Íòu‘;Á¼cQ@nqxk3ï¶äñÃXç¯W‹¡ãá¿ĞëÑô.±‘pl¾tkª÷u:™“l6üpìÃÛéİ5Öšÿ´ñş_£š«ë™n~’Zì.l{… Ö¸~x6Ş3°4nÓ‘ï“
-a&ó¤£›°jJØĞ÷ï”ß¤ÒÔYsˆeï¾v¡/©'ä6óBlê`‡Sfæ’½{€Ti¬[löhƒ²½zA`×Ôs*všWÙedp=JTD(i®xD;*—Ö7±ê RMüÅÌ=ÉË‹d|[x¢ä"2ÙÙÅèéƒ¹$½¨$kXuzrªvtÔvö§ÖÄzõŸ´0²É%FP, ö¡ÙM•Ü¤;ãJÎÎ˜¿/æo‚B›Ü¸}=Ñ‰hjø;óÒ’³ß›ıtAñKôÆ²|­|Á¥ª§ïi¨Æå¤êşùéïe'eSåòÍ“šüh Æåcí›G.#9YÜ ø˜ÆÄÜì/¢şßÈ‡èLblŠä¶MËZÌD…ææ›ÒÇ¿qÑ”h…kôÍcˆfNl%ŸpâÎá¦ãšzï¡ƒ­eOå~!Z¥#]°œqF*CñŒ|:sÌ¶§õôª™Ÿ¥˜UÛ‚±ˆĞgè°Ê5«WPšåõ³‘ CâL IĞ‹\tA–z’ÆpZãÅEÿÂAmL M?‰ƒÙ¹fWmÏDßdÊ*®l8áš°Ú^/ Ä[¼úi\¯ï->ÈÑÊGm²Dê ¶z1/Âô™‘ †´éß‡Œ}…­@Ÿ&¢¿X#]ZĞšèëAÔ+ò.Ş›‹àØÂ¾°k¦¿U{›œ„·bš8œ·ĞXãyÍÅJ,mœ€u_ì(M†ã‰¡òéöË¥—²Ùyb<¼RnQKü!Q¬ÅÑnÉİ%e4}‚‡ß\ÍE\cp„VÚŠOF¸i
-o—©p$¨…hl9UKai·®ó·ÖWÛÒu‹Hk™)À¸«kCÿ¡E6a"œÙu+0]‘´RÕ:¾c)+=¤3ˆ™ÃÕf½E¸Ôÿ#úÅ S]NĞn0­¹Úê<«ƒ•%ÄsĞlEg£r64˜ş4Ğ{æp´U¢Ğ{ƒÄ7YÑw.÷›ŠÏzt_3™Î~e‡#ÏÆ*•Ö¸Ú².Ñ2âÛ9ô4—XòàRz˜ÆPYZGHvË¶ †º`Îª”÷)œ€•¸ÜxØ<HL¥ ğSìxï ®EøôÇ¢D?[=‘È•E£Xd%'ŒëIÚAº‡s"–Á;ºgäh´En‚JgÉ;ÿ?æĞ\şúrŠk/\t}UQ§q¡üîK'ü6ŸkoóŸH|ÄH3bŸSlşéfšÄ€L`a3kººÓfÃÌ	µÆLÏ	  «alü:wŸØ]"×È¯®¶,&Ú¢mËFLÛÔœ²ŸDâË-Š“ß>á§ói4‰¢[`²À°åÁş@ãçüa1½âûıÊ‹	œ%c¼;o´$<rÄW‚Hq˜„·¥UÄˆğ}47N8;Zä.J#·Y•äƒ)V¹.#ÿYOde®àMgà‚†³ÎÅèæÒ%?R%æo%&¸î“EEsäNEÌ8ÑOú’)~ÑµÍÚÚ3AÉ"ÕJ#z±X˜X°©ˆä|LèH^yÌüøFFp.‡>Mûl2K†¸‹	™ßÙ½Œ.¨ ö2š¸¤ÂcOÖ„Ï¥Ÿ›3¦ùİÉŞßÊâpEüš“˜ª(¸¿@¹ÿºBıP
-&Søÿq—EØOQ«äU;xcBÄã©‚NşD%ËÅ:â£8¨"ÓŠf$ãœé>y“Wêù×ç+ø|ª¢¸^Á	X,+Ï^¿ø„°±7k1‰‚h„pB4¡{ñ²äâr‘áCóu¹q…	³?a‡“‰"ˆÆD#
-Áù°€L@`òoóóÑ–—Æ÷"áóÉÅÜ›™qªCwº`rô#÷	Ëìcæ‰Èìãsÿ?   ÿÿì}ëoÇ•ï¿Rfì˜¼!‡óàP#Y (ŠâE2äˆ¶—W›3­™^Ít»{ø0­?A°6‹`±X+†$aç*‹ˆöÃş?øŸÜsªªßUÕÕÃ‡(›G$gº«««NWó;ê6‡Zêošı#üªıœcäk™÷§4ì5Mú‚ÆüiÆçğJÓ]i´Kù¶ÚPªÁƒÒİ)£â—
-r#cß¢F»òÖùY¢q¥4b“,t1#$©Ó¦“ÍR	f}ŞëF ‹¨ôE
-s=î”`•NfÖ°*üDíø* ê"ñU <Öb9‹O,Õş:-Ğ‘.ı²‹xÅ­©Y¬&“¶ 8ÊqÒ
-À«)ä:·ğïj¬’G<2GV®#Âb§æg-´A«µë“³søfxƒ!×ÊS¯,ş£ä¶h¹Í®)	5ÆŒ‰,ÉÚÂxÂ4f‹ø•*B“!¹%J¤áb@Ğ>EljY.¼Y÷<XÕ£1"Äq¾ÑØ“¤“Do‚,Ï²1gG)
-;}ßG_Ù†(CšY6aMœĞ¨0«É²š#– gG>Ş÷ v &K§8Œ¨8@zÛ€/íñÌ…"z‰f'ñIôÃÊ£tqr‹§$Wg&#5hE?’€ÿ×tÍürÆÌß©T‚ôÉÈÄOİ…Eâáw"?rÄğŒßô)A§$ÉædêË$¥Ü‡[õdñŞÂÚÚÒ*Y]Y»OîÜYÚ$Öï,¬êÑ-„¤nZ_éT¤«E³ùÔZ€Lë£Ó)³gËµÕÓ•=vhF;ëØ~F¬#%¹& á/ey”È%¿ˆ'(Ÿ ŸôıI—ƒÚìÔêtrƒ¿SJÆíü¬Z©<©Î>¢µ<"é[Á;3—ö £à"S\ 9*6;#hUpw*sĞ3’tÇK…<{ĞÚÆÉËçy:ü³İÉ¹l•[­jX×‹§K:Ğà<ôÍ‰†Ñş¹‡EËÿkxáp8nàŞğKÔ7øÛ>ÑÏ¾ã™4MúKòâoÿ>n¼ü&{òps•¦M=çÕÃ™wÏV|¸K–éÔ±·»=¤evD²Ğj1îÅÅ¸R×ªm…‰——¨$²²a9•9nPS[°~qÁ$ („3¤0t%îİ5¶>ÅÔ›T:áØdÉäh'< m¯%üRkÊ6¿OW›Q€?ü›{œ'œ7ã‹ˆÓ%CŞÉ&/¦oÕI?q¦°0 @!	
-Ä6~<İ<ô‡JÔ–­Ï¢ä¯³(XC5şGàöÁÒÑLÚ.¢™*×â³êËLáyLæÉ|àJüÿ	*À/Ì0y»f©éô¦ØfÚó]Óè•zµ °16åK«%ä>Üù“£{®Ü;¶ócÜ‹L[i;|Ñ‰É3³F›ö–ñ°rDê£÷ı6Øªµz\ãQÛ‘ 96yO©¤ä¾K+XsÅS¼Áù©‚Ì­ÆF›¾/-07O>3>Ö2|c"åL{{í_ôº¿lvfüæÀ257ùNm¾ ğ…íİ|ù°ŸıııÒ~­ä¸mx!x+¸â]²g™û·ƒ›ï–Á¨ªÎÀïâQC÷æ»øJïr¿ñÍwé2Ì›ïVÃp:›Fÿæ»t°‰ÿ¦#øüÚ­ïti-R:S0ÀYrTªèÑ¨Ì‘ëüªéà2ş'~›øHv€MÖ†ÃÌ’y2FKHÂL0éÁjt;¢òÁ­x“ÆÕ›&P×ÓCü]r“ğôL’>ç°:ilm7¶Çâ›"nI÷™n·ŠŸ0Í¡ûü¦±{Š!4%ÕU
-âŞè³pï,fakqôà½§Á«ÏOk~ç‡ïxn·Gâ¾Çº!?'~Ç¢U·áßÁéÇù+D1o"üÿ:Æ£.N?M°zQGÒïŸû0C†P¸jDò>¾µ¥÷/o®?ÜJF.R¸Øª•%‘²—ıiœÿ'ü¹Ã
-jí—J¥Â¯}cšéúÚ•@Í`±¡ÑÔH¡´râw$¾³‰’AŠì+õŸ÷ái”4$"GQÔç©=&}±5—,¸TTšQ9†T¾Ç eMm¿Cïøëy¾?7±j`[vkB‹¥tµ‚#•BËµØè^=öGeE‰gW‚ÿ&Ç)Ÿ«ÅîĞª9¹¾/©7«
-¶ÎC’î%O<Æ)¾Y¾±Â£a…y`ª.@h¾,¨0™¤cÎd¶ÿª­§P©mY¨Iµœ‡t#ŞûøË³ı‹äaù«æQG®xÕŠÌûÎÏZåİæ“'¢‰ßùY³jÌ=¹ş(˜ù0Å8¤Ngõgµ¹Šy­ú(J×îÂğ3õ‰Gú³/?-PO¿0|öÆ4zÔS§R’}ªsÉÍ¥ë¥ğ\rëı•Æâ½•µeréÃ…;EO'7işŞÕéäÕé¤Î¤ŸÑédõN'ƒô”ç“ª0}àŒ¨½Â2Ÿ†ËÇØSÈGmÜ¸lˆ·´L„eÎÏäQ&ÏDóÁ<Î½Md‰O–¯…jşéN•¹ªïY­8[N}H«Ò®,¯4€ßYÙÚX]øl, ÇÎæõ¤	/¶²ÁŠcê
-aœ´Cÿ<û´vĞMÆà }{dq	”HÌ[Ë%‰âDOÃÃ]‡dğ¤»”UÌŞË§úÿ6jı’¼‚€IbˆšP\S¼ŸtgbÅ2	¯7UI€İiX­iX=[u€h­·	•1d˜,ú[\b.PÇŞ{Là22Al°hÛ!s­cysåe·]«EğDJò@ç¤öIHy	rB™ßG; sª“„ÎÌ$yRèÚ$™›$×1È.{@qÆ”T¦ĞŸ)AÒÃš|`Q†K^İR×´Û~‡Ü 5UN›©;chÆ”ßQŠ¯«ïC'g×5ïá6FÂÔ‚9å£Ÿ¸¼*½\;²y&Ù,RKXKJ™Y­€`”™ƒyÜ0%G‚z™Œ¡6T*¨º¤‘xcq’£“2šˆ]^äZ !«K›äöÃFc}M™·›²úO†´%¨üé²U1MjQd,÷`ŸUÓdûB/ÿ:cÏRéÈDÆ±yA9d&	µ»×uöW1*0‹›)ÑòR¤)$ÃZÚ\?K*³Ş‘9¶¿+K«¬	>•“øhGü˜y´h{”G$ÿõûCüo¥©‚§õI =§§è•¦±XÁÊ¡Är›a“¢SÜ÷M,VŸÙm}£µEKN€n'ß0¬#úL³µØÁ]ìÒÆ¿Xí5ŒJ³£„¡mvJü=Ö½]Xt<M‹Æ-­cB{NİªD°ícÜÉŠígn›$•ò>Vqsìöô<ÒÛ%·’ÅD§TÉë¶èç:vWnñÉX)LÅµbÉH5# ·F,7DQ6â>«ác}ìı¯y<5µú±²Ef–%©^M¤ü(.oX=Óø¹	¼é×Ä‚–rë ¬'Ğ-®¤QsÓ	¤Èırà¥ÏDF:â8K©$:§™…õ ?6Z
-]+Õé)té¯3''çrFrwa±±¾ù!Ù\ÚZjÅõµ»+›+ CÜ5š¾ãnšxšÙğîU&×œ•dpø¯ÎN’İ\¶Ì.	¼Ğ„/vSÛqÚ]0Šp‹ô;'Ç_7Isø¥…Ñz/ÿË'mŒ‡úìSŸéçƒÕ3ù`=Ÿ†¨xûäåsFöTÌ“—ß5Ù›ô0`Ï¦¥ªäã¿EÎğKƒ~ÏU“ÃáŸ³‡~gøm³3Iº'Ç¿mRõå[Ì:KtØ>Ç˜¥?Ø<h—Ì;yùìş·ä`øÂ 1ˆóñßlÛ=ø”ECş–~úò0¨´ÊÓñgÁÍÃçÍô½Âd4QõŸÁa›Œƒë¼&.%$²S)•k¹	ìğ~^äD Ä	QKPD¢œkù­ü’”äB;1yçÀö±”­¸^abxº8˜³Xéâd¢n£(‘1IÁ_hQFTcÚéğÚsQêß¥­•å5²õáVcéüõ`l¬o<ÜĞWûî€¡vÇô¬¶½uè*s¥ó]ÅÇèLú­ã½öìı*+v»ƒ¥9{„í¹ ¸Aÿ"´7Áˆ^}>üÃ!é‚úCû}”T%•,Ôuv‡ÏÒ;yùÍ ŞÔaeFC5 /¨&Ä2CÂ¿ä}cÏÌ–ÏZtz½ø!Ù4Ÿ '½¥ä~Õ¤ÊòWªğuP#Û£ıb€²øò…İ$=zS6Š¼CGíKŸşµI>ÎçGÚäÉñŸhğñ×v[K]“ˆ}±ş%d¥RåKù})Erı<BW‹:ò|ÁUîhßdP$‹ÏEì®<x°´¹µ²½D¶V—–6ĞÕ²DÖ·—61öIKôZŞV×4û@"§Cyº`a[Ñ@üÌÑˆJV¢——¨¾ÉªË‹é4 ;ûîòÿÄJßÏ­·Òå¢"Eûõë×(n&÷JRôGØyê8®Ø2ò[Å•ZPØq	„xlq•‚;ÍÓ•fÕ‚”/p@øn€²§f½]ñ67ñüªP¢ïOÍ”1€²"üå©a"sZ™–QŒ¾ª”ª¨ÑÄæµ:WuğW¶“™o¡]ÍûŒø€Åå9Ã+`(¢ä_¥U='Ï&LÁ4—3È²[VÛ	Â:¨^| HøùÉGšõJvÖé|³™?ƒ9—Ô&zs¾?UÅ˜çj:èYà†¬'Ê.”«‚Ñl8ûÈ´‡C¸ŸxwÓ3ùØòàÈEšGØ²<„2ÕØÚaÂ£h£Ş±Ú–otYŸ{†k¶·X-s×p)º»¶*
-º‘P§Ò÷§æDcéØ•”]+'Ãİä&üƒ~ßt›@1ÂÜ4¼şÙ€šêT¾ÿ‹yMŸÓòó_£r}ü‚ªÊŸ!òÕs»Cµ¡?¥İ½\‘NEò£ópG¬l.-6†€ß^X¼Oîn®? ø]Ï¢Dô¡Û½òE\ù"t&ıöEŒvŞ¤Jà©óQë¢g
-ñx•Ás~<gé]úÀŒ ÁZB|¶^¥,F¤rƒÁb0—ŒN¢~\šu-Š;H}G{ ?BaÎñWêõgÈ.…h;Ã/³ˆ6š…v.ƒ(ÈCS¸@f¼É@”àn¹Ğn9¨n‘€áeoÑk%n"0‚;ÉÛt°~D8él11˜Æ´¾íô¡¥©+ù®ÕŸ‡²O`t}e8‰ßTÄÁY­yò{ÖàÔÛGw@ø–lg|â™ü
-v¬0X.«Iî ¨#ÏñKÉo¢åªà1I7·â)]§í4`­àõpğÂÛíyé÷„`JaÛîrbÊw¦v]òÄuz;KKf]/—¥{¦
-ÜLE†ÆÖï,cCÂWvw˜±º2ÜmöêsÁr){µO¿°B©ÀàŠ`ªK¥Ò©£õÏÌ‘}v^ëïÌ=ÖzJx(’Šj	ÉÎÁ6[^Z[Ú\h,‘»kwÀ,[]_^ß*$h·®Ş¯â_§6s˜
-oŒ–pnWuŒ‘é³KiÑyT}>ÿ¿²ı‚Ïuœ+´±D‡ôéÛ#7®Ú_O_ŸÄªÑÆ)9v­N&ßW(;¢SåVßpŸvMO©S}H\²ó†¤çù›ÓØ–Mx[,ÁÍ¶	Y=4ä 6¬éç:îd+ÁP¨F5p)Éˆ.F¿’ƒ5§iäÃÉË¯¬x´*ËhußlY†pä¯±ÿI‡´C›_ChXËN$¯,E9,Gà'ô87ô´§ó‰©–ÁÅ·‡CÃÉñwdšlÿÚrÌ—_…ŒÏÍ~Bett=°l¹­p7ì)eêÃ#c{Öù”Œ‰+î^ÁZÄş€ó0ı“œ*aúóÊLIYP B3‰‹S&ƒSÉÙ’l[¦–6à8nB¯ÄÖšz~ö¬iñ:B«…Õ<ÍÑLtmª˜&?M–ìv×ò:‚ákq`×ËÉ
-èyD]£8$Ï«ˆD¡r(´évc{’Ü±<Û<|Ì½“äŞíõ`¸­ás›À®zJ³!şxHOÿˆ&>[Ú0Úfò)¬ˆãC4é“}–HşrVsa®Gÿ)T@%KñqúMÉïº¦ñ”ê¹Q‘
-1½¾ú<A@º1a^VlQ†ŸÄßu¦,Û„¤H¥D3¼÷-¿3>ÆË	ŒMÈ³ÈsîöèíROß­ÔıÒçÉGAwæövL3(iäü·ğÇô¾õÔš¦erÙoÏŞN½/¼ÛAXäÇ”KÈKæÊÀ§äÊ®ûId¥I¡®ÓSµôŠ!´HÑX2:j ¼’>ú‰ŠÆ7‚¸'6~1€> p¾Ì˜R ºs%	I@ôè–å»]³êe}ÍÓ:<#–¿ÑÖ
-ŸV¯Ç>•<›´*-ÿh·oÒÒ¶z6ur^%Ğx°®2nsÃêµ¥›«Ê‡\8‰o5K¸m’í4ç©e–lÓŸ6ûğ’Î4­ŠâM_›¾V~ µÙq!ôíö´kîYÌß4õüi6Ï¾ÃŠ™LaÖìšrùVs÷fµ\-ÏUëåkÕ™JE^ÒË¦ñ×–_•õ7¤ËÚ¦³×·$ÕØF¨º.­ãM%Ã{ì!!MPùT‹“ãß@Ÿó7ÜÒ¢Ïå•Üåë/v+„µ…Î„ø{„6<ò€†,@¤yÍ.ı­‡·¬4Èİ¥¥;4Üª¨3ß4[èÇ¾rç_…YéLúU˜Õ¹…Y%¶âUœÕ›gÅ*È’`í2£º˜«å“ão)˜ÂË¯lLËûW+uÀ"†ÛÖğe‘¾J¹ ¼?³ø¡açæîù'Ç_ø¤óÃó4eŸ6Ê
-¥Yv‚¢‘MØÓÂüÅ)@Æ#Ä
-ÛÄ­˜D÷„×]ê&’œÃ`{õ9Á†‰}H+,èÒ:’!ÌAÑ–¢Ó‡* ±QX`ìElÍbË¯—‚-Ëë‚½Â–˜Uş”„[!S=¬1¤¿GfO%´³ÂÌ ƒG6b9RŞ$Lé·ñ‘}´Ò«ÿ´ét×#oËº°ál7É“Ä$)oA?ã#‡fÁÉ)4ªÕíÆş–¯kó$‰˜áãÓ3Ê>d^lr•\Qò…áô
-ïºª\’£Ç&¤ß•n!´KÓMİ@u…Ûi¬18féc’òXd¼>]ŸOÏ<t?£˜M| å²ã3Ê%]×”‹ßş…¦¾ÂñZÎc$ªæÓåıáŸzd¼šÛ?%ÁMLo©à-çìJ»Db¸¦è,4áoç5ì“ãß[ÀhàõÛÃ}2üGàfOˆŞîÉñ¿Y´@bÿp(q·Îv>±ü¨İ{7vÏh¡½4Ù,ğ±g¼ƒ—;¸LYëŞËÅ‡÷Æ×+7¶7½VjÌ”h¬ç‡ŠL†œ[@KO?tìßŒ6*
-6İ ñÿ/bde6L|‡\…›a¸iV÷¿t>ªÆ½…µûäÃõ‡E½S	b½òN	½S•+ïÔ›èì:ÿ”>‚Elz†U4¬f8lÛ5M;gÈ>¡vHe¢›CBˆ¦Pb Ì¦¢¦Mô„äUá„ÙÏ/ npørü@½0Ã¯òø´ ´–¦ÇèZöT¶ç³0ÒYym_Pl¿£°vä)¦æÑQ¾ôÛ¸‰~€£ÿ£
-î¿^¥fgø’B‰ÿ}N/¿Õ\K}wì4|ÖyMÁDd]IÅªIUGÓ¡hv2biVeĞØYl’¼”
-„.H!®İ¥ÿ¬h'i¬“ÆÒVƒ¼¿°½´E×<x¸¶ÒøğT€ÕÓó·nâ
-­úêëÇ©(¼iÇXÂ-yuœõfg-vĞ±ùˆjƒÚì49—Ší$îŞ­Ì€OqÒu(8é
-CÊ¤ĞâÁ;lêœ+9Ç\%²ï‚b~7;?|o¤NË0é‚Î]ê¿´ñ«_˜0›Y¼;ü;­‹‘‡¯á»4ƒ#¬ªVâ_‚Šõ­İ!ö«Ï0‚c&nÍ<ÈïÿÜCıìÛ'‡ë°WŸèQ4Oÿ‡ïAKm“®aŒbMcB-Ê/ˆlw°tæ|ç4°çiTMÄÜIı£™İš_^æ›ªÒl®buPF@ùÉ;®ù$
-»Ã€¹©=\…LTÓì–Œ~_Xoz¬o=½Å~*ºF®9}Ù"¶£Š`ÓÍ‡\:è3‡e×j£6©òvP-¶|Ç5Úf	+¶ÇÇè»=6ú÷P^tÇ&Év"sijçÅ¸ëØ)# ´_€³skßò›À}İ¯ÍÀÙXo¬®,ßk`íë…Û«KwŠÚ1[}Çï¢€¾Ã¯™sõxf-æ'S™Ãï\ƒ›}Ãéoá¾iàŒA¼ğÎšÅé+ëŒ\´uöI0ó3ÑÄ‚1T±B®Ø®Ğ2W^2“/\RXcZßÔòÂô“×iäEãÚ
-Çe;>Ùw\|9âY F‰	‹uŒd+è™XšªG×ß¬D–ØWĞ·GíùyÛÿeğ$Ãnİ„…=GUF¿ÚuÀˆ‚L;ò£kdÓ)<±¡Á~Ìlâ?œ•Ùtñ¼ åñ¹WèÎìj¾H[foÄeÊQ¹ÙZŞ‚ÖIÊÖŠwhÓtÙ]`'Èòï
-'á.°(ïx­‘¯§èRQ³”íI¾›ò(b¡¾¹›ãÔÔñZ}¡(=CÅb×ñ²Ì÷ufm2ä´­‡ËËK[£YmÒÈ­A»mzş•™wçU¸^·y÷0Øß¤ÀÅ‘X-P•:&qØÊät¶Á˜‰AğQHYÜ±Ş7íEÃÏ•mÁ¥°“a¶t/_¾kº9WgMÑ+[4A±º%1£´×J Ş›²YµLT´e©uŠìÿ	†½c3ª¦15a$h×B+TKJÊÊòWb[—ä™‡’ùËZÉH™´wZR.Ú:Š¦¥	:óA §ƒ¹•ã1àq]Ÿ#èrp„Ïí[öSú».Z\W ¥„Š‹-Ñ… ÆuÛiÕXdRKòHîó:y¬ô²ÈÙ#íá_Èß§LÙ%XqÂ$kã Øˆ‰HÆ¡2Ç?¢Awø
-ğ™kĞ÷ u±ŠŠc9â-Ëy“¼ß]4ß4»ÂçdAËz‚˜¨Ğ‹	qÃè6•ë¶bÅ°®óV4şààôäø×˜AÖ\a•¦í6-rh³`æ†ËØ:9şköT®`ôÛñ˜¹Yëüğ=ÅMÀ#Úo’¥ŒÎğ«CIÃæ8Á„gÀôæì›|Û=<ªå%´qL±û=| µìÑ|ÖšÑ]«»ÓÃ”3PŒôËõÌà¬‹êåĞê/\m •yxûá‹ŸSY"§Hdjâ}Å²;Ã,Î,n Un§_Œ$†›ñq<égu¿›ğïïìğÀŸç=u‚/ül|¤5aÿşğ/½T£åù"¬#Uê¨"‹3?=SËæ*œo9ÉTI'E4ĞÄMZz(kBãYd>ËeÕ®éï›¦­¡\,ô ‰Q–eX"5$Z 0#\P:Àß‘WÅ`¹Ì¶ãZ¦WêšvÛïĞ¾²ä^„ˆ¬£z1m<ØªDÇ^}>ü* ÿ·sğŒõZ0¾[ì˜{®cßÂŒ&™ËÀt’²D˜EüöQŠ´q\ÇGÍ£2W¦X`RŒ/1Ì›LÃ–yšĞ‹(0qÄUõÒ³²À?™R%ôf5{±É)Kú•§üÊ¸Ğ<ÁšƒTï/SœƒRÙJ£2[İÍµ•`;rEõ×OEm.X÷¹È$:d•#û´w¯é:İî®áNùËeÊsÀ@ù_Ø3¬.úô8A®ãfi÷°•¬”.	­öayAır“È¶‰e7»ƒ–éÉ’øy‡†_²Zòz„H9-6×ô®-
-`-.€5
-À†#OgM<€5M95ÌÒŒ&Xœo@ã›âePÏLĞdkø„jYz}v‹¾£Õ"owÎ_Ú¨)j±Ä.RQk9yŸñ¦˜³­1—J%É¼é½³şü<Òyóœ+$ZFl8úFx¼w€|PÒîP!–Öm§UˆzÆ…Ã˜
-Ñ‚59OcM)F²/	U>Ø€=ñ¤Ğî·b¼ğ­İx’ˆ”Tö&¸µ,Åú/Î
-qÊßÔl-Òãá$
-bĞÅ×Çó]ç©9µS{¤À¥‹š…?TìßH]$W)kFLêg*İ*zš
-ƒY¾©I_GñP÷$à¨q´
-&hd¿‰h4z}3tb4P›ÁxïI²HÃ¿Å¢{rüÛI²ı
-! †/ŒI²l±òîğÛIŒóÔ¥@'ö$¹ßqL[ü]¯>w(ÖQSÌ{4—°M„¾,mÊ(eFmòÃ\ÃVã&qÃ•Q›h§6jÙrfÒ†»K×¢Ï˜´ÁãÿÙ±ìqŒŸ(ÿ|æl’¨/Â¤M=ñR›µBçÔOÏ´U©ìc¡HQf„Ëy¶Šõ•¡ØQ_IêâJ}i$ÊòŠ9õ…1q§¸Có5¹à'Pªkb¾z‚§^¨'€=óÍwğÙÅ,DQ7 Hsæ€_˜+€õôæø‚IÑÀo×ôèOÎ•#àÊ k?G çÌ??@ëic±‚æğ¹õ&úX¾»ß¡Õ˜' Íƒ ›ù4£µ1×;ã&> p\^c=e7S[=ùÙ™›êE­¯luQKËl¹F2ÕcT=¾0õOJ¬]¥ÁŒárÛëIÂ¾ s=õÀËl­h—ÉX¯
-¬uI-öúlÆb×1Îóc>ÓlD[Ï»T…Š‚ §gêE#ƒ¶È<Ô‰mL¦È?ÉK»©7 kJöò)çëpzÆì)Ô´UÄ9¾ó(WÉSUê°Åâ˜ñ#ŠR›ÒªÃ•<UğÁğ…¡Ò ‚¦¥-Ê_=G³Moƒ¶kµşƒÂÌ›ºF*1ÒaĞ\×8,a4óøØÂíÅ;Kw—ï­üÏû«ÖÖ7~µ¹Õx¸ışşÓØõÖ(ßu¼KWSËQĞ›ƒMHİ¡C‡?;Ï˜Õòé`ÓÛ
-Ø¨o‡=>†±Ù=Ø
-»x°âæÁ&ÛŸš·K©˜³Ûx—¾l—ºzØÜêy>°iy{è…ù®l¼>Ø¤<NûÒÎŞƒş›16êÎua‹+ƒàR1·NŞ	Ü4Ïó£(ü&qSIz-æ=Q!,$re4+:®`¼º,CG„`ËYÅgÊˆ¸EĞú,„¦>¥aúƒ«|›Î‰§§/É:hÇ©]B´ªLµ‰ƒÓe.§ÊÎfğt%šº^’r~-†–yİÓç/k­Ë^M,|Ù9İüÇ½y^&-dØÓl¤ªòşğ“(«“+õG v}rvÿ+—j5”Dø-EV¦AÑÉ>Ú«uQÙæÛí:Ù^ÚÜÂDó­¥Õ¥Ešr¾±¾ñpC?å|Ûß«o8ıAÿ*Óü
-9gÒÏ{kîµ #P)!Ï‰"L¡½ˆºÌeB™”€-‰ÒF‹Šó-è¢3_#qí5ª+ÿP‰¼%àü1ñ,îõ×Ö%É˜¬
-Ovö`ş×6qúò°À°8p]˜¼®qHË°Áb2Õ‹„Ùf·dµ¨kú‚_E*²Ò% vPÓŸõ,S µÍw¦Ë0Ã…'`’(0Y±%1¤ºxJ§¾ZDê²¤æ\ÒŸ¯y”Ãğãáˆoqò•ãçpŠ—i§!WlCÿıÈ©Ü±Z-ÓV•™LÓÂLº³+á1|ˆC5=#21½ºb¡ÚøLîçàŒblõ$¦ªô|
-4,~ÊGÀ¼uMáé0kzfô,d`YåÎïÌ$º’
-8êRR€ĞeŸŠ±Ì,KD¹'ut6pcÓô …mÜ™QDf¸S>s±Oç¯Cÿ•£Ÿ% €ê\´(Ä•‚–„  M:İ+vË‚tÜSQHJüåIÔøg÷ˆÊ®åëÎM‘E»¥^3QÀ]´Zp®”zI€(„ãÖĞúO±ıÓºHè‚«Â`i&¦1ø¸’<*áŸŠ†Ä_É}Y!”–ÑS4zˆ•Ó×?kœıÂZãkD5¬«‘ÊßèªJÛíåu²´½´Ö w—–î­ÆÂÚÛu,íÁÔ`!Ñ+ÜCP½òœ±‡`¦zyj'ÕÏÃo@ú»SÕà9»éæãrI"†Å!‰9‰Ó:#rÜR‡„« Ÿ"É¡®œgä¬w—ê)ènQ]IJİâ’’DÃjÿŸEs€€böN^şİ&•ò-mô-ÅÓzùõ€Âjıod5ÌÚf©>{Ã¿Ñ/Ûì]Z‹òÕÃç™ùˆ¥…÷ +ÿ†Gk½wwåîyßqÚA–UËÕÙÓü;Ì!ú³M<Ú%{"Hö/³õ*4‰è×6¹‡µ)É6bò	LS‰D®yÎm6ÌãƒÅX[?˜†ì¸Ù,0°0œ£¿6‰ùCıQ ÃS0Õ «@änÚÛó÷ªô?küç,ÿyÿ¼Î‚‘Íó•8"…Ü'ët“ô]§iz^è†Â »5>Ş¤77¯t&r½`øÆ[ÍÎDà›²a·şRd”MOÃÂz¾Ó#]§íÀ9Ô¶Aì+ÄÕ¢j{…ã¥¬âıódÓlÂDú
-Ÿ$ìç{ğBbÿ	Îà<	Ëú]Çh•ö­§VÏlYFÉqÛÓøWÿšn:½<rº5İªOƒ¾V}Œ£~\-WjazŒnÉÛkK2ÆpŠ?ifzfŸT+ö¤ÙØ“<di“>É(ÙNÓqZfÉ6ıi:åÓ x´Moº>]§OšeOz§:‡»mÊ6ß©^§ÂÏRßnO»&‘:ö4Zg?Í”yßÁÈA¿3…aœÀËå[Íİ›ØGy¶<W™k?ïpAß5Ac»¹gÉÇ­øøiã:ÿy¶T®–`¾fGsµR­ÔÊ×ê•òuí1_/>æÚtÒÑõØœWj|ÎGw¹R­ÎUj•ë5ıqWÊó;¸èë ±^Ã×©”Sä3ÙÌT«åúÌµr]çU‰Øã8Æ‡nx@ŒSìX­GäÓOÙ•ğû•^[Ş¾“ôçà¡?'ï|³s>Îy¡~w*½~ô~Ì#AqoÅnùtÅöüèæ–-“´¾3µsVIy­z‚ÒnªÂ~DW×Qù—ËƒŸÖ‡:LÑÏ=¡‘V½;¶zªùöÜæÍ#Î(TmF¬nàj·:îxVÜpÃíyˆu§TõƒwÒô‚¹À¼«¿óˆ8»ÿÛw
-³ıË&,,•PGÌ®F³ZdUTBrÇXó¸c•±çŠ|iUÙª»‚§
-Ê"ZUØQ%#œ4(œÃ×ğz/Àñ;š~y½¿±X-CürÖ#yğpµ±²½²ô>[ß,ê ~ saíYæ>“ö{å>×Ú“W`]Gp¥Z6«3¦¯—ßèh±Ó8v—ÑÁ#+Œ`Ù-«í`&˜D6]D !˜=2‘‹v‹¹×•“ø<Ä‚ê»@“)?±€Zø)‚wrüéÒjXšaprü¯!Ä!ƒ4ˆ6‡gïÄ8|Ù$ãşÉñ7¤JÉÿm“ë™§Ğ&JäBëw¨—|àšË`åaÙû“ã?Ùí3pÁÎDÕWf…^Øê$93I€{Ï¼6Iæ&ÉuîlµöG¤ßªjöÃÍb=TÓêÛüá¶Zúôé¸p	¹qTÔÃë£ã}<Àâúf}ª”MárA	£5b³¨Äö4ÿ"•v[¨>6]¸š\Ñeô¾G—\‰T JòN–¤r:l’FWj!ÿ&=T¥nË-¢‰JÁê›vKqr‘¢Œz Ìqf•…%ki+GBäét¦3¬Ôxïäø‡XÄä_.±y´xoammi•l¬,Ş_İHâÎĞ óÊRº¬!3Õs·”O8gKiæ ËADvæê{“©~:“))jeÁ4)¯¶Ú ÂíÈŠ,”Äš	®Ç(qxM¥Ìbá¯§2Ê{—İ$‹‡ë€ºëûİ>#cb•ëˆ	Hâuˆë€àq¼D¸E¤wş‚T$7Q£×f(f9¸®µ¨®Eye-âgÔA,„5vût¢5ö<İ³!3Rm^ñáÊhœA›}P‚œàº:]­L³Aw:£<_«\«Ô*×ê‘r/™¢áò 7+ÓU2E¯Òâ1õ»ôÌÂ6=D¯eøatûµrêG4<„c¯(úºĞÙ“ˆF,»?ğ¥ÇHÏ¢ÇöAƒ0;ÀéL÷æXká=Å0¨TÅ=¿3üs¯T*‰zØ3ºçŒ¾Øûıj`º‡¢}<¡ƒõ1)˜WØHß8n–|Ãm›~‰v­{¸Ñº8®nÅ7Z¹Ú$¢)ˆƒæÀ“|êü®e›!$íéDÀˆHl²ƒi»Æ!•Rù+¬ØëeKa‘¨rù9á–V4Ô”õS•.Z=9‹S[¡ò^Rt2xø' £6ÕÏ†Ø1¨ÙŠ†|L;JùU¼0RË¨4ƒ0·8ša*~-{·:°§%^BK”J*‚ñÏªRƒÒÏO¨Êë1âñzR]ez®œVWBÌ8uöYXœF>*eö™ÒÕŒ<YPv†{=zíhy=Â¦–ÿ¹/u†°‘«°ìòsĞ‚µh¸-FÙSD«Î íÜ!]ª¾»Äóe1¦¼—5ÒkÍ§™boŠx>Øêh£Ûß1š·-ÓÇ`«N‰ÅÌàV{õ9­¥ºKƒoÇ.µ¾£Q¾®0H™ 
-¸*Ë8[ùxTÚJl^W°Ë>J1Ågi’l+P`ÒŞÎ\µ,ØÙ¾-Ñše[”ÎML¢Q{“ËX™·*t½Òà”x$ÊN¥T®*Ã«‚aî•Aœ•ÑÛ‘\GpJ¤³oĞS\K‰õğ›ÈNˆºQEÍD-x¥­Kd“¼‡åA~å!sQ–ÅÂ´ÛWp¤ IwvØº=FTsNiÌôÄ;Ò˜­èI:ªz-ñÖ3ÚÔN¥’’ )O9ÆczI/ĞÏË„Sc¹4óˆğ2eb$ÇH]–œ*ˆ­¢xLt:§¨òÁ~¤fJ‚íì»FŸÏÆıÂ±–×J×P#j-gáĞºÉYµ)Ø– tçĞ«úÆ|…%S0“ĞúZ¸ùH¼òK–a;V“"€e38Eö-ĞõĞ£‚×ëw-ˆÀµÎ¾Ã¸h€¸¹G {Îğ:²Æ8›L•F¸‚:Œï‰,vÃpıùPÅXÓ¸hè;Õ¹wèVÁ_gáWékÈ!såÄ¾;ğæãÁ6ÄÄÔU˜¤h'ñãÚg¸Y5¦„Q=_K>Ÿ~JÆÀØ—øÍÓ¡C]<w7  ;Ö%vˆjM7! 3õwaZÇ_ãGJÔºÒIˆ¡0Ò »!Ú£Œ•›xqrHQ@‚:Ò„×6´×‘ÇéçàÄÆ¬ù7ş=B›n4p¼oq.?$$cœÇˆd–†R>»ä:ŒÚêÃ›Oí[]`Q˜ İU¼Ş+uÊTØ/EîŸg#)y>´÷>°ñqİyÜuìö˜
-‡\6–¹96üYd$|,1[gk±±]¬‡pU>†jÑ1dG±İØn»E{	Fr}†ïc­n5Xİj=#•ZÄÛèïº½ëàÖbÓ`ˆù`%QÓ*ŸÄš SJW^Æ„ßÑí6VÀûù!Ô,Š­@G´l[ N§b÷z\ê#ÉÚ5q%Ó‚5'^gŞ±ï×€Çèõ¬)‰5*-iö¥qÑë)£$ùJ’|PÌW
-Á=mŠ0éWè$ÍfãMÈ2:ÒZZvÕd2VÂ™Ç4‰†p¿3ü›İ&>5`öø×‡,JzÚ99ş÷>Ù£ùä4Âği‡Ö<ˆ
--¥£S,fJ~tñ.w6–—n¯.aœKãáæÒÔÊÚÿ•ŒoXäîêúBcem™¼¿²vgı}½Ëƒ{YjŸn¼KË5Ú™8=X¹AïæuW=Ë\°ËºñÍ£r©\O~­ú(—æê“>ªëÕDÁô®ÌMŠğÅ£7AÈşXøc¹ñ6,Yi&ğ€TgB´Zjj•¹}„x«ÕÀÍ¯òØI40Qcúd)Œêû:7‚¸Ì³åtÜÈÜÄ£¬G%­¶'ƒHâZ%÷¶]c7ˆy‹}´‹Y^ÒPıä.B¢Ò$YBt¤#z6U²é‚×£×-ÓZŒ¥ºN‘.YÜIÒ•aëƒ	* û²¡<§- ôÎÏh“£T!*|lA*Ge6 BşA•’¥ÃšÍ“£t^´Ø2Ÿˆqôõ&6mÖàã)#FW"©"Š‰·¼f¦²ƒ^hHÒ	/Ò’}ËïÂsQZ¤ßÁºÆ(ï~È($ßïŸ#œ–pÖ$Y:€gÙFwÈ\‚	X(®äG:åBi~´ Ñ&S¨sdŠéµ÷Ä•“4X¤yî:ûìFp˜Ey=®EŞL3‹ìZï9İZSìgö{ÇŞ¦ß¡ @BÛ’K{xĞÍ#úCÔÑƒïçìB|)”K®ë¸áyaænZ¸NñN¡n.ıêáÊæÒ²±úpye<X¿³°ªû¼Ñ´-{Óüx`¡u?®b/_Ìó2;´V¿Œ…Îno±óÃ÷`w¿´hŠÛùdyøÂB°ãßØk gø|6lVİm¶.LİÃº—¢ØçWŸ#¸™wrü-iú@­éoÑ‚~õ™,º˜C³eF#Èhê‰G.ç;Œİ5àšk2=‘a½e¾™${t[lf©¡¿ïcÎğK|Ÿh–GILZ<gŠ$ö´óhcVF$Ñyà/ÖÜ“!ô„Wo±·@øÂŞëÓÇ>ö|Ç•ÀûƒLÎBæ‘ƒ‘Œ9Øˆ*—qOÿ†%ŒêõÉàÿÈ	41{Á&"ıWŸ[A’k3"ÑsÒ¥Õô¤¿	+ZÑ³Mz›9Ï¤·ÑÖêR‚D?\[YÛj,¬®’Åõµ»+›hı¨
- Ûìç¡ôîã¬]©~WªŸzÒ¯T¿U¿å“ãç4–´S*ß­×¦óİ¦€Íá‹ %£-ä9i€T¢n…ş'ÈSz t‹j±ß ğ„3Éá&öN^~ÃŞÑï †W»p…E<Ñz,Åo†öÈc¯[Û›™ZqÍ(ªn¤/Ç<™öˆá•ìÖq	üïZ]A™ø`ø¼IìEŸ“¶'YÊ+5/ge(ÒÁ¥Óò¸‡gº?T>üscs}ysik‹ÃĞûÆ³„ñ¶ŒŒ€V‡¬Ó²ÒSóĞçÔXëŞƒOLGÏè8É;)à.Lâß€¨#Ÿ~ª}ÛÀİ:H° Š<|%9
-9› Ì,xğâ™g'ûyôËÌ­–·	QyO©·<“ñiÜ…p›`i€ßî[~³CÆÓï’˜ˆEÆÌƒ¾ãú`Â»¦ÑË:óû`pòòk?€hÊäá°ÎzARŠ¢£0q… ¢™¤£¾ÕWt±a5ÑõÓNø¯’nœ¾i?¶©¾§ÑÉñ†ØS Ó|Ñ”tÖpóéc6¿Šş;X6à³ éŞîvGÒ£Ñj=fØÒŠş˜ù$ÃbTJ¦3Îîä]¤ı†©âÜşÙÄø„€î@oX”è¤{‹ÔÊì‚r–Ä}¸œ†•ÊÅ†ë´½dv¹u+è>ÛfbôÿMòÀğ;%*eÆÇÇƒáL…™ ÓA/äÀˆÊÉ×f‡´´4+“ªˆUÀt=­ñZÁxØFÒiÍ„ÁˆÁŒ=3Cö²›²"æÍY) TdQ²É˜Ø*=÷ÎdÔ¿}”âFcq`Œ'Êñ—±gQĞ^Ää£T…ÁÀQÕÄü*[ÓE‚[r.æ8ÅK¼¼$›\húês#u¢gÆónOiÌóWˆôyX«ì,‡µRI‰÷	^¥ñÛ9óTÔÙÁ;}CgIäRÉº-xÈ—ëä¶ ĞŞ*Îl‹bË 29qU¹½™<ÃãHâ¤‚‹µ8[êŒÆ„â#—FÈÇE›™'½}Ä•¡gï|$ÏŞ–É°J©Æ"bˆáfÂNƒ&†«’…kqğD¢W;'ÌNbº‚ì<ÿ'r†Nd
-²7‘p>ˆ˜²í’M†Y")ÅğcY€tÎ÷¢õUáfŠ1°$È§?^^IÙ¶ãã}×ÜcØ´²ì/˜¼H\9ˆ´0Ÿ¶)Æ¬V×¤³ZÖ’2DÏ&ägÖ	«Æ­Dhà%ÁúXñ‹¾€¸2¶–Ù5{7û*;?Ş¸íÑìKĞo_ƒ/ô,ŸçÜéŸ™ıÇEÓÊ
-¥öUR>‹N¤¾9±#NşMl¹ĞZÖsÍİµàSß4»dÁó,x5³j1ÑZËgô·W`raBÚø¾bHûğTG±“ä` …^²ÄfŠ„¸Ó¤xB`0XA¯ïRßAùğÎæIuúh=TÕá¯Œ½&±sieK”Ã2¾As"`L,W:Ú&•ÙJ­Z`CìT©ÎU‡nÆÛ™iåÇuafD
-=S33›Ù ÁË$FU¼FòBà¨š˜ B¡Ò9gÑ5¾ÖVÙCœ½Q`ó!f’ÇõçËìfy±aú†`„<²»qòò¹wŸÿ¾‰qôÿ—4©ğ76wÚiñ½w»ğ®qÄø/çÎOÔMLJu*?Ç"]Ÿ¡¤9“[Õ©.«êšÚå9«5S‘9§rI(ª§®U­8ÆJQ`èÛĞ®|À“Áï®A%ĞAÛ…qm £K¸N/6{ğşaø\ÜìZı)ì‹Ms¤ ¼DÈÿ…J6Üéir]Î%ü	 NË”¥Eï…W°…ƒ‡cH9ÍáS‚	>«y#*H£ğ‹dÅãLîG†¨')ø†	;ˆâ×È™Ì*«†LãnE¬F“ÉÜc“­Áf( l¸åÅk2 ºkÎnû¿Ò#a´~úÓ$N=.ÆôñHÁİ²Zæ®!Hƒ#*•iÖ¥ÆÄ²½nrä!´ŒøN(ıÆ‹|½`àiÁGİ¹aìzœ‹ó=à¶-]F¥>—“×§ŸJ¥™»@(˜Å)ÃõH¯”™háIÏ)Scü0viò$?êeHÀŞE€ ‰$8 çåG
-I]`¹L!›‹™ ë¡OK†eœÒ$P	Kë~q±×B]Pæú“¿€´j¾?»kÂJ­´n±Îhdk°›fÅnYM!CÚQ€4–Ö_dŒw(rWÂ-•`w½ö¼?U©Ê—pHOKRNéu1gCmN€F´Ğ	Q“^TÄ‘.<[9©ßŞQJÏOw‹´‚sÚàq=ÈwO¿"İá?N·¹£Ñ_íîÄU?šİ-Ğ`ÒĞK´p•iHÏ²-ëÍ+eÕ–½•! ô—*Ñ‘ñ)kˆë&2ı…*7²HQ5Âr˜;^d\,u0œDê‚ŠsUësåô*sˆ¡ãõäèÌÍ(SL³:'ZM>ËÏnFJ^”=5ºN¤ìÖq<zµ ªEŒY(`Àî7Úæ­©a^F•Vr¤NVÖ0_L>•,qÇiêõMQ Od4âZ¤Ty+§\¢¤Ÿ(aüBgfÅr9[Ôä†TzqrÙ¶9˜ùŸûZ]{Az-sÅRºŠ¬¤¶+–6–GgN¼'‡"¾”E®°‰‹Rå©Å¬d=åÔ«ÂV¹hTàv8Súbğ¯D|U!·úX¡xüÆFW@;ï§.5­ÛNëPis¤]j:®PA­¯>ú=y`èa¹1S-/†8±øöÈÓÇ“L\Hª„Å*ê„«f
-b¼ª}^Ê-.)¯¸5	5¸KAŞ"Ö¥eµ	óª*êven]I™Â°P!Û6ü4"§^a¶b¡Lšj¶ßt9Caâ‡«ªâ9Å›_æPB0ÒERHem1Ffì™•‚%!©5wu€ ,İÔI mæ¥3cÒ¿Â áĞd¤ûÁğ…!QVºPÆ‰£ Ó§1fòri¶¥'HDUF8á–'êuƒÆ"€ur“›W|À^‰}3>î)ã—iş²ŒfK¾kõÆ'Â„fß˜²`e6œÃqˆzsV}Ó]4<s\
-UŸ[ÏcèÉŞJ–İìZ¦7şñD6É;~syw¼’çôÌññ‚5bë•P5-ÜI,+"yùgÉÔÓ¨á"**[×Üi†É™š‡ ‡
-¡ñ5Ë!	 ò…!9¿ßştN¿ê‹sèhUdÓ)L>3á|ÒŠ“P…Fœ¿åqû›ïJÓæî¼	 Šæš(f•–—äÏUH‰^:’æŸó1ó^”õ+2…§ñ.‚~ıX!G.«ó£†iÜoOTN• `-”n¤P‡àzBèVBÚå•†‰;‡vÊ	&åJ¹}ğ¢ÙG"ÅE]DQU{Fµïô":«x.4µ?Uæ"*§"–†C<j¢È«Ğ Âl-¾rÏVk2ŸwÔr*ïHƒ×Ï­v£ŸsAêĞYè¤Aî‹¼ı\şÛëÀaÜB‚v•zWLÔÌ¹D”\N¥#×â5‘{>:3tŠ	ò‚tö^ÿÔƒÍ-¨£®™L‡„ÕPXÊÓ&s
-×¥ô/.§ß#¹êF«¼°)´H˜1!ÀŞ'%&‰8Ò0ŞöÜ5ØÕ×â%¤²PøE¢“vÏÓÌÉ¯ˆê£Æ<\T>%Š ª03ËB? {´¤ã-wß4\ÃëT‹@ò'n×©ü$_À‘T'qpr,k-Ó¿Ğzºm4ŸbyñÅá«vQ&vÀsÕÉÁVm üm3j,$±RäÚPfUª3%Q¢œÅAßh¸ÃÚÇƒ¢©•¤-'Š¢ÛâWãƒ*æEJr5“dğ„G vîêzqwµÄA])‘‡¬…ù¢ËbñÎê»f7#ø³ñ~QÔ éˆT•*ô·Ûu€ä™áŸ)Hèï,b·øşäø?,Òş] —‰KF‡wÆ®Û„¿§T¡‘ö²FÌ#¸/íE÷“ğG9v4i´;ü’´‡¹•ë˜ßOyU¹)"q­Æº z5H„¥ê7z½8EÆÆ¬t¼Š<´õàÓØø*ÒüKé;ìutÔ™r-G;/»$vç‡ï©—ã¿©?ãYƒ_ëç3ÖùºB:Ã¿ätì¼üÇ˜%?|ÿ¶‚KìqA6¬ËÕY±ñØ
-=‰C
-8H‘ÕŒ˜¬ê!‹¥ûbêåŒ[	WLÊUò–.öªÂÉëÌè`ÈïRÑv…%IQôZRÃ("ŠİCò¾±gzdÑéõ6(¶·Ä í‡QG†Zl£Hµmº^€	CÆo›¾!öoKE“Şq—€ûÀœ#¨éã?E´Ãä”"íÿF:´hèßtşßàÅ½×³(üâğ6ñiv6"éşµGÚÖğ¥Ì! ÛüåW(¯:ğÔ#fPL~móÅ
-R®ğŸŒ“xø4ä¿‡Gï¿”< ¨}Ò¢8ÓÛ“ô5BŞuKcÈiPùwM<jük“?9W–bKÑšüI¸À1fÕJd«g¸8‘ï´Û]“Œo di0üN8ñÖÄù1*=ïåŒØTÈ(dlAÌöb"Vˆœ—ïxÏ¤dİÄ¬NSjÖ‹KM<	Àj¸/¿ó©ŒíB.è3ı)÷W¬ÅO’í0œ´&Y#TzºdQĞ‚Cep7<„~ÀJÀoÿ•€1ú’S†bD}^']ÃV'‡ËÅ>Ê5BÑçZ©‚5›4@û4¦(7)&£¹…1,éÛÌ~‰ùx%K•y›0Â³6Ó¼V¿BÁü¯)‰Ñ,’`“ŸêC«9˜±ŠHµàÕ [şI½|.ù'	+!\à} ™Î”Šô·;§OsÈ0º`ŠïHQùêb?_ÒÅ`!`G²nÄ”{ª¶$µ¬åÎ8)¨ +`)zƒèd‰|£‘v.Ç’
-¾Ïñc…ëLé4ş7‰7à²ûÙôaZ¸.
-D«T²®¼p—×'¿\
-£‹³<YìOc¤Ì5G+³ÇÑÔÜŸÂØR‰•}[zªØRº(oV€)ÃüOšŸz±¥ì•Æn¸Ò˜òš¸[ÏïùSMÎ™<¡çÜbDS‹v*Ïé9ë5[,Úl«ošÍÎ¦ÙtÚ6#rSz!ãû–Ü–5‡¥ìİŠ¸ÈìíûæîSËÏt"‹mcAŠ™ËåŠÑkºñ$¶¹Ÿ}qy¸(¶X¥®A+ãŒíYSÛk™Š'²»(™Y½MÓt},ÍCñ—tïîLÈJÆàíÕ­>lš¶é²í×pÏçpĞ O}‡ÎŒvÇD~­ıÒ´Všş9¶K_KQÛg.¹š$±ñúE|ux´‡ëÑÛ)?‚ÿJt[7]«ï«ÆD¤\(‹V(,÷r×:À’1pZ^Š‘_1Âà¼Ôc	ã3yg¿H¼¨ú^q¼DÔÄK>üŠiëÃàRSö'E˜f/_hPF·ğ:‹†»zrüo([qÚõ¨ã|FLØ`Êa¡ôXÃ¥~ö5DüÀÁØqsÇ8«ˆGZÌ·Ø†¿Ãİ†¸ÏrG‹4F†¾Æ)\/)ZS)·Éˆ+æw8MÌUFOÏåE\E&§ˆ…#ÚÆ4Ñİ“—E˜ûøTs=°šºoôú³Ìü ê Vu@Š¤}„è¬ÂrÔKù8–ç¥œ¦“/„=MO£§È¶ao’»4>^ñÀ €~±ƒïcÉ"vš`‹á…¬ë 3E¥Œ4;9y0ŠNÉ†	-„w`µNu;u9ebÈ¼`¶<PÍñò$©Ô'~‰K„0‘0û.¬A¥ÃàŠòş^Ï´[Ôİä‘ıi³×÷ÅëÍ²cx1Å'ZÕ(‚µ¬ÈKy+ºıü²Q*iCBvjF1½’ÍŠRáHº¦ë/Zn³›rŠ1°ÍØ8ª /å*ï1íZU:„5AâÌSà¤°½ôŒ,™/Cö"œø'Çß ¸{au ªØÊ“§İ¨ Ç‚ïÏ:1GF$²sVq	 Ö(ŒçvÄÔ–)<‰*ûH¼òB¸åY€…<1ZæŠ—j‘›¿‘>—îççoˆœùùî™GÛÄÛ}#*o¨Ò3ê¨½õq~H=í,ÅÀŞüzøâÉzÁaCAŒöd[Æodøæ†ËcÎc-'@?7İ!KZm×jü™¤ª?¼È}ÇÄ¡ÉsLXçšjQİâÀ¥Xø*wFĞ˜Ë=”‡°ğÅo
-òô¨ÄÏ³5¤UÔô7X£é{tyÙ¬i{‹’§ûÑàï+”ÿÚ¬IÎ’”@>Œu/EûŞ¢&[¼}Díá(„ƒ¼}Ä5¼go}¤2ÏâMs¤Ró,Ù’q=ŠGÌRµ¤ÒIÎq ÌÊØZÔ­“ µpGiÏ6½°ì–Õv¦®×ËÈò©‘]>·¬¥“$kDY‘s²ÔÉ„+_xœ™mù©rØt˜7°7 º®ÓvVzòÚ˜Ù– a8•j¾Uá‰Ä¢ıhÉ!>09•¨á¡`lôö	kÒĞˆ€é‚3X¯VT®VŸîØ©]È4
-ÜW„JÔr’¸¢¦!«ƒ&?‹t;:¦Ï»v*µH5DøÖˆF“šQ¤E´‘JY€|Zl`-O?~o°ëùJ…†q-7}1œ¤s¯×§Äû£›a¬êFPŠG+—6ì³Siû¦™“IÌŒÒ@c&¼3]//åY#ß9jú“ÀH¨G ¤^€D£wÔ2JbÏI›'û4z¨CÿMy›=Ó5º´,IÎŠ’\õy6yÚ2úÙ7!9i'ˆí(p»é?7¯=¸PûEoltqF¶I±‚§b[%¾Šá–³š¥r¿írkÙ¦EX:yÊ¬åªéÏNkïæ\ í^q_ñ”èÜEòıl¢×r’Ey0] …D­ø×$Vë@jlÖ;Í1½Iàú<‡ãàCá«Ò˜V ŞPk†“’ÆËD3|&3éxPÀw3l	:›.L£kÂ„óT!zİÁ%©¯d[EFdèz\Ø3|	Z$¿(™¾k\Xõ)ùêóĞ×>
-”{–X{³—˜F—-°Ü€(R9'E€fÔÁĞ;?«TËfuæ‘†5‹°ÔH”ã£¡“˜=&Œ3Ùëyò1‡e¨İJE]wõOrA”Å¾é-Ÿ¼^hĞRuCir@^ÍĞAÍĞÚÄ£LíOĞ“`gSÆ‘âDÜã>E*…
-„M±Àêõ“I°mL£çovwÙÉ÷²¼+>›ıª ¤B«İÌ©7ÄÒYW=ã Œ‹ksï<Š9¤â5mSÄ8ré™sHÄO$¡ô12xße{8â+	‡»Ú®ÎaO„êÃŞÛ•ÃdMN@Šc$³e!ä'ÓN»HÃj‘„MF§C}y`Ø¾¨ášâPÆ¨ñ@ŞäPxa–§‰5Ïô—DÒ‚ŒZ!Ø¡›F5ePcÕÂ@Şx‚‡© Òœ£­åšõ	,7ğwª´,x—´	ïæÑÃï`¬`¾‰XÍ÷w—¹äõ»–?>ö¿ì±	ÎJózÊQ´B¬QÁÈ*Óni{-tÏQŠ@`‰b—ÒyÜªÒ0†ãÉQ¬Xzˆ L•Í„:Ëñ²2v\^]´dËß­÷Nÿ˜g¯êZo²R:Ìô[ ! üíN©TJjtNƒx;ÀÌX¯Õ*Ú_:ıEIm|ãü	ZgS±€X#…Âjê4ş•!šjßƒ¨¸b ÓÇIG¦ß›$¼î|¸2ú~·yâéô)"«biÎ·„%èÜ-ëmbT/‹7õ	ôNıÎ~Kç(UãpRƒÉ Çş?   ÿÿä]KoE¾ó+&EKdïË6¶#£(`EX%
-HDÊivg¯²/íx›ÄNˆc~ „à€â‰øù'Tu÷ÌvÏTõcvL˜ƒ­İwwWUWõ}NÊ1ÍL]±Uúâïß—¥µ³Ae–J‡V[Æp0Ş¶0|Pë¸E]Ş|±årzÏ%+a,0	“!~N¢‡™	ö]˜™x°S^-Ç¤§Ñ&G¦œÜ£‚8õ7æL+Ä›<[À²q¢¦4+İ%élÍ¹V~†^àğÊ•ÔOßşõıTŠIÄš¥Y“°ò~ZZ—ØÆ¬u#L•îÌ,?ƒÿ ¢J¡*«®à`
-ìèëìğ¾k*ãf…‰Ôæê
-|°ÎA Âª¥™È²×¹üGSaÎÇÊàg\ÀsÆDÇ±`ÀÉÀãš9ÙX¾Î—o_ı|vÓiøİlÄMÚ Wpm§àmÇI`T:<E(5ø0Kğ}šø-¶†âŠÃrí8i,è°mí©Ü<Æ;>Çàâé0sSÀ¸cO\\mdÜÚØ¸õĞq¢¾âŞ>Øüè»3Qà¹³	ú€l¸HÓiæ}2lEY³ÙÁƒ,¾Æzûè0úhÇ"Á<–È@¤%*É·Í<1wfpkdHÏ¥ßş}ºÜšaÏÕBRÏÆs<ê¶ö=ÁLÍbF|ìs¾ÕÃ¾Q÷²&şM¼Ìæ@pâÃ€p¸­†Ãíİâp«ŠÃ­`nÀ”@ÄIHNœşå|zw-´n%Ä\hŸ]_'Şo`óà²8A WD„ÀUÍUCWÚÍ…z«Ñ^¡cÓÓÄ>±¬1bş÷Ä
-¾ñ0äYĞÎeº3µLÔ[‹¶¿RVŸ1#Ô®YÃ]Ò™ÁI&ô«’íë@ZßC†Bß¦“æÛÅ{WŸ$ªÓ¬ø”L¹v©#c"ê’Ê†`),ªB-(çHÆ,‚ŠD1øŸB»H¤‹y?$˜¥„5aùø†-=w‚a¿k AJh†‚“›±$}b>
-ûflq-r¸½Î^¿sw{œ.f“zìpûıİî^§Çª”+r6Õ¿ù½ˆ/ÅİùkÊæn5b`B”¬G5P	¸tìSoº"R~ó©ƒ²åò½ùµİæÊ¹m•¦<Í1ıCÅòyêßÏbLâGãôí)ÄêY^p”¤ÑÑ"~F˜·ÃÛ²ÅîÃAét˜–oK™>y*ÒğÙù€EJ;S©9BvxŒ”Á*ë3‚(şöv7%-|Ñ>Ø¥sãpqxOŞ-îÑ‡¦ç£3ê²]Ëê´bmãƒŠûJÜæÅ‹
-ç¦¦Ó¾¡Ôìw$k³üĞïn\J²Æ‚î‰v»bAR+7<(E£êP×ÑÔH´D
-›tĞœ‡{?ÀÄLÌµãåbk’x0r øVè8j‚Š>ğ¾»ä£rƒ+|?XÕe°†Çj­Ÿ‚xkó/SªËuyÌ‡Ö¤ Ø
-EÈÀ°ûĞÍF’Ë“C—è°S±|,ÈgOX±¯c ™)KJ‰.°«SĞEr¤Óçxq?%I*a¹nU<~_dgÉŞúèŞ]d²F€‹øædq]–—0…p3ĞöR`*£iš8¢UÙ³ğÚTË‚¯Ï}ÂØåAzBu¢
-'ªC²„¤$~Înµu¼’RNù¬~Ñ×oŸÅÃÓ4Á[•ÇpS%ºòæåëß¦§Ñ“×¿LXæ;EN‡'y
-–Ó…ú¶ÓAş¬ôLµªÀ„FÙ,Ê°íÄ{‚™¤aC?†ĞŒ<—‰,EG²Ş„ö¹Ãa:‡¨Qª›ñ|ıE$ôáğÎªõ³³‹±ğÔÉ(›cğµ’%¸J‡Ó@Lã%¸¡å8Ê[¹µÒèÓx-D¹êqzsúÎä:Ò æË'~ë"Õõ k°Ü€ŸÏı³X˜òœ'r3§O:¯‡æ/—·©m]4$JÏ«KNt’&£¥m‚hFk®ÏÎÃ°Ù°Ë÷(ìd¹¹Öóq{o:Röw3îÎè<MZ½/£Ï?áÀÜµæWIilXA+¾—˜$6G²H¢€í$‹v½Z¶cÄv?Û«úS\¥ ]á—ËÁç)VW˜¶•'?JOâå˜e¯ÍWì§‰	”£«1íŸ-e¶!MMR²¥¾Q$ÁÊä¡¿¨ØBfÿÑÔ”6KıG5íéc®—ùíıíıAr²_úWe¶mW’ßçÇ(+´¼Ú©H®IpY÷ÇË,—˜+ãIúk\ÕhänRQX{(ëœoµEäÇuuàJOVÇ½)³föjÛ'ëª‚BäfmQKŠÎ½}õªa‰P0`â":€7íêÊ¢P?6$Ã*æ-¡Šâ pV{¬h°.öV¤ØpşmğúÏécŒ¯Ü2g?Œ¶ùÇ&Òã¢x *²2¸Aôy;{AèO/pÌ?fw§Ÿ¢Øx0N“ÍEçQ5è0D·Ç‚a@™)N2A£æ¬
-Ån“ÂùıhZğ ‚à¸A*Ü–Ö)ƒWÆ;Y´Ì0çøt6¾SNë¿©ÿš”şÁ„şĞù×!ó_‡ÊßIäÏÆvW¥ø7h±uyPÕî`¿g)4¼ö®)	Ğ° @Énûª 4§PWÀÎÿß$ûÿ¥wƒÖ¡şÇ79ƒY 8¶åËóÏÊ=<D;€UpêÊ«Ñ`ŸŒö´ÿ“ UŠú)0qiU@$zv>¥ZQªÓıgbVK?à*®²9&ƒuÙ¹ä«0¹	»~=ºVMÔĞÉ˜zÉ…s*Â2½¯•ÀOÅ>&¯•»úÃ¬YÑÃº¢Š¶lÓ1Á¥a’5ŞRÓÒ«<˜OñáŒÒÛ˜^*v!ÖƒŒ³‚º|ï   ÿÿ †Q‰ó
+       {/* Disabled Spotlight Modal */}
+       {showSpotlightDisabledModal && (
+         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+           <div className="w-full max-w-md p-6 rounded-2xl bg-[#1c1a24] border border-white/15 text-white shadow-2xl font-sans space-y-4">
+             <div className="flex items-center gap-3 text-amber-400">
+               <AlertCircle className="w-6 h-6 shrink-0" />
+               <h3 className="text-base font-bold">TÃ¬m kiáº¿m Ä‘ang táº¯t</h3>
+             </div>
+             <p className="text-xs text-white/70 leading-relaxed">
+               Táº¥t cáº£ cÃ¡c nguá»“n dá»¯ liá»‡u trong Spotlight Search Ä‘Ã£ bá»‹ táº¯t trong CÃ i Ä‘áº·t. Vui lÃ²ng báº­t láº¡i Ã­t nháº¥t má»™t má»¥c Ä‘á»ƒ sá»­ dá»¥ng tÃ­nh nÄƒng tÃ¬m kiáº¿m.
+             </p>
+             <div className="flex justify-end gap-3 pt-2">
+               <button
+                 type="button"
+                 onClick={() => setShowSpotlightDisabledModal(false)}
+                 className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-all cursor-pointer"
+               >
+                 ÄÃ³ng
+               </button>
+               <button
+                 type="button"
+                 onClick={() => {
+                   setShowSpotlightDisabledModal(false);
+                   setActiveTab("settings");
+                   setActiveSettingSection("search");
+                 }}
+                 className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold shadow-lg shadow-sky-500/25 transition-all cursor-pointer"
+               >
+                 Äi tá»›i CÃ i Ä‘áº·t
+               </button>
+             </div>
+           </div>
+         </div>
+       )}
+     </div>
+   );
+ }
