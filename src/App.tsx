@@ -98,8 +98,8 @@ import DigitalClock from "./components/DigitalClock";
 import { VAppsView } from "./components/VAppsView";
 import { VPremiumView } from "./components/VPremiumView";
 import { LocalStorageBar } from "./components/LocalStorageBar";
+import { FullPageSearchView } from "./components/FullPageSearchView";
 import { FeaturesVoteBanner } from "./components/FeaturesVoteBanner";
-import { SpotlightSearchModal } from "./components/SpotlightSearchModal";
 
 const DiscordIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg
@@ -592,9 +592,18 @@ export default function App() {
       },
     ];
   }, []);
-  const [isSpotlightOpen, setIsSpotlightOpen] = useState<boolean>(false);
+  const [isHeaderSearchExpanded, setIsHeaderSearchExpanded] =
+    useState<boolean>(false);
+  const headerSearchInputRef = useRef<HTMLInputElement>(null);
 
-
+  // Auto-focus header search input when expanded
+  useEffect(() => {
+    if (isHeaderSearchExpanded && headerSearchInputRef.current) {
+      setTimeout(() => {
+        headerSearchInputRef.current?.focus();
+      }, 50);
+    }
+  }, [isHeaderSearchExpanded]);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sidebarFileOpen, setSidebarFileOpen] = useState<boolean>(true);
@@ -945,6 +954,7 @@ export default function App() {
 
   // Spotlight Search Customization Settings
   const DEFAULT_SPOTLIGHT_SEARCH_SETTINGS = {
+    fullPageSearch: false, // Use search interface full page (Liquid Glass)
     categories: true, // Danh m·ª•c (Tabs & Navigation)
     vapps: true, // V-Apps & 5 Games V-Arcade, V-Files, V-Learn...
     vpremium: true, // V-Premium: G√≥i V-Cloud Storage, V-Bank, Verified
@@ -982,6 +992,28 @@ export default function App() {
     !spotlightSearchSettings.channels &&
     !spotlightSearchSettings.toolbox &&
     !spotlightSearchSettings.settings;
+
+  // Global Shortcut for Spotlight Search (Cmd + K / Ctrl + K)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        playPopSound();
+        if (isSpotlightAllDisabled) {
+          setShowSpotlightDisabledModal(true);
+          return;
+        }
+        if (spotlightSearchSettings.fullPageSearch) {
+          setShowFullPageSearch((prev) => !prev);
+          setShowSearchDropdown(false);
+        } else {
+          setShowSearchDropdown((prev) => !prev);
+        }
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [spotlightSearchSettings.fullPageSearch, isSpotlightAllDisabled]);
 
   const [dockItems, setDockItems] = useState<
     { id: string; label: string; enabled: boolean }[]
@@ -1251,8 +1283,12 @@ export default function App() {
           setShowSpotlightDisabledModal(true);
           return;
         }
-        setPrevTab(activeTab as any);
-        setActiveTab("search");
+        if (spotlightSearchSettings.fullPageSearch) {
+          setShowFullPageSearch(true);
+        } else {
+          setPrevTab(activeTab as any);
+          setActiveTab("search");
+        }
         break;
       case "profile":
         setActiveTab("settings");
@@ -1582,29 +1618,10 @@ export default function App() {
     useState<boolean>(false);
   const [showSpotlightDisabledModal, setShowSpotlightDisabledModal] =
     useState<boolean>(false);
-
-  // Global Shortcut for Spotlight Search (Cmd+K / Ctrl+K and ESC)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        if (isSpotlightAllDisabled) {
-          setShowSpotlightDisabledModal(true);
-          return;
-        }
-        setIsSpotlightOpen((prev) => !prev);
-      }
-      if (e.key === "Escape" && isSpotlightOpen) {
-        e.preventDefault();
-        setIsSpotlightOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSpotlightOpen, isSpotlightAllDisabled]);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [showPowerDropdown, setShowPowerDropdown] = useState<boolean>(false);
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
+  const [showFullPageSearch, setShowFullPageSearch] = useState<boolean>(false);
   const [isSleepMode, setIsSleepMode] = useState<boolean>(false);
   const [menubarSearchQuery, setMenubarSearchQuery] = useState<string>("");
   const [isSpotlightFocused, setIsSpotlightFocused] = useState<boolean>(false);
@@ -4467,7 +4484,7 @@ export default function App() {
             {getHeaderTitle()}
           </div>
 
-          {/* Right: Spotlight Search button */}
+          {/* Right: Spotlight Search button & Dropdown */}
           <div className="relative flex items-center gap-1 group/search">
             <button
               type="button"
@@ -4477,7 +4494,7 @@ export default function App() {
                   setShowSpotlightDisabledModal(true);
                   return;
                 }
-                setIsSpotlightOpen(true);
+                setIsHeaderSearchExpanded(!isHeaderSearchExpanded);
               }}
               className="w-8 h-8 rounded-lg hover:bg-white/10 active:bg-white/15 flex items-center justify-center text-white/90 hover:text-white active:scale-95 transition-all cursor-pointer"
               aria-label="Spotlight Search"
@@ -4490,12 +4507,100 @@ export default function App() {
               />
             </button>
 
-            {/* Glassmorphism Tooltip for Spotlight Search */}
-            <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/search:block pointer-events-none z-50">
-              Spotlight Search (‚åòK)
-            </div>
+            {/* Glassmorphism Tooltip for Spotlight Search (Larger, 100% Rounded, No Animation) */}
+            {!isHeaderSearchExpanded && (
+              <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/search:block pointer-events-none z-50">
+                Spotlight Search
+              </div>
+            )}
+
+            {/* Spotlight Search Dropdown Menu */}
+            {isHeaderSearchExpanded && (
+              <>
+                {/* Backdrop overlay */}
+                <div
+                  className="fixed inset-0 z-[105]"
+                  onClick={() => setIsHeaderSearchExpanded(false)}
+                />
+
+                <div className="absolute right-0 top-10 z-[110] w-[300px] sm:w-[360px] rounded-2xl bg-[#141218]/95 backdrop-blur-2xl border border-white/15 p-3 shadow-[0_16px_40px_rgba(0,0,0,0.6)] text-white font-sans animate-fade-in space-y-2.5">
+                  {/* Search input field */}
+                  <div className="relative flex items-center w-full">
+                    <input
+                      ref={headerSearchInputRef}
+                      type="text"
+                      placeholder="Spotlight Search..."
+                      value={menubarSearchQuery}
+                      onChange={(e) => setMenubarSearchQuery(e.target.value)}
+                      className="w-full pl-9.5 pr-10 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
+                    />
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                      <img
+                        src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
+                        className="w-3.5 h-3.5 brightness-0 invert opacity-70"
+                        referrerPolicy="no-referrer"
+                        alt="Search"
+                      />
+                    </div>
+                    {menubarSearchQuery ? (
+                      <button
+                        type="button"
+                        onClick={() => setMenubarSearchQuery("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-none cursor-pointer bouncy-btn"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const SpeechRecognition =
+                            (window as any).SpeechRecognition ||
+                            (window as any).webkitSpeechRecognition;
+                          if (SpeechRecognition) {
+                            const recognition = new SpeechRecognition();
+                            recognition.lang = "vi-VN";
+                            recognition.interimResults = false;
+                            recognition.maxAlternatives = 1;
+                            triggerToast("ƒêang l·∫Øng nghe...");
+                            recognition.start();
+                            recognition.onresult = (event: any) => {
+                              const speechResult =
+                                event.results[0][0].transcript;
+                              setMenubarSearchQuery((prev) => {
+                                const prefix = prev.trim() ? prev + " " : "";
+                                return prefix + speechResult;
+                              });
+                              triggerToast("ƒê√£ nh·∫≠p: " + speechResult);
+                            };
+                            recognition.onerror = (event: any) => {
+                              triggerToast("L·ªói: " + event.error);
+                            };
+                          } else {
+                            triggerToast(
+                              "Tr√¨nh duy·ªát kh√¥ng h·ªó tr·ª£ nh·∫≠n di·ªán gi·ªçng n√≥i",
+                            );
+                          }
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white hover:text-white/80 transition-none cursor-pointer bouncy-btn"
+                        title="T√¨m ki·∫øm b·∫±ng gi·ªçng n√≥i"
+                      >
+                        <Mic className="w-3.5 h-3.5 text-white shrink-0" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Search Results / Suggestions inside Dropdown Menu */}
+                  <div className="max-h-64 overflow-y-auto flex flex-col gap-1 custom-scrollbar pr-1">
+                    {renderSpotlightUnifiedResults(() =>
+                      setIsHeaderSearchExpanded(false),
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-</header>
+        </header>
       )}
 
       {/* High-Fidelity Sidebar Left Navigation (Inspired by the design) */}
@@ -4624,68 +4729,142 @@ export default function App() {
                   {/* Spotlight Search at the absolute top of sidebar (above Home) */}
                   {!showHeaderBar &&
                     dockItems.find((it) => it.id === "search")?.enabled &&
-                      (sidebarExpanded || isMobile ? (
-                        <div
-                          key="sidebar-search-spotlight"
-                          className="space-y-1"
-                        >
-                          <button
-                            type="button"
-                            onClick={() => {
-                              playPopSound();
-                              if (isSpotlightAllDisabled) {
-                                setShowSpotlightDisabledModal(true);
-                                return;
-                              }
-                              setIsSpotlightOpen(true);
-                            }}
-                            className="h-10 w-full relative flex items-center justify-between px-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-white/85 hover:text-white border border-white/10 transition-all duration-200 cursor-pointer group/sidebar select-none shadow-sm"
-                          >
-                            <div className="flex items-center gap-3">
+                    (sidebarExpanded || isMobile ? (
+                      <div key="sidebar-search-spotlight" className="space-y-1">
+                        <div className="relative flex flex-col gap-2 w-full">
+                          <div className="relative flex items-center w-full">
+                            <input
+                              ref={sidebarSearchRef}
+                              type="text"
+                              placeholder="Spotlight Search..."
+                              value={menubarSearchQuery}
+                              onChange={(e) => {
+                                setMenubarSearchQuery(e.target.value);
+                              }}
+                              onFocus={() => {
+                                if (isSpotlightAllDisabled) {
+                                  setShowSpotlightDisabledModal(true);
+                                  return;
+                                }
+                                setIsSpotlightFocused(true);
+                              }}
+                              onClick={() => {
+                                if (isSpotlightAllDisabled) {
+                                  setShowSpotlightDisabledModal(true);
+                                }
+                              }}
+                              onBlur={() => {
+                                setTimeout(() => {
+                                  setIsSpotlightFocused(false);
+                                }, 250);
+                              }}
+                              className="w-full pl-9.5 pr-10 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
+                            />
+                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
                               <img
                                 src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
-                                className="w-4 h-4 brightness-0 invert opacity-80 group-hover/sidebar:opacity-100"
+                                className="w-3.5 h-3.5 brightness-0 invert opacity-70"
                                 referrerPolicy="no-referrer"
                                 alt="Search"
                               />
-                              <span className="text-xs font-semibold tracking-wide font-sans">
-                                Spotlight Search
-                              </span>
                             </div>
-                            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-white/60 font-mono">
-                              ‚åòK
-                            </kbd>
-                          </button>
+                            {menubarSearchQuery ? (
+                              <button
+                                type="button"
+                                onClick={() => setMenubarSearchQuery("")}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-none cursor-pointer bouncy-btn"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const SpeechRecognition =
+                                    (window as any).SpeechRecognition ||
+                                    (window as any).webkitSpeechRecognition;
+                                  if (SpeechRecognition) {
+                                    const recognition = new SpeechRecognition();
+                                    recognition.lang = "vi-VN";
+                                    recognition.interimResults = false;
+                                    recognition.maxAlternatives = 1;
+                                    triggerToast("ƒêang l·∫Øng nghe...");
+                                    recognition.start();
+                                    recognition.onresult = (event: any) => {
+                                      const speechResult =
+                                        event.results[0][0].transcript;
+                                      setMenubarSearchQuery((prev) => {
+                                        const prefix = prev.trim()
+                                          ? prev + " "
+                                          : "";
+                                        return prefix + speechResult;
+                                      });
+                                      triggerToast("ƒê√£ nh·∫≠p: " + speechResult);
+                                    };
+                                    recognition.onerror = (event: any) => {
+                                      triggerToast("L·ªói: " + event.error);
+                                    };
+                                  } else {
+                                    triggerToast(
+                                      "Tr√¨nh duy·ªát kh√¥ng h·ªó tr·ª£ nh·∫≠n di·ªán gi·ªçng n√≥i",
+                                    );
+                                  }
+                                }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white hover:text-white/80 transition-none cursor-pointer bouncy-btn"
+                                title="T√¨m ki·∫øm b·∫±ng gi·ªçng n√≥i"
+                              >
+                                <Mic className="w-3.5 h-3.5 text-white shrink-0" />
+                              </button>
+                            )}
+                          </div>
+                          {(isSpotlightFocused ||
+                            menubarSearchQuery.trim() !== "") && (
+                            <div className="max-h-64 overflow-y-auto flex flex-col gap-1 custom-scrollbar pr-1 mt-1 bg-black/40 p-1.5 rounded-xl border border-white/5">
+                              {renderSpotlightUnifiedResults(
+                                () => setIsSpotlightFocused(false),
+                                true,
+                              )}
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div
-                          key="sidebar-search-spotlight-collapsed"
-                          className="space-y-1"
+                      </div>
+                    ) : (
+                      <div
+                        key="sidebar-search-spotlight-collapsed"
+                        className="space-y-1"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isSpotlightAllDisabled) {
+                              setShowSpotlightDisabledModal(true);
+                              return;
+                            }
+                            setSidebarExpanded(true);
+                            setIsSpotlightFocused(true);
+                            setTimeout(() => {
+                              sidebarSearchRef.current?.focus();
+                            }, 150);
+                          }}
+                          className={`h-10 w-full relative flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer group/sidebar select-none box-border ${
+                            isSpotlightFocused ||
+                            menubarSearchQuery.trim() !== ""
+                              ? "bg-[#d946ef] text-white font-bold shadow-lg shadow-fuchsia-500/25 border border-white/20"
+                              : "border border-transparent text-white/75 hover:text-white hover:bg-[#d946ef]"
+                          }`}
                         >
-                          <button
-                            type="button"
-                            onClick={() => {
-                              playPopSound();
-                              if (isSpotlightAllDisabled) {
-                                setShowSpotlightDisabledModal(true);
-                                return;
-                              }
-                              setIsSpotlightOpen(true);
-                            }}
-                            className="h-10 w-full relative flex items-center justify-center rounded-xl border border-transparent text-white/75 hover:text-white hover:bg-white/10 transition-all duration-200 cursor-pointer group/sidebar select-none"
-                          >
-                            <div className="absolute left-full ml-3 px-3 py-1.5 bg-[#121116] border border-white/10 text-white text-xs font-sans font-medium rounded-lg opacity-0 scale-95 pointer-events-none group-hover/sidebar:opacity-100 group-hover/sidebar:scale-100 transition-none shadow-xl whitespace-nowrap z-50">
-                              Spotlight Search (‚åòK)
-                            </div>
-                            <img
-                              src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
-                              className="w-4.5 h-4.5 brightness-0 invert"
-                              referrerPolicy="no-referrer"
-                              alt="Search"
-                            />
-                          </button>
-                        </div>
-                      ))}
+                          <div className="absolute left-full ml-3 px-3 py-1.5 bg-[#121116] border border-white/10 text-white text-xs font-sans font-medium rounded-lg opacity-0 scale-95 pointer-events-none group-hover/sidebar:opacity-100 group-hover/sidebar:scale-100 transition-none shadow-xl whitespace-nowrap z-50">
+                            Spotlight Search
+                          </div>
+                          <img
+                            src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
+                            className="w-4.5 h-4.5 brightness-0 invert"
+                            referrerPolicy="no-referrer"
+                            alt="Search"
+                          />
+                        </button>
+                      </div>
+                    ))}
 
                   {dockItems
                     .filter(
@@ -6500,16 +6679,20 @@ export default function App() {
             <div className="relative group/menubartooltip">
               <button
                 onClick={() => {
-                  playPopSound();
                   if (isSpotlightAllDisabled) {
                     setShowSpotlightDisabledModal(true);
                     return;
                   }
-                  setIsSpotlightOpen(true);
+                  if (spotlightSearchSettings.fullPageSearch) {
+                    setShowFullPageSearch(true);
+                    setShowSearchDropdown(false);
+                  } else {
+                    setShowSearchDropdown(!showSearchDropdown);
+                  }
                   setShowPowerDropdown(false);
                   setShowVIntel(false);
                 }}
-                className="relative flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-all active:scale-95 cursor-pointer"
+                className={`relative flex items-center justify-center w-8 h-8 rounded-lg hover:bg-white/10 text-white/90 hover:text-white transition-all active:scale-95 cursor-pointer ${showSearchDropdown ? "bg-white/10 text-[#38bdf8]" : ""}`}
                 aria-label="Spotlight Search"
               >
                 <img
@@ -6520,14 +6703,109 @@ export default function App() {
                   referrerPolicy="no-referrer"
                 />
                 <span
-                  className="absolute bottom-0 inset-x-1.5 h-0.5 bg-white rounded-full transition-transform duration-200 origin-center scale-x-0 group-hover/menubartooltip:scale-x-100"
+                  className={`absolute bottom-0 inset-x-1.5 h-0.5 bg-white rounded-full transition-transform duration-200 origin-center ${showSearchDropdown ? "scale-x-100" : "scale-x-0 group-hover/menubartooltip:scale-x-100"}`}
                 />
               </button>
 
-              {/* Glassmorphism Tooltip */}
-              <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/menubartooltip:block pointer-events-none z-50">
-                Spotlight Search (‚åòK)
-              </div>
+              {/* Glassmorphism Tooltip (Larger, 100% Rounded, No Animation) */}
+              {!showSearchDropdown && (
+                <div className="absolute top-full right-0 mt-2.5 px-3.5 py-1.5 rounded-full bg-[#18161e]/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] text-xs font-semibold text-white whitespace-nowrap hidden group-hover/menubartooltip:block pointer-events-none z-50">
+                  Spotlight Search
+                </div>
+              )}
+
+              <AnimatePresence>
+                {showSearchDropdown && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowSearchDropdown(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -16, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -16, scale: 0.95 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute right-0 top-full mt-2 w-72 rounded-[28px] bg-[#1d1b24]/95 backdrop-blur-md border border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.5)] z-50 p-3 flex flex-col gap-2 font-sans"
+                    >
+                      <div className="relative flex items-center w-full">
+                        <input
+                          type="text"
+                          autoFocus
+                          placeholder="T√¨m nhanh k√™nh..."
+                          value={menubarSearchQuery}
+                          onChange={(e) =>
+                            setMenubarSearchQuery(e.target.value)
+                          }
+                          className="w-full pl-9.5 pr-10 py-2.5 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
+                        />
+                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                          <img
+                            src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
+                            className="w-3.5 h-3.5 brightness-0 invert opacity-70"
+                            referrerPolicy="no-referrer"
+                            alt="Search"
+                          />
+                        </div>
+                        {menubarSearchQuery ? (
+                          <button
+                            type="button"
+                            onClick={() => setMenubarSearchQuery("")}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all cursor-pointer bouncy-btn"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const SpeechRecognition =
+                                (window as any).SpeechRecognition ||
+                                (window as any).webkitSpeechRecognition;
+                              if (SpeechRecognition) {
+                                const recognition = new SpeechRecognition();
+                                recognition.lang = "vi-VN";
+                                recognition.interimResults = false;
+                                recognition.maxAlternatives = 1;
+                                triggerToast("ƒêang l·∫Øng nghe...");
+                                recognition.start();
+                                recognition.onresult = (event: any) => {
+                                  const speechResult =
+                                    event.results[0][0].transcript;
+                                  setMenubarSearchQuery((prev) => {
+                                    const prefix = prev.trim()
+                                      ? prev + " "
+                                      : "";
+                                    return prefix + speechResult;
+                                  });
+                                  triggerToast("ƒê√£ nh·∫≠p: " + speechResult);
+                                };
+                                recognition.onerror = (event: any) => {
+                                  triggerToast("L·ªói: " + event.error);
+                                };
+                              } else {
+                                triggerToast(
+                                  "Tr√¨nh duy·ªát kh√¥ng h·ªó tr·ª£ nh·∫≠n di·ªán gi·ªçng n√≥i",
+                                );
+                              }
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white hover:text-white/80 transition-all cursor-pointer bouncy-btn"
+                            title="T√¨m ki·∫øm b·∫±ng gi·ªçng n√≥i"
+                          >
+                            <Mic className="w-3.5 h-3.5 text-white shrink-0" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="max-h-64 overflow-y-auto flex flex-col gap-1 custom-scrollbar pr-1">
+                        {renderSpotlightUnifiedResults(() =>
+                          setShowSearchDropdown(false),
+                        )}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Real-time Ticking Digital Clock on the far right (replacing User Profile) */}
@@ -8720,324 +8998,1412 @@ export default function App() {
                                         </div>
                                       </div>
 
-                                       {/* 2. Tin t·ª©c */}
-                                       {(matches("tin t·ª©c") || matches("news")) && (
-                                         <div
-                                           onClick={() => {
-                                             playPopSound();
-                                             setSpotlightSearchSettings(
-                                               (prev) => ({
-                                                 ...prev,
-                                                 news: !prev.news,
-                                               }),
-                                             );
-                                           }}
-                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                         >
-                                           <div className="space-y-1 pr-2">
-                                             <h4 className="text-sm font-semibold text-white">
-                                               Tin t·ª©c & Th√¥ng b√°o
-                                             </h4>
-                                             <p className="text-xs text-white/60">
-                                               T√¨m ki·∫øm c√°c b√†i vi·∫øt tin t·ª©c, c·∫≠p nh·∫≠t v√† th√¥ng b√°o c·ªông ƒë·ªìng.
-                                             </p>
-                                           </div>
-                                           <div
-                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                               spotlightSearchSettings.news
-                                                 ? "bg-amber-500 border-amber-400 text-white shadow-[0_0_10px_rgba(245,158,11,0.4)]"
-                                                 : "bg-white/5 border-white/20 hover:border-white/40"
-                                             }`}
-                                           >
-                                             {spotlightSearchSettings.news && (
-                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                             )}
-                                           </div>
-                                         </div>
-                                       )}
+                                      {/* 2. Tin t·ª©c */}
+                                      <div
+                                        onClick={() => {
+                                          playPopSound();
+                                          setSpotlightSearchSettings(
+                                            (prev) => ({
+                                              ...prev,
+                                              news: !prev.news,
+                                            }),
+                                          );
+                                        }}
+                                        className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                      >
+                                        <div className="space-y-0.5 pr-2">
+                                          <h4 className="text-sm font-semibold text-white">
+                                            Tin t·ª©c
+                                          </h4>
+                                          <p className="text-xs text-white/60">
+                                            Hi·ªÉn th·ªã c√°c b√†i vi·∫øt tin t·ª©c, th√¥ng
+                                            b√°o c·ªông ƒë·ªìng v√† s·ª± ki·ªán Discord
+                                          </p>
+                                        </div>
+                                        <div
+                                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                            spotlightSearchSettings.news
+                                              ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
+                                              : "bg-white/5 border-white/20 hover:border-white/40"
+                                          }`}
+                                        >
+                                          {spotlightSearchSettings.news && (
+                                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                          )}
+                                        </div>
+                                      </div>
 
-                                       {/* 3. K√™nh truy·ªÅn h√¨nh */}
-                                       {(matches("k√™nh") || matches("truy·ªÅn h√¨nh") || matches("tv") || matches("v-play")) && (
-                                         <div
-                                           onClick={() => {
-                                             playPopSound();
-                                             setSpotlightSearchSettings(
-                                               (prev) => ({
-                                                 ...prev,
-                                                 channels: !prev.channels,
-                                               }),
-                                             );
-                                           }}
-                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                         >
-                                           <div className="space-y-1 pr-2">
-                                             <h4 className="text-sm font-semibold text-white">
-                                               K√™nh truy·ªÅn h√¨nh V-Play
-                                             </h4>
-                                             <p className="text-xs text-white/60">
-                                               T√¨m ki·∫øm t√™n k√™nh truy·ªÅn h√¨nh tr·ª±c tuy·∫øn trong kho 120+ k√™nh s√≥ng.
-                                             </p>
-                                           </div>
-                                           <div
-                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                               spotlightSearchSettings.channels
-                                                 ? "bg-blue-500 border-blue-400 text-white shadow-[0_0_10px_rgba(59,130,246,0.4)]"
-                                                 : "bg-white/5 border-white/20 hover:border-white/40"
-                                             }`}
-                                           >
-                                             {spotlightSearchSettings.channels && (
-                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                             )}
-                                           </div>
-                                         </div>
-                                       )}
+                                      {/* 3. Truy·ªÅn h√¨nh */}
+                                      <div className="space-y-2">
+                                        <div
+                                          onClick={() => {
+                                            playPopSound();
+                                            setSpotlightSearchSettings(
+                                              (prev) => ({
+                                                ...prev,
+                                                channels: !prev.channels,
+                                              }),
+                                            );
+                                          }}
+                                          className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                        >
+                                          <div className="space-y-0.5 pr-2">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              Truy·ªÅn h√¨nh
+                                            </h4>
+                                            <p className="text-xs text-white/60">
+                                              Hi·ªÉn th·ªã danh s√°ch k√™nh truy·ªÅn
+                                              h√¨nh tr·ª±c ti·∫øp theo t√™n ho·∫∑c nh√≥m
+                                              k√™nh
+                                            </p>
+                                          </div>
+                                          <div
+                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                              spotlightSearchSettings.channels
+                                                ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
+                                                : "bg-white/5 border-white/20 hover:border-white/40"
+                                            }`}
+                                          >
+                                            {spotlightSearchSettings.channels && (
+                                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                            )}
+                                          </div>
+                                        </div>
 
-                                       {/* 4. T√¨m theo s·ªë hi·ªáu k√™nh */}
-                                       {(matches("s·ªë hi·ªáu") || matches("channel number")) && (
-                                         <div
-                                           onClick={() => {
-                                             playPopSound();
-                                             setSpotlightSearchSettings(
-                                               (prev) => ({
-                                                 ...prev,
-                                                 channelNumbers:
-                                                   !prev.channelNumbers,
-                                               }),
-                                             );
-                                           }}
-                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                         >
-                                           <div className="space-y-1 pr-2">
-                                             <h4 className="text-sm font-semibold text-white">
-                                               T√¨m k√™nh theo s·ªë hi·ªáu
-                                             </h4>
-                                             <p className="text-xs text-white/60">
-                                               Cho ph√©p g√µ s·ªë hi·ªáu k√™nh (#1, #2, #55...) ƒë·ªÉ chuy·ªÉn k√™nh nhanh.
-                                             </p>
-                                           </div>
-                                           <div
-                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                               spotlightSearchSettings.channelNumbers
-                                                 ? "bg-blue-500 border-blue-400 text-white shadow-[0_0_10px_rgba(59,130,246,0.4)]"
-                                                 : "bg-white/5 border-white/20 hover:border-white/40"
-                                             }`}
-                                           >
-                                             {spotlightSearchSettings.channelNumbers && (
-                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                             )}
-                                           </div>
-                                         </div>
-                                       )}
+                                        {/* 3.1. M·ª•c nh·ªè c·ªßa truy·ªÅn h√¨nh: T√¨m k√™nh theo s·ªë hi·ªáu k√™nh */}
+                                        <div
+                                          onClick={() => {
+                                            if (
+                                              !spotlightSearchSettings.channels
+                                            )
+                                              return;
+                                            playPopSound();
+                                            setSpotlightSearchSettings(
+                                              (prev) => ({
+                                                ...prev,
+                                                channelNumbers:
+                                                  !prev.channelNumbers,
+                                              }),
+                                            );
+                                          }}
+                                          className={`ml-5 pl-4 pr-3.5 py-3 rounded-xl bg-white/[0.03] border-l-2 border-y border-r border-white/10 flex items-center justify-between gap-3 transition-colors select-none ${
+                                            spotlightSearchSettings.channels
+                                              ? "cursor-pointer hover:bg-white/10 border-l-sky-400"
+                                              : "opacity-40 cursor-not-allowed border-l-white/20"
+                                          }`}
+                                        >
+                                          <div className="space-y-0.5 pr-2">
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-xs font-semibold text-sky-300">
+                                                ‚Ü≥ T√¨m k√™nh theo s·ªë hi·ªáu k√™nh
+                                              </span>
+                                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                                                CH #
+                                              </span>
+                                            </div>
+                                            <p className="text-[11px] text-white/50">
+                                              Cho ph√©p g√µ s·ªë k√™nh (v√≠ d·ª•: 1,
+                                              001, #12, k√™nh 5) ƒë·ªÉ t√¨m nhanh
+                                            </p>
+                                          </div>
+                                          <div
+                                            className={`w-4.5 h-4.5 rounded flex items-center justify-center transition-all shrink-0 border ${
+                                              spotlightSearchSettings.channels &&
+                                              spotlightSearchSettings.channelNumbers
+                                                ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_8px_rgba(56,189,248,0.4)]"
+                                                : "bg-white/5 border-white/20"
+                                            }`}
+                                          >
+                                            {spotlightSearchSettings.channels &&
+                                              spotlightSearchSettings.channelNumbers && (
+                                                <Check className="w-3 h-3 stroke-[3]" />
+                                              )}
+                                          </div>
+                                        </div>
+                                      </div>
 
-                                       {/* 5. Toolbox */}
-                                       {(matches("toolbox") || matches("ti·ªán √≠ch")) && (
-                                         <div
-                                           onClick={() => {
-                                             playPopSound();
-                                             setSpotlightSearchSettings(
-                                               (prev) => ({
-                                                 ...prev,
-                                                 toolbox: !prev.toolbox,
-                                               }),
-                                             );
-                                           }}
-                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                         >
-                                           <div className="space-y-1 pr-2">
-                                             <h4 className="text-sm font-semibold text-white">
-                                               Toolbox & Ti·ªán √≠ch
-                                             </h4>
-                                             <p className="text-xs text-white/60">
-                                               T√¨m ki·∫øm c√°c ti·ªán √≠ch m·ªü r·ªông (Multiview, ƒê·ªìng h·ªì, Ghi ch√∫, Th√™m lu·ªìng m3u8...).
-                                             </p>
-                                           </div>
-                                           <div
-                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                               spotlightSearchSettings.toolbox
-                                                 ? "bg-purple-500 border-purple-400 text-white shadow-[0_0_10px_rgba(168,85,247,0.4)]"
-                                                 : "bg-white/5 border-white/20 hover:border-white/40"
-                                             }`}
-                                           >
-                                             {spotlightSearchSettings.toolbox && (
-                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                             )}
-                                           </div>
-                                         </div>
-                                       )}
+                                      {/* 4. Toolbox */}
+                                      <div
+                                        onClick={() => {
+                                          playPopSound();
+                                          setSpotlightSearchSettings(
+                                            (prev) => ({
+                                              ...prev,
+                                              toolbox: !prev.toolbox,
+                                            }),
+                                          );
+                                        }}
+                                        className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                      >
+                                        <div className="space-y-0.5 pr-2">
+                                          <h4 className="text-sm font-semibold text-white">
+                                            Toolbox
+                                          </h4>
+                                          <p className="text-xs text-white/60">
+                                            Hi·ªÉn th·ªã c√°c c√¥ng c·ª• ti·ªán √≠ch (Xem
+                                            URL, Th√™m k√™nh, Nh·∫≠p/Xu·∫•t M3U,
+                                            Multiview,...)
+                                          </p>
+                                        </div>
+                                        <div
+                                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                            spotlightSearchSettings.toolbox
+                                              ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
+                                              : "bg-white/5 border-white/20 hover:border-white/40"
+                                          }`}
+                                        >
+                                          {spotlightSearchSettings.toolbox && (
+                                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                          )}
+                                        </div>
+                                      </div>
 
-                                       {/* 6. Settings */}
-                                       {(matches("c√†i ƒë·∫∑t") || matches("settings")) && (
-                                         <div
-                                           onClick={() => {
-                                             playPopSound();
-                                             setSpotlightSearchSettings(
-                                               (prev) => ({
-                                                 ...prev,
-                                                 settings: !prev.settings,
-                                               }),
-                                             );
-                                           }}
-                                           className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
-                                         >
-                                           <div className="space-y-1 pr-2">
-                                             <h4 className="text-sm font-semibold text-white">
-                                               C√†i ƒë·∫∑t h·ªá th·ªëng
-                                             </h4>
-                                             <p className="text-xs text-white/60">
-                                               T√¨m ki·∫øm c√°c m·ª•c c√†i ƒë·∫∑t h·ªá th·ªëng (Giao di·ªán, Spotlight, Tr·ª£ nƒÉng, T√†i kho·∫£n...).
-                                             </p>
-                                           </div>
-                                           <div
-                                             className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
-                                               spotlightSearchSettings.settings
-                                                 ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
-                                                 : "bg-white/5 border-white/20 hover:border-white/40"
-                                             }`}
-                                           >
-                                             {spotlightSearchSettings.settings && (
-                                               <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                             )}
-                                           </div>
-                                         </div>
-                                       )}
-                                     </div>
-                                   </div>
-                                 )}
-                               </div>
-                             );
-                           })()}
-                          </motion.div>
-                        ) : null}
-                     </AnimatePresence>
-                   </div>
-                 </motion.div>
-               ) : activeTab === "vapps" ? (
-                 <motion.div
-                   key="vapps"
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   exit={{ opacity: 0 }}
-                   transition={{ duration: 0.5, ease: "easeOut" }}
-                   className="w-full max-w-7xl mx-auto px-4 pt-14 pb-8"
-                 >
-                   <VAppsView
-                     triggerToast={triggerToast}
-                     onNavigateToChannel={(chId) => {
-                       const ch = processedChannels.find(
-                         (c) => c.id === chId,
-                       );
-                       if (ch) {
-                         handleSelectChannel(ch);
-                         setActiveTab("live");
-                       }
-                     }}
-                   />
-                 </motion.div>
-               ) : activeTab === "vpremium" ? (
-                 <motion.div
-                   key="vpremium"
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   exit={{ opacity: 0 }}
-                   transition={{ duration: 0.5, ease: "easeOut" }}
-                   className="w-full max-w-7xl mx-auto px-4 pt-14 pb-8"
-                 >
-                   <VPremiumView />
-                 </motion.div>
-               ) : activeTab === "news" ? (
-                 <motion.div
-                   key="news"
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   exit={{ opacity: 0 }}
-                   transition={{ duration: 0.5, ease: "easeOut" }}
-                   className="w-full max-w-7xl mx-auto px-4 pt-14 pb-8"
-                 >
-                   <NewsView
-                     triggerToast={triggerToast}
-                     onSelectChannel={(chId) => {
-                       const ch = processedChannels.find(
-                         (c) => c.id === chId,
-                       );
-                       if (ch) {
-                         handleSelectChannel(ch);
-                         setActiveTab("live");
-                       }
-                     }}
-                   />
-                 </motion.div>
-               ) : null}
-             </AnimatePresence>
-           </motion.div>
-         )}
-       </main>
+                                      {/* 5. C√†i ƒë·∫∑t */}
+                                      <div
+                                        onClick={() => {
+                                          playPopSound();
+                                          setSpotlightSearchSettings(
+                                            (prev) => ({
+                                              ...prev,
+                                              settings: !prev.settings,
+                                            }),
+                                          );
+                                        }}
+                                        className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                      >
+                                        <div className="space-y-0.5 pr-2">
+                                          <h4 className="text-sm font-semibold text-white">
+                                            C√†i ƒë·∫∑t
+                                          </h4>
+                                          <p className="text-xs text-white/60">
+                                            Hi·ªÉn th·ªã c√°c m·ª•c c·∫•u h√¨nh h·ªá th·ªëng,
+                                            giao di·ªán, tr·ª£ nƒÉng v√† ti·ªán √≠ch
+                                            trong C√†i ƒë·∫∑t
+                                          </p>
+                                        </div>
+                                        <div
+                                          className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                            spotlightSearchSettings.settings
+                                              ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
+                                              : "bg-white/5 border-white/20 hover:border-white/40"
+                                          }`}
+                                        >
+                                          {spotlightSearchSettings.settings && (
+                                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
 
-       {/* Unified Spotlight Search Modal */}
-       <SpotlightSearchModal
-         isOpen={isSpotlightOpen}
-         onClose={() => setIsSpotlightOpen(false)}
-         query={menubarSearchQuery}
-         onQueryChange={setMenubarSearchQuery}
-         results={spotlightSearchResults}
-         isAllDisabled={isSpotlightAllDisabled}
-         onOpenSettings={() => {
-           setActiveTab("settings");
-           setActiveSettingSection("search");
-         }}
-         triggerToast={triggerToast}
-         onSelectNews={(id, title) => {
-           setActiveTab("news");
-           triggerToast("M·ªü tin t·ª©c: " + title);
-         }}
-         onSelectChannel={(ch) => {
-           handleSelectChannel(ch);
-           triggerToast("ƒêang ph√°t: " + ch.name);
-         }}
-         selectedChannelId={selectedChannel?.id}
-       />
+                                {/* 3. TR·ª¢ NƒÇNG (ACCESSIBILITY) */}
+                                {(matches("tr·ª£ nƒÉng") ||
+                                  matches("slide") ||
+                                  matches("sidebar") ||
+                                  matches("auto")) && (
+                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
+                                    <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                                      <Key className="w-5 h-5 text-emerald-400 shrink-0" />
+                                      <div>
+                                        <h3 className="text-base font-bold text-white">
+                                          Tr·ª£ nƒÉng
+                                        </h3>
+                                        <p className="text-xs text-white/60">
+                                          ƒêi·ªÅu ch·ªânh t·ª± ƒë·ªông tr∆∞·ª£t banner v√†
+                                          t∆∞∆°ng t√°c menu
+                                        </p>
+                                      </div>
+                                    </div>
 
-       {/* Toast Notification Container */}
-       {toastMessage && (
-         <div className="fixed bottom-6 right-6 z-[9999] px-4 py-2.5 rounded-xl bg-[#1d1b24]/90 backdrop-blur-xl border border-white/20 text-white text-xs font-semibold shadow-2xl animate-fade-in flex items-center gap-2">
-           <Sparkles className="w-4 h-4 text-sky-400" />
-           <span>{toastMessage}</span>
-         </div>
-       )}
+                                    {/* TOGGLE: Auto Slide */}
+                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                                      <div className="space-y-1 pr-4">
+                                        <h4 className="text-sm font-semibold text-white">
+                                          T·ª± ƒë·ªông tr∆∞·ª£t h√¨nh Banner
+                                        </h4>
+                                        <p className="text-xs text-white/60">
+                                          Banner h√¨nh ·∫£nh ·ªü trang ch·ªß t·ª± ƒë·ªông
+                                          tr∆∞·ª£t sau m·ªói 5 gi√¢y
+                                        </p>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          playPopSound();
+                                          setAutoSlide(!autoSlide);
+                                        }}
+                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 relative cursor-pointer flex items-center shrink-0 ${
+                                          autoSlide
+                                            ? "bg-[#34c759]"
+                                            : "bg-[#3a3a3c]"
+                                        }`}
+                                      >
+                                        <motion.div
+                                          animate={{ x: autoSlide ? 20 : 0 }}
+                                          transition={{
+                                            type: "spring",
+                                            stiffness: 500,
+                                            damping: 30,
+                                          }}
+                                          className="w-5 h-5 rounded-full bg-white shadow-md"
+                                        />
+                                      </button>
+                                    </div>
 
-       {/* Disabled Spotlight Modal */}
-       {showSpotlightDisabledModal && (
-         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-           <div className="w-full max-w-md p-6 rounded-2xl bg-[#1c1a24] border border-white/15 text-white shadow-2xl font-sans space-y-4">
-             <div className="flex items-center gap-3 text-amber-400">
-               <AlertCircle className="w-6 h-6 shrink-0" />
-               <h3 className="text-base font-bold">T√¨m ki·∫øm ƒëang t·∫Øt</h3>
-             </div>
-             <p className="text-xs text-white/70 leading-relaxed">
-               T·∫•t c·∫£ c√°c ngu·ªìn d·ªØ li·ªáu trong Spotlight Search ƒë√£ b·ªã t·∫Øt trong C√†i ƒë·∫∑t. Vui l√≤ng b·∫≠t l·∫°i √≠t nh·∫•t m·ªôt m·ª•c ƒë·ªÉ s·ª≠ d·ª•ng t√≠nh nƒÉng t√¨m ki·∫øm.
-             </p>
-             <div className="flex justify-end gap-3 pt-2">
-               <button
-                 type="button"
-                 onClick={() => setShowSpotlightDisabledModal(false)}
-                 className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-all cursor-pointer"
-               >
-                 ƒê√≥ng
-               </button>
-               <button
-                 type="button"
-                 onClick={() => {
-                   setShowSpotlightDisabledModal(false);
-                   setActiveTab("settings");
-                   setActiveSettingSection("search");
-                 }}
-                 className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold shadow-lg shadow-sky-500/25 transition-all cursor-pointer"
-               >
-                 ƒêi t·ªõi C√†i ƒë·∫∑t
-               </button>
-             </div>
-           </div>
-         </div>
-       )}
-     </div>
-   );
- }
+                                    {/* TOGGLE: Auto Hide Sidebar */}
+                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                                      <div className="space-y-1 pr-4">
+                                        <h4 className="text-sm font-semibold text-white">
+                                          T·ª± ƒë·ªông ·∫©n Sidebar
+                                        </h4>
+                                        <p className="text-xs text-white/60">
+                                          T·ª± ƒë·ªông thu g·ªçn thanh menu khi kh√¥ng
+                                          di chu·ªôt v√†o
+                                        </p>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          playPopSound();
+                                          setAutoHideSidebar(!autoHideSidebar);
+                                        }}
+                                        className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 relative cursor-pointer flex items-center shrink-0 ${
+                                          autoHideSidebar
+                                            ? "bg-[#34c759]"
+                                            : "bg-[#3a3a3c]"
+                                        }`}
+                                      >
+                                        <motion.div
+                                          animate={{
+                                            x: autoHideSidebar ? 20 : 0,
+                                          }}
+                                          transition={{
+                                            type: "spring",
+                                            stiffness: 500,
+                                            damping: 30,
+                                          }}
+                                          className="w-5 h-5 rounded-full bg-white shadow-md"
+                                        />
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* 4. TIN T·ª®C (NEWS SETTINGS) */}
+                                {(matches("news") ||
+                                  matches("tin t·ª©c") ||
+                                  matches("b·∫£n tin") ||
+                                  matches("b√†i vi·∫øt") ||
+                                  matches("c·ª° ch·ªØ") ||
+                                  matches("font") ||
+                                  matches("ch·ªØ to") ||
+                                  matches("ch·ªØ nh·ªè") ||
+                                  matches("size")) && (
+                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
+                                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                                      <div className="flex items-center gap-3">
+                                        <Megaphone className="w-5 h-5 text-rose-400 shrink-0" />
+                                        <div>
+                                          <h3 className="text-base font-bold text-white">
+                                            Tin t·ª©c (News)
+                                          </h3>
+                                          <p className="text-xs text-white/60">
+                                            T√πy ch·ªânh c·ª° ch·ªØ ƒë·ªçc b√†i vi·∫øt v√†
+                                            qu·∫£n l√Ω tr·∫£i nghi·ªám ƒë·ªçc b·∫£n tin
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          playPopSound();
+                                          setActiveSettingSection("news");
+                                        }}
+                                        className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold shrink-0 active:scale-95 transition-all cursor-pointer shadow-sm bouncy-btn flex items-center gap-1"
+                                      >
+                                        <span>Chi ti·∫øt</span>
+                                        <ChevronRight className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+
+                                    {/* C·ª° ch·ªØ b√†i vi·∫øt Selector */}
+                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-3">
+                                      <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                          <Type className="w-4 h-4 text-rose-300" />
+                                          <h4 className="text-sm font-semibold text-white">
+                                            K√≠ch th∆∞·ªõc c·ª° ch·ªØ ƒë·ªçc b√†i vi·∫øt
+                                          </h4>
+                                        </div>
+                                        <span className="text-xs font-medium text-rose-300">
+                                          {newsFontSize === "small"
+                                            ? "Nh·ªè (14px)"
+                                            : newsFontSize === "normal"
+                                              ? "Ti√™u chu·∫©n (16px)"
+                                              : newsFontSize === "large"
+                                                ? "L·ªõn (18px)"
+                                                : "R·∫•t l·ªõn (20px)"}
+                                        </span>
+                                      </div>
+
+                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                        {[
+                                          {
+                                            id: "small",
+                                            label: "Nh·ªè",
+                                            size: "14px",
+                                            sampleClass: "text-xs",
+                                          },
+                                          {
+                                            id: "normal",
+                                            label: "Chu·∫©n",
+                                            size: "16px",
+                                            sampleClass: "text-sm",
+                                          },
+                                          {
+                                            id: "large",
+                                            label: "L·ªõn",
+                                            size: "18px",
+                                            sampleClass: "text-base",
+                                          },
+                                          {
+                                            id: "huge",
+                                            label: "R·∫•t l·ªõn",
+                                            size: "20px",
+                                            sampleClass: "text-lg",
+                                          },
+                                        ].map((option) => (
+                                          <button
+                                            key={option.id}
+                                            type="button"
+                                            onClick={() =>
+                                              handleUpdateNewsFontSize(
+                                                option.id as NewsFontSize,
+                                              )
+                                            }
+                                            className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 bouncy-btn ${
+                                              newsFontSize === option.id
+                                                ? "bg-rose-500/25 border-rose-400/80 text-white shadow-[0_0_15px_rgba(244,63,94,0.3)] ring-1 ring-rose-400/50"
+                                                : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white"
+                                            }`}
+                                          >
+                                            <span className="text-xs font-bold">
+                                              {option.label}
+                                            </span>
+                                            <span className="text-[10px] text-white/50">
+                                              {option.size}
+                                            </span>
+                                          </button>
+                                        ))}
+                                      </div>
+
+                                      {/* Interactive Live Preview Box */}
+                                      <div className="mt-2 p-3.5 rounded-xl bg-black/30 border border-white/10 flex flex-col gap-1.5">
+                                        <div className="text-[10px] uppercase font-bold tracking-wider text-white/40">
+                                          Xem tr∆∞·ªõc tr·ª±c ti·∫øp
+                                        </div>
+                                        <p
+                                          className={`text-white/90 font-sans transition-all duration-200 ${
+                                            newsFontSize === "small"
+                                              ? "text-xs leading-relaxed"
+                                              : newsFontSize === "normal"
+                                                ? "text-sm leading-relaxed"
+                                                : newsFontSize === "large"
+                                                  ? "text-base leading-relaxed"
+                                                  : "text-lg leading-relaxed"
+                                          }`}
+                                        >
+                                          The Waves ‚Äî T·ª´ nh·ªØng ng∆∞·ªùi xa l·∫° t√¨nh
+                                          c·ªù g·∫∑p nhau d∆∞·ªõi ph·∫ßn b√¨nh lu·∫≠n
+                                          YouTube, m·ªôt c·ªông ƒë·ªìng ƒë∆∞·ª£c h√¨nh
+                                          th√†nh.
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* 5. C·ª¨A H√ÄNG TI·ªÜN √çCH (PLUGIN STORE) */}
+                                {(matches("c·ª≠a h√†ng ti·ªán √≠ch") ||
+                                  matches("plugin") ||
+                                  matches("ti·ªán √≠ch")) && (
+                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
+                                    <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                                      <Puzzle className="w-5 h-5 text-amber-400 shrink-0" />
+                                      <div>
+                                        <h3 className="text-base font-bold text-white">
+                                          C·ª≠a h√†ng ti·ªán √≠ch
+                                        </h3>
+                                        <p className="text-xs text-white/60">
+                                          C√†i ƒë·∫∑t v√† g·ª° b·ªè c√°c g√≥i ti·ªán √≠ch m·ªü
+                                          r·ªông c·ªßa Waves Community
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+                                      {[
+                                        {
+                                          id: "export_stream",
+                                          name: "Xu·∫•t lu·ªìng",
+                                          desc: "Xu·∫•t l∆∞u danh s√°ch k√™nh t·ªáp .m3u8",
+                                        },
+                                        {
+                                          id: "multiview",
+                                          name: "Multiview Grid",
+                                          desc: "Xem t·ªëi ƒëa 4 k√™nh c√πng l√∫c",
+                                        },
+                                        {
+                                          id: "pip",
+                                          name: "Picture in Picture",
+                                          desc: "C·ª≠a s·ªï n·ªïi thu nh·ªè ti·ªán l·ª£i",
+                                        },
+                                        {
+                                          id: "open_native",
+                                          name: "M·ªü lu·ªìng g·ªëc",
+                                          desc: "M·ªü tr·ª±c ti·∫øp lu·ªìng stream hls g·ªëc",
+                                        },
+                                      ].map((p) => {
+                                        const status =
+                                          installedPlugins[p.id] || "idle";
+                                        return (
+                                          <div
+                                            key={p.id}
+                                            className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3"
+                                          >
+                                            <div className="min-w-0">
+                                              <h4 className="text-sm font-semibold text-white truncate">
+                                                {p.name}
+                                              </h4>
+                                              <p className="text-[11px] text-white/50 truncate mt-0.5">
+                                                {p.desc}
+                                              </p>
+                                            </div>
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                playPopSound();
+                                                if (status === "installed") {
+                                                  setPluginToUninstall(p);
+                                                } else {
+                                                  startInstallPlugin(p.id);
+                                                }
+                                              }}
+                                              className={`px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+                                                status === "installed"
+                                                  ? "bg-red-500/10 text-red-300 border border-red-500/20 hover:bg-red-500/20"
+                                                  : "bg-white/10 text-white border border-white/15 hover:bg-white/20"
+                                              }`}
+                                            >
+                                              {status === "installed"
+                                                ? "G·ª° b·ªè"
+                                                : status === "installing"
+                                                  ? "ƒêang c√†i..."
+                                                  : "C√†i ƒë·∫∑t"}
+                                            </button>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* 4. T√ôY CH·ªåN NH√Ä PH√ÅT TRI·ªÇN (DEVELOPER OPTIONS / DESIGN COMPONENTS) */}
+                                {(matches("design") ||
+                                  matches("components") ||
+                                  matches("nh√† ph√°t tri·ªÉn") ||
+                                  matches("th√†nh ph·∫ßn")) && (
+                                  <div className="bg-white/10 backdrop-blur-[15px] rounded-[20px] p-5 sm:p-6 border border-white/10 space-y-4 text-left">
+                                    <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                                      <Cpu className="w-5 h-5 text-purple-400 shrink-0" />
+                                      <div>
+                                        <h3 className="text-base font-bold text-white">
+                                          T√πy ch·ªçn nh√† ph√°t tri·ªÉn
+                                        </h3>
+                                        <p className="text-xs text-white/60">
+                                          Ki·ªÉm tra c√°c th√†nh ph·∫ßn giao di·ªán v√†
+                                          t√†i nguy√™n h·ªá th·ªëng
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-4">
+                                      <div className="space-y-1">
+                                        <h4 className="text-sm font-semibold text-white">
+                                          Waves Community Design components
+                                        </h4>
+                                        <p className="text-xs text-white/60">
+                                          H·ªá th·ªëng ng√¥n ng·ªØ thi·∫øt k·∫ø, t∆∞∆°ng t√°c
+                                          n√∫t b·∫•m, hi·ªáu ·ª©ng b√°m d√≠nh v√† xem th·ª≠
+                                          th√†nh ph·∫ßn UI
+                                        </p>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          playPopSound();
+                                          setActiveSettingSection(
+                                            "design_system",
+                                          );
+                                        }}
+                                        className="px-4 py-2 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold shrink-0 active:scale-95 transition-all cursor-pointer shadow-md bouncy-btn flex items-center gap-1.5"
+                                      >
+                                        <span>Kh√°m ph√° UI</span>
+                                        <ChevronRight className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="detail"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className={`mt-16 sm:mt-20 rounded-[15px] p-6 sm:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] border border-white/10 text-white ${
+                            activeSettingSection === "design_system"
+                              ? "bg-[#211f26] backdrop-blur-[10px]"
+                              : "bg-white/10 backdrop-blur-[10px]"
+                          }`}
+                        >
+                          {activeSettingSection === "appearance" &&
+                            (() => {
+                              const isMatched = (text: string) => {
+                                const q = settingDetailSearchQuery
+                                  .trim()
+                                  .toLowerCase();
+                                if (!q) return true;
+                                return text.toLowerCase().includes(q);
+                              };
+
+                              const matchGlow =
+                                isMatched("M√†u S·∫Øc √Ånh S√°ng N·ªÅn") ||
+                                isMatched("Backdrop Glow") ||
+                                isMatched("cosmic") ||
+                                isMatched("sunset") ||
+                                isMatched("aurora") ||
+                                isMatched("t·ªëi gi·∫£n") ||
+                                isMatched("ch·ªß ƒë·ªÅ") ||
+                                isMatched("m√†u");
+                              const matchAmoled =
+                                isMatched("AMOLED Dark") ||
+                                isMatched("si√™u t·ªëi") ||
+                                isMatched("b·∫£o v·ªá m·∫Øt") ||
+                                isMatched("t·ªëi");
+                              const matchDockToSidebar =
+                                isMatched("Dock to Sidebar") ||
+                                isMatched("sidebar") ||
+                                isMatched("thanh dock th√†nh sidebar") ||
+                                isMatched("thanh b√™n") ||
+                                isMatched("giao di·ªán sidebar") ||
+                                isMatched("expand") ||
+                                isMatched("collapse");
+                              const matchDock =
+                                isMatched("T√πy bi·∫øn thanh ƒëi·ªÅu h∆∞·ªõng Dock") ||
+                                isMatched("thanh Dock") ||
+                                isMatched("Dock Customizer") ||
+                                isMatched("rearrange") ||
+                                isMatched("trang ch·ªß") ||
+                                isMatched("tr·ª±c ti·∫øp") ||
+                                isMatched("c√†i ƒë·∫∑t") ||
+                                isMatched("t√¨m ki·∫øm") ||
+                                isMatched("t·∫£i l·∫°i") ||
+                                isMatched("ghim") ||
+                                isMatched("h·ªì s∆°") ||
+                                isMatched("c·ª≠a h√†ng") ||
+                                isMatched("v·ªÅ ·ª©ng d·ª•ng");
+
+                              const hasResults =
+                                matchGlow ||
+                                matchAmoled ||
+                                matchDockToSidebar ||
+                                matchDock;
+
+                              return (
+                                <div className="space-y-6">
+                                  {/* Section Header with Search Bar */}
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                    <div className="flex items-center gap-3 text-left">
+                                      <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
+                                        <Palette className="w-6 h-6" />
+                                      </div>
+                                      <div>
+                                        <h3 className="text-lg font-semibold text-white">
+                                          Giao di·ªán
+                                        </h3>
+                                        <p className="text-xs text-white/60">
+                                          T√πy bi·∫øn d·∫£i m√†u chuy·ªÉn s·∫Øc ph√≠a d∆∞·ªõi
+                                          l·ªõp k√≠nh m·ªù theo ƒë√∫ng s·ªü th√≠ch c·ªßa
+                                          b·∫°n.
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="relative w-full md:max-w-[280px]">
+                                      <input
+                                        type="text"
+                                        value={settingDetailSearchQuery}
+                                        onChange={(e) =>
+                                          setSettingDetailSearchQuery(
+                                            e.target.value,
+                                          )
+                                        }
+                                        placeholder="T√¨m ki·∫øm c√†i ƒë·∫∑t..."
+                                        className="w-full pl-10 pr-10 py-2 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
+                                      />
+                                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                        <img
+                                          src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest/scale-to-width-down/1000?cb=20260717131751"
+                                          className="w-4 h-4 brightness-0 invert opacity-60"
+                                          referrerPolicy="no-referrer"
+                                          alt="Search"
+                                        />
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const SpeechRecognition =
+                                            (window as any).SpeechRecognition ||
+                                            (window as any)
+                                              .webkitSpeechRecognition;
+                                          if (SpeechRecognition) {
+                                            const recognition =
+                                              new SpeechRecognition();
+                                            recognition.lang = "vi-VN";
+                                            recognition.interimResults = false;
+                                            recognition.maxAlternatives = 1;
+                                            triggerToast("ƒêang l·∫Øng nghe...");
+                                            recognition.start();
+                                            recognition.onresult = (
+                                              event: any,
+                                            ) => {
+                                              const speechResult =
+                                                event.results[0][0].transcript;
+                                              setSettingDetailSearchQuery(
+                                                (prev) => {
+                                                  const prefix = prev.trim()
+                                                    ? prev + " "
+                                                    : "";
+                                                  return prefix + speechResult;
+                                                },
+                                              );
+                                              triggerToast(
+                                                "ƒê√£ nh·∫≠p: " + speechResult,
+                                              );
+                                            };
+                                            recognition.onerror = (
+                                              event: any,
+                                            ) => {
+                                              triggerToast(
+                                                "L·ªói: " + event.error,
+                                              );
+                                            };
+                                          } else {
+                                            triggerToast(
+                                              "Tr√¨nh duy·ªát kh√¥ng h·ªó tr·ª£ nh·∫≠n di·ªán gi·ªçng n√≥i",
+                                            );
+                                          }
+                                        }}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-teal-400 hover:text-teal-300 transition-all cursor-pointer bouncy-btn"
+                                        title="T√¨m ki·∫øm b·∫±ng gi·ªçng n√≥i"
+                                      >
+                                        <Mic className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {!hasResults ? (
+                                    <div className="py-12 text-center text-white/50 space-y-2">
+                                      <AlertCircle className="w-10 h-10 mx-auto opacity-40 text-rose-400" />
+                                      <p className="text-sm font-semibold">
+                                        Kh√¥ng t√¨m th·∫•y k·∫øt qu·∫£ ph√π h·ª£p
+                                      </p>
+                                      <p className="text-xs opacity-60">
+                                        H√£y th·ª≠ nh·∫≠p t·ª´ kh√≥a kh√°c ƒë·ªÉ t√¨m ki·∫øm
+                                        l·∫°i.
+                                      </p>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      {/* Header bar toggle */}
+                                      <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between mb-4">
+                                        <div className="space-y-1 text-left">
+                                          <div className="flex items-center gap-2">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              Header bar
+                                            </h4>
+                                            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                                              M·ªõi
+                                            </span>
+                                          </div>
+                                          <p className="text-xs text-white/60">
+                                            Hi·ªÉn th·ªã thanh Header bar tr·∫Øng c·ªë
+                                            ƒë·ªãnh ·ªü ƒë·ªânh m√†n h√¨nh (Always on top)
+                                          </p>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            playPopSound();
+                                            setShowHeaderBar(!showHeaderBar);
+                                          }}
+                                          className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 relative cursor-pointer flex items-center shrink-0 ${
+                                            showHeaderBar
+                                              ? "bg-[#34c759]"
+                                              : "bg-[#3a3a3c]"
+                                          }`}
+                                        >
+                                          <motion.div
+                                            animate={{
+                                              x: showHeaderBar ? 20 : 0,
+                                            }}
+                                            transition={{
+                                              type: "spring",
+                                              stiffness: 500,
+                                              damping: 30,
+                                            }}
+                                            className="w-5 h-5 rounded-full bg-white shadow-md"
+                                          />
+                                        </button>
+                                      </div>
+
+                                      {/* Backdrop Glow Toggle */}
+                                      {matchGlow && (
+                                        <div className="space-y-3">
+                                          <label className="text-sm font-semibold block text-white/90 text-left">
+                                            M√†u S·∫Øc √Ånh S√°ng N·ªÅn (Backdrop Glow)
+                                          </label>
+                                          <div className="grid grid-cols-2 gap-2.5">
+                                            {[
+                                              {
+                                                id: "cosmic",
+                                                name: "Cosmic Glow",
+                                                color:
+                                                  "from-pink-600 to-indigo-800",
+                                              },
+                                              {
+                                                id: "deep",
+                                                name: "T·ªëi gi·∫£n",
+                                                color:
+                                                  "from-neutral-800 to-slate-900",
+                                              },
+                                              {
+                                                id: "aurora",
+                                                name: "C·ª±c quang",
+                                                color:
+                                                  "from-teal-600 to-lime-900",
+                                              },
+                                              {
+                                                id: "sunset",
+                                                name: "Sunset View",
+                                                color:
+                                                  "from-rose-600 to-amber-900",
+                                              },
+                                            ].map((item) => (
+                                              <button
+                                                key={item.id}
+                                                onClick={() =>
+                                                  setBgColor(item.id as any)
+                                                }
+                                                className={`p-4 rounded-xl text-left text-xs font-bold relative overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-98 cursor-default border ${
+                                                  bgColor === item.id
+                                                    ? "border-white bg-white/15"
+                                                    : "border-white/10 hover:border-white/20 bg-white/5"
+                                                }`}
+                                              >
+                                                <div className="flex flex-col h-full justify-between">
+                                                  <span className="text-white font-bold mb-2">
+                                                    {item.name}
+                                                  </span>
+                                                  <div
+                                                    className={`w-full h-2 rounded bg-gradient-to-r ${item.color} opacity-80`}
+                                                  />
+                                                </div>
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* AMOLED Dark Mode Toggle */}
+                                      {matchAmoled && (
+                                        <div className="pt-4 border-t border-white/10 flex items-center justify-between text-left">
+                                          <div className="flex-1 pr-4">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              AMOLED Dark
+                                            </h4>
+                                            <p className="text-xs text-white/60 mt-0.5">
+                                              Ch·∫ø ƒë·ªô si√™u t·ªëi gi√∫p b·∫£o v·ªá m·∫Øt
+                                            </p>
+                                          </div>
+                                          <button
+                                            onClick={() =>
+                                              setAmoledDark(!amoledDark)
+                                            }
+                                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                              amoledDark
+                                                ? "bg-[#34c759]"
+                                                : "bg-white/20"
+                                            }`}
+                                          >
+                                            <motion.div
+                                              animate={{
+                                                x: amoledDark ? 20 : 0,
+                                              }}
+                                              transition={{
+                                                type: "spring",
+                                                stiffness: 500,
+                                                damping: 30,
+                                              }}
+                                              className="relative w-6 h-5 flex items-center justify-center group"
+                                            >
+                                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                              <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                                            </motion.div>
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* Dock to Sidebar Toggle */}
+                                      {matchDockToSidebar && (
+                                        <div className="pt-4 border-t border-white/10 flex items-center justify-between text-left">
+                                          <div className="flex-1 pr-4">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              Dock to Sidebar
+                                            </h4>
+                                            <p className="text-xs text-white/60 mt-0.5">
+                                              Chuy·ªÉn ƒë·ªïi thanh ƒëi·ªÅu h∆∞·ªõng ph√≠a
+                                              d∆∞·ªõi th√†nh thanh Sidebar d·ªçc ·ªü
+                                              c·∫°nh tr√°i m√†n h√¨nh
+                                            </p>
+                                          </div>
+                                          <button
+                                            onClick={() => {
+                                              setDockToSidebar(!dockToSidebar);
+                                              triggerToast(
+                                                !dockToSidebar
+                                                  ? "ƒê√£ chuy·ªÉn ƒë·ªïi sang Giao di·ªán Sidebar"
+                                                  : "ƒê√£ chuy·ªÉn ƒë·ªïi sang Giao di·ªán Dock",
+                                              );
+                                            }}
+                                            className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center ${
+                                              dockToSidebar
+                                                ? "bg-[#34c759]"
+                                                : "bg-white/20"
+                                            }`}
+                                          >
+                                            <motion.div
+                                              animate={{
+                                                x: dockToSidebar ? 20 : 0,
+                                              }}
+                                              transition={{
+                                                type: "spring",
+                                                stiffness: 500,
+                                                damping: 30,
+                                              }}
+                                              className="relative w-6 h-5 flex items-center justify-center group"
+                                            >
+                                              <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                              <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                                            </motion.div>
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* Dock Customizer Section */}
+                                      {matchDock && (
+                                        <div className="pt-6 border-t border-white/10 space-y-4 text-left">
+                                          <div className="flex flex-col gap-1">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              T√πy bi·∫øn thanh ƒëi·ªÅu h∆∞·ªõng Dock
+                                            </h4>
+                                            <p className="text-xs text-white/60">
+                                              B·∫≠t/t·∫Øt v√† thay ƒë·ªïi th·ª© t·ª± c√°c n√∫t
+                                              ch·ª©c nƒÉng xu·∫•t hi·ªán tr√™n thanh
+                                              Dock b√™n d∆∞·ªõi.
+                                            </p>
+                                          </div>
+
+                                          {/* Miniature live dock preview */}
+                                          <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center">
+                                            <div className="w-full max-w-[340px] h-12 rounded-full bg-white/[0.08] border border-white/10 flex items-center justify-around px-2 py-0.5 relative">
+                                              {dockItems
+                                                .filter((item) => item.enabled)
+                                                .map((item) => {
+                                                  const config =
+                                                    getDockItemConfig(item.id);
+                                                  return (
+                                                    <div
+                                                      key={`preview-${item.id}`}
+                                                      className="flex flex-col items-center justify-center text-white/50 w-8 h-8 animate-fade-in"
+                                                      title={config.label}
+                                                    >
+                                                      {config.isImg ? (
+                                                        <img
+                                                          src={config.icon}
+                                                          className="w-4.5 h-4.5 object-contain opacity-70 filter brightness-0 invert"
+                                                          alt={config.label}
+                                                          referrerPolicy="no-referrer"
+                                                        />
+                                                      ) : (
+                                                        (() => {
+                                                          const IconComponent =
+                                                            config.icon;
+                                                          return (
+                                                            <IconComponent className="w-4.5 h-4.5" />
+                                                          );
+                                                        })()
+                                                      )}
+                                                    </div>
+                                                  );
+                                                })}
+                                            </div>
+                                          </div>
+
+                                          {/* List of dock items with toggle & reorder controls */}
+                                          <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
+                                            {dockItems.map((item, idx) => {
+                                              const config = getDockItemConfig(
+                                                item.id,
+                                              );
+                                              return (
+                                                <div
+                                                  key={item.id}
+                                                  className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-200"
+                                                >
+                                                  <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-white/80 shrink-0">
+                                                      {config.isImg ? (
+                                                        <img
+                                                          src={config.icon}
+                                                          className="w-5 h-5 object-contain filter brightness-0 invert opacity-80"
+                                                          alt={config.label}
+                                                          referrerPolicy="no-referrer"
+                                                        />
+                                                      ) : (
+                                                        (() => {
+                                                          const IconComponent =
+                                                            config.icon;
+                                                          return (
+                                                            <IconComponent className="w-5 h-5" />
+                                                          );
+                                                        })()
+                                                      )}
+                                                    </div>
+                                                    <div>
+                                                      <div className="text-xs font-bold text-white">
+                                                        {config.label}
+                                                      </div>
+                                                      <div className="text-[9px] text-white/40">
+                                                        ID: {item.id}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+
+                                                  <div className="flex items-center gap-1.5">
+                                                    {/* Up/Down buttons */}
+                                                    <button
+                                                      onClick={() =>
+                                                        moveDockItem(idx, "up")
+                                                      }
+                                                      disabled={idx === 0}
+                                                      className="p-1 rounded bg-white/5 border border-white/5 text-white/60 hover:text-white hover:bg-white/15 disabled:opacity-30 disabled:pointer-events-none transition-all duration-150"
+                                                      title="Di chuy·ªÉn l√™n"
+                                                    >
+                                                      <ChevronUp className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                      onClick={() =>
+                                                        moveDockItem(
+                                                          idx,
+                                                          "down",
+                                                        )
+                                                      }
+                                                      disabled={
+                                                        idx ===
+                                                        dockItems.length - 1
+                                                      }
+                                                      className="p-1 rounded bg-white/5 border border-white/5 text-white/60 hover:text-white hover:bg-white/15 disabled:opacity-30 disabled:pointer-events-none transition-all duration-150"
+                                                      title="Di chuy·ªÉn xu·ªëng"
+                                                    >
+                                                      <ChevronDown className="w-3.5 h-3.5" />
+                                                    </button>
+
+                                                    {/* Toggle active / inactive switch */}
+                                                    <button
+                                                      onClick={() =>
+                                                        toggleDockItem(item.id)
+                                                      }
+                                                      className={`ml-1 px-2.5 py-1 text-[10px] font-semibold rounded-md border transition-all duration-200 cursor-pointer ${
+                                                        item.enabled
+                                                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+                                                          : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white/60"
+                                                      }`}
+                                                    >
+                                                      {item.enabled
+                                                        ? "Hi·ªÉn th·ªã"
+                                                        : "·∫®n"}
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+
+                                          {/* Toggle: Merge search into dock */}
+                                          <div className="mt-4 flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-all duration-300">
+                                            <div className="space-y-0.5 text-left">
+                                              <div className="text-xs font-bold text-white">
+                                                Nh·∫≠p n√∫t t√¨m ki·∫øm v√†o thanh dock
+                                              </div>
+                                              <p className="text-[10px] text-white/50">
+                                                T√≠ch h·ª£p tr·ª±c ti·∫øp n√∫t T√¨m ki·∫øm
+                                                v√†o thanh dock thay v√¨ t√°ch
+                                                ri√™ng ra ngo√†i.
+                                              </p>
+                                            </div>
+                                            <button
+                                              onClick={() => {
+                                                const searchItem =
+                                                  dockItems.find(
+                                                    (it) => it.id === "search",
+                                                  );
+                                                const searchEnabled =
+                                                  searchItem?.enabled ?? false;
+
+                                                if (!mergeSearchToDock) {
+                                                  // Turning ON. If search is enabled, the new rendered count will include the search item.
+                                                  const otherEnabledCount =
+                                                    dockItems.filter(
+                                                      (it) =>
+                                                        it.enabled &&
+                                                        it.id !== "search",
+                                                    ).length;
+                                                  const newRenderedCount =
+                                                    otherEnabledCount +
+                                                    (searchEnabled ? 1 : 0);
+
+                                                  if (newRenderedCount > 5) {
+                                                    triggerToast(
+                                                      "Thanh dock ch·ªâ ch·ª©a ƒë∆∞·ª£c 5 m·ª•c",
+                                                    );
+                                                    return;
+                                                  }
+                                                }
+                                                setMergeSearchToDock(
+                                                  !mergeSearchToDock,
+                                                );
+                                              }}
+                                              className={`w-12 h-6 rounded-full p-0.5 transition-colors duration-300 focus:outline-none relative cursor-pointer flex items-center shrink-0 ${
+                                                mergeSearchToDock
+                                                  ? "bg-[#34c759]"
+                                                  : "bg-white/20"
+                                              }`}
+                                            >
+                                              <motion.div
+                                                animate={{
+                                                  x: mergeSearchToDock ? 20 : 0,
+                                                }}
+                                                transition={{
+                                                  type: "spring",
+                                                  stiffness: 500,
+                                                  damping: 30,
+                                                }}
+                                                className="relative w-6 h-5 flex items-center justify-center group"
+                                              >
+                                                <div className="absolute -inset-2 rounded-full bg-white/15 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-200 pointer-events-none" />
+                                                <div className="w-full h-full rounded-full bg-white border border-transparent transition-all duration-300 shadow-md z-10 group-hover:scale-110 group-hover:bg-transparent group-hover:backdrop-blur-md group-hover:border-white/95" />
+                                              </motion.div>
+                                            </button>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              );
+                            })()}
+
+                          {activeSettingSection === "search" &&
+                            (() => {
+                              const isMatched = (text: string) => {
+                                const q = settingDetailSearchQuery
+                                  .trim()
+                                  .toLowerCase();
+                                if (!q) return true;
+                                return text.toLowerCase().includes(q);
+                              };
+
+                              const matchCat =
+                                isMatched("Danh m·ª•c") ||
+                                isMatched("ƒëi·ªÅu h∆∞·ªõng") ||
+                                isMatched("tab") ||
+                                isMatched("menu") ||
+                                isMatched("home") ||
+                                isMatched("live tv");
+                              const matchVApps =
+                                isMatched("V-Apps") ||
+                                isMatched("vapps") ||
+                                isMatched("tr√≤ ch∆°i") ||
+                                isMatched("game") ||
+                                isMatched("arcade") ||
+                                isMatched("caro") ||
+                                isMatched("files") ||
+                                isMatched("learn") ||
+                                isMatched("calc");
+                              const matchVPremium =
+                                isMatched("V-Premium") ||
+                                isMatched("vpremium") ||
+                                isMatched("premium") ||
+                                isMatched("vip") ||
+                                isMatched("vbank") ||
+                                isMatched("storage") ||
+                                isMatched("cloud") ||
+                                isMatched("verified") ||
+                                isMatched("t√≠ch xanh");
+                              const matchNews =
+                                isMatched("Tin t·ª©c") ||
+                                isMatched("news") ||
+                                isMatched("th√¥ng b√°o") ||
+                                isMatched("discord");
+                              const matchChannels =
+                                isMatched("Truy·ªÅn h√¨nh") ||
+                                isMatched("k√™nh") ||
+                                isMatched("channels") ||
+                                isMatched("live") ||
+                                isMatched("tv");
+                              const matchChannelNumbers =
+                                isMatched("T√¨m k√™nh theo s·ªë hi·ªáu") ||
+                                isMatched("s·ªë k√™nh") ||
+                                isMatched("s·ªë hi·ªáu") ||
+                                isMatched("channel number") ||
+                                isMatched("ch");
+                              const matchToolbox =
+                                isMatched("Toolbox") ||
+                                isMatched("c√¥ng c·ª•") ||
+                                isMatched("ti·ªán √≠ch") ||
+                                isMatched("multiview") ||
+                                isMatched("m3u8");
+                              const matchSettings =
+                                isMatched("C√†i ƒë·∫∑t") ||
+                                isMatched("settings") ||
+                                isMatched("c·∫•u h√¨nh") ||
+                                isMatched("giao di·ªán");
+
+                              const hasResults =
+                                matchCat ||
+                                matchVApps ||
+                                matchVPremium ||
+                                matchNews ||
+                                matchChannels ||
+                                matchChannelNumbers ||
+                                matchToolbox ||
+                                matchSettings;
+
+                              return (
+                                <div className="space-y-6">
+                                  {/* Section Header with Search Bar */}
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+                                    <div className="flex items-center gap-3 text-left">
+                                      <div className="w-12 h-12 flex items-center justify-center shrink-0 text-white">
+                                        <Search className="w-6 h-6 text-sky-400" />
+                                      </div>
+                                      <div>
+                                        <h3 className="text-lg font-semibold text-white">
+                                          T√¨m ki·∫øm
+                                        </h3>
+                                        <p className="text-xs text-white/60">
+                                          T√πy bi·∫øn c√°c danh m·ª•c k·∫øt qu·∫£ hi·ªÉn th·ªã
+                                          trong thanh Spotlight Search (Cmd + K
+                                          / Ctrl + K).
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="relative w-full md:max-w-[280px]">
+                                      <input
+                                        type="text"
+                                        value={settingDetailSearchQuery}
+                                        onChange={(e) =>
+                                          setSettingDetailSearchQuery(
+                                            e.target.value,
+                                          )
+                                        }
+                                        placeholder="T√¨m ki·∫øm c√†i ƒë·∫∑t..."
+                                        className="w-full pl-10 pr-10 py-2 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/20 transition-none text-left"
+                                      />
+                                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                        <Search className="w-4 h-4 text-white/60" />
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const SpeechRecognition =
+                                            (window as any).SpeechRecognition ||
+                                            (window as any)
+                                              .webkitSpeechRecognition;
+                                          if (SpeechRecognition) {
+                                            const recognition =
+                                              new SpeechRecognition();
+                                            recognition.lang = "vi-VN";
+                                            recognition.interimResults = false;
+                                            recognition.maxAlternatives = 1;
+                                            triggerToast("ƒêang l·∫Øng nghe...");
+                                            recognition.start();
+                                            recognition.onresult = (
+                                              event: any,
+                                            ) => {
+                                              const speechResult =
+                                                event.results[0][0].transcript;
+                                              setSettingDetailSearchQuery(
+                                                (prev) => {
+                                                  const prefix = prev.trim()
+                                                    ? prev + " "
+                                                    : "";
+                                                  return prefix + speechResult;
+                                                },
+                                              );
+                                              triggerToast(
+                                                "ƒê√£ nh·∫≠p: " + speechResult,
+                                              );
+                                            };
+                                            recognition.onerror = (
+                                              event: any,
+                                            ) => {
+                                              triggerToast(
+                                                "L·ªói: " + event.error,
+                                              );
+                                            };
+                                          } else {
+                                            triggerToast(
+                                              "Tr√¨nh duy·ªát kh√¥ng h·ªó tr·ª£ nh·∫≠n di·ªán gi·ªçng n√≥i",
+                                            );
+                                          }
+                                        }}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-teal-400 hover:text-teal-300 transition-all cursor-pointer bouncy-btn"
+                                        title="T√¨m ki·∫øm b·∫±ng gi·ªçng n√≥i"
+                                      >
+                                        <Mic className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {!hasResults ? (
+                                    <div className="py-12 text-center text-white/50 text-sm">
+                                      Kh√¥ng t√¨m th·∫•y t√πy ch·ªçn t√¨m ki·∫øm n√†o ph√π
+                                      h·ª£p v·ªõi "{settingDetailSearchQuery}".
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-3.5 text-left">
+                                      {/* 1. Danh m·ª•c */}
+                                      {matchCat && (
+                                        <div
+                                          onClick={() => {
+                                            playPopSound();
+                                            setSpotlightSearchSettings(
+                                              (prev) => ({
+                                                ...prev,
+                                                categories: !prev.categories,
+                                              }),
+                                            );
+                                          }}
+                                          className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                        >
+                                          <div className="space-y-1 pr-2">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              Danh m·ª•c & ƒêi·ªÅu h∆∞·ªõng
+                                            </h4>
+                                            <p className="text-xs text-white/60">
+                                              Hi·ªÉn th·ªã c√°c tab v√† ƒëi·ªÅu h∆∞·ªõng h·ªá
+                                              th·ªëng (Home, V-Play, News, v.v.)
+                                            </p>
+                                          </div>
+                                          <div
+                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                              spotlightSearchSettings.categories
+                                                ? "bg-sky-500 border-sky-400 text-white shadow-[0_0_10px_rgba(56,189,248,0.4)]"
+                                                : "bg-white/5 border-white/20 hover:border-white/40"
+                                            }`}
+                                          >
+                                            {spotlightSearchSettings.categories && (
+                                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* 1.1 V-Apps & 5 Tr√≤ ch∆°i Ore UI */}
+                                      {matchVApps && (
+                                        <div
+                                          onClick={() => {
+                                            playPopSound();
+                                            setSpotlightSearchSettings(
+                                              (prev) => ({
+                                                ...prev,
+                                                vapps: !prev.vapps,
+                                              }),
+                                            );
+                                          }}
+                                          className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                        >
+                                          <div className="space-y-1 pr-2">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              V-Apps & 5 Tr√≤ ch∆°i Ore UI
+                                            </h4>
+                                            <p className="text-xs text-white/60">
+                                              T√¨m ki·∫øm V-Arcade 5 games (Caro XO, K√©o b√∫a bao, N·ªëi t·ª´, ƒê·∫øm s·ªë, R·∫Øn), V-Files, Explore VN, V-Learn...
+                                            </p>
+                                          </div>
+                                          <div
+                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                              spotlightSearchSettings.vapps
+                                                ? "bg-emerald-500 border-emerald-400 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]"
+                                                : "bg-white/5 border-white/20 hover:border-white/40"
+                                            }`}
+                                          >
+                                            {spotlightSearchSettings.vapps && (
+                                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* 1.2 V-Premium & V-Cloud VIP */}
+                                      {matchVPremium && (
+                                        <div
+                                          onClick={() => {
+                                            playPopSound();
+                                            setSpotlightSearchSettings(
+                                              (prev) => ({
+                                                ...prev,
+                                                vpremium: !prev.vpremium,
+                                              }),
+                                            );
+                                          }}
+                                          className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/10 transition-colors select-none"
+                                        >
+                                          <div className="space-y-1 pr-2">
+                                            <h4 className="text-sm font-semibold text-white">
+                                              V-Premium & V-Cloud VIP
+                                            </h4>
+                                            <p className="text-xs text-white/60">
+                                              T√¨m ki·∫øm c√°c g√≥i V-Cloud Storage (50GB, 200GB, 2TB), Ng√¢n h√†ng s·ªë V-Bank & Verified T√≠ch Xanh
+                                            </p>
+                                          </div>
+                                          <div
+                                            className={`w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 border ${
+                                              spotlightSearchSettings.vpremium
+                                                ? "bg-amber-500 border-amber-400 text-white shadow-[0_0_10px_rgba(245,158,11,0.4)]"
+        xúÏõKè€∂Ä˜˝ßnÿ≠‰◊x¶ì‘NÃmh3ô[ª≥	Çîñ9í:2)Ë·G/ä,∫Ë™∏´ªkp—EãvQ†EÅx—Öã˚?¸OÓ°,Ÿ“XvƒIìI/ƒ,Q&yx?“ÄlÈ∫∫:4LèVˆ°Àùu¬lΩ
+PÁF‚i£Zx+£Ï MøòJîø)%{‚⁄‹≥L›⁄î8ö—¶ûg2›-láˆMø◊ÆAQJ$@Û»†⁄9hq›c“ß≠¬P›+ÔÉ|∫û√œ©˙pÔQ*r⁄ñd¢YÈôÉÏÚ•ä£"KN*ÔAΩìÅ∑ò˝†¡{ï¨ùòÙâß«tË °âë'Œé,S;oMä%h›ÑâîElãåO∏›Ê>ÎKJ’u©◊Nü}≤Æàìuh_îS_§rπ,™+“ZÊº-*ó≈Ω¨ÑiIÆÜ‘Ne\%Ê©∂⁄ GXìˆ‘ëë-‡jU8≥ËæÔ™eñ¯“w=Ûl¨v©7§îÅNlu4ﬂqπ£⁄‹
+ÖqQ_Ú¬\”39S5nq«≈	bQÕSg4{ƒîâ(¬S‚ùwm¢Qu¨÷¿v‘zA.85çF\ñGGûÍˆ·å3ºb,Ìr´¡”†Àí“aB‰¥™…~ÿ›π1≈+Ui›ÔöãŸSTﬂXÃæm˛LÉÓ¸;Ê‚˘xQœ,1ˇïÈ¯Ì3⁄bˆoºˇÛ€≈Ï_xÃø√Gœ∂ÅxÒ Ö}à¸ñÈícbKÕπÖD: «˝oÚ≈PÂ˛ 	˚Ω.fcÆC,\√1ŸπZç\ˆ]Ÿ†∏
+Dîìì|‰pó™˚’HßeæÅ˘ıƒBΩIè’á’«’«µ™=zÏË]R¨7 ¡ûrΩ°TÀç“#9vÈˇ–ò4,SgÎ$‡lØüÃd:ë?^Ãæb`Ã¬¨,ßÑ1jÂ¨ˆÇt5¨¶Ö÷âx- ÁÃñ3€+d∂‘»r>#=ìˇ1Æ3ˇ©Á⁄˙`¸˜É™Ô√yZÔ˛£“¯äßùSÓäè”ŒëÌ#q˚OëMC‚{˛G)Á∂◊¡mQ¥ª$ªic¬‚Ï‰3±€ÅR;¨+ıZ=g∑4{‰¸∂E)~´-„ígP.Ü0p∑˘µ¶Kr‹±ﬂÔR'ßπ§+•π–Fò.|öì›´#;Ë[j#«ªêáñ¸s1˙ﬂ©Vk
+‡gÁπ,Ëº	¥wdp∞ç˘6ËÛﬂpB,fø µ	˙≥ó=]ˆ\úœ=Eó¸˜îÖ˙¢ë√›kÑª0ÏÂà∑ëÆÒ.ÖÀîÉﬁ:	–kî°√π’Â#i¶ãÍÂ0∑3]ÃyK„Dfs|ÀÊ^%πE:◊Ã÷dyÂM`¥¯â‹}ﬂÚÃÅIáp«1{
+tå˘è}∞¸ÂœßLÁ‚'◊˚{ü*pb˘∫…†Ìqá¢„Ê†ˆ:@-åló$4è+NhA>€®UD¥ÜR;8»-≈9õmQDÇÕˆÀp$¢ÓüˇÓIÛYdí–vß´47‘6"¥(ü#ZéhØ—‚Â%^ız”(-8[æ◊_Ãæ◊ƒ;mﬂ˚·œ¶wL¬°©´†Å(Á,fˇˆÁS¶Á∏ˆöp-
+só‰5€wl+Ò [¯$≥’ï√}•ﬁ¯ g∂4£‰–ˆädñôA^&Y/X…ß•‚éñöï>ﬁ^ﬁ—–ñÍÕ -f"a“á∫îi4≠˛ñÏj∂ÑﬁE4‹l”ÈB´’Ç¬Äÿ∂[@ﬂﬂúïÕµ†îÊœÈ∏÷N˘÷dÈà’öLÄ„bmz„PMá≤Ïj¢h-Ω(ô^ëÎP+J˜|áà{,^n(@âK1»àÀﬂ+§KH8€ôoYõùLµ…È-êSìSÌé
+ñπ◊kM¢ÏΩ’# .é≈8Mõøñ5s¯oQó∑t$ 7ˆj‘NOñc"ÏB€Ô‚†£q√ÔÓ≈OˇKä˜ß/m≈†rn¡’àâR€Í≠úìÅ©cg;¸S4A¥«µ¸Vdìb¡¬õ¬ñ8ó°@∫îà∂IÚS◊©”·ƒ≈!çÁ“ÀCﬂ∆M€|Çz«s€4˝‹Ó°ûÎ:E˜I§Áq¨∫x¸Ö(ÜvJä⁄πÓ•ã[)É_ì›\ü˛àÛù;ÔÇÅÇc¨~fj¡‰Jı4w¥:ÒD›˚‘uâN7Èmªœ•∫î¯Y«ã´ãä~}sFß∫XPu]3≈Â6›-[s1Á93G¥á–ÌyºØÄ#HØO‘á◊EzˆHmÄ=VÎÂıÊßæ<ËZD;Ø‚∂Ø=á€¯ƒwÇ√âîâzb3mWìõı„˜{ıhìQUÇøÚ~ÈQ ∂Kcı¬ïπõr:qqN^<e™udÏ˙™ü"Æ@ÙŒÅÿÖvRmÙ‹¯n∫6a7h⁄¨/Ã˙t?â˘Yäc$Ê˘m°⁄âò°À}<¿míE∆pü˜p˛'&ª(+ä.K^à~¶˚¿¶Ü]Éì„≥FIr7€Âãgƒri)Y≠úÖØ*buÕH9”‹uf)ö
+d–^(E»ÿ(≥ü„%¶Iù÷!:X∏ãÈ +µnPTœ‘ö@Eléîo4	è°ò]±dıå∫ÖÙ"ñÅÄ\.°` E“vÍëf6U≈‚î~6ûŸdK, ÷\∏å∑q
+ºRt©ˆRmØW˛-•í-Ìm’4zAª5!ñ˝g◊ßfíp§:wLä≈énu>æÛ‡≥{∑„%∂úb¥∂oƒÎûë ˆÑ’mr0;\◊-z;¸i&ëèóÕF=úâòuQ’¥Òr#èD['J∏ ¨ˆÂXn˙÷ˇ   ˇˇ Y¶F
