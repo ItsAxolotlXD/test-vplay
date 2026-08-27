@@ -23,7 +23,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const menuItems: { id: SidebarMenuItem; label: string; badge?: string }[] = [
     { id: 'home', label: t('header.home', 'Home') },
-    { id: 'live_tv', label: t('header.live', 'Live TV'), badge: `(${channelCount})` },
+    { id: 'live_tv', label: t('header.live', 'V-Play'), badge: `(${channelCount})` },
     { id: 'v_apps', label: t('header.vapps', 'V-Apps') },
     { id: 'v_arcade', label: 'V-Arcade', badge: '🎮' },
     { id: 'v_premium', label: t('header.vpremium', 'V-Premium'), badge: '★' },

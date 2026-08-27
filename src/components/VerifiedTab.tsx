@@ -328,7 +328,7 @@ export default function VerifiedTab({
               </h2>
 
               <p className="text-xs text-zinc-300 leading-relaxed font-jura">
-                Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến Vplay. Tự do sở hữu huy hiệu tích tím uy tín, thưởng thức Live TV Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày Khoáng Thạch mỗi ngày!
+                Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến Vplay. Tự do sở hữu huy hiệu tích tím uy tín, thưởng thức V-Play Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày Khoáng Thạch mỗi ngày!
               </p>
             </div>
 
@@ -436,7 +436,7 @@ export default function VerifiedTab({
                   </div>
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                    <span>Xem Live TV chất lượng <strong>Full HD 1080p</strong></span>
+                    <span>Xem V-Play chất lượng <strong>Full HD 1080p</strong></span>
                   </div>
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
@@ -489,7 +489,7 @@ export default function VerifiedTab({
                   </div>
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                    <span>Xem Live TV & Shorts <strong>Server 4K Ultra HD</strong></span>
+                    <span>Xem V-Play & Shorts <strong>Server 4K Ultra HD</strong></span>
                   </div>
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
@@ -538,7 +538,7 @@ export default function VerifiedTab({
                   </div>
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                    <span>Xem Live TV & Shorts <strong>Server 4K Ultra HD Low-Latency</strong></span>
+                    <span>Xem V-Play & Shorts <strong>Server 4K Ultra HD Low-Latency</strong></span>
                   </div>
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
@@ -646,7 +646,7 @@ export default function VerifiedTab({
                     <td className="py-2.5 px-2 text-center text-purple-300 font-black bg-[#3b1d54]">Tích Tím Hoàng Gia</td>
                   </tr>
                   <tr className="bg-[#2d2f32]">
-                    <td className="py-2.5 px-3 font-bold text-white">Chất lượng phát Live TV & Shorts</td>
+                    <td className="py-2.5 px-3 font-bold text-white">Chất lượng phát V-Play & Shorts</td>
                     <td className="py-2.5 px-2 text-center text-zinc-400">720p HD</td>
                     <td className="py-2.5 px-2 text-center text-purple-200">1080p Full HD</td>
                     <td className="py-2.5 px-2 text-center text-purple-300">4K Ultra HD</td>
@@ -702,7 +702,7 @@ export default function VerifiedTab({
                   <div className="w-10 h-10 bg-[#cc1827] border-2 border-[#141414] flex items-center justify-center text-white font-bold">
                     <Tv className="w-5 h-5" />
                   </div>
-                  <h4 className="text-sm font-extrabold text-white font-jura">Xem Truyền Hình Live TV</h4>
+                  <h4 className="text-sm font-extrabold text-white font-jura">Xem Truyền Hình V-Play</h4>
                   <p className="text-xs text-zinc-300 font-jura">
                     Mỗi phút xem trực tiếp các kênh VTV, HTV, Thể thao... sẽ tự động nhận Khoáng Thạch
                   </p>
@@ -713,7 +713,7 @@ export default function VerifiedTab({
                     onClick={() => onNavigateToTab?.("live_tv")}
                     className="mt-2 w-full text-xs py-1.5"
                   >
-                    Mở Live TV Ngay
+                    Mở V-Play Ngay
                   </VplaySecondaryButton>
                 </div>
               </div>
@@ -855,7 +855,7 @@ export default function VerifiedTab({
                     </div>
                     <div className="flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                      <span>Lưu kho video Live TV & V-Box</span>
+                      <span>Lưu kho video V-Play & V-Box</span>
                     </div>
                   </div>
                 </div>
@@ -1074,7 +1074,7 @@ export default function VerifiedTab({
                 }}
                 className="w-full !py-2 text-xs"
               >
-                Xem Live TV Để Tích Thêm Khoáng Thạch (+10 ore/phút)
+                Xem V-Play Để Tích Thêm Khoáng Thạch (+10 ore/phút)
               </VplaySecondaryButton>
             </div>
           </div>

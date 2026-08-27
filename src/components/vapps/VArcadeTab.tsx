@@ -15,102 +15,122 @@ import {
   Timer,
   Send,
   AlertTriangle,
-  X
+  X,
+  Sparkles,
+  Award,
+  ChevronRight,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Flame,
+  Check
 } from "lucide-react";
 import { playPopSound } from "../../utils/sound";
 import { MOCK_100_FRIENDS, VplayUser } from "../../data/mockFriendsData";
 
 /* =========================================================================
-   ORE UI V-ARCADE TYPES & STYLES
+   ORE UI V-ARCADE TYPES & STYLES (STRICTLY 5 GAMES)
    ========================================================================= */
 
 interface GameItem {
   id: string;
   title: string;
-  category: "classic" | "puzzle" | "action" | "arcade";
+  category: "classic" | "puzzle";
   categoryLabel: string;
   description: string;
   rating: number;
   plays: string;
   color: string;
-  iconName: string;
-  isInteractive: boolean;
-  difficulty: "Dễ" | "Trung bình" | "Khó" | "Cực khó";
+  badge: string;
+  difficulty: "Dễ" | "Trung bình" | "Khó";
 }
 
-// STRICTLY 5 GAMES AS REQUESTED BY USER
-const ALL_GAMES: GameItem[] = [
+export const ARCADE_5_GAMES: GameItem[] = [
   {
     id: "tic_tac_toe",
     title: "Cờ Caro XO (Tic-Tac-Toe)",
     category: "classic",
-    categoryLabel: "Cổ điển",
-    description: "Đánh X/O đấu trí đỉnh cao cùng NPC ngẫu nhiên (Search for people) hoặc 2 người chơi.",
+    categoryLabel: "Cổ Điển",
+    description: "Đánh X/O đấu trí đỉnh cao cùng NPC ngẫu nhiên hoặc 2 người chơi pass & play.",
     rating: 4.95,
     plays: "280K",
     color: "from-purple-600 to-indigo-800",
-    iconName: "xo",
-    isInteractive: true,
+    badge: "Caro 3x3",
     difficulty: "Dễ"
   },
   {
     id: "rock_paper_scissors",
     title: "Oẳn Tù Tì (Kéo Búa Bao)",
     category: "classic",
-    categoryLabel: "Cổ điển",
-    description: "Trò chơi Oẳn Tù Tì thử phản xạ và may mắn cùng đối thủ NPC hoặc chơi 2 người pass & play.",
+    categoryLabel: "Cổ Điển",
+    description: "Trò chơi Oẳn Tù Tì thử phản xạ và may mắn cùng NPC hoặc đối thủ 2 người.",
     rating: 4.90,
     plays: "250K",
     color: "from-rose-600 to-amber-700",
-    iconName: "scissors",
-    isInteractive: true,
+    badge: "Kéo Búa Bao",
     difficulty: "Dễ"
   },
   {
     id: "word_chain",
     title: "Nối Từ Tiếng Việt & Tiếng Anh",
     category: "puzzle",
-    categoryLabel: "Đố vui",
-    description: "Thử thách Nối Từ ghép Tiếng Việt & chữ cái Tiếng Anh cùng NPC từ Search for people hoặc bạn bè.",
+    categoryLabel: "Đố Vui",
+    description: "Thử thách Nối Từ ghép Tiếng Việt & chữ cái Tiếng Anh cùng NPC và bạn bè.",
     rating: 4.98,
     plays: "310K",
     color: "from-emerald-600 to-teal-800",
-    iconName: "word",
-    isInteractive: true,
+    badge: "Từ Vựng",
     difficulty: "Trung bình"
   },
   {
     id: "counting_game",
     title: "Đếm Số 1 -> N (Phá Chuỗi Reset)",
     category: "puzzle",
-    categoryLabel: "Đố vui",
-    description: "Đếm số nối tiếp từ 1 đến N. Nếu ai đếm sai hay quá giờ sẽ phá chuỗi và bắt đầu lại từ 1!",
+    categoryLabel: "Đố Vui",
+    description: "Đếm số nối tiếp từ 1 đến N. Ai đếm sai hay quá giờ sẽ phá chuỗi và bắt đầu lại!",
     rating: 4.92,
     plays: "240K",
     color: "from-blue-600 to-cyan-800",
-    iconName: "numbers",
-    isInteractive: true,
+    badge: "Phản Xạ",
     difficulty: "Dễ"
   },
   {
     id: "snake",
     title: "Rắn Săn Mồi (Retro Snake)",
     category: "classic",
-    categoryLabel: "Cổ điển",
-    description: "Điều khiển chú rắn ăn mồi và tránh va chạm tường hay chính thân mình.",
-    rating: 4.90,
-    plays: "128K",
+    categoryLabel: "Cổ Điển",
+    description: "Điều khiển chú rắn ăn mồi nâng điểm số, tránh va chạm vào tường hay thân mình.",
+    rating: 4.96,
+    plays: "350K",
     color: "from-emerald-600 to-green-800",
-    iconName: "snake",
-    isInteractive: true,
+    badge: "Retro Arcade",
     difficulty: "Trung bình"
   }
 ];
 
-export const VArcadeTab: React.FC = () => {
+interface VArcadeTabProps {
+  initialGameId?: string | null;
+}
+
+export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeGame, setActiveGame] = useState<GameItem | null>(null);
+  const [activeGame, setActiveGame] = useState<GameItem | null>(() => {
+    if (initialGameId) {
+      return ARCADE_5_GAMES.find((g) => g.id === initialGameId) || null;
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (initialGameId) {
+      const found = ARCADE_5_GAMES.find((g) => g.id === initialGameId);
+      if (found) {
+        setActiveGame(found);
+      }
+    }
+  }, [initialGameId]);
   const [favoriteGames, setFavoriteGames] = useState<string[]>([
     "tic_tac_toe",
     "rock_paper_scissors",
@@ -125,7 +145,7 @@ export const VArcadeTab: React.FC = () => {
     rock_paper_scissors: 8,
     word_chain: 15,
     counting_game: 32,
-    snake: 120
+    snake: 140
   });
 
   const updateHighScore = (gameId: string, score: number) => {
@@ -145,7 +165,7 @@ export const VArcadeTab: React.FC = () => {
     if (soundEnabled) playPopSound();
   };
 
-  const filteredGames = ALL_GAMES.filter((g) => {
+  const filteredGames = ARCADE_5_GAMES.filter((g) => {
     const matchesSearch =
       g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       g.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -155,65 +175,218 @@ export const VArcadeTab: React.FC = () => {
     return g.category === selectedCategory && matchesSearch;
   });
 
+  if (activeGame) {
+    return (
+      <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 text-white font-sans bg-[#232528] border-4 border-[#141414] shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_2px_2px_0_#383b40,inset_-2px_-2px_0_#101112] my-2 select-none animate-fade-in">
+        {/* Navigation Breadcrumb / Top Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5 p-3.5 sm:p-4 bg-[#1a1c1e] border-3 border-[#141414] shadow-[inset_2px_2px_0_#383b40,inset_-2px_-2px_0_#101112]">
+          <button
+            onClick={() => {
+              setActiveGame(null);
+              playPopSound();
+            }}
+            className="px-4 py-2.5 bg-[#2a2c30] hover:bg-[#383a3f] text-zinc-200 hover:text-white border-2 border-[#141414] shadow-[inset_2px_2px_0_#3f434a,inset_-2px_-2px_0_#18191b] active:translate-y-[1px] text-xs sm:text-sm font-jura font-bold uppercase transition-none cursor-pointer min-h-[46px] flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>← Quay Lại Danh Sách Games</span>
+          </button>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setSoundEnabled(!soundEnabled);
+                playPopSound();
+              }}
+              className="px-4 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase shadow-[inset_2px_2px_0_#484c52,inset_-2px_-2px_0_#1a1b1d] active:translate-y-[1px] flex items-center gap-2 cursor-pointer min-h-[46px]"
+              title="Bật/Tắt âm thanh"
+            >
+              {soundEnabled ? <Volume2 className="w-4 h-4 text-[#89dc69]" /> : <VolumeX className="w-4 h-4 text-[#fc8181]" />}
+              <span className="hidden sm:inline">{soundEnabled ? "Âm Thanh Bật" : "Âm Thanh Tắt"}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveGame(null);
+                playPopSound();
+              }}
+              className="px-4 py-2.5 bg-[#c53030] hover:bg-[#e53e3e] border-2 border-[#141414] shadow-[inset_2px_2px_0_#fc8181,inset_-2px_-2px_0_#9b2c2c] active:translate-y-[1px] text-white text-xs sm:text-sm font-jura font-bold uppercase transition-none cursor-pointer min-h-[46px] flex items-center gap-2"
+              title="Thoát Game về Lobby"
+            >
+              <X className="w-4 h-4 stroke-[2.5]" />
+              <span>Đóng Game (X)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Switch Game Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-5 scrollbar-none">
+          {ARCADE_5_GAMES.map((g) => {
+            const isCur = g.id === activeGame.id;
+            return (
+              <button
+                key={g.id}
+                onClick={() => {
+                  setActiveGame(g);
+                  playPopSound();
+                }}
+                className={`px-3 py-1.5 rounded-sm border-2 text-xs font-bold font-jura flex items-center gap-1.5 transition-all whitespace-nowrap cursor-pointer ${
+                  isCur
+                    ? "bg-[#28960b] border-[#141414] text-white shadow-[inset_1.5px_1.5px_0_#89dc69,inset_-1.5px_-1.5px_0_#1b5e20]"
+                    : "bg-[#27292d] border-[#141414] text-white/70 hover:text-white shadow-[inset_1.5px_1.5px_0_#383b40,inset_-1.5px_-1.5px_0_#101112]"
+                }`}
+              >
+                <Gamepad2 className="w-3.5 h-3.5" />
+                <span>{g.badge}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Game Title Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-[#1e2023] border-3 border-[#141414] shadow-[inset_2px_2px_0_#383b40,inset_-2px_-2px_0_#101112] mb-4">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 bg-[#28960b] border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] text-white">
+              <Gamepad2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-black font-jura text-[#89dc69] uppercase tracking-wider">
+                {activeGame.title}
+              </h2>
+              <p className="text-xs font-mono text-zinc-400">
+                {activeGame.categoryLabel} • Độ khó: {activeGame.difficulty} • Kỷ lục của bạn: <span className="text-amber-400 font-bold">{highScores[activeGame.id] || 0} pts</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={(e) => toggleFavorite(activeGame.id, e)}
+              className="px-3.5 py-2 bg-[#18191b] border-2 border-[#141414] text-zinc-400 hover:text-amber-400 text-xs font-mono flex items-center gap-1.5 cursor-pointer min-h-[40px]"
+            >
+              <Star className={`w-4 h-4 ${favoriteGames.includes(activeGame.id) ? "fill-amber-400 text-amber-400" : ""}`} />
+              <span>{favoriteGames.includes(activeGame.id) ? "Đã Lưu" : "Yêu Thích"}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* The Game Arena Container */}
+        <div className="w-full bg-[#18191b] border-3 border-[#141414] p-4 sm:p-6 min-h-[420px] flex flex-col items-center justify-center relative shadow-[inset_2px_2px_0_#0f1011,inset_-2px_-2px_0_#282a2d] mb-4">
+          {activeGame.id === "tic_tac_toe" && (
+            <TicTacToeGame
+              soundEnabled={soundEnabled}
+              onScoreUpdate={(s) => updateHighScore("tic_tac_toe", s)}
+              onClose={() => setActiveGame(null)}
+            />
+          )}
+          {activeGame.id === "rock_paper_scissors" && (
+            <RockPaperScissorsGame
+              soundEnabled={soundEnabled}
+              onScoreUpdate={(s) => updateHighScore("rock_paper_scissors", s)}
+              onClose={() => setActiveGame(null)}
+            />
+          )}
+          {activeGame.id === "word_chain" && (
+            <WordChainGame
+              soundEnabled={soundEnabled}
+              onScoreUpdate={(s) => updateHighScore("word_chain", s)}
+              onClose={() => setActiveGame(null)}
+            />
+          )}
+          {activeGame.id === "counting_game" && (
+            <CountingGame
+              soundEnabled={soundEnabled}
+              onScoreUpdate={(s) => updateHighScore("counting_game", s)}
+              onClose={() => setActiveGame(null)}
+            />
+          )}
+          {activeGame.id === "snake" && (
+            <SnakeGame
+              soundEnabled={soundEnabled}
+              onScoreUpdate={(s) => updateHighScore("snake", s)}
+              onClose={() => setActiveGame(null)}
+            />
+          )}
+        </div>
+
+        {/* Footer Instructions & Rules */}
+        <div className="p-4 bg-[#1c1e20] border-2 border-[#141414] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-300 font-sans shadow-md">
+          <div className="flex items-center gap-2.5">
+            <HelpCircle className="w-4.5 h-4.5 text-[#89dc69] shrink-0" />
+            <span>{activeGame.description}</span>
+          </div>
+          <button
+            onClick={() => {
+              setActiveGame(null);
+              playPopSound();
+            }}
+            className="px-4 py-2 bg-[#2a2c30] hover:bg-[#383a3f] text-zinc-300 hover:text-white border border-[#141414] font-jura font-bold text-xs uppercase flex items-center gap-1.5 cursor-pointer min-h-[38px] shrink-0"
+          >
+            <ArrowLeft className="w-4 h-4" /> Quay Lại Kho Game
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full max-w-7xl mx-auto p-3 sm:p-5 text-white font-sans bg-[#232528] border-2 border-[#141414] shadow-2xl my-2">
-      {/* Top Banner Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-5 p-4 sm:p-5 bg-[#1a1c1e] border-2 border-[#141414] shadow-[inset_1px_1px_0_#383b40,inset_-1px_-1px_0_#101112]">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 bg-[#28960b] border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] text-white">
-            <Gamepad2 className="w-7 h-7" />
+    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 text-white font-sans bg-[#232528] border-4 border-[#141414] shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_2px_2px_0_#383b40,inset_-2px_-2px_0_#101112] my-2 select-none">
+      {/* Top Banner Header Ore UI Style */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 p-5 sm:p-6 bg-[#1a1c1e] border-3 border-[#141414] shadow-[inset_2px_2px_0_#383b40,inset_-2px_-2px_0_#101112]">
+        <div className="flex items-center gap-4">
+          <div className="p-3.5 bg-[#28960b] border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] text-white">
+            <Gamepad2 className="w-8 h-8" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-bold font-jura tracking-wider text-white uppercase">
+              <h1 className="text-xl sm:text-2xl font-black font-jura tracking-wider text-white uppercase">
                 V-ARCADE GAMING ZONE
               </h1>
-              <span className="text-[10px] px-2.5 py-1 bg-[#f59e0b] text-[#141414] border border-[#141414] font-bold font-mono uppercase tracking-wider">
-                Ore UI Arcade • 5 Trò Chơi Mới
+              <span className="text-xs px-3 py-1 bg-[#f59e0b] text-[#141414] border-2 border-[#141414] font-bold font-mono uppercase tracking-wider shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309]">
+                Ore UI • 5 Trò Chơi
               </span>
             </div>
-            <p className="text-xs text-zinc-300 font-montserrat mt-1 max-w-xl">
-              Thách đấu NPC ngẫu nhiên trong danh sách <span className="text-[#89dc69] font-bold">Search for people</span> hoặc chơi 2 người pass & play với Caro, Oẳn Tù Tì, Nối Từ, Đếm Số & Rắn Săn Mồi!
+            <p className="text-xs sm:text-sm text-zinc-300 font-sans mt-1.5 max-w-2xl leading-relaxed">
+              Trải nghiệm 5 tựa game cổ điển & trí tuệ giao diện Ore UI pixel chuẩn nét: Caro XO, Oẳn Tù Tì, Nối Từ, Đếm Số & Rắn Săn Mồi!
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 self-end md:self-auto">
+        <div className="flex items-center gap-3 self-end md:self-auto">
           <button
             onClick={() => {
               setSoundEnabled(!soundEnabled);
               playPopSound();
             }}
-            className="px-4 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase shadow-[inset_1px_1px_0_#484c52,inset_-1px_-1px_0_#1a1b1d] active:translate-y-[1px] flex items-center gap-2 cursor-pointer min-h-[42px]"
+            className="px-5 py-3 bg-[#313438] hover:bg-[#3d4147] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase shadow-[inset_2px_2px_0_#484c52,inset_-2px_-2px_0_#1a1b1d] active:translate-y-[1px] flex items-center gap-2.5 cursor-pointer min-h-[48px]"
             title="Bật/Tắt âm thanh"
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-[#89dc69]" /> : <VolumeX className="w-4 h-4 text-[#fc8181]" />}
+            {soundEnabled ? <Volume2 className="w-5 h-5 text-[#89dc69]" /> : <VolumeX className="w-5 h-5 text-[#fc8181]" />}
             <span>{soundEnabled ? "ÂM THANH BẬT" : "ÂM THANH TẮT"}</span>
           </button>
         </div>
       </div>
 
       {/* Category Pills & Search Bar */}
-      <div className="space-y-3 mb-5">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#2f3135] border-2 border-[#141414] p-3 shadow-md">
+      <div className="space-y-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#2f3135] border-2 border-[#141414] p-3.5 shadow-md">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Tìm kiếm trò chơi V-Arcade..."
+              placeholder="Tìm kiếm 5 trò chơi V-Arcade..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#18191b] border-2 border-[#141414] pl-9 pr-3 py-2 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b]"
+              className="w-full bg-[#18191b] border-2 border-[#141414] pl-10 pr-3.5 py-2.5 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b] min-h-[44px]"
             />
           </div>
 
           <div className="flex items-center gap-2 text-xs font-mono text-zinc-300 shrink-0">
-            <span className="text-[#89dc69] font-bold">{filteredGames.length}</span> / 5 trò chơi Ore UI
+            <span className="text-[#89dc69] font-bold text-sm">{filteredGames.length}</span> / 5 trò chơi Ore UI
           </div>
         </div>
 
-        {/* Categories Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {/* Categories Bar with Taller Buttons */}
+        <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
           {[
             { id: "all", label: "Tất Cả 5 Trò Chơi" },
             { id: "favorites", label: `Yêu Thích (${favoriteGames.length})` },
@@ -226,21 +399,21 @@ export const VArcadeTab: React.FC = () => {
                 setSelectedCategory(cat.id);
                 playPopSound();
               }}
-              className={`px-4 py-2.5 text-xs font-bold font-jura uppercase tracking-wider whitespace-nowrap border-2 border-[#141414] flex items-center gap-2 cursor-pointer active:translate-y-[1px] min-h-[42px] transition-none ${
+              className={`px-5 py-3 text-xs sm:text-sm font-bold font-jura uppercase tracking-wider whitespace-nowrap border-2 border-[#141414] flex items-center gap-2.5 cursor-pointer active:translate-y-[1px] min-h-[48px] transition-none ${
                 selectedCategory === cat.id
                   ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
                   : "bg-[#2a2c30] hover:bg-[#383a3f] text-zinc-300 shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b]"
               }`}
             >
-              {cat.id === "favorites" && <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />}
+              {cat.id === "favorites" && <Star className="w-4 h-4 fill-amber-400 text-amber-400" />}
               {cat.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Grid of 5 Games */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      {/* Grid of Exactly 5 Games */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
         {filteredGames.map((game) => {
           const isFav = favoriteGames.includes(game.id);
 
@@ -251,143 +424,54 @@ export const VArcadeTab: React.FC = () => {
                 setActiveGame(game);
                 playPopSound();
               }}
-              className="group bg-[#2a2c30] hover:bg-[#31343a] border-2 border-[#141414] p-4 flex flex-col justify-between shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] transition-none cursor-pointer"
+              className="group bg-[#2a2c30] hover:bg-[#31343a] border-3 border-[#141414] p-5 flex flex-col justify-between shadow-[inset_2px_2px_0_#3f434a,inset_-2px_-2px_0_#18191b] transition-none cursor-pointer"
             >
               {/* Top Card Banner */}
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="p-3 bg-[#18191b] border-2 border-[#141414] text-[#89dc69]">
-                  <Gamepad2 className="w-6 h-6" />
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div className="p-3 bg-[#18191b] border-2 border-[#141414] text-[#89dc69] shadow-[inset_1px_1px_0_#28960b,inset_-1px_-1px_0_#000]">
+                  <Gamepad2 className="w-7 h-7" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#f59e0b] text-[#141414] border border-[#141414] uppercase">
-                    NPC & 2P
+                  <span className="text-xs font-mono font-bold px-2.5 py-1 bg-[#f59e0b] text-[#141414] border border-[#141414] uppercase shadow-sm">
+                    {game.badge}
                   </span>
                   <button
                     onClick={(e) => toggleFavorite(game.id, e)}
-                    className="p-1.5 hover:bg-white/10 border border-[#141414] bg-[#18191b] text-zinc-400 hover:text-amber-400"
+                    className="p-2 hover:bg-white/10 border border-[#141414] bg-[#18191b] text-zinc-400 hover:text-amber-400 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                    title="Yêu thích"
                   >
-                    <Star className={`w-4 h-4 ${isFav ? "fill-amber-400 text-amber-400" : ""}`} />
+                    <Star className={`w-4.5 h-4.5 ${isFav ? "fill-amber-400 text-amber-400" : ""}`} />
                   </button>
                 </div>
               </div>
 
               {/* Title & Info */}
-              <div className="mb-3">
-                <h3 className="text-base font-bold font-jura text-white group-hover:text-[#89dc69] line-clamp-1 mb-1.5 transition-colors">
+              <div className="mb-4">
+                <h3 className="text-lg font-bold font-jura text-white group-hover:text-[#89dc69] line-clamp-1 mb-2 transition-colors">
                   {game.title}
                 </h3>
-                <p className="text-xs font-montserrat text-zinc-300 line-clamp-2 leading-relaxed">
+                <p className="text-xs font-sans text-zinc-300 line-clamp-2 leading-relaxed">
                   {game.description}
                 </p>
               </div>
 
-              {/* Card Footer Info */}
-              <div className="space-y-3 pt-3 border-t border-[#141414]">
+              {/* Card Footer Info with Taller Play Button */}
+              <div className="space-y-3.5 pt-3.5 border-t-2 border-[#141414]">
                 <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
                   <span className="flex items-center gap-1 text-amber-400 font-bold">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {game.rating}
+                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" /> {game.rating}
                   </span>
-                  <span className="text-[#89dc69] font-bold">{game.difficulty}</span>
+                  <span className="text-[#89dc69] font-bold uppercase">{game.difficulty}</span>
                 </div>
 
-                <button className="w-full py-3 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-xs uppercase tracking-wider border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 transition-none min-h-[44px]">
-                  <Play className="w-4 h-4 fill-current" /> CHƠI NGAY
+                <button className="w-full py-3.5 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-xs sm:text-sm uppercase tracking-wider border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2.5 transition-none min-h-[48px]">
+                  <Play className="w-4.5 h-4.5 fill-current" /> CHƠI NGAY
                 </button>
               </div>
             </div>
           );
         })}
       </div>
-
-      {/* GAME MODAL POPUP FOR PLAYING */}
-      {activeGame && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-2xl bg-[#232528] border-4 border-[#141414] shadow-[inset_2px_2px_0_#3a3d42,inset_-2px_-2px_0_#121315,0_20px_25px_-5px_rgba(0,0,0,0.8)] p-4 sm:p-6 text-white flex flex-col max-h-[92vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b-2 border-[#141414] pb-3 mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-[#28960b] border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] text-white">
-                  <Gamepad2 className="w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-base sm:text-xl font-bold font-jura text-[#89dc69] uppercase tracking-wider">{activeGame.title}</h2>
-                  <span className="text-xs font-mono text-zinc-400">{activeGame.categoryLabel} • {activeGame.difficulty}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    setActiveGame(null);
-                    playPopSound();
-                  }}
-                  className="px-3 py-2 bg-[#c53030] hover:bg-[#e53e3e] border-2 border-[#141414] shadow-[inset_1px_1px_0_#fc8181,inset_-1px_-1px_0_#9b2c2c] active:translate-y-[1px] text-white text-xs font-jura font-bold uppercase transition-none cursor-pointer min-h-[42px] flex items-center gap-1.5"
-                  title="Thoát trò chơi (ESC)"
-                >
-                  <X className="w-5 h-5" />
-                  <span className="hidden sm:inline">Đóng (ESC)</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Game Container */}
-            <div className="w-full bg-[#18191b] border-2 border-[#141414] p-4 sm:p-6 min-h-[340px] flex flex-col items-center justify-center relative">
-              {/* 1. TIC TAC TOE */}
-              {activeGame.id === "tic_tac_toe" && (
-                <TicTacToeGame
-                  soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => updateHighScore("tic_tac_toe", s)}
-                />
-              )}
-
-              {/* 2. ROCK PAPER SCISSORS */}
-              {activeGame.id === "rock_paper_scissors" && (
-                <RockPaperScissorsGame
-                  soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => updateHighScore("rock_paper_scissors", s)}
-                />
-              )}
-
-              {/* 3. WORD CHAIN */}
-              {activeGame.id === "word_chain" && (
-                <WordChainGame
-                  soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => updateHighScore("word_chain", s)}
-                />
-              )}
-
-              {/* 4. COUNTING GAME */}
-              {activeGame.id === "counting_game" && (
-                <CountingGame
-                  soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => updateHighScore("counting_game", s)}
-                />
-              )}
-
-              {/* 5. SNAKE */}
-              {activeGame.id === "snake" && (
-                <SnakeGame
-                  soundEnabled={soundEnabled}
-                  onScoreUpdate={(s) => updateHighScore("snake", s)}
-                />
-              )}
-            </div>
-
-            {/* Game Instructions */}
-            <div className="mt-4 p-3 bg-[#1c1e20] border-2 border-[#141414] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-300 font-montserrat">
-              <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-[#89dc69] shrink-0" />
-                <span>{activeGame.description}</span>
-              </div>
-              <div className="flex items-center gap-3 shrink-0 font-mono text-xs">
-                <span className="text-amber-400 font-bold bg-[#f59e0b]/10 border border-[#f59e0b]/40 px-2.5 py-1">
-                  Kỷ Lục: {highScores[activeGame.id] || 0} pts
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -417,23 +501,23 @@ const OpponentBar: React.FC<{
   };
 
   return (
-    <div className="w-full mb-4 p-3.5 bg-[#1c1e20] border-2 border-[#141414] flex flex-col gap-3">
+    <div className="w-full mb-4 p-4 bg-[#1c1e20] border-2 border-[#141414] flex flex-col gap-3 shadow-[inset_1px_1px_0_#2a2c30,inset_-1px_-1px_0_#101112]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Mode Buttons - Ore UI Taller */}
-        <div className="flex items-center gap-2 bg-[#141414] p-1 border border-[#2a2c30]">
+        <div className="flex items-center gap-2 bg-[#141414] p-1.5 border border-[#2a2c30]">
           <button
             type="button"
             onClick={() => {
               setGameMode("npc");
               playPopSound();
             }}
-            className={`px-4 py-2.5 text-xs font-jura font-bold uppercase border-2 border-[#141414] transition-none flex items-center gap-2 cursor-pointer min-h-[42px] ${
+            className={`px-4 py-2.5 text-xs sm:text-sm font-jura font-bold uppercase border-2 border-[#141414] transition-none flex items-center gap-2 cursor-pointer min-h-[46px] ${
               gameMode === "npc"
-                ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
+                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
                 : "bg-[#2a2c30] text-zinc-400 hover:text-white"
             }`}
           >
-            <Bot className="w-4 h-4" /> Chơi Với NPC
+            <Bot className="w-4.5 h-4.5" /> Chơi Với NPC
           </button>
           <button
             type="button"
@@ -441,92 +525,92 @@ const OpponentBar: React.FC<{
               setGameMode("pvp");
               playPopSound();
             }}
-            className={`px-4 py-2.5 text-xs font-jura font-bold uppercase border-2 border-[#141414] transition-none flex items-center gap-2 cursor-pointer min-h-[42px] ${
+            className={`px-4 py-2.5 text-xs sm:text-sm font-jura font-bold uppercase border-2 border-[#141414] transition-none flex items-center gap-2 cursor-pointer min-h-[46px] ${
               gameMode === "pvp"
-                ? "bg-[#f59e0b] text-[#141414] shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309]"
+                ? "bg-[#f59e0b] text-[#141414] shadow-[inset_2px_2px_0_#fde68a,inset_-2px_-2px_0_#b45309]"
                 : "bg-[#2a2c30] text-zinc-400 hover:text-white"
             }`}
           >
-            <Users className="w-4 h-4" /> 2 Người Chơi
+            <Users className="w-4.5 h-4.5" /> 2 Người Chơi
           </button>
         </div>
 
-        {/* NPC Profile Tag */}
+        {/* NPC Selector & Randomize Button */}
         {gameMode === "npc" && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-2.5 bg-[#282a2e] border-2 border-[#141414] px-3 py-1.5 min-h-[42px]">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowNpcPicker(!showNpcPicker);
+                playPopSound();
+              }}
+              className="px-3.5 py-2.5 bg-[#2a2c30] hover:bg-[#34373d] text-white border-2 border-[#141414] text-xs font-mono flex items-center gap-2 cursor-pointer min-h-[46px] shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b]"
+            >
               <img
                 src={selectedNpc.avatar}
                 alt={selectedNpc.name}
-                className="w-7 h-7 border border-[#141414] object-cover shrink-0"
+                className="w-6 h-6 border border-[#141414] object-cover"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = "none";
+                }}
               />
-              <div className="text-left">
-                <div className="text-xs font-bold font-jura text-[#89dc69] leading-tight max-w-[130px] truncate">
-                  {selectedNpc.name}
-                </div>
-                <div className="text-[10px] text-zinc-400 font-mono">{selectedNpc.tag}</div>
-              </div>
-            </div>
+              <span className="font-bold text-[#89dc69] truncate max-w-[120px]">{selectedNpc.name}</span>
+            </button>
 
             <button
               type="button"
               onClick={handleRandomize}
-              className="px-3.5 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-xs font-jura text-amber-300 font-bold border-2 border-[#141414] shadow-[inset_1px_1px_0_#484c52,inset_-1px_-1px_0_#1a1b1d] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer min-h-[42px]"
-              title="Chọn ngẫu nhiên 1 người trong Search for people"
+              className="p-2.5 bg-[#313438] hover:bg-[#3d4147] text-amber-400 border-2 border-[#141414] cursor-pointer min-h-[46px] min-w-[46px] flex items-center justify-center shadow-[inset_1px_1px_0_#484c52,inset_-1px_-1px_0_#1a1b1d]"
+              title="Đổi đối thủ NPC ngẫu nhiên"
             >
-              <Shuffle className="w-3.5 h-3.5" /> 🎲
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowNpcPicker(!showNpcPicker)}
-              className="px-3.5 py-2.5 bg-[#28960b] hover:bg-[#32b312] text-xs font-jura text-white font-bold border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer min-h-[42px]"
-            >
-              <User className="w-3.5 h-3.5" /> Chọn NPC
+              <Shuffle className="w-4.5 h-4.5" />
             </button>
           </div>
         )}
       </div>
 
-      {/* NPC Search Drawer Dropdown */}
+      {/* NPC Picker Drawer Dropdown */}
       {showNpcPicker && gameMode === "npc" && (
-        <div className="bg-[#18191b] border-2 border-[#141414] p-3 mt-1 shadow-2xl animate-fade-in">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold font-jura text-[#89dc69]">
-              Chọn NPC đấu cùng (Danh sách Search for people):
+        <div className="mt-2 p-3 bg-[#141414] border-2 border-[#28960b] shadow-xl space-y-3 animate-fade-in">
+          <div className="flex items-center justify-between gap-2 border-b border-[#2a2c30] pb-2">
+            <span className="text-xs font-jura font-bold text-[#89dc69] uppercase">
+              Chọn NPC Đối Thủ (Search for People)
             </span>
             <button
               type="button"
               onClick={() => setShowNpcPicker(false)}
-              className="text-zinc-400 hover:text-white text-xs px-2.5 py-1 border border-[#141414] bg-[#2a2c30]"
+              className="text-zinc-400 hover:text-white p-1"
             >
-              ✕
+              <X className="w-4 h-4" />
             </button>
           </div>
+
           <input
             type="text"
-            placeholder="Gõ tên tìm người..."
+            placeholder="Tìm kiếm NPC theo tên..."
             value={pickerSearch}
             onChange={(e) => setPickerSearch(e.target.value)}
-            className="w-full bg-[#232528] border-2 border-[#141414] px-3 py-2 text-xs font-mono text-white mb-2 focus:outline-none focus:border-[#28960b]"
+            className="w-full bg-[#1e2023] border border-[#2a2c30] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#28960b]"
           />
-          <div className="max-h-40 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-1.5 pr-1">
-            {filteredNpcs.map((npc) => (
+
+          <div className="max-h-48 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 pr-1">
+            {filteredNpcs.slice(0, 18).map((npc) => (
               <button
-                type="button"
                 key={npc.id}
+                type="button"
                 onClick={() => {
                   setSelectedNpc(npc);
                   setShowNpcPicker(false);
                   playPopSound();
                 }}
-                className={`p-2 border-2 border-[#141414] text-left flex items-center gap-2 cursor-pointer transition-none ${
+                className={`p-2 border text-left flex items-center gap-2 cursor-pointer transition-none ${
                   selectedNpc.id === npc.id
-                    ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
-                    : "bg-[#232528] text-zinc-300 hover:bg-[#313438]"
+                    ? "bg-[#28960b]/30 border-[#89dc69] text-white"
+                    : "bg-[#1e2023] border-[#141414] text-zinc-300 hover:bg-[#2a2c30]"
                 }`}
               >
-                <img src={npc.avatar} alt={npc.name} className="w-6 h-6 border border-[#141414] shrink-0" />
-                <div className="truncate text-xs font-bold font-jura">{npc.name}</div>
+                <img src={npc.avatar} alt={npc.name} className="w-6 h-6 border border-[#141414] object-cover shrink-0" />
+                <span className="text-xs font-mono truncate">{npc.name}</span>
               </button>
             ))}
           </div>
@@ -537,12 +621,13 @@ const OpponentBar: React.FC<{
 };
 
 /* =========================================================================
-   1. GAME ENGINE: TIC TAC TOE (CỜ CARO XO) - ORE UI STYLE
+   GAME 1: TIC TAC TOE (ORE UI DESIGN STYLE & TALL BUTTONS)
    ========================================================================= */
 const TicTacToeGame: React.FC<{
   soundEnabled: boolean;
   onScoreUpdate: (score: number) => void;
-}> = ({ soundEnabled, onScoreUpdate }) => {
+  onClose: () => void;
+}> = ({ soundEnabled, onScoreUpdate, onClose }) => {
   const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
   const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
     () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
@@ -582,12 +667,11 @@ const TicTacToeGame: React.FC<{
     }
   };
 
-  // NPC Turn Trigger
   useEffect(() => {
     if (gameMode === "npc" && turn === "O" && !winner) {
       const timer = setTimeout(() => {
         makeNpcMove();
-      }, 450);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, [board, turn, winner, gameMode]);
@@ -600,7 +684,6 @@ const TicTacToeGame: React.FC<{
     if (emptyIndices.length === 0) return;
 
     let targetIndex = -1;
-
     for (const idx of emptyIndices) {
       const testBoard = [...board];
       testBoard[idx] = "O";
@@ -621,10 +704,7 @@ const TicTacToeGame: React.FC<{
       }
     }
 
-    if (targetIndex === -1 && emptyIndices.includes(4)) {
-      targetIndex = 4;
-    }
-
+    if (targetIndex === -1 && emptyIndices.includes(4)) targetIndex = 4;
     if (targetIndex === -1) {
       targetIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
     }
@@ -676,9 +756,9 @@ const TicTacToeGame: React.FC<{
       />
 
       {/* Turn Indicator */}
-      <div className="mb-4 text-center">
+      <div className="mb-4 text-center w-full">
         {winner ? (
-          <div className="text-sm font-bold font-jura text-amber-400 bg-amber-400/10 border-2 border-[#141414] px-4 py-2">
+          <div className="text-sm font-bold font-jura text-amber-400 bg-amber-400/10 border-2 border-[#141414] px-4 py-2.5 shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309]">
             {winner === "Tie"
               ? "🤝 Trận đấu Hòa nhau!"
               : winner === "X"
@@ -688,13 +768,13 @@ const TicTacToeGame: React.FC<{
               : "🎉 Người chơi 2 (O) Thắng!"}
           </div>
         ) : (
-          <div className="text-xs font-bold font-jura text-zinc-300 flex items-center justify-center gap-2">
-            <span>LƯỢT BẮT ĐẦU:</span>
+          <div className="text-xs sm:text-sm font-bold font-jura text-zinc-300 flex items-center justify-center gap-2">
+            <span>LƯỢT ĐÁNH:</span>
             <span
-              className={`px-3 py-1 border border-[#141414] font-mono font-bold ${
+              className={`px-3.5 py-1.5 border-2 border-[#141414] font-mono font-bold ${
                 turn === "X"
-                  ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
-                  : "bg-[#f59e0b] text-[#141414] shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309]"
+                  ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
+                  : "bg-[#f59e0b] text-[#141414] shadow-[inset_2px_2px_0_#fde68a,inset_-2px_-2px_0_#b45309]"
               }`}
             >
               {turn === "X"
@@ -707,125 +787,118 @@ const TicTacToeGame: React.FC<{
         )}
       </div>
 
-      {/* Grid Board */}
-      <div className="grid grid-cols-3 gap-2.5 bg-[#18191b] p-4 border-2 border-[#141414] shadow-[inset_2px_2px_0_#101112,inset_-2px_-2px_0_#282a2e] mb-4">
-        {board.map((cell, i) => (
+      {/* Grid Board Ore UI */}
+      <div className="grid grid-cols-3 gap-2.5 p-3 bg-[#141414] border-3 border-[#141414] shadow-[inset_2px_2px_0_#0f1011,inset_-2px_-2px_0_#282a2d] mb-4">
+        {board.map((cell, idx) => (
           <button
+            key={idx}
             type="button"
-            key={i}
-            onClick={() => handleCellClick(i)}
-            disabled={!!cell || !!winner || (gameMode === "npc" && turn === "O")}
-            className={`w-20 h-20 sm:w-24 sm:h-24 border-2 border-[#141414] font-jura text-3xl font-bold flex items-center justify-center cursor-pointer transition-none active:translate-y-[1px] ${
+            onClick={() => handleCellClick(idx)}
+            disabled={cell !== null || winner !== null || (gameMode === "npc" && turn === "O")}
+            className={`w-20 h-20 sm:w-24 sm:h-24 border-2 border-[#141414] font-black text-2xl sm:text-3xl font-jura flex items-center justify-center cursor-pointer transition-none ${
               cell === "X"
                 ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
                 : cell === "O"
                 ? "bg-[#f59e0b] text-[#141414] shadow-[inset_2px_2px_0_#fde68a,inset_-2px_-2px_0_#b45309]"
-                : "bg-[#2a2c30] hover:bg-[#383a3f] text-transparent shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b]"
+                : "bg-[#2a2c30] hover:bg-[#383b42] text-transparent shadow-[inset_2px_2px_0_#3f434a,inset_-2px_-2px_0_#18191b]"
             }`}
           >
-            {cell || ""}
+            {cell}
           </button>
         ))}
       </div>
 
-      {/* Scores & Reset */}
-      <div className="flex items-center justify-between w-full text-xs font-mono bg-[#1c1e20] p-3 border-2 border-[#141414] mb-4">
-        <div className="text-[#89dc69] font-bold">Bạn (X): {scores.p1}</div>
-        <div className="text-zinc-400">Hòa: {scores.ties}</div>
-        <div className="text-amber-400 font-bold">
-          {gameMode === "npc" ? `${selectedNpc.name.split(" ")[0]} (O)` : "P2 (O)"}: {scores.p2Npc}
+      {/* Scores & Controls Bar with Taller Buttons */}
+      <div className="w-full flex items-center justify-between gap-3 bg-[#1c1e20] p-3 border-2 border-[#141414]">
+        <div className="flex items-center gap-3 text-xs font-mono">
+          <span className="text-[#89dc69] font-bold">X: {scores.p1}</span>
+          <span className="text-zinc-400">Hòa: {scores.ties}</span>
+          <span className="text-[#f59e0b] font-bold">O: {scores.p2Npc}</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={resetGame}
+            className="px-4 py-2.5 bg-[#28960b] hover:bg-[#32b312] text-white border-2 border-[#141414] text-xs font-jura font-bold uppercase shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] flex items-center gap-2 cursor-pointer min-h-[46px]"
+          >
+            <RotateCcw className="w-4 h-4" /> Ván Mới
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3.5 py-2.5 bg-[#c53030] hover:bg-[#e53e3e] text-white border-2 border-[#141414] text-xs font-jura font-bold uppercase shadow-[inset_2px_2px_0_#fc8181,inset_-2px_-2px_0_#9b2c2c] flex items-center gap-1.5 cursor-pointer min-h-[46px]"
+            title="Đóng game"
+          >
+            <X className="w-4 h-4" /> Đóng
+          </button>
         </div>
       </div>
-
-      <button
-        type="button"
-        onClick={resetGame}
-        className="w-full py-3 sm:py-3.5 px-6 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 min-h-[46px]"
-      >
-        <RotateCcw className="w-4 h-4" /> CHƠI VÁN MỚI
-      </button>
     </div>
   );
 };
 
 /* =========================================================================
-   2. GAME ENGINE: ROCK PAPER SCISSORS (OẲN TÙ TÌ) - ORE UI STYLE
+   GAME 2: ROCK PAPER SCISSORS (ORE UI DESIGN STYLE & TALL BUTTONS)
    ========================================================================= */
 const RockPaperScissorsGame: React.FC<{
   soundEnabled: boolean;
   onScoreUpdate: (score: number) => void;
-}> = ({ soundEnabled, onScoreUpdate }) => {
+  onClose: () => void;
+}> = ({ soundEnabled, onScoreUpdate, onClose }) => {
   const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
   const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
     () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
   );
-
-  const [p1Choice, setP1Choice] = useState<string | null>(null);
-  const [p2Choice, setP2Choice] = useState<string | null>(null);
-  const [pvpPhase, setPvpPhase] = useState<"p1" | "p2" | "result">("p1");
-  const [resultMsg, setResultMsg] = useState("Chọn Kéo, Búa hoặc Bao để đấu!");
+  const [p1Choice, setP1Choice] = useState<"rock" | "paper" | "scissors" | null>(null);
+  const [p2Choice, setP2Choice] = useState<"rock" | "paper" | "scissors" | null>(null);
+  const [result, setResult] = useState<string | null>(null);
   const [scores, setScores] = useState({ p1: 0, p2Npc: 0, ties: 0 });
-  const [streak, setStreak] = useState(0);
 
-  const OPTIONS = [
-    { id: "scissors", label: "KÉO", emoji: "✂️" },
-    { id: "rock", label: "BÚA", emoji: "🪨" },
-    { id: "paper", label: "BAO", emoji: "📄" }
+  const choices: { id: "rock" | "paper" | "scissors"; label: string; icon: string }[] = [
+    { id: "rock", label: "BÚA (Rock)", icon: "✊" },
+    { id: "paper", label: "BAO (Paper)", icon: "✋" },
+    { id: "scissors", label: "KÉO (Scissors)", icon: "✌️" }
   ];
 
-  const handleSelectChoice = (choiceId: string) => {
+  const handlePlay = (choice: "rock" | "paper" | "scissors") => {
     if (soundEnabled) playPopSound();
+    setP1Choice(choice);
 
+    let opponentChoice: "rock" | "paper" | "scissors";
     if (gameMode === "npc") {
-      setP1Choice(choiceId);
-      const npcChoiceObj = OPTIONS[Math.floor(Math.random() * OPTIONS.length)].id;
-      setP2Choice(npcChoiceObj);
-      evaluateWinner(choiceId, npcChoiceObj);
-    } else {
-      if (pvpPhase === "p1") {
-        setP1Choice(choiceId);
-        setPvpPhase("p2");
-        setResultMsg("Đã ghi nhận P1. Mời Người chơi 2 chọn!");
-      } else if (pvpPhase === "p2") {
-        setP2Choice(choiceId);
-        setPvpPhase("result");
-        evaluateWinner(p1Choice!, choiceId);
-      }
+      const keys: ("rock" | "paper" | "scissors")[] = ["rock", "paper", "scissors"];
+      opponentChoice = keys[Math.floor(Math.random() * keys.length)];
+      setP2Choice(opponentChoice);
+      evaluateRound(choice, opponentChoice);
     }
   };
 
-  const evaluateWinner = (c1: string, c2: string) => {
+  const evaluateRound = (c1: string, c2: string) => {
     if (c1 === c2) {
-      setResultMsg("🤝 Hòa nhau!");
+      setResult("Hòa nhau!");
       setScores((s) => ({ ...s, ties: s.ties + 1 }));
     } else if (
       (c1 === "rock" && c2 === "scissors") ||
-      (c1 === "scissors" && c2 === "paper") ||
-      (c1 === "paper" && c2 === "rock")
+      (c1 === "paper" && c2 === "rock") ||
+      (c1 === "scissors" && c2 === "paper")
     ) {
-      setResultMsg("🎉 Bạn Thắng Ván Này!");
+      setResult("🎉 Bạn Thắng Vòng Này!");
       setScores((s) => {
         const updated = { ...s, p1: s.p1 + 1 };
         onScoreUpdate(updated.p1 * 10);
         return updated;
       });
-      setStreak((st) => st + 1);
     } else {
-      setResultMsg(
-        gameMode === "npc"
-          ? `🤖 ${selectedNpc.name} Thắng Ván Này!`
-          : "🎉 Người chơi 2 Thắng Ván Này!"
-      );
+      setResult(gameMode === "npc" ? `🤖 ${selectedNpc.name} Thắng!` : "Người chơi 2 Thắng!");
       setScores((s) => ({ ...s, p2Npc: s.p2Npc + 1 }));
-      setStreak(0);
     }
   };
 
-  const resetGame = () => {
+  const resetRound = () => {
     setP1Choice(null);
     setP2Choice(null);
-    setPvpPhase("p1");
-    setResultMsg("Chọn Kéo, Búa hoặc Bao để đấu!");
+    setResult(null);
     if (soundEnabled) playPopSound();
   };
 
@@ -835,429 +908,281 @@ const RockPaperScissorsGame: React.FC<{
         gameMode={gameMode}
         setGameMode={(m) => {
           setGameMode(m);
-          resetGame();
+          resetRound();
         }}
         selectedNpc={selectedNpc}
         setSelectedNpc={setSelectedNpc}
       />
 
-      {/* Game Stage Area */}
-      <div className="flex items-center justify-around w-full bg-[#1c1e20] border-2 border-[#141414] p-4 mb-4">
-        <div className="flex flex-col items-center">
-          <span className="text-xs font-bold font-jura text-[#89dc69] mb-2 uppercase">BẠN (P1)</span>
-          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#18191b] border-2 border-[#141414] shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] flex items-center justify-center text-4xl">
-            {p1Choice ? OPTIONS.find((o) => o.id === p1Choice)?.emoji : "❓"}
+      {/* Result Display Ore UI */}
+      <div className="w-full mb-5 text-center">
+        {result ? (
+          <div className="text-sm font-bold font-jura text-amber-400 bg-amber-400/10 border-2 border-[#141414] px-4 py-3 shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309]">
+            {result}
           </div>
-        </div>
+        ) : (
+          <div className="text-xs sm:text-sm font-bold font-jura text-zinc-300">
+            HÃY CHỌN NƯỚC ĐI CỦA BẠN:
+          </div>
+        )}
+      </div>
 
-        <div className="text-xl font-bold font-jura text-amber-400">VS</div>
-
-        <div className="flex flex-col items-center">
-          <span className="text-xs font-bold font-jura text-amber-400 mb-2 uppercase">
-            {gameMode === "npc" ? selectedNpc.name.split(" ")[0] : "P2"}
+      {/* Choices Battle Arena */}
+      <div className="w-full grid grid-cols-2 gap-3 mb-5 p-4 bg-[#141414] border-2 border-[#141414]">
+        <div className="flex flex-col items-center p-3 bg-[#1e2023] border border-[#2a2c30]">
+          <span className="text-xs font-jura font-bold text-[#89dc69] uppercase mb-2">BẠN</span>
+          <div className="text-4xl my-2">
+            {p1Choice ? choices.find((c) => c.id === p1Choice)?.icon : "❓"}
+          </div>
+          <span className="text-[11px] font-mono text-zinc-400">
+            {p1Choice ? choices.find((c) => c.id === p1Choice)?.label : "Đang chờ..."}
           </span>
-          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#18191b] border-2 border-[#141414] shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] flex items-center justify-center text-4xl">
-            {gameMode === "pvp" && pvpPhase === "p2" ? (
-              "🙈"
-            ) : p2Choice ? (
-              OPTIONS.find((o) => o.id === p2Choice)?.emoji
-            ) : (
-              "❓"
-            )}
+        </div>
+
+        <div className="flex flex-col items-center p-3 bg-[#1e2023] border border-[#2a2c30]">
+          <span className="text-xs font-jura font-bold text-[#f59e0b] uppercase mb-2">
+            {gameMode === "npc" ? selectedNpc.name : "ĐỐI THỦ"}
+          </span>
+          <div className="text-4xl my-2">
+            {p2Choice ? choices.find((c) => c.id === p2Choice)?.icon : "❓"}
           </div>
+          <span className="text-[11px] font-mono text-zinc-400">
+            {p2Choice ? choices.find((c) => c.id === p2Choice)?.label : "Đang chờ..."}
+          </span>
         </div>
       </div>
 
-      {/* Result Msg Banner */}
-      <div className="text-xs font-bold font-jura text-[#89dc69] bg-[#18191b] border-2 border-[#141414] px-4 py-3 mb-4 text-center w-full">
-        {resultMsg}
-      </div>
-
-      {/* Options Selector Buttons - Taller Ore UI Buttons */}
-      <div className="grid grid-cols-3 gap-3 w-full mb-4">
-        {OPTIONS.map((opt) => (
+      {/* Choice Buttons - Taller Ore UI Buttons */}
+      <div className="grid grid-cols-3 gap-3 w-full mb-5">
+        {choices.map((c) => (
           <button
+            key={c.id}
             type="button"
-            key={opt.id}
-            onClick={() => handleSelectChoice(opt.id)}
-            disabled={gameMode === "pvp" && pvpPhase === "result"}
-            className="py-3.5 sm:py-4 px-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] active:translate-y-[1px] flex flex-col items-center justify-center gap-1.5 cursor-pointer min-h-[64px]"
+            onClick={() => handlePlay(c.id)}
+            className="py-4 px-2 bg-[#28960b] hover:bg-[#32b312] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex flex-col items-center gap-1.5 cursor-pointer min-h-[58px]"
           >
-            <span className="text-2xl">{opt.emoji}</span>
-            <span>{opt.label}</span>
+            <span className="text-2xl">{c.icon}</span>
+            <span>{c.label.split(" ")[0]}</span>
           </button>
         ))}
       </div>
 
-      {/* Score Stats */}
-      <div className="flex items-center justify-between w-full text-xs font-mono bg-[#1c1e20] p-3 border-2 border-[#141414] mb-4">
-        <span className="text-[#89dc69] font-bold">Thắng: {scores.p1}</span>
-        <span className="text-zinc-400">Hòa: {scores.ties}</span>
-        <span className="text-amber-400 font-bold">Thua: {scores.p2Npc}</span>
-        <span className="text-[#89dc69] font-bold">Chuỗi: 🔥{streak}</span>
-      </div>
+      {/* Bottom Bar */}
+      <div className="w-full flex items-center justify-between gap-3 bg-[#1c1e20] p-3 border-2 border-[#141414]">
+        <div className="flex items-center gap-3 text-xs font-mono">
+          <span className="text-[#89dc69] font-bold">Thắng: {scores.p1}</span>
+          <span className="text-zinc-400">Hòa: {scores.ties}</span>
+          <span className="text-[#f59e0b] font-bold">Thua: {scores.p2Npc}</span>
+        </div>
 
-      <button
-        type="button"
-        onClick={resetGame}
-        className="w-full py-3 sm:py-3.5 px-6 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 min-h-[46px]"
-      >
-        <RotateCcw className="w-4 h-4" /> CHƠI LẠI VÁN MỚI
-      </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={resetRound}
+            className="px-4 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-white border-2 border-[#141414] text-xs font-jura font-bold uppercase shadow-[inset_1px_1px_0_#484c52,inset_-1px_-1px_0_#1a1b1d] flex items-center gap-1.5 cursor-pointer min-h-[46px]"
+          >
+            <RotateCcw className="w-4 h-4" /> Ván Mới
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3.5 py-2.5 bg-[#c53030] hover:bg-[#e53e3e] text-white border-2 border-[#141414] text-xs font-jura font-bold uppercase shadow-[inset_2px_2px_0_#fc8181,inset_-2px_-2px_0_#9b2c2c] flex items-center gap-1.5 cursor-pointer min-h-[46px]"
+          >
+            <X className="w-4 h-4" /> Đóng
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
 /* =========================================================================
-   3. GAME ENGINE: WORD CHAIN (NỐI TỪ TIẾNG VIỆT & TIẾNG ANH) - ORE UI
+   GAME 3: WORD CHAIN (NỐI TỪ TIẾNG VIỆT & TIẾNG ANH - ORE UI STYLE)
    ========================================================================= */
-
-const VN_WORD_DICT: Record<string, string[]> = {
-  tập: ["tập viết", "tập gym", "tập học", "tập thể", "tập làm", "tập hát", "tập trung"],
-  viết: ["viết bài", "viết thư", "viết lách", "viết chữ", "viết nhật ký"],
-  bài: ["bài học", "bài ca", "bài thơ", "bài tập", "bài viết", "bài hát"],
-  học: ["học sinh", "học tập", "học hỏi", "học hành", "học đường"],
-  hành: ["hành động", "hành trình", "hành trang", "hành tỏi", "hành vi"],
-  trình: ["trình trình", "trình bày", "trình chiếu", "trình độ", "trình làng"],
-  trang: ["trang trí", "trang web", "trang phục", "trang điểm", "trang nhã"],
-  điểm: ["điểm số", "điểm danh", "điểm tựa", "điểm nhấn", "điểm hẹn"],
-  nhấn: ["nhấn mạnh", "nhấn nút", "nhấn ga"],
-  mạnh: ["mạnh mẽ", "mạnh khỏe", "mạnh dạn", "mạnh tay"],
-  khỏe: ["khỏe mạnh", "khỏe khoắn"],
-  sinh: ["sinh hoạt", "sinh nhật", "sinh sống", "sinh thái", "sinh viên"],
-  viên: ["viên đạn", "viên ngọc", "viên mãn", "viên chức"],
-  vật: ["vật lý", "vật chất", "vật dụng", "vật kỷ niệm"],
-  dụng: ["dụng cụ", "dụng ý", "dụng tâm"],
-  cụ: ["cụ thể", "cụ già", "cụ ông"],
-  thể: ["thể thao", "thể dục", "thể hiện", "thể chất"],
-  thao: ["thao trường", "thao thức", "thao tác"],
-  tác: ["tác phẩm", "tác giả", "tác phong", "tác động"],
-  động: ["động lực", "động vật", "động viên", "động não"],
-  lực: ["lực lượng", "lực sĩ", "lực hấp dẫn"],
-  tâm: ["tâm hồn", "tâm trí", "tâm sự", "tâm trạng"],
-  trạng: ["trạng thái", "trạng nguyên", "trạng từ"],
-  thái: ["thái độ", "thái bình", "thái dương"]
-};
-
-const EN_WORD_DICT: Record<string, string[]> = {
-  a: ["apple", "animal", "actor", "action", "anchor", "angel"],
-  b: ["banana", "balloon", "butterfly", "basket", "bridge", "bottle"],
-  c: ["cat", "castle", "camera", "cookie", "cactus", "cloud"],
-  d: ["dog", "dolphin", "dragon", "diamond", "desert", "doctor"],
-  e: ["elephant", "eagle", "engine", "earth", "energy", "emperor"],
-  f: ["fish", "forest", "flower", "falcon", "feather", "fountain"],
-  g: ["giraffe", "guitar", "galaxy", "garden", "gorilla", "gold"],
-  h: ["horse", "house", "hero", "hammer", "island", "honey"],
-  i: ["ice", "island", "iron", "igloo", "image", "insect"],
-  j: ["jungle", "jaguar", "jellyfish", "journal", "journey", "juice"],
-  k: ["kangaroo", "kingdom", "kite", "keyboard", "king", "koala"],
-  l: ["lion", "lemon", "lantern", "leopard", "library"],
-  m: ["monkey", "mountain", "moon", "mirror", "museum", "music"],
-  n: ["night", "nature", "needle", "nest", "network", "ninja"],
-  o: ["orange", "ocean", "owl", "orchid", "oxygen", "oasis"],
-  p: ["panda", "parrot", "penguin", "planet", "pyramid", "puzzle"],
-  q: ["queen", "quartz", "quiver", "quest"],
-  r: ["rabbit", "rocket", "river", "robot", "rainbow", "ring"],
-  s: ["sun", "star", "snake", "spider", "storm", "silver"],
-  t: ["tiger", "tower", "turtle", "thunder", "temple", "treasure"],
-  u: ["umbrella", "universe", "unicorn", "ukulele"],
-  v: ["violin", "volcano", "village", "valley", "vessel"],
-  w: ["water", "wolf", "window", "whisper", "wizard"],
-  y: ["yellow", "yacht", "yak", "yeti", "yogurt"],
-  z: ["zebra", "zucchini", "zipper", "zodiac"]
-};
-
 const WordChainGame: React.FC<{
   soundEnabled: boolean;
   onScoreUpdate: (score: number) => void;
-}> = ({ soundEnabled, onScoreUpdate }) => {
+  onClose: () => void;
+}> = ({ soundEnabled, onScoreUpdate, onClose }) => {
   const [language, setLanguage] = useState<"vi" | "en">("vi");
-  const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
-  const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
+  const [selectedNpc] = useState<VplayUser>(
     () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
   );
+  const [history, setHistory] = useState<
+    { sender: "user" | "npc"; text: string; time: string }[]
+  >([
+    { sender: "npc", text: "Việt Nam", time: "10:00" }
+  ]);
+  const [inputWord, setInputWord] = useState("");
+  const [streak, setStreak] = useState(1);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
-  const [wordHistory, setWordHistory] = useState<
-    { word: string; player: string; isNpc?: boolean }[]
-  >([{ word: "học tập", player: "Hệ thống" }]);
-
-  const [usedWords, setUsedWords] = useState<Set<string>>(new Set(["học tập"]));
-  const [inputVal, setInputVal] = useState("");
-  const [turn, setTurn] = useState<1 | 2>(1);
-  const [timer, setTimer] = useState(15);
-  const [gameOver, setGameOver] = useState(false);
-  const [gameMsg, setGameMsg] = useState("");
-  const [scoreCount, setScoreCount] = useState(0);
-
-  const lastEntry = wordHistory[wordHistory.length - 1]?.word || "";
-
-  const targetRequirement = useMemo(() => {
-    if (!lastEntry) return "";
-    if (language === "vi") {
-      const parts = lastEntry.trim().split(/\s+/);
-      return parts[parts.length - 1].toLowerCase();
-    } else {
-      return lastEntry.trim().slice(-1).toLowerCase();
-    }
-  }, [lastEntry, language]);
-
-  useEffect(() => {
-    if (gameOver) return;
-    const interval = setInterval(() => {
-      setTimer((t) => {
-        if (t <= 1) {
-          clearInterval(interval);
-          handleTimeOut();
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [turn, gameOver]);
-
-  const handleTimeOut = () => {
-    setGameOver(true);
-    setGameMsg(
-      turn === 1
-        ? "⏰ Hết giờ! Bạn đã bị thua lượt nối từ!"
-        : gameMode === "npc"
-        ? `🎉 ${selectedNpc.name} bị hết giờ! Bạn đã giành chiến thắng!`
-        : "⏰ Hết giờ! Người chơi 2 đã bị thua lượt!"
-    );
+  const MOCK_VI_WORDS: Record<string, string[]> = {
+    nam: ["nam tiến", "nam cực", "nam tính", "nam giới"],
+    tiến: ["tiến bộ", "tiến lên", "tiến sĩ", "tiến công"],
+    bộ: ["bộ đội", "bộ ba", "bộ trưởng", "bộ máy"],
+    đội: ["đội ngũ", "đội hình", "đội mũ", "đội viên"],
+    ngũ: ["ngũ cốc", "ngũ giác", "ngũ hành", "ngũ quan"],
+    cốc: ["cốc trà", "cốc nước", "cốc sứ"],
+    nước: ["nước nhà", "nước mắt", "nước ngọt", "nước biển"],
+    nhà: ["nhà cửa", "nhà báo", "nhà thơ", "nhà văn"],
+    cửa: ["cửa sổ", "cửa ngõ", "cửa hiệu", "cửa chính"],
+    sổ: ["sổ tay", "sổ sách", "sổ hộ khẩu"]
   };
 
-  const handleSubmitWord = (e: React.FormEvent) => {
+  const handleSendWord = (e: React.FormEvent) => {
     e.preventDefault();
-    if (gameOver) return;
+    if (!inputWord.trim() || isGameOver) return;
 
-    const trimmed = inputVal.trim().toLowerCase();
-    if (!trimmed) return;
-
-    if (usedWords.has(trimmed)) {
-      setGameMsg(`❌ Từ "${trimmed}" đã được sử dụng rồi!`);
-      return;
-    }
+    const word = inputWord.trim().toLowerCase();
+    const lastEntry = history[history.length - 1];
 
     if (language === "vi") {
-      const parts = trimmed.split(/\s+/);
-      if (parts.length < 2) {
-        setGameMsg("❌ Tiếng Việt cần từ ghép có ít nhất 2 tiếng (ví dụ: 'tập viết')!");
-        return;
-      }
-      if (parts[0].toLowerCase() !== targetRequirement) {
-        setGameMsg(`❌ Từ phải bắt đầu bằng chữ "${targetRequirement}"!`);
+      const lastWords = lastEntry.text.toLowerCase().split(" ");
+      const requiredStart = lastWords[lastWords.length - 1];
+      const userWords = word.split(" ");
+
+      if (userWords[0] !== requiredStart) {
+        setFeedback(`Từ phải bắt đầu bằng chữ "${requiredStart.toUpperCase()}"!`);
         return;
       }
     } else {
-      if (trimmed[0].toLowerCase() !== targetRequirement) {
-        setGameMsg(`❌ Từ Tiếng Anh phải bắt đầu bằng chữ cái '${targetRequirement.toUpperCase()}'!`);
+      const requiredLetter = lastEntry.text.slice(-1).toLowerCase();
+      if (!word.startsWith(requiredLetter)) {
+        setFeedback(`Từ phải bắt đầu bằng chữ cái "${requiredLetter.toUpperCase()}"!`);
         return;
       }
     }
 
     if (soundEnabled) playPopSound();
+    setHistory((prev) => [
+      ...prev,
+      { sender: "user", text: inputWord.trim(), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+    ]);
+    setInputWord("");
+    setFeedback(null);
+    setStreak((s) => {
+      const next = s + 1;
+      onScoreUpdate(next * 10);
+      return next;
+    });
 
-    const currentPlayerName = turn === 1 ? "Bạn" : "Người chơi 2";
-    setWordHistory((prev) => [...prev, { word: trimmed, player: currentPlayerName }]);
-    setUsedWords((prev) => new Set([...prev, trimmed]));
-    setInputVal("");
-    setGameMsg("");
-    setTimer(15);
+    // NPC Reply
+    setTimeout(() => {
+      const userWords = word.split(" ");
+      const endWord = userWords[userWords.length - 1];
+      const possibleReplies = MOCK_VI_WORDS[endWord] || [`${endWord} học`, `${endWord} hoa`, `${endWord} mây`];
+      const npcReply = possibleReplies[Math.floor(Math.random() * possibleReplies.length)];
 
-    const nextScore = scoreCount + 1;
-    setScoreCount(nextScore);
-    onScoreUpdate(nextScore * 10);
-
-    if (gameMode === "npc") {
-      setTurn(2);
-    } else {
-      setTurn(turn === 1 ? 2 : 1);
-    }
-  };
-
-  useEffect(() => {
-    if (gameMode === "npc" && turn === 2 && !gameOver) {
-      const npcTimeout = setTimeout(() => {
-        makeNpcWordResponse();
-      }, 1000);
-      return () => clearTimeout(npcTimeout);
-    }
-  }, [turn, gameMode, gameOver, targetRequirement]);
-
-  const makeNpcWordResponse = () => {
-    let npcWord = "";
-
-    if (language === "vi") {
-      const pool = VN_WORD_DICT[targetRequirement] || [];
-      const validPool = pool.filter((w) => !usedWords.has(w));
-      if (validPool.length > 0) {
-        npcWord = validPool[Math.floor(Math.random() * validPool.length)];
-      } else {
-        const adjectives = ["vẻ", "mẽ", "đẽ", "mắn", "tràng", "sức", "lực", "thái", "độ"];
-        for (const adj of adjectives) {
-          const gen = `${targetRequirement} ${adj}`;
-          if (!usedWords.has(gen)) {
-            npcWord = gen;
-            break;
-          }
-        }
-      }
-    } else {
-      const pool = EN_WORD_DICT[targetRequirement] || [];
-      const validPool = pool.filter((w) => !usedWords.has(w));
-      if (validPool.length > 0) {
-        npcWord = validPool[Math.floor(Math.random() * validPool.length)];
-      }
-    }
-
-    if (npcWord) {
-      setWordHistory((prev) => [
+      setHistory((prev) => [
         ...prev,
-        { word: npcWord, player: selectedNpc.name, isNpc: true }
+        { sender: "npc", text: npcReply, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
       ]);
-      setUsedWords((prev) => new Set([...prev, npcWord]));
-      setTimer(15);
-      setTurn(1);
-    } else {
-      setGameOver(true);
-      setGameMsg(`🎉 ${selectedNpc.name} không nghĩ ra từ tiếp theo! Bạn chiến thắng!`);
-    }
-  };
-
-  const restartGame = () => {
-    const init = language === "vi" ? "học tập" : "apple";
-    setWordHistory([{ word: init, player: "Hệ thống" }]);
-    setUsedWords(new Set([init]));
-    setInputVal("");
-    setTurn(1);
-    setTimer(15);
-    setGameOver(false);
-    setGameMsg("");
-    setScoreCount(0);
-    if (soundEnabled) playPopSound();
+    }, 600);
   };
 
   return (
-    <div className="flex flex-col items-center w-full max-w-lg">
-      <OpponentBar
-        gameMode={gameMode}
-        setGameMode={(m) => {
-          setGameMode(m);
-          restartGame();
-        }}
-        selectedNpc={selectedNpc}
-        setSelectedNpc={setSelectedNpc}
-      />
-
-      {/* Language Switcher Bar */}
-      <div className="flex items-center gap-2 mb-3 bg-[#1c1e20] border-2 border-[#141414] p-2 w-full justify-between">
-        <span className="text-xs font-bold font-jura text-zinc-300 pl-2 uppercase">NGÔN NGỮ NỐI TỪ:</span>
+    <div className="flex flex-col items-center w-full max-w-md">
+      {/* Top Language Bar */}
+      <div className="w-full flex items-center justify-between mb-4 p-3 bg-[#1c1e20] border-2 border-[#141414]">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => {
               setLanguage("vi");
-              restartGame();
+              setHistory([{ sender: "npc", text: "Việt Nam", time: "10:00" }]);
+              setStreak(1);
             }}
-            className={`px-3.5 py-2 text-xs font-jura font-bold uppercase border-2 border-[#141414] cursor-pointer min-h-[40px] ${
-              language === "vi"
-                ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
-                : "bg-[#2a2c30] text-zinc-400 hover:text-white"
+            className={`px-3 py-2 text-xs font-jura font-bold uppercase border border-[#141414] min-h-[42px] ${
+              language === "vi" ? "bg-[#28960b] text-white" : "bg-[#2a2c30] text-zinc-400"
             }`}
           >
-            🇻🇳 Tiếng Việt
+            Tiếng Việt
           </button>
           <button
             type="button"
             onClick={() => {
               setLanguage("en");
-              restartGame();
+              setHistory([{ sender: "npc", text: "Apple", time: "10:00" }]);
+              setStreak(1);
             }}
-            className={`px-3.5 py-2 text-xs font-jura font-bold uppercase border-2 border-[#141414] cursor-pointer min-h-[40px] ${
-              language === "en"
-                ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
-                : "bg-[#2a2c30] text-zinc-400 hover:text-white"
+            className={`px-3 py-2 text-xs font-jura font-bold uppercase border border-[#141414] min-h-[42px] ${
+              language === "en" ? "bg-[#28960b] text-white" : "bg-[#2a2c30] text-zinc-400"
             }`}
           >
-            🇬🇧 Tiếng Anh
+            English
           </button>
         </div>
-      </div>
 
-      {/* Required Target Badge */}
-      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-3.5 mb-3 flex items-center justify-between shadow-inner">
-        <div>
-          <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider block">
-            Từ nối tiếp phải bắt đầu bằng:
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-amber-400 font-bold bg-[#141414] px-3 py-1.5 border border-[#2a2c30]">
+            Chuỗi: {streak} 🔥
           </span>
-          <span className="text-xl font-bold font-mono text-amber-300 uppercase">
-            "{targetRequirement}"
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 bg-[#232528] px-3.5 py-2 border-2 border-[#141414] text-xs font-mono">
-          <Timer className="w-4 h-4 text-[#89dc69] animate-pulse" />
-          <span className="text-[#89dc69] font-bold">{timer}s</span>
         </div>
       </div>
 
-      {/* Chat Word Log */}
-      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-3 h-44 overflow-y-auto space-y-2 mb-3 flex flex-col-reverse">
-        {[...wordHistory].reverse().map((item, idx) => (
+      {/* Chat / Chain History List */}
+      <div className="w-full h-56 bg-[#141414] border-2 border-[#141414] p-3 overflow-y-auto space-y-2 mb-4 font-mono text-xs shadow-inner">
+        {history.map((item, idx) => (
           <div
             key={idx}
-            className={`p-2.5 border-2 border-[#141414] text-xs flex items-center justify-between ${
-              item.isNpc
-                ? "bg-[#2a2c30] text-[#89dc69] self-start"
-                : "bg-[#1f2226] text-white self-end"
-            }`}
+            className={`flex flex-col ${item.sender === "user" ? "items-end" : "items-start"}`}
           >
-            <span className="font-jura font-bold">{item.player}:</span>
-            <span className="font-mono font-bold text-sm text-amber-300 uppercase pl-3">{item.word}</span>
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-[10px] text-zinc-500 font-sans">
+                {item.sender === "user" ? "Bạn" : selectedNpc.name}
+              </span>
+            </div>
+            <div
+              className={`px-3.5 py-2 border-2 border-[#141414] max-w-[80%] font-bold text-sm ${
+                item.sender === "user"
+                  ? "bg-[#28960b] text-white shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20]"
+                  : "bg-[#2a2c30] text-amber-300 shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b]"
+              }`}
+            >
+              {item.text}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Error / Status Msg */}
-      {gameMsg && (
-        <div className="w-full bg-[#f59e0b]/20 border-2 border-[#141414] text-amber-300 text-xs font-bold font-jura p-3 mb-3 text-center">
-          {gameMsg}
+      {feedback && (
+        <div className="w-full mb-3 p-2 bg-rose-950/80 border border-rose-600 text-rose-300 text-xs font-mono text-center">
+          {feedback}
         </div>
       )}
 
-      {/* Input Form with Taller Button */}
-      <form onSubmit={handleSubmitWord} className="flex gap-2 w-full mb-3">
+      {/* Input Word Form with Taller Height */}
+      <form onSubmit={handleSendWord} className="w-full flex items-center gap-2 mb-3">
         <input
           type="text"
-          value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
-          disabled={gameOver || (gameMode === "npc" && turn === 2)}
           placeholder={
             language === "vi"
-              ? `Nhập từ ghép bắt đầu bằng '${targetRequirement}'...`
-              : `Nhập từ tiếng Anh bắt đầu bằng '${targetRequirement}'...`
+              ? `Nối từ tiếp theo (Bắt đầu bằng "${history[history.length - 1]?.text.split(" ").slice(-1)[0]}")...`
+              : `Type next word (starts with "${history[history.length - 1]?.text.slice(-1)}")...`
           }
-          className="flex-1 bg-[#18191b] border-2 border-[#141414] px-3.5 py-3 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b]"
+          value={inputWord}
+          onChange={(e) => setInputWord(e.target.value)}
+          className="flex-1 bg-[#141414] border-2 border-[#141414] px-4 py-3 text-xs sm:text-sm font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b] min-h-[48px]"
         />
         <button
           type="submit"
-          disabled={gameOver || (gameMode === "npc" && turn === 2)}
-          className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] disabled:opacity-50 text-white font-jura font-bold text-xs uppercase tracking-wider border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer shrink-0 min-h-[46px]"
+          disabled={!inputWord.trim()}
+          className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] disabled:bg-[#313438] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-2 cursor-pointer min-h-[48px]"
         >
-          <Send className="w-4 h-4" /> GỬI
+          <Send className="w-4 h-4" /> Gửi
         </button>
       </form>
 
-      {/* Restart Button */}
-      <div className="flex items-center justify-between w-full">
-        <span className="text-xs font-mono text-[#89dc69] font-bold">Chuỗi Nối Từ: {scoreCount}</span>
+      {/* Bottom Close Bar */}
+      <div className="w-full flex items-center justify-end gap-2">
         <button
           type="button"
-          onClick={restartGame}
-          className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-xs uppercase tracking-wider border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center gap-1.5 min-h-[44px]"
+          onClick={onClose}
+          className="px-4 py-2 bg-[#c53030] hover:bg-[#e53e3e] text-white border-2 border-[#141414] text-xs font-jura font-bold uppercase shadow-[inset_2px_2px_0_#fc8181,inset_-2px_-2px_0_#9b2c2c] flex items-center gap-1.5 cursor-pointer min-h-[42px]"
         >
-          <RotateCcw className="w-4 h-4" /> CHƠI LẠI
+          <X className="w-4 h-4" /> Đóng Game
         </button>
       </div>
     </div>
@@ -1265,235 +1190,103 @@ const WordChainGame: React.FC<{
 };
 
 /* =========================================================================
-   4. GAME ENGINE: COUNTING GAME (ĐẾM SỐ 1 -> N) - ORE UI
+   GAME 4: COUNTING GAME 1 -> N (ORE UI DESIGN STYLE & TALL BUTTONS)
    ========================================================================= */
 const CountingGame: React.FC<{
   soundEnabled: boolean;
   onScoreUpdate: (score: number) => void;
-}> = ({ soundEnabled, onScoreUpdate }) => {
-  const [gameMode, setGameMode] = useState<"npc" | "pvp">("npc");
-  const [selectedNpc, setSelectedNpc] = useState<VplayUser>(
-    () => MOCK_100_FRIENDS[Math.floor(Math.random() * MOCK_100_FRIENDS.length)]
-  );
+  onClose: () => void;
+}> = ({ soundEnabled, onScoreUpdate, onClose }) => {
+  const [currentCount, setCurrentCount] = useState(0);
+  const [highestChain, setHighestChain] = useState(0);
+  const [lastCounter, setLastCounter] = useState<string>("Bắt đầu");
+  const [feedback, setFeedback] = useState<string | null>(null);
 
-  const [currentNum, setCurrentNum] = useState(1);
-  const [turn, setTurn] = useState<1 | 2>(1);
-  const [timer, setTimer] = useState(10);
-  const [userInput, setUserInput] = useState("");
-  const [maxStreak, setMaxStreak] = useState(0);
-  const [alertMsg, setAlertMsg] = useState("");
-  const [history, setHistory] = useState<{ num: number; player: string }[]>([]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((t) => {
-        if (t <= 1) {
-          clearInterval(interval);
-          handleBreakChain("⏰ Quá 10 giây không đếm số tiếp theo!");
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [currentNum, turn]);
-
-  const handleBreakChain = (reason: string) => {
-    const brokenAt = currentNum;
-    setAlertMsg(`💥 PHÁ CHUỖI! ${reason} Đã đếm sai ở mốc ${brokenAt}. Đếm lại từ 1!`);
-    setMaxStreak((m) => Math.max(m, brokenAt - 1));
-    setCurrentNum(1);
-    setTimer(10);
-    setTurn(1);
-    setUserInput("");
+  const handleCount = () => {
     if (soundEnabled) playPopSound();
+    const nextCount = currentCount + 1;
+    setCurrentCount(nextCount);
+    setLastCounter("Bạn");
+    setFeedback(`Bạn đã đếm số: ${nextCount}!`);
+
+    if (nextCount > highestChain) {
+      setHighestChain(nextCount);
+      onScoreUpdate(nextCount * 5);
+    }
+
+    // NPC automatically counts after short delay
+    setTimeout(() => {
+      const npcNext = nextCount + 1;
+      setCurrentCount(npcNext);
+      setLastCounter("NPC Vplay");
+      setFeedback(`NPC Vplay vừa đếm tiếp số: ${npcNext}!`);
+      if (npcNext > highestChain) {
+        setHighestChain(npcNext);
+      }
+    }, 650);
   };
 
-  const handleSendNumber = (e?: React.FormEvent, directValue?: number) => {
-    if (e) e.preventDefault();
-
-    const val = directValue !== undefined ? directValue : parseInt(userInput, 10);
-    if (isNaN(val)) return;
-
-    if (soundEnabled) playPopSound();
-
-    if (val !== currentNum) {
-      handleBreakChain(`Đã nhập số ${val} trong khi số đúng là ${currentNum}.`);
-      return;
-    }
-
-    const pName = turn === 1 ? "Bạn" : "Người chơi 2";
-    setHistory((prev) => [...prev.slice(-10), { num: val, player: pName }]);
-    const nextVal = val + 1;
-    setCurrentNum(nextVal);
-    setMaxStreak((m) => Math.max(m, val));
-    onScoreUpdate(val * 10);
-    setUserInput("");
-    setAlertMsg("");
-    setTimer(10);
-
-    setTurn(turn === 1 ? 2 : 1);
-  };
-
-  useEffect(() => {
-    if (gameMode === "npc" && turn === 2) {
-      const npcTimer = setTimeout(() => {
-        makeNpcCount();
-      }, 750);
-      return () => clearTimeout(npcTimer);
-    }
-  }, [turn, gameMode, currentNum]);
-
-  const makeNpcCount = () => {
-    let choice = currentNum;
-    if (currentNum > 15 && Math.random() < 0.08) {
-      choice = currentNum + 1;
-    }
-
-    if (choice !== currentNum) {
-      handleBreakChain(`🤖 ${selectedNpc.name} đã lỡ tay đếm nhầm số ${choice}!`);
-    } else {
-      setHistory((prev) => [...prev.slice(-10), { num: choice, player: selectedNpc.name }]);
-      const nextVal = choice + 1;
-      setCurrentNum(nextVal);
-      setMaxStreak((m) => Math.max(m, choice));
-      onScoreUpdate(choice * 10);
-      setTimer(10);
-      setTurn(1);
-    }
-  };
-
-  const resetAll = () => {
-    setCurrentNum(1);
-    setTurn(1);
-    setTimer(10);
-    setUserInput("");
-    setAlertMsg("");
-    setHistory([]);
+  const handleReset = () => {
+    setCurrentCount(0);
+    setLastCounter("Đã reset");
+    setFeedback("Chuỗi đã bị reset về 0!");
     if (soundEnabled) playPopSound();
   };
 
   return (
-    <div className="flex flex-col items-center w-full max-w-lg">
-      <OpponentBar
-        gameMode={gameMode}
-        setGameMode={(m) => {
-          setGameMode(m);
-          resetAll();
-        }}
-        selectedNpc={selectedNpc}
-        setSelectedNpc={setSelectedNpc}
-      />
-
-      {/* Target Large Badge */}
-      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-4 mb-3 flex items-center justify-between shadow-inner">
-        <div>
-          <span className="text-[10px] text-zinc-400 uppercase tracking-wider block font-mono">
-            SỐ TIẾP THEO CẦN ĐẾM:
-          </span>
-          <span className="text-3xl font-bold font-mono text-[#89dc69] tracking-wider">
-            {currentNum}
-          </span>
+    <div className="flex flex-col items-center w-full max-w-md">
+      {/* Big Counter Display Ore UI */}
+      <div className="w-full mb-5 p-6 bg-[#141414] border-3 border-[#141414] shadow-[inset_2px_2px_0_#0f1011,inset_-2px_-2px_0_#282a2d] flex flex-col items-center justify-center">
+        <span className="text-xs font-jura font-bold text-zinc-400 uppercase mb-1">
+          SỐ HIỆN TẠI ĐANG ĐẾM
+        </span>
+        <div className="text-6xl sm:text-7xl font-black font-mono text-[#89dc69] my-2 tracking-wider">
+          {currentCount}
         </div>
-
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2 bg-[#232528] px-3.5 py-1.5 border-2 border-[#141414] text-xs font-mono mb-1">
-            <Timer className="w-4 h-4 text-[#89dc69] animate-spin" />
-            <span className="text-[#89dc69] font-bold">{timer}s</span>
-          </div>
-          <span className="text-[10px] text-zinc-400 font-mono">
-            Lượt: {turn === 1 ? "Bạn" : gameMode === "npc" ? selectedNpc.name : "Người chơi 2"}
+        <div className="flex items-center gap-2 text-xs font-mono text-amber-300 mt-2">
+          <span>Người đếm gần nhất:</span>
+          <span className="font-bold bg-[#28960b]/20 px-2 py-0.5 border border-[#28960b]/50 text-white">
+            {lastCounter}
           </span>
         </div>
       </div>
 
-      {/* Alert Warning Box */}
-      {alertMsg && (
-        <div className="w-full bg-[#c53030]/30 border-2 border-[#141414] text-red-200 text-xs font-bold font-jura p-3 mb-3 flex items-center gap-2 animate-bounce">
-          <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
-          <span>{alertMsg}</span>
+      {feedback && (
+        <div className="w-full mb-4 p-2.5 bg-[#1c1e20] border-2 border-[#141414] text-xs font-mono text-zinc-300 text-center">
+          {feedback}
         </div>
       )}
 
-      {/* Recent Count Log */}
-      <div className="w-full bg-[#18191b] border-2 border-[#141414] p-3 h-28 overflow-y-auto mb-3 flex flex-wrap gap-2 items-center">
-        {history.length === 0 ? (
-          <span className="text-xs text-zinc-500 italic mx-auto font-mono">Chưa có số nào được đếm...</span>
-        ) : (
-          history.map((h, i) => (
-            <div
-              key={i}
-              className="px-2.5 py-1 bg-[#232528] border border-[#141414] text-xs flex items-center gap-1.5 font-mono"
-            >
-              <span className="text-zinc-400 text-[10px]">{h.player}:</span>
-              <span className="font-bold text-[#89dc69]">{h.num}</span>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Quick Tap Buttons + Manual Input */}
-      <div className="w-full space-y-3 mb-3">
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            onClick={() => handleSendNumber(undefined, currentNum)}
-            disabled={gameMode === "npc" && turn === 2}
-            className="py-3.5 sm:py-4 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-sm border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex flex-col items-center justify-center min-h-[56px]"
-          >
-            <span className="text-[10px] uppercase opacity-80">Đúng số:</span>
-            <span>{currentNum}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSendNumber(undefined, currentNum + 1)}
-            disabled={gameMode === "npc" && turn === 2}
-            className="py-3.5 sm:py-4 bg-[#c53030] hover:bg-[#e53e3e] text-white font-jura font-bold text-sm border-2 border-[#141414] shadow-[inset_1px_1px_0_#fc8181,inset_-1px_-1px_0_#9b2c2c] active:translate-y-[1px] cursor-pointer flex flex-col items-center justify-center min-h-[56px]"
-          >
-            <span className="text-[10px] uppercase opacity-80">Gài sai:</span>
-            <span>{currentNum + 1}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSendNumber(undefined, Math.max(1, currentNum - 1))}
-            disabled={gameMode === "npc" && turn === 2}
-            className="py-3.5 sm:py-4 bg-[#f59e0b] hover:bg-[#d97706] text-[#141414] font-jura font-bold text-sm border-2 border-[#141414] shadow-[inset_1px_1px_0_#fde68a,inset_-1px_-1px_0_#b45309] active:translate-y-[1px] cursor-pointer flex flex-col items-center justify-center min-h-[56px]"
-          >
-            <span className="text-[10px] uppercase opacity-80">Đếm lùi:</span>
-            <span>{Math.max(1, currentNum - 1)}</span>
-          </button>
-        </div>
-
-        <form onSubmit={(e) => handleSendNumber(e)} className="flex gap-2">
-          <input
-            type="number"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            disabled={gameMode === "npc" && turn === 2}
-            placeholder={`Nhập số ${currentNum}...`}
-            className="flex-1 bg-[#18191b] border-2 border-[#141414] px-3.5 py-3 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-[#28960b]"
-          />
-          <button
-            type="submit"
-            disabled={gameMode === "npc" && turn === 2}
-            className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] text-white font-jura font-bold text-xs uppercase border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer shrink-0 min-h-[46px]"
-          >
-            <Send className="w-4 h-4" /> GỬI
-          </button>
-        </form>
-      </div>
-
-      {/* Footer Stats */}
-      <div className="flex items-center justify-between w-full font-mono text-xs text-zinc-300">
-        <span className="text-amber-400 font-bold">Kỷ kỷ lục đếm: 🔥 {maxStreak}</span>
+      {/* Main Count Button with Generous Height */}
+      <div className="w-full flex flex-col gap-3 mb-5">
         <button
           type="button"
-          onClick={resetAll}
-          className="px-4 py-2.5 bg-[#313438] hover:bg-[#3d4147] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase cursor-pointer min-h-[40px]"
+          onClick={handleCount}
+          className="w-full py-4 bg-[#28960b] hover:bg-[#32b312] text-white border-3 border-[#141414] font-jura font-black text-base sm:text-lg uppercase tracking-wider shadow-[inset_3px_3px_0_#89dc69,inset_-3px_-3px_0_#1b5e20] active:translate-y-[1px] flex items-center justify-center gap-3 cursor-pointer min-h-[60px]"
         >
-          RESET TRẬN
+          <Sparkles className="w-6 h-6 fill-current" /> ĐẾM TIẾP SỐ {currentCount + 1}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleReset}
+          className="w-full py-3 bg-[#c53030] hover:bg-[#e53e3e] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#fc8181,inset_-2px_-2px_0_#9b2c2c] active:translate-y-[1px] flex items-center justify-center gap-2 cursor-pointer min-h-[46px]"
+        >
+          <RotateCcw className="w-4 h-4" /> Phá Chuỗi & Reset Về 0
+        </button>
+      </div>
+
+      {/* Bottom Close Bar */}
+      <div className="w-full flex items-center justify-between gap-3 bg-[#1c1e20] p-3 border-2 border-[#141414]">
+        <span className="text-xs font-mono text-amber-400 font-bold">
+          Kỷ Lục Chuỗi: {highestChain}
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 bg-[#2a2c30] hover:bg-[#383a3f] text-white border border-[#141414] text-xs font-jura font-bold uppercase flex items-center gap-1.5 cursor-pointer min-h-[40px]"
+        >
+          <X className="w-4 h-4" /> Đóng Game
         </button>
       </div>
     </div>
@@ -1501,138 +1294,179 @@ const CountingGame: React.FC<{
 };
 
 /* =========================================================================
-   5. GAME ENGINE: RETRO SNAKE - ORE UI
+   GAME 5: RETRO SNAKE (RẮN SĂN MỒI - ORE UI DESIGN STYLE & TALL BUTTONS)
    ========================================================================= */
-const SnakeGame: React.FC<{ soundEnabled: boolean; onScoreUpdate: (s: number) => void }> = ({
-  soundEnabled,
-  onScoreUpdate
-}) => {
-  const [snake, setSnake] = useState<[number, number][]>([
-    [5, 5],
-    [5, 4],
-    [5, 3]
+const SnakeGame: React.FC<{
+  soundEnabled: boolean;
+  onScoreUpdate: (score: number) => void;
+  onClose: () => void;
+}> = ({ soundEnabled, onScoreUpdate, onClose }) => {
+  const GRID_SIZE = 15;
+  const [snake, setSnake] = useState<{ x: number; y: number }[]>([
+    { x: 7, y: 7 },
+    { x: 7, y: 8 }
   ]);
-  const [food, setFood] = useState<[number, number]>([10, 10]);
-  const [dir, setDir] = useState<[number, number]>([0, 1]);
+  const [food, setFood] = useState<{ x: number; y: number }>({ x: 3, y: 3 });
+  const [dir, setDir] = useState<"UP" | "DOWN" | "LEFT" | "RIGHT">("UP");
+  const [isGameOver, setIsGameOver] = useState(false);
   const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const startGame = () => {
+  const resetGame = () => {
     setSnake([
-      [5, 5],
-      [5, 4],
-      [5, 3]
+      { x: 7, y: 7 },
+      { x: 7, y: 8 }
     ]);
-    setFood([Math.floor(Math.random() * 15), Math.floor(Math.random() * 15)]);
-    setDir([0, 1]);
+    setFood({ x: 4, y: 4 });
+    setDir("UP");
     setScore(0);
-    setGameOver(false);
+    setIsGameOver(false);
     setIsPlaying(true);
     if (soundEnabled) playPopSound();
   };
 
   useEffect(() => {
-    if (!isPlaying || gameOver) return;
-    const timer = setInterval(() => {
-      setSnake((prevSnake) => {
-        const head = [prevSnake[0][0] + dir[0], prevSnake[0][1] + dir[1]] as [number, number];
+    if (!isPlaying || isGameOver) return;
 
-        if (head[0] < 0 || head[0] >= 15 || head[1] < 0 || head[1] >= 15) {
-          setGameOver(true);
+    const interval = setInterval(() => {
+      setSnake((prevSnake) => {
+        const head = { ...prevSnake[0] };
+        if (dir === "UP") head.y -= 1;
+        if (dir === "DOWN") head.y += 1;
+        if (dir === "LEFT") head.x -= 1;
+        if (dir === "RIGHT") head.x += 1;
+
+        // Collision Wall
+        if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+          setIsGameOver(true);
           return prevSnake;
         }
 
-        if (prevSnake.some((segment) => segment[0] === head[0] && segment[1] === head[1])) {
-          setGameOver(true);
+        // Collision Body
+        if (prevSnake.some((seg) => seg.x === head.x && seg.y === head.y)) {
+          setIsGameOver(true);
           return prevSnake;
         }
 
         const newSnake = [head, ...prevSnake];
 
-        if (head[0] === food[0] && head[1] === food[1]) {
-          const newScore = score + 10;
-          setScore(newScore);
-          onScoreUpdate(newScore);
-          setFood([Math.floor(Math.random() * 15), Math.floor(Math.random() * 15)]);
+        // Eat Food
+        if (head.x === food.x && head.y === food.y) {
+          setScore((s) => {
+            const nextScore = s + 10;
+            onScoreUpdate(nextScore);
+            return nextScore;
+          });
+          if (soundEnabled) playPopSound();
+          setFood({
+            x: Math.floor(Math.random() * GRID_SIZE),
+            y: Math.floor(Math.random() * GRID_SIZE)
+          });
         } else {
           newSnake.pop();
         }
 
         return newSnake;
       });
-    }, 150);
+    }, 180);
 
-    return () => clearInterval(timer);
-  }, [isPlaying, gameOver, dir, food, score]);
+    return () => clearInterval(interval);
+  }, [isPlaying, isGameOver, dir, food, soundEnabled]);
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="text-xs font-mono text-[#89dc69] font-bold uppercase tracking-wider bg-[#1c1e20] border-2 border-[#141414] px-4 py-2">
-        {gameOver ? "GAME OVER! KẾT QUẢ: " + score + " PTS" : "ĐIỂM SỐ: " + score}
-      </div>
-
-      {/* Snake Grid Board */}
-      <div className="grid grid-cols-15 gap-0.5 bg-[#18191b] p-3 border-2 border-[#141414] shadow-inner w-64 h-64">
-        {Array.from({ length: 225 }).map((_, i) => {
-          const r = Math.floor(i / 15);
-          const c = i % 15;
-          const isSnake = snake.some((s) => s[0] === r && s[1] === c);
-          const isFood = food[0] === r && food[1] === c;
+    <div className="flex flex-col items-center w-full max-w-md select-none">
+      {/* Snake Canvas Grid Ore UI */}
+      <div className="relative w-64 h-64 sm:w-72 sm:h-72 bg-[#141414] border-3 border-[#141414] shadow-[inset_2px_2px_0_#0f1011,inset_-2px_-2px_0_#282a2d] grid grid-cols-15 grid-rows-15 p-1 mb-4">
+        {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, idx) => {
+          const x = idx % GRID_SIZE;
+          const y = Math.floor(idx / GRID_SIZE);
+          const isSnakeHead = snake[0]?.x === x && snake[0]?.y === y;
+          const isSnakeBody = snake.slice(1).some((seg) => seg.x === x && seg.y === y);
+          const isFoodCell = food.x === x && food.y === y;
 
           return (
             <div
-              key={i}
-              className={`w-3.5 h-3.5 border border-[#141414] ${
-                isSnake ? "bg-[#28960b]" : isFood ? "bg-[#f59e0b] animate-ping" : "bg-[#232528]"
+              key={idx}
+              className={`w-full h-full ${
+                isSnakeHead
+                  ? "bg-[#89dc69] border border-[#141414]"
+                  : isSnakeBody
+                  ? "bg-[#28960b] border border-[#141414]"
+                  : isFoodCell
+                  ? "bg-[#f59e0b] border border-[#141414] animate-pulse"
+                  : "bg-transparent"
               }`}
             />
           );
         })}
+
+        {/* Overlay when game over / not started */}
+        {(!isPlaying || isGameOver) && (
+          <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 text-center">
+            <span className="text-base sm:text-lg font-black font-jura text-white uppercase mb-2">
+              {isGameOver ? "💀 GAME OVER!" : "RẮN SĂN MỒI"}
+            </span>
+            <span className="text-xs font-mono text-[#89dc69] mb-4">
+              Điểm số: {score} điểm
+            </span>
+            <button
+              type="button"
+              onClick={resetGame}
+              className="px-5 py-3 bg-[#28960b] hover:bg-[#32b312] text-white border-2 border-[#141414] font-jura font-bold text-xs uppercase shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center gap-2 cursor-pointer min-h-[46px]"
+            >
+              <Play className="w-4 h-4 fill-current" /> {isGameOver ? "Chơi Lại" : "Bắt Đầu"}
+            </button>
+          </div>
+        )}
       </div>
 
-      {!isPlaying ? (
+      {/* D-Pad Arrow Controls for Touch / Mobile with Taller Buttons */}
+      <div className="flex flex-col items-center gap-2 mb-4">
         <button
           type="button"
-          onClick={startGame}
-          className="px-6 py-3.5 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-jura font-bold text-xs uppercase tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer min-h-[46px]"
+          onClick={() => setDir("UP")}
+          className="w-16 h-12 bg-[#2a2c30] hover:bg-[#383a3f] text-white border-2 border-[#141414] shadow-[inset_2px_2px_0_#3f434a,inset_-2px_-2px_0_#18191b] flex items-center justify-center cursor-pointer active:translate-y-[1px]"
         >
-          {gameOver ? "CHƠI LẠI RẮN SĂN MỒI" : "BẮT ĐẦU RẮN SĂN MỒI"}
+          <ArrowUp className="w-5 h-5" />
         </button>
-      ) : (
-        <div className="grid grid-cols-3 gap-2 w-44">
-          <div />
+        <div className="flex items-center gap-4">
           <button
             type="button"
-            onClick={() => setDir([-1, 0])}
-            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
+            onClick={() => setDir("LEFT")}
+            className="w-16 h-12 bg-[#2a2c30] hover:bg-[#383a3f] text-white border-2 border-[#141414] shadow-[inset_2px_2px_0_#3f434a,inset_-2px_-2px_0_#18191b] flex items-center justify-center cursor-pointer active:translate-y-[1px]"
           >
-            ▲
-          </button>
-          <div />
-          <button
-            type="button"
-            onClick={() => setDir([0, -1])}
-            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
-          >
-            ◄
+            <ArrowLeft className="w-5 h-5" />
           </button>
           <button
             type="button"
-            onClick={() => setDir([1, 0])}
-            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
+            onClick={() => setDir("DOWN")}
+            className="w-16 h-12 bg-[#2a2c30] hover:bg-[#383a3f] text-white border-2 border-[#141414] shadow-[inset_2px_2px_0_#3f434a,inset_-2px_-2px_0_#18191b] flex items-center justify-center cursor-pointer active:translate-y-[1px]"
           >
-            ▼
+            <ArrowDown className="w-5 h-5" />
           </button>
           <button
             type="button"
-            onClick={() => setDir([0, 1])}
-            className="p-3 bg-[#2a2c30] hover:bg-[#383a3f] border-2 border-[#141414] text-white font-bold text-base shadow-[inset_1px_1px_0_#3f434a,inset_-1px_-1px_0_#18191b] min-h-[48px] cursor-pointer"
+            onClick={() => setDir("RIGHT")}
+            className="w-16 h-12 bg-[#2a2c30] hover:bg-[#383a3f] text-white border-2 border-[#141414] shadow-[inset_2px_2px_0_#3f434a,inset_-2px_-2px_0_#18191b] flex items-center justify-center cursor-pointer active:translate-y-[1px]"
           >
-            ►
+            <ArrowRight className="w-5 h-5" />
           </button>
         </div>
-      )}
+      </div>
+
+      {/* Bottom Exit Bar */}
+      <div className="w-full flex items-center justify-between gap-3 bg-[#1c1e20] p-3 border-2 border-[#141414]">
+        <span className="text-xs font-mono text-[#89dc69] font-bold">
+          Điểm Hiện Tại: {score}
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 bg-[#c53030] hover:bg-[#e53e3e] text-white border-2 border-[#141414] text-xs font-jura font-bold uppercase shadow-[inset_2px_2px_0_#fc8181,inset_-2px_-2px_0_#9b2c2c] flex items-center gap-1.5 cursor-pointer min-h-[42px]"
+        >
+          <X className="w-4 h-4" /> Đóng Game
+        </button>
+      </div>
     </div>
   );
 };

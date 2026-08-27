@@ -102,7 +102,7 @@ export const CreateChannelModal: React.FC<CreateChannelModalProps> = ({
         {/* Subtitle / Description Section */}
         <div className="p-4 bg-[#383b3e] border-b border-[#2d3033] flex-shrink-0">
           <p className="text-xs text-gray-200 leading-relaxed font-normal">
-            Tự tạo và thêm một luồng kênh vào danh sách kênh Live TV
+            Tự tạo và thêm một luồng kênh vào danh sách kênh V-Play
           </p>
         </div>
 

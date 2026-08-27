@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Bell,
   CheckCircle2,
@@ -11,8 +11,10 @@ import {
   AlertCircle,
   Search,
   Filter,
-  Sparkles
+  Sparkles,
+  Check,
 } from "lucide-react";
+import { playPopSound } from "../../utils/sound";
 
 export interface ReminderItem {
   id: string;
@@ -28,13 +30,13 @@ export interface ReminderItem {
 const INITIAL_REMINDERS: ReminderItem[] = [
   {
     id: "rem-1",
-    title: "Tham gia buổi họp Demo Vplay Ore UI Design System",
+    title: "Tham gia buổi họp Demo Waves V-Play Design System",
     category: "Công việc",
     dueDate: "2026-07-24",
     dueTime: "10:00",
     priority: "High",
     isCompleted: false,
-    notes: "Chuẩn bị slide giới thiệu các thành phần V-Office và V-Bank."
+    notes: "Chuẩn bị slide giới thiệu các thành phần V-Apps và V-Bank.",
   },
   {
     id: "rem-2",
@@ -43,41 +45,58 @@ const INITIAL_REMINDERS: ReminderItem[] = [
     dueDate: "2026-07-24",
     dueTime: "16:30",
     priority: "Medium",
-    isCompleted: true
+    isCompleted: true,
   },
   {
     id: "rem-3",
-    title: "Uống 2 lít nước và tập thể dục nhẹ buổi chiều",
-    category: "Sức khỏe",
-    dueDate: "2026-07-24",
-    dueTime: "17:00",
-    priority: "Low",
-    isCompleted: false
-  }
+    title: "Xem trận chung kết bóng đá trực tiếp trên V-Play K+ Sports",
+    category: "Cá nhân",
+    dueDate: "2026-07-25",
+    dueTime: "20:00",
+    priority: "High",
+    isCompleted: false,
+    notes: "Đặt báo thức trước 15 phút để chuẩn bị nước và đồ ăn vặt.",
+  },
 ];
 
 export const VRemindersTab: React.FC = () => {
-  const [reminders, setReminders] = useState<ReminderItem[]>(INITIAL_REMINDERS);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterCategory, setFilterCategory] = useState("all");
-  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("all");
+  const [reminders, setReminders] = useState<ReminderItem[]>(() => {
+    try {
+      const saved = localStorage.getItem("vplay_reminders_list");
+      return saved ? JSON.parse(saved) : INITIAL_REMINDERS;
+    } catch {
+      return INITIAL_REMINDERS;
+    }
+  });
 
-  // Form State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("all");
   const [showAddForm, setShowAddForm] = useState(false);
+
+  // Form state
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState<ReminderItem["category"]>("Công việc");
-  const [newDueDate, setNewDueDate] = useState("2026-07-24");
-  const [newDueTime, setNewDueTime] = useState("09:00");
   const [newPriority, setNewPriority] = useState<ReminderItem["priority"]>("Medium");
+  const [newDueDate, setNewDueDate] = useState("2026-07-24");
+  const [newDueTime, setNewDueTime] = useState("12:00");
   const [newNotes, setNewNotes] = useState("");
 
+  useEffect(() => {
+    try {
+      localStorage.setItem("vplay_reminders_list", JSON.stringify(reminders));
+    } catch {}
+  }, [reminders]);
+
   const handleToggleComplete = (id: string) => {
+    playPopSound();
     setReminders((prev) =>
       prev.map((r) => (r.id === id ? { ...r, isCompleted: !r.isCompleted } : r))
     );
   };
 
   const handleDeleteReminder = (id: string) => {
+    playPopSound();
     setReminders((prev) => prev.filter((r) => r.id !== id));
   };
 
@@ -85,95 +104,110 @@ export const VRemindersTab: React.FC = () => {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    const newItem: ReminderItem = {
+    playPopSound();
+    const item: ReminderItem = {
       id: `rem-${Date.now()}`,
-      title: newTitle,
+      title: newTitle.trim(),
       category: newCategory,
+      priority: newPriority,
       dueDate: newDueDate,
       dueTime: newDueTime,
-      priority: newPriority,
       isCompleted: false,
-      notes: newNotes
+      notes: newNotes.trim() || undefined,
     };
 
-    setReminders([newItem, ...reminders]);
+    setReminders([item, ...reminders]);
     setNewTitle("");
     setNewNotes("");
     setShowAddForm(false);
   };
 
   const filteredReminders = reminders.filter((r) => {
-    const matchesSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = filterCategory === "all" || r.category === filterCategory;
-    const matchesStatus =
+    const matchSearch =
+      r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (r.notes && r.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchCat = filterCategory === "all" || r.category === filterCategory;
+    const matchStatus =
       filterStatus === "all"
         ? true
-        : filterStatus === "pending"
-        ? !r.isCompleted
-        : r.isCompleted;
-    return matchesSearch && matchesCat && matchesStatus;
+        : filterStatus === "completed"
+        ? r.isCompleted
+        : !r.isCompleted;
+    return matchSearch && matchCat && matchStatus;
   });
 
+  const pendingCount = reminders.filter((r) => !r.isCompleted).length;
+
   return (
-    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-jura select-none">
-      {/* Banner Header - Ore UI Style */}
-      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
-            <Bell className="w-5 h-5 text-white" />
+    <div className="w-full max-w-5xl mx-auto space-y-6 text-left">
+      {/* Top Banner Stat Bar in Glassmorphism */}
+      <div className="rounded-3xl bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] border border-white/20 p-5 sm:p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-400/30 flex items-center justify-center text-orange-300 shadow-inner">
+            <Bell className="w-6 h-6 animate-pulse" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-sm sm:text-base font-black text-white uppercase tracking-wider font-jura">
-                V-REMINDERS (NHẮC NHỞ & CÔNG VIỆC)
-              </h1>
-              <span className="bg-[#89dc69] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
-                Ore UI Task
-              </span>
-            </div>
-            <p className="text-[11px] text-zinc-300 font-jura">
-              Quản lý danh sách việc cần làm, đặt lịch thông báo và theo dõi tiến độ hoàn thành.
+            <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
+              V-Reminders & Lịch Nhắc Việc
+            </h2>
+            <p className="text-xs text-white/70 mt-0.5">
+              Đang có <strong className="text-amber-300 font-bold">{pendingCount}</strong> việc cần hoàn thành
             </p>
           </div>
         </div>
 
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white font-bold text-xs uppercase font-jura tracking-wider shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer shrink-0"
+          onClick={() => {
+            playPopSound();
+            setShowAddForm(!showAddForm);
+          }}
+          className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-black font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-orange-500/30 transition-all cursor-pointer active:scale-95 border border-white/20 self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4" /> Thêm Nhắc Nhở Mới
+          <Plus className="w-4 h-4" />
+          <span>Thêm Nhắc Nhở</span>
         </button>
       </div>
 
-      {/* Add Reminder Modal/Form */}
+      {/* Add New Reminder Form Modal / Collapse */}
       {showAddForm && (
         <form
           onSubmit={handleAddReminder}
-          className="bg-[#2d2f32] border-2 border-[#141414] p-5 mb-6 shadow-2xl space-y-4 font-jura"
+          className="rounded-3xl bg-[#181326]/95 backdrop-blur-[30px] border border-white/20 p-6 shadow-2xl space-y-4 animate-fade-in"
         >
-          <h3 className="text-xs font-bold text-white uppercase tracking-wider border-b-2 border-[#141414] pb-2 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#89dc69]" /> Tạo Nhắc Nhở Mới
-          </h3>
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-orange-400" /> Tạo nhắc nhở mới
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowAddForm(false)}
+              className="text-xs text-white/50 hover:text-white"
+            >
+              Đóng
+            </button>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Tiêu đề việc cần làm</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="sm:col-span-2 md:col-span-3">
+              <label className="block text-xs font-semibold text-white/80 mb-1">
+                Tiêu đề việc cần làm <span className="text-rose-400">*</span>
+              </label>
               <input
                 type="text"
                 required
                 placeholder="Nhập công việc..."
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none"
+                className="w-full bg-white/[0.08] border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-white/40 focus:outline-none focus:border-orange-400"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Danh mục</label>
+              <label className="block text-xs font-semibold text-white/80 mb-1">Danh mục</label>
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as any)}
-                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none cursor-pointer"
+                className="w-full bg-[#1e192d] border border-white/20 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
               >
                 <option value="Công việc">Công việc</option>
                 <option value="Học tập">Học tập</option>
@@ -184,11 +218,11 @@ export const VRemindersTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Mức độ ưu tiên</label>
+              <label className="block text-xs font-semibold text-white/80 mb-1">Mức độ ưu tiên</label>
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value as any)}
-                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none cursor-pointer"
+                className="w-full bg-[#1e192d] border border-white/20 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none cursor-pointer"
               >
                 <option value="High">Cao (Quan trọng)</option>
                 <option value="Medium">Trung bình</option>
@@ -197,37 +231,48 @@ export const VRemindersTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Ngày nhắc</label>
+              <label className="block text-xs font-semibold text-white/80 mb-1">Ngày nhắc</label>
               <input
                 type="date"
                 value={newDueDate}
                 onChange={(e) => setNewDueDate(e.target.value)}
-                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none"
+                className="w-full bg-[#1e192d] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-zinc-300 mb-1 uppercase">Giờ nhắc</label>
+              <label className="block text-xs font-semibold text-white/80 mb-1">Giờ nhắc</label>
               <input
                 type="time"
                 value={newDueTime}
                 onChange={(e) => setNewDueTime(e.target.value)}
-                className="w-full bg-[#1f2022] border-2 border-[#141414] px-3 py-2 text-xs text-white focus:outline-none"
+                className="w-full bg-[#1e192d] border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-white/80 mb-1">Ghi chú bổ sung</label>
+              <input
+                type="text"
+                value={newNotes}
+                onChange={(e) => setNewNotes(e.target.value)}
+                placeholder="Ghi chú chi tiết thêm..."
+                className="w-full bg-white/[0.08] border border-white/15 rounded-xl px-3.5 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-orange-400"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t-2 border-[#141414]">
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
-              className="px-4 py-1.5 bg-[#383b3e] hover:bg-[#4a4d50] border-2 border-[#141414] text-zinc-200 text-xs font-bold cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 text-xs font-semibold cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-4 py-1.5 bg-[#28960b] hover:bg-[#32b312] border-2 border-[#141414] text-white text-xs font-bold uppercase shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-black text-xs font-bold shadow-lg shadow-orange-500/30 cursor-pointer"
             >
               Lưu Nhắc Nhở
             </button>
@@ -235,28 +280,31 @@ export const VRemindersTab: React.FC = () => {
         </form>
       )}
 
-      {/* Filter Bar */}
-      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 mb-6 shadow-xl flex flex-wrap items-center justify-between gap-3 font-jura">
+      {/* Filter Bar in Glassmorphism */}
+      <div className="rounded-2xl bg-white/[0.07] backdrop-blur-[20px] saturate-[180%] border border-white/15 p-3 shadow-md flex flex-wrap items-center justify-between gap-3">
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Tìm kiếm nhắc nhở..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#1f2022] border-2 border-[#141414] pl-9 pr-3 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none"
+            className="w-full bg-white/[0.08] border border-white/15 rounded-xl pl-9 pr-3.5 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-orange-400"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0">
           {["all", "pending", "completed"].map((st) => (
             <button
               key={st}
-              onClick={() => setFilterStatus(st as any)}
-              className={`px-3 py-1.5 text-xs font-bold transition-all cursor-pointer border-2 border-[#141414] ${
+              onClick={() => {
+                playPopSound();
+                setFilterStatus(st as any);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 filterStatus === st
-                  ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
-                  : "bg-[#383b3e] text-zinc-300 hover:text-white"
+                  ? "bg-white/25 text-white border border-white/30 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.5)]"
+                  : "bg-white/5 text-white/60 hover:text-white"
               }`}
             >
               {st === "all" ? "Tất cả" : st === "pending" ? "Đang chờ" : "Đã hoàn thành"}
@@ -266,75 +314,70 @@ export const VRemindersTab: React.FC = () => {
       </div>
 
       {/* Reminders List */}
-      <div className="space-y-3 font-jura">
+      <div className="space-y-3">
         {filteredReminders.length === 0 ? (
-          <div className="bg-[#2d2f32] border-2 border-[#141414] p-10 text-center text-zinc-400 text-xs">
+          <div className="rounded-3xl bg-white/[0.06] backdrop-blur-md border border-white/15 p-12 text-center text-white/40 text-xs">
             Không có nhắc nhở nào khớp với bộ lọc.
           </div>
         ) : (
           filteredReminders.map((item) => (
             <div
               key={item.id}
-              className={`p-4 border-2 border-[#141414] transition-all flex items-start justify-between gap-4 shadow-lg ${
+              className={`p-4 sm:p-5 rounded-2xl border transition-all flex items-start justify-between gap-4 shadow-lg backdrop-blur-[20px] ${
                 item.isCompleted
-                  ? "bg-[#232528] opacity-60"
-                  : "bg-[#2d2f32]"
+                  ? "bg-white/[0.03] border-white/10 opacity-60"
+                  : "bg-white/[0.08] border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] hover:border-white/40"
               }`}
             >
-              <div className="flex items-start gap-3 flex-1">
+              <div className="flex items-start gap-3.5 flex-1">
                 <button
                   onClick={() => handleToggleComplete(item.id)}
-                  className="mt-0.5 text-zinc-400 hover:text-[#89dc69] transition-colors cursor-pointer"
+                  className="mt-0.5 text-white/40 hover:text-emerald-400 transition-colors cursor-pointer"
                 >
                   {item.isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5 text-[#89dc69]" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                   ) : (
                     <Circle className="w-5 h-5" />
                   )}
                 </button>
-
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                     <h3
                       className={`text-xs sm:text-sm font-bold text-white ${
-                        item.isCompleted ? "line-through text-zinc-500" : ""
+                        item.isCompleted ? "line-through text-white/40" : ""
                       }`}
                     >
                       {item.title}
                     </h3>
-
                     <span
-                      className={`text-[9px] px-2 py-0.5 font-bold uppercase border border-[#141414] ${
+                      className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase border ${
                         item.priority === "High"
-                          ? "bg-[#cc1827] text-white"
+                          ? "bg-rose-500/20 text-rose-300 border-rose-500/30"
                           : item.priority === "Medium"
-                          ? "bg-amber-600 text-white"
-                          : "bg-blue-600 text-white"
+                          ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                          : "bg-blue-500/20 text-blue-300 border-blue-500/30"
                       }`}
                     >
                       {item.priority} Priority
                     </span>
                   </div>
-
-                  {item.notes && <p className="text-xs text-zinc-300 mb-2 font-sans">{item.notes}</p>}
-
-                  <div className="flex items-center gap-3 text-[11px] text-zinc-400 flex-wrap font-mono">
+                  {item.notes && <p className="text-xs text-white/70 mb-2.5 font-sans">{item.notes}</p>}
+                  <div className="flex items-center gap-3 text-[11px] text-white/60 flex-wrap font-mono">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-[#89dc69]" /> {item.dueDate}
+                      <Calendar className="w-3.5 h-3.5 text-orange-400" /> {item.dueDate}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-[#89dc69]" /> {item.dueTime}
+                      <Clock className="w-3.5 h-3.5 text-orange-400" /> {item.dueTime}
                     </span>
-                    <span className="px-2 py-0.5 bg-[#1f2022] border border-[#141414] text-zinc-300 font-bold">
+                    <span className="px-2 py-0.5 rounded-lg bg-white/10 border border-white/15 text-white/80 font-bold">
                       {item.category}
                     </span>
                   </div>
                 </div>
               </div>
-
               <button
                 onClick={() => handleDeleteReminder(item.id)}
-                className="p-1.5 border border-[#141414] bg-[#383b3e] hover:bg-[#cc1827] text-zinc-300 hover:text-white transition-all cursor-pointer"
+                className="p-2 rounded-xl bg-white/10 hover:bg-rose-500/30 text-white/60 hover:text-rose-200 border border-white/10 transition-all cursor-pointer"
                 title="Xóa"
               >
                 <Trash2 className="w-4 h-4" />

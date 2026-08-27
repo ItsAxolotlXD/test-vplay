@@ -45,5 +45,4 @@ export interface UserSettings {
   showFrameLatency?: boolean;
   useMouseCursor?: boolean;
   useArrowKeysCursor?: boolean;
-  enableTizenOsUi?: boolean;
 }

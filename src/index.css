@@ -1,320 +1,279 @@
+@font-face {
+  font-family: 'Google Sans Flex';
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/googlesansflex/v1/4UaCrENHsxJLFrXsU3qg313w-PvN7Q.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://fonts.gstatic.com/s/googlesans/v14/4UaGrENHsxJLFrXsU3qg32ky-PvN.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: url('https://fonts.gstatic.com/s/googlesans/v14/4UabrENHsxJLFrXsU3qgi13w-PvN7Q.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Google Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: url('https://fonts.gstatic.com/s/googlesans/v14/4UabrENHsxJLFrXsU3qg313w-PvN7Q.woff2') format('woff2');
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=Google+Sans+Flex:wght@100..1000&family=Montserrat:wght@400;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
-@layer utilities {
-  .font-jura {
-    font-family: 'Jura', sans-serif;
-  }
-  .font-montserrat {
-    font-family: 'Jura', sans-serif;
-  }
-  .font-pixel {
-    font-family: 'Jura', 'Pixelify Sans', sans-serif;
-  }
-  .font-press-start {
-    font-family: 'Jura', sans-serif;
-    font-weight: 700;
-  }
-  .font-silkscreen {
-    font-family: 'Jura', sans-serif;
-  }
-  .font-vt323 {
-    font-family: 'Jura', sans-serif;
-  }
+@theme {
+  --font-sans: "Google Sans Flex", "Google Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-google: "Google Sans Flex", "Google Sans", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-play: "Play", sans-serif;
 }
 
-/* Custom Pixel Art Bevel & Border styles */
-.pixel-border-dark {
-  border: 2px solid #141414;
+.font-play {
+  font-family: 'Play', sans-serif;
 }
 
-.pixel-[#418a28] {
-  background-color: #418a28;
+html, body {
+  font-family: "Google Sans Flex", "Google Sans", system-ui, -apple-system, sans-serif;
 }
 
-.pixel-shadow-hero {
-  box-shadow: inset 0 2px 0 #6cc34b, inset 0 -3px 0 #1e4511;
-}
-
-.pixel-shadow-hero-hover {
-  box-shadow: inset 0 2px 0 #89dc69, inset 0 -3px 0 #285718;
-}
-
-.pixel-shadow-hero-pressed {
-  box-shadow: inset 0 3px 0 #18370d, inset 0 -1px 0 #418a28;
-}
-
-.pixel-shadow-hero-disabled {
-  box-shadow: inset 0 2px 0 #e2e5e8, inset 0 -3px 0 #9ca0a4;
-}
-
-/* Minecraft Bedrock Ore UI Authentic Button Classes */
-.mc-button-primary {
-  background-color: #418a28;
-  color: #ffffff;
-  border: 2px solid #141414;
-  box-shadow: inset 0 2px 0 #6bc34b, inset 0 -3px 0 #1e4511;
-  font-family: 'Jura', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  user-select: none;
-  cursor: default;
-  transition: none !important;
-}
-.mc-button-primary:hover {
-  background-color: #51a233;
-  border-color: #ffffff;
-  box-shadow: inset 0 2px 0 #89dc69, inset 0 -2px 0 #285718;
-}
-.mc-button-primary:active {
-  background-color: #2b611a;
-  border-color: #ffffff;
-  box-shadow: inset 0 3px 0 #18370d, inset 0 -1px 0 #418a28;
-  transform: translateY(2px);
-}
-.mc-button-primary:disabled {
-  background-color: #7a7e82;
-  color: #4d5053;
-  border-color: #141414;
-  box-shadow: inset 0 2px 0 #a0a4a8, inset 0 -3px 0 #505356;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.mc-button-secondary {
-  background-color: #c6c6c6;
-  color: #404040;
-  border: 2px solid #141414;
-  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #898d91;
-  font-family: 'Jura', sans-serif;
-  font-weight: 700;
-  user-select: none;
-  cursor: default;
-  transition: none !important;
-}
-.mc-button-secondary:hover {
-  background-color: #28960b;
-  color: #ffffff;
-  border-color: #ffffff;
-  box-shadow: inset 2px 2px 0 #89dc69, inset -2px -2px 0 #1b5e20;
-}
-.mc-button-secondary:active {
-  background-color: #2b611a;
-  color: #ffffff;
-  border-color: #ffffff;
-  box-shadow: inset 2px 2px 0 #18370d, inset -2px -2px 0 #418a28;
-  transform: translateY(1px);
-}
-.mc-button-secondary:disabled {
-  background-color: #7a7e82;
-  color: #4d5053;
-  border-color: #141414;
-  box-shadow: inset 2px 2px 0 #a0a4a8, inset -2px -2px 0 #505356;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Minecraft Bedrock Ore UI Authentic Input / Search Box */
-.mc-input-box {
-  background-color: #4c4c4c;
-  color: #ffffff;
-  border: 2px solid #141414;
-  box-shadow: inset 2px 2px 0 #202020, inset -2px -2px 0 #808080;
-  font-family: 'Jura', sans-serif;
-  font-weight: 600;
-  outline: none;
-  transition: none !important;
-}
-.mc-input-box::placeholder {
-  color: #a0a0a0;
-}
-.mc-input-box:hover,
-.mc-input-box:focus {
-  background-color: #555555;
-  border-color: #ffffff !important;
-  box-shadow: inset 2px 2px 0 #181818, inset -2px -2px 0 #909090;
-}
-
-/* Global Default Arrow Cursor Override for all UI Controls (Buttons, Inputs, Sliders, Toggles) */
-button,
-input,
-select,
-textarea,
-label,
-a,
-[role="button"],
-.cursor-pointer,
-.cursor-text,
-input[type="range"],
-input[type="checkbox"],
-button:hover,
-input:hover,
-.btn-press-effect,
-.btn-press-effect:hover {
-  cursor: default !important;
-}
-
-/* Universal hover border for buttons and inputs */
-button:hover:not(:disabled),
-input:hover:not(:disabled),
-input:focus {
-  border-color: #ffffff !important;
-}
-
-.mc-button-danger {
-  background-color: #b82222;
-  color: #ffffff;
-  border: 2px solid #141414;
-  box-shadow: inset 0 2px 0 #e65c5c, inset 0 -3px 0 #6b1010;
-  font-family: 'Jura', sans-serif;
-  font-weight: 700;
-  user-select: none;
-  cursor: pointer;
-  transition: none !important;
-}
-.mc-button-danger:hover {
-  background-color: #d92b2b;
-  box-shadow: inset 0 2px 0 #ff8080, inset 0 -2px 0 #821414;
-}
-.mc-button-danger:active {
-  background-color: #821414;
-  box-shadow: inset 0 3px 0 #420a0a, inset 0 -1px 0 #b82222;
-  transform: translateY(2px);
-}
-.mc-button-danger:disabled {
-  background-color: #7a7e82;
-  color: #4d5053;
-  box-shadow: inset 0 2px 0 #a0a4a8, inset 0 -3px 0 #505356;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Button Press Down Motion - Instant snappy response without animation */
-.btn-press-effect {
-  transition: none !important;
-}
-.btn-press-effect:active, .btn-pressed {
-  transform: translateY(2px) !important;
-  transition: none !important;
-}
-
-/* Remove fade transition on hover for all buttons, input boxes, and controls */
-button,
-button *,
-input,
-select,
-textarea,
-a,
-[role="button"],
-.mc-button-primary,
-.mc-button-secondary,
-.mc-button-danger,
-.mc-input-box,
-.btn-press-effect,
-.btn-pressed {
-  transition: none !important;
-}
-
-/* Slide in from left to right animation */
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-in-left {
-  animation: slideInLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Custom Scanline FX for TV screen */
-.crt-scanlines {
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.25) 50%
-  ), linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 0.03),
-    rgba(0, 255, 0, 0.01),
-    rgba(0, 0, 255, 0.03)
-  );
-  background-size: 100% 3px, 6px 100%;
-}
-
-/* Minecraft Panorama Scrolling Keyframes - 3D accelerated for maximum smoothness */
-@keyframes minecraft-panorama-scroll {
-  0% {
-    transform: translate3d(0%, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-.animate-panorama {
-  animation: minecraft-panorama-scroll 75s linear infinite;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-.bg-radial-vignette {
-  background: radial-gradient(circle at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%);
-}
-
-/* Custom Ore UI / Secondary Button Styled Native Scrollbars */
+/* Custom gorgeous scrollbar for glassmorphic style */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e2022;
-  border: 2px solid #141414;
-  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cdd1d4;
-  border: 2px solid #141414;
-  box-shadow: inset 0 1px 0 #f4f6f8, inset 0 -2px 0 #9ea2a6;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #f4f6f8;
-  box-shadow: inset 0 1px 0 #ffffff, inset 0 -2px 0 #b5b9bd;
+  background: rgba(255, 255, 255, 0.3);
 }
 
-::-webkit-scrollbar-thumb:active {
-  background: #abafb3;
-  box-shadow: inset 0 2px 0 #898d91, inset 0 -1px 0 #cdd1d4;
+.scrollbar-none {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-::-webkit-scrollbar-corner {
-  background: #141414;
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
-/* Firefox scrollbar support */
-* {
-  scrollbar-width: auto;
-  scrollbar-color: #cdd1d4 #1e2022;
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-/* High quality smooth rendering for TV channel logos */
-.tv-logo-high-quality, img.tv-logo-high-quality {
-  image-rendering: auto;
-  image-rendering: smooth;
+.glass-panel-deep {
+  background: rgba(15, 10, 25, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Progressive blur styles for high-fidelity vintage glass appearance with GPU acceleration */
+.progressive-blur-header {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(33, 31, 38, 0.95) 0%, rgba(33, 31, 38, 0.8) 35%, rgba(33, 31, 38, 0.4) 75%, rgba(33, 31, 38, 0) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateZ(0);
+  will-change: opacity;
+}
+
+.progressive-blur-dock {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(33, 31, 38, 0.95) 0%, rgba(33, 31, 38, 0.8) 35%, rgba(33, 31, 38, 0.4) 75%, rgba(33, 31, 38, 0) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: opacity;
+}
+
+.progressive-blur-player {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(33, 31, 38, 0.95) 0%, rgba(33, 31, 38, 0.75) 40%, rgba(33, 31, 38, 0) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0) 100%);
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+/* Range slider custom pill shape values (Horizontal Pill) */
+.range-slider-pill::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  cursor: default;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.range-slider-pill::-moz-range-thumb {
+  width: 28px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  cursor: default;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.range-slider-pill:hover::-webkit-slider-thumb {
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+.range-slider-pill:hover::-moz-range-thumb {
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+.range-slider-pill:active::-webkit-slider-thumb {
+  transform: scale(1.25);
+  border-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+.range-slider-pill:active::-moz-range-thumb {
+  transform: scale(1.25);
+  border-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.bouncy-btn {
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease, opacity 0.15s ease, border-color 0.15s ease !important;
+  transform: translateZ(0);
+}
+
+.tooltip-bounce {
+  transition: opacity 0.15s ease, transform 0.15s ease !important;
+}
+
+.bouncy-btn:hover {
+  transform: scale(1.06) translateZ(0);
+}
+
+.bouncy-btn:active {
+  transform: scale(0.96) translateZ(0);
+}
+
+.channel-grid-item {
+  content-visibility: auto;
+  contain-intrinsic-size: 160px;
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: none;
+}
+
+.glass-pill-active {
+  background: #d0bcff;
+  color: #381e72;
+  box-shadow: none;
+  border: none;
+}
+
+.glass-input {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.glass-input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Custom class for vertical menu item indicator with bouncy animation */
+.menu-vertical-pill {
+  position: absolute;
+  left: 8px; /* equivalent to left-2 */
+  width: 4px; /* equivalent to w-1 */
+  height: 14px; /* equivalent to h-3.5 */
+  background-color: #38bdf8; /* light blue */
+  border-radius: 9999px;
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.175, 1.85, 0.32, 1.4), opacity 0.2s ease;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+}
+
+button:hover .menu-vertical-pill {
+  opacity: 1 !important;
+  transform: scaleY(1) !important;
+}
+
+.menu-vertical-pill-red {
+  position: absolute;
+  left: 8px; /* equivalent to left-2 */
+  width: 4px; /* equivalent to w-1 */
+  height: 14px; /* equivalent to h-3.5 */
+  background-color: #ef4444; /* red-500 */
+  border-radius: 9999px;
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.175, 1.85, 0.32, 1.4), opacity 0.2s ease;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+}
+
+button:hover .menu-vertical-pill-red {
+  opacity: 1 !important;
+  transform: scaleY(1) !important;
+}
+
+.orange-hover-filter {
+  filter: brightness(0) invert(0.65);
+  transition: filter 0.3s ease;
+}
+
+.group:hover .orange-hover-filter {
+  filter: brightness(0) saturate(100%) invert(43%) sepia(87%) saturate(1478%) hue-rotate(1deg) brightness(101%) contrast(101%) !important;
 }
 
