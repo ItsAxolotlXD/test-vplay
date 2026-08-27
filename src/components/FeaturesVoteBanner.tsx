@@ -34,10 +34,50 @@ export interface FeatureItem {
   votes: number;
   status: "in_progress" | "planned" | "under_review" | "completed";
   author: string;
-  icon: any;
+  iconName?: string;
   accentGradient: string;
   badgeColor: string;
 }
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Zap,
+  Radio,
+  Gamepad2,
+  MessageSquare,
+  Bot,
+  Palette,
+  Sparkles,
+  Tv,
+  Layers,
+  Vote,
+  Flame,
+  Award,
+  TrendingUp,
+  Share2,
+};
+
+const getFeatureIcon = (feat: FeatureItem): React.ComponentType<{ className?: string }> => {
+  if (feat.iconName && ICON_MAP[feat.iconName]) {
+    return ICON_MAP[feat.iconName];
+  }
+  if (typeof (feat as any).icon === "function") {
+    return (feat as any).icon;
+  }
+  switch (feat.category) {
+    case "streaming":
+      return Zap;
+    case "gaming":
+      return Gamepad2;
+    case "ai":
+      return Bot;
+    case "social":
+      return MessageSquare;
+    case "ui":
+      return Palette;
+    default:
+      return Sparkles;
+  }
+};
 
 const DEFAULT_FEATURES: FeatureItem[] = [
   {
@@ -49,7 +89,7 @@ const DEFAULT_FEATURES: FeatureItem[] = [
     votes: 428,
     status: "in_progress",
     author: "Waves Core Team",
-    icon: Zap,
+    iconName: "Zap",
     accentGradient: "from-amber-500/20 via-orange-500/20 to-red-500/20 border-amber-500/40",
     badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
   },
@@ -58,64 +98,64 @@ const DEFAULT_FEATURES: FeatureItem[] = [
     title: "V-Radio & Waves Podcast Studio",
     category: "streaming",
     description: "Tích hợp hơn 200+ kênh phát thanh FM/AM Việt Nam & Quốc Tế, nghe radio nền và các kênh Podcast chuyên đề.",
-    tagline: "Đài phát thanh trực tuyến",
-    votes: 364,
-    status: "planned",
-    author: "Cộng đồng đề xuất",
-    icon: Radio,
-    accentGradient: "from-sky-500/20 via-blue-500/20 to-indigo-500/20 border-sky-500/40",
-    badgeColor: "bg-sky-500/20 text-sky-300 border-sky-500/30",
-  },
-  {
-    id: "feat_arcade_multiplayer",
-    title: "V-Arcade Cloud Multiplayer (PvP Online)",
-    category: "gaming",
-    description: "Đấu Caro, Rắn săn mồi, Nối từ tiếng Việt trực tuyến với bạn bè qua hệ thống tạo mã phòng hoặc ghép trận ngẫu nhiên.",
-    tagline: "Đấu game online thời gian thực",
-    votes: 512,
+    tagline: "200+ Kênh Radio & Podcast",
+    votes: 384,
     status: "in_progress",
-    author: "Game Dev Group",
-    icon: Gamepad2,
+    author: "Cộng đồng đề xuất",
+    iconName: "Radio",
     accentGradient: "from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border-emerald-500/40",
     badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
   },
   {
-    id: "feat_watch_party",
-    title: "Watch Party & Phòng Xem Chung Bạn Bè",
-    category: "social",
-    description: "Tạo phòng xem cùng lúc luồng TV trực tiếp với bạn bè, trò chuyện âm thanh (Voice Chat) và nhắn tin reaction sôi nổi.",
-    tagline: "Xem TV đồng bộ với bạn bè",
-    votes: 295,
+    id: "feat_multiplayer_arcade",
+    title: "V-Arcade Multiplayer Online 1v1",
+    category: "gaming",
+    description: "Thách đấu trực tiếp bạn bè qua Room Code trong Caro 5 nước, Cờ vua chớp nhoáng và Đua xe Pixel.",
+    tagline: "Chơi cùng bạn bè qua mạng",
+    votes: 512,
     status: "planned",
-    author: "Cộng đồng đề xuất",
-    icon: MessageSquare,
-    accentGradient: "from-purple-500/20 via-fuchsia-500/20 to-pink-500/20 border-purple-500/40",
-    badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+    author: "Ore UI Gaming Guild",
+    iconName: "Gamepad2",
+    accentGradient: "from-fuchsia-500/20 via-purple-500/20 to-indigo-500/20 border-fuchsia-500/40",
+    badgeColor: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30",
   },
   {
-    id: "feat_ai_epg",
-    title: "AI Smart EPG & Lịch Phát Sóng Tự Động",
-    category: "ai",
-    description: "Trí tuệ nhân tạo tự động nhận diện khung giờ phát sóng, tóm tắt nội dung trận bóng đá / phim truyện và đặt lịch thông báo.",
-    tagline: "Lịch phát sóng thông minh AI",
-    votes: 388,
+    id: "feat_soundtrack_chat",
+    title: "Phòng Trò Chuyện & Chia Sẻ Nhạc Realtime",
+    category: "social",
+    description: "Phòng chat nhóm riêng tư với hiệu ứng âm thanh sống động, chia sẻ danh sách phát và cùng xem kênh trực tiếp.",
+    tagline: "Xem chung & Chat trực tiếp",
+    votes: 290,
     status: "under_review",
-    author: "AI Research Lab",
-    icon: Bot,
-    accentGradient: "from-rose-500/20 via-pink-500/20 to-red-500/20 border-rose-500/40",
-    badgeColor: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+    author: "Waves Chat Club",
+    iconName: "MessageSquare",
+    accentGradient: "from-pink-500/20 via-rose-500/20 to-red-500/20 border-pink-500/40",
+    badgeColor: "bg-pink-500/20 text-pink-300 border-pink-500/30",
   },
   {
-    id: "feat_custom_theme",
-    title: "Custom Glass Themes & Shaders Mở Rộng",
+    id: "feat_gemini_smart_guide",
+    title: "Trợ Lý AI V-Intel Tự Động Gợi Ý Kênh",
+    category: "ai",
+    description: "Học thói quen xem TV, tự động tạo lịch chiếu thông minh và tóm tắt nhanh tin tức phát sóng trong ngày qua Gemini AI.",
+    tagline: "Trợ lý ảo thông minh",
+    votes: 645,
+    status: "in_progress",
+    author: "V-Intel Labs",
+    iconName: "Bot",
+    accentGradient: "from-cyan-500/20 via-sky-500/20 to-blue-500/20 border-cyan-500/40",
+    badgeColor: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+  },
+  {
+    id: "feat_custom_liquid_themes",
+    title: "Theme Studio: Tự Phối Màu & Dynamic Glass",
     category: "ui",
-    description: "Tự tạo phối màu Glassmorphism, điều chỉnh độ mờ kính mờ backdrop blur, hình nền động Live Canvas và font chữ yêu thích.",
-    tagline: "Cá nhân hóa giao diện không giới hạn",
+    description: "Tùy biến bảng màu gradient, độ mờ đục liquid glass, hình nền hoạt họa động và xuất file cấu hình chia sẻ.",
+    tagline: "Tùy biến phong cách riêng",
     votes: 310,
     status: "planned",
-    author: "Design System Group",
-    icon: Palette,
-    accentGradient: "from-violet-500/20 via-indigo-500/20 to-blue-500/20 border-violet-500/40",
+    author: "Liquid UI Designers",
+    iconName: "Palette",
+    accentGradient: "from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 border-violet-500/40",
     badgeColor: "bg-violet-500/20 text-violet-300 border-violet-500/30",
   },
 ];
@@ -133,7 +173,13 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
     try {
       const saved = localStorage.getItem("waves_features_vote_data");
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((item: any) => ({
+            ...item,
+            iconName: item.iconName || (typeof item.icon === "string" ? item.icon : undefined),
+          }));
+        }
       }
     } catch (e) {}
     return DEFAULT_FEATURES;
@@ -228,6 +274,17 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
     }
 
     playPopSound();
+    const defaultIconName =
+      newCategory === "streaming"
+        ? "Zap"
+        : newCategory === "gaming"
+        ? "Gamepad2"
+        : newCategory === "ai"
+        ? "Bot"
+        : newCategory === "social"
+        ? "MessageSquare"
+        : "Palette";
+
     const newFeat: FeatureItem = {
       id: `feat_${Date.now()}`,
       title: newTitle.trim(),
@@ -237,7 +294,7 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
       votes: 1,
       status: "under_review",
       author: "Bạn (Đề xuất)",
-      icon: Sparkles,
+      iconName: defaultIconName,
       accentGradient: "from-fuchsia-500/20 via-purple-500/20 to-pink-500/20 border-fuchsia-500/40",
       badgeColor: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30",
     };
@@ -262,57 +319,62 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
       case "planned":
         return {
           label: "Đã lên kế hoạch",
-          badgeClass: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+          badgeClass: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
         };
       case "under_review":
         return {
-          label: "Đang xét duyệt",
+          label: "Đang xem xét",
           badgeClass: "bg-purple-500/20 text-purple-300 border-purple-500/30",
         };
       case "completed":
         return {
-          label: "Đã ra mắt",
+          label: "Đã hoàn thành",
           badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+        };
+      default:
+        return {
+          label: "Đang biểu quyết",
+          badgeClass: "bg-white/10 text-white/70 border-white/20",
         };
     }
   };
 
   return (
     <div
-      id="waves-features-vote-banner"
-      className={`relative w-full rounded-3xl bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] border border-white/20 shadow-[0_12px_40px_0_rgba(0,0,0,0.35),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] p-5 sm:p-7 md:p-8 text-left text-white overflow-hidden transition-all duration-300 ${className}`}
+      className={`relative overflow-hidden rounded-[28px] p-6 sm:p-8 bg-[#140e24]/75 backdrop-blur-[25px] border border-fuchsia-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.4),inset_0.5px_0.5px_0px_rgba(255,255,255,0.2)] text-left ${className}`}
     >
-      {/* Dynamic ambient background glow orbs */}
+      {/* Background ambient lighting */}
       <div className="absolute -top-12 -left-12 w-64 h-64 bg-fuchsia-600/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 -right-16 -translate-y-1/2 w-80 h-80 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-10 left-1/3 w-60 h-60 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Banner Header & Hero Controls */}
+      {/* Main Container */}
       <div className="relative z-10 flex flex-col gap-5">
+        {/* Banner Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          {/* Left Title & Description */}
+          {/* Title & Description */}
           <div className="space-y-1.5 max-w-2xl">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-fuchsia-500 to-indigo-500 p-0.5 shadow-lg shadow-fuchsia-500/30 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-fuchsia-500 to-indigo-500 p-0.5 shadow-lg shadow-fuchsia-500/30 flex-shrink-0">
                 <div className="w-full h-full bg-[#171228] rounded-[14px] flex items-center justify-center">
                   <Vote className="w-5 h-5 text-fuchsia-300 animate-pulse" />
                 </div>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-100 to-fuchsia-200">
-                Bình Chọn Tính Năng Mới
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-fuchsia-100 to-indigo-200">
+                Bình Chọn & Đề Xuất Tính Năng Waves
               </h2>
-              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-fuchsia-500/20 border border-fuchsia-500/30 text-fuchsia-200 flex items-center gap-1 shadow-sm">
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-fuchsia-500/20 border border-fuchsia-500/40 text-fuchsia-300 flex items-center gap-1.5 shadow-inner">
                 <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                 <span>Community Roadmap</span>
               </span>
             </div>
             <p className="text-xs sm:text-sm text-white/75 leading-relaxed font-sans">
               Cùng quyết định lộ trình phát triển của hệ sinh thái <strong>Waves</strong> & <strong>V-Play</strong>!
-              Bình chọn tính năng bạn yêu thích nhất hoặc trực tiếp gửi ý tưởng mới.
+              Bình chọn cho tính năng bạn yêu thích hoặc gửi ý tưởng mới để đội ngũ hiện thực hóa sớm nhất.
             </p>
           </div>
 
-          {/* Right Action Buttons */}
+          {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap self-start lg:self-center">
             {/* Propose Feature Button */}
             <button
@@ -321,7 +383,7 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
                 playPopSound();
                 setIsProposeModalOpen(true);
               }}
-              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-[0_4px_20px_rgba(217,70,239,0.35),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] transition-all cursor-pointer active:scale-95 border border-white/20"
+              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 hover:from-fuchsia-500 hover:via-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-2 shadow-[0_4px_16px_rgba(217,70,239,0.35)] transition-all active:scale-95 cursor-pointer border border-white/20"
             >
               <Plus className="w-4 h-4" />
               <span>Đề xuất tính năng</span>
@@ -334,7 +396,7 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
                 playPopSound();
                 setIsExpanded(!isExpanded);
               }}
-              className="px-3.5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
+              className="px-3.5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white/90 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer border border-white/15 backdrop-blur-md"
             >
               <span>{isExpanded ? "Thu gọn" : "Mở rộng"}</span>
               {isExpanded ? (
@@ -346,33 +408,33 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
           </div>
         </div>
 
-        {/* Global Voting Stats Bar & Filter Tabs */}
+        {/* Global Statistics & Filter Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-white/10">
-          {/* Quick Metrics */}
+          {/* Quick Stats */}
           <div className="flex items-center gap-4 text-xs text-white/70 font-medium">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <span>Tổng phiếu:</span>
               <strong className="text-white font-bold text-sm">
-                {totalVotesCount.toLocaleString()}
+                {totalVotesCount.toLocaleString("vi-VN")}
               </strong>
             </div>
             <div className="h-3 w-px bg-white/20" />
             <div>
               <span>Đang dẫn đầu:</span>{" "}
               <strong className="text-fuchsia-300 font-semibold">
-                {topFeature?.title.slice(0, 24)}... ({topFeature?.votes} vote)
+                {topFeature ? topFeature.title : "Chưa có"}
               </strong>
             </div>
           </div>
 
-          {/* Filter pills */}
+          {/* Filter Pills */}
           <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             {[
-              { id: "all", label: "Tất cả (" + features.length + ")" },
-              { id: "in_progress", label: "Đang phát triển" },
-              { id: "planned", label: "Đã lên kế hoạch" },
-              { id: "top", label: "Nhiều vote nhất ★" },
+              { id: "all", label: "Tất cả" },
+              { id: "top", label: "🔥 Top phiếu" },
+              { id: "in_progress", label: "⚡ Đang làm" },
+              { id: "planned", label: "📌 Kế hoạch" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -381,10 +443,10 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
                   playPopSound();
                   setFilterTab(tab.id);
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   filterTab === tab.id
-                    ? "bg-white/25 text-white border border-white/30 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.5)]"
-                    : "bg-white/5 text-white/65 hover:bg-white/15 hover:text-white"
+                    ? "bg-fuchsia-500 text-white shadow-md shadow-fuchsia-500/30"
+                    : "text-white/60 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {tab.label}
@@ -404,7 +466,7 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-3 overflow-hidden"
             >
               {sortedFeatures.map((feat, idx) => {
-                const IconComponent = feat.icon;
+                const IconComponent = getFeatureIcon(feat);
                 const hasVoted = votedIds.includes(feat.id);
                 const statusMeta = getStatusBadge(feat.status);
                 const percent = Math.min(
@@ -447,13 +509,13 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
                             <span>{feat.votes}</span>
                           </div>
                           <span className="text-[10px] text-white/50 font-mono">
-                            {percent}% tỷ lệ
+                            {percent}% tổng
                           </span>
                         </div>
                       </div>
 
-                      {/* Title & Description */}
-                      <h3 className="font-bold text-base text-white tracking-tight group-hover:text-fuchsia-200 transition-colors mb-1.5 leading-snug">
+                      {/* Title & Desc */}
+                      <h3 className="font-bold text-base text-white tracking-tight group-hover:text-fuchsia-200 transition-colors mb-1.5">
                         {feat.title}
                       </h3>
                       <p className="text-xs text-white/70 leading-relaxed line-clamp-3 font-sans">
@@ -461,17 +523,16 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
                       </p>
                     </div>
 
-                    {/* Bottom Progress & Vote Action Button */}
+                    {/* Bottom Progress & Vote Action */}
                     <div className="pt-4 mt-4 border-t border-white/10 space-y-3">
-                      {/* Mini visual progress bar */}
+                      {/* Popularity Bar */}
                       <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden p-0.5 border border-white/10">
                         <div
                           className="h-full bg-gradient-to-r from-fuchsia-500 to-indigo-400 rounded-full transition-all duration-500"
-                          style={{ width: `${Math.max(5, percent * 2.5)}%` }}
+                          style={{ width: `${Math.max(8, percent)}%` }}
                         />
                       </div>
 
-                      {/* Action Button */}
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-[11px] text-white/50 truncate max-w-[130px]">
                           Bởi: {feat.author}
