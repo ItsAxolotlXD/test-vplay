@@ -333,11 +333,110 @@ export const Settings: React.FC = () => {
         </section>
       )}
 
-      {/* 4. Section 3: Tìm kiếm */}
+      {/* 4. Section 3: Copilot for Vplay */}
+      {(matchesSearch('Copilot') ||
+        matchesSearch('Trợ lý ảo') ||
+        matchesSearch('Merge Spotlight') ||
+        matchesSearch('Hợp nhất') ||
+        matchesSearch('Slash') ||
+        matchesSearch('Lệnh')) && (
+        <section 
+          id="settings-section-copilot"
+          className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
+        >
+          {/* Section Header with Custom Copilot Icon */}
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 min-w-[24px] flex items-center justify-center shrink-0 mt-0.5">
+              <img
+                src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                alt="Copilot"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(99,102,241,0.5)]"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                }}
+              />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white leading-tight">
+                Copilot for Vplay
+              </h2>
+              <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
+                Quản lý trợ lý trí tuệ nhân tạo, tính năng hợp nhất tìm kiếm và gợi ý lệnh
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-1">
+            {/* Card 1: Merge Spotlight Search to Copilot */}
+            {(matchesSearch('Merge Spotlight Search to Copilot') || matchesSearch('Hợp nhất') || matchesSearch('Spotlight') || matchesSearch('Copilot') || matchesSearch('Tìm kiếm')) && (
+              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+                <div>
+                  <div className="font-semibold text-white text-sm">
+                    Merge Spotlight Search to Copilot
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    Hợp nhất tìm kiếm nhanh Spotlight Search vào trợ lý Copilot for Vplay để có trải nghiệm tìm kiếm thông minh hơn
+                  </div>
+                </div>
+
+                {/* Red Toggle Switch */}
+                <button
+                  id="toggle-merge-spotlight-to-copilot"
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.mergeSpotlightToCopilot}
+                  onClick={() => updateSetting('mergeSpotlightToCopilot', !settings.mergeSpotlightToCopilot)}
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
+                    settings.mergeSpotlightToCopilot ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  }`}
+                >
+                  <span
+                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.mergeSpotlightToCopilot ? 'translate-x-5.5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
+            {/* Card 2: Gợi ý lệnh thông minh Slash Commands */}
+            {(matchesSearch('Gợi ý lệnh') || matchesSearch('Slash') || matchesSearch('Copilot') || matchesSearch('Lệnh')) && (
+              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+                <div>
+                  <div className="font-semibold text-white text-sm">
+                    Gợi ý lệnh Slash Commands
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    Hiển thị các phím tắt lệnh nhanh (/spolight-search, /mode, /navigation, /subscribe) phía trên khung chat
+                  </div>
+                </div>
+
+                {/* Red Toggle Switch */}
+                <button
+                  id="toggle-copilot-slash-suggestions"
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.copilotSlashSuggestions}
+                  onClick={() => updateSetting('copilotSlashSuggestions', !settings.copilotSlashSuggestions)}
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
+                    settings.copilotSlashSuggestions ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  }`}
+                >
+                  <span
+                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.copilotSlashSuggestions ? 'translate-x-5.5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* 5. Section 4: Tìm kiếm */}
       {(matchesSearch('Tìm kiếm') ||
-        matchesSearch('Use search interface full page') ||
-        matchesSearch('Giao diện tìm kiếm toàn trang') ||
-        matchesSearch('Full page') ||
         matchesSearch('Danh mục') ||
         matchesSearch('Tin tức') ||
         matchesSearch('Truyền hình') ||
@@ -355,43 +454,12 @@ export const Settings: React.FC = () => {
                 Tìm kiếm
               </h2>
               <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
-                Tùy chỉnh chế độ hiển thị và các danh mục kết quả trong Spotlight Search
+                Tùy chỉnh các danh mục kết quả trong tìm kiếm Spotlight
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
-            {/* Card 0: Use search interface full page */}
-            {(matchesSearch('Use search interface full page') || matchesSearch('Giao diện tìm kiếm toàn trang') || matchesSearch('Full page') || matchesSearch('Tìm kiếm')) && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Use search interface full page
-                  </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Mở giao diện tìm kiếm ở chế độ toàn trang thay vì mở dạng popup menu nhỏ
-                  </div>
-                </div>
-
-                {/* Red Toggle Switch */}
-                <button
-                  id="toggle-full-page-search"
-                  type="button"
-                  role="switch"
-                  aria-checked={settings.fullPageSearch}
-                  onClick={() => updateSetting('fullPageSearch', !settings.fullPageSearch)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.fullPageSearch ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
-                  }`}
-                >
-                  <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.fullPageSearch ? 'translate-x-5.5' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
-              </div>
-            )}
 
             {/* 1. Danh mục */}
             {matchesSearch('Danh mục') && (

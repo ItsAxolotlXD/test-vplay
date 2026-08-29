@@ -22,6 +22,112 @@ try {
   console.error("Failed to load channels for Firesteel:", err);
 }
 
+// API endpoint for Copilot for Vplay
+app.post("/api/gemini", async (req, res) => {
+  try {
+    const { prompt, history, channels = [], mode = "chat" } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Vui lòng nhập nội dung câu hỏi" });
+    }
+
+    if (!apiKey) {
+      return res.json({
+        text: `Chào bạn! Mình là **Copilot for Vplay** 🚀.
+Hệ thống hiện đang chạy ở chế độ offline cơ bản. Bạn có thể sử dụng các lệnh điều khiển nhanh:
+- \`/spolight-search <từ khóa>\`: Tìm kiếm kênh truyền hình và tin tức
+- \`/mode <light/dark>\`: Chuyển đổi giao diện Sáng / Tối
+- \`/navigation <dock/sidebar>\`: Đổi thanh điều hướng
+- \`/subscribe premium\`: Mở cổng đăng ký Waves Premium (V-Premium)`
+      });
+    }
+
+    const channelsSummary = channels.slice(0, 30).map((c: any) => `${c.name} (${c.id}) - ${c.group || ''}`).join("\n");
+
+    const systemInstruction = `Bạn là "Copilot for Vplay" - Trợ lý Trí tuệ Nhân tạo thông minh, đắc lực và thân thiện của ứng dụng truyền hình Vplay (Waves Community).
+Bạn xưng hô là "mình" và gọi người dùng là "bạn". Giọng văn lịch sự, nhiệt tình, có kèm emoji sinh động.
+Khi người dùng muốn xem hoặc chuyển sang kênh nào, bạn hãy trả lời thật tự nhiên và chèn cú pháp lệnh [COMMAND: SWITCH_CHANNEL: <channel_id_or_name>] vào cuối câu trả lời để hệ thống tự động phát kênh đó.
+
+Danh sách kênh phát sóng tiêu biểu:
+${channelsSummary}
+
+Khi người dùng hỏi về các tính năng điều khiển, bạn có thể hướng dẫn các lệnh hữu ích:
+- /spolight-search <từ khóa>: Tìm kiếm kênh và tin tức
+- /mode <light/dark>: Đổi giao diện Sáng/Tối
+- /navigation <dock/sidebar>: Đổi kiểu thanh điều hướng
+- /subscribe premium: Đăng ký Waves Premium`;
+
+    const contents: any[] = [];
+    if (Array.isArray(history)) {
+      for (const h of history.slice(-6)) {
+        contents.push({
+          role: h.role === "user" ? "user" : "model",
+          parts: [{ text: h.text }]
+        });
+      }
+    }
+    contents.push({
+      role: "user",
+      parts: [{ text: prompt }]
+    });
+
+    const modelsToTry = [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.5-flash"
+    ];
+
+    let lastError = null;
+    for (const modelName of modelsToTry) {
+      try {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        const apiResponse = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents,
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 800
+            }
+          })
+        });
+
+        if (apiResponse.ok) {
+          const data: any = await apiResponse.json();
+          const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (replyText) {
+            return res.json({ text: replyText });
+          }
+        } else {
+          const errorBody = await apiResponse.text();
+          lastError = `Status ${apiResponse.status}: ${errorBody}`;
+        }
+      } catch (err: any) {
+        lastError = err.message;
+      }
+    }
+
+    // Fallback response if all API models fail
+    console.warn("Copilot Gemini fallback triggered:", lastError);
+    return res.json({
+      text: `Chào bạn! **Copilot for Vplay** đã nhận được yêu cầu của bạn: "${prompt}".
+Hệ thống AI đang phản hồi và bạn có thể thử các phím lệnh nhanh:
+- \`/spolight-search ${prompt}\`: Tìm kiếm kênh và chương trình phù hợp
+- \`/mode light\` hoặc \`/mode dark\`: Thay đổi giao diện
+- \`/navigation dock\` hoặc \`/navigation sidebar\`: Đổi thanh điều hướng
+- \`/subscribe premium\`: Khám phá Waves Premium`
+    });
+  } catch (error: any) {
+    console.error("Copilot API Error:", error);
+    res.json({
+      text: "Xin lỗi bạn, kết nối tới Copilot AI tạm thời gián đoạn. Bạn có thể sử dụng các lệnh `/spolight-search`, `/mode`, `/navigation` hoặc `/subscribe premium` trực tiếp ngay lúc này!"
+    });
+  }
+});
+
 // API endpoint for Firesteel
 app.post("/api/vintelligence", async (req, res) => {
   try {

@@ -56,6 +56,7 @@ export interface Channel {
   officialWebsite?: string;
   tags?: string[];
   bannerImage?: string;
+  channelNumber?: string;
 }
 
 export type TvChannel = any;
@@ -120,4 +121,17 @@ export interface UserSettings {
   showEpgOverlay: boolean;
   enableNoiseFilter: boolean;
   theme: 'dark' | 'oled';
+  useMouseCursor?: boolean;
+  useArrowKeysCursor?: boolean;
+  soundVolume?: number;
+  qualityOption?: string;
+  subtitles?: boolean;
+  searchQuery?: string;
+  notifications?: boolean;
+  disablePanorama?: boolean;
+  lockPanoramaScroll?: boolean;
+  panoramaScrollSpeed?: number;
+  showFps?: boolean;
+  showFrameLatency?: boolean;
+  [key: string]: any;
 }

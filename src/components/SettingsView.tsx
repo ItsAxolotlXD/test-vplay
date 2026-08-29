@@ -101,7 +101,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const handleResetDefault = () => {
     playPopSound();
-    setTemp({
+    setTemp((prev) => ({
+      ...prev,
       soundVolume: 7,
       qualityOption: '1080p',
       subtitles: true,
@@ -114,7 +115,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       disablePanorama: false,
       lockPanoramaScroll: false,
       panoramaScrollSpeed: 5,
-    });
+    }));
   };
 
   const handleSaveClick = () => {

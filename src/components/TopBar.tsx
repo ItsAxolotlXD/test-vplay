@@ -146,23 +146,23 @@ export const TopBar: React.FC<TopBarProps> = ({
           )}
         </button>
 
-        {/* Copilot Assistant button */}
+        {/* Copilot for Vplay button */}
         <button
           id="btn-top-copilot"
           onClick={() => navigate('/copilot')}
-          className={`w-9 h-9 flex items-center justify-center text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent transition-all drop-shadow-sm cursor-pointer hover:scale-105 active:scale-95 ${
-            _currentRoute === '/copilot' ? 'ring-2 ring-[#E6005A] rounded-xl bg-[#E6005A]/10' : ''
+          className={`w-9 h-9 flex items-center justify-center text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent transition-all drop-shadow-sm cursor-pointer hover:scale-105 active:scale-95 rounded-xl ${
+            _currentRoute === '/copilot' ? 'ring-2 ring-indigo-500 bg-indigo-500/10' : ''
           }`}
-          title="Trợ lý AI Copilot"
-          aria-label="Mở Trợ lý AI Copilot"
+          title="Copilot for Vplay"
+          aria-label="Mở Copilot for Vplay"
         >
           <img
-            src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/microsoft-copilot.png"
-            alt="Copilot"
+            src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+            alt="Copilot for Vplay"
             referrerPolicy="no-referrer"
             className="w-5 h-5 object-contain"
             onError={(e) => {
-              (e.target as HTMLElement).style.display = 'none';
+              (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
             }}
           />
         </button>

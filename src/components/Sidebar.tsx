@@ -281,11 +281,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="truncate">News</span>
         </button>
 
-        {/* 4. Copilot (AI) */}
+        {/* 4. Copilot for Vplay (AI) */}
         <button
           id={isMobile ? 'mobile-nav-item-copilot' : 'nav-item-copilot'}
           onClick={() => handleNavClick('/copilot')}
-          title="Copilot"
+          title="Copilot for Vplay"
           className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
             isActive('/copilot')
               ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
@@ -293,15 +293,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <img
-            src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/microsoft-copilot.png"
-            alt="Copilot"
+            src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+            alt="Copilot for Vplay"
             referrerPolicy="no-referrer"
             className="w-5 h-5 object-contain shrink-0"
             onError={(e) => {
-              (e.target as HTMLElement).style.display = 'none';
+              (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
             }}
           />
-          <span className="truncate">Copilot</span>
+          <span className="truncate">Copilot for Vplay</span>
         </button>
 
         {/* 5. V-Space */}
@@ -643,18 +643,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
                 <button
                   onClick={() => handleNavClick('/copilot')}
-                  title="Copilot"
+                  title="Copilot for Vplay"
                   className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
                     isActive('/copilot') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
                   <img
-                    src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/microsoft-copilot.png"
-                    alt="Copilot"
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    alt="Copilot for Vplay"
                     referrerPolicy="no-referrer"
                     className="w-5 h-5 object-contain shrink-0"
                     onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
+                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
                     }}
                   />
                 </button>

@@ -17,6 +17,7 @@ import { Toolbox } from './pages/Toolbox';
 import { About } from './pages/About';
 import { Settings } from './pages/Settings';
 import { CopilotTab } from './components/CopilotTab';
+import { CopilotFloatingWindow } from './components/CopilotFloatingWindow';
 import { VAppsView } from './components/VAppsView';
 import { VPremiumView } from './components/VPremiumView';
 import { FullPageSearchView } from './components/FullPageSearchView';
@@ -38,6 +39,25 @@ export default function App() {
   });
   const [isCrashed, setIsCrashed] = useState<boolean>(false);
   const [crashReason, setCrashReason] = useState<string>('');
+
+  // Floating Copilot Movable Window State
+  const [isCopilotFloating, setIsCopilotFloating] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('waves_copilot_floating') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleCopilotFloating = (forceState?: boolean) => {
+    setIsCopilotFloating((prev) => {
+      const next = typeof forceState === 'boolean' ? forceState : !prev;
+      try {
+        localStorage.setItem('waves_copilot_floating', String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Navigation Route State (supports browser pathname or internal state)
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
@@ -206,6 +226,9 @@ export default function App() {
               navigate(`/live-tv?channel=${ch.slug}`);
             }}
             onBack={() => navigate('/')}
+            onDetachWindow={() => toggleCopilotFloating(true)}
+            isDetached={isCopilotFloating}
+            navigate={navigate}
           />
         );
 
@@ -350,75 +373,13 @@ export default function App() {
         />
       )}
 
-      {/* Global Modals */}
-      {settings.fullPageSearch ? (
-        <FullPageSearchView
-          isOpen={isSpotlightOpen}
-          onClose={() => setIsSpotlightOpen(false)}
-          onSelectChannel={(ch) => {
-            setCurrentChannel(ch);
-            setIsSpotlightOpen(false);
-            navigate(`/live-tv?channel=${ch.slug}`);
-          }}
-          onNavigateToTab={(tab) => {
-            setIsSpotlightOpen(false);
-            if (tab === 'home') navigate('/');
-            else if (tab === 'live') navigate('/live-tv');
-            else if (tab === 'vapps') navigate('/v-space');
-            else if (tab === 'vpremium') navigate('/v-premium');
-            else if (tab === 'news') navigate('/news');
-            else if (tab === 'settings') navigate('/settings');
-          }}
-          onNavigateToVApp={(appId, gameId) => {
-            setIsSpotlightOpen(false);
-            navigate('/v-space', { appId, gameId });
-          }}
-          onNavigateToVPremium={(subTab) => {
-            setIsSpotlightOpen(false);
-            navigate('/v-premium', { subTab });
-          }}
-          onNavigateToNews={(articleId) => {
-            setIsSpotlightOpen(false);
-            if (articleId) navigate(`/news/${articleId}`);
-            else navigate('/news');
-          }}
-          onNavigateToSettingSection={(_section) => {
-            setIsSpotlightOpen(false);
-            navigate('/settings');
-          }}
-          channels={channels}
-          categories={Array.from(new Set(channels.map((c) => c.category))).map((cat) => ({
-            id: cat,
-            name: cat,
-            count: channels.filter((c) => c.category === cat).length,
-          }))}
-          spotlightSearchSettings={{
-            fullPageSearch: settings.fullPageSearch,
-            categories: settings.searchCategories,
-            vapps: true,
-            vpremium: true,
-            news: settings.searchNews,
-            channels: settings.searchTv,
-            channelNumbers: settings.searchChannelNumber,
-            toolbox: settings.searchToolbox,
-            settings: settings.searchSettings,
-          }}
-          favorites={favoriteChannelIds}
-          onToggleFavorite={toggleFavoriteChannel}
-          triggerToast={(msg) => console.log(msg)}
-          onOpenSearchSettings={() => {
-            setIsSpotlightOpen(false);
-            navigate('/settings');
-          }}
-        />
-      ) : (
-        <SpotlightModal
-          isOpen={isSpotlightOpen}
-          onClose={() => setIsSpotlightOpen(false)}
-          navigate={navigate}
-          onSelectChannel={setCurrentChannel}
-        />
-      )}
+      {/* Global Search Modal (Spotlight Search is moving to Copilot) */}
+      <SpotlightModal
+        isOpen={isSpotlightOpen}
+        onClose={() => setIsSpotlightOpen(false)}
+        navigate={navigate}
+        onSelectChannel={setCurrentChannel}
+      />
 
       <CustomStreamModal
         isOpen={isCustomStreamModalOpen}
@@ -431,6 +392,22 @@ export default function App() {
       <WelcomeModal
         isOpen={isWelcomeModalOpen}
         onClose={() => setIsWelcomeModalOpen(false)}
+      />
+
+      {/* Detached Movable Copilot Window */}
+      <CopilotFloatingWindow
+        isOpen={isCopilotFloating}
+        onClose={() => toggleCopilotFloating(false)}
+        onDockBack={() => {
+          toggleCopilotFloating(false);
+          navigate('/copilot');
+        }}
+        onSelectChannel={(ch) => {
+          setCurrentChannel(ch);
+          navigate(`/live-tv?channel=${ch.slug}`);
+        }}
+        channels={channels}
+        navigate={navigate}
       />
     </div>
   );

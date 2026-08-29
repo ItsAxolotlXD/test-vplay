@@ -298,8 +298,8 @@ const VPagesApp: React.FC = () => {
         {/* 4. COLOR TEXT & HIGHLIGHT BACKGROUND COLOR */}
         <div className="flex items-center gap-2 border-r border-white/10 pr-2">
           {/* Text Color Picker */}
-          <div className="flex items-center gap-1">
-            <Palette className="w-4 h-4 text-blue-400" title="Màu chữ" />
+          <div className="flex items-center gap-1" title="Màu chữ">
+            <Palette className="w-4 h-4 text-blue-400" />
             <input
               type="color"
               value={textColor}
@@ -310,8 +310,8 @@ const VPagesApp: React.FC = () => {
           </div>
 
           {/* Highlight Color Picker */}
-          <div className="flex items-center gap-1">
-            <Highlighter className="w-4 h-4 text-amber-400" title="Màu nền highlight" />
+          <div className="flex items-center gap-1" title="Màu nền highlight">
+            <Highlighter className="w-4 h-4 text-amber-400" />
             <input
               type="color"
               value={highlightColor === "transparent" ? "#ffff00" : highlightColor}

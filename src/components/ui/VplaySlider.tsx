@@ -116,7 +116,6 @@ export const VplaySlider: React.FC<VplaySliderProps> = ({
           value={currentValue}
           disabled={effectiveDisabled}
           onChange={handleInputChange}
-          onInput={handleInputChange}
           className="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer disabled:cursor-not-allowed"
         />
 

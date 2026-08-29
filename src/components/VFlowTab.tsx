@@ -653,9 +653,9 @@ export default function VFlowTab({
                             <span className="font-extrabold text-sm text-white">{post.author}</span>
                             {post.isVerified && (
                               post.verifiedType === "verified_plus" ? (
-                                <Crown className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" title="Verified PLUS Royal Member" />
+                                <span title="Verified PLUS Royal Member"><Crown className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" /></span>
                               ) : (
-                                <BadgeCheck className="w-4 h-4 text-amber-400 fill-amber-400/20 shrink-0" title="Verified Member" />
+                                <span title="Verified Member"><BadgeCheck className="w-4 h-4 text-amber-400 fill-amber-400/20 shrink-0" /></span>
                               )
                             )}
                           </div>

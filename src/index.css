@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @font-face {
   font-family: 'Google Sans';
   font-style: normal;
@@ -1076,5 +1078,61 @@ html.light-mode #waves-vpremium-view .bg-emerald-600,
 html.light-mode #waves-vpremium-view .bg-rose-600,
 html.light-mode #waves-vpremium-view .bg-sky-600 {
   color: #FFFFFF !important;
+}
+
+/* Copilot for Vplay & Floating Window Light Mode Overrides */
+html.light-mode #waves-copilot-view {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light-mode #waves-copilot-view h1,
+html.light-mode #waves-copilot-view h2,
+html.light-mode #waves-copilot-view h3 {
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-copilot-view p {
+  color: #475569 !important;
+}
+
+html.light-mode #waves-copilot-view input {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-copilot-view input::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Floating Window Light Mode Overrides */
+html.light-mode #waves-copilot-floating-window {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+html.light-mode #waves-copilot-floating-window > div:first-child {
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-copilot-floating-window .select-text {
+  background-color: #F8FAFC !important;
+}
+
+html.light-mode #waves-copilot-floating-window input {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-copilot-floating-window input::placeholder {
+  color: #94A3B8 !important;
 }
 

@@ -6,7 +6,8 @@ export interface SystemSettings {
   fontScale: number; // 0: 85%, 1: 100%, 2: 115%, 3: 130%
   autoScrollBanner: boolean;
   autoHideSidebar: boolean;
-  fullPageSearch: boolean;
+  mergeSpotlightToCopilot: boolean;
+  copilotSlashSuggestions: boolean;
   searchCategories: boolean;
   searchNews: boolean;
   searchTv: boolean;
@@ -21,7 +22,8 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   fontScale: 1,
   autoScrollBanner: true,
   autoHideSidebar: false,
-  fullPageSearch: false,
+  mergeSpotlightToCopilot: true,
+  copilotSlashSuggestions: true,
   searchCategories: true,
   searchNews: true,
   searchTv: true,

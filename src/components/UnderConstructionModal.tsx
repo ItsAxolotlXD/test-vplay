@@ -176,7 +176,9 @@ export const UnderConstructionModal: React.FC<UnderConstructionModalProps> = ({
                 {digits.map((digit, index) => (
                   <input
                     key={index}
-                    ref={(el) => (inputRefs.current[index] = el)}
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
+                    }}
                     id={`passcode-digit-${index}`}
                     type="password"
                     inputMode="numeric"
