@@ -1,6 +1,6 @@
 {
-  "name": "Waves Community",
-  "description": "Waves Community - Ứng dụng xem truyền hình mượt mà chất lượng cao trên nền tảng kính mờ, hỗ trợ 120+ kênh sóng VTV, HTV, VTVCab và Radio.",
+  "name": "Vplay by Waves",
+  "description": "Nền tảng cộng đồng dành cho những người yêu thích, theo dõi và lưu trữ nội dung về truyền hình Việt Nam với giao diện streaming hiện đại.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,260 +1,233 @@
-import rawChannels from "./channels.json";
+import { Channel, ProgramScheduleItem, Category } from '../types';
 
-export interface Channel {
+export type { Channel, Category, ProgramScheduleItem };
+
+interface RawChannelItem {
   id: string;
   name: string;
-  url: string;
-  group: string;
-  logoText: string;
-  logoBg: string; // Tailwind class, e.g. "bg-red-600"
-  userAgent?: string;
-  isRadio?: boolean;
-  logoImg?: string;
-  channelNumber?: string;
+  logo: string;
+  category: string;
+  streamUrl: string;
 }
 
-export interface Category {
-  id: string;
-  name: string;
-  description: string;
-  logo?: string;
-  channels: Channel[];
-}
+const RAW_CHANNELS: RawChannelItem[] = [
+  // Kênh VTV
+  { id: 'vtv1', name: 'VTV1 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/a/ac/1vv.png/revision/latest/scale-to-width-down/1000?cb=20260604052331&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/vtv1/live247-hls-avc/vtv1-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
+  { id: 'vtv2', name: 'VTV2 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/5/5b/2f.png/revision/latest/scale-to-width-down/1000?cb=20260604052625&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v2abr/live247-hls-avc/v2abr-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
+  { id: 'vtv3', name: 'VTV3 HD', logo: 'https://static.wikia.nocookie.net/logos/images/0/05/VTV3_logo_%282013-nay%29.png/revision/latest?cb=20201228131947&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v3abr/live247-hls-avc/v3abr-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
+  { id: 'vtv4', name: 'VTV4 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/0/02/Imagei4.png/revision/latest/scale-to-width-down/1000?cb=20260601093135&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/vtv4/live247-hls-avc/vtv4-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
+  { id: 'vtv5', name: 'VTV5 HD', logo: 'https://static.wikia.nocookie.net/79/Imagej42.png/revision/latest/scale-to-width-down/1000?cb=20260601093345&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/vtv5/live247-hls-avc/vtv5-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
+  { id: 'vtv6', name: 'VTV6 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/c/c1/V6.png/revision/latest/scale-to-width-down/1000?cb=20260601093700&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v6abr/live247-hls-avc/v6abr-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
+  { id: 'vtv7', name: 'VTV7 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/4/43/Image7.png/revision/latest/scale-to-width-down/1000?cb=20260601093859&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v7abr/live247-hls-avc/v7abr-avc1_5600000=10000-mp4a_140800_vie=20000.m3u8' },
+  { id: 'vtv8', name: 'VTV8 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/b/b1/Imagea8.png/revision/latest/scale-to-width-down/1000?cb=20260601094212&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/fnxsd1/vtv8hd_vhls.smil/chunklist_b2500000.m3u8' },
+  { id: 'vtv9', name: 'VTV9 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/8/8c/Imagei9.png/revision/latest/scale-to-width-down/1000?cb=20260601094610&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v9abr/live247-hls-avc/v9abr-avc1_5600000=10000-mp4a_140800_vie=20000.m3u8' },
+  { id: 'vtv10', name: 'VTV10 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/a/a0/I10.png/revision/latest/scale-to-width-down/1000?cb=20260601094723&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v10abr/live247-hls-avc/v10abr-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
+  { id: 'vn_today', name: 'Vietnam Today HD', logo: 'https://static.wikia.nocookie.net/ftv/images/7/7f/Vtd.png/revision/latest/scale-to-width-down/1000?cb=20260601094859&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8' },
 
-const getLogoText = (name: string): string => {
-  let clean = name;
-  if (clean.includes(" - ")) {
-    clean = clean.split(" - ")[1];
-  } else {
-    clean = clean.replace(/TRUYỀN HÌNH\s+/i, "");
-    clean = clean.replace(/Truyền hình\s+/i, "");
-  }
-  if (clean.includes(" (")) {
-    clean = clean.split(" (")[0];
-  }
-  return clean.trim();
-};
+  // Kênh VTVcab
+  { id: 'on_trending', name: 'ON TRENDING TV HD', logo: 'https://img.vtvprime.vn/55xu-sW33ZbTdC_Jok1jkP6jWGpa3U96dXvvDuXoyz0/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGZjNzVhY2EtYjZhYS00MjYwLWIwMDMtZDRkYzg4OWI4ZGNkLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=186' },
+  { id: 'on_kids', name: 'ON Kids HD', logo: 'https://img.vtvprime.vn/L7ERumqY3GEtK8vTe_DtMEJRYJkZPrVD3O4cbdT5P44/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGFlYmUzZGMtODZmYS00NGFkLTlhNzUtODg5NmFkODZhNGI3LnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=179' },
+  { id: 'on_golf', name: 'ON Golf HD', logo: 'https://static.wikia.nocookie.net/logos/images/f/ff/ON_Golf_logo_2022.png/revision/latest/scale-to-width-down/1000?cb=20220311023800&path-prefix=vi', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=169' },
+  { id: 'on_e_channel', name: 'ON E- Channel HD', logo: 'https://img.vtvprime.vn/bofK3Lca_KQJMc9sb6pUyQ_A41aWbsQi2ibNAzkN3I0/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZTk3YjgwOGUtNjI3OS00NWQ4LWJkMTAtNWY1MGE1MjIwMTZkLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=182' },
+  { id: 'on_vie_giaitri', name: 'ON Vie Giải Trí HD', logo: 'https://img.vtvprime.vn/gV1k4G1mCGQpnNGJFCJQISd0-p96jY14Ufz_mOb8h_o/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZjVhZDhkNmBiMTQ4NS00YjYxLThhMDEtNTdiYzBiMjU2NGU1LnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=180' },
+  { id: 'on_vie_dramas', name: 'ON Vie Dramas HD', logo: 'https://img.vtvprime.vn/mVzz9rvhJ_BCun2e4ILB0OYl8ptcxG9TsSrIZ85kpLk/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvMmExZjgwNGYtNjc0Yi00ZjYzLThjZWMtNjgwN2NkNThhYTRkLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'http://dvrfl05.bozztv.com/vch_vchannel18/tracks-v1a1/mono.m3u8' },
+  { id: 'on_phimviet', name: 'ON Phim Việt HD', logo: 'https://img.vtvprime.vn/vDASEJI2IRP0eBox0ta6hgKo4vnY-3AdofWLa5lSqjM/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZTc3YzdkNmItZTVhNi00ZTkyLWIzYzUtMGEzMTkyZjIyM2RhLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=175' },
+  { id: 'on_movies_youtv', name: 'ON Movies - You TV HD', logo: 'https://img.vtvprime.vn/8-eDFNeJkwyONvmJVu_JydPc2dZaNJXuBTY7vtvCxxE/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZWQzOTEzNjgtYTJmNy00NDBkLWI0N2ItNzA2MDliNjJmNDYzLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=181' },
+  { id: 'on_o2tv', name: 'ON O2TV HD', logo: 'https://img.vtvprime.vn/5FxYjiz34GsArbti7aFiSkIO7NMCxKNZcQJ9AvIme80/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvODAyNGIwMDQtNGJiNC00M2Y3LWJkYmEtYmU0MWVkMGY0NjM4LnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=136' },
+  { id: 'on_bibi', name: 'ON BiBi HD', logo: 'https://img.vtvprime.vn/vjXRRLGeFrNx1iAkqhrK9RoAgU1oW6kq5q_6r7cd9zs/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvYzI3NWExNmEtNTMwOS00ZWE3LWJjMjMtYTMyNGIwZDczNGJlLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=178' },
+  { id: 'on_infotv', name: 'ON Info TV HD', logo: 'https://img.vtvprime.vn/nCr-YgSmtNg5gcpJ35d6l_T4DUWz8fzr9EJpd9jAZ6E/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvM2E2NzM5NzQtNzRhYi00MjYxLTg2M2QtZWE2YzUyNzU5YzcyLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=189' },
+  { id: 'on_cine', name: 'ON Cine HD', logo: 'https://img.vtvprime.vn/XY6SjolNpy8W8Eh_v_2oDyE6BiNOvofLosgPYO-hlY4/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZTY5YjgyNmUtNjkzYi00YzBiLWFhZmYtNmFhZGFjZjFhZDA0LnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=176' },
+  { id: 'on_styletv', name: 'ON Style TV HD', logo: 'https://img.vtvprime.vn/TxObOi0p9hC6K414i12Fk27SP8s_QKswAvPaRH2kK6M/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvNTcyOGM3MzEtOWE4OS00ZjljLTkyYTItMWVhODZmNzhiOWE4LnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=184' },
+  { id: 'on_music', name: 'ON Music HD', logo: 'https://img.vtvprime.vn/39RnkA6ZHfNSCcsMaaSivvTVwmWjeGsbqlQsmD7nuvQ/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvN7RmOTYzYTYtZWRkYS00MDdjLWIxYmYtYTAwODBhMTUyYTNlLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=185' },
+  { id: 'on_vfamily', name: 'ON V Family HD', logo: 'https://img.vtvprime.vn/8oeGePxG0Z-iJqm5biFVNdMdAlVHFDYsS0i7i3IpH2Y/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGI0YzYzOTgtNWJiOS00ODQ1LWE1ZjMtZTdhZTM5ZTc4NzVmLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=187' },
+  { id: 'on_life', name: 'ON Life HD', logo: 'https://img.vtvprime.vn/cJ9URVIqC2BkU1gsT0IKiEy0tXDXqu7C4M3Ni3hjlgY/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvY2U2MWMwZGEtMWI1Zi00ZWJiLWE4ZTktZjdmZTVkNzRlODhmLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=188' },
 
-const getGradient = (group: string, name: string): string => {
-  const lowerG = group.toLowerCase();
-  const lowerN = name.toLowerCase();
-  if (lowerG.includes("vtv")) {
-    if (lowerN.includes("1")) return "bg-gradient-to-br from-red-600 to-red-800";
-    if (lowerN.includes("2")) return "bg-gradient-to-br from-purple-600 to-purple-800";
-    if (lowerN.includes("3")) return "bg-gradient-to-br from-blue-600 to-blue-800";
-    if (lowerN.includes("4")) return "bg-gradient-to-br from-teal-600 to-teal-800";
-    if (lowerN.includes("5")) return "bg-gradient-to-br from-emerald-600 to-emerald-800";
-    return "bg-gradient-to-br from-red-500 to-orange-600";
-  }
-  if (lowerG.includes("vtvcab")) {
-    return "bg-gradient-to-br from-fuchsia-600 to-pink-700";
-  }
-  if (lowerG.includes("htv")) {
-    return "bg-gradient-to-br from-blue-600 to-indigo-800";
-  }
-  if (lowerG.includes("sctv")) {
-    return "bg-gradient-to-br from-rose-600 to-blue-800";
-  }
-  if (lowerG.includes("radio")) {
-    return "bg-gradient-to-br from-red-500 to-pink-600";
-  }
-  if (lowerG.includes("quốc tế") || lowerG.includes("world")) {
-    return "bg-gradient-to-br from-neutral-800 to-stone-900";
-  }
-  return "bg-gradient-to-br from-teal-500 to-cyan-700";
-};
+  // Kênh HTV
+  { id: 'htv1', name: 'HTV1 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/0/04/HTV1.png/revision/latest/scale-to-width-down/1000?cb=20260601104705&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htv1_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'htv2', name: 'HTV2 / Vie Channel HD', logo: 'https://static.wikia.nocookie.net/ftv/images/9/99/HTV2.png/revision/latest/scale-to-width-down/1000?cb=20260601105845&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htv2hd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htv3', name: 'HTV3 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/2/26/H3.png/revision/latest/scale-to-width-down/1000?cb=20260601110041&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htv3_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'htv4', name: 'HTV4 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/d/d4/H4.png/revision/latest/scale-to-width-down/1000?cb=20260601110245&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htv4_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'htv5', name: 'HTV5 / B Channel HD', logo: 'https://static.wikia.nocookie.net/ftv/images/e/ec/H5.png/revision/latest/scale-to-width-down/1000?cb=20260601110811&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/fnxsd1/btv9_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'htv7', name: 'HTV7 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/6/60/H7.png/revision/latest/scale-to-width-down/1000?cb=20260601112033&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htv7hd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htv9', name: 'HTV9 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/e/e4/H9.png/revision/latest/scale-to-width-down/1000?cb=20260601111956&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htv9hd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htv_thethao', name: 'HTV Thể Thao HD', logo: 'https://static.wikia.nocookie.net/ftv/images/5/5c/H6.png/revision/latest/scale-to-width-down/1000?cb=20260601112653&path-prefix=vi', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcthethao_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_thethao', name: 'HTVC Thể Thao HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/d/d4/HTVC_Th%E1%BB%83_thao.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcthethao_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_canhac', name: 'HTVC Ca Nhạc HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/a/ad/HTVC_Ca_nh%E1%BA%A1c.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcmusic_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_dulich', name: 'HTVC Du Lịch HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/9/98/HTVC_Du_l%E1%BB%8Bch.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcdulich_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_giadinh', name: 'HTVC Gia Đình HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/1/18/HTVC_Gia_%C4%91%C3%ACnh.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcgiadinh_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_phimhd', name: 'HTVC Phim HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/3/36/HTVC_Phim.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcmovieshd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_phunu', name: 'HTVC Phụ Nữ HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/4/4e/HTVC_Ph%E1%BB%A5_n%E1%BB%AF.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcphunu_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_thuanviethd', name: 'HTVC Thuần Việt HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/3/3a/Thu%E1%BA%A7n_Vi%E1%BB%87t.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcthuanviethd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'htvc_plus_hd', name: 'HTVC+ HD', logo: 'https://upload.wikimedia.org/wikipedia/vi/e/ec/HTVC_Plus.png', category: 'Kênh HTV', streamUrl: 'https://live.fptplay53.net/epzhd1/htvcplus_vhls.smil/chunklist_b5000000.m3u8' },
 
-// Map raw channels list to our required application structure
-export const processedChannels: Channel[] = rawChannels.map((ch: any) => {
-  const isRadio = ch.group === "Radio" || !!ch.isRadio;
-  return {
-    id: ch.id,
-    name: ch.name,
-    url: ch.url,
-    group: ch.group,
-    logoText: getLogoText(ch.name),
-    logoBg: getGradient(ch.group, ch.name),
-    isRadio: isRadio,
-    logoImg: ch.logo
-  };
-});
+  // Kênh SCTV
+  { id: 'sctv1', name: 'SCTV1 HD', logo: 'https://static.wikia.nocookie.net/logos/images/3/3c/SCTV1.png/revision/latest/scale-to-width-down/1000?cb=20201119113949&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv1' },
+  { id: 'sctv2', name: 'SCTV2 HD', logo: 'https://static.wikia.nocookie.net/logos/images/6/64/SCTV2.png/revision/latest/scale-to-width-down/1000?cb=20201119114104&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://liveh12.vtvprime.vn/hls/SCTV2/03.m3u8' },
+  { id: 'sctv3', name: 'SCTV3 HD', logo: 'https://static.wikia.nocookie.net/logos/images/4/4a/SCTV3.png/revision/latest/scale-to-width-down/1000?cb=20210819101244&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv3' },
+  { id: 'sctv4', name: 'SCTV4 HD', logo: 'https://static.wikia.nocookie.net/logos/images/6/62/SCTV4.png/revision/latest/scale-to-width-down/1000?cb=20240116011558&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv4' },
+  { id: 'sctv5', name: 'SCTV5 HD', logo: 'https://static.wikia.nocookie.net/logos/images/e/e7/SCTV5.png/revision/latest/scale-to-width-down/1000?cb=20210819100021&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv5' },
+  { id: 'sctv6', name: 'SCTV6 HD', logo: 'https://static.wikia.nocookie.net/logos/images/4/4b/SCTV6.png/revision/latest/scale-to-width-down/1000?cb=20210819100633&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://live.fptplay53.net/epzhd2/film360_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'sctv7', name: 'SCTV7 HD', logo: 'https://static.wikia.nocookie.net/logos/images/8/87/SCTV7.png/revision/latest/scale-to-width-down/1000?cb=20210819102155&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv7' },
+  { id: 'sctv8', name: 'SCTV8 HD', logo: 'https://static.wikia.nocookie.net/logos/images/0/05/SCTV8.png/revision/latest/scale-to-width-down/1000?cb=20210819103024&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv8' },
+  { id: 'sctv9', name: 'SCTV9 HD', logo: 'https://static.wikia.nocookie.net/logos/images/f/f3/SCTV9.png/revision/latest/scale-to-width-down/1000?cb=20210821040105&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv9' },
+  { id: 'sctv10', name: 'SCTV10 HD', logo: 'https://static.wikia.nocookie.net/logos/images/c/c0/SCTV10.png/revision/latest/scale-to-width-down/1000?cb=20210819105314&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://liveh34.vtvprime.vn/hls/SCTV10/01.m3u8' },
+  { id: 'sctv11', name: 'SCTV11 HD', logo: 'https://static.wikia.nocookie.net/logos/images/7/7d/SCTV11.png/revision/latest/scale-to-width-down/1000?cb=20210821040108&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv11' },
+  { id: 'sctv12', name: 'SCTV12 HD', logo: 'https://static.wikia.nocookie.net/logos/images/5/51/SCTV12.png/revision/latest/scale-to-width-down/1000?cb=20201127035429&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv12' },
+  { id: 'sctv13', name: 'SCTV13 HD', logo: 'https://static.wikia.nocookie.net/logos/images/c/c1/SCTV13_logo_2022.png/revision/latest/scale-to-width-down/1000?cb=20230630142130&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv13' },
+  { id: 'sctv14', name: 'SCTV14 HD', logo: 'https://static.wikia.nocookie.net/logos/images/1/12/SCTV14_logo_2022.png/revision/latest/scale-to-width-down/1000?cb=20220428035033&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv14' },
+  { id: 'sctv15', name: 'SCTV15 HD', logo: 'https://static.wikia.nocookie.net/logos/images/9/92/SCTV15.png/revision/latest/scale-to-width-down/1000?cb=20210820043237&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv15' },
+  { id: 'sctv16', name: 'SCTV16 HD', logo: 'https://static.wikia.nocookie.net/logos/images/a/aa/SCTV16.png/revision/latest/scale-to-width-down/1000?cb=20210820043927&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv16' },
+  { id: 'sctv17', name: 'SCTV17 HD', logo: 'https://static.wikia.nocookie.net/logos/images/0/0a/SCTV17.png/revision/latest/scale-to-width-down/1000?cb=20210820120340&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv17' },
+  { id: 'sctv18', name: 'SCTV18 HD', logo: 'https://static.wikia.nocookie.net/logos/images/c/ca/SCTV18.png/revision/latest/scale-to-width-down/1000?cb=20210820120952&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv18' },
+  { id: 'sctv19', name: 'SCTV19 HD', logo: 'https://static.wikia.nocookie.net/logos/images/e/ef/SCTV19.png/revision/latest/scale-to-width-down/1000?cb=20240131141543&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv19' },
+  { id: 'sctv20', name: 'SCTV20 HD', logo: 'https://static.wikia.nocookie.net/logos/images/b/b1/SCTV20.png/revision/latest/scale-to-width-down/1000?cb=20210821042852&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv20' },
+  { id: 'sctv21', name: 'SCTV21 HD', logo: 'https://static.wikia.nocookie.net/logos/images/9/9f/SCTV21.png/revision/latest/scale-to-width-down/1000?cb=20210821043405&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv21' },
+  { id: 'sctv22', name: 'SCTV22 HD', logo: 'https://static.wikia.nocookie.net/logos/images/5/5f/SCTV22.png/revision/latest/scale-to-width-down/1000?cb=20210821035512&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv22' },
+  { id: 'sctv_phim', name: 'SCTV Phim HD', logo: 'https://static.wikia.nocookie.net/logos/images/1/12/SCTV_Phim_T%E1%BB%95ng_h%E1%BB%A3p_2020.png/revision/latest?cb=20230323070113&path-prefix=vi', category: 'Kênh SCTV', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctvphim' },
 
-// Category template definitions
-const categoryTemplates = [
-  { id: "vtv", name: "Kênh VTV", description: "Các kênh sóng truyền hình quốc gia VTV", logo: "https://static.wikia.nocookie.net/logos/images/1/13/VTV_logo_%28b%E1%BA%A3n_2%29.png/revision/latest/scale-to-width-down/1000?cb=20240103140637&path-prefix=vi" },
-  { id: "vtvcab", name: "Kênh VTVcab", description: "Kênh giải trí thể thao, phim ảnh tổng hợp đặc sắc", logo: "https://static.wikia.nocookie.net/logos/images/4/45/VTVcab_logo.png/revision/latest/scale-to-width-down/1000?cb=20230331092733&path-prefix=vi" },
-  { id: "htv", name: "Kênh HTV", description: "Các kênh sóng truyền hình Đài Thành phố Hồ Chí Minh", logo: "https://static.wikia.nocookie.net/logos/images/d/dd/HTV_logo_2012_%281%29.png/revision/latest/scale-to-width-down/1000?cb=20231118121202&path-prefix=vi" },
-  { id: "sctv", name: "Kênh SCTV", description: "Các kênh giải trí, khoa học và phim truyện SCTV cáp", logo: "https://static.wikia.nocookie.net/logos/images/1/15/SCTV.png/revision/latest/scale-to-width-down/1000?cb=20230624130447&path-prefix=vi" },
-  { id: "thiet-yeu", name: "Kênh thiết yếu", description: "Truyền hình thiết yếu quốc gia", logo: "https://em-content.zobj.net/source/microsoft/379/check-mark-button_2705.png" },
-  { id: "dia-phuong", name: "Kênh địa phương", description: "Truyền hình địa phương, liên tỉnh bản quyền", logo: "https://vectorflags.s3.amazonaws.com/flags/vn-wave-01.png" },
-  { id: "quoc-te", name: "Kênh quốc tế", description: "Kênh tin tức thời sự thế giới, phim hoạt hình nổi tiếng nước ngoài", logo: "https://em-content.zobj.net/source/microsoft/379/globe-with-meridians_1f310.png" },
-  { id: "phat-thanh-radio", name: "Kênh phát thanh", description: "Các đài phát thanh VOV, VOH, FM Giao thông đặc sắc" }
+  // Kênh thiết yếu
+  { id: 'antv_thiet_yeu', name: 'Truyền hình Công an Nhân dân (ANTV) HD', logo: 'https://img-zlr1.tv360.vn/image1/2020_09_23/1600822516608/b33963dc0df8_640_360.png', category: 'Kênh thiết yếu', streamUrl: 'https://live.fptplay53.net/fnxhd2/anninhtv_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'qpvn_thiet_yeu', name: 'Truyền hình Quốc phòng Việt Nam (QPVN) HD', logo: 'https://static.wikia.nocookie.net/logos/images/5/5d/QPVN.png/revision/latest/scale-to-width-down/1000?cb=20220827083916&path-prefix=vi', category: 'Kênh thiết yếu', streamUrl: 'https://live.fptplay53.net/fnxhd2/quocphongvnhd_vhls.smil/chunklist_b5000000.m3u8' },
+
+  // Kênh địa phương
+  { id: 'atv1', name: 'Truyền hình An Giang - ATV1 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/f/f3/Atv.png/revision/latest/scale-to-width-down/1000?cb=20260601113339&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/angiang01_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'atv2', name: 'Truyền hình An Giang - ATV2 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/5/57/2a.png/revision/latest/scale-to-width-down/1000?cb=20260601113455&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/angiang_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'atv3', name: 'Truyền hình An Giang - ATV3 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/a/ae/Atv3.png/revision/latest/scale-to-width-down/1000?cb=20260601113538&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/angiang03_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'bac_ninh', name: 'Truyền hình Bắc Ninh - BTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/7/70/BTVHD.png/revision/latest/scale-to-width-down/1000?cb=20260706052923', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/bacninh01_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'ca_mau', name: 'Truyền hình Cà Mau - CTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/5/55/CTVHD.png/revision/latest/scale-to-width-down/1000?cb=20260706053344', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/camau_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'cao_bang', name: 'Truyền hình Cao Bằng - CRTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/e/ec/Caob.png/revision/latest/scale-to-width-down/1000?cb=20260702004111', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/caobang_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'can_tho_1', name: 'Truyền hình Cần Thơ - CầnThơ 1 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/a/a9/Cansa.png/revision/latest/scale-to-width-down/1000?cb=20260701135206', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/cantho_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'can_tho_2', name: 'Truyền hình Cần Thơ - CầnThơ 2 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/a/a4/C2.png/revision/latest/scale-to-width-down/1000?cb=20260701135242', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/cantho02_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'can_tho_3', name: 'Truyền hình Cần Thơ - CầnThơ 3 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/5/54/C3.png/revision/latest/scale-to-width-down/1000?cb=20260701135509', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/cantho03_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'da_nang_1', name: 'Truyền hình Đà Nẵng - ĐNRT1 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/c/c6/D1.png/revision/latest/scale-to-width-down/1000?cb=20260601122210&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/danang1_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'da_nang_2', name: 'Truyền hình Đà Nẵng - ĐNRT2 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/8/8b/D2.png/revision/latest/scale-to-width-down/1000?cb=20260601122329&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/danang2_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'dak_lak', name: 'Truyền hình Đắk Lắk - DRT HD', logo: 'https://static.wikia.nocookie.net/ftv/images/0/07/Derote.png/revision/latest/scale-to-width-down/1000?cb=20260601122629&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/daklak_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'dien_bien', name: 'Truyền hình Điện Biên - ĐTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/9/94/Dien_bien_deteve.png/revision/latest/scale-to-width-down/1000?cb=20260706054014', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/dienbien_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'dong_nai_1', name: 'Truyền hình Đồng Nai - ĐNRTV1 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/9/95/Dong1.png/revision/latest/scale-to-width-down/1000?cb=20260702004514', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/dongnai1_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'dong_nai_2', name: 'Truyền hình Đồng Nai - ĐNRTV2 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/4/41/%C4%902.png/revision/latest/scale-to-width-down/1000?cb=20260702004615', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/dongnai2_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'gia_lai', name: 'Truyền hình Gia Lai - GTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/d/db/Gtvc.png/revision/latest/scale-to-width-down/1000?cb=20260601123951&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/gialai01_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'dong_thap_1', name: 'Truyền hình Đồng Tháp - THĐT1 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/4/44/D8.png/revision/latest/scale-to-width-down/1000?cb=20260601123433&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/dongthap_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'dong_thap_2', name: 'Truyền hình Đồng Tháp - THĐT2 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/1/14/D9.png/revision/latest/scale-to-width-down/1000?cb=20260601123603&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/dongthaphd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'ha_noi_1', name: 'Truyền hình Hà Nội - H1 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/4/4e/H1.png/revision/latest/scale-to-width-down/1000?cb=20260702004820', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxhd2/hanoitv1_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'ha_noi_2', name: 'Truyền hình Hà Nội - H2 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/7/78/H2.png/revision/latest/scale-to-width-down/1000?cb=20260702004903', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxhd1/hntv2_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'hue', name: 'Truyền hình Huế - HueTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/8/8b/Httvv.png/revision/latest/scale-to-width-down/1000?cb=20260602021015&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/hue_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'ha_tinh', name: 'Truyền hình Hà Tĩnh - HTTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/f/f9/Htinh.png/revision/latest/scale-to-width-down/1000?cb=20260602020455&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/hatinh_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'hai_phong', name: 'Truyền hình Hải Phòng - THP HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/c/c8/Tho1.png/revision/latest/scale-to-width-down/1000?cb=20260706064226', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/haiphong_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'hai_phong_3', name: 'Truyền hình Hải Phòng - THP3 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/b/bd/Imageg4f3.png/revision/latest/scale-to-width-down/1000?cb=20260602020807&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/haiphongplus_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'hung_yen', name: 'Truyền hình Hưng Yên - HYTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/9/94/Hytv.png/revision/latest/scale-to-width-down/1000?cb=20260702005210', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/hungyen_2000.stream/chunklist_b2500000.m3u8' },
+  { id: 'khanh_hoa', name: 'Truyền hình Khánh Hòa - KTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/0/03/K0.png/revision/latest/scale-to-width-down/1000?cb=20260602021528&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/khanhhoa_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'khanh_hoa_1', name: 'Truyền hình Khánh Hòa - KTV1 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/b/bc/K1.png/revision/latest/scale-to-width-down/1000?cb=20260602021704&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/khanhhoa01_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'lai_chau', name: 'Truyền hình Lai Châu - LTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/8/81/Laichou.png/revision/latest/scale-to-width-down/1000?cb=20260602021840&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/laichau_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'lao_cai', name: 'Truyền hình Lào Cai - THLC HD', logo: 'https://static.wikia.nocookie.net/ftv/images/2/2d/Thlc.png/revision/latest/scale-to-width-down/1000?cb=20260602022338&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/laocai_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'lang_son', name: 'Truyền hình Lạng Sơn - LSTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/e/e0/L%E1%BB%9D_s%E1%BB%9D_t%E1%BB%9D_v%E1%BB%9D.png/revision/latest/scale-to-width-down/1000?cb=20260602022221&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/langson_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'lam_dong_1', name: 'Truyền hình Lâm Đồng - LTV1 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/7/76/L1.png/revision/latest/scale-to-width-down/1000?cb=20260706060807', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/lamdong_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'lam_dong_2', name: 'Truyền hình Lâm Đồng - LTV2 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/f/ff/Ltv2.png/revision/latest/scale-to-width-down/1000?cb=20260706063410', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/lamdong02_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'lam_dong_3', name: 'Truyền hình Lâm Đồng - LTV3 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/2/2c/L3.png/revision/latest/scale-to-width-down/1000?cb=20260706063528', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/lamdong03_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'nghe_an', name: 'Truyền hình Nghệ An - NTV HD', logo: 'https://img-zlr1.tv360.vn/image1/2020_09_23/1600821989411/75bfb004e210_640_360.png', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/nghean_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'ninh_binh', name: 'Truyền hình Ninh Bình - NBTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/4/49/Truyenhinhninhbinh.png/revision/latest/scale-to-width-down/1000?cb=20260602022536&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/ninhbinh_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'phu_tho', name: 'Truyền hình Phú Thọ - PTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/8/8e/Ptvhd.png/revision/latest/scale-to-width-down/1000?cb=20260706052313', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/phutho_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'quang_ninh_1', name: 'Truyền hình Quảng Ninh - QTV1 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/d/d5/Q1.png/revision/latest/scale-to-width-down/1000?cb=20260602023030&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/quangninh1_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'quang_ninh_3', name: 'Truyền hình Quảng Ninh - QTV3 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/2/21/Q3.png/revision/latest/scale-to-width-down/1000?cb=20260602023204&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/quangninh3_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'quang_ngai_1', name: 'Truyền hình Quảng Ngãi - QNgTV1 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/1/1f/Qngtv1.png/revision/latest/scale-to-width-down/1000?cb=20260623103509', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/quangngai_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'quang_ngai_2', name: 'Truyền hình Quảng Ngãi - QNgTV2 HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/1/11/Qngtv.png/revision/latest/scale-to-width-down/1000?cb=20260623103717', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/quangngai01_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'tay_ninh', name: 'Truyền hình Tây Ninh - TN HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/5/53/Tn1.png/revision/latest/scale-to-width-down/1000?cb=20260702005350', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/tayninh01_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'son_la', name: 'Truyền hình Sơn La - Snews HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/0/03/Snews_test_2.png/revision/latest/scale-to-width-down/1000?cb=20260701105218', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/sonla_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'quang_tri', name: 'Truyền hình Quảng Trị - QTTV HD', logo: 'https://static.wikia.nocookie.net/ftv/images/b/bf/Imageqtvv.png/revision/latest/scale-to-width-down/1000?cb=20260602023509&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/quangtri_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'tuyen_quang', name: 'Truyền hình Tuyên Quang - TTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/5/5a/Ttv.png/revision/latest/scale-to-width-down/1000?cb=20260706055252', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/tuyenquang_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'thanh_hoa', name: 'Truyền hình Thanh Hóa - TTV HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/9/99/Thanhhoe.png/revision/latest/scale-to-width-down/1000?cb=20260706060048', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/thanhhoa_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'thai_nguyen', name: 'Truyền hình Thái Nguyên - TN HD', logo: 'https://static.wikia.nocookie.net/ep-deo/images/f/fa/Tn.png/revision/latest/scale-to-width-down/1000?cb=20260702005531', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/fnxsd1/thainguyen_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'vinh_long_1', name: 'Truyền hình Vĩnh Long - THVL1 HD', logo: 'https://static.wikia.nocookie.net/logos/images/3/32/THVL1_logo_ident_2025.png/revision/latest/scale-to-width-down/1000?cb=20251206083051&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzhd2/vinhlong1_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'vinh_long_2', name: 'Truyền hình Vĩnh Long - THVL2 HD', logo: 'https://static.wikia.nocookie.net/logos/images/9/98/THVL2_logo_ident_2025.png/revision/latest/scale-to-width-down/1000?cb=20251206083053&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzhd2/vinhlong2_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'vinh_long_3', name: 'Truyền hình Vĩnh Long - THVL3 HD', logo: 'https://static.wikia.nocookie.net/logos/images/2/29/THVL3_logo_ident_2025.png/revision/latest/scale-to-width-down/1000?cb=20251206083054&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzhd2/vinhlong3_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'vinh_long_4', name: 'Truyền hình Vĩnh Long - THVL4 HD', logo: 'https://static.wikia.nocookie.net/logos/images/7/7e/THVL4_logo_ident_2025.png/revision/latest/scale-to-width-down/1000?cb=20251206083055&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzhd2/vinhlong4hd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'vinh_long_5', name: 'Truyền hình Vĩnh Long - THVL5 HD', logo: 'https://static.wikia.nocookie.net/logos/images/3/3b/THVL5_logo_ident_2025.png/revision/latest/scale-to-width-down/1000?cb=20251206083057&path-prefix=vi', category: 'Kênh địa phương', streamUrl: 'https://live.fptplay53.net/epzsd1/vinhlong5_vhls.smil/chunklist_b5000000.m3u8' },
+
+  // Kênh quốc tế
+  { id: 'cnn', name: 'CNN HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/CNN.svg', category: 'Kênh quốc tế', streamUrl: 'https://d3bp6dwmpbdajl.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-ury0meh5m4nzm/index.m3u8' },
+  { id: 'bbc_news', name: 'BBC News HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/62/BBC_News_2022.svg', category: 'Kênh quốc tế', streamUrl: 'https://stream8.cinerama.uz/1251/tracks-v1a1/mono.m3u8' },
+  { id: 'discovery_channel_hd', name: 'Discovery Channel HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Discovery_Channel_logo.svg', category: 'Kênh quốc tế', streamUrl: 'http://cdn4.skygo.mn/live/disk1/SoutheastAsia/HLSv3-FTA/SoutheastAsia.m3u8' },
+  { id: 'aljazeera', name: 'ALJAZEERA HD', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Aljazeera_eng.svg', category: 'Kênh quốc tế', streamUrl: 'https://live-hls-apps-aje-fa.getaj.net/AJE/01.m3u8' },
+  { id: 'animal_planet', name: 'Animal Planet HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Animal_Planet_logo_2018.svg', category: 'Kênh quốc tế', streamUrl: 'https://tiger-hub.vercel.app@vodzong.mjunoon.tv:8087/streamtest/Animal-Planet-158-3/playlist.m3u8' },
+  { id: 'asian_food_network', name: 'ASIAN FOOD NETWORK HD', logo: 'https://static.wikia.nocookie.net/logos/images/a/a2/Asian_Food_Network.png', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/fnxhd2/afchd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'cartoon_network_intl', name: 'Cartoon Network HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bb/Cartoon_Network_logo.svg', category: 'Kênh quốc tế', streamUrl: 'http://cdn4.skygo.mn/live/disk1/Cartoon_Network/HLSv3-FTA/Cartoon_Network.m3u8' },
+  { id: 'kbs_world_intl', name: 'KBS World HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/KBS_World_2018.svg', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/epzhd2/kbs_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'nhk_world_japan', name: 'NHK World Japan HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/87/NHK_World-Japan_logo.svg', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/fnxhd2/nhkworld_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'tv5_monde', name: 'TV5 Monde HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/TV5MONDE_logo.svg', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/fnxhd2/tv5_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'cna', name: 'CNA HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Channel_NewsAsia_logo.svg', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/fnxhd2/newsasia_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'cnbc', name: 'CNBC HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/CNBC_logo.svg', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/fnxsd1/cnbc_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'kix_hd', name: 'KIX HD', logo: 'https://static.wikia.nocookie.net/logos/images/0/05/KIX_HD.png', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/fnxhd2/kixhd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'outdoor_channel', name: 'Outdoor Channel HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Outdoor_Channel_logo.svg', category: 'Kênh quốc tế', streamUrl: 'https://live.fptplay53.net/epzhd2/outdoorfhd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'tvn', name: 'tvN HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/be/Tvn_logo.svg', category: 'Kênh quốc tế', streamUrl: 'https://d21dxaer0ypwk1.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-a6m2cy2rylsvo-ssai-prd/54ac8e25_eb5a_4f10_ba20_ffb254f0a16c/hls/playlist.m3u8' },
+  { id: 'warner_tv_hd', name: 'Warner TV HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Warner_TV_logo.svg', category: 'Kênh quốc tế', streamUrl: 'http://cdn4.skygo.mn/live/disk1/Warner/HLSv3-FTA/Warner.m3u8' },
+  { id: 'extreme_sports', name: 'Extreme Sports HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/18/Extreme_Group_Logo.svg', category: 'Kênh quốc tế', streamUrl: 'http://flussonic.mkpnet.ru/tv-1a9441fd32d63873/video.m3u8' },
+  { id: 'fashion_tv', name: 'Fashion TV HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Fashion_TV.svg', category: 'Kênh quốc tế', streamUrl: 'https://stream8.cinerama.uz/1053/tracks-v1a1/mono.m3u8' },
+  { id: 'bloomberg', name: 'Bloomberg HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Bloomberg_logo.svg', category: 'Kênh quốc tế', streamUrl: 'https://cdn4.skygo.mn/live/disk1/Bloomberg/HLSv3-FTA/Bloomberg.m3u8' },
+
+  // Kênh phát thanh
+  { id: 'vov1', name: 'VOV1', logo: 'https://static.wikia.nocookie.net/ep-deo/images/c/c9/V0v1.png/revision/latest/scale-to-width-down/1000?cb=20260622072449', category: 'Kênh phát thanh', streamUrl: 'https://media-audio.vov.vn/vov1vov5Vietnamese.sdp_aac/playlist.m3u8' },
+  { id: 'vov2', name: 'VOV2', logo: 'https://static.wikia.nocookie.net/ep-deo/images/3/31/V0v2.png/revision/latest/scale-to-width-down/1000?cb=20260622072053', category: 'Kênh phát thanh', streamUrl: 'https://media-audio.vov.vn/vov2.sdp_aac/playlist.m3u8' },
+  { id: 'vov3', name: 'VOV3', logo: 'https://static.wikia.nocookie.net/ep-deo/images/8/8c/Vov03.png/revision/latest/scale-to-width-down/1000?cb=20260622071720', category: 'Kênh phát thanh', streamUrl: 'https://media-audio.vov.vn/vov3.sdp_aac/playlist.m3u8' },
+  { id: 'vov4', name: 'VOV4', logo: 'https://static.wikia.nocookie.net/ep-deo/images/3/32/V0v4.png/revision/latest/scale-to-width-down/1000?cb=20260622071948', category: 'Kênh phát thanh', streamUrl: 'http://media.kythuatvov.vn:1936/live/VOV4_TB.sdp/chunklist.m3u8' },
+  { id: 'vov4_tb', name: 'VOV4 Tây Bắc', logo: 'https://static.wikia.nocookie.net/ep-deo/images/3/32/V0v4.png/revision/latest/scale-to-width-down/1000?cb=20260622071948', category: 'Kênh phát thanh', streamUrl: 'http://media.kythuatvov.vn:1936/live/VOV4_TB.sdp/chunklist.m3u8' },
+  { id: 'vov4_tn', name: 'VOV4 Tây Nguyên', logo: 'https://static.wikia.nocookie.net/ep-deo/images/3/32/V0v4.png/revision/latest/scale-to-width-down/1000?cb=20260622071948', category: 'Kênh phát thanh', streamUrl: 'https://str.vov.gov.vn/vovlive/vov4.TayNguyen.sdp_aac/playlist.m3u8' },
+  { id: 'vov5', name: 'VOV5', logo: 'https://static.wikia.nocookie.net/ep-deo/images/7/73/Vov5.png/revision/latest/scale-to-width-down/1000?cb=20260622072118', category: 'Kênh phát thanh', streamUrl: 'https://media-audio.vov.vn/vov5.sdp_aac/playlist.m3u8' },
+  { id: 'vov_giao_thong', name: 'VOV Giao Thông', logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/6a/VOV_GT.png/revision/latest/scale-to-width-down/1000?cb=20260622072341', category: 'Kênh phát thanh', streamUrl: 'https://play.vovgiaothong.vn/live/gthn/playlist.m3u8' },
+  { id: 'vov_gt_hn', name: 'VOV Giao Thông Hà Nội', logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/6a/VOV_GT.png/revision/latest/scale-to-width-down/1000?cb=20260622072341', category: 'Kênh phát thanh', streamUrl: 'https://play.vovgiaothong.vn/live/gthn/playlist.m3u8' },
+  { id: 'vov_gt_hcm', name: 'VOV Giao Thông TP.HCM', logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/6a/VOV_GT.png/revision/latest/scale-to-width-down/1000?cb=20260622072341', category: 'Kênh phát thanh', streamUrl: 'https://play.vovgiaothong.vn/live/gthcm/playlist.m3u8' },
+  { id: 'vov_gt_mekong', name: 'VOV Giao Thông Mê Kông', logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/6a/VOV_GT.png/revision/latest/scale-to-width-down/1000?cb=20260622072341', category: 'Kênh phát thanh', streamUrl: 'https://play.vovgiaothong.vn/live/mekong/playlist.m3u8' },
+  { id: 'vov_gt_duyenhai', name: 'VOV Giao Thông Duyên Hải', logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/6a/VOV_GT.png/revision/latest/scale-to-width-down/1000?cb=20260622072341', category: 'Kênh phát thanh', streamUrl: 'https://play.vovgiaothong.vn/live/duyenhai2/playlist.m3u8' },
+  { id: 'hanoi_fm90', name: 'Hà Nội FM90', logo: 'https://static.wikia.nocookie.net/ep-deo/images/1/11/Fm90.png/revision/latest/scale-to-width-down/1000?cb=20260622073617', category: 'Kênh phát thanh', streamUrl: 'http://14.162.146.90:8000/HANOI90' },
+  { id: 'hanoi_fm96', name: 'Hà Nội FM96', logo: 'https://static.wikia.nocookie.net/ep-deo/images/5/55/FM96.png/revision/latest/scale-to-width-down/1000?cb=20260622073735', category: 'Kênh phát thanh', streamUrl: 'http://222.252.21.96:8000/HANOI96' }
 ];
 
-// Custom helper to provide specific custom sort order for local channels as requested by the user
-function getSortName(name: string, id: string): string {
-  // Group 1: Gia Lai & Dong Thap (GTV đặt trước THĐT1)
-  if (id === "gia_lai") {
-    return "Truyền hình Đồng Tháp - THĐT A_gia_lai";
-  }
-  if (id === "dong_thap_1") {
-    return "Truyền hình Đồng Tháp - THĐT B_dong_thap_1";
-  }
-  if (id === "dong_thap_2") {
-    return "Truyền hình Đồng Tháp - THĐT C_dong_thap_2";
-  }
+export const CHANNELS_DATA: Channel[] = RAW_CHANNELS.map((item, idx) => ({
+  id: item.id,
+  name: item.name,
+  shortName: item.name.replace(/ HD| —.*/g, ''),
+  slug: item.id,
+  logo: item.logo,
+  category: item.category,
+  quality: item.name.includes('HD') ? 'HD' : item.category === 'Kênh phát thanh' ? 'SD' : 'HD',
+  streamUrl: item.streamUrl,
+  isLive: true,
+  viewers: Math.floor(1800 + Math.abs(Math.sin(idx + 1)) * 32000),
+  currentProgram: {
+    title: item.category === 'Kênh phát thanh'
+      ? `${item.name} — Phát thanh trực tiếp`
+      : `${item.name} — Chương trình trực tiếp`,
+    startTime: '19:00',
+    endTime: '21:00',
+    progress: 45 + (idx % 40),
+    description: `Phát sóng trực tiếp chất lượng cao từ ${item.name}. Tiếp sóng hạ tầng Waves Network.`
+  },
+  nextProgram: {
+    title: item.category === 'Kênh phát thanh'
+      ? 'Chương trình phát thanh tiếp nối'
+      : 'Bản tin & Sự kiện thời sự tiếp theo',
+    startTime: '21:00'
+  },
+  description: `Tiếp sóng trực tiếp chính thức kênh ${item.name} (${item.category}).`,
+  resolution: item.category === 'Kênh phát thanh' ? 'Audio Stream' : '1080p Full HD',
+  bitrate: item.category === 'Kênh phát thanh' ? '128 - 320 kbps' : '6.5 - 9.0 Mbps HLS',
+  tags: [item.category, item.name, 'Trực tuyến', 'Waves Live']
+}));
 
-  // Group 2: Lao Cai & Lang Son (LSTV đặt sau Lào cai)
-  if (id === "lao_cai") {
-    return "Truyền hình Lào Cai - THLC A_lao_cai";
-  }
-  if (id === "lang_son") {
-    return "Truyền hình Lào Cai - THLC B_lang_son";
-  }
+export const processedChannels = CHANNELS_DATA;
 
-  // Group 3: Quang Ninh & Quang Ngai (QTV1 và 3 đặt trc qngtv1 và 2)
-  if (id === "quang_ninh_1") {
-    return "Truyền hình Quảng Ngãi - QNgTV A1_quang_ninh_1";
-  }
-  if (id === "quang_ninh_3") {
-    return "Truyền hình Quảng Ngãi - QNgTV A2_quang_ninh_3";
-  }
-  if (id === "quang_ngai_1") {
-    return "Truyền hình Quảng Ngãi - QNgTV B1_quang_ngai_1";
-  }
-  if (id === "quang_ngai_2") {
-    return "Truyền hình Quảng Ngãi - QNgTV B2_quang_ngai_2";
-  }
-
-  // Group 4: Tay Ninh, Son La, Quang Tri (Tây ninh đặt trc QTTV, Snews đặt giữa tây ninh và QTTV)
-  if (id === "tay_ninh") {
-    return "Truyền hình Quảng Trị - QTTV A_tay_ninh";
-  }
-  if (id === "son_la") {
-    return "Truyền hình Quảng Trị - QTTV B_son_la";
-  }
-  if (id === "quang_tri") {
-    return "Truyền hình Quảng Trị - QTTV C_quang_tri";
-  }
-
-  // Group 5: Tuyen Quang, Thanh Hoa, Thai Nguyen (TTV Tuyên quang đặt trước thanh hóa, thái nguyên đặt sau 2 kênh TTV)
-  if (id === "tuyen_quang") {
-    return "Truyền hình Thái Nguyên - TN A_tuyen_quang";
-  }
-  if (id === "thanh_hoa") {
-    return "Truyền hình Thái Nguyên - TN B_thanh_hoa";
-  }
-  if (id === "thai_nguyen") {
-    return "Truyền hình Thái Nguyên - TN C_thai_nguyen";
-  }
-
-  // Group 6: Ha Noi & HueTV (HueTV đặt cạnh H2)
-  if (id === "ha_noi_1") {
-    return "Truyền hình Hà Nội - H1";
-  }
-  if (id === "ha_noi_2") {
-    return "Truyền hình Hà Nội - H2";
-  }
-  if (id === "hue") {
-    return "Truyền hình Hà Nội - H3_hue";
-  }
-
-  return name;
-}
-
-// Dynamically construct and populate categories based on channel groups
-export const CATEGORIES: Category[] = categoryTemplates.map(tpl => {
-  let matchedChannels: Channel[] = [];
-  
-  if (tpl.id === "vtv") {
-    matchedChannels = processedChannels.filter(c => c.group === "VTV" && c.id !== "vtv5_tn" && c.id !== "vtv5_tnb");
-  } else if (tpl.id === "vtvcab") {
-    matchedChannels = processedChannels.filter(c => c.group === "VTVcab");
-  } else if (tpl.id === "htv") {
-    matchedChannels = processedChannels.filter(c => c.group === "HTV" || c.group === "HTVC");
-  } else if (tpl.id === "sctv") {
-    matchedChannels = processedChannels.filter(c => c.group === "SCTV");
-  } else if (tpl.id === "thiet-yeu") {
-    matchedChannels = processedChannels.filter(c => c.id === "antv_thiet_yeu" || c.id === "qpvn_thiet_yeu" || c.group === "Thiết yếu");
-  } else if (tpl.id === "dia-phuong") {
-    matchedChannels = processedChannels.filter(c => c.group === "Địa phương");
-  } else if (tpl.id === "quoc-te") {
-    matchedChannels = processedChannels.filter(c => c.group === "Quốc tế" || c.group === "World");
-  } else if (tpl.id === "phat-thanh-radio") {
-    matchedChannels = processedChannels.filter(c => c.isRadio);
-  } else if (tpl.id === "thu-nghiem") {
-    matchedChannels = processedChannels.filter(c => c.group === "Thử nghiệm");
-  }
-
-  // Auto clean names and append HD appropriately
-  const formattedChannels = matchedChannels.map(ch => {
-    let cleanName = ch.name;
-    const nameUpper = cleanName.toUpperCase();
-    if (!nameUpper.endsWith("HD") && !nameUpper.includes(" HD") && !ch.isRadio && tpl.id !== "thu-nghiem") {
-      cleanName = `${cleanName.trim()} HD`;
-    }
-    return { ...ch, name: cleanName };
-  });
-
-  // Sort alphabetically from A-Z for local and essential categories
-  if (tpl.id === "dia-phuong" || tpl.id === "thiet-yeu") {
-    formattedChannels.sort((a, b) => getSortName(a.name, a.id).localeCompare(getSortName(b.name, b.id), "vi"));
-  }
-
-  return {
-    ...tpl,
-    channels: formattedChannels
-  };
-});
-
-// Assign channel position numbers in the format xxx
-const SPECIAL_VTV_NUMBERS: Record<string, string> = {
-  vtv1: "001",
-  vtv2: "002",
-  vtv3: "003",
-  vtv4: "004",
-  vtv5: "005",
-  vtv6: "006",
-  vtv7: "007",
-  vtv8: "008",
-  vtv9: "009",
-  vtv10: "010",
-  vtv5_tnb: "011",
-  vtv5_tn: "012",
+export const SCHEDULE_DATA: Record<string, ProgramScheduleItem[]> = {
+  vtv1: [
+    { id: 'v1-1', channelId: 'vtv1', startTime: '18:30', endTime: '19:00', title: 'Việt Nam hôm nay', category: 'Chính luận', description: 'Phân tích các vấn đề kinh tế xã hội.' },
+    { id: 'v1-2', channelId: 'vtv1', startTime: '19:00', endTime: '19:50', title: 'Thời sự 19h Quốc gia', category: 'Thời sự', description: 'Bản tin chính luận trọng điểm quốc gia.', isLive: true },
+    { id: 'v1-3', channelId: 'vtv1', startTime: '20:00', endTime: '20:45', title: 'Vấn đề hôm nay — Tọa đàm', category: 'Tọa đàm', description: 'Diễn đàn đối thoại trực tiếp.' }
+  ],
+  vtv3: [
+    { id: 'v3-1', channelId: 'vtv3', startTime: '19:00', endTime: '20:00', title: 'Tiếp sóng Thời sự 19h VTV', category: 'Thời sự', description: 'Tiếp sóng tin tức thời sự.' },
+    { id: 'v3-2', channelId: 'vtv3', startTime: '20:00', endTime: '21:00', title: 'Phim truyện: Mùa hè năm ấy', category: 'Phim truyện', description: 'Phim truyền hình Việt Nam VFC - Đạo diễn Lê Đỗ Ngọc Linh.', isLive: true },
+    { id: 'v3-3', channelId: 'vtv3', startTime: '21:00', endTime: '22:00', title: 'Cuộc hẹn cuối tuần', category: 'Giải trí', description: 'Talkshow nghệ thuật sống động.' }
+  ],
+  vtv4: [
+    { id: 'v4-1', channelId: 'vtv4', startTime: '19:00', endTime: '20:00', title: 'Thời sự VTV4', category: 'Tin tức', description: 'Bản tin đối ngoại.' },
+    { id: 'v4-2', channelId: 'vtv4', startTime: '20:00', endTime: '21:00', title: 'VIETNAM TODAY: Kết nối Thế giới', category: 'Đối ngoại', description: 'Cửa sổ thông tin của Việt Nam ra thế giới.', isLive: true },
+    { id: 'v4-3', channelId: 'vtv4', startTime: '21:00', endTime: '21:45', title: 'Vietnam Today English News 9PM', category: 'English', description: 'Daily news in English.' }
+  ]
 };
-
-let nextNum = 13;
-
-// First pass: assign numbers to all channels inside categories
-CATEGORIES.forEach(category => {
-  category.channels.forEach(ch => {
-    if (SPECIAL_VTV_NUMBERS[ch.id]) {
-      ch.channelNumber = SPECIAL_VTV_NUMBERS[ch.id];
-    } else {
-      ch.channelNumber = String(nextNum).padStart(3, '0');
-      nextNum++;
-    }
-  });
-});
-
-// Assign numbers to the raw processedChannels for consistency
-processedChannels.forEach(ch => {
-  if (SPECIAL_VTV_NUMBERS[ch.id]) {
-    ch.channelNumber = SPECIAL_VTV_NUMBERS[ch.id];
-  } else {
-    // Match the number already assigned in CATEGORIES
-    const matched = CATEGORIES.flatMap(cat => cat.channels).find(c => c.id === ch.id);
-    if (matched && matched.channelNumber) {
-      ch.channelNumber = matched.channelNumber;
-    } else {
-      ch.channelNumber = String(nextNum).padStart(3, '0');
-      nextNum++;
-    }
-  }
-});
-
-// Explicitly ensure the VTV5 subchannels are correctly numbered in processedChannels
-const tnbChan = processedChannels.find(c => c.id === "vtv5_tnb");
-if (tnbChan) tnbChan.channelNumber = "011";
-const tnChan = processedChannels.find(c => c.id === "vtv5_tn");
-if (tnChan) tnChan.channelNumber = "012";

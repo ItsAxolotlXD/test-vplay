@@ -4,6 +4,7 @@ import { playPopSound } from '../utils/sound';
 import { VBankTab } from './vapps';
 import VerifiedTab from './VerifiedTab';
 import {
+  Waves,
   Crown,
   HardDrive,
   Building2,
@@ -165,17 +166,17 @@ export const VPremiumView: React.FC<VPremiumViewProps> = ({ initialSubTab = 'vba
         <div className="absolute -top-10 -right-10 w-48 h-48 bg-gradient-to-br from-amber-400/20 to-purple-600/20 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex items-start gap-4">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-400 via-purple-500 to-indigo-500 p-0.5 shadow-xl shadow-amber-500/20 flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-sky-400 via-indigo-500 to-fuchsia-500 p-0.5 shadow-xl shadow-sky-500/20 flex items-center justify-center shrink-0">
             <div className="w-full h-full bg-[#181326]/90 backdrop-blur-md rounded-[14px] flex items-center justify-center">
-              <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-amber-300 animate-pulse" />
+              <Waves className="w-7 h-7 sm:w-8 sm:h-8 text-sky-300 animate-pulse" />
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-100 to-amber-200 tracking-tight">
-                V-Premium Ecosystem
+              <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-sky-100 to-indigo-200 tracking-tight">
+                Waves Premium
               </h1>
-              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center gap-1 shadow-sm uppercase tracking-wider">
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-sky-500/20 border border-sky-500/40 text-sky-300 flex items-center gap-1 shadow-sm uppercase tracking-wider">
                 <Sparkles className="w-3 h-3" /> VIP Services
               </span>
             </div>

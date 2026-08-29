@@ -1,279 +1,846 @@
-@font-face {
-  font-family: 'Google Sans Flex';
-  font-style: normal;
-  font-weight: 100 1000;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/googlesansflex/v1/4UaCrENHsxJLFrXsU3qg313w-PvN7Q.woff2') format('woff2');
-}
+@import "tailwindcss";
+
 @font-face {
   font-family: 'Google Sans';
   font-style: normal;
   font-weight: 400;
-  src: url('https://fonts.gstatic.com/s/googlesans/v14/4UaGrENHsxJLFrXsU3qg32ky-PvN.woff2') format('woff2');
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/googlesans/v58/4UaGrENHsxJlGDuGo1OIlL3Kwp5MKg.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Google Sans';
   font-style: normal;
   font-weight: 500;
-  src: url('https://fonts.gstatic.com/s/googlesans/v14/4UabrENHsxJLFrXsU3qgi13w-PvN7Q.woff2') format('woff2');
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLU94Yt3CwZ-Pw.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Google Sans';
   font-style: normal;
   font-weight: 700;
-  src: url('https://fonts.gstatic.com/s/googlesans/v14/4UabrENHsxJLFrXsU3qg313w-PvN7Q.woff2') format('woff2');
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLV154t3CwZ-Pw.woff2') format('woff2');
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=Google+Sans+Flex:wght@100..1000&family=Montserrat:wght@400;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
-@import "tailwindcss";
+@layer base {
+  :root {
+    --primary-red: #E6005A;
+    --solid-red: #E6005A;
+    --accent-red: #FF267A;
+    --dark-red: #B30046;
+    --dark-bg: #141416;
+    --sidebar-bg: #222227;
+    --card-bg: #222226;
+    --waves-font-scale: 1;
+  }
 
-@theme {
-  --font-sans: "Google Sans Flex", "Google Sans", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-google: "Google Sans Flex", "Google Sans", sans-serif;
-  --font-montserrat: "Montserrat", sans-serif;
-  --font-play: "Play", sans-serif;
+  *, *::before, *::after {
+    font-family: 'Google Sans', 'Google Sans Flex', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  }
+
+  html {
+    font-size: calc(16px * var(--waves-font-scale, 1));
+  }
+
+  body {
+    background-color: #141416;
+    color: #F3F4F6;
+    overflow-x: hidden;
+  }
 }
 
-.font-play {
-  font-family: 'Play', sans-serif;
+/* Light Mode Global Overrides */
+html.light-mode body {
+  background-color: #E2E4EA !important;
+  color: #111827 !important;
 }
 
-html, body {
-  font-family: "Google Sans Flex", "Google Sans", system-ui, -apple-system, sans-serif;
+/* Header & Search Monochrome Filter */
+html.light-mode .topbar-search-icon,
+html.light-mode .sidebar-nav-home-icon,
+html.light-mode #btn-top-search img,
+html.light-mode #btn-spotlight-search-mini img,
+html.light-mode #btn-spotlight-search-desktop img,
+html.light-mode .spotlight-bubble-box img,
+html.light-mode #dock-spotlight-btn img {
+  filter: brightness(0) !important;
+  opacity: 0.85 !important;
 }
 
-/* Custom gorgeous scrollbar for glassmorphic style */
+html:not(.light-mode) .topbar-search-icon,
+html:not(.light-mode) .sidebar-nav-home-icon,
+html:not(.light-mode) #btn-top-search img,
+html:not(.light-mode) #btn-spotlight-search-mini img,
+html:not(.light-mode) #btn-spotlight-search-desktop img,
+html:not(.light-mode) .spotlight-bubble-box img,
+html:not(.light-mode) #dock-spotlight-btn img {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Light Mode Header & TopBar controls */
+html.light-mode #btn-top-search,
+html.light-mode #btn-top-notifications,
+html.light-mode #btn-top-light-mode,
+html.light-mode #btn-mobile-menu-toggle {
+  color: #18181B !important;
+}
+
+html.light-mode #btn-top-light-mode svg {
+  color: #18181B !important;
+  fill: none !important;
+  stroke: currentColor !important;
+}
+
+html.light-mode #btn-top-notifications svg {
+  color: #18181B !important;
+}
+
+/* Light Mode Desktop & Mobile Sidebar */
+html.light-mode #waves-desktop-sidebar,
+html.light-mode #waves-mobile-sidebar {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light-mode #waves-desktop-sidebar .text-white,
+html.light-mode #waves-mobile-sidebar .text-white {
+  color: #111827 !important;
+}
+
+html.light-mode #waves-desktop-sidebar .text-\[\#D1D5DB\],
+html.light-mode #waves-mobile-sidebar .text-\[\#D1D5DB\] {
+  color: #374151 !important;
+}
+
+html.light-mode #waves-desktop-sidebar .text-\[\#A1A1AA\],
+html.light-mode #waves-mobile-sidebar .text-\[\#A1A1AA\] {
+  color: #6B7280 !important;
+}
+
+html.light-mode #waves-desktop-sidebar hr,
+html.light-mode #waves-mobile-sidebar hr {
+  border-color: #E5E7EB !important;
+}
+
+html.light-mode #waves-desktop-sidebar button:not(.bg-\[\#E6005A\]):hover,
+html.light-mode #waves-mobile-sidebar button:not(.bg-\[\#E6005A\]):hover {
+  background-color: #F1F3F5 !important;
+  color: #111827 !important;
+}
+
+/* Close & collapse button on sidebar */
+html.light-mode #btn-sidebar-collapse,
+html.light-mode #btn-sidebar-expand,
+html.light-mode #btn-mobile-sidebar-close,
+html.light-mode #btn-sidebar-back {
+  background-color: #F1F3F5 !important;
+  border-color: #E5E7EB !important;
+  color: #4B5563 !important;
+}
+html.light-mode #btn-sidebar-collapse:hover,
+html.light-mode #btn-sidebar-expand:hover,
+html.light-mode #btn-mobile-sidebar-close:hover,
+html.light-mode #btn-sidebar-back:hover {
+  background-color: #E5E7EB !important;
+  color: #111827 !important;
+}
+
+/* Light Mode Settings Page */
+html.light-mode #settings-search-input,
+html.light-mode .spotlight-bubble-box input,
+html.light-mode .search-box-capsule input {
+  background-color: transparent !important;
+  border: none !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+html.light-mode #settings-search-input::placeholder,
+html.light-mode .spotlight-bubble-box input::placeholder,
+html.light-mode .search-box-capsule input::placeholder {
+  color: #6B7280 !important;
+}
+html.light-mode #settings-section-interface,
+html.light-mode #settings-section-accessibility,
+html.light-mode #settings-section-search {
+  background-color: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05) !important;
+}
+html.light-mode #settings-section-interface .text-white,
+html.light-mode #settings-section-accessibility .text-white,
+html.light-mode #settings-section-search .text-white {
+  color: #111827 !important;
+}
+html.light-mode #settings-section-interface .bg-\[\#28272E\],
+html.light-mode #settings-section-accessibility .bg-\[\#28272E\],
+html.light-mode #settings-section-search .bg-\[\#28272E\] {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+html.light-mode #settings-section-search hr {
+  border-color: #E2E8F0 !important;
+}
+
+/* Search Box Container Capsule Style - Only outer box gets thick red focus border */
+.spotlight-bubble-box,
+.search-box-capsule {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%), #27272D;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-top-color: rgba(255, 255, 255, 0.35);
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+  transition: border 0.18s ease-in-out, box-shadow 0.18s ease-in-out, background 0.18s ease-in-out;
+}
+
+.spotlight-bubble-box:hover,
+.search-box-capsule:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%), #2E2E36;
+  border-color: rgba(255, 255, 255, 0.32);
+  border-top-color: rgba(255, 255, 255, 0.52);
+  border-bottom-color: rgba(255, 255, 255, 0.24);
+  box-shadow: none;
+}
+
+/* THICK FOCUS BORDER ON SEARCH BOX CONTAINER ONLY (3px Solid Reddish Magenta) */
+.spotlight-bubble-box:focus-within,
+.search-box-capsule:focus-within {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%), #32323B;
+  border: 3px solid #E6005A !important;
+  box-shadow: 0 0 0 3px rgba(230, 0, 90, 0.25), 0 4px 16px rgba(230, 0, 90, 0.15) !important;
+}
+
+/* Inner input inside search boxes NEVER gets focus border/ring */
+.spotlight-bubble-box input,
+.spotlight-bubble-box input:focus,
+.search-box-capsule input,
+.search-box-capsule input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  ring: 0 !important;
+  --tw-ring-shadow: none !important;
+  --tw-ring-offset-shadow: none !important;
+  background-color: transparent !important;
+}
+
+html.light-mode .spotlight-bubble-box,
+html.light-mode .search-box-capsule {
+  background: #F1F3F6 !important;
+  border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+  border-top-color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.14) !important;
+  box-shadow: none !important;
+}
+
+html.light-mode .spotlight-bubble-box:hover,
+html.light-mode .search-box-capsule:hover {
+  background: #E8EBEF !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  border-top-color: #FFFFFF !important;
+  box-shadow: none !important;
+}
+
+html.light-mode .spotlight-bubble-box:focus-within,
+html.light-mode .search-box-capsule:focus-within {
+  background: #FFFFFF !important;
+  border: 3px solid #E6005A !important;
+  box-shadow: 0 0 0 3px rgba(230, 0, 90, 0.2), 0 4px 16px rgba(230, 0, 90, 0.1) !important;
+}
+
+/* Spotlight search on sidebar */
+html.light-mode .sidebar-search-btn {
+  background-color: #F1F3F5 !important;
+  border-color: #E2E8F0 !important;
+}
+html.light-mode .sidebar-search-btn:hover {
+  background-color: #E5E7EB !important;
+}
+html.light-mode .sidebar-search-btn span,
+html.light-mode .sidebar-search-btn svg {
+  color: #6B7280 !important;
+}
+html.light-mode .sidebar-search-btn:hover span,
+html.light-mode .sidebar-search-btn:hover svg {
+  color: #111827 !important;
+}
+
+/* Sidebar tabs hover and active states */
+html.light-mode #waves-desktop-sidebar button:not(.bg-\[\#E6005A\]):hover {
+  background-color: #F1F3F5 !important;
+  color: #111827 !important;
+}
+html.light-mode #waves-desktop-sidebar button:not(.bg-\[\#E6005A\]):hover span,
+html.light-mode #waves-desktop-sidebar button:not(.bg-\[\#E6005A\]):hover svg {
+  color: #111827 !important;
+}
+
+html.light-mode #waves-desktop-sidebar .bg-\[\#E6005A\] {
+  background-color: #E6005A !important;
+  color: #FFFFFF !important;
+}
+html.light-mode #waves-desktop-sidebar .bg-\[\#E6005A\] span,
+html.light-mode #waves-desktop-sidebar .bg-\[\#E6005A\] svg {
+  color: #FFFFFF !important;
+}
+
+/* Submenu expanded container */
+html.light-mode #waves-desktop-sidebar .border-l {
+  border-color: #E5E7EB !important;
+}
+
+/* Discord link in sidebar */
+html.light-mode #nav-item-discord {
+  color: #374151 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+html.light-mode #nav-item-discord:hover {
+  background-color: #F1F3F5 !important;
+  color: #111827 !important;
+}
+
+/* TopBar Dropdown in Light Mode */
+html.light-mode .topbar-notification-box {
+  background-color: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+}
+
+html.light-mode .topbar-notification-header {
+  border-color: #F3F4F6 !important;
+}
+
+html.light-mode .topbar-notification-header span:first-child {
+  color: #111827 !important;
+}
+
+html.light-mode .topbar-notification-item {
+  color: #111827 !important;
+}
+
+html.light-mode .topbar-notification-item.bg-\[\#2E2E34\] {
+  background-color: #F3F4F6 !important;
+  border-color: #E5E7EB !important;
+}
+
+html.light-mode .topbar-notification-item p {
+  color: #111827 !important;
+}
+
+/* Light Mode Global Card & Surface Elements */
+html.light-mode .bg-\[\#1C1C1E\],
+html.light-mode .bg-\[\#1E1E22\],
+html.light-mode .bg-\[\#222226\],
+html.light-mode .bg-\[\#24242A\],
+html.light-mode .bg-\[\#25252C\],
+html.light-mode .bg-\[\#26262C\],
+html.light-mode .bg-\[\#26262D\],
+html.light-mode .bg-\[\#28282E\],
+html.light-mode .bg-\[\#2E2E34\],
+html.light-mode .bg-\[\#2E2E35\] {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* Inner row containers */
+html.light-mode .bg-\[\#141416\],
+html.light-mode .bg-\[\#18181B\],
+html.light-mode .bg-\[\#1F1F24\],
+html.light-mode .bg-\[\#2A2A32\] {
+  background-color: #F8F9FA !important;
+  border-color: #E5E7EB !important;
+}
+
+html.light-mode .border-\[\#2B2B32\],
+html.light-mode .border-\[\#2C2C34\],
+html.light-mode .border-\[\#2D2D35\],
+html.light-mode .border-\[\#323238\],
+html.light-mode .border-\[\#34343C\],
+html.light-mode .border-\[\#34343E\],
+html.light-mode .border-\[\#36363E\],
+html.light-mode .border-\[\#383840\],
+html.light-mode .border-\[\#3E3E48\],
+html.light-mode .border-\[\#3A3A40\],
+html.light-mode .border-\[\#40404A\] {
+  border-color: #E5E7EB !important;
+}
+
+html.light-mode main h1,
+html.light-mode main h2,
+html.light-mode main h3,
+html.light-mode main h4,
+html.light-mode main .text-white {
+  color: #111827 !important;
+}
+
+html.light-mode main p,
+html.light-mode main .text-\[\#9CA3AF\],
+html.light-mode main .text-\[\#8E8E93\],
+html.light-mode main .text-\[\#A1A1AA\],
+html.light-mode main .text-\[\#D1D5DB\],
+html.light-mode main .text-\[\#E0E0E6\] {
+  color: #4B5563 !important;
+}
+
+/* Form controls in light mode */
+html.light-mode input[type="text"],
+html.light-mode input[type="search"],
+html.light-mode input[type="url"],
+html.light-mode input[type="password"],
+html.light-mode textarea,
+html.light-mode select {
+  background-color: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
+html.light-mode select option {
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+}
+
+html.light-mode input::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Light Mode Big Thumbnail Hero Banner (White Overlay & Dark Typography) */
+html.light-mode #hero-carousel-container {
+  background-color: #FFFFFF !important;
+}
+
+html.light-mode .hero-overlay-t {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.75) 45%, transparent 100%) !important;
+}
+
+html.light-mode .hero-overlay-r {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.8) 45%, transparent 100%) !important;
+}
+
+html.light-mode .hero-overlay-radial {
+  background: radial-gradient(circle at center, transparent 30%, rgba(255, 255, 255, 0.2) 60%, rgba(255, 255, 255, 0.85) 100%) !important;
+}
+
+html.light-mode .hero-watermark-text {
+  color: #000000 !important;
+  opacity: 0.08 !important;
+}
+
+html.light-mode #hero-carousel-container h1 {
+  color: #111827 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+html.light-mode #hero-carousel-container p {
+  color: #374151 !important;
+}
+
+/* Light mode Director Badge on Hero Banner */
+html.light-mode .hero-director-badge {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light-mode .hero-director-label {
+  color: #6B7280 !important;
+}
+
+html.light-mode .hero-director-name {
+  color: #111827 !important;
+}
+
+/* Hero Banner Channel Logo in Light Mode - Subtle, clean shadow instead of heavy dark halo */
+html.light-mode .hero-banner-channel-logo {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12)) brightness(1) !important;
+}
+
+html.light-mode #hero-carousel-container .hero-badge-channel {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light-mode #hero-carousel-container .hero-badge-channel span {
+  color: #111827 !important;
+}
+
+html.light-mode #hero-carousel-container #btn-hero-prev,
+html.light-mode #hero-carousel-container #btn-hero-next {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #1F2937 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light-mode #hero-carousel-container #btn-hero-prev:hover,
+html.light-mode #hero-carousel-container #btn-hero-next:hover {
+  background-color: #F3F4F6 !important;
+  color: #111827 !important;
+}
+
+html.light-mode #btn-hero-watch-now {
+  background-color: #E6005A !important;
+  color: #FFFFFF !important;
+}
+
+html.light-mode #btn-hero-watch-now span,
+html.light-mode #btn-hero-watch-now svg {
+  color: #FFFFFF !important;
+  fill: #FFFFFF !important;
+}
+
+/* Spotlight Compact Popover in Light Mode */
+html.light-mode #spotlight-popup-card {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.14) !important;
+}
+
+html.light-mode .spotlight-input-container {
+  background-color: #F1F3F5 !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light-mode .spotlight-input-container input {
+  color: #111827 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+html.light-mode .spotlight-input-container input::placeholder {
+  color: #6B7280 !important;
+}
+
+html.light-mode .spotlight-input-container svg {
+  color: #6B7280 !important;
+}
+
+/* Light mode category filter buttons */
+html.light-mode .bg-\[\#222226\].text-\[\#A1A1AA\],
+html.light-mode .bg-\[\#1E1E22\].text-\[\#A1A1AA\] {
+  background-color: #FFFFFF !important;
+  color: #4B5563 !important;
+  border-color: #E5E7EB !important;
+}
+
+/* Light Mode Modal Dialog Overrides */
+html.light-mode #discord-welcome-dialog {
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+html.light-mode #discord-welcome-title {
+  color: #111827 !important;
+}
+
+html.light-mode #discord-welcome-subtitle {
+  color: #4B5563 !important;
+}
+
+html.light-mode #btn-discord-close {
+  color: #4B5563 !important;
+}
+
+html.light-mode #btn-discord-close:hover {
+  background-color: #F1F3F5 !important;
+  color: #111827 !important;
+}
+
+html.light-mode #discord-welcome-backdrop,
+html.light-mode #custom-stream-backdrop,
+html.light-mode #under-construction-backdrop {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Custom Stream Modal in Light Mode */
+html.light-mode #custom-stream-dialog {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+html.light-mode #custom-stream-dialog h3 {
+  color: #111827 !important;
+}
+
+html.light-mode #custom-stream-dialog label {
+  color: #374151 !important;
+}
+
+html.light-mode #custom-stream-dialog input,
+html.light-mode #custom-stream-dialog textarea {
+  background-color: #F8FAFC !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
+html.light-mode #custom-stream-dialog input:focus,
+html.light-mode #custom-stream-dialog textarea:focus {
+  border-color: #E6005A !important;
+  background-color: #FFFFFF !important;
+}
+
+html.light-mode #custom-stream-dialog .bg-\[\#141318\],
+html.light-mode #custom-stream-dialog .bg-\[\#28282E\] {
+  background-color: #F1F3F5 !important;
+  border-color: #E2E8F0 !important;
+  color: #374151 !important;
+}
+
+html.light-mode #custom-stream-dialog button.bg-\[\#28282E\] {
+  background-color: #F1F3F5 !important;
+  border-color: #D1D5DB !important;
+  color: #374151 !important;
+}
+
+html.light-mode #custom-stream-dialog button.bg-\[\#28282E\]:hover {
+  background-color: #E5E7EB !important;
+  color: #111827 !important;
+}
+
+/* Under Construction Modal in Light Mode */
+html.light-mode #under-construction-dialog {
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Welcome Modal in Light Mode */
+html.light-mode #welcome-modal-dialog {
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+html.light-mode #welcome-modal-title {
+  color: #111827 !important;
+}
+
+html.light-mode #welcome-modal-description {
+  color: #4B5563 !important;
+}
+
+html.light-mode #btn-welcome-close-icon {
+  background-color: #F1F3F5 !important;
+  color: #4B5563 !important;
+}
+
+html.light-mode #btn-welcome-close-icon:hover {
+  background-color: #E5E7EB !important;
+  color: #111827 !important;
+}
+
+html.light-mode #under-construction-title {
+  color: #111827 !important;
+}
+
+html.light-mode #under-construction-subtitle {
+  color: #4B5563 !important;
+}
+
+html.light-mode #under-construction-dialog input {
+  background-color: #F8FAFC !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
+html.light-mode #under-construction-dialog input:focus {
+  background-color: #FFFFFF !important;
+  border-color: #E6005A !important;
+  color: #111827 !important;
+}
+
+html.light-mode #btn-enter-password {
+  background-color: #FEE2E2 !important;
+  color: #991B1B !important;
+}
+
+/* Theme Segmented Box in Settings */
+html.light-mode .theme-segmented-box {
+  background-color: #F1F3F5 !important;
+  border-color: #E5E7EB !important;
+}
+
+html.light-mode .theme-segmented-box button:not(.bg-\[\#E6005A\]) {
+  color: #4B5563 !important;
+}
+
+html.light-mode .theme-segmented-box button:not(.bg-\[\#E6005A\]):hover {
+  color: #111827 !important;
+}
+
+/* BottomDock in Light Mode */
+html.light-mode .fixed.bottom-5 > div,
+html.light-mode .fixed.bottom-4 > div {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+html.light-mode #dock-spotlight-btn {
+  color: #18181B !important;
+}
+
+html.light-mode #dock-spotlight-btn:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light-mode .fixed.bottom-5 button:not(.bg-\[\#E6005A\]),
+html.light-mode .fixed.bottom-4 button:not(.bg-\[\#E6005A\]) {
+  color: #4B5563 !important;
+}
+
+html.light-mode .fixed.bottom-5 button:not(.bg-\[\#E6005A\]):hover,
+html.light-mode .fixed.bottom-4 button:not(.bg-\[\#E6005A\]):hover {
+  color: #111827 !important;
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Settings Slider Capsule */
+html.light-mode .settings-slider-capsule {
+  background-color: #F1F3F5 !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light-mode .settings-slider-capsule .bg-\[\#383842\] {
+  background-color: #D1D5DB !important;
+}
+
+html.light-mode .settings-slider-capsule .shadow-\[0_2px_10px_rgba\(0\,0\,0\,0\.3\)\] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Settings Deactivated Switches & Checkboxes in Light Mode */
+html.light-mode button[role="switch"]:not(.bg-\[\#E6005A\]) {
+  background-color: #E4E4E7 !important;
+}
+
+html.light-mode button[role="switch"] span {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18) !important;
+}
+
+html.light-mode #settings-section-search .bg-\[\#24242A\] {
+  background-color: #F4F4F5 !important;
+  border-color: #D4D4D8 !important;
+}
+
+/* Settings Section Header Icons in Light Mode */
+html.light-mode #settings-section-interface > div:first-child svg,
+html.light-mode #settings-section-accessibility > div:first-child svg,
+html.light-mode #settings-section-search > div:first-child svg {
+  color: #E6005A !important;
+}
+
+/* Global Form Controls (Checkboxes, Switches, Sliders) */
+input[type="checkbox"] {
+  accent-color: #E6005A !important;
+}
+
+input[type="range"] {
+  accent-color: #E6005A !important;
+}
+
+/* Modal Dialog Zoom Ease In / Ease Out Animations */
+@keyframes modalZoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.10);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modalZoomOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+.modal-dialog-enter {
+  animation: modalZoomIn 0.40s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modal-dialog-exit {
+  animation: modalZoomOut 0.26s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+/* Custom Scrollbar for dark theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 999px;
+  background: rgba(20, 20, 22, 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
+  background: rgba(230, 0, 90, 0.35);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(230, 0, 90, 0.65);
 }
 
-.scrollbar-none {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+/* Text Gradients */
+.text-gradient-red {
+  background: linear-gradient(135deg, #FF267A 0%, #E6005A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.scrollbar-none::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+.text-gradient-red-magenta {
+  background: linear-gradient(135deg, #FF4D8B 0%, #E6005A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.font-montserrat {
-  font-family: 'Montserrat', sans-serif;
+.text-gradient-purple {
+  background: linear-gradient(135deg, #FF267A 0%, #E6005A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Glassmorphism utility classes */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+.bg-gradient-purple-active {
+  background: linear-gradient(90deg, #E6005A 0%, #B30046 100%) !important;
 }
 
-.glass-panel-deep {
-  background: rgba(15, 10, 25, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.bg-gradient-red-magenta {
+  background: linear-gradient(90deg, #FF267A 0%, #E6005A 100%);
 }
 
-/* Progressive blur styles for high-fidelity vintage glass appearance with GPU acceleration */
-.progressive-blur-header {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(33, 31, 38, 0.95) 0%, rgba(33, 31, 38, 0.8) 35%, rgba(33, 31, 38, 0.4) 75%, rgba(33, 31, 38, 0) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: translateZ(0);
-  will-change: opacity;
+.glow-purple {
+  box-shadow: 0 0 25px rgba(230, 0, 90, 0.35);
 }
 
-.progressive-blur-dock {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(33, 31, 38, 0.95) 0%, rgba(33, 31, 38, 0.8) 35%, rgba(33, 31, 38, 0.4) 75%, rgba(33, 31, 38, 0) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0) 100%);
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-  transform: translateZ(0);
-  will-change: opacity;
+.glow-purple-sm {
+  box-shadow: 0 0 12px rgba(230, 0, 90, 0.25);
 }
 
-.progressive-blur-player {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(33, 31, 38, 0.95) 0%, rgba(33, 31, 38, 0.75) 40%, rgba(33, 31, 38, 0) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0) 100%);
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0) 100%);
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-  transform: translateZ(0);
+/* Hide scrollbar for clean scrolling across sidebar and components */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Range slider custom pill shape values (Horizontal Pill) */
-.range-slider-pill::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 28px;
-  height: 16px;
-  border-radius: 9999px;
-  background: #ffffff;
-  cursor: default;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  transition: transform 0.15s ease, background-color 0.15s ease;
+.sidebar-scroller {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-.range-slider-pill::-moz-range-thumb {
-  width: 28px;
-  height: 16px;
-  border-radius: 9999px;
-  background: #ffffff;
-  cursor: default;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  transition: transform 0.15s ease, background-color 0.15s ease;
+.sidebar-scroller::-webkit-scrollbar {
+  display: none;
 }
-.range-slider-pill:hover::-webkit-slider-thumb {
-  transform: scale(1.15);
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-}
-.range-slider-pill:hover::-moz-range-thumb {
-  transform: scale(1.15);
-  border-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-}
-.range-slider-pill:active::-webkit-slider-thumb {
-  transform: scale(1.25);
-  border-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-.range-slider-pill:active::-moz-range-thumb {
-  transform: scale(1.25);
-  border-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.bouncy-btn {
-  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease, opacity 0.15s ease, border-color 0.15s ease !important;
-  transform: translateZ(0);
-}
-
-.tooltip-bounce {
-  transition: opacity 0.15s ease, transform 0.15s ease !important;
-}
-
-.bouncy-btn:hover {
-  transform: scale(1.06) translateZ(0);
-}
-
-.bouncy-btn:active {
-  transform: scale(0.96) translateZ(0);
-}
-
-.channel-grid-item {
-  content-visibility: auto;
-  contain-intrinsic-size: 160px;
-}
-
-.glass-pill {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: none;
-}
-
-.glass-pill-active {
-  background: #d0bcff;
-  color: #381e72;
-  box-shadow: none;
-  border: none;
-}
-
-.glass-input {
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.glass-input:focus {
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-}
-
-/* Custom class for vertical menu item indicator with bouncy animation */
-.menu-vertical-pill {
-  position: absolute;
-  left: 8px; /* equivalent to left-2 */
-  width: 4px; /* equivalent to w-1 */
-  height: 14px; /* equivalent to h-3.5 */
-  background-color: #38bdf8; /* light blue */
-  border-radius: 9999px;
-  opacity: 0;
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.3s cubic-bezier(0.175, 1.85, 0.32, 1.4), opacity 0.2s ease;
-  pointer-events: none;
-  box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
-}
-
-button:hover .menu-vertical-pill {
-  opacity: 1 !important;
-  transform: scaleY(1) !important;
-}
-
-.menu-vertical-pill-red {
-  position: absolute;
-  left: 8px; /* equivalent to left-2 */
-  width: 4px; /* equivalent to w-1 */
-  height: 14px; /* equivalent to h-3.5 */
-  background-color: #ef4444; /* red-500 */
-  border-radius: 9999px;
-  opacity: 0;
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.3s cubic-bezier(0.175, 1.85, 0.32, 1.4), opacity 0.2s ease;
-  pointer-events: none;
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
-}
-
-button:hover .menu-vertical-pill-red {
-  opacity: 1 !important;
-  transform: scaleY(1) !important;
-}
-
-.orange-hover-filter {
-  filter: brightness(0) invert(0.65);
-  transition: filter 0.3s ease;
-}
-
-.group:hover .orange-hover-filter {
-  filter: brightness(0) saturate(100%) invert(43%) sepia(87%) saturate(1478%) hue-rotate(1deg) brightness(101%) contrast(101%) !important;
-}
-

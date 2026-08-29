@@ -1,128 +1,231 @@
-import React, { useState } from "react";
-import { ChevronLeft, X, Send, Check } from "lucide-react";
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ShieldAlert, AlertTriangle } from 'lucide-react';
 
 interface UnderConstructionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onGiveFeedback?: () => void;
-  onGoBackToOldUI?: () => void;
+  isOpen?: boolean;
+  onUnlock: () => void;
+  onCrash: (reason: string) => void;
 }
 
 export const UnderConstructionModal: React.FC<UnderConstructionModalProps> = ({
-  isOpen,
-  onClose,
-  onGiveFeedback,
-  onGoBackToOldUI,
+  isOpen = true,
+  onUnlock,
+  onCrash,
 }) => {
-  const [feedbackText, setFeedbackText] = useState("");
-  const [isCheckboxChecked, setIsCheckboxChecked] = useState(true);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [failedAttempts, setFailedAttempts] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isShaking, setIsShaking] = useState(false);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  if (!isOpen) return null;
-
-  const handleSubmitFeedback = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!feedbackText.trim()) return;
-    
-    if (onGiveFeedback) {
-      onGiveFeedback();
+  // Focus first input on mount
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        inputRefs.current[0]?.focus();
+      }, 250);
+      return () => clearTimeout(timer);
     }
+  }, [isOpen]);
+
+  const handleDigitChange = (index: number, value: string) => {
+    // Only accept numeric inputs
+    const lastChar = value.replace(/[^0-9]/g, '').slice(-1);
     
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFeedbackText("");
-      onClose();
-    }, 1500);
+    const newDigits = [...digits];
+    newDigits[index] = lastChar;
+    setDigits(newDigits);
+    setErrorMessage('');
+
+    // If a digit was entered, move to next box
+    if (lastChar && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      if (!digits[index] && index > 0) {
+        inputRefs.current[index - 1]?.focus();
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      handleVerifyPassword();
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').trim().replace(/[^0-9]/g, '');
+    if (!pastedData) return;
+
+    const newDigits = [...digits];
+    for (let i = 0; i < 6; i++) {
+      if (i < pastedData.length) {
+        newDigits[i] = pastedData[i];
+      }
+    }
+    setDigits(newDigits);
+
+    const nextIndex = Math.min(pastedData.length, 5);
+    inputRefs.current[nextIndex]?.focus();
+  };
+
+  const handleVerifyPassword = () => {
+    const enteredCode = digits.join('');
+
+    if (enteredCode.length < 6) {
+      setErrorMessage('Vui lòng nhập đủ 6 chữ số mã bảo mật.');
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 400);
+      return;
+    }
+
+    if (enteredCode === '190926') {
+      onUnlock();
+    } else {
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 400);
+
+      // Clear input digits
+      setDigits(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+
+      if (newAttempts >= 3) {
+        // Exceeded 3 attempts -> Crash web
+        onCrash('EXCEEDED_MAX_PASSCODE_ATTEMPTS (Sai mật khẩu 3/3 lần)');
+      } else {
+        const remaining = 3 - newAttempts;
+        setErrorMessage(
+          `Mật khẩu không chính xác! Còn ${remaining} lần thử trước khi web bị crash.`
+        );
+      }
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150 select-none">
-      {/* Main Modal Box with WHITE OUTER BORDER */}
-      <div 
-        className="w-full max-w-md bg-[#c6c6c6] border-2 border-white shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-5 sm:p-6 text-[#1c1d1f] font-sans relative animate-in zoom-in-95 duration-150"
-      >
-        {/* Header Title */}
-        <h2 className="text-sm sm:text-base font-bold text-[#1c1d1f] tracking-wide mb-3 font-jura uppercase">
-          Gửi Ý Kiến Đóng Góp Vplay
-        </h2>
+    <AnimatePresence>
+      {isOpen && (
+        <div
+          id="under-construction-container"
+          className="fixed inset-0 z-9999 flex items-center justify-center p-4 sm:p-6 selection:bg-[#E6005A] selection:text-white"
+        >
+          {/* 1. Backdrop / Lớp nền mờ */}
+          <motion.div
+            id="under-construction-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 bg-black/85 backdrop-blur-md"
+          />
 
-        {/* Modal Content */}
-        {isSubmitted ? (
-          <div className="p-6 bg-[#0e0e0e] border-2 border-[#141414] flex flex-col items-center justify-center text-center space-y-3 my-2">
-            <div className="border border-white/90 p-4 w-full flex flex-col items-center">
-              <div className="w-12 h-12 bg-[#388e3c] border-2 border-[#1b5e20] flex items-center justify-center text-white mb-2">
-                <Check className="w-6 h-6 stroke-[3]" />
-              </div>
-              <h4 className="font-jura font-bold text-base text-white uppercase">Cảm ơn bạn!</h4>
-              <p className="text-xs text-gray-300">Ý kiến đóng góp của bạn đã được gửi thành công đến đội ngũ Vplay.</p>
-            </div>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmitFeedback} className="space-y-3">
-            {/* Dark Inset Box with Black Outer Border + Sharp WHITE INNER BORDER */}
-            <div className="bg-[#0e0e0e] border-2 border-[#141414] p-[2px]">
-              <div className="border border-white/90 p-4 sm:p-5 text-white font-sans text-xs sm:text-sm space-y-3 font-normal">
-                <p className="text-gray-200 leading-relaxed">
-                  Chúng tôi rất mong muốn nhận được ý kiến đóng góp của bạn về giao diện và trải nghiệm ứng dụng Vplay mới.
-                </p>
+          {/* 2. Dialog Modal Box */}
+          <motion.div
+            id="under-construction-dialog"
+            initial={{ opacity: 0, scale: 1.10 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              transition: {
+                duration: 0.40,
+                ease: [0.16, 1, 0.3, 1]
+              }
+            }}
+            exit={{ 
+              opacity: 0, 
+              scale: 1.08,
+              transition: {
+                duration: 0.26,
+                ease: [0.25, 0.1, 0.25, 1]
+              }
+            }}
+            className={`relative z-10 w-full max-w-[500px] bg-[#1E1D22] rounded-[38px] p-8 sm:p-10 shadow-2xl select-none border border-white/5 ${
+              isShaking ? 'animate-bounce' : ''
+            }`}
+          >
+            {/* Title */}
+            <h1
+              id="under-construction-title"
+              className="text-2xl sm:text-[28px] font-bold text-white tracking-tight mb-3 font-sans leading-tight"
+            >
+              Under construction
+            </h1>
 
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-bold text-gray-300 uppercase font-jura">
-                    Ý Kiến Của Bạn
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    placeholder="Nhập suy nghĩ, câu hỏi hoặc góp ý cải thiện của bạn tại đây..."
-                    className="w-full bg-[#1c1e20] text-white p-3 text-xs sm:text-sm font-sans border-2 border-[#141414] focus:outline-none focus:border-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] placeholder:text-gray-500 resize-none"
-                  />
-                </div>
+            {/* Subtitle */}
+            <p
+              id="under-construction-subtitle"
+              className="text-sm sm:text-[15px] text-[#D1D5DB] leading-relaxed mb-6 font-normal"
+            >
+              Nothing interesting to see here... yet... Unless you are the one who got approved or a developer, please enter this 6 digits password.
+            </p>
 
-                {/* Checkbox */}
-                <div className="flex items-center gap-2 pt-1">
+            {/* 6-Digit Passcode Input Section */}
+            <div className="mb-6">
+              <div
+                className="flex items-center justify-between gap-2 sm:gap-2.5"
+                onPaste={handlePaste}
+              >
+                {digits.map((digit, index) => (
                   <input
-                    type="checkbox"
-                    id="vplayDiagnosticCheckbox"
-                    checked={isCheckboxChecked}
-                    onChange={(e) => setIsCheckboxChecked(e.target.checked)}
-                    className="w-4 h-4 bg-[#1c1e20] border border-gray-500 accent-[#3eb82a] cursor-pointer"
+                    key={index}
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    id={`passcode-digit-${index}`}
+                    type="password"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleDigitChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className={`w-11 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-bold bg-[#141318] border rounded-[20px] transition-all outline-none ${
+                      digit
+                        ? 'border-[#E6005A] text-white bg-[#222129]'
+                        : 'border-[#2D2D36] text-[#E0E0E6] focus:border-[#E6005A] focus:bg-[#201F26]'
+                    }`}
+                    autoComplete="off"
                   />
-                  <label htmlFor="vplayDiagnosticCheckbox" className="text-[11px] text-gray-300 cursor-pointer select-none">
-                    Đính kèm thông tin chẩn đoán trải nghiệm ứng dụng
-                  </label>
-                </div>
+                ))}
               </div>
+
+              {/* Error and Attempt Counter */}
+              {errorMessage && (
+                <div className="mt-3.5 flex items-start gap-2 text-xs text-[#FF6B6B] bg-[#2C1417] border border-[#FF4D4D]/30 px-3.5 py-2.5 rounded-2xl animate-in fade-in">
+                  <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
+              {failedAttempts > 0 && failedAttempts < 3 && !errorMessage && (
+                <p className="mt-2.5 text-xs text-[#FFB066] flex items-center gap-1.5 font-medium">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>Cảnh báo: Còn {3 - failedAttempts} lần thử trước khi web dừng hoạt động.</span>
+                </p>
+              )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-3 pt-1">
-              {/* Green Primary Button wrapped in White Frame */}
-              <div className="border-2 border-white p-[1px] bg-[#141414]">
-                <button
-                  type="submit"
-                  className="w-full py-2.5 sm:py-3 px-4 bg-[#3eb82a] hover:bg-[#48c933] active:bg-[#2b871c] text-white font-bold text-xs sm:text-sm uppercase tracking-wide font-jura border-2 border-[#141414] shadow-[inset_0_2px_0_#89dc69,inset_0_-2px_0_#236315] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 transition-colors"
-                >
-                  <Send className="w-4 h-4 text-white shrink-0" />
-                  <span>Gửi Ý Kiến</span>
-                </button>
-              </div>
-
-              {/* Light Gray Secondary Button */}
+            {/* Action Buttons (Enter password only) */}
+            <div className="flex flex-col gap-3.5">
+              {/* Button colored: Enter password */}
               <button
                 type="button"
-                onClick={onClose}
-                className="w-full py-2.5 sm:py-3 px-4 bg-[#c6c6c6] hover:bg-[#28960b] active:bg-[#2b611a] text-[#1c1d1f] hover:text-white font-bold text-xs sm:text-sm uppercase tracking-wide font-jura border-2 border-[#141414] shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] hover:shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-2 transition-colors"
+                id="btn-enter-password"
+                onClick={handleVerifyPassword}
+                className="w-full py-4 px-6 rounded-full font-bold text-white bg-[#E6005A] hover:bg-[#FF267A] active:scale-[0.98] transition-all text-base sm:text-[17px] cursor-pointer flex items-center justify-center shadow-md tracking-tight"
               >
-                Hủy bỏ
+                Enter password
               </button>
             </div>
-          </form>
-        )}
-
-      </div>
-    </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };
