@@ -116,9 +116,9 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-3 sm:p-6 text-white font-sans min-h-[calc(100vh-80px)] flex flex-col bg-transparent">
+    <div id="waves-copilot-view" className="w-full max-w-6xl mx-auto p-3 sm:p-6 text-slate-900 dark:text-white font-sans min-h-[calc(100vh-80px)] flex flex-col bg-transparent">
       {/* Copilot Header - Seamless without background box */}
-      <div className="p-4 sm:p-5 border-b border-indigo-500/20 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-transparent">
+      <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-indigo-500/20 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-transparent">
         <div className="flex items-center gap-4 relative z-10">
           <div 
             onClick={() => setSpinCount(prev => prev + 1)} 
@@ -143,14 +143,14 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-mono">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white font-mono">
                 Copilot
               </h1>
-              <span className="text-[10px] px-2.5 py-0.5 bg-white/10 text-white border border-white/20 font-mono font-bold uppercase tracking-wider active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600">
+              <span className="text-[10px] px-2.5 py-0.5 bg-indigo-50 dark:bg-white/10 text-indigo-700 dark:text-white border border-indigo-200 dark:border-white/20 font-mono font-bold uppercase tracking-wider">
                 Gemini 3.5 AI
               </span>
             </div>
-            <p className="text-xs text-slate-300/80 mt-1 font-mono">
+            <p className="text-xs text-slate-600 dark:text-slate-300/80 mt-1 font-mono">
               Trợ lý Trí tuệ Nhân tạo thông minh • Điều khiển truyền hình Vplay bằng giọng nói & văn bản
             </p>
           </div>
@@ -161,7 +161,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
           {vIntelHistory.length > 0 && (
             <button
               onClick={handleClear}
-              className="px-3.5 py-2 bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-white/10 hover:border-red-500/30 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2"
+              className="px-3.5 py-2 bg-slate-100 hover:bg-rose-50 dark:bg-white/5 dark:hover:bg-red-500/20 text-slate-700 hover:text-rose-600 dark:text-slate-300 dark:hover:text-red-400 border border-slate-200 hover:border-rose-300 dark:border-white/10 dark:hover:border-red-500/30 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 rounded-lg"
             >
               <Trash2 className="w-3.5 h-3.5" /> Xóa hội thoại
             </button>
@@ -169,35 +169,35 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
         </div>
       </div>
 
-      {/* Main Workspace - Seamless without background card */}
+      {/* Main Workspace */}
       <div className="flex-1 flex flex-col relative bg-transparent">
         {/* Mode Segmented Tabs */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-          <div className="flex items-center gap-2 p-1 bg-white/5 border border-white/10">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4 mb-4">
+          <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
             <button
               onClick={() => setVIntelMode("chat")}
-              className={`px-4 py-2 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-4 py-2 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 rounded-lg ${
                 vIntelMode === "chat"
-                  ? "bg-white/10 text-white border border-white/20 active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600"
-                  : "text-slate-400 hover:text-white hover:bg-white/5 active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600"
+                  ? "bg-white text-slate-900 shadow-sm border border-slate-200 dark:bg-white/10 dark:text-white dark:border-white/20"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-white/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5"
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" /> Trò chuyện Chat
             </button>
             <button
               onClick={() => setVIntelMode("search")}
-              className={`px-4 py-2 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-4 py-2 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 rounded-lg ${
                 vIntelMode === "search"
-                  ? "bg-white/10 text-white border border-white/20 active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600"
-                  : "text-slate-400 hover:text-white hover:bg-white/5 active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600"
+                  ? "bg-white text-slate-900 shadow-sm border border-slate-200 dark:bg-white/10 dark:text-white dark:border-white/20"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-white/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5"
               }`}
             >
               <Search className="w-3.5 h-3.5" /> Tìm kênh AI
             </button>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-300 bg-white/5 px-3 py-1.5 border border-white/10">
-            <Zap className="w-3.5 h-3.5 text-slate-300" />
+          <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-white/5 px-3 py-1.5 border border-slate-200 dark:border-white/10 rounded-xl">
+            <Zap className="w-3.5 h-3.5 text-indigo-500 dark:text-slate-300" />
             <span>Phản hồi phản xạ sinh tạo tức thì</span>
           </div>
         </div>
@@ -205,8 +205,8 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
         {/* Message Feed Area */}
         <div className="flex-1 overflow-y-auto space-y-4 pr-1 min-h-[360px] max-h-[560px]">
           {vIntelHistory.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center py-12 text-center text-slate-400">
-              <div className="w-16 h-16 bg-indigo-500/10 border-2 border-indigo-500/20 flex items-center justify-center mb-4">
+            <div className="h-full flex flex-col items-center justify-center py-12 text-center text-slate-500 dark:text-slate-400">
+              <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 border-2 border-indigo-200 dark:border-indigo-500/20 rounded-2xl flex items-center justify-center mb-4">
                 <img
                   src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
                   onError={(e) => {
@@ -218,10 +218,10 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                 />
               </div>
 
-              <h2 className="text-lg font-mono font-bold text-white mb-2">
+              <h2 className="text-lg font-mono font-bold text-slate-900 dark:text-white mb-2">
                 {vIntelMode === "chat" ? "Xin chào! Mình là Copilot" : "Tìm kiếm Kênh Truyền hình Thông minh"}
               </h2>
-              <p className="text-xs text-slate-400 leading-relaxed max-w-md mb-6 font-sans">
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mb-6 font-sans">
                 {vIntelMode === "chat"
                   ? "Hãy xưng 'mình' - 'bạn' cùng Copilot! Mình có thể giúp bạn chuyển kênh, gợi ý nội dung giải trí, giải đáp các thắc mắc nhanh chóng."
                   : "Nhập mong muốn hoặc thể loại bạn muốn xem. Mô hình sinh tạo sẽ tự động lọc danh sách kênh Vplay và đưa bạn đến kênh phù hợp!"}
@@ -229,7 +229,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
 
               {/* Suggestions */}
               <div className="w-full max-w-lg space-y-2 text-left">
-                <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest pl-1">
+                <p className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest pl-1">
                   Gợi ý câu hỏi phổ biến:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -250,9 +250,9 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                     <button
                       key={idx}
                       onClick={() => handleSend(sug)}
-                      className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/50 text-xs font-mono text-indigo-200 hover:text-white transition-all cursor-pointer flex items-center gap-2.5 text-left group"
+                      className="p-3 bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 text-xs font-mono text-slate-800 hover:text-indigo-600 rounded-xl transition-all cursor-pointer flex items-center gap-2.5 text-left group shadow-xs dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:hover:border-indigo-500/50 dark:text-indigo-200 dark:hover:text-white"
                     >
-                      <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 group-hover:rotate-12 transition-transform" />
+                      <Sparkles className="w-4 h-4 text-indigo-500 dark:text-indigo-400 shrink-0 group-hover:rotate-12 transition-transform" />
                       <span className="truncate">{sug}</span>
                     </button>
                   ))}
@@ -270,36 +270,36 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                     key={idx}
                     className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}
                   >
-                    <div className="text-[10px] font-mono font-bold text-slate-400 mb-1 px-1 uppercase tracking-wider flex items-center gap-1.5">
+                    <div className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 mb-1 px-1 uppercase tracking-wider flex items-center gap-1.5">
                       {msg.role === "user" ? (
                         <span>Bạn</span>
                       ) : (
                         <>
-                          <span className="w-2 h-2 bg-indigo-400" />
-                          <span>Copilot AI</span>
+                          <span className="w-2 h-2 bg-indigo-500 rounded-full" />
+                          <span className="text-indigo-600 dark:text-indigo-400 font-bold">Copilot AI</span>
                         </>
                       )}
                     </div>
 
                     <div
-                      className={`p-4 text-xs sm:text-sm leading-relaxed max-w-[88%] whitespace-pre-wrap break-words border ${
+                      className={`p-4 text-xs sm:text-sm leading-relaxed max-w-[88%] whitespace-pre-wrap break-words rounded-2xl ${
                         msg.role === "user"
-                          ? "bg-white/10 hover:bg-white/15 active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600 border-white/20 text-white"
-                          : "bg-white/5 border-white/10 text-slate-100"
+                          ? "bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md"
+                          : "bg-white text-slate-900 border border-slate-200 shadow-sm dark:bg-white/5 dark:border-white/10 dark:text-slate-100"
                       }`}
                     >
                       {cleanedText}
 
                       {/* Interactive Tune-In Button if Copilot generated a channel command */}
                       {targetChannel && onSelectChannel && (
-                        <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-400">
-                            <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+                        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            <Radio className="w-4 h-4 text-emerald-500 animate-pulse" />
                             <span>Kênh tìm thấy: {targetChannel.name}</span>
                           </div>
                           <button
                             onClick={() => onSelectChannel(targetChannel)}
-                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 shadow-sm"
                           >
                             <Play className="w-3.5 h-3.5 fill-white" /> Mở kênh ngay
                           </button>
@@ -312,12 +312,12 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
 
               {isVIntelLoading && (
                 <div className="flex flex-col items-start animate-pulse">
-                  <div className="text-[10px] font-mono font-bold text-indigo-400 mb-1 px-1 flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-indigo-400 animate-ping" />
+                  <div className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 mb-1 px-1 flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-indigo-500 rounded-full animate-ping" />
                     <span>Copilot đang suy nghĩ...</span>
                   </div>
-                  <div className="p-4 bg-white/5 border border-white/10 text-xs text-slate-400 flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
+                  <div className="p-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-xs text-slate-600 dark:text-slate-400 flex items-center gap-2 shadow-sm">
+                    <RefreshCw className="w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400" />
                     <span>Đang tổng hợp thông tin từ mô hình AI...</span>
                   </div>
                 </div>
@@ -328,19 +328,19 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
         </div>
 
         {/* Text Input Area */}
-        <div className="mt-4 pt-3 border-t border-[#2b2f42] flex items-center gap-2">
+        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-[#2b2f42] flex items-center gap-2">
           <input
             type="text"
             value={vIntelQuery}
             onChange={(e) => setVIntelQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder={vIntelMode === "chat" ? "Hỏi Copilot AI... (ví dụ: 'Mở VTV3', 'Thời tiết hôm nay')" : "Nhập kênh hoặc thể loại bạn muốn tìm..."}
-            className="flex-1 mc-input-box px-4 py-3 text-xs sm:text-sm cursor-default"
+            className="flex-1 bg-white dark:bg-white/5 text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 rounded-xl px-4 py-3 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
           />
           <button
             onClick={() => handleSend()}
             disabled={!vIntelQuery.trim() || isVIntelLoading}
-            className="px-5 py-3 bg-white/10 hover:bg-white/20 active:bg-gradient-to-r active:from-indigo-600 active:to-purple-600 border border-white/10 disabled:opacity-40 disabled:cursor-not-allowed text-white font-mono font-bold text-xs uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+            className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-mono font-bold text-xs uppercase tracking-wider rounded-xl flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-md shadow-indigo-600/20"
           >
             <Send className="w-4 h-4" /> Gửi
           </button>

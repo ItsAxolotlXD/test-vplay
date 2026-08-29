@@ -844,3 +844,237 @@ input[type="range"] {
 .sidebar-scroller::-webkit-scrollbar {
   display: none;
 }
+
+/* =========================================================================
+   LIGHT MODE OVERRIDES FOR COPILOT, V-PREMIUM, V-SPACE & ALL V-SPACE APPS
+   ========================================================================= */
+
+/* 1. Global Light Mode Container Baseline */
+html.light-mode #waves-copilot-view,
+html.light-mode #waves-vpremium-view,
+html.light-mode #waves-vapps-view {
+  color: #111827 !important;
+}
+
+/* 2. Glassmorphism Panels in Light Mode */
+html.light-mode #waves-vpremium-view > div.relative.rounded-3xl,
+html.light-mode #waves-vapps-view > div.relative.rounded-3xl,
+html.light-mode #waves-vpremium-view > div.relative.rounded-2xl,
+html.light-mode #waves-vapps-view > div.relative.rounded-2xl {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+/* Headers & Titles */
+html.light-mode #waves-vpremium-view h1,
+html.light-mode #waves-vapps-view h1,
+html.light-mode #waves-vpremium-view h2,
+html.light-mode #waves-vapps-view h2,
+html.light-mode #waves-vpremium-view h3,
+html.light-mode #waves-vapps-view h3 {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+}
+
+html.light-mode #waves-vpremium-view p,
+html.light-mode #waves-vapps-view p {
+  color: #475569 !important;
+}
+
+/* Status Cards & Pills in Headers */
+html.light-mode #waves-vpremium-view .bg-white\/\[0\.06\],
+html.light-mode #waves-vpremium-view .bg-white\/15,
+html.light-mode #waves-vapps-view .bg-white\/15,
+html.light-mode #waves-vapps-view .bg-white\/\[0\.08\] {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #1E293B !important;
+}
+
+html.light-mode #waves-vpremium-view .text-white,
+html.light-mode #waves-vapps-view .text-white {
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-vpremium-view .text-white\/90,
+html.light-mode #waves-vpremium-view .text-white\/80,
+html.light-mode #waves-vpremium-view .text-white\/75,
+html.light-mode #waves-vpremium-view .text-white\/70,
+html.light-mode #waves-vpremium-view .text-white\/60,
+html.light-mode #waves-vapps-view .text-white\/90,
+html.light-mode #waves-vapps-view .text-white\/80,
+html.light-mode #waves-vapps-view .text-white\/70,
+html.light-mode #waves-vapps-view .text-white\/65,
+html.light-mode #waves-vapps-view .text-white\/60,
+html.light-mode #waves-vapps-view .text-white\/50 {
+  color: #475569 !important;
+}
+
+/* Navigation Horizontal Tabs in Light Mode */
+html.light-mode #waves-vpremium-view button .text-white,
+html.light-mode #waves-vapps-view button .text-white {
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-vapps-view button .bg-white\/20,
+html.light-mode #waves-vpremium-view button .bg-white\/20 {
+  background-color: #E2E8F0 !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* Storage Plans Cards in Light Mode */
+html.light-mode #waves-vpremium-view .grid .rounded-3xl {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light-mode #waves-vpremium-view .grid .rounded-3xl:hover {
+  border-color: #6366F1 !important;
+  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.12) !important;
+}
+
+html.light-mode #waves-vpremium-view .grid .rounded-3xl button {
+  background-color: #0F172A !important;
+  color: #FFFFFF !important;
+}
+
+html.light-mode #waves-vpremium-view .grid .rounded-3xl button:hover {
+  background-color: #334155 !important;
+}
+
+/* Modals & Dialogs in V-Premium and V-Apps */
+html.light-mode .fixed.inset-0 .bg-\[\#1a1426\]\/95,
+html.light-mode .fixed.inset-0 .bg-\[\#181424\]\/95,
+html.light-mode .fixed.inset-0 .bg-\[\#181326\]\/95 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18) !important;
+}
+
+html.light-mode .fixed.inset-0 .bg-white\/10,
+html.light-mode .fixed.inset-0 .bg-white\/\[0\.08\],
+html.light-mode .fixed.inset-0 .bg-white\/5 {
+  background-color: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light-mode .fixed.inset-0 input {
+  background-color: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light-mode .fixed.inset-0 input::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* 3. V-Space Sub-Apps Light Mode Styling (V-Arcade, V-Calc, V-Reminders, V-Study, V-Notes, V-Bank, Explore Vietnam, V-Files) */
+
+/* General Card Surfaces inside V-Space */
+html.light-mode #waves-vapps-view .bg-white\/\[0\.08\],
+html.light-mode #waves-vapps-view .bg-white\/\[0\.07\],
+html.light-mode #waves-vapps-view .bg-white\/\[0\.05\],
+html.light-mode #waves-vapps-view .bg-white\/\[0\.04\],
+html.light-mode #waves-vapps-view .bg-white\/5,
+html.light-mode #waves-vapps-view .bg-white\/10,
+html.light-mode #waves-vapps-view .bg-\[\#141416\],
+html.light-mode #waves-vapps-view .bg-\[\#181424\],
+html.light-mode #waves-vapps-view .bg-\[\#1a1426\],
+html.light-mode #waves-vapps-view .bg-\[\#181326\],
+html.light-mode #waves-vapps-view .bg-\[\#161224\],
+html.light-mode #waves-vapps-view .bg-\[\#1c162b\],
+html.light-mode #waves-vpremium-view .bg-\[\#141416\],
+html.light-mode #waves-vpremium-view .bg-\[\#181424\],
+html.light-mode #waves-vpremium-view .bg-\[\#1a1426\],
+html.light-mode #waves-vpremium-view .bg-\[\#181326\] {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Form Inputs inside V-Space and V-Premium */
+html.light-mode #waves-vapps-view input,
+html.light-mode #waves-vapps-view select,
+html.light-mode #waves-vapps-view textarea,
+html.light-mode #waves-vpremium-view input,
+html.light-mode #waves-vpremium-view select,
+html.light-mode #waves-vpremium-view textarea {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-vapps-view input::placeholder,
+html.light-mode #waves-vpremium-view input::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Secondary Buttons & Pills */
+html.light-mode #waves-vapps-view .bg-white\/10,
+html.light-mode #waves-vpremium-view .bg-white\/10 {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #1E293B !important;
+}
+
+html.light-mode #waves-vapps-view .bg-white\/10:hover,
+html.light-mode #waves-vpremium-view .bg-white\/10:hover {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Slate text overrides inside V-Space apps */
+html.light-mode #waves-vapps-view .text-slate-100,
+html.light-mode #waves-vapps-view .text-slate-200,
+html.light-mode #waves-vapps-view .text-slate-300,
+html.light-mode #waves-vpremium-view .text-slate-100,
+html.light-mode #waves-vpremium-view .text-slate-200,
+html.light-mode #waves-vpremium-view .text-slate-300 {
+  color: #1E293B !important;
+}
+
+html.light-mode #waves-vapps-view .text-slate-400,
+html.light-mode #waves-vapps-view .text-slate-500,
+html.light-mode #waves-vpremium-view .text-slate-400,
+html.light-mode #waves-vpremium-view .text-slate-500 {
+  color: #475569 !important;
+}
+
+/* V-Arcade Game Cards & Game Canvas in Light Mode */
+html.light-mode #waves-vapps-view .grid > div {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* V-Calc Keypad Buttons */
+html.light-mode #waves-vapps-view .grid-cols-4 button,
+html.light-mode #waves-vapps-view .grid-cols-5 button {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+html.light-mode #waves-vapps-view .grid-cols-4 button:hover,
+html.light-mode #waves-vapps-view .grid-cols-5 button:hover {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Calculator Action / Accent buttons retain distinct color */
+html.light-mode #waves-vapps-view .bg-indigo-600,
+html.light-mode #waves-vapps-view .bg-emerald-600,
+html.light-mode #waves-vapps-view .bg-rose-600,
+html.light-mode #waves-vapps-view .bg-sky-600,
+html.light-mode #waves-vpremium-view .bg-indigo-600,
+html.light-mode #waves-vpremium-view .bg-emerald-600,
+html.light-mode #waves-vpremium-view .bg-rose-600,
+html.light-mode #waves-vpremium-view .bg-sky-600 {
+  color: #FFFFFF !important;
+}
+
