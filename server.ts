@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+import { GoogleGenAI, Type } from "@google/genai";
 
 dotenv.config();
 
@@ -10,6 +11,24 @@ const app = express();
 app.use(express.json());
 
 const PORT = 3000;
+
+// Shared Gemini AI Client instance
+let aiClient: GoogleGenAI | null = null;
+function getGeminiClient(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+  if (!aiClient) {
+    aiClient = new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          "User-Agent": "aistudio-build",
+        },
+      },
+    });
+  }
+  return aiClient;
+}
 
 // Load channels from JSON for searching grounding
 let cachedChannels: any[] = [];
@@ -19,103 +38,88 @@ try {
     cachedChannels = JSON.parse(fs.readFileSync(channelsPath, "utf-8"));
   }
 } catch (err) {
-  console.error("Failed to load channels for Firesteel:", err);
+  console.error("Failed to load channels for Copilot:", err);
 }
 
 // API endpoint for Copilot for Vplay
 app.post("/api/gemini", async (req, res) => {
   try {
-    const { prompt, history, channels = [], mode = "chat" } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY;
+    const { prompt, history, channels = [], userName = "User", mode = "chat" } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ error: "Vui lòng nhập nội dung câu hỏi" });
     }
 
-    if (!apiKey) {
+    const ai = getGeminiClient();
+    if (!ai) {
       return res.json({
-        text: `Chào bạn! Mình là **Copilot for Vplay** 🚀.
-Hệ thống hiện đang chạy ở chế độ offline cơ bản. Bạn có thể sử dụng các lệnh điều khiển nhanh:
-- \`/spolight-search <từ khóa>\`: Tìm kiếm kênh truyền hình và tin tức
+        text: `Chào ${userName}! Mình là **Copilot for Vplay** 🚀.
+Hệ thống hiện đang chạy ở chế độ cơ bản do chưa phát hiện API key trong cấu hình môi trường. Bạn có thể sử dụng các lệnh điều khiển nhanh:
+- \`/search <từ khóa>\`: Tìm kiếm thông minh toàn hệ thống
+- \`/search <từ khóa> filter <loại>\`: Tìm kiếm theo bộ lọc (tv, news, copilot...)
 - \`/mode <light/dark>\`: Chuyển đổi giao diện Sáng / Tối
 - \`/navigation <dock/sidebar>\`: Đổi thanh điều hướng
 - \`/subscribe premium\`: Mở cổng đăng ký Waves Premium (V-Premium)`
       });
     }
 
-    const channelsSummary = channels.slice(0, 30).map((c: any) => `${c.name} (${c.id}) - ${c.group || ''}`).join("\n");
+    const channelsSummary = (Array.isArray(channels) ? channels : []).slice(0, 35)
+      .map((c: any) => `${c.name} (id: ${c.id}) - ${c.group || ''}`)
+      .join("\n");
 
     const systemInstruction = `Bạn là "Copilot for Vplay" - Trợ lý Trí tuệ Nhân tạo thông minh, đắc lực và thân thiện của ứng dụng truyền hình Vplay (Waves Community).
-Bạn xưng hô là "mình" và gọi người dùng là "bạn". Giọng văn lịch sự, nhiệt tình, có kèm emoji sinh động.
+Bạn xưng hô là "mình" và gọi người dùng là "${userName || 'bạn'}". Giọng văn lịch sự, nhiệt tình, có kèm emoji sinh động, hỗ trợ cả Markdown và tiếng Việt chuẩn xác.
 Khi người dùng muốn xem hoặc chuyển sang kênh nào, bạn hãy trả lời thật tự nhiên và chèn cú pháp lệnh [COMMAND: SWITCH_CHANNEL: <channel_id_or_name>] vào cuối câu trả lời để hệ thống tự động phát kênh đó.
 
-Danh sách kênh phát sóng tiêu biểu:
+Danh sách kênh phát sóng tiêu biểu trong hệ thống Vplay:
 ${channelsSummary}
 
 Khi người dùng hỏi về các tính năng điều khiển, bạn có thể hướng dẫn các lệnh hữu ích:
-- /spolight-search <từ khóa>: Tìm kiếm kênh và tin tức
-- /mode <light/dark>: Đổi giao diện Sáng/Tối
+- /search <từ khóa>: Tìm kiếm toàn hệ thống
+- /search <từ khóa> filter <loại>: Lọc theo kênh (tv), tin tức (news), v.v.
+- /mode <light/dark>: Đổi giao diện Sáng / Tối
 - /navigation <dock/sidebar>: Đổi kiểu thanh điều hướng
 - /subscribe premium: Đăng ký Waves Premium`;
 
     const contents: any[] = [];
     if (Array.isArray(history)) {
-      for (const h of history.slice(-6)) {
-        contents.push({
-          role: h.role === "user" ? "user" : "model",
-          parts: [{ text: h.text }]
-        });
+      for (const h of history.slice(-8)) {
+        if (h && h.text) {
+          contents.push({
+            role: h.role === "user" ? "user" : "model",
+            parts: [{ text: String(h.text) }]
+          });
+        }
       }
     }
     contents.push({
       role: "user",
-      parts: [{ text: prompt }]
+      parts: [{ text: String(prompt) }]
     });
 
-    const modelsToTry = [
-      "gemini-2.5-flash",
-      "gemini-2.0-flash",
-      "gemini-1.5-flash"
-    ];
-
-    let lastError = null;
-    for (const modelName of modelsToTry) {
-      try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        const apiResponse = await fetch(geminiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents,
-            systemInstruction: { parts: [{ text: systemInstruction }] },
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 800
-            }
-          })
-        });
-
-        if (apiResponse.ok) {
-          const data: any = await apiResponse.json();
-          const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (replyText) {
-            return res.json({ text: replyText });
-          }
-        } else {
-          const errorBody = await apiResponse.text();
-          lastError = `Status ${apiResponse.status}: ${errorBody}`;
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3.7-flash",
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
         }
-      } catch (err: any) {
-        lastError = err.message;
+      });
+
+      const replyText = response.text;
+      if (replyText) {
+        return res.json({ text: replyText });
       }
+    } catch (genError: any) {
+      console.warn("Primary Gemini generation error, attempting fallback:", genError?.message);
     }
 
-    // Fallback response if all API models fail
-    console.warn("Copilot Gemini fallback triggered:", lastError);
+    // Fallback response if generation returned empty text
     return res.json({
-      text: `Chào bạn! **Copilot for Vplay** đã nhận được yêu cầu của bạn: "${prompt}".
-Hệ thống AI đang phản hồi và bạn có thể thử các phím lệnh nhanh:
-- \`/spolight-search ${prompt}\`: Tìm kiếm kênh và chương trình phù hợp
+      text: `Chào ${userName}! **Copilot for Vplay** đã nhận được yêu cầu của bạn: "${prompt}".
+Bạn có thể thử các phím lệnh nhanh:
+- \`/search ${prompt}\`: Tìm kiếm kênh và chương trình phù hợp
 - \`/mode light\` hoặc \`/mode dark\`: Thay đổi giao diện
 - \`/navigation dock\` hoặc \`/navigation sidebar\`: Đổi thanh điều hướng
 - \`/subscribe premium\`: Khám phá Waves Premium`
@@ -123,7 +127,7 @@ Hệ thống AI đang phản hồi và bạn có thể thử các phím lệnh n
   } catch (error: any) {
     console.error("Copilot API Error:", error);
     res.json({
-      text: "Xin lỗi bạn, kết nối tới Copilot AI tạm thời gián đoạn. Bạn có thể sử dụng các lệnh `/spolight-search`, `/mode`, `/navigation` hoặc `/subscribe premium` trực tiếp ngay lúc này!"
+      text: "Xin lỗi bạn, kết nối tới Copilot AI tạm thời gián đoạn. Bạn có thể sử dụng các lệnh `/search`, `/mode`, `/navigation` hoặc `/subscribe premium` trực tiếp ngay lúc này!"
     });
   }
 });
@@ -131,22 +135,21 @@ Hệ thống AI đang phản hồi và bạn có thể thử các phím lệnh n
 // API endpoint for Firesteel
 app.post("/api/vintelligence", async (req, res) => {
   try {
-    const { messages, mode, userName, smartAction } = req.body; // messages: Array<{role: string, content: string}>, mode: 'chat' | 'search'
-    
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    const { messages = [], mode = "chat", userName = "User", smartAction } = req.body;
+    const ai = getGeminiClient();
+    if (!ai) {
       throw new Error("GEMINI_API_KEY is not defined in environment variables");
     }
-    
+
     // Prepare channels context
     const channelsContext = cachedChannels.map(ch => ({
       id: ch.id,
       name: ch.name,
       group: ch.group
     }));
-    
+
     const isSmartActionEnabled = smartAction !== false;
-    const userIntro = userName ? `Người dùng hiện tại tên là "${userName}". Hãy xưng hô thân mật bằng cách gọi họ bằng tên "${userName}" khi thích hợp (ví dụ: "Chào anh/chị ${userName}", "Chào ${userName}", "Cảm ơn ${userName}").` : "Người dùng chưa thiết lập tên gọi cụ thể. Vui lòng xưng hô lịch sự, thân mật chung chung và không dùng tên riêng.";
+    const userIntro = userName ? `Người dùng hiện tại tên là "${userName}". Hãy xưng hô thân mật bằng cách gọi họ bằng tên "${userName}" khi thích hợp (ví dụ: "Chào ${userName}", "Cảm ơn ${userName}").` : "Người dùng chưa thiết lập tên gọi cụ thể. Vui lòng xưng hô lịch sự, thân mật chung chung và không dùng tên riêng.";
     const actionRestriction = !isSmartActionEnabled ? "\nHành động thông minh (smart actions) ĐÃ BỊ TẮT bởi cài đặt của người dùng. Bạn TUYỆT ĐỐI không được thực hiện bất kỳ hành động tự động nào dưới đây (tức là luôn trả về đối tượng action là null)." : "";
 
     const systemInstruction = `Bạn là Firesteel, trợ lý trí tuệ nhân tạo đắc lực và thân thiện của Waves Community - ứng dụng xem truyền hình mượt mà chất lượng cao.
@@ -190,57 +193,40 @@ HƯỚNG DẪN CHI TIẾT & QUY TẮC:
 
 CHẾ ĐỘ HIỆN TẠI: Chế độ ${mode === 'search' ? 'Tìm kiếm thông minh (AI) - Ưu tiên tìm và đề xuất các kênh phù hợp nhất với yêu cầu' : 'Trò chuyện tâm sự - Thoải mái giao lưu, giải đáp thắc mắc và điều khiển app theo yêu cầu'}.`;
 
-    // Map roles: 'user' -> 'user', 'assistant' or 'model' -> 'model'
     const contents = messages.map((m: any) => ({
       role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }]
+      parts: [{ text: String(m.content) }]
     }));
 
-    // Use a direct REST fetch request to Google Gemini API
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
-    const apiResponse = await fetch(geminiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contents,
-        systemInstruction: {
-          parts: [{ text: systemInstruction }]
-        },
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: {
-              reply: { type: "STRING" },
-              recommendedChannels: {
-                type: "ARRAY",
-                items: { type: "STRING" }
-              },
-              action: {
-                type: "OBJECT",
-                properties: {
-                  type: { type: "STRING" },
-                  target: { type: "STRING" },
-                  section: { type: "STRING" }
-                }
-              }
+    const response = await ai.models.generateContent({
+      model: "gemini-3.7-flash",
+      contents,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            reply: { type: Type.STRING },
+            recommendedChannels: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING }
             },
-            required: ["reply", "recommendedChannels"]
-          }
+            action: {
+              type: Type.OBJECT,
+              properties: {
+                type: { type: Type.STRING },
+                target: { type: Type.STRING },
+                section: { type: Type.STRING }
+              }
+            }
+          },
+          required: ["reply", "recommendedChannels"]
         }
-      })
+      }
     });
 
-    if (!apiResponse.ok) {
-      const errText = await apiResponse.text();
-      throw new Error(`Gemini API returned status ${apiResponse.status}: ${errText}`);
-    }
-
-    const data = await apiResponse.json();
-    const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const resultText = response.text || "{}";
     res.json(JSON.parse(resultText));
   } catch (error: any) {
     console.error("Firesteel API Error:", error);

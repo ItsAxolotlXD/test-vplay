@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export interface SystemSettings {
+  userName: string;
   theme: 'light' | 'dark';
   dockToSidebar: boolean;
   fontScale: number; // 0: 85%, 1: 100%, 2: 115%, 3: 130%
@@ -17,6 +18,7 @@ export interface SystemSettings {
 }
 
 export const DEFAULT_SETTINGS: SystemSettings = {
+  userName: 'User',
   theme: 'light',
   dockToSidebar: true,
   fontScale: 1,
@@ -43,17 +45,25 @@ export const getStoredSettings = (): SystemSettings => {
   try {
     const saved = localStorage.getItem('waves_system_settings');
     const legacyTheme = localStorage.getItem('waves_theme');
+    const legacyUser = localStorage.getItem('copilot_username');
     
+    let base = { ...DEFAULT_SETTINGS };
+    if (legacyUser && legacyUser.trim()) {
+      base.userName = legacyUser.trim();
+    }
+
     if (saved) {
       const parsed = JSON.parse(saved);
       return { 
-        ...DEFAULT_SETTINGS, 
+        ...base, 
         ...parsed,
+        userName: parsed.userName || legacyUser || 'User',
         theme: parsed.theme || (legacyTheme === 'dark' ? 'dark' : 'light')
       };
-    } else if (legacyTheme) {
+    } else if (legacyTheme || legacyUser) {
       return {
-        ...DEFAULT_SETTINGS,
+        ...base,
+        userName: legacyUser || 'User',
         theme: legacyTheme === 'dark' ? 'dark' : 'light'
       };
     }
@@ -82,15 +92,17 @@ export const applySystemSettings = (settings: SystemSettings) => {
 export const useSettings = () => {
   const [settings, setSettings] = useState<SystemSettings>(() => {
     const initial = getStoredSettings();
-    applySystemSettings(initial);
     return initial;
   });
+
+  useEffect(() => {
+    applySystemSettings(settings);
+  }, [settings]);
 
   useEffect(() => {
     const handleSettingsChange = () => {
       const updated = getStoredSettings();
       setSettings(updated);
-      applySystemSettings(updated);
     };
 
     window.addEventListener('waves_settings_change', handleSettingsChange);
@@ -110,11 +122,17 @@ export const useSettings = () => {
         if (key === 'theme') {
           localStorage.setItem('waves_theme', value as string);
         }
-        applySystemSettings(updated);
-        window.dispatchEvent(new Event('waves_settings_change'));
+        if (key === 'userName') {
+          localStorage.setItem('copilot_username', (value as string) || 'User');
+        }
       } catch {}
       return updated;
     });
+
+    // Asynchronously dispatch the change event to avoid updating other components during current render/state transition
+    setTimeout(() => {
+      window.dispatchEvent(new Event('waves_settings_change'));
+    }, 0);
   };
 
   return { settings, updateSetting };

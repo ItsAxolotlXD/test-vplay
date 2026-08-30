@@ -304,19 +304,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="truncate">Copilot for Vplay</span>
         </button>
 
-        {/* 5. V-Space */}
+        {/* 5. Space 360 */}
         <button
-          id={isMobile ? 'mobile-nav-item-vspace' : 'nav-item-vspace'}
+          id={isMobile ? 'mobile-nav-item-space360' : 'nav-item-space360'}
           onClick={() => handleNavClick('/v-space')}
-          title="V-Space"
+          title="Space 360"
           className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
-            isActive('/v-space') || isActive('/v-apps')
+            isActive('/v-space') || isActive('/space-360') || isActive('/v-apps')
               ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
               : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
           }`}
         >
           <LayoutGrid className="w-5 h-5 shrink-0" />
-          <span className="truncate">V-Space</span>
+          <span className="truncate">Space 360</span>
         </button>
 
         {/* 6. Waves Premium */}
@@ -457,6 +457,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <Film className="w-3.5 h-3.5 text-[#FBBF24]" />
                 <span className="truncate">Broadcast Timecode</span>
+              </button>
+              <button
+                onClick={() => handleNavClick('/toolbox', { tab: 'mc-container' })}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-[12px] text-xs text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35] transition-colors cursor-pointer"
+              >
+                <Box className="w-3.5 h-3.5 text-[#10B981]" />
+                <span className="truncate">Minecraft Container GUI</span>
               </button>
             </div>
           )}
@@ -660,9 +667,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
                 <button
                   onClick={() => handleNavClick('/v-space')}
-                  title="V-Space"
+                  title="Space 360"
                   className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
-                    isActive('/v-space') || isActive('/v-apps') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                    isActive('/v-space') || isActive('/space-360') || isActive('/v-apps') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
                   <LayoutGrid className="w-5 h-5" />

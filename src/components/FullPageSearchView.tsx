@@ -223,9 +223,9 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
     },
     {
       id: "tab-vapps",
-      title: "V-Apps & Trò chơi",
+      title: "Space 360 & Trò chơi",
       tab: "vapps" as const,
-      description: "5 Trò chơi Ore UI V-Arcade, V-Files, V-Learn và Explore VN",
+      description: "Kho tiện ích & 5 Trò chơi Ore UI V-Arcade, V-Files, V-Learn và Explore VN",
       icon: <Gamepad2 className="w-5 h-5 text-emerald-400" />,
       color: "from-emerald-500/20 to-green-500/20",
     },
@@ -607,7 +607,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
                     </span>
                   </h2>
                   <p className="text-xs text-white/50 hidden sm:block">
-                    Tra cứu kênh TV, V-Apps 5 trò chơi, V-Cloud VIP, Tin tức và Lối tắt hệ thống
+                    Tra cứu kênh TV, Space 360 & Trò chơi, V-Cloud VIP, Tin tức và Lối tắt hệ thống
                   </p>
                 </div>
               </div>
@@ -712,7 +712,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
               {[
                 { id: "all" as FilterTab, label: "Tất cả", count: results.totalCount },
                 { id: "channels" as FilterTab, label: "Kênh TV", count: results.channels.length, enabled: spotlightSearchSettings.channels },
-                { id: "vapps" as FilterTab, label: "V-Apps & Games", count: results.vapps.length, enabled: spotlightSearchSettings.vapps },
+                { id: "vapps" as FilterTab, label: "Space 360 & Games", count: results.vapps.length, enabled: spotlightSearchSettings.vapps },
                 { id: "vpremium" as FilterTab, label: "V-Premium", count: results.vpremium.length, enabled: spotlightSearchSettings.vpremium },
                 { id: "news" as FilterTab, label: "Tin tức", count: results.news.length, enabled: spotlightSearchSettings.news },
                 { id: "tabs" as FilterTab, label: "Danh mục", count: results.tabs.length, enabled: spotlightSearchSettings.categories },
@@ -1084,7 +1084,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
                     <div className="space-y-3">
                       <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
                         <Gamepad2 className="w-4 h-4" />
-                        V-Apps & 5 Trò Chơi Ore UI ({results.vapps.length})
+                        Space 360 & 5 Trò Chơi Ore UI ({results.vapps.length})
                       </h4>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

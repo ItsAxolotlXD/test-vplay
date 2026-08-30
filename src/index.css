@@ -163,6 +163,7 @@ html.light-mode .search-box-capsule input::placeholder {
 }
 html.light-mode #settings-section-interface,
 html.light-mode #settings-section-accessibility,
+html.light-mode #settings-section-copilot,
 html.light-mode #settings-section-search {
   background-color: #FFFFFF !important;
   border-color: #E5E7EB !important;
@@ -170,11 +171,13 @@ html.light-mode #settings-section-search {
 }
 html.light-mode #settings-section-interface .text-white,
 html.light-mode #settings-section-accessibility .text-white,
+html.light-mode #settings-section-copilot .text-white,
 html.light-mode #settings-section-search .text-white {
   color: #111827 !important;
 }
 html.light-mode #settings-section-interface .bg-\[\#28272E\],
 html.light-mode #settings-section-accessibility .bg-\[\#28272E\],
+html.light-mode #settings-section-copilot .bg-\[\#28272E\],
 html.light-mode #settings-section-search .bg-\[\#28272E\] {
   background-color: #F8FAFC !important;
   border-color: #E2E8F0 !important;
@@ -732,6 +735,7 @@ html.light-mode #settings-section-search .bg-\[\#24242A\] {
 /* Settings Section Header Icons in Light Mode */
 html.light-mode #settings-section-interface > div:first-child svg,
 html.light-mode #settings-section-accessibility > div:first-child svg,
+html.light-mode #settings-section-copilot > div:first-child svg,
 html.light-mode #settings-section-search > div:first-child svg {
   color: #E6005A !important;
 }

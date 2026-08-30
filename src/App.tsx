@@ -17,6 +17,7 @@ import { Toolbox } from './pages/Toolbox';
 import { About } from './pages/About';
 import { Settings } from './pages/Settings';
 import { CopilotTab } from './components/CopilotTab';
+import { CopilotStandaloneView } from './components/CopilotStandaloneView';
 import { CopilotFloatingWindow } from './components/CopilotFloatingWindow';
 import { VAppsView } from './components/VAppsView';
 import { VPremiumView } from './components/VPremiumView';
@@ -116,6 +117,27 @@ export default function App() {
 
   // Determine effective sidebar width for page adaptation
   const isEffectiveCollapsed = settings.autoHideSidebar || isSidebarCollapsed;
+
+  // Search opener logic respecting settings.mergeSpotlightToCopilot
+  const handleOpenSearch = () => {
+    if (settings.mergeSpotlightToCopilot) {
+      navigate('/copilot');
+    } else {
+      setIsSpotlightOpen(true);
+    }
+  };
+
+  // Global keyboard shortcut Ctrl/Cmd+K for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        handleOpenSearch();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [settings.mergeSpotlightToCopilot]);
 
   // Navigation handler
   const navigate = (path: string, state?: any) => {
@@ -317,6 +339,21 @@ export default function App() {
     return <CrashScreen reason={crashReason || 'FATAL_SYSTEM_SHUTDOWN'} />;
   }
 
+  // If in Standalone Copilot Page Mode (takes over full-screen like a separate standalone app)
+  if (currentRoute === '/copilot-standalone') {
+    return (
+      <CopilotStandaloneView
+        onOptOut={() => navigate('/copilot')}
+        channels={channels}
+        onSelectChannel={(ch) => {
+          setCurrentChannel(ch);
+          navigate(`/live-tv?channel=${ch.slug}`);
+        }}
+        navigate={navigate}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#141416] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative">
       {/* Under Construction Modal Gate (if not unlocked) */}
@@ -330,7 +367,7 @@ export default function App() {
       <Sidebar
         currentRoute={currentRoute}
         navigate={navigate}
-        onOpenSearch={() => setIsSpotlightOpen(true)}
+        onOpenSearch={handleOpenSearch}
         onSelectChannel={setCurrentChannel}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={toggleSidebarCollapse}
@@ -350,7 +387,7 @@ export default function App() {
         <TopBar
           currentRoute={currentRoute}
           navigate={navigate}
-          onOpenSearch={() => setIsSpotlightOpen(true)}
+          onOpenSearch={handleOpenSearch}
           onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
         />
 
@@ -369,16 +406,55 @@ export default function App() {
         <BottomDock
           currentRoute={currentRoute}
           navigate={navigate}
-          onOpenSearch={() => setIsSpotlightOpen(true)}
+          onOpenSearch={handleOpenSearch}
         />
       )}
 
-      {/* Global Search Modal (Spotlight Search is moving to Copilot) */}
-      <SpotlightModal
+      {/* Global Spotlight Search Modal Popup (When mergeSpotlightToCopilot is false) */}
+      <FullPageSearchView
         isOpen={isSpotlightOpen}
         onClose={() => setIsSpotlightOpen(false)}
-        navigate={navigate}
-        onSelectChannel={setCurrentChannel}
+        onSelectChannel={(ch) => {
+          setCurrentChannel(ch);
+          navigate(`/live-tv?channel=${ch.slug}`);
+        }}
+        onNavigateToTab={(tab) => {
+          if (tab === "home") navigate("/");
+          else if (tab === "live") navigate("/live-tv");
+          else if (tab === "vapps") navigate("/v-space");
+          else if (tab === "vpremium") navigate("/v-premium");
+          else if (tab === "news") navigate("/news");
+          else if (tab === "settings") navigate("/settings");
+        }}
+        onNavigateToVApp={(appId, gameId) => {
+          navigate("/v-space", { appId, gameId });
+        }}
+        onNavigateToVPremium={(subTab) => {
+          navigate("/v-premium", { subTab });
+        }}
+        onNavigateToNews={(articleId) => {
+          if (articleId) navigate(`/news/${articleId}`);
+          else navigate("/news");
+        }}
+        onNavigateToSettingSection={(_sec) => {
+          navigate("/settings");
+        }}
+        channels={channels}
+        categories={[]}
+        spotlightSearchSettings={{
+          categories: true,
+          vapps: true,
+          vpremium: true,
+          news: true,
+          channels: true,
+          channelNumbers: true,
+          toolbox: true,
+          settings: true,
+        }}
+        favorites={favoriteChannelIds}
+        onToggleFavorite={toggleFavoriteChannel}
+        triggerToast={(_msg) => {}}
+        onOpenSearchSettings={() => navigate("/settings")}
       />
 
       <CustomStreamModal

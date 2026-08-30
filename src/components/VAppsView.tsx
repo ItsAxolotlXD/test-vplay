@@ -227,7 +227,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
             title="Mở toàn bộ kho ứng dụng"
           >
             <LayoutGrid className="w-4 h-4 text-sky-300" />
-            <span>Kho V-Space ({VAPPS_LIST.length})</span>
+            <span>Kho Space 360 ({VAPPS_LIST.length})</span>
           </button>
         </div>
       </div>
@@ -299,7 +299,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
                   <Grid className="w-5 h-5 text-indigo-300" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white tracking-wide">Kho Tiện Ích & Ứng Dụng V-Space</h2>
+                  <h2 className="text-lg font-bold text-white tracking-wide">Kho Tiện Ích & Ứng Dụng Space 360</h2>
                   <p className="text-xs text-white/60">Chọn ứng dụng để mở trực tiếp trong giao diện Waves</p>
                 </div>
               </div>

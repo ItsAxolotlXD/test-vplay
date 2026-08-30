@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Palette, 
   Key, 
@@ -7,13 +7,31 @@ import {
   Check,
   X,
   Sun,
-  Moon
+  Moon,
+  Bot,
+  User,
+  RotateCcw,
+  Sparkles
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG } from '../hooks/useSettings';
 
 export const Settings: React.FC = () => {
   const { settings, updateSetting } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
+  const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
+  const [isNameSaved, setIsNameSaved] = useState(false);
+
+  useEffect(() => {
+    setInputUserName(settings.userName || 'User');
+  }, [settings.userName]);
+
+  const handleSaveUserName = (nameToSave?: string) => {
+    const finalVal = (nameToSave !== undefined ? nameToSave : inputUserName).trim() || 'User';
+    updateSetting('userName', finalVal);
+    setInputUserName(finalVal);
+    setIsNameSaved(true);
+    setTimeout(() => setIsNameSaved(false), 2000);
+  };
 
   const matchesSearch = (text: string) => {
     if (!searchQuery.trim()) return true;
@@ -336,6 +354,12 @@ export const Settings: React.FC = () => {
       {/* 4. Section 3: Copilot for Vplay */}
       {(matchesSearch('Copilot') ||
         matchesSearch('Trợ lý ảo') ||
+        matchesSearch('Tên người dùng') ||
+        matchesSearch('Username') ||
+        matchesSearch('User') ||
+        matchesSearch('Tên') ||
+        matchesSearch('Hồ sơ') ||
+        matchesSearch('Profile') ||
         matchesSearch('Merge Spotlight') ||
         matchesSearch('Hợp nhất') ||
         matchesSearch('Slash') ||
@@ -344,30 +368,97 @@ export const Settings: React.FC = () => {
           id="settings-section-copilot"
           className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
         >
-          {/* Section Header with Custom Copilot Icon */}
+          {/* Section Header with Monochrome Red Icon matching interface, accessibility & search */}
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 min-w-[24px] flex items-center justify-center shrink-0 mt-0.5">
-              <img
-                src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-                alt="Copilot"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(99,102,241,0.5)]"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-                }}
-              />
-            </div>
+            <Bot className="w-5 h-5 text-[#E50914] dark:text-[#E50914] shrink-0 mt-0.5" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
                 Copilot for Vplay
               </h2>
               <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
-                Quản lý trợ lý trí tuệ nhân tạo, tính năng hợp nhất tìm kiếm và gợi ý lệnh
+                Quản lý tên người dùng, trợ lý trí tuệ nhân tạo, tính năng hợp nhất tìm kiếm và gợi ý lệnh
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
+            {/* Card 0: Tên người dùng (User Name) */}
+            {(matchesSearch('Tên người dùng') || matchesSearch('Username') || matchesSearch('User') || matchesSearch('Tên') || matchesSearch('Hồ sơ') || matchesSearch('Profile') || matchesSearch('Copilot')) && (
+              <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-3.5 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <User className="w-4 h-4 text-[#E50914]" />
+                      <span>Tên người dùng (Username)</span>
+                    </div>
+                    <div className="text-xs text-[#9CA3AF] mt-0.5 leading-normal">
+                      Tên gọi chào mừng trong Copilot AI và giao diện Standalone (Mặc định: <span className="text-white font-medium">User</span>)
+                    </div>
+                  </div>
+
+                  {/* Live greeting preview tag */}
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18181B] text-xs text-zinc-300 border border-white/5 shrink-0 self-start sm:self-auto">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Hi <strong className="text-white">{settings.userName || 'User'}</strong>!</span>
+                  </div>
+                </div>
+
+                {/* Input & Action buttons */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                  <div className="relative flex-1">
+                    <input
+                      id="settings-username-input"
+                      type="text"
+                      value={inputUserName}
+                      onChange={(e) => setInputUserName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSaveUserName();
+                        }
+                      }}
+                      placeholder="Nhập tên của bạn (vd: User, Alex, Minh...)"
+                      maxLength={30}
+                      className="w-full h-10 px-3.5 rounded-xl bg-[#1E1D22] border border-[#3E3E4A] text-white text-sm placeholder-[#71717A] focus:outline-none focus:border-[#E50914] transition-all"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      id="btn-save-username"
+                      type="button"
+                      onClick={() => handleSaveUserName()}
+                      className={`h-10 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                        isNameSaved
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-[#E50914] hover:bg-[#c80812] text-white'
+                      }`}
+                    >
+                      {isNameSaved ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Đã lưu</span>
+                        </>
+                      ) : (
+                        <span>Lưu tên</span>
+                      )}
+                    </button>
+
+                    <button
+                      id="btn-reset-username"
+                      type="button"
+                      onClick={() => handleSaveUserName('User')}
+                      title="Đặt lại về mặc định (User)"
+                      className="h-10 px-3 rounded-xl text-xs font-medium bg-[#1E1D22] hover:bg-[#34343E] text-[#9CA3AF] hover:text-white border border-[#3E3E4A] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Mặc định</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Card 1: Merge Spotlight Search to Copilot */}
             {(matchesSearch('Merge Spotlight Search to Copilot') || matchesSearch('Hợp nhất') || matchesSearch('Spotlight') || matchesSearch('Copilot') || matchesSearch('Tìm kiếm')) && (
               <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
@@ -408,7 +499,7 @@ export const Settings: React.FC = () => {
                     Gợi ý lệnh Slash Commands
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hiển thị các phím tắt lệnh nhanh (/spolight-search, /mode, /navigation, /subscribe) phía trên khung chat
+                    Hiển thị các phím tắt lệnh nhanh (/search, /mode, /navigation, /subscribe) phía trên khung chat
                   </div>
                 </div>
 
