@@ -4,7 +4,6 @@ import { TopBar } from './components/TopBar';
 import { BottomDock } from './components/BottomDock';
 import { SpotlightModal } from './components/SpotlightModal';
 import { CustomStreamModal } from './components/CustomStreamModal';
-import { UnderConstructionModal } from './components/UnderConstructionModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
@@ -16,6 +15,8 @@ import { Favorites } from './pages/Favorites';
 import { Toolbox } from './pages/Toolbox';
 import { About } from './pages/About';
 import { Settings } from './pages/Settings';
+import { FriendsAndPeople } from './pages/FriendsAndPeople';
+import { BetArenaPage } from './pages/BetArenaPage';
 import { CopilotTab } from './components/CopilotTab';
 import { CopilotStandaloneView } from './components/CopilotStandaloneView';
 import { CopilotFloatingWindow } from './components/CopilotFloatingWindow';
@@ -289,6 +290,29 @@ export default function App() {
           />
         );
 
+      case '/friends':
+      case '/people':
+      case '/friends-and-people':
+        return (
+          <FriendsAndPeople
+            channels={channels}
+            onSelectChannel={setCurrentChannel}
+            navigate={navigate}
+          />
+        );
+
+      case '/bet-arena':
+      case '/orbs-bet':
+      case '/sancuoc':
+      case '/san-cuoc':
+      case '/casino':
+      case '/bet':
+        return (
+          <BetArenaPage
+            navigate={navigate}
+          />
+        );
+
       case '/toolbox':
         return (
           <Toolbox
@@ -356,13 +380,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#141416] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative">
-      {/* Under Construction Modal Gate (if not unlocked) */}
-      <UnderConstructionModal
-        isOpen={!isUnlocked}
-        onUnlock={handleUnlock}
-        onCrash={handleCrash}
-      />
-
       {/* Sidebar Navigation (Desktop + Mobile Drawer) */}
       <Sidebar
         currentRoute={currentRoute}

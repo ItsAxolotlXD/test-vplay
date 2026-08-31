@@ -5,7 +5,9 @@ import {
   Heart, 
   Box, 
   Settings as SettingsIcon,
-  Search
+  Search,
+  Users,
+  Gem
 } from 'lucide-react';
 
 interface BottomDockProps {
@@ -28,6 +30,8 @@ export const BottomDock: React.FC<BottomDockProps> = ({
     { id: 'dock-home', label: 'Trang chủ', isCustomHome: true, route: '/' },
     { id: 'dock-tv', label: 'Truyền hình', icon: Tv, route: '/live-tv' },
     { id: 'dock-news', label: 'Tin tức', icon: Megaphone, route: '/news' },
+    { id: 'dock-friends', label: 'Bạn bè & Người dùng', icon: Users, route: '/friends' },
+    { id: 'dock-bet', label: 'Sàn cược Orbs VIP', icon: Gem, route: '/bet-arena' },
     { id: 'dock-settings', label: 'Cài đặt', icon: SettingsIcon, route: '/settings' },
   ];
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { playPopSound } from '../utils/sound';
 import ExploreVietnamTab from './ExploreVietnamTab';
@@ -24,6 +24,12 @@ import {
   Layers,
   ChevronRight,
   Zap,
+  ArrowRight,
+  TrendingUp,
+  Compass,
+  CheckCircle2,
+  SlidersHorizontal,
+  Maximize2
 } from 'lucide-react';
 
 export type VAppId =
@@ -42,112 +48,112 @@ interface VAppDefinition {
   name: string;
   tagline: string;
   description: string;
-  icon: React.ReactNode;
-  color: string;
-  gradient: string;
+  category: 'Trò chơi (Arcade)' | 'Tiện ích & Tệp tin' | 'Học tập & Văn hóa' | 'Giải trí & Media';
   badge: string;
-  category: 'game' | 'utility' | 'learning' | 'media';
+  themeGradient: string;
+  icon: React.ReactNode;
+  tags: string[];
 }
 
 const VAPPS_LIST: VAppDefinition[] = [
   {
     id: 'v_arcade',
-    name: 'V-Arcade',
-    tagline: '5 Trò Chơi Ore UI',
-    description: 'Caro XO, Oẳn Tù Tì, Nối Từ Tiếng Việt & Anh, Đếm Số 1->N và Rắn Săn Mồi đấu với NPC!',
-    icon: <Gamepad2 className="w-6 h-6 text-emerald-400" />,
-    color: 'border-emerald-500/30 shadow-emerald-500/10',
-    gradient: 'from-emerald-500/20 via-teal-900/30 to-cyan-900/30',
+    name: 'V-Arcade Minigames',
+    tagline: '5 Trò Chơi Ore UI Siêu Cuốn',
+    description: 'Caro XO thông minh, Oẳn Tù Tì đối kháng, Nối Từ Tiếng Việt & Anh, Đếm Số 1->N phản xạ và Rắn Săn Mồi tốc độ cao đấu với NPC.',
+    category: 'Trò chơi (Arcade)',
     badge: 'Hot • 5 Trò',
-    category: 'game',
+    themeGradient: 'from-emerald-600/20 via-teal-900/10 to-transparent',
+    icon: <Gamepad2 className="w-8 h-8 text-emerald-400" />,
+    tags: ['Caro XO', 'Rắn Săn Mồi', 'Nối Từ', 'Oẳn Tù Tì'],
   },
   {
     id: 'v_xplore',
-    name: 'V-Files',
-    tagline: 'File Explorer Ore UI',
-    description: 'Quản lý tệp phong cách Windows Explorer, xem trước media, sao lưu M3U8 và V-Cloud.',
-    icon: <Folder className="w-6 h-6 text-purple-400" />,
-    color: 'border-purple-500/30 shadow-purple-500/10',
-    gradient: 'from-purple-500/20 via-indigo-900/30 to-blue-900/30',
-    badge: 'Tệp tin',
-    category: 'utility',
+    name: 'V-Files Explorer',
+    tagline: 'Trình Quản Lý Tệp Ore UI',
+    description: 'Quản lý tệp đa năng phong cách Windows Explorer, xem trước media, phát danh sách phát M3U8 và sao lưu dữ liệu đám mây V-Cloud.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Tệp Tin',
+    themeGradient: 'from-purple-600/20 via-indigo-900/10 to-transparent',
+    icon: <Folder className="w-8 h-8 text-purple-400" />,
+    tags: ['File Manager', 'M3U8 Playlists', 'V-Cloud Backup'],
   },
   {
     id: 'explore_vietnam',
-    name: 'Explore VN',
-    tagline: 'Khám phá 63 tỉnh thành',
-    description: 'Bản đồ tương tác, ẩm thực, danh lam thắng cảnh và bản sắc văn hóa Việt Nam.',
-    icon: <MapPin className="w-6 h-6 text-rose-400" />,
-    color: 'border-rose-500/30 shadow-rose-500/10',
-    gradient: 'from-rose-500/20 via-red-900/30 to-orange-900/30',
-    badge: 'Du lịch',
-    category: 'learning',
+    name: 'Explore Vietnam 360',
+    tagline: 'Khám Phá 63 Tỉnh Thành',
+    description: 'Bản đồ tương tác 63 tỉnh thành Việt Nam, tra cứu danh lam thắng cảnh, ẩm thực đặc sản, văn hóa truyền thống và thông tin địa lý.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Bản Sắc VN',
+    themeGradient: 'from-rose-600/20 via-pink-900/10 to-transparent',
+    icon: <MapPin className="w-8 h-8 text-rose-400" />,
+    tags: ['63 Tỉnh Thành', 'Ẩm Thực', 'Danh Lam Thắng Cảnh'],
   },
   {
     id: 'v_box',
-    name: 'V-Box',
-    tagline: 'Kho Video & Truyền Hình',
-    description: 'Bộ sưu tập video đặc sắc, các clip phát lại và nội dung giải trí chọn lọc.',
-    icon: <Tv className="w-6 h-6 text-amber-400" />,
-    color: 'border-amber-500/30 shadow-amber-500/10',
-    gradient: 'from-amber-500/20 via-orange-900/30 to-yellow-900/30',
-    badge: 'Giải trí',
-    category: 'media',
+    name: 'V-Box Media Player',
+    tagline: 'Kho Video & Truyền Hình Đặc Sắc',
+    description: 'Bộ sưu tập video giải trí đặc sắc, các clip phát lại chất lượng cao, luồng phát sóng chọn lọc và tin tức tổng hợp.',
+    category: 'Giải trí & Media',
+    badge: 'Giải Trí',
+    themeGradient: 'from-amber-600/20 via-orange-900/10 to-transparent',
+    icon: <Tv className="w-8 h-8 text-amber-400" />,
+    tags: ['Video Clip', 'Phát Lại', 'Giải Trí HD'],
   },
   {
     id: 'v_learn',
-    name: 'V-Study',
-    tagline: 'Học tập & Flashcard',
-    description: 'Công cụ ôn tập bài học, đồng hồ Pomodoro, quản lý flashcard và mục tiêu học tập.',
-    icon: <GraduationCap className="w-6 h-6 text-sky-400" />,
-    color: 'border-sky-500/30 shadow-sky-500/10',
-    gradient: 'from-sky-500/20 via-blue-900/30 to-indigo-900/30',
-    badge: 'Học tập',
-    category: 'learning',
+    name: 'V-Study Pomodoro',
+    tagline: 'Học Tập, Flashcard & Tập Trung',
+    description: 'Công cụ hỗ trợ học tập đắc lực: Đồng hồ đếm ngược Pomodoro tập trung sâu, quản lý bộ thẻ Flashcard và theo dõi tiến độ mục tiêu.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Học Tập',
+    themeGradient: 'from-sky-600/20 via-blue-900/10 to-transparent',
+    icon: <GraduationCap className="w-8 h-8 text-sky-400" />,
+    tags: ['Pomodoro', 'Flashcards', 'Ghi Nhớ'],
   },
   {
     id: 'v_calc',
-    name: 'V-Calc',
-    tagline: 'Máy tính biểu thức',
-    description: 'Máy tính bỏ túi khoa học hỗ trợ tính biểu thức phức tạp và chuyển đổi đơn vị.',
-    icon: <Calculator className="w-6 h-6 text-cyan-400" />,
-    color: 'border-cyan-500/30 shadow-cyan-500/10',
-    gradient: 'from-cyan-500/20 via-teal-900/30 to-blue-900/30',
-    badge: 'Tiện ích',
-    category: 'utility',
+    name: 'V-Calc Express',
+    tagline: 'Máy Tính Biểu Thức Khoa Học',
+    description: 'Máy tính bỏ túi khoa học hỗ trợ tính toán biểu thức phức tạp, lưu lịch sử phép tính và quy đổi đơn vị đo lường linh hoạt.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Toán Học',
+    themeGradient: 'from-cyan-600/20 via-teal-900/10 to-transparent',
+    icon: <Calculator className="w-8 h-8 text-cyan-400" />,
+    tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi Đơn Vị'],
   },
   {
     id: 'v_reminders',
-    name: 'V-Reminders',
-    tagline: 'Hẹn giờ & Nhắc việc',
-    description: 'Lên lịch nhắc nhở xem chương trình TV, công việc quan trọng với chuông báo âm thanh.',
-    icon: <Bell className="w-6 h-6 text-orange-400" />,
-    color: 'border-orange-500/30 shadow-orange-500/10',
-    gradient: 'from-orange-500/20 via-amber-900/30 to-red-900/30',
-    badge: 'Nhắc nhở',
-    category: 'utility',
+    name: 'V-Reminders Alarm',
+    tagline: 'Hẹn Giờ & Nhắc Việc Thông Minh',
+    description: 'Lên lịch nhắc nhở đón xem chương trình truyền hình yêu thích, các công việc quan trọng kèm chuông báo âm thanh cảnh báo sống động.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Nhắc Việc',
+    themeGradient: 'from-orange-600/20 via-amber-900/10 to-transparent',
+    icon: <Bell className="w-8 h-8 text-orange-400" />,
+    tags: ['Chuông Báo', 'Lịch Xem TV', 'Task Alert'],
   },
   {
     id: 'v_notes',
-    name: 'V-Notes',
-    tagline: 'Ghi chú nhanh',
-    description: 'Soạn thảo văn bản ghi chú với định dạng màu sắc, sticky notes và tìm kiếm thông minh.',
-    icon: <StickyNote className="w-6 h-6 text-yellow-400" />,
-    color: 'border-yellow-500/30 shadow-yellow-500/10',
-    gradient: 'from-yellow-500/20 via-amber-900/30 to-orange-900/30',
-    badge: 'Ghi chép',
-    category: 'utility',
+    name: 'V-Notes Smart',
+    tagline: 'Ghi Chú Nhanh & Sticky Notes',
+    description: 'Soạn thảo văn bản ghi chú với hệ thống dán nhãn màu sắc phong phú, quản lý dạng thẻ Sticky Notes và tìm kiếm thông minh.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Ghi Chép',
+    themeGradient: 'from-yellow-600/20 via-amber-900/10 to-transparent',
+    icon: <StickyNote className="w-8 h-8 text-yellow-400" />,
+    tags: ['Ghi Chú Nhanh', 'Sticky Notes', 'Đồng Bộ'],
   },
   {
     id: 'v_furniture',
-    name: 'V-Furniture',
-    tagline: 'Thiết kế không gian',
-    description: 'Trải nghiệm không gian nội thất, bài trí phòng xem TV và thư giãn 3D.',
-    icon: <Armchair className="w-6 h-6 text-lime-400" />,
-    color: 'border-lime-500/30 shadow-lime-500/10',
-    gradient: 'from-lime-500/20 via-emerald-900/30 to-teal-900/30',
-    badge: 'Nội thất',
-    category: 'utility',
+    name: 'V-Furniture 3D',
+    tagline: 'Thiết Kế & Bài Trí Phòng Khách TV',
+    description: 'Trải nghiệm không gian nội thất phòng xem truyền hình, tùy biến ánh sáng, sofa thư giãn và bài trí rạp hát tại gia.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Nội Thất',
+    themeGradient: 'from-lime-600/20 via-emerald-900/10 to-transparent',
+    icon: <Armchair className="w-8 h-8 text-lime-400" />,
+    tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn'],
   },
 ];
 
@@ -161,208 +167,330 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   selectedGameId = null,
 }) => {
   const [activeApp, setActiveApp] = useState<VAppId>(initialAppId);
-  const [isGridModalOpen, setIsGridModalOpen] = useState(false);
-  const [searchFilter, setSearchFilter] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const currentApp = VAPPS_LIST.find((a) => a.id === activeApp) || VAPPS_LIST[0];
+  const categories = [
+    'Tất cả',
+    'Trò chơi (Arcade)',
+    'Tiện ích & Tệp tin',
+    'Học tập & Văn hóa',
+    'Giải trí & Media',
+    'Đang mở'
+  ];
 
   const handleSelectApp = (appId: VAppId) => {
     playPopSound();
     setActiveApp(appId);
-    setIsGridModalOpen(false);
+    const container = document.getElementById('active-app-execution-container');
+    if (container) {
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
-  const filteredApps = VAPPS_LIST.filter(
-    (app) =>
-      app.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      app.tagline.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      app.description.toLowerCase().includes(searchFilter.toLowerCase())
-  );
+  const filteredApps = useMemo(() => {
+    return VAPPS_LIST.filter((app) => {
+      let matchCat = true;
+      if (selectedCategory === 'Đang mở') {
+        matchCat = app.id === activeApp;
+      } else if (selectedCategory !== 'Tất cả') {
+        matchCat = app.category === selectedCategory;
+      }
+
+      const matchSearch =
+        app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        app.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        app.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        app.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      return matchCat && matchSearch;
+    });
+  }, [selectedCategory, searchQuery, activeApp]);
+
+  const currentApp = VAPPS_LIST.find((a) => a.id === activeApp) || VAPPS_LIST[0];
 
   return (
-    <div
-      id="waves-vapps-view"
-      className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 space-y-6 animate-fade-in relative text-left"
-    >
-      {/* Dynamic ambient glass glow in background */}
-      <div className="absolute top-10 left-10 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-fuchsia-600/15 rounded-full blur-3xl pointer-events-none -z-10" />
-
-      {/* Main Glassmorphism Top Banner */}
-      <div className="relative rounded-3xl bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] border border-white/20 p-5 sm:p-7 shadow-[0_12px_40px_0_rgba(0,0,0,0.35),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] flex flex-col md:flex-row md:items-center justify-between gap-5 overflow-hidden">
-        {/* Glow corner accent */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Current Active App Meta Header */}
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-white shadow-inner shrink-0 group">
-            {currentApp.icon}
+    <div id="waves-vapps-view" className="space-y-8 pb-16 text-left select-none animate-in fade-in duration-300">
+      {/* 1. HEADER (News style UI) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold uppercase tracking-wider mb-1">
+            <Compass className="w-4 h-4 text-emerald-400 animate-spin-slow" />
+            <span>HỆ SINH THÁI ỨNG DỤNG • WAVES SPACE 360</span>
           </div>
-          <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                {currentApp.name}
-              </h1>
-              <span className="text-[11px] font-bold px-3 py-0.5 rounded-full bg-white/15 border border-white/20 text-white/90 shadow-sm uppercase tracking-wider">
-                {currentApp.badge}
-              </span>
-              <span className="text-xs text-indigo-300 font-semibold">
-                • {currentApp.tagline}
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-white/70 mt-1 max-w-xl line-clamp-1 font-sans">
-              {currentApp.description}
-            </p>
-          </div>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+            Space 360 & Kho Ứng Dụng Mini
+          </h1>
+          <p className="text-xs sm:text-sm text-[#9CA3AF] mt-1">
+            Hệ sinh thái mini-apps phong phú: Game Arcade Ore UI, Trình quản lý tệp V-Files, Khám phá 63 tỉnh thành Việt Nam, V-Study Pomodoro và các tiện ích sáng tạo.
+          </p>
         </div>
 
-        {/* Action Buttons: App Drawer button */}
-        <div className="relative z-10 flex items-center gap-2 self-start md:self-center shrink-0">
-          <button
-            onClick={() => {
-              playPopSound();
-              setIsGridModalOpen(true);
-            }}
-            className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600/80 to-purple-600/80 hover:from-indigo-500 hover:to-purple-500 border border-white/20 text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-[0_4px_20px_rgba(99,102,241,0.3),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] cursor-pointer active:scale-95"
-            title="Mở toàn bộ kho ứng dụng"
-          >
-            <LayoutGrid className="w-4 h-4 text-sky-300" />
-            <span>Kho Space 360 ({VAPPS_LIST.length})</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Horizontal Liquid Glass Tabs Bar */}
-      <div className="relative rounded-2xl bg-white/[0.07] backdrop-blur-[20px] saturate-[180%] border border-white/15 p-2 shadow-[0_8px_30px_rgba(0,0,0,0.25),inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)]">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {VAPPS_LIST.map((app) => {
-            const isActive = activeApp === app.id;
-            return (
-              <button
-                key={app.id}
-                onClick={() => handleSelectApp(app.id)}
-                className={`relative px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-                  isActive
-                    ? 'text-white font-bold'
-                    : 'text-white/60 hover:text-white hover:bg-white/[0.06]'
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeVAppPill"
-                    transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                    className="absolute inset-0 bg-white/20 border border-white/30 rounded-xl shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.6),0_4px_15px_rgba(0,0,0,0.3)] -z-10"
-                  />
-                )}
-                <span className="shrink-0 scale-90">{app.icon}</span>
-                <span>{app.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Main Content View with Fluid Motion Transition */}
-      <div className="min-h-[550px] w-full">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeApp}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="w-full"
-          >
-            {activeApp === 'v_arcade' && <VArcadeTab initialGameId={selectedGameId} />}
-            {activeApp === 'v_xplore' && <VXploreTab />}
-            {activeApp === 'explore_vietnam' && <ExploreVietnamTab />}
-            {activeApp === 'v_box' && <VplayVBoxTab />}
-            {activeApp === 'v_learn' && <VStudyTab />}
-            {activeApp === 'v_calc' && <VCalcTab />}
-            {activeApp === 'v_reminders' && <VRemindersTab />}
-            {activeApp === 'v_notes' && <VNotesView />}
-            {activeApp === 'v_furniture' && <VFurnitureTab />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Pure Glassmorphism App Grid Drawer Modal */}
-      {isGridModalOpen && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in">
-          {/* Backdrop click to close */}
-          <div className="absolute inset-0" onClick={() => setIsGridModalOpen(false)} />
-          <div className="relative z-10 w-full max-w-4xl rounded-3xl bg-[#181424]/95 backdrop-blur-[30px] border border-white/20 shadow-[0_25px_60px_rgba(0,0,0,0.9),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] p-6 sm:p-8 text-white flex flex-col max-h-[88vh] overflow-hidden text-left">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center text-white shadow-inner">
-                  <Grid className="w-5 h-5 text-indigo-300" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-white tracking-wide">Kho Tiện Ích & Ứng Dụng Space 360</h2>
-                  <p className="text-xs text-white/60">Chọn ứng dụng để mở trực tiếp trong giao diện Waves</p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  playPopSound();
-                  setIsGridModalOpen(false);
-                }}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white/70 hover:text-white transition-all cursor-pointer"
-                title="Đóng (ESC)"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Search filter in modal */}
-            <div className="relative mb-5">
-              <Search className="w-4 h-4 text-white/40 absolute left-4 top-1/2 -translate-y-1/2" />
+        {/* Right Search Box & Total Apps Badge */}
+        <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
+          <div className="relative w-full sm:w-64 search-box-capsule rounded-full transition-all">
+            <div className="flex items-center px-3 py-1.5 w-full">
+              <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
               <input
                 type="text"
-                placeholder="Tìm kiếm ứng dụng, công cụ, trò chơi..."
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                className="w-full bg-white/[0.08] border border-white/15 rounded-2xl pl-11 pr-4 py-3 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 focus:bg-white/[0.12] transition-all"
-                autoFocus
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm ứng dụng trong Space 360..."
+                className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none"
               />
             </div>
+          </div>
 
-            {/* Grid of Apps */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-1">
-              {filteredApps.map((app) => (
-                <div
-                  key={app.id}
-                  onClick={() => handleSelectApp(app.id)}
-                  className={`group rounded-2xl p-5 bg-gradient-to-br ${app.gradient} backdrop-blur-[20px] border ${app.color} hover:border-white/40 hover:scale-[1.02] transition-all duration-200 cursor-pointer flex flex-col justify-between shadow-lg relative overflow-hidden`}
-                >
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <div className="w-12 h-12 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-white shadow-inner group-hover:scale-110 transition-transform">
-                      {app.icon}
-                    </div>
-                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/15 border border-white/20 text-white/90 uppercase tracking-wider">
-                      {app.badge}
-                    </span>
-                  </div>
-                  <div className="mb-3">
-                    <h3 className="font-bold text-sm text-white group-hover:text-indigo-200 transition-colors flex items-center gap-1.5">
-                      {app.name}
-                      <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-300" />
-                    </h3>
-                    <p className="text-xs text-white/65 mt-1 line-clamp-2 leading-relaxed font-sans">
-                      {app.description}
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-white/50">
-                    <span>{app.tagline}</span>
-                    <span className="text-indigo-300 font-semibold group-hover:underline">Khởi chạy</span>
-                  </div>
+          <div className="px-3.5 py-1.5 rounded-full bg-[#1E1E22] border border-[#2D2D35] flex items-center gap-2 text-xs">
+            <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-zinc-400 font-medium">Kho:</span>
+            <span className="font-bold text-white">{VAPPS_LIST.length} Mini-Apps</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. FEATURED BIG SHOWCASE CARD (Native Vector UI Stage - No Placeholder Images) */}
+      {currentApp && (
+        <div
+          onClick={() => handleSelectApp(currentApp.id)}
+          className="relative rounded-[30px] overflow-hidden bg-[#1E1E22] border border-[#2D2D35] hover:border-emerald-500/60 cursor-pointer group shadow-2xl transition-all"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-12 min-h-[340px]">
+            {/* Left Vector App Emblem Visual Stage */}
+            <div className="md:col-span-6 relative p-8 flex flex-col justify-between overflow-hidden bg-[#131916] border-b md:border-b-0 md:border-r border-[#2D2D35]">
+              {/* Glow backdrop */}
+              <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-emerald-600/10 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-teal-600/10 blur-3xl pointer-events-none" />
+
+              {/* Top status */}
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-md">
+                  <TrendingUp className="w-3 h-3" />
+                  <span>Tiêu điểm Ứng Dụng • ĐANG CHỌN</span>
                 </div>
-              ))}
+
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1A2620] border border-[#283C33] text-[10px] font-mono text-emerald-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>Sẵn sàng chạy</span>
+                </div>
+              </div>
+
+              {/* Center App Icon Emblem */}
+              <div className="relative z-10 my-6 flex items-center gap-5">
+                <div className="w-20 h-20 rounded-3xl bg-[#1A2621] border border-emerald-500/40 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.15)] group-hover:scale-105 transition-transform">
+                  {currentApp.icon}
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 font-mono block">
+                    {currentApp.category}
+                  </span>
+                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">
+                    {currentApp.name}
+                  </h3>
+                  <span className="text-xs font-semibold text-zinc-300">
+                    {currentApp.tagline}
+                  </span>
+                </div>
+              </div>
+
+              {/* Bottom Tags */}
+              <div className="relative z-10 flex items-center gap-2 flex-wrap">
+                {currentApp.tags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 rounded-xl bg-[#19241F] border border-[#293D33] text-[11px] font-medium text-emerald-200"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Content Details & Actions */}
+            <div className="md:col-span-6 p-6 md:p-8 flex flex-col justify-between bg-[#191A20]">
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 font-mono">
+                    TỔNG QUAN TÍNH NĂNG
+                  </span>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    {currentApp.badge}
+                  </span>
+                </div>
+
+                <p className="text-xs md:text-sm text-[#9CA3AF] mt-3 leading-relaxed">
+                  {currentApp.description}
+                </p>
+
+                <div className="mt-4 p-3.5 rounded-2xl bg-[#14141A] border border-[#2D2D35] flex items-center gap-2.5 text-xs text-zinc-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Tương thích hoàn toàn với chế độ đa nhiệm và phím tắt Vplay.</span>
+                </div>
+              </div>
+
+              {/* Bottom Quick Launch Action */}
+              <div className="pt-5 mt-4 border-t border-[#2A2A30] flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 text-zinc-400">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>Trực tuyến</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-emerald-300 font-bold group-hover:translate-x-1 transition-transform">
+                  <span>Khởi chạy ứng dụng ngay</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* 3. CATEGORY PILLS (News style) */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {categories.map((cat) => {
+          const isSelected = selectedCategory === cat;
+          return (
+            <button
+              key={cat}
+              onClick={() => {
+                playPopSound();
+                setSelectedCategory(cat);
+              }}
+              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                isSelected
+                  ? 'bg-gradient-purple-active text-white shadow-md glow-purple-sm font-bold'
+                  : 'bg-[#1E1E22] text-[#A1A1AA] hover:text-white border border-[#32323A]'
+              }`}
+            >
+              {cat}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 4. APP CARDS GRID (Clean Vector Headers - No Placeholder Images) */}
+      {selectedCategory !== 'Đang mở' && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredApps.map((app) => {
+            const isCurrent = activeApp === app.id;
+            return (
+              <div
+                key={app.id}
+                onClick={() => handleSelectApp(app.id)}
+                className={`group rounded-[28px] bg-[#1E1E22] border transition-all overflow-hidden flex flex-col justify-between cursor-pointer shadow-lg hover:scale-[1.01] ${
+                  isCurrent
+                    ? 'border-emerald-500/70 ring-2 ring-emerald-500/30 bg-[#1c2420]'
+                    : 'border-[#2D2D35] hover:border-emerald-500/60 hover:bg-[#25252C]'
+                }`}
+              >
+                {/* Styled Vector Header */}
+                <div className={`p-6 pb-4 border-b border-[#2A2A32] bg-gradient-to-br ${app.themeGradient} relative overflow-hidden`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="px-2.5 py-0.5 rounded-full bg-black/40 border border-white/10 text-[10px] font-bold text-emerald-300 uppercase tracking-wider">
+                      {app.category}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-[10px] font-mono font-black text-emerald-300">
+                      {app.badge}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-14 h-14 rounded-2xl bg-[#141A17] border border-white/10 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                      {app.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug line-clamp-1">
+                        {app.name}
+                      </h3>
+                      <span className="text-[11px] font-semibold text-emerald-400 line-clamp-1">
+                        {app.tagline}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 pt-4 flex-1 flex flex-col justify-between">
+                  <p className="text-xs text-[#9CA3AF] line-clamp-2 leading-relaxed">
+                    {app.description}
+                  </p>
+
+                  {/* Metadata Footer */}
+                  <div className="mt-5 pt-3 border-t border-[#2A2A30] flex items-center justify-between text-xs text-[#8E8E93]">
+                    <div className="flex items-center gap-1.5 text-zinc-400">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{app.tags[0]}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1 font-bold text-white group-hover:text-emerald-300">
+                      <span>Mở App</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 5. ACTIVE APP EXECUTION ENGINE */}
+      <div id="active-app-execution-container" className="rounded-[30px] overflow-hidden border border-[#2D2D35] shadow-2xl bg-[#18191C]">
+        {/* App Top Toolbar */}
+        <div className="px-6 py-4 border-b border-[#2D2D35] bg-[#1E1E22] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#2D2D35] flex items-center justify-center text-emerald-300">
+              {currentApp.icon}
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <span>{currentApp.name}</span>
+                <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  {currentApp.badge}
+                </span>
+              </h3>
+              <p className="text-[11px] text-[#9CA3AF]">{currentApp.tagline}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const el = document.getElementById('waves-vapps-view');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-3.5 py-1.5 rounded-full bg-[#2A2A35] hover:bg-[#3A3A48] text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Xem Kho App</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic App Renderer */}
+        <div className="p-4 sm:p-6 min-h-[550px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeApp}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="w-full"
+            >
+              {activeApp === 'v_arcade' && <VArcadeTab initialGameId={selectedGameId} />}
+              {activeApp === 'v_xplore' && <VXploreTab />}
+              {activeApp === 'explore_vietnam' && <ExploreVietnamTab />}
+              {activeApp === 'v_box' && <VplayVBoxTab />}
+              {activeApp === 'v_learn' && <VStudyTab />}
+              {activeApp === 'v_calc' && <VCalcTab />}
+              {activeApp === 'v_reminders' && <VRemindersTab />}
+              {activeApp === 'v_notes' && <VNotesView />}
+              {activeApp === 'v_furniture' && <VFurnitureTab />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 };

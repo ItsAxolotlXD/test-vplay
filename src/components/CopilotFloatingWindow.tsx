@@ -30,6 +30,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { processCopilotCommand, SearchCategoryGroup, SearchItem } from "../utils/copilotCommands";
 import { CopilotMarkdown } from "./CopilotMarkdown";
+import { CopilotBetArena } from "./CopilotBetArena";
 import { CopilotMessage, CopilotSession } from "./CopilotTab";
 import { useSettings } from "../hooks/useSettings";
 
@@ -188,6 +189,9 @@ export const CopilotFloatingWindow: React.FC<CopilotFloatingWindowProps> = ({
         role: "model",
         text: cmdResult.replyText,
         searchCategoryResults: cmdResult.searchCategoryResults,
+        isBetArena: cmdResult.isBetArena,
+        betGame: cmdResult.betGame,
+        betAmount: cmdResult.betAmount,
         timestamp: Date.now()
       };
       const newHist = [...updatedHistory, aiMsg];
@@ -454,6 +458,16 @@ export const CopilotFloatingWindow: React.FC<CopilotFloatingWindowProps> = ({
                           }`}
                         >
                           <CopilotMarkdown content={cleaned} isUser={msg.role === "user"} />
+
+                          {/* Interactive Bet Arena */}
+                          {(msg.isBetArena || (cleaned && cleaned.includes("SỚI CƯỢC ORBS VIP"))) && (
+                            <div className="mt-3 pt-2 border-t border-slate-200 dark:border-[#34343E]">
+                              <CopilotBetArena
+                                initialGame={msg.betGame || "baucua"}
+                                initialAmount={msg.betAmount || 500}
+                              />
+                            </div>
+                          )}
 
                           {/* Categorized results in floating window */}
                           {msg.searchCategoryResults && msg.searchCategoryResults.length > 0 && (

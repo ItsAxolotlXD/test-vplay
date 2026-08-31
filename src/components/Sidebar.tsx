@@ -11,18 +11,22 @@ import {
   Settings, 
   ChevronDown, 
   ChevronRight, 
-  ChevronLeft,
-  X,
-  Radio,
-  Palette,
-  Film,
-  Layers,
-  Waves,
-  LayoutGrid
+  ChevronLeft, 
+  X, 
+  Radio, 
+  Palette, 
+  Film, 
+  Layers, 
+  Waves, 
+  LayoutGrid,
+  Sparkles,
+  Gem,
+  Users
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSettings } from '../hooks/useSettings';
+import { useOrbs } from '../hooks/useOrbs';
 import { CHANNELS_DATA } from '../data/channels';
 import { Channel } from '../types';
 import { DiscordWelcomeModal } from './DiscordWelcomeModal';
@@ -52,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { settings } = useSettings();
   const { timeString, dateString } = useClock();
   const { favoriteChannelIds } = useFavorites();
+  const { orbs, addOrbs } = useOrbs();
 
   const [isLiveTvExpanded, setIsLiveTvExpanded] = useState(false);
   const [isFavoritesExpanded, setIsFavoritesExpanded] = useState(false);
@@ -60,6 +65,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [logoError, setLogoError] = useState(false);
   const [isDiscordModalOpen, setIsDiscordModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [claimToast, setClaimToast] = useState<string | null>(null);
+
+  const handleClaimQuickOrbs = () => {
+    const bonus = 50;
+    addOrbs(bonus);
+    setClaimToast(`+${bonus} Orbs! ✨`);
+    setTimeout(() => setClaimToast(null), 2500);
+  };
 
   const favoriteChannels = CHANNELS_DATA.filter((ch) => favoriteChannelIds.includes(ch.id));
 
@@ -146,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Spotlight Search Box with generous breathing room */}
-      <div className="px-4 pt-2 pb-5 shrink-0">
+      <div className="px-4 pt-2 pb-2.5 shrink-0">
         <button
           id={isMobile ? 'btn-mobile-spotlight-search' : 'btn-spotlight-search'}
           onClick={handleSpotlightClick}
@@ -178,6 +191,68 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
           </div>
         </button>
+      </div>
+
+      {/* Orbs Balance Counter Widget (Under Spotlight Search) */}
+      <div className="px-4 pb-3 shrink-0">
+        <div 
+          id={isMobile ? "mobile-sidebar-orbs-widget" : "sidebar-orbs-widget"}
+          onClick={() => handleNavClick('/v-premium')}
+          className="group relative overflow-hidden rounded-2xl p-2.5 bg-gradient-to-br from-[#2b1b3d]/90 via-[#231e33]/90 to-[#191921]/95 border border-purple-500/30 hover:border-purple-400/60 shadow-lg shadow-purple-950/30 transition-all duration-200 cursor-pointer"
+          title="Xem khoáng vật Orbs & Gói đặc quyền VIP"
+        >
+          {/* Subtle Ambient Glow */}
+          <div className="absolute -right-3 -bottom-3 w-16 h-16 bg-purple-500/15 rounded-full blur-xl pointer-events-none group-hover:bg-purple-500/25 transition-all" />
+
+          <div className="flex items-center justify-between gap-2 relative z-10">
+            <div className="flex items-center gap-2.5 min-w-0">
+              {/* Glowing Orb Sphere Avatar */}
+              <div className="relative w-8 h-8 rounded-xl bg-purple-950/70 border border-purple-400/40 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
+                <Gem className="w-4 h-4 text-purple-300 drop-shadow-[0_0_8px_rgba(168,85,247,0.9)]" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-purple-400 animate-ping opacity-75" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-purple-300" />
+              </div>
+
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-purple-300/90 font-mono truncate">
+                    Orbs
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[8.5px] font-extrabold bg-purple-500/25 text-purple-200 border border-purple-400/30">
+                    Khoáng vật
+                  </span>
+                </div>
+                <div className="text-[13px] font-black text-white font-mono tracking-tight flex items-baseline gap-1 truncate">
+                  <span className="text-purple-100 font-extrabold tracking-normal">
+                    {orbs.toLocaleString()}
+                  </span>
+                  <span className="text-[9.5px] font-bold text-purple-400 font-sans">ORBS</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Claim Bonus / Action Button */}
+            <div className="flex items-center gap-1 shrink-0">
+              {claimToast && (
+                <span className="text-[10px] font-bold text-emerald-400 font-mono animate-bounce mr-0.5">
+                  {claimToast}
+                </span>
+              )}
+              <button
+                id={isMobile ? "btn-mobile-claim-orbs" : "btn-claim-orbs"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClaimQuickOrbs();
+                }}
+                className="px-2 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-[10.5px] font-bold shadow-xs transition-all flex items-center gap-1 border border-purple-400/40 cursor-pointer"
+                title="Nhận thêm +50 Orbs điểm danh"
+              >
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span>+50</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Scrollable Navigation Menu */}
@@ -332,6 +407,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Waves className="w-5 h-5 shrink-0" />
           <span className="truncate">Waves Premium</span>
+        </button>
+
+        {/* 7. Friends & People (Community) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-friends' : 'nav-item-friends'}
+          onClick={() => handleNavClick('/friends')}
+          title="Friends & People"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/friends') || isActive('/people')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <Users className="w-5 h-5 shrink-0" />
+            <span className="truncate">Friends & People</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">
+            100+
+          </span>
+        </button>
+
+        {/* 8. Sàn cược Orbs (VIP Casino & Bet Arena) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-bet-arena' : 'nav-item-bet-arena'}
+          onClick={() => handleNavClick('/bet-arena')}
+          title="Sàn cược Orbs VIP"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/bet-arena') || isActive('/orbs-bet') || isActive('/casino')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <Gem className="w-5 h-5 shrink-0 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]" />
+            <span className="truncate">Sàn cược Orbs</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-black bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-400/40 rounded-full">
+            LIVE
+          </span>
         </button>
 
         {/* Divider */}
@@ -591,7 +706,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
 
               {/* Collapsed Search button */}
-              <div className="px-2 pt-4 pb-3 flex justify-center">
+              <div className="px-2 pt-4 pb-1.5 flex justify-center">
                 <button
                   id="btn-spotlight-search-mini"
                   onClick={handleSpotlightClick}
@@ -606,6 +721,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       className="w-full h-full aspect-square object-contain brightness-0 invert opacity-80"
                     />
                   </div>
+                </button>
+              </div>
+
+              {/* Mini Orbs Counter */}
+              <div className="px-2 pb-3 flex justify-center">
+                <button
+                  id="btn-mini-orbs-indicator"
+                  onClick={() => handleNavClick('/v-premium')}
+                  title={`Số dư: ${orbs.toLocaleString()} Orbs (Khoáng vật)`}
+                  className="w-11 py-1 px-0.5 rounded-xl bg-purple-950/50 border border-purple-500/30 flex flex-col items-center justify-center hover:border-purple-400 hover:bg-purple-900/40 hover:scale-105 transition-all shadow-md cursor-pointer group"
+                >
+                  <Gem className="w-3.5 h-3.5 text-purple-300 drop-shadow-[0_0_4px_rgba(168,85,247,0.8)]" />
+                  <span className="text-[8px] font-mono font-extrabold text-purple-200 mt-0.5 tracking-tight truncate max-w-[38px]">
+                    {orbs >= 1000000
+                      ? `${(orbs / 1000000).toFixed(1)}M`
+                      : orbs >= 1000
+                      ? `${(orbs / 1000).toFixed(0)}k`
+                      : orbs}
+                  </span>
                 </button>
               </div>
 
@@ -682,6 +816,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }`}
                 >
                   <Waves className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/friends')}
+                  title="Friends & People (100+ người dùng)"
+                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                    isActive('/friends') || isActive('/people') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Users className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/bet-arena')}
+                  title="Sàn cược Orbs (Bầu Cua, Lật Xu, Bài Cào, Tài Xỉu)"
+                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                    isActive('/bet-arena') || isActive('/orbs-bet') || isActive('/casino') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Gem className="w-5 h-5 text-amber-400" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/favorites')}

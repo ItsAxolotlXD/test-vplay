@@ -23,6 +23,7 @@ import {
   Home
 } from "lucide-react";
 import { playPopSound } from "../../utils/sound";
+import { useOrbs } from "../../hooks/useOrbs";
 
 export interface FurnitureProduct {
   id: string;
@@ -302,17 +303,8 @@ const PRODUCT_CATALOG: FurnitureProduct[] = [
 ];
 
 export const VFurnitureTab: React.FC = () => {
-  // Ore Currency state synced with localStorage vplay_vcoins
-  const [oreBalance, setOreBalance] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem("vplay_vcoins");
-      if (saved) {
-        const val = parseInt(saved, 10);
-        if (!isNaN(val)) return val;
-      }
-    } catch (e) {}
-    return 150000;
-  });
+  // Orbs Currency state synced with useOrbs hook & localStorage
+  const { orbs: oreBalance, setOrbs: setOreBalance, addOrbs } = useOrbs();
 
   // Selected Category filter
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -344,14 +336,6 @@ export const VFurnitureTab: React.FC = () => {
 
   // Toast / Banner notice
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Sync oreBalance changes to localStorage & storage event
-  useEffect(() => {
-    try {
-      localStorage.setItem("vplay_vcoins", oreBalance.toString());
-      window.dispatchEvent(new Event("storage"));
-    } catch (e) {}
-  }, [oreBalance]);
 
   // Sync cart to localStorage
   useEffect(() => {
@@ -389,7 +373,7 @@ export const VFurnitureTab: React.FC = () => {
       }
       return [...prev, { product, quantity: 1 }];
     });
-    showToast(`Đã thêm "${product.name}" vào giỏ hàng Ore! 🛒`);
+    showToast(`Đã thêm "${product.name}" vào giỏ hàng Orbs! 🛒`);
   };
 
   // Update cart item quantity
@@ -420,19 +404,19 @@ export const VFurnitureTab: React.FC = () => {
     0
   );
 
-  // Claim Daily Free Ore bonus
+  // Claim Daily Free Orbs bonus
   const handleClaimFreeOre = () => {
     playPopSound();
     const bonus = 500;
-    setOreBalance((prev) => prev + bonus);
-    showToast(`🎁 Đã nhận thêm +${bonus.toLocaleString()} Khoáng Thạch Ore miễn phí!`);
+    addOrbs(bonus);
+    showToast(`🎁 Đã nhận thêm +${bonus.toLocaleString()} Khoáng vật Orbs miễn phí!`);
   };
 
   // Buy direct single product
   const handleBuyDirect = (product: FurnitureProduct) => {
     if (oreBalance < product.priceOre) {
       showToast(
-        `❌ Bạn không đủ Khoáng Thạch! Cần ${product.priceOre.toLocaleString()} Ore (Hiện có ${oreBalance.toLocaleString()} Ore).`
+        `❌ Bạn không đủ Orbs! Cần ${product.priceOre.toLocaleString()} Orbs (Hiện có ${oreBalance.toLocaleString()} Orbs).`
       );
       return;
     }
@@ -466,7 +450,7 @@ export const VFurnitureTab: React.FC = () => {
 
     if (oreBalance < cartTotalOre) {
       showToast(
-        `❌ Số dư Ore không đủ! Tổng giỏ hàng là ${cartTotalOre.toLocaleString()} Ore (Hiện có ${oreBalance.toLocaleString()} Ore).`
+        `❌ Số dư Orbs không đủ! Tổng giỏ hàng là ${cartTotalOre.toLocaleString()} Orbs (Hiện có ${oreBalance.toLocaleString()} Orbs).`
       );
       return;
     }
@@ -494,7 +478,7 @@ export const VFurnitureTab: React.FC = () => {
     setPurchases((prev) => [...newPurchases, ...prev]);
     setCart([]);
     setActiveTab("purchases");
-    showToast(`🎉 Thanh toán thành công ${cart.length} sản phẩm bằng ${cartTotalOre.toLocaleString()} Ore!`);
+    showToast(`🎉 Thanh toán thành công ${cart.length} sản phẩm bằng ${cartTotalOre.toLocaleString()} Orbs!`);
   };
 
   // Filter products
@@ -522,26 +506,26 @@ export const VFurnitureTab: React.FC = () => {
               <h1 className="font-black text-sm sm:text-base text-white uppercase tracking-wider font-jura">
                 V-FURNITURE • CỬA HÀNG GIA DỤNG ONLINE
               </h1>
-              <span className="bg-[#f59e0b] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
-                ORE STORE
+              <span className="bg-[#a855f7] text-white px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
+                ORBS STORE
               </span>
             </div>
             <p className="text-[11px] text-zinc-300 font-jura">
-              Trang trí nhà cửa & thiết bị điện gia dụng Vplay - Thanh toán 100% bằng Khoáng Thạch (Ore)
+              Trang trí nhà cửa & thiết bị điện gia dụng Vplay - Thanh toán 100% bằng Khoáng vật Orbs
             </p>
           </div>
         </div>
 
-        {/* ORE BALANCE CARD & FREE CLAIM BUTTON */}
+        {/* ORBS BALANCE CARD & FREE CLAIM BUTTON */}
         <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end bg-[#2a2c30] p-2 border-2 border-[#141414] shadow-inner">
           <div className="flex items-center gap-2 font-mono">
-            <div className="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-500 flex items-center justify-center text-amber-400 shrink-0">
+            <div className="w-7 h-7 rounded-full bg-purple-500/20 border border-purple-500 flex items-center justify-center text-purple-400 shrink-0">
               <Coins className="w-4 h-4 animate-pulse" />
             </div>
             <div>
-              <div className="text-[9px] text-zinc-400 uppercase font-bold">Số dư Khoáng Thạch</div>
-              <div className="text-xs sm:text-sm font-black text-amber-400">
-                {oreBalance.toLocaleString()} <span className="text-[10px] text-amber-300">ORE</span>
+              <div className="text-[9px] text-zinc-400 uppercase font-bold">Số dư Khoáng vật Orbs</div>
+              <div className="text-xs sm:text-sm font-black text-purple-300">
+                {oreBalance.toLocaleString()} <span className="text-[10px] text-purple-400 font-bold">ORBS</span>
               </div>
             </div>
           </div>
@@ -549,10 +533,10 @@ export const VFurnitureTab: React.FC = () => {
           <button
             onClick={handleClaimFreeOre}
             className="bg-[#28960b] hover:bg-[#32b312] text-white px-2.5 py-1.5 text-[11px] font-bold font-mono border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] flex items-center gap-1 active:translate-y-[1px]"
-            title="Thưởng thêm 500 Ore miễn phí"
+            title="Thưởng thêm 500 Orbs miễn phí"
           >
             <Gift className="w-3.5 h-3.5 text-yellow-300" />
-            <span>+500 Ore</span>
+            <span>+500 Orbs</span>
           </button>
         </div>
       </div>
@@ -737,17 +721,17 @@ export const VFurnitureTab: React.FC = () => {
                     <div className="pt-2 border-t border-black/30 space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-[10px] text-zinc-400 font-mono">Giá Khoáng Thạch</div>
-                          <div className="text-sm font-black text-amber-400 font-mono flex items-center gap-1">
+                          <div className="text-[10px] text-zinc-400 font-mono">Giá Orbs</div>
+                          <div className="text-sm font-black text-purple-300 font-mono flex items-center gap-1">
                             <span>{product.priceOre.toLocaleString()}</span>
-                            <span className="text-[10px] text-amber-300">ORE</span>
+                            <span className="text-[10px] text-purple-400">ORBS</span>
                           </div>
                         </div>
 
                         {product.originalPriceOre && (
                           <div className="text-right">
                             <div className="text-[9px] text-zinc-500 line-through font-mono">
-                              {product.originalPriceOre.toLocaleString()} ORE
+                              {product.originalPriceOre.toLocaleString()} ORBS
                             </div>
                           </div>
                         )}
@@ -864,8 +848,8 @@ export const VFurnitureTab: React.FC = () => {
                         {/* Subtotal */}
                         <div className="text-right min-w-[90px]">
                           <div className="text-[9px] text-zinc-400 font-mono">Thành tiền</div>
-                          <div className="text-xs font-black text-amber-400 font-mono">
-                            {(item.product.priceOre * item.quantity).toLocaleString()} ORE
+                          <div className="text-xs font-black text-purple-300 font-mono">
+                            {(item.product.priceOre * item.quantity).toLocaleString()} ORBS
                           </div>
                         </div>
 
@@ -885,22 +869,22 @@ export const VFurnitureTab: React.FC = () => {
                 {/* Summary & Checkout Box */}
                 <div className="bg-[#1f2023] border-2 border-[#141414] p-4 space-y-3">
                   <div className="flex items-center justify-between text-xs font-mono text-zinc-300">
-                    <span>Tổng tiền hàng Ore:</span>
-                    <span>{cartTotalOre.toLocaleString()} ORE</span>
+                    <span>Tổng tiền hàng Orbs:</span>
+                    <span className="text-purple-300 font-bold">{cartTotalOre.toLocaleString()} ORBS</span>
                   </div>
                   <div className="flex items-center justify-between text-xs font-mono text-emerald-400">
                     <span>Phí giao hàng Vplay Express:</span>
-                    <span>MIỄN PHÍ (0 ORE)</span>
+                    <span>MIỄN PHÍ (0 ORBS)</span>
                   </div>
                   <div className="border-t border-black/30 pt-2 flex items-center justify-between">
                     <div>
                       <div className="text-xs font-bold text-white font-jura">TỔNG CỘNG THANH TOÁN:</div>
                       <div className="text-xs text-zinc-400 font-mono">
-                        Số dư sau thanh toán: {(oreBalance - cartTotalOre).toLocaleString()} ORE
+                        Số dư sau thanh toán: {(oreBalance - cartTotalOre).toLocaleString()} ORBS
                       </div>
                     </div>
-                    <div className="text-base font-black text-amber-400 font-mono">
-                      {cartTotalOre.toLocaleString()} ORE
+                    <div className="text-base font-black text-purple-300 font-mono">
+                      {cartTotalOre.toLocaleString()} ORBS
                     </div>
                   </div>
 
@@ -909,7 +893,7 @@ export const VFurnitureTab: React.FC = () => {
                     className="w-full bg-[#28960b] hover:bg-[#32b312] text-white py-2.5 text-xs font-bold font-mono border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="w-4 h-4 text-yellow-300" />
-                    <span>XÁC NHẬN THANH TOÁN BẰNG ORE</span>
+                    <span>XÁC NHẬN THANH TOÁN BẰNG ORBS</span>
                   </button>
                 </div>
               </div>
@@ -1080,9 +1064,9 @@ export const VFurnitureTab: React.FC = () => {
             {/* Modal Footer Actions */}
             <div className="bg-[#1f2022] border-t-2 border-[#141414] p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div>
-                <div className="text-[10px] text-zinc-400 font-mono">Giá thanh toán Ore</div>
-                <div className="text-lg font-black text-amber-400 font-mono">
-                  {selectedProduct.priceOre.toLocaleString()} <span className="text-xs">ORE</span>
+                <div className="text-[10px] text-zinc-400 font-mono">Giá thanh toán Orbs</div>
+                <div className="text-lg font-black text-purple-300 font-mono">
+                  {selectedProduct.priceOre.toLocaleString()} <span className="text-xs">ORBS</span>
                 </div>
               </div>
 
@@ -1101,7 +1085,7 @@ export const VFurnitureTab: React.FC = () => {
                   onClick={() => handleBuyDirect(selectedProduct)}
                   className="flex-1 sm:flex-none bg-[#28960b] hover:bg-[#32b312] text-white px-5 py-2 text-xs font-bold font-mono border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69] active:translate-y-[1px]"
                 >
-                  Mua Ngay Bằng Ore
+                  Mua Ngay Bằng Orbs
                 </button>
               </div>
             </div>
@@ -1115,7 +1099,7 @@ export const VFurnitureTab: React.FC = () => {
           <Truck className="w-3.5 h-3.5 text-emerald-400" />
           <span>Vplay Express Delivery • Giao hàng tận nhà 24/7</span>
         </span>
-        <span>V-Furniture Ore UI v1.0</span>
+        <span>V-Furniture Orbs UI v1.0</span>
       </div>
     </div>
   );

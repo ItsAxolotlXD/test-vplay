@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import { ExternalLink, ChevronLeft, Trash2, ShoppingBag, Palette, User, Sliders, Cpu, Layers, HardDrive, RefreshCw, X, Check, Plus, Activity, Gauge } from "lucide-react";
+import { ExternalLink, ChevronLeft, Trash2, ShoppingBag, Palette, User, Sliders, Cpu, Layers, HardDrive, RefreshCw, X, Check, Plus, Activity, Gauge, Gem } from "lucide-react";
 import { VplayToggleSwitch } from "./ui/VplayToggleSwitch";
 import { VplaySecondaryButton } from "./ui/VplaySecondaryButton";
 import { PerformanceStressModal } from "./PerformanceStressModal";
@@ -683,7 +683,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                     <div className="p-3 bg-[#242424] border border-[#181818] rounded-none space-y-1">
                       <div className="text-[11px] font-mono font-bold text-zinc-400 uppercase">Số dư V-pearls hiện tại</div>
                       <div className="text-sm font-mono font-black text-amber-400 flex items-center gap-1.5">
-                        <span>🔮</span> {vCoins.toLocaleString()} VP
+                        <Gem className="w-4 h-4 text-purple-400 shrink-0" /> {vCoins.toLocaleString()} VP
                       </div>
                     </div>
                     <div className="p-3 bg-[#242424] border border-[#181818] rounded-none space-y-1">
@@ -738,7 +738,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                             <div className="font-mono font-bold text-xs sm:text-sm text-white">{pkg.label}</div>
                             <div className="text-[11px] text-emerald-400 font-mono mt-0.5">+{pkg.mb.toLocaleString()} MB</div>
                             <div className="text-[11px] font-mono font-bold text-amber-300 mt-1 flex items-center gap-1">
-                              <span>🔮</span> {priceVP.toLocaleString()} VP
+                              <Gem className="w-3 h-3 text-purple-400 shrink-0" /> {priceVP.toLocaleString()} VP
                             </div>
                           </button>
                         );

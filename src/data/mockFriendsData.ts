@@ -8,6 +8,13 @@ export interface VplayUser {
   channelPlaying?: string;
   isYou?: boolean;
   mutualFriends?: number;
+  level?: number;
+  orbs?: number;
+  badge?: string;
+  badgeColor?: string;
+  bio?: string;
+  favoriteChannel?: string;
+  joinDate?: string;
 }
 
 // Helper to generate Minecraft-style pixel avatars or custom skins
@@ -16,6 +23,26 @@ const getAvatarUrl = (seed: string, index: number): string => {
   const skinName = mcSkins[index % mcSkins.length];
   return `https://mc-heads.net/avatar/${skinName}/64`;
 };
+
+const USER_BADGES = [
+  { name: 'Cư dân VIP Kim Cương', color: 'from-amber-400 to-amber-600 border-amber-400/50 text-amber-200' },
+  { name: 'Chiến thần Minigame', color: 'from-purple-500 to-indigo-600 border-purple-400/50 text-purple-200' },
+  { name: 'Thần đồng VStudy', color: 'from-cyan-500 to-blue-600 border-cyan-400/50 text-cyan-200' },
+  { name: 'Mọt Phim HD', color: 'from-rose-500 to-pink-600 border-rose-400/50 text-rose-200' },
+  { name: 'Nhà phát triển Vplay', color: 'from-emerald-500 to-teal-600 border-emerald-400/50 text-emerald-200' },
+  { name: 'Tay cược Huyền thoại', color: 'from-fuchsia-500 to-purple-700 border-fuchsia-400/50 text-fuchsia-200' },
+  { name: 'Cư dân thân thiện', color: 'from-blue-500 to-indigo-500 border-blue-400/50 text-blue-200' }
+];
+
+const USER_BIOS = [
+  "Đam mê xem truyền hình trực tuyến độ nét cao & thi đấu VStudy!",
+  "Thợ săn Orbs cấp vũ trụ • Sẵn sàng giao lưu PvP Caro & Bầu cua",
+  "Yêu thích các chương trình thời sự VTV1 & VTV3 giải trí cuối tuần",
+  "Ore UI Minecraft fan chính hiệu • Thích tùy biến giao diện Vplay",
+  "Luôn online trải nghiệm phim chiếu rạp và nghe VOV Music thư giãn",
+  "Xin chào! Kết bạn để cùng xem phim và chia sẻ phòng live TV nhé!",
+  "Thành viên tích cực của cộng đồng Vplay Media Hub Việt Nam."
+];
 
 // 100 Unique Everyday Vietnamese Names (No celebrities or football players)
 const VIETNAMESE_NAMES: string[] = [
@@ -45,7 +72,7 @@ const ACTIVITIES_JOINABLE = [
   "Đang xem VTV3 HD", "Đang xem VTV1 HD", "Đang xem THVL1 4K", "Đang xem HTV7 HD",
   "Đang xem VTV6 - Thể Thao", "Đang xem K+ SPORT 1", "Đang phát kênh tùy chỉnh (M3U8)",
   "Playing in Creative Mode", "Playing in Survival Mode", "Playing Minecraft Launcher",
-  "Đang nghe VOV1 - Thời Sự", "Đang xem Phim Chiếu Ráp Vplay", "Đang thi đấu VStudy Quiz"
+  "Đang nghe VOV1 - Thời Sự", "Đang xem Phim Chiếu Rạp Vplay", "Đang thi đấu VStudy Quiz"
 ];
 
 const ACTIVITIES_ONLINE = [
@@ -67,17 +94,30 @@ export const CURRENT_USER: VplayUser = {
   status: "online",
   activity: "In the Menus",
   isYou: true,
-  mutualFriends: 100
+  mutualFriends: 100,
+  level: 42,
+  orbs: 15400,
+  badge: "Nhà phát triển Vplay",
+  badgeColor: "from-emerald-500 to-teal-600 border-emerald-400/50 text-emerald-200",
+  bio: "Tài khoản của bạn trên Vplay Platform • Luôn sẵn sàng hỗ trợ và giao lưu!",
+  favoriteChannel: "VTV3 HD",
+  joinDate: "01/01/2026"
 };
 
 // Generate exactly 100 friends with distinct names
 export const MOCK_100_FRIENDS: VplayUser[] = VIETNAMESE_NAMES.map((name, index) => {
   let status: 'joinable' | 'online' | 'offline';
   let activity: string;
+  let channelPlaying: string | undefined = undefined;
 
   if (index < 20) {
     status = 'joinable';
     activity = ACTIVITIES_JOINABLE[index % ACTIVITIES_JOINABLE.length];
+    if (activity.includes("VTV3")) channelPlaying = "vtv3";
+    else if (activity.includes("VTV1")) channelPlaying = "vtv1";
+    else if (activity.includes("THVL1")) channelPlaying = "thvl1";
+    else if (activity.includes("HTV7")) channelPlaying = "htv7";
+    else if (activity.includes("K+")) channelPlaying = "kplus-sport1";
   } else if (index < 55) {
     status = 'online';
     activity = ACTIVITIES_ONLINE[index % ACTIVITIES_ONLINE.length];
@@ -87,6 +127,7 @@ export const MOCK_100_FRIENDS: VplayUser[] = VIETNAMESE_NAMES.map((name, index) 
   }
 
   const tagNumber = String(1000 + index).padStart(4, '0');
+  const badgeObj = USER_BADGES[index % USER_BADGES.length];
 
   return {
     id: `vplay_user_${index + 1}`,
@@ -95,7 +136,15 @@ export const MOCK_100_FRIENDS: VplayUser[] = VIETNAMESE_NAMES.map((name, index) 
     avatar: getAvatarUrl(name, index),
     status,
     activity,
-    mutualFriends: Math.floor(Math.random() * 25) + 1
+    channelPlaying,
+    mutualFriends: Math.floor(Math.random() * 25) + 1,
+    level: Math.floor(Math.random() * 50) + 1,
+    orbs: (Math.floor(Math.random() * 40) + 2) * 500,
+    badge: badgeObj.name,
+    badgeColor: badgeObj.color,
+    bio: USER_BIOS[index % USER_BIOS.length],
+    favoriteChannel: index % 2 === 0 ? "VTV3 HD" : "VTV1 HD",
+    joinDate: `${(index % 28) + 1}/${((index % 12) + 1).toString().padStart(2, '0')}/2026`
   };
 });
 
@@ -115,8 +164,36 @@ export const MOCK_FRIEND_REQUESTS: FriendRequest[] = [
       avatar: "https://mc-heads.net/avatar/Alex/64",
       status: "online",
       activity: "Mời bạn cùng xem VTV3 HD",
-      mutualFriends: 12
+      mutualFriends: 12,
+      level: 28,
+      orbs: 4500,
+      badge: "Cư dân VIP Kim Cương",
+      badgeColor: "from-amber-400 to-amber-600 border-amber-400/50 text-amber-200",
+      bio: "Rất vui được làm quen với mọi người trên hệ sinh thái Vplay!",
+      favoriteChannel: "VTV3 HD",
+      joinDate: "15/05/2026"
     },
     timestamp: "10 phút trước"
+  },
+  {
+    id: "req_2",
+    user: {
+      id: "req_user_2",
+      name: "Phan Hoàng Nam",
+      tag: "#3421",
+      avatar: "https://mc-heads.net/avatar/Notch/64",
+      status: "joinable",
+      activity: "Đang xem K+ SPORT 1",
+      channelPlaying: "kplus-sport1",
+      mutualFriends: 8,
+      level: 35,
+      orbs: 8900,
+      badge: "Chiến thần Minigame",
+      badgeColor: "from-purple-500 to-indigo-600 border-purple-400/50 text-purple-200",
+      bio: "Thích thể thao và các trận cầu Ngoại hạng Anh cuối tuần!",
+      favoriteChannel: "K+ SPORT 1",
+      joinDate: "02/03/2026"
+    },
+    timestamp: "1 giờ trước"
   }
 ];

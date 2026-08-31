@@ -26,8 +26,11 @@ export interface CommandResult {
   replyText: string;
   foundChannels?: Channel[];
   searchCategoryResults?: SearchCategoryGroup[];
+  isBetArena?: boolean;
+  betGame?: 'baucua' | 'latxu' | 'danhbai' | 'xucxac';
+  betAmount?: number;
   action?: {
-    type: 'navigate' | 'theme' | 'navigation' | 'channel';
+    type: 'navigate' | 'theme' | 'navigation' | 'channel' | 'bet_arena';
     payload?: any;
   };
 }
@@ -966,11 +969,113 @@ Cú pháp:
     };
   }
 
-  // 7. /help or /commands
+  // 7. /cược, /cuoc, /bet, /baucua, /latxu, /danhbai, /xucxac
+  if (
+    command === "/cược" ||
+    command === "/cuoc" ||
+    command === "/bet" ||
+    command === "/gamble" ||
+    command === "/baucua" ||
+    command === "/latxu" ||
+    command === "/danhbai" ||
+    command === "/xucxac" ||
+    command === "/taixiu"
+  ) {
+    const rawLower = rawArgs.toLowerCase();
+    let selectedGame: "baucua" | "latxu" | "danhbai" | "xucxac" = "baucua";
+    let selectedAmount = 500;
+
+    // Parse game type
+    if (command === "/baucua" || rawLower.includes("baucua") || rawLower.includes("bầu") || rawLower.includes("cua")) {
+      selectedGame = "baucua";
+    } else if (command === "/latxu" || rawLower.includes("latxu") || rawLower.includes("xu") || rawLower.includes("coin") || rawLower.includes("flip")) {
+      selectedGame = "latxu";
+    } else if (command === "/danhbai" || rawLower.includes("danhbai") || rawLower.includes("bài") || rawLower.includes("bai") || rawLower.includes("card") || rawLower.includes("3cay")) {
+      selectedGame = "danhbai";
+    } else if (command === "/xucxac" || command === "/taixiu" || rawLower.includes("xucxac") || rawLower.includes("xúc") || rawLower.includes("tai") || rawLower.includes("xỉu") || rawLower.includes("dice")) {
+      selectedGame = "xucxac";
+    }
+
+    // Parse amount if specified in args
+    const amountMatch = rawArgs.match(/\b(\d+)\b/);
+    if (amountMatch) {
+      const parsedAmt = parseInt(amountMatch[1], 10);
+      if (!isNaN(parsedAmt) && parsedAmt > 0) {
+        selectedAmount = parsedAmt;
+      }
+    }
+
+    const gameTitles: Record<string, string> = {
+      baucua: "🦀 Bầu Cua Tôm Cá",
+      latxu: "🪙 Lật Xu Sấp Ngửa",
+      danhbai: "🎴 Đánh Bài 3 Cây PvP",
+      xucxac: "🎲 Xúc Xắc Tài Xỉu"
+    };
+
+    return {
+      handled: true,
+      isBetArena: true,
+      betGame: selectedGame,
+      betAmount: selectedAmount,
+      replyText: `🎰 **SỚI CƯỢC ORBS VIP • ĐẤU NGƯỜI CHƠI (PvP)**
+Đã mở sàn cược **${gameTitles[selectedGame]}** cho bạn!
+
+🎯 **Các trò chơi có sẵn:**
+1. 🦀 **Bầu Cua Tôm Cá:** Đặt cược 6 linh vật (Nai, Bầu, Gà, Cá, Cua, Tôm), ăn x1, x2, x3 tùy số hột xuất hiện.
+2. 🪙 **Lật Xu (Coin Flip):** Chọn Mặt Sấp (Kim Long) hoặc Mặt Ngửa (Hỏa Phụng), tỷ lệ thắng x1.98 Lần.
+3. 🎴 **Đánh Bài (Bài Cào 3 Cây PvP):** So nút với người chơi online (0 - 9 nút, Ba Tây, Sáp x3 cược).
+4. 🎲 **Xúc Xắc (Tài Xỉu):** Đặt cược Tài (11-17), Xỉu (4-10) hoặc Bão x30 lần.
+
+👇 *Tương tác trực tiếp trên bảng cược dưới đây:*`,
+      action: {
+        type: "bet_arena",
+        payload: {
+          game: selectedGame,
+          amount: selectedAmount
+        }
+      }
+    };
+  }
+
+  // 8. /friends, /people, /users, /banbe
+  if (
+    command === "/friends" ||
+    command === "/people" ||
+    command === "/users" ||
+    command === "/banbe" ||
+    command === "/nguoidung"
+  ) {
+    return {
+      handled: true,
+      replyText: `👥 **CỘNG ĐỒNG VPLAY • BẠN BÈ & NGƯỜI DÙNG**
+Đang mở trang danh sách **101+ Cư dân Vplay**.
+
+✨ **Các tính năng trên tab Friends and People:**
+- 🟢 Theo dõi trạng thái Online / Offline / Đang xem TV thời gian thực
+- 📺 Bấm **Cùng xem** để xem chung kênh truyền hình đang phát
+- 💬 Nhắn tin trực tiếp (DM) & trao đổi minigame
+- 💎 **Tặng khoáng vật Orbs** cho bạn bè
+- 🏆 **Bảng xếp hạng đại gia Orbs** toàn hệ thống Vplay
+
+Đang chuyển hướng bạn sang giao diện Bạn bè & Người dùng...`,
+      action: {
+        type: "navigate",
+        payload: "/friends"
+      }
+    };
+  }
+
+  // 9. /help or /commands
   if (command === "/help" || command === "/commands") {
     return {
       handled: true,
       replyText: `🤖 **Danh sách lệnh điều khiển của Copilot for Vplay:**
+- \`/cược\` : Mở sới cược Orbs PvP (Bầu cua, Lật xu, Đánh bài, Xúc xắc)
+- \`/cược baucua 1000\` : Vào ngay sới Bầu Cua mức cược 1.000 Orbs
+- \`/cược latxu 500\` : Chơi Lật Xu Sấp / Ngửa
+- \`/cược danhbai 2000\` : Đánh Bài Cào 3 Cây đấu PvP người chơi
+- \`/cược xucxac 5000\` : Lắc Xúc Xắc Tài Xỉu
+- \`/friends\` hoặc \`/people\` : Xem danh sách Bạn bè & Người dùng Vplay (100+ cư dân)
 - \`/standalone\` : Mở Copilot dưới dạng ứng dụng độc lập toàn màn hình
 - \`/space360\` hoặc \`/vapps\` : Khám phá kho ứng dụng & trò chơi Space 360
 - \`/caro\` / \`/arcade\` : Chơi ngay 5 trò chơi Ore UI (Caro XO, Rắn săn mồi, Nối từ...)

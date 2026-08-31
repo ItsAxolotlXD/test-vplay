@@ -179,7 +179,7 @@ export default function VerifiedTab({
           <Coins className="w-5 h-5 shrink-0 text-amber-300" />
           <div>
             <div className="text-[10px] uppercase font-mono tracking-wider opacity-90">THÀNH CÔNG</div>
-            <div className="text-xs">+50 Khoáng Thạch Điểm Danh Hàng Ngày!</div>
+            <div className="text-xs">+50 Orbs Điểm Danh Hàng Ngày!</div>
           </div>
         </div>
       )}
@@ -223,9 +223,9 @@ export default function VerifiedTab({
           <div className="flex items-center gap-2.5">
             <Coins className="w-5 h-5 text-purple-400 shrink-0 animate-pulse" />
             <div>
-              <div className="text-[9px] uppercase font-mono text-zinc-400 font-bold">Số dư Khoáng Thạch</div>
+              <div className="text-[9px] uppercase font-mono text-zinc-400 font-bold">Số dư Khoáng vật Orbs</div>
               <div className="text-sm sm:text-base font-extrabold text-purple-300 font-mono">
-                {vCoins.toLocaleString()} <span className="text-xs text-purple-400/80 font-jura">Khoáng Thạch</span>
+                {vCoins.toLocaleString()} <span className="text-xs text-purple-400/80 font-jura">Orbs</span>
               </div>
             </div>
           </div>
@@ -328,7 +328,7 @@ export default function VerifiedTab({
               </h2>
 
               <p className="text-xs text-zinc-300 leading-relaxed font-jura">
-                Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến Vplay. Tự do sở hữu huy hiệu tích tím uy tín, thưởng thức V-Play Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày Khoáng Thạch mỗi ngày!
+                Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến Vplay. Tự do sở hữu huy hiệu tích tím uy tín, thưởng thức V-Play Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày Orbs mỗi ngày!
               </p>
             </div>
 
@@ -344,7 +344,7 @@ export default function VerifiedTab({
               </div>
               <div className="p-2 bg-[#1f2123] border-2 border-[#141414] text-center">
                 <div className="text-sm font-extrabold text-amber-300 font-mono">x2 Tốc Độ</div>
-                <div className="text-[9px] text-zinc-400 font-bold uppercase mt-0.5 font-jura">Cày Khoáng Thạch</div>
+                <div className="text-[9px] text-zinc-400 font-bold uppercase mt-0.5 font-jura">Cày Orbs</div>
               </div>
             </div>
           </div>
@@ -383,7 +383,7 @@ export default function VerifiedTab({
             }}
             className="flex-1 !py-2 text-xs font-bold"
           >
-            Tích Khoáng Thạch
+            Tích Lũy Orbs
           </VplayTab>
 
           <VplayTab
@@ -405,7 +405,7 @@ export default function VerifiedTab({
         {activeTabSection === "plans" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* PLAN 1: VERIFIED BASIC - 5 DAYS TRIAL (10,000 KHOÁNG THẠCH) */}
+            {/* PLAN 1: VERIFIED BASIC - 5 DAYS TRIAL (10,000 ORBS) */}
             <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 flex flex-col justify-between space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022]">
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
@@ -423,7 +423,7 @@ export default function VerifiedTab({
                 <div className="py-2 border-y-2 border-[#141414]">
                   <div className="flex items-baseline gap-1">
                     <span className="text-xl font-extrabold text-purple-300 font-mono">10.000</span>
-                    <span className="text-xs font-bold text-zinc-300 font-jura">Khoáng Thạch / 5 ngày</span>
+                    <span className="text-xs font-bold text-zinc-300 font-jura">Orbs / 5 ngày</span>
                   </div>
                   <p className="text-[10px] text-zinc-400 mt-0.5 font-jura">Dễ tích lũy cho người mới bắt đầu</p>
                 </div>
@@ -476,7 +476,7 @@ export default function VerifiedTab({
                 <div className="py-2 border-y-2 border-[#141414]">
                   <div className="flex items-baseline gap-1">
                     <span className="text-xl font-extrabold text-purple-300 font-mono">100.000</span>
-                    <span className="text-xs font-bold text-zinc-300 font-jura">Khoáng Thạch / 10 ngày</span>
+                    <span className="text-xs font-bold text-zinc-300 font-jura">Orbs / 10 ngày</span>
                   </div>
                   <p className="text-[10px] text-purple-300 mt-0.5 font-jura">Tiết kiệm và đầy đủ đặc quyền 10 ngày</p>
                 </div>
@@ -503,7 +503,7 @@ export default function VerifiedTab({
                 variant="purple"
                 className="!py-2 text-xs font-bold w-full"
               >
-                <Coins className="w-3.5 h-3.5 inline mr-1" /> Standard (100.000 ore)
+                <Coins className="w-3.5 h-3.5 inline mr-1" /> Standard (100.000 Orbs)
               </VplayPrimaryButton>
             </div>
 
@@ -525,7 +525,7 @@ export default function VerifiedTab({
                 <div className="py-2 border-y-2 border-[#141414]">
                   <div className="flex items-baseline gap-1">
                     <span className="text-xl font-extrabold text-purple-300 font-mono">1.000.000</span>
-                    <span className="text-xs font-bold text-zinc-300 font-jura">Khoáng Thạch / 30 ngày</span>
+                    <span className="text-xs font-bold text-zinc-300 font-jura">Orbs / 30 ngày</span>
                   </div>
                   <p className="text-[10px] text-zinc-400 mt-0.5 font-jura">Đầy đủ tính năng cao cấp không giới hạn</p>
                 </div>
@@ -552,7 +552,7 @@ export default function VerifiedTab({
                 variant="purple"
                 className="!py-2 text-xs font-bold w-full"
               >
-                <Coins className="w-3.5 h-3.5 inline mr-1" /> Verified (1.000.000 ore)
+                <Coins className="w-3.5 h-3.5 inline mr-1" /> Verified (1.000.000 Orbs)
               </VplayPrimaryButton>
             </div>
 
@@ -579,7 +579,7 @@ export default function VerifiedTab({
                 <div className="py-2 border-y-2 border-[#141414]">
                   <div className="flex items-baseline gap-1">
                     <span className="text-xl font-extrabold text-purple-200 font-mono">5.000.000</span>
-                    <span className="text-xs font-bold text-purple-200 font-jura">Khoáng Thạch / 365 ngày</span>
+                    <span className="text-xs font-bold text-purple-200 font-jura">Orbs / 365 ngày</span>
                   </div>
                   <div className="text-[10px] text-emerald-400 font-bold mt-0.5 flex items-center gap-1 font-jura">
                     <Zap className="w-3 h-3 text-emerald-400" />
@@ -591,7 +591,7 @@ export default function VerifiedTab({
                 <div className="space-y-2 text-xs text-purple-100 font-jura">
                   <div className="flex items-start gap-1.5 bg-[#1e2022]/60 p-1.5 border border-purple-400/30">
                     <Zap className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
-                    <span><strong>x2 Tốc độ cày Khoáng Thạch</strong> (+20 Khoáng Thạch/phút)</span>
+                    <span><strong>x2 Tốc độ cày Orbs</strong> (+20 Orbs/phút)</span>
                   </div>
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-purple-300 shrink-0 mt-0.5" />
@@ -610,7 +610,7 @@ export default function VerifiedTab({
                 className="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-black text-xs border-2 border-[#141414] shadow-[inset_2px_2px_0_#c084fc,inset_-2px_-2px_0_#3b0764] flex items-center justify-center gap-1.5 uppercase font-jura active:translate-y-[1px] cursor-default"
               >
                 <Crown className="w-4 h-4 fill-white" />
-                <span>Nâng Cấp PLUS (5.000.000 ore)</span>
+                <span>Nâng Cấp PLUS (5.000.000 Orbs)</span>
               </button>
             </div>
 
@@ -662,12 +662,12 @@ export default function VerifiedTab({
                     <td className="py-2.5 px-2 text-center text-emerald-400 font-black bg-[#3b1d54]">Tắt Quảng Cáo 100%</td>
                   </tr>
                   <tr className="bg-[#2d2f32]">
-                    <td className="py-2.5 px-3 font-bold text-white">Tốc độ cày Khoáng Thạch khi giải trí</td>
-                    <td className="py-2.5 px-2 text-center text-zinc-300">10 Khoáng Thạch / phút</td>
-                    <td className="py-2.5 px-2 text-center text-purple-200">10 Khoáng Thạch / phút</td>
-                    <td className="py-2.5 px-2 text-center text-purple-300">10 Khoáng Thạch / phút</td>
-                    <td className="py-2.5 px-2 text-center text-purple-300 font-bold">10 Khoáng Thạch / phút</td>
-                    <td className="py-2.5 px-2 text-center text-purple-400 font-black bg-[#3b1d54]">20 Khoáng Thạch / phút (x2)</td>
+                    <td className="py-2.5 px-3 font-bold text-white">Tốc độ cày Orbs khi giải trí</td>
+                    <td className="py-2.5 px-2 text-center text-zinc-300">10 Orbs / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-200">10 Orbs / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300">10 Orbs / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-300 font-bold">10 Orbs / phút</td>
+                    <td className="py-2.5 px-2 text-center text-purple-400 font-black bg-[#3b1d54]">20 Orbs / phút (x2)</td>
                   </tr>
                   <tr className="bg-[#27292c]">
                     <td className="py-2.5 px-3 font-bold text-white">Server đường truyền ưu tiên</td>
@@ -688,10 +688,10 @@ export default function VerifiedTab({
           <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 sm:p-5 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] space-y-4">
             <div className="text-center max-w-xl mx-auto">
               <h3 className="text-base font-black text-white uppercase font-jura">
-                Tích Khoáng Thạch Miễn Phí Rất Đơn Giản
+                Tích Lũy Khoáng Vật Orbs Rất Đơn Giản
               </h3>
               <p className="text-xs text-zinc-300 mt-1 font-jura">
-                Không cần nạp tiền thật! Chỉ cần thưởng thức truyền hình và video ngắn trên Vplay để cày Khoáng Thạch
+                Không cần nạp tiền thật! Chỉ cần thưởng thức truyền hình và video ngắn trên Vplay để cày Orbs
               </p>
             </div>
 
@@ -704,11 +704,11 @@ export default function VerifiedTab({
                   </div>
                   <h4 className="text-sm font-extrabold text-white font-jura">Xem Truyền Hình V-Play</h4>
                   <p className="text-xs text-zinc-300 font-jura">
-                    Mỗi phút xem trực tiếp các kênh VTV, HTV, Thể thao... sẽ tự động nhận Khoáng Thạch
+                    Mỗi phút xem trực tiếp các kênh VTV, HTV, Thể thao... sẽ tự động nhận Orbs
                   </p>
                 </div>
                 <div>
-                  <div className="text-sm font-extrabold text-amber-400 font-mono">+10 Khoáng Thạch / phút</div>
+                  <div className="text-sm font-extrabold text-amber-400 font-mono">+10 Orbs / phút</div>
                   <VplaySecondaryButton
                     onClick={() => onNavigateToTab?.("live_tv")}
                     className="mt-2 w-full text-xs py-1.5"
@@ -725,11 +725,11 @@ export default function VerifiedTab({
                   </div>
                   <h4 className="text-sm font-extrabold text-white font-jura">Xem Video Vertical</h4>
                   <p className="text-xs text-zinc-300 font-jura">
-                    Lướt video giải trí ngắn chuẩn Shorts/TikTok cực cuốn nhận Khoáng Thạch tự động
+                    Lướt video giải trí ngắn chuẩn Shorts/TikTok cực cuốn nhận Orbs tự động
                   </p>
                 </div>
                 <div>
-                  <div className="text-sm font-extrabold text-amber-400 font-mono">+10 Khoáng Thạch / phút</div>
+                  <div className="text-sm font-extrabold text-amber-400 font-mono">+10 Orbs / phút</div>
                   <VplaySecondaryButton
                     onClick={() => onNavigateToTab?.("vertical")}
                     className="mt-2 w-full text-xs py-1.5"
@@ -750,13 +750,13 @@ export default function VerifiedTab({
                   </p>
                 </div>
                 <div>
-                  <div className="text-sm font-extrabold text-amber-400 font-mono">+50 Khoáng Thạch / ngày</div>
+                  <div className="text-sm font-extrabold text-amber-400 font-mono">+50 Orbs / ngày</div>
                   <VplayPrimaryButton
                     onClick={handleClaimDaily}
                     disabled={dailyClaimed}
                     className="mt-2 w-full text-xs py-1.5"
                   >
-                    {dailyClaimed ? "Đã Nhận Hôm Nay" : "Nhận 50 ore Free"}
+                    {dailyClaimed ? "Đã Nhận Hôm Nay" : "Nhận 50 Orbs Free"}
                   </VplayPrimaryButton>
                 </div>
               </div>
@@ -971,19 +971,19 @@ export default function VerifiedTab({
               <div className="flex justify-between">
                 <span className="text-zinc-400">Giá nâng cấp:</span>
                 <span className="font-bold text-amber-400">
-                  {PLAN_PRICES[confirmModal].toLocaleString()} Khoáng Thạch
+                  {PLAN_PRICES[confirmModal].toLocaleString()} Orbs
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">Số dư hiện tại:</span>
                 <span className="font-bold text-white">
-                  {vCoins.toLocaleString()} Khoáng Thạch
+                  {vCoins.toLocaleString()} Orbs
                 </span>
               </div>
               <div className="flex justify-between pt-1.5 border-t border-[#141414]">
                 <span className="text-zinc-400">Còn lại sau nâng cấp:</span>
                 <span className="font-bold text-emerald-400">
-                  {(vCoins - PLAN_PRICES[confirmModal]).toLocaleString()} Khoáng Thạch
+                  {(vCoins - PLAN_PRICES[confirmModal]).toLocaleString()} Orbs
                 </span>
               </div>
             </div>
@@ -1009,7 +1009,7 @@ export default function VerifiedTab({
         </div>
       )}
 
-      {/* MODAL: ERROR NOT ENOUGH KHOÁNG THẠCH */}
+      {/* MODAL: ERROR NOT ENOUGH ORBS */}
       {errorModal && (
         <div className="fixed inset-0 z-[100000] bg-black/80 flex items-center justify-center p-3 font-jura select-none">
           <div className="w-full max-w-md bg-[#2d2f32] border-4 border-[#141414] p-5 sm:p-6 text-center space-y-4 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] relative">
@@ -1029,11 +1029,11 @@ export default function VerifiedTab({
             </div>
 
             <div>
-              <h3 className="text-base font-black text-white uppercase">KHÔNG ĐỦ KHOÁNG THẠCH</h3>
+              <h3 className="text-base font-black text-white uppercase">KHÔNG ĐỦ KHOÁNG VẬT ORBS</h3>
               <p className="text-xs text-zinc-300 mt-1">
                 Bạn còn thiếu{" "}
                 <strong className="text-amber-400 font-mono">
-                  {(errorModal.required - errorModal.current).toLocaleString()} Khoáng Thạch
+                  {(errorModal.required - errorModal.current).toLocaleString()} Orbs
                 </strong>{" "}
                 để đăng ký gói này.
               </p>
@@ -1043,13 +1043,13 @@ export default function VerifiedTab({
               <div className="flex justify-between">
                 <span className="text-zinc-400">Chi phí gói:</span>
                 <span className="font-bold text-purple-400">
-                  {errorModal.required.toLocaleString()} Khoáng Thạch
+                  {errorModal.required.toLocaleString()} Orbs
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">Số dư hiện tại:</span>
                 <span className="font-bold text-rose-400">
-                  {errorModal.current.toLocaleString()} Khoáng Thạch
+                  {errorModal.current.toLocaleString()} Orbs
                 </span>
               </div>
             </div>
@@ -1063,7 +1063,7 @@ export default function VerifiedTab({
                   }}
                   className="w-full !py-2 text-xs font-bold"
                 >
-                  Nhận Ngay +50 Free Khoáng Thạch Điểm Danh
+                  Nhận Ngay +50 Free Orbs Điểm Danh
                 </VplayPrimaryButton>
               )}
               <VplaySecondaryButton
@@ -1074,7 +1074,7 @@ export default function VerifiedTab({
                 }}
                 className="w-full !py-2 text-xs"
               >
-                Xem V-Play Để Tích Thêm Khoáng Thạch (+10 ore/phút)
+                Xem V-Play Để Tích Thêm Orbs (+10 Orbs/phút)
               </VplaySecondaryButton>
             </div>
           </div>

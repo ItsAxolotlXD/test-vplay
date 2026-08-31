@@ -34,12 +34,16 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { processCopilotCommand, SearchCategoryGroup, SearchItem } from "../utils/copilotCommands";
 import { CopilotMarkdown } from "./CopilotMarkdown";
+import { CopilotBetArena } from "./CopilotBetArena";
 import { useSettings } from "../hooks/useSettings";
 
 export interface CopilotMessage {
   role: "user" | "model";
   text: string;
   searchCategoryResults?: SearchCategoryGroup[];
+  isBetArena?: boolean;
+  betGame?: 'baucua' | 'latxu' | 'danhbai' | 'xucxac';
+  betAmount?: number;
   timestamp?: number;
 }
 
@@ -279,6 +283,9 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
         role: "model",
         text: cmdResult.replyText,
         searchCategoryResults: cmdResult.searchCategoryResults,
+        isBetArena: cmdResult.isBetArena,
+        betGame: cmdResult.betGame,
+        betAmount: cmdResult.betAmount,
         timestamp: Date.now()
       };
       const newHist = [...updatedHistory, aiMsg];
@@ -808,9 +815,13 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {[
+                      "/cược",
+                      "/cược baucua 1000",
+                      "/cược latxu 500",
+                      "/cược danhbai 2000",
+                      "/cược xucxac 5000",
                       "/search vtv3",
                       "/search bóng đá filter tv",
-                      "/search filter copilot",
                       "/search filter space360",
                       "/mode light",
                       "/navigation dock"
@@ -820,7 +831,9 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                         onClick={() => handleSend(sug)}
                         className="p-3 bg-[#F1F5F9] hover:bg-white border border-slate-200 hover:border-[#E50914]/50 text-xs font-mono text-slate-800 hover:text-[#E50914] rounded-xl transition-all cursor-pointer flex items-center gap-2.5 text-left group shadow-xs dark:bg-[#1E1D24] dark:hover:bg-[#26252E] dark:border-[#34343E] dark:hover:border-[#E50914]/50 dark:text-slate-200 dark:hover:text-white"
                       >
-                        {sug.startsWith("/search") ? (
+                        {sug.startsWith("/cược") ? (
+                          <Zap className="w-4 h-4 text-purple-400 shrink-0 group-hover:scale-110 transition-transform" />
+                        ) : sug.startsWith("/search") ? (
                           <Search className="w-4 h-4 text-[#E50914] shrink-0 group-hover:scale-110 transition-transform" />
                         ) : sug.startsWith("/") ? (
                           <Terminal className="w-4 h-4 text-[#E50914] shrink-0 group-hover:rotate-12 transition-transform" />
@@ -864,6 +877,16 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                       >
                         {/* Markdown Text Formatting */}
                         <CopilotMarkdown content={cleanedText} isUser={msg.role === "user"} />
+
+                        {/* Interactive Bet Arena Component */}
+                        {(msg.isBetArena || cleanedText.includes("SỚI CƯỢC ORBS VIP")) && (
+                          <div className="mt-4 pt-3 border-t border-slate-200 dark:border-[#34343E]">
+                            <CopilotBetArena
+                              initialGame={msg.betGame || "baucua"}
+                              initialAmount={msg.betAmount || 500}
+                            />
+                          </div>
+                        )}
 
                         {/* Rich Categorized Search Results List */}
                         {msg.searchCategoryResults && msg.searchCategoryResults.length > 0 && (

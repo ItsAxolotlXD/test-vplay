@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Bell, Sun, Moon } from 'lucide-react';
+import { Menu, Bell, Sun, Moon, Users } from 'lucide-react';
 import { useSettings } from '../hooks/useSettings';
 
 interface TopBarProps {
@@ -130,6 +130,19 @@ export const TopBar: React.FC<TopBarProps> = ({
             </div>
           )}
         </div>
+
+        {/* Friends & People button */}
+        <button
+          id="btn-top-friends"
+          onClick={() => navigate('/friends')}
+          className={`w-9 h-9 flex items-center justify-center text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent transition-all drop-shadow-sm cursor-pointer hover:scale-105 active:scale-95 rounded-xl ${
+            _currentRoute === '/friends' || _currentRoute === '/people' ? 'ring-2 ring-[#E6005A] bg-[#E6005A]/10 text-[#E6005A]' : ''
+          }`}
+          title="Bạn bè & Người dùng Vplay (100+ Cư dân)"
+          aria-label="Mở Friends & People"
+        >
+          <Users className="w-5 h-5" />
+        </button>
 
         {/* Light Mode / Dark Mode Toggle button */}
         <button

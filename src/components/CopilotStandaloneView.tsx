@@ -62,6 +62,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { CopilotMarkdown } from "./CopilotMarkdown";
+import { CopilotBetArena } from "./CopilotBetArena";
 import { processCopilotCommand, SearchCategoryGroup, SearchItem } from "../utils/copilotCommands";
 import { useSettings } from "../hooks/useSettings";
 
@@ -87,6 +88,9 @@ export interface CopilotMessage {
   text: string;
   searchCategoryResults?: SearchCategoryGroup[];
   imageUrl?: string;
+  isBetArena?: boolean;
+  betGame?: 'baucua' | 'latxu' | 'danhbai' | 'xucxac';
+  betAmount?: number;
   timestamp?: number;
 }
 
@@ -674,6 +678,9 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
         role: "model",
         text: cmdResult.replyText,
         searchCategoryResults: cmdResult.searchCategoryResults,
+        isBetArena: cmdResult.isBetArena,
+        betGame: cmdResult.betGame,
+        betAmount: cmdResult.betAmount,
         timestamp: Date.now()
       };
       updateMessages([...updatedHistory, aiMsg]);
@@ -1724,6 +1731,16 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
 
                     {/* Text / Markdown */}
                     <CopilotMarkdown content={msg.text} isUser={msg.role === "user"} />
+
+                    {/* Interactive Bet Arena (Bầu Cua, Lật Xu, Đánh Bài, Xúc Xắc) */}
+                    {(msg.isBetArena || (msg.text && msg.text.includes("SỚI CƯỢC ORBS VIP"))) && (
+                      <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                        <CopilotBetArena
+                          initialGame={msg.betGame || "baucua"}
+                          initialAmount={msg.betAmount || 500}
+                        />
+                      </div>
+                    )}
 
                     {/* Search Category Group Results (if any) */}
                     {msg.searchCategoryResults && msg.searchCategoryResults.length > 0 && (
