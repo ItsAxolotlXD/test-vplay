@@ -23,6 +23,9 @@ import {
   Share2,
   ArrowLeft,
   ChevronDown,
+  ChevronRight,
+  Minus,
+  Video,
   History,
   Bot,
   ExternalLink,
@@ -2472,7 +2475,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                 <div className="flex-1 overflow-y-auto p-3 sm:p-5">
                   {activeSpace360App === "v_arcade" && (
                     <div className="h-full">
-                      <VArcadeTab onLaunchGame={(gameId) => setSelectedArcadeGameId(gameId)} />
+                      <VArcadeTab initialGameId={selectedArcadeGameId} />
                     </div>
                   )}
 
@@ -2494,179 +2497,57 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                     </div>
                   )}
 
-                  {/* V-Calc (Embedded Interactive Expression Calculator) */}
                   {activeSpace360App === "v_calc" && (
-                    <div className="max-w-xl mx-auto p-4 sm:p-6 rounded-3xl border bg-white dark:bg-[#1E1E22] border-zinc-200 dark:border-white/10 shadow-lg space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Calculator className="w-5 h-5 text-cyan-500" />
-                          <h4 className="font-bold text-sm">V-Calc Studio</h4>
-                        </div>
-                        <span className="text-xs text-zinc-400">Scientific Calculator</span>
-                      </div>
-
-                      {/* Display Screen */}
-                      <div className="p-4 rounded-2xl bg-zinc-900 text-white text-right space-y-1 font-mono">
-                        <div className="text-xs text-zinc-400 min-h-[1rem]">
-                          {calcInput || "0"}
-                        </div>
-                        <div className="text-3xl font-bold tracking-wider text-cyan-400">
-                          {calcResult || "0"}
-                        </div>
-                      </div>
-
-                      {/* Keypad */}
-                      <div className="grid grid-cols-4 gap-2 text-sm font-semibold">
-                        {["C", "(", ")", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "sqrt", "="].map((btn) => (
-                          <button
-                            key={btn}
-                            onClick={() => {
-                              if (btn === "C") {
-                                setCalcInput("");
-                                setCalcResult("");
-                              } else if (btn === "=") {
-                                try {
-                                  // Safe evaluation of basic math expression
-                                  const sanitized = calcInput.replace(/sqrt\(([^)]+)\)/g, "Math.sqrt($1)");
-                                  // eslint-disable-next-line no-eval
-                                  const res = Function(`'use strict'; return (${sanitized})`)();
-                                  setCalcResult(String(res));
-                                } catch (e) {
-                                  setCalcResult("Lỗi cú pháp");
-                                }
-                              } else if (btn === "sqrt") {
-                                setCalcInput((prev) => prev + "sqrt(");
-                              } else {
-                                setCalcInput((prev) => prev + btn);
-                              }
-                            }}
-                            className={`p-3 rounded-2xl transition-all cursor-pointer text-center font-bold ${
-                              btn === "="
-                                ? "bg-cyan-500 hover:bg-cyan-400 text-white col-span-1 shadow-md shadow-cyan-500/20"
-                                : btn === "C"
-                                ? "bg-rose-500/15 text-rose-500 hover:bg-rose-500/25"
-                                : ["/", "*", "-", "+"].includes(btn)
-                                ? "bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/25"
-                                : "bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10"
-                            }`}
-                          >
-                            {btn}
-                          </button>
-                        ))}
-                      </div>
+                    <div className="h-full">
+                      <VCalcTab />
                     </div>
                   )}
 
-                  {/* V-Xplore File Manager */}
                   {activeSpace360App === "v_xplore" && (
-                    <div className="p-6 rounded-3xl border bg-white dark:bg-[#1E1E22] border-zinc-200 dark:border-white/10 shadow-lg space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/10">
-                        <div className="flex items-center gap-2">
-                          <Folder className="w-5 h-5 text-blue-500" />
-                          <h4 className="font-bold text-sm">V-Files Explorer & Cloud Vault</h4>
-                        </div>
-                        <button
-                          onClick={() => alert("Đã tạo thư mục mới thành công!")}
-                          className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-bold flex items-center gap-1.5"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Thư mục mới</span>
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                        {[
-                          { name: "Tài liệu học tập", items: "12 tệp", size: "48 MB", icon: Folder, color: "text-amber-500" },
-                          { name: "Ảnh kỷ niệm TV", items: "85 tệp", size: "320 MB", icon: ImageIcon, color: "text-emerald-500" },
-                          { name: "Bản vẽ thiết kế", items: "6 tệp", size: "15 MB", icon: PenTool, color: "text-purple-500" },
-                          { name: "Video clips HD", items: "4 tệp", size: "1.2 GB", icon: Video, color: "text-rose-500" },
-                          { name: "Báo cáo Vplay.pdf", items: "PDF", size: "2.4 MB", icon: FileText, color: "text-blue-500" },
-                          { name: "Danh sách kênh.xlsx", items: "Excel", size: "840 KB", icon: FileText, color: "text-emerald-600" }
-                        ].map((file, idx) => (
-                          <div
-                            key={idx}
-                            className="p-3.5 rounded-2xl border border-zinc-200/80 dark:border-white/5 bg-zinc-50 dark:bg-white/5 hover:border-blue-400 transition-all cursor-pointer"
-                          >
-                            <file.icon className={`w-8 h-8 ${file.color} mb-2`} />
-                            <div className="font-bold text-xs truncate">{file.name}</div>
-                            <div className="text-[10px] text-zinc-400 flex items-center justify-between mt-1">
-                              <span>{file.items}</span>
-                              <span>{file.size}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                    <div className="h-full">
+                      <VXploreTab />
                     </div>
                   )}
 
-                  {/* V-Box Streaming Player */}
                   {activeSpace360App === "v_box" && (
-                    <div className="p-6 rounded-3xl border bg-white dark:bg-[#1E1E22] border-zinc-200 dark:border-white/10 shadow-lg space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Tv className="w-5 h-5 text-rose-500" />
-                          <h4 className="font-bold text-sm">V-Box Cinema & Stream Studio</h4>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20">
-                          HD 1080p Stream
-                        </span>
-                      </div>
-
-                      <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black relative flex items-center justify-center">
-                        <iframe
-                          className="w-full h-full"
-                          src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0"
-                          title="V-Box Cinema"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
+                    <div className="h-full">
+                      <VplayVBoxTab />
                     </div>
                   )}
 
-                  {/* Other Space 360 Utility Apps */}
-                  {!["v_arcade", "v_notes", "explore_vietnam", "v_learn", "v_calc", "v_xplore", "v_box"].includes(
-                    activeSpace360App
-                  ) && (
-                    <div className="p-6 rounded-3xl border bg-white dark:bg-[#1E1E22] border-zinc-200 dark:border-white/10 shadow-lg space-y-4 text-center py-12">
-                      {(() => {
-                        const currentApp = SPACE360_APPS.find((a) => a.id === activeSpace360App);
-                        const IconComp = currentApp?.icon || Gamepad2;
-                        return (
-                          <>
-                            <div
-                              className={`w-16 h-16 mx-auto rounded-3xl flex items-center justify-center border shadow-md ${currentApp?.accentColor}`}
-                            >
-                              <IconComp className="w-8 h-8" />
-                            </div>
-                            <h4 className="text-lg font-bold">{currentApp?.name}</h4>
-                            <p className="text-xs text-zinc-400 max-w-md mx-auto">
-                              {currentApp?.tagline}
-                            </p>
-                            <div className="pt-4 flex items-center justify-center gap-3">
-                              <button
-                                onClick={() => {
-                                  handleSend(`Hãy hướng dẫn tôi cách sử dụng ứng dụng ${currentApp?.name}`);
-                                  setIsSpace360Minimized(true);
-                                }}
-                                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-2 shadow-xs"
-                              >
-                                <Sparkles className="w-4 h-4" />
-                                <span>Hỏi Copilot hướng dẫn chi tiết</span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  onOptOut();
-                                  navigate?.("/v-space");
-                                }}
-                                className="px-4 py-2 rounded-xl border border-zinc-300 dark:border-white/20 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-white/10"
-                              >
-                                Mở trên Space 360
-                              </button>
-                            </div>
-                          </>
-                        );
-                      })()}
+                  {activeSpace360App === "v_reminders" && (
+                    <div className="h-full">
+                      <VRemindersTab />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_furniture" && (
+                    <div className="h-full">
+                      <VFurnitureTab />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_books" && (
+                    <div className="h-full">
+                      <VBooksTab />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_bank" && (
+                    <div className="h-full">
+                      <VBankTab />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_office" && (
+                    <div className="h-full">
+                      <VOfficeTab />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_recorder" && (
+                    <div className="h-full">
+                      <VRecorderTab />
                     </div>
                   )}
                 </div>
