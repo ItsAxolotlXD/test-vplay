@@ -17,6 +17,7 @@ import {
   Users,
   Coins,
   Search,
+  X,
   ArrowRight,
   Clock,
   Play,
@@ -169,7 +170,7 @@ export const BetArenaPage: React.FC<BetArenaPageProps> = ({ navigate }) => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-xs text-purple-400 font-bold uppercase tracking-wider mb-1">
-            <Gem className="w-4 h-4 text-purple-400 animate-pulse" />
+            <Coins className="w-4 h-4 text-purple-400 animate-pulse" />
             <span>SÀN CƯỢC KHOÁNG VẬT • HIGH-ROLLER CASINO</span>
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
@@ -183,22 +184,29 @@ export const BetArenaPage: React.FC<BetArenaPageProps> = ({ navigate }) => {
         {/* Right Action: Search Box & Balance Capsule */}
         <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
           {/* Search Box */}
-          <div className="relative w-full sm:w-64 search-box-capsule rounded-full transition-all">
-            <div className="flex items-center px-3 py-1.5 w-full">
-              <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm sảnh cược..."
-                className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none"
-              />
-            </div>
+          <div className="relative w-full sm:w-64 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+            <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm sảnh cược..."
+              className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                title="Xóa tìm kiếm"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* User Orbs Badge Capsule */}
           <div className="px-3.5 py-1.5 rounded-full bg-[#1E1E22] border border-[#2D2D35] flex items-center gap-2 text-xs">
-            <Gem className="w-3.5 h-3.5 text-purple-400" />
+            <Coins className="w-3.5 h-3.5 text-purple-400" />
             <span className="text-zinc-400 font-medium">Orbs:</span>
             <span className="font-mono font-black text-amber-300">{orbs.toLocaleString()}</span>
           </div>
@@ -405,7 +413,7 @@ export const BetArenaPage: React.FC<BetArenaPageProps> = ({ navigate }) => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="p-4 rounded-[22px] bg-[#1E1E22] border border-[#2D2D35] flex items-center gap-3 shadow-md">
           <div className="w-10 h-10 rounded-2xl bg-purple-950/70 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0">
-            <Gem className="w-5 h-5 text-purple-300" />
+            <Coins className="w-5 h-5 text-purple-300" />
           </div>
           <div className="min-w-0">
             <span className="text-[10px] text-zinc-400 uppercase font-bold block">Đơn vị thanh toán</span>

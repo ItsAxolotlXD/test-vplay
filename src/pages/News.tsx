@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NEWS_DATA } from '../data/news';
 import { NewsCard } from '../components/NewsCard';
 import { NewsArticle } from '../types';
-import { Newspaper, Search, Filter, Sparkles, TrendingUp } from 'lucide-react';
+import { Newspaper, Search, Filter, Sparkles, TrendingUp, X } from 'lucide-react';
 
 interface NewsProps {
   navigate: (route: string) => void;
@@ -49,17 +49,24 @@ export const News: React.FC<NewsProps> = ({ navigate }) => {
         </div>
 
         {/* Search */}
-        <div className="relative w-full sm:w-72 search-box-capsule rounded-full transition-all">
-          <div className="flex items-center px-3 py-1.5 w-full">
-            <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm kiếm bài viết..."
-              className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none"
-            />
-          </div>
+        <div className="relative w-full sm:w-72 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+          <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm bài viết..."
+            className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+              title="Xóa tìm kiếm"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

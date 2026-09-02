@@ -7,7 +7,8 @@ import {
   Settings as SettingsIcon,
   Search,
   Users,
-  Gem
+  Coins,
+  Smartphone
 } from 'lucide-react';
 
 interface BottomDockProps {
@@ -23,15 +24,17 @@ export const BottomDock: React.FC<BottomDockProps> = ({
 }) => {
   const isActive = (path: string) => {
     if (path === '/') return currentRoute === '/' || currentRoute === '/home';
+    if (path === '/vertical') return currentRoute === '/vertical' || currentRoute === '/shorts' || currentRoute === '/vplay-vertical';
     return currentRoute.startsWith(path);
   };
 
   const navItems = [
     { id: 'dock-home', label: 'Trang chủ', isCustomHome: true, route: '/' },
     { id: 'dock-tv', label: 'Truyền hình', icon: Tv, route: '/live-tv' },
+    { id: 'dock-vertical', label: 'Vplay Vertical', icon: Smartphone, route: '/vertical' },
     { id: 'dock-news', label: 'Tin tức', icon: Megaphone, route: '/news' },
     { id: 'dock-friends', label: 'Bạn bè & Người dùng', icon: Users, route: '/friends' },
-    { id: 'dock-bet', label: 'Sàn cược Orbs VIP', icon: Gem, route: '/bet-arena' },
+    { id: 'dock-bet', label: 'Sàn cược Orbs VIP', icon: Coins, route: '/bet-arena' },
     { id: 'dock-settings', label: 'Cài đặt', icon: SettingsIcon, route: '/settings' },
   ];
 
@@ -43,7 +46,11 @@ export const BottomDock: React.FC<BottomDockProps> = ({
           id="dock-spotlight-btn"
           onClick={onOpenSearch}
           title="Spotlight Search (⌘K)"
-          className="w-12 h-12 rounded-full flex items-center justify-center text-[#9CA3AF] hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+            currentRoute === '/search' || currentRoute === '/spotlight'
+              ? 'bg-[#E50914] text-white shadow-lg shadow-[#E50914]/30'
+              : 'text-[#9CA3AF] hover:text-white hover:bg-white/10'
+          }`}
         >
           <Search className="w-5.5 h-5.5" />
         </button>

@@ -2,6 +2,20 @@ import { HeroSlide } from '../types';
 
 export const HERO_SLIDES: HeroSlide[] = [
   {
+    id: 'copilot-coming-to-vplay',
+    title: 'Copilot is coming to Vplay',
+    subtitle: 'Microsoft & Vplay AI Collaboration',
+    description: '<gradient>Microsoft is collaborating with Vplay</gradient> to bring Copilot - an everyday AI companion to your Vplay! Trải nghiệm trợ lý trí tuệ nhân tạo thông minh thế hệ mới, hỗ trợ gợi ý nội dung, tra cứu lịch phát sóng, tóm tắt tin tức và điều khiển ứng dụng trực tiếp.',
+    category: 'AI COMPANION',
+    quality: 'Next-Gen AI | Microsoft Copilot',
+    badge: 'COMING SOON • SẮP RA MẮT',
+    channelId: 'copilot',
+    channelName: 'Copilot for Vplay',
+    channelLogo: 'https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg',
+    backgroundImage: 'https://news.microsoft.com/source/emea/wp-content/uploads/2025/01/copilot-masthead.png',
+    ctaText: 'Khám phá Copilot'
+  },
+  {
     id: 'mua-he-nam-ay',
     title: 'Mùa hè năm ấy',
     subtitle: 'Phim truyền hình VFC • VTV3',

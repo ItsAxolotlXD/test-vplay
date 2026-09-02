@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ChevronDown, ChevronUp, Check, Share2, Copy, Play, Download, Bug } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Check, Share2, Copy, Play, Download, Bug, X } from 'lucide-react';
 import { TvChannel } from '../types';
 import { playPopSound } from '../utils/sound';
 import { useLang } from '../context/LanguageContext';
@@ -147,26 +147,22 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
               Find channels by name or category
             </label>
 
-            <div className="relative flex items-center">
-              <img
-                src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531"
-                alt="Search"
-                referrerPolicy="no-referrer"
-                className="absolute left-3 w-5 h-5 object-contain pointer-events-none z-10"
-              />
+            <div className="relative flex items-center h-[40px] px-3.5 rounded-full spotlight-bubble-box search-box-capsule border-0 transition-all">
+              <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search for channels"
-                className="w-full h-9.5 mc-input-box pl-10 pr-8 text-xs font-medium cursor-default"
+                className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
               />
               {searchQuery && (
                 <button
                   onClick={() => onSearchChange('')}
-                  className="absolute right-2.5 text-gray-400 hover:text-white font-bold text-xs p-1 cursor-pointer"
+                  className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                  title="Xóa tìm kiếm"
                 >
-                  ✕
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>

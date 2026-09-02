@@ -6,6 +6,7 @@ import VplayVBoxTab from './VplayVBoxTab';
 import VStudyTab from './VStudyTab';
 import { VArcadeTab, VCalcTab, VRemindersTab, VXploreTab, VFurnitureTab } from './vapps';
 import { VNotesView } from './VNotesView';
+import { MinecraftContainerEmulator } from './minecraft/MinecraftContainerEmulator';
 import {
   Grid,
   MapPin,
@@ -29,7 +30,8 @@ import {
   Compass,
   CheckCircle2,
   SlidersHorizontal,
-  Maximize2
+  Maximize2,
+  Box
 } from 'lucide-react';
 
 export type VAppId =
@@ -41,7 +43,8 @@ export type VAppId =
   | 'v_calc'
   | 'v_reminders'
   | 'v_notes'
-  | 'v_furniture';
+  | 'v_furniture'
+  | 'v_minecraft';
 
 interface VAppDefinition {
   id: VAppId;
@@ -155,6 +158,17 @@ const VAPPS_LIST: VAppDefinition[] = [
     icon: <Armchair className="w-8 h-8 text-lime-400" />,
     tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn'],
   },
+  {
+    id: 'v_minecraft',
+    name: 'Minecraft Container GUI',
+    tagline: 'Mô Phỏng Kho Đồ & Rương Minecraft Pixel Art',
+    description: 'Trải nghiệm rương chứa đồ (Chest, Double Chest, Ender Chest, Shulker Box, Hopper, Lò Nung Furnace) với âm thanh Web Audio chân thực, kéo thả item, tách stack và bảng Creative item.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Sandbox GUI',
+    themeGradient: 'from-emerald-600/20 via-green-900/10 to-transparent',
+    icon: <Box className="w-8 h-8 text-emerald-400" />,
+    tags: ['Minecraft Chest', 'Container GUI', 'Pixel Art', 'Inventory'],
+  },
 ];
 
 interface VAppsViewProps {
@@ -228,17 +242,24 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
 
         {/* Right Search Box & Total Apps Badge */}
         <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
-          <div className="relative w-full sm:w-64 search-box-capsule rounded-full transition-all">
-            <div className="flex items-center px-3 py-1.5 w-full">
-              <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm ứng dụng trong Space 360..."
-                className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none"
-              />
-            </div>
+          <div className="relative w-full sm:w-64 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+            <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm ứng dụng trong Space 360..."
+              className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                title="Xóa tìm kiếm"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="px-3.5 py-1.5 rounded-full bg-[#1E1E22] border border-[#2D2D35] flex items-center gap-2 text-xs">
@@ -487,6 +508,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
               {activeApp === 'v_reminders' && <VRemindersTab />}
               {activeApp === 'v_notes' && <VNotesView />}
               {activeApp === 'v_furniture' && <VFurnitureTab />}
+              {activeApp === 'v_minecraft' && <MinecraftContainerEmulator />}
             </motion.div>
           </AnimatePresence>
         </div>

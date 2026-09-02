@@ -39,7 +39,78 @@ export const Home: React.FC<HomeProps> = ({
       />
 
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-12">
-        {/* 2. Đang phát sóng (On Air Section) */}
+        {/* 2. Copilot is coming to Vplay - Featured Banner Thumbnail */}
+        <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-[#1A1A20] via-[#241C2B] to-[#1A1A20] border border-[#3E344A] p-6 sm:p-8 shadow-xl">
+          <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#E6005A]/20 to-[#A800FF]/15 blur-3xl pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 sm:gap-8 justify-between">
+            {/* Thumbnail Image */}
+            <div className="relative w-full md:w-[320px] lg:w-[380px] h-[190px] sm:h-[220px] rounded-[20px] overflow-hidden shrink-0 border border-white/10 shadow-lg group">
+              <img
+                src="https://news.microsoft.com/source/emea/wp-content/uploads/2025/01/copilot-masthead.png"
+                alt="Copilot is coming to Vplay"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[11px] font-bold text-white">
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    alt="Copilot"
+                    referrerPolicy="no-referrer"
+                    className="w-4 h-4 object-contain"
+                  />
+                  <span>Microsoft Copilot</span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#E6005A]/30 border border-[#E6005A]/50 text-[10px] font-mono font-bold text-[#FF6699]">
+                  PREVIEW
+                </span>
+              </div>
+            </div>
+
+            {/* Banner Content */}
+            <div className="flex-1 space-y-3.5 text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E6005A]/15 border border-[#E6005A]/30 text-xs font-semibold text-[#FF4D8B]">
+                <Sparkles className="w-3.5 h-3.5 text-[#FF4D8B]" />
+                <span>AI COMPANION COLLABORATION</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Copilot is coming to Vplay
+              </h2>
+
+              <p className="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-2xl font-normal">
+                Microsoft is collaborating with Vplay to bring Copilot - an everyday AI companion to your Vplay!
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  id="btn-home-banner-ask-copilot"
+                  onClick={() => navigate('/copilot')}
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#E6005A] via-[#FF1E6B] to-[#D0008F] hover:from-[#FF1E6B] hover:to-[#E6005A] text-white text-sm font-bold shadow-[0_4px_20px_rgba(230,0,90,0.4)] hover:shadow-[0_6px_25px_rgba(230,0,90,0.6)] transition-all cursor-pointer group"
+                >
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    alt="Copilot"
+                    referrerPolicy="no-referrer"
+                    className="w-4 h-4 object-contain shrink-0 group-hover:rotate-180 transition-transform duration-500"
+                  />
+                  <span>Ask Copilot</span>
+                </button>
+
+                <button
+                  id="btn-home-banner-open-standalone"
+                  onClick={() => navigate('/copilot-standalone')}
+                  className="px-5 py-3 rounded-full bg-[#2A2A33] hover:bg-[#34343F] text-zinc-200 text-sm font-semibold border border-white/10 transition-colors cursor-pointer"
+                >
+                  Giao diện độc lập
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. Đang phát sóng (On Air Section) */}
         <OnAirSlider
           channels={channels}
           onSelectChannel={onSelectChannel}

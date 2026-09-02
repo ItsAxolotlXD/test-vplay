@@ -186,23 +186,19 @@ html.light-mode #settings-section-search hr {
   border-color: #E2E8F0 !important;
 }
 
-/* Search Box Container Capsule Style - Only outer box gets thick red focus border */
+/* Search Box Container Capsule Style - Borderless modern spotlight capsule */
 .spotlight-bubble-box,
 .search-box-capsule {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%), #27272D;
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
-  border-top-color: rgba(255, 255, 255, 0.35);
-  border-bottom-color: rgba(255, 255, 255, 0.15);
+  border: none !important;
   box-shadow: none;
-  transition: border 0.18s ease-in-out, box-shadow 0.18s ease-in-out, background 0.18s ease-in-out;
+  transition: box-shadow 0.18s ease-in-out, background 0.18s ease-in-out;
 }
 
 .spotlight-bubble-box:hover,
 .search-box-capsule:hover {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%), #2E2E36;
-  border-color: rgba(255, 255, 255, 0.32);
-  border-top-color: rgba(255, 255, 255, 0.52);
-  border-bottom-color: rgba(255, 255, 255, 0.24);
+  border: none !important;
   box-shadow: none;
 }
 
@@ -210,8 +206,8 @@ html.light-mode #settings-section-search hr {
 .spotlight-bubble-box:focus-within,
 .search-box-capsule:focus-within {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%), #32323B;
-  border: 3px solid #E6005A !important;
-  box-shadow: 0 0 0 3px rgba(230, 0, 90, 0.25), 0 4px 16px rgba(230, 0, 90, 0.15) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Inner input inside search boxes NEVER gets focus border/ring */
@@ -231,25 +227,22 @@ html.light-mode #settings-section-search hr {
 html.light-mode .spotlight-bubble-box,
 html.light-mode .search-box-capsule {
   background: #F1F3F6 !important;
-  border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
-  border-top-color: rgba(255, 255, 255, 0.9) !important;
-  border-bottom-color: rgba(0, 0, 0, 0.14) !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
 html.light-mode .spotlight-bubble-box:hover,
 html.light-mode .search-box-capsule:hover {
   background: #E8EBEF !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
-  border-top-color: #FFFFFF !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
 html.light-mode .spotlight-bubble-box:focus-within,
 html.light-mode .search-box-capsule:focus-within {
   background: #FFFFFF !important;
-  border: 3px solid #E6005A !important;
-  box-shadow: 0 0 0 3px rgba(230, 0, 90, 0.2), 0 4px 16px rgba(230, 0, 90, 0.1) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Spotlight search on sidebar */
@@ -501,7 +494,7 @@ html.light-mode #spotlight-popup-card {
 
 html.light-mode .spotlight-input-container {
   background-color: #F1F3F5 !important;
-  border-color: #E2E8F0 !important;
+  border: none !important;
 }
 
 html.light-mode .spotlight-input-container input {

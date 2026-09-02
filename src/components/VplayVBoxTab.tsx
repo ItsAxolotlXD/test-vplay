@@ -419,19 +419,20 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
         <div className="lg:col-span-3 space-y-4">
           
           {/* Search bar */}
-          <div className="flex items-center gap-2 bg-[#2d2f32] border-2 border-[#141414] px-3 py-2 shadow-xl">
-            <Search className="w-4 h-4 text-zinc-400 shrink-0" />
+          <div className="flex items-center gap-2.5 spotlight-bubble-box search-box-capsule rounded-full px-4 py-2.5 border-0 transition-all">
+            <Search className="w-4 h-4 text-[#8E8E93] shrink-0" />
             <input
               type="text"
               placeholder={`Tìm kiếm tiêu đề, mã hiệu hoặc nội dung trong ${activeSubTab === "community" ? "Community Box" : "Your Box"}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-xs text-white placeholder-zinc-400 focus:outline-none font-jura"
+              className="flex-1 bg-transparent border-none text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery("")}
                 className="text-zinc-400 hover:text-white cursor-pointer transition-colors p-1"
+                title="Xóa tìm kiếm"
               >
                 <X className="w-4 h-4" />
               </button>

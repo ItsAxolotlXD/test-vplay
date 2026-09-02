@@ -411,21 +411,22 @@ export const VNotesView: React.FC = () => {
       {/* CATEGORY TABS & SEARCH BAR */}
       <div className="bg-[#35383b] border-2 border-[#141414] p-3 shadow-md space-y-3">
         {/* Search input */}
-        <div className="relative flex items-center w-full">
-          <Search className="absolute left-3 w-4 h-4 text-zinc-400 pointer-events-none z-10" />
+        <div className="relative flex items-center w-full h-[40px] px-3.5 rounded-full spotlight-bubble-box search-box-capsule border-0 transition-all">
+          <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm kiếm trong V-Notes (tiêu đề, nội dung)..."
-            className="w-full h-9 mc-input-box pl-9 pr-8 text-xs font-medium"
+            className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 text-gray-400 hover:text-white font-bold text-xs p-1"
+              className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+              title="Xóa tìm kiếm"
             >
-              ✕
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>

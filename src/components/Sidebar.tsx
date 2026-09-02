@@ -20,8 +20,10 @@ import {
   Waves, 
   LayoutGrid,
   Sparkles,
-  Gem,
-  Users
+  Coins,
+  Users,
+  Smartphone,
+  RotateCw
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -163,9 +165,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           id={isMobile ? 'btn-mobile-spotlight-search' : 'btn-spotlight-search'}
           onClick={handleSpotlightClick}
-          className="w-full h-[46px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box spotlight-input-container text-left text-sm text-[#8E8E93] hover:text-white transition-all group cursor-pointer"
+          className={`w-full h-[46px] flex items-center justify-center px-4 rounded-full spotlight-bubble-box spotlight-input-container text-sm transition-all group cursor-pointer border-0 ${
+            currentRoute === '/search' || currentRoute === '/spotlight'
+              ? 'bg-[#282834] text-white shadow-lg shadow-cyan-500/20'
+              : 'text-[#8E8E93] hover:text-white'
+          }`}
         >
-          <div className="flex items-center gap-3 min-w-0 truncate">
+          <div className="flex items-center justify-center gap-2.5 min-w-0">
             <div className="w-[18px] h-[18px] min-w-[18px] min-h-[18px] max-w-[18px] max-h-[18px] flex items-center justify-center shrink-0">
               <img
                 src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest?cb=20260717131751"
@@ -177,18 +183,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
               />
             </div>
-            <span className="text-sm text-[#8E8E93] group-hover:text-white font-medium truncate">Spotlight Search...</span>
-          </div>
-          <div className="w-4 h-4 min-w-[16px] min-h-[16px] max-w-[16px] max-h-[16px] flex items-center justify-center shrink-0 ml-1">
-            <img
-              src="https://github.com/andrewtavis/sf-symbols-online/raw/master/glyphs/mic.png"
-              alt="Mic"
-              referrerPolicy="no-referrer"
-              className="w-full h-full aspect-square object-contain brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
-            />
+            <span className={`text-sm font-medium truncate ${
+              currentRoute === '/search' || currentRoute === '/spotlight' ? 'text-white' : 'text-[#8E8E93] group-hover:text-white'
+            }`}>Search</span>
           </div>
         </button>
       </div>
@@ -208,9 +205,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex items-center gap-2.5 min-w-0">
               {/* Glowing Orb Sphere Avatar */}
               <div className="relative w-8 h-8 rounded-xl bg-purple-950/70 border border-purple-400/40 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
-                <Gem className="w-4 h-4 text-purple-300 drop-shadow-[0_0_8px_rgba(168,85,247,0.9)]" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-purple-400 animate-ping opacity-75" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-purple-300" />
+                <Coins className="w-4 h-4 text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.9)]" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 animate-ping opacity-75" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-300" />
               </div>
 
               <div className="flex flex-col min-w-0">
@@ -257,7 +254,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Scrollable Navigation Menu */}
       <div className="flex-1 overflow-y-auto pb-6 text-sm font-medium sidebar-scroller no-scrollbar px-4 pt-1 space-y-2.5">
-        {/* 1. Home */}
+        {/* 1. Copilot for Vplay (AI) - Placed at Top above Home */}
+        <button
+          id={isMobile ? 'mobile-nav-item-copilot' : 'nav-item-copilot'}
+          onClick={() => handleNavClick('/copilot')}
+          title="Copilot for Vplay"
+          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/copilot')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <img
+            src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+            alt="Copilot for Vplay"
+            referrerPolicy="no-referrer"
+            className="w-5 h-5 object-contain shrink-0"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+            }}
+          />
+          <span className="truncate">Copilot for Vplay</span>
+        </button>
+
+        {/* 2. Home (Primary Tab) */}
         <button
           id={isMobile ? 'mobile-nav-item-home' : 'nav-item-home'}
           onClick={() => handleNavClick('/')}
@@ -341,7 +361,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
-        {/* 3. News */}
+        {/* 3. Vertical TV / Shorts */}
+        <button
+          id={isMobile ? 'mobile-nav-item-vertical' : 'nav-item-vertical'}
+          onClick={() => handleNavClick('/vertical')}
+          title="Vplay Vertical"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/vertical') || isActive('/shorts') || isActive('/vplay-vertical')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <Smartphone className="w-5 h-5 shrink-0" />
+            <span className="truncate">Vertical</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-black bg-gradient-to-r from-rose-500/20 to-orange-500/20 text-rose-300 border border-rose-400/40 rounded-full">
+            SHORTS
+          </span>
+        </button>
+
+        {/* 4. News */}
         <button
           id={isMobile ? 'mobile-nav-item-news' : 'nav-item-news'}
           onClick={() => handleNavClick('/news')}
@@ -354,29 +394,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Megaphone className="w-5 h-5 shrink-0" />
           <span className="truncate">News</span>
-        </button>
-
-        {/* 4. Copilot for Vplay (AI) */}
-        <button
-          id={isMobile ? 'mobile-nav-item-copilot' : 'nav-item-copilot'}
-          onClick={() => handleNavClick('/copilot')}
-          title="Copilot for Vplay"
-          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
-            isActive('/copilot')
-              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
-              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
-          }`}
-        >
-          <img
-            src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-            alt="Copilot for Vplay"
-            referrerPolicy="no-referrer"
-            className="w-5 h-5 object-contain shrink-0"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-            }}
-          />
-          <span className="truncate">Copilot for Vplay</span>
         </button>
 
         {/* 5. Space 360 */}
@@ -441,11 +458,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <div className="flex items-center gap-3.5 truncate">
-            <Gem className="w-5 h-5 shrink-0 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]" />
+            <Coins className="w-5 h-5 shrink-0 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]" />
             <span className="truncate">Sàn cược Orbs</span>
           </div>
           <span className="px-2 py-0.5 text-[9.5px] font-mono font-black bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-400/40 rounded-full">
             LIVE
+          </span>
+        </button>
+
+        {/* 9. Minecraft Container GUI */}
+        <button
+          id={isMobile ? 'mobile-nav-item-minecraft' : 'nav-item-minecraft'}
+          onClick={() => handleNavClick('/minecraft')}
+          title="Minecraft Container GUI"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/minecraft') || isActive('/minecraft-gui') || isActive('/minecraft-container') || isActive('/mc-container')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <Box className="w-5 h-5 shrink-0 text-emerald-400" />
+            <span className="truncate">Minecraft Container GUI</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">
+            GUI
           </span>
         </button>
 
@@ -656,6 +693,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Settings className="w-5 h-5 shrink-0" />
           <span className="truncate">Cài đặt</span>
         </button>
+
+        {/* 11. Reload App */}
+        <button
+          id={isMobile ? 'mobile-nav-item-reload-app' : 'nav-item-reload-app'}
+          onClick={() => {
+            window.location.reload();
+          }}
+          title="Tải lại ứng dụng (Reload App)"
+          className="w-full flex items-center justify-between px-4 py-3 rounded-[14px] text-[#A1A1AA] hover:text-white hover:bg-[#2F2F36] transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <RotateCw className="w-5 h-5 shrink-0 text-cyan-400 group-hover:rotate-180 transition-transform duration-500" />
+            <span className="truncate font-medium">Reload App</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">
+            F5
+          </span>
+        </button>
       </div>
     </div>
   );
@@ -699,40 +754,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button 
                 id="btn-sidebar-expand"
                 onClick={onToggleCollapse}
-                className="mt-3 w-7 h-7 rounded-full bg-[#2F2F36] border border-[#3E3E48] flex items-center justify-center text-[#A1A1AA] hover:text-white hover:bg-[#3C3C46] transition-all cursor-pointer shadow-sm"
+                className="mt-3 w-7 h-7 rounded-full bg-[#2F2F36] border border-[#3E3E48] flex items-center justify-center text-[#A1A1AA] hover:text-white hover:bg-[#3C3C46] transition-all cursor-pointer shadow-sm shrink-0"
                 title="Mở rộng menu"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 shrink-0" />
               </button>
 
               {/* Collapsed Search button */}
-              <div className="px-2 pt-4 pb-1.5 flex justify-center">
+              <div className="px-2 pt-4 pb-1.5 flex justify-center shrink-0">
                 <button
                   id="btn-spotlight-search-mini"
                   onClick={handleSpotlightClick}
                   title="Spotlight Search (⌘K)"
-                  className="w-11 h-11 rounded-full spotlight-bubble-box flex items-center justify-center text-[#A1A1AA] hover:text-white transition-all cursor-pointer shadow-md hover:ring-1 hover:ring-white/40"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-full spotlight-bubble-box flex items-center justify-center transition-all cursor-pointer shadow-md border-0 ${
+                    currentRoute === '/search' || currentRoute === '/spotlight'
+                      ? 'bg-[#282834] text-white shadow-lg shadow-cyan-500/20'
+                      : 'text-[#A1A1AA] hover:text-white'
+                  }`}
                 >
                   <div className="w-[18px] h-[18px] min-w-[18px] min-h-[18px] max-w-[18px] max-h-[18px] flex items-center justify-center shrink-0">
                     <img
                       src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest?cb=20260717131751"
                       alt="Search"
                       referrerPolicy="no-referrer"
-                      className="w-full h-full aspect-square object-contain brightness-0 invert opacity-80"
+                      className="w-full h-full aspect-square object-contain brightness-0 invert opacity-80 shrink-0"
                     />
                   </div>
                 </button>
               </div>
 
               {/* Mini Orbs Counter */}
-              <div className="px-2 pb-3 flex justify-center">
+              <div className="px-2 pb-3 flex justify-center shrink-0">
                 <button
                   id="btn-mini-orbs-indicator"
                   onClick={() => handleNavClick('/v-premium')}
                   title={`Số dư: ${orbs.toLocaleString()} Orbs (Khoáng vật)`}
-                  className="w-11 py-1 px-0.5 rounded-xl bg-purple-950/50 border border-purple-500/30 flex flex-col items-center justify-center hover:border-purple-400 hover:bg-purple-900/40 hover:scale-105 transition-all shadow-md cursor-pointer group"
+                  className="w-11 min-w-[44px] shrink-0 py-1 px-0.5 rounded-xl bg-purple-950/50 border border-purple-500/30 flex flex-col items-center justify-center hover:border-purple-400 hover:bg-purple-900/40 hover:scale-105 transition-all shadow-md cursor-pointer group"
                 >
-                  <Gem className="w-3.5 h-3.5 text-purple-300 drop-shadow-[0_0_4px_rgba(168,85,247,0.8)]" />
+                  <Coins className="w-3.5 h-3.5 text-amber-300 drop-shadow-[0_0_4px_rgba(251,191,36,0.8)] shrink-0" />
                   <span className="text-[8px] font-mono font-extrabold text-purple-200 mt-0.5 tracking-tight truncate max-w-[38px]">
                     {orbs >= 1000000
                       ? `${(orbs / 1000000).toFixed(1)}M`
@@ -744,11 +803,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
 
               {/* Mini nav icons */}
-              <div className="flex-1 overflow-y-auto pb-4 space-y-3 flex flex-col items-center no-scrollbar">
+              <div className="w-full flex-1 overflow-y-auto pb-4 space-y-2.5 flex flex-col items-center no-scrollbar">
+                {/* 1. Copilot (Top above Home) */}
+                <button
+                  onClick={() => handleNavClick('/copilot')}
+                  title="Copilot for Vplay"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/copilot') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    alt="Copilot for Vplay"
+                    referrerPolicy="no-referrer"
+                    className="w-5 h-5 min-w-[20px] min-h-[20px] object-contain shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                    }}
+                  />
+                </button>
+
+                {/* 2. Home (Primary Tab) */}
                 <button
                   onClick={() => handleNavClick('/')}
                   title="Home"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/') && currentRoute === '/' ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
@@ -756,7 +835,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     src="https://static.wikia.nocookie.net/ep-deo/images/6/6e/New_hom.png/revision/latest?cb=20260722124341"
                     alt="Home"
                     referrerPolicy="no-referrer"
-                    className={`w-5 h-5 object-contain shrink-0 ${
+                    className={`w-5 h-5 min-w-[20px] min-h-[20px] object-contain shrink-0 ${
                       isActive('/') && currentRoute === '/' ? 'brightness-0 invert' : 'sidebar-nav-home-icon'
                     }`}
                     onError={(e) => {
@@ -767,109 +846,117 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   onClick={() => handleNavClick('/live-tv')}
                   title="Live TV"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/live-tv') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Tv className="w-5 h-5" />
+                  <Tv className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/vertical')}
+                  title="Vplay Vertical"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/vertical') || isActive('/shorts') || isActive('/vplay-vertical') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Smartphone className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/news')}
                   title="News"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/news') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Megaphone className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/copilot')}
-                  title="Copilot for Vplay"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
-                    isActive('/copilot') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <img
-                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-                    alt="Copilot for Vplay"
-                    referrerPolicy="no-referrer"
-                    className="w-5 h-5 object-contain shrink-0"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-                    }}
-                  />
+                  <Megaphone className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/v-space')}
                   title="Space 360"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/v-space') || isActive('/space-360') || isActive('/v-apps') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <LayoutGrid className="w-5 h-5" />
+                  <LayoutGrid className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/v-premium')}
                   title="Waves Premium"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/v-premium') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Waves className="w-5 h-5" />
+                  <Waves className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/friends')}
                   title="Friends & People (100+ người dùng)"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/friends') || isActive('/people') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Users className="w-5 h-5" />
+                  <Users className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/bet-arena')}
                   title="Sàn cược Orbs (Bầu Cua, Lật Xu, Bài Cào, Tài Xỉu)"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/bet-arena') || isActive('/orbs-bet') || isActive('/casino') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Gem className="w-5 h-5 text-amber-400" />
+                  <Coins className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-amber-400" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/minecraft')}
+                  title="Minecraft Container GUI"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/minecraft') || isActive('/minecraft-gui') || isActive('/minecraft-container') || isActive('/mc-container') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Box className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-emerald-400" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/favorites')}
                   title="Favorites"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/favorites') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Heart className="w-5 h-5" />
+                  <Heart className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/toolbox')}
                   title="Toolbox"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/toolbox') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Box className="w-5 h-5" />
+                  <Box className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/about')}
                   title="About"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/about') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Info className="w-5 h-5" />
+                  <Info className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/settings')}
                   title="Cài đặt"
-                  className={`w-11 h-11 rounded-[14px] flex items-center justify-center p-0 transition-all ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/settings') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
+                </button>
+                <button
+                  onClick={() => window.location.reload()}
+                  title="Tải lại ứng dụng (Reload App)"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 text-[#A1A1AA] hover:text-white hover:bg-[#2F2F36] transition-all group cursor-pointer"
+                >
+                  <RotateCw className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-cyan-400 group-hover:rotate-180 transition-transform duration-500" />
                 </button>
               </div>
             </div>

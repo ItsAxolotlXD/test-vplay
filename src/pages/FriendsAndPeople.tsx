@@ -31,7 +31,7 @@ import {
   Activity,
   Heart,
   Compass,
-  Gem
+  Coins
 } from 'lucide-react';
 import { 
   VplayUser, 
@@ -303,7 +303,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
               </div>
 
               <div className="px-3.5 py-2 rounded-xl bg-purple-950/40 border border-purple-500/30 flex items-center gap-2">
-                <Gem className="w-3.5 h-3.5 text-purple-400" />
+                <Coins className="w-3.5 h-3.5 text-purple-400" />
                 <span className="text-xs text-purple-200 font-medium">Orbs của bạn:</span>
                 <span className="text-xs font-black text-purple-300 font-mono">{orbs.toLocaleString()}</span>
               </div>
@@ -394,19 +394,20 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
         {/* Right Controls: Search, Sort, Add Friend & View Mode */}
         <div className="flex items-center gap-2.5">
           {/* Search Box */}
-          <div className="relative flex-1 md:w-64">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative flex-1 md:w-64 h-[42px] flex items-center px-3.5 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+            <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm tên, #tag, hoạt động..."
-              className="w-full bg-[#1E1D24] text-xs text-white placeholder-zinc-500 pl-9 pr-8 py-2.5 rounded-xl border border-[#34343E] focus:outline-none focus:border-[#E6005A] transition-all font-medium"
+              className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                title="Xóa tìm kiếm"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -1112,7 +1113,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-10 h-10 rounded-xl bg-purple-950/70 border border-purple-500/40 flex items-center justify-center text-purple-300">
-                    <Gem className="w-5 h-5 text-purple-300 animate-pulse" />
+                    <Coins className="w-5 h-5 text-purple-300 animate-pulse" />
                   </div>
                   <div>
                     <h2 className="text-base font-bold text-white">Tặng Khoáng Vật Orbs</h2>

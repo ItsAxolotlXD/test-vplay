@@ -138,12 +138,48 @@ interface VplayVerticalProps {
   setActiveTab?: (tab: string) => void;
 }
 
-export default function VplayVertical({ channels, onBack, isMaterialDesignActive = false, setActiveTab }: VplayVerticalProps) {
-  // Filter out radio and non-video channels
-  const videoChannels = channels.filter(ch => !ch.isRadio && ch.url !== "#testcard");
+const FALLBACK_CHANNEL: Channel = {
+  id: 'vtv1',
+  name: 'VTV1 HD',
+  slug: 'vtv1',
+  logo: 'https://static.wikia.nocookie.net/ftv/images/a/ac/1vv.png/revision/latest/scale-to-width-down/1000?cb=20260604052331&path-prefix=vi',
+  logoImg: 'https://static.wikia.nocookie.net/ftv/images/a/ac/1vv.png/revision/latest/scale-to-width-down/1000?cb=20260604052331&path-prefix=vi',
+  logoText: 'VTV1',
+  category: 'Kênh VTV',
+  group: 'Kênh VTV',
+  quality: 'HD',
+  streamUrl: 'https://live.fptplay53.net/live/media/vtv1/live247-hls-avc/vtv1-avc1_5600000=10000-mp4a_131600=20000.m3u8',
+  url: 'https://live.fptplay53.net/live/media/vtv1/live247-hls-avc/vtv1-avc1_5600000=10000-mp4a_131600=20000.m3u8',
+  isLive: true,
+  currentProgram: {
+    title: 'Thời sự 19h',
+    startTime: '19:00',
+    endTime: '19:45',
+    progress: 50,
+    description: 'Chương trình Thời sự quốc gia'
+  },
+  description: 'Kênh tin tức tổng hợp'
+};
+
+export default function VplayVertical({ channels = [], onBack, isMaterialDesignActive = false, setActiveTab }: VplayVerticalProps) {
+  // Normalize channels and filter out radio / non-video channels
+  const rawList = Array.isArray(channels) && channels.length > 0 ? channels : [FALLBACK_CHANNEL];
+  const videoChannels = rawList
+    .filter(ch => ch && !ch.isRadio && ch.url !== "#testcard" && ch.streamUrl !== "#testcard")
+    .map(ch => ({
+      ...ch,
+      url: ch.url || ch.streamUrl || "",
+      streamUrl: ch.streamUrl || ch.url || "",
+      logoImg: ch.logoImg || ch.logo || "",
+      logoText: ch.logoText || ch.shortName || ch.name || "CH",
+      group: ch.group || ch.category || "Truyền hình",
+    }))
+    .filter(ch => Boolean(ch.url));
+
+  const safeChannels = videoChannels.length > 0 ? videoChannels : [FALLBACK_CHANNEL];
   
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const currentChannel = videoChannels[currentIndex] || videoChannels[0];
+  const currentChannel = safeChannels[currentIndex] || safeChannels[0] || FALLBACK_CHANNEL;
   
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [muted, setMuted] = useState<boolean>(false);
@@ -315,6 +351,9 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
     const video = videoRef.current;
     if (!video || !currentChannel) return;
 
+    const streamSource = currentChannel.url || currentChannel.streamUrl || "";
+    if (!streamSource) return;
+
     setIsPlaying(true);
 
     if (hlsRef.current) {
@@ -323,10 +362,10 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
     }
 
     // MP4/Sample assets support
-    const isMp4 = currentChannel.id === "test_video" || currentChannel.url.endsWith(".mp4") || currentChannel.url.includes(".mp4?");
+    const isMp4 = currentChannel.id === "test_video" || (typeof streamSource === "string" && (streamSource.endsWith(".mp4") || streamSource.includes(".mp4?")));
 
     if (isMp4) {
-      video.src = currentChannel.url;
+      video.src = streamSource;
       video.load();
       video.play().catch(err => console.log("Autoplay block or playback interrupted:", err));
     } else {
@@ -336,7 +375,7 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
           lowLatencyMode: true,
         });
         hlsRef.current = hls;
-        hls.loadSource(currentChannel.url);
+        hls.loadSource(streamSource);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           video.play().catch(err => console.log("HLS play block:", err));
@@ -344,14 +383,14 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
         hls.on(Hls.Events.ERROR, (event, data) => {
           console.warn("HLS Error:", data);
           if (data.fatal) {
-            triggerToast(`Luồng ${currentChannel.name} gặp sự cố. Đang tự động bỏ qua...`);
+            triggerToast(`Luồng ${currentChannel.name || 'kênh'} gặp sự cố. Đang tự động bỏ qua...`);
             setTimeout(() => {
               handleNextShort();
             }, 1500);
           }
         });
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = currentChannel.url;
+        video.src = streamSource;
         video.load();
         video.play().catch(err => console.log("Safari play block:", err));
       }
@@ -858,14 +897,25 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
 
         {/* Live Channel Search */}
         <div className="relative mb-3.5">
-          <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 object-contain" referrerPolicy="no-referrer" alt="Search" />
-          <input
-            type="text"
-            placeholder="Tìm kênh Vertical..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/[0.04] border border-white/10 hover:border-white/25 focus:border-indigo-500 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-white/30 outline-none transition-all font-medium"
-          />
+          <div className="flex items-center gap-2.5 spotlight-bubble-box search-box-capsule rounded-full px-3.5 py-2 border-0 transition-all">
+            <Search className="w-3.5 h-3.5 text-[#8E8E93] shrink-0" />
+            <input
+              type="text"
+              placeholder="Tìm kênh Vertical..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent border-none text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="text-zinc-400 hover:text-white p-0.5 cursor-pointer transition-colors"
+                title="Xóa tìm kiếm"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Sidebar Channel List container */}
@@ -1556,15 +1606,24 @@ export default function VplayVertical({ channels, onBack, isMaterialDesignActive
 
               {/* Search Input */}
               <div className="p-3 border-b border-white/5 shrink-0">
-                <div className="relative">
-                  <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 object-contain" referrerPolicy="no-referrer" alt="Search" />
+                <div className="flex items-center gap-2 spotlight-bubble-box search-box-capsule rounded-full px-3 py-1.5 border-0 transition-all">
+                  <Search className="w-3.5 h-3.5 text-[#8E8E93] shrink-0" />
                   <input
                     type="text"
                     placeholder="Nhập tên kênh cần tìm..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white/[0.05] border border-white/10 focus:border-amber-400 rounded-xl pl-8.5 pr-4 py-2 text-[11px] text-white placeholder-white/30 outline-none transition-all font-medium"
+                    className="flex-1 bg-transparent border-none text-[11px] text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
                   />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="text-zinc-400 hover:text-white p-0.5 cursor-pointer transition-colors"
+                      title="Xóa tìm kiếm"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
               </div>
 

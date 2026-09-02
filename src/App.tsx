@@ -5,6 +5,7 @@ import { BottomDock } from './components/BottomDock';
 import { SpotlightModal } from './components/SpotlightModal';
 import { CustomStreamModal } from './components/CustomStreamModal';
 import { WelcomeModal } from './components/WelcomeModal';
+import { SplashScreen } from './components/SplashScreen';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
 import { LiveTV } from './pages/LiveTV';
@@ -22,7 +23,8 @@ import { CopilotStandaloneView } from './components/CopilotStandaloneView';
 import { CopilotFloatingWindow } from './components/CopilotFloatingWindow';
 import { VAppsView } from './components/VAppsView';
 import { VPremiumView } from './components/VPremiumView';
-import { FullPageSearchView } from './components/FullPageSearchView';
+import { SearchTab } from './components/SearchTab';
+import VplayVertical from './components/VplayVertical';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
 import { useSettings } from './hooks/useSettings';
@@ -93,9 +95,20 @@ export default function App() {
     return CHANNELS_DATA[0];
   });
 
+  // Splash Screen State
+  const [showSplashScreen, setShowSplashScreen] = useState<boolean>(true);
+
+  // Allow replaying splash screen from any menu / component via custom event
+  useEffect(() => {
+    const handleReplaySplash = () => {
+      setShowSplashScreen(true);
+    };
+    window.addEventListener('vplay:replay_splash', handleReplaySplash);
+    return () => window.removeEventListener('vplay:replay_splash', handleReplaySplash);
+  }, []);
+
   // Modals state
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(true);
-  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [isCustomStreamModalOpen, setIsCustomStreamModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
@@ -119,12 +132,14 @@ export default function App() {
   // Determine effective sidebar width for page adaptation
   const isEffectiveCollapsed = settings.autoHideSidebar || isSidebarCollapsed;
 
-  // Search opener logic respecting settings.mergeSpotlightToCopilot
+  // Search opener logic respecting settings.mergeSpotlightToCopilot:
+  // When mergeSpotlightToCopilot is true -> navigates to Copilot
+  // When mergeSpotlightToCopilot is false -> opens Search as a dedicated Tab (/search)
   const handleOpenSearch = () => {
     if (settings.mergeSpotlightToCopilot) {
       navigate('/copilot');
     } else {
-      setIsSpotlightOpen(true);
+      navigate('/search');
     }
   };
 
@@ -237,10 +252,38 @@ export default function App() {
           />
         );
 
+      case '/vertical':
+      case '/vplay-vertical':
+      case '/shorts':
+      case '/vertical-tv':
+        return (
+          <VplayVertical
+            channels={channels}
+            onBack={() => navigate('/')}
+            setActiveTab={(tab) => {
+              if (tab === 'live') navigate('/live-tv');
+              else if (tab === 'home') navigate('/');
+              else navigate(`/${tab}`);
+            }}
+          />
+        );
+
       case '/news':
         return <News navigate={navigate} />;
 
+      case '/search':
+      case '/spotlight':
+      case '/tim-kiem':
+        return (
+          <SearchTab
+            navigate={navigate}
+            onSelectChannel={setCurrentChannel}
+            channels={channels}
+          />
+        );
+
       case '/copilot':
+      case '/copilot-standalone':
         return (
           <CopilotTab
             channels={channels}
@@ -317,6 +360,19 @@ export default function App() {
         return (
           <Toolbox
             initialTab={routeState?.tab || 'safe-area'}
+            onSelectChannel={setCurrentChannel}
+            navigate={navigate}
+          />
+        );
+
+      case '/minecraft':
+      case '/minecraft-gui':
+      case '/minecraft-container':
+      case '/mc-container':
+      case '/minecraft-chest':
+        return (
+          <Toolbox
+            initialTab="mc-container"
             onSelectChannel={setCurrentChannel}
             navigate={navigate}
           />
@@ -406,6 +462,7 @@ export default function App() {
           navigate={navigate}
           onOpenSearch={handleOpenSearch}
           onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
+          onOpenCopilotWindow={() => toggleCopilotFloating(true)}
         />
 
         {/* Dynamic Page Content with smooth fade */}
@@ -427,59 +484,21 @@ export default function App() {
         />
       )}
 
-      {/* Global Spotlight Search Modal Popup (When mergeSpotlightToCopilot is false) */}
-      <FullPageSearchView
-        isOpen={isSpotlightOpen}
-        onClose={() => setIsSpotlightOpen(false)}
-        onSelectChannel={(ch) => {
-          setCurrentChannel(ch);
-          navigate(`/live-tv?channel=${ch.slug}`);
-        }}
-        onNavigateToTab={(tab) => {
-          if (tab === "home") navigate("/");
-          else if (tab === "live") navigate("/live-tv");
-          else if (tab === "vapps") navigate("/v-space");
-          else if (tab === "vpremium") navigate("/v-premium");
-          else if (tab === "news") navigate("/news");
-          else if (tab === "settings") navigate("/settings");
-        }}
-        onNavigateToVApp={(appId, gameId) => {
-          navigate("/v-space", { appId, gameId });
-        }}
-        onNavigateToVPremium={(subTab) => {
-          navigate("/v-premium", { subTab });
-        }}
-        onNavigateToNews={(articleId) => {
-          if (articleId) navigate(`/news/${articleId}`);
-          else navigate("/news");
-        }}
-        onNavigateToSettingSection={(_sec) => {
-          navigate("/settings");
-        }}
-        channels={channels}
-        categories={[]}
-        spotlightSearchSettings={{
-          categories: true,
-          vapps: true,
-          vpremium: true,
-          news: true,
-          channels: true,
-          channelNumbers: true,
-          toolbox: true,
-          settings: true,
-        }}
-        favorites={favoriteChannelIds}
-        onToggleFavorite={toggleFavoriteChannel}
-        triggerToast={(_msg) => {}}
-        onOpenSearchSettings={() => navigate("/settings")}
-      />
-
       <CustomStreamModal
         isOpen={isCustomStreamModalOpen}
         onClose={() => setIsCustomStreamModalOpen(false)}
         onPlayCustomChannel={handlePlayCustomChannel}
         onImportPlaylist={handleImportPlaylist}
       />
+
+      {/* Initial Startup / Replay Splash Screen */}
+      {showSplashScreen && (
+        <SplashScreen
+          onFinish={() => {
+            setShowSplashScreen(false);
+          }}
+        />
+      )}
 
       {/* Startup / Refresh Welcome Modal */}
       <WelcomeModal

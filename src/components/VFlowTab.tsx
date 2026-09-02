@@ -615,15 +615,24 @@ export default function VFlowTab({
               </div>
 
               {/* Search Box */}
-              <div className="relative w-full sm:w-60 shrink-0">
-                <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <div className="relative w-full sm:w-60 h-[38px] flex items-center px-3.5 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0 shrink-0">
+                <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Tìm bài viết..."
-                  className="w-full bg-zinc-900/90 border border-white/10 pl-9 pr-3 py-1.5 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400 transition-all"
+                  className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                    title="Xóa tìm kiếm"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Channel } from '../types';
 import { ChannelCard } from '../components/ChannelCard';
-import { Tag, Search, Radio, Filter, Tv, CheckCircle2, Sparkles, Satellite } from 'lucide-react';
+import { Tag, Search, Radio, Filter, Tv, CheckCircle2, Sparkles, Satellite, X } from 'lucide-react';
 
 interface ChannelsProps {
   channels: Channel[];
@@ -76,15 +76,24 @@ export const Channels: React.FC<ChannelsProps> = ({
         </div>
 
         {/* Search */}
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-[#8E8E93]" />
+        <div className="relative w-full md:w-72 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+          <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm kiếm kênh truyền hình..."
-            className="w-full pl-10 pr-4 py-2 rounded-full bg-[#141416] border border-[#34343C] text-xs text-white placeholder-[#8E8E93] focus:outline-none focus:border-[#DF37EE]"
+            className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+              title="Xóa tìm kiếm"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

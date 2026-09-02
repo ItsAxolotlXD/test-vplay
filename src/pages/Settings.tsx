@@ -11,6 +11,7 @@ import {
   Bot,
   User,
   RotateCcw,
+  RotateCw,
   Sparkles
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG } from '../hooks/useSettings';
@@ -256,6 +257,64 @@ export const Settings: React.FC = () => {
                     })}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Card 4: Màn hình khởi động (Splash Screen) */}
+            {(matchesSearch('Splash Screen') || matchesSearch('Màn hình khởi động')) && (
+              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+                <div>
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <span>Màn hình khởi động (Splash Screen)</span>
+                    <span className="px-2 py-0.5 text-[10px] font-bold bg-[#E6005A]/20 text-[#E6005A] rounded-full">
+                      Vplay OS
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    Hiển thị logo tối giản và vòng tròn tải khi khởi chạy ứng dụng
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  id="btn-settings-replay-splash"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('vplay:replay_splash'));
+                  }}
+                  className="px-4 py-2 rounded-full bg-[#E6005A] hover:bg-[#FF267A] text-white text-xs font-bold transition-all shadow-md shadow-[#E6005A]/25 cursor-pointer shrink-0"
+                >
+                  Xem lại
+                </button>
+              </div>
+            )}
+
+            {/* Card 5: Tải lại ứng dụng (Reload App) */}
+            {(matchesSearch('Reload App') || matchesSearch('Tải lại') || matchesSearch('Làm mới') || matchesSearch('Reload')) && (
+              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+                <div>
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <RotateCw className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span>Tải lại ứng dụng (Reload App)</span>
+                    <span className="px-2 py-0.5 text-[10px] font-mono bg-cyan-500/20 text-cyan-300 rounded-full">
+                      F5
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    Làm mới toàn bộ dữ liệu, bộ nhớ tạm và tái khởi động ứng dụng mượt mà
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  id="btn-settings-reload-app"
+                  onClick={() => {
+                    window.location.reload();
+                  }}
+                  className="px-4 py-2 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md shadow-cyan-600/25 cursor-pointer shrink-0 flex items-center gap-1.5"
+                >
+                  <RotateCw className="w-3.5 h-3.5" />
+                  <span>Reload App</span>
+                </button>
               </div>
             )}
           </div>

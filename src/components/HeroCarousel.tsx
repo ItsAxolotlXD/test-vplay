@@ -43,6 +43,10 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
   }, [isHovered, settings.autoScrollBanner]);
 
   const handleWatchNow = () => {
+    if (currentSlide.channelId === 'copilot' || currentSlide.id.includes('copilot')) {
+      navigate('/copilot');
+      return;
+    }
     const targetChannel = CHANNELS_DATA.find((c) => c.id === currentSlide.channelId) || CHANNELS_DATA[0];
     onSelectChannel(targetChannel);
     navigate(`/live-tv?channel=${targetChannel.slug}`);

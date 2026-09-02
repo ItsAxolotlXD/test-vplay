@@ -168,8 +168,14 @@ export const ChannelPlayer = React.memo(function ChannelPlayer({
         });
     };
 
+    const streamUrl = channel?.url || channel?.streamUrl || "";
+    if (!streamUrl) {
+      setIsLoading(false);
+      return;
+    }
+
     // Check if the source is video format or an absolute m3u8 url
-    if (channel.url.endsWith(".m3u8") || hlsRef.current === null) {
+    if (streamUrl.endsWith(".m3u8") || hlsRef.current === null) {
       if (Hls.isSupported()) {
         const hls = new Hls({
           enableWorker: true,
@@ -180,7 +186,7 @@ export const ChannelPlayer = React.memo(function ChannelPlayer({
         });
 
         hlsRef.current = hls;
-        hls.loadSource(channel.url);
+        hls.loadSource(streamUrl);
         hls.attachMedia(video);
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -212,7 +218,7 @@ export const ChannelPlayer = React.memo(function ChannelPlayer({
         });
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
         // Native HLS (e.g. Safari)
-        video.src = channel.url;
+        video.src = streamUrl;
         video.addEventListener("loadedmetadata", () => {
           playVideo();
         });
@@ -234,7 +240,7 @@ export const ChannelPlayer = React.memo(function ChannelPlayer({
         hlsRef.current = null;
       }
     };
-  }, [channel.url, channel.id]);
+  }, [channel?.url, channel?.streamUrl, channel?.id]);
 
   // Web Audio API for 1kHz beep on channel 155 ("vplay_live") and VTVgo Event Feed ("vietnam-wild-live")
   useEffect(() => {

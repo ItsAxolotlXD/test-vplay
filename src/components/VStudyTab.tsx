@@ -1059,15 +1059,24 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
 
               {/* Filters & Search bar for history */}
               <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="relative flex-1 w-full">
-                  <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <div className="relative flex-1 w-full h-[40px] flex items-center px-3.5 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+                  <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
                   <input
                     type="text"
                     placeholder="Tìm kiếm môn học, bài kiểm tra..."
                     value={historySearchQuery}
                     onChange={(e) => setHistorySearchQuery(e.target.value)}
-                    className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+                    className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
                   />
+                  {historySearchQuery && (
+                    <button
+                      onClick={() => setHistorySearchQuery('')}
+                      className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                      title="Xóa tìm kiếm"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Level dropdown filter */}

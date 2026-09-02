@@ -95,15 +95,15 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
         
         {/* TOP BAR: Search Input & Close Button */}
         <div className="p-2 sm:p-2.5 bg-[#2b2d30] border-b-2 border-[#141414] flex items-center gap-2 shrink-0">
-          {/* Search Box in mc-input-box style */}
-          <div className="flex-1 relative flex items-center bg-[#1e2022] border-2 border-[#141414] px-2 py-1 shadow-[inset_2px_2px_0_#101112]">
-            <Search className="w-4 h-4 text-zinc-400 shrink-0 mr-1.5" />
+          {/* Search Box */}
+          <div className="flex-1 relative flex items-center h-[38px] px-3 rounded-full spotlight-bubble-box search-box-capsule border-0 transition-all">
+            <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for people..."
-              className="w-full bg-transparent text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none font-jura font-semibold"
+              className="w-full bg-transparent text-xs sm:text-sm text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
             />
             {searchQuery && (
               <button
@@ -112,7 +112,8 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
                   playPopSound();
                   setSearchQuery('');
                 }}
-                className="text-zinc-400 hover:text-white p-0.5 ml-1"
+                className="text-zinc-400 hover:text-white p-0.5 ml-1 cursor-pointer"
+                title="Xóa tìm kiếm"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

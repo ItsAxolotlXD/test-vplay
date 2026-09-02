@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Menu, Bell, Sun, Moon, Users } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Menu, Bell, Sun, Moon, Users, List, Pencil } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
 
 interface TopBarProps {
@@ -7,17 +8,32 @@ interface TopBarProps {
   navigate: (route: string) => void;
   onOpenSearch: () => void;
   onOpenMobileMenu?: () => void;
+  onOpenCopilotWindow?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
-  currentRoute: _currentRoute,
+  currentRoute,
   navigate,
   onOpenSearch,
-  onOpenMobileMenu
+  onOpenMobileMenu,
+  onOpenCopilotWindow
 }) => {
   const { settings, updateSetting } = useSettings();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [copilotMenuOpen, setCopilotMenuOpen] = useState(false);
+  const copilotTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [logoError, setLogoError] = useState(false);
+
+  const handleCopilotMouseEnter = () => {
+    if (copilotTimerRef.current) clearTimeout(copilotTimerRef.current);
+    setCopilotMenuOpen(true);
+  };
+
+  const handleCopilotMouseLeave = () => {
+    copilotTimerRef.current = setTimeout(() => {
+      setCopilotMenuOpen(false);
+    }, 250);
+  };
 
   const isLightMode = settings.theme === 'light';
 
@@ -76,7 +92,11 @@ export const TopBar: React.FC<TopBarProps> = ({
         <button
           id="btn-top-search"
           onClick={onOpenSearch}
-          className="w-9 h-9 flex items-center justify-center text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent transition-all drop-shadow-sm cursor-pointer"
+          className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all drop-shadow-sm cursor-pointer ${
+            currentRoute === '/search' || currentRoute === '/spotlight'
+              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 ring-2 ring-cyan-400/40'
+              : 'text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent'
+          }`}
           title="Spotlight Search (⌘K)"
         >
           <img
@@ -136,7 +156,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           id="btn-top-friends"
           onClick={() => navigate('/friends')}
           className={`w-9 h-9 flex items-center justify-center text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent transition-all drop-shadow-sm cursor-pointer hover:scale-105 active:scale-95 rounded-xl ${
-            _currentRoute === '/friends' || _currentRoute === '/people' ? 'ring-2 ring-[#E6005A] bg-[#E6005A]/10 text-[#E6005A]' : ''
+            currentRoute === '/friends' || currentRoute === '/people' ? 'ring-2 ring-[#E6005A] bg-[#E6005A]/10 text-[#E6005A]' : ''
           }`}
           title="Bạn bè & Người dùng Vplay (100+ Cư dân)"
           aria-label="Mở Friends & People"
@@ -159,26 +179,96 @@ export const TopBar: React.FC<TopBarProps> = ({
           )}
         </button>
 
-        {/* Copilot for Vplay button */}
-        <button
-          id="btn-top-copilot"
-          onClick={() => navigate('/copilot')}
-          className={`w-9 h-9 flex items-center justify-center text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent transition-all drop-shadow-sm cursor-pointer hover:scale-105 active:scale-95 rounded-xl ${
-            _currentRoute === '/copilot' ? 'ring-2 ring-indigo-500 bg-indigo-500/10' : ''
-          }`}
-          title="Copilot for Vplay"
-          aria-label="Mở Copilot for Vplay"
+        {/* Copilot for Vplay button with Windows 11 style Hover Menu */}
+        <div
+          className="relative"
+          onMouseEnter={handleCopilotMouseEnter}
+          onMouseLeave={handleCopilotMouseLeave}
         >
-          <img
-            src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-            alt="Copilot for Vplay"
-            referrerPolicy="no-referrer"
-            className="w-5 h-5 object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-            }}
-          />
-        </button>
+          <button
+            id="btn-top-copilot"
+            onClick={() => navigate('/copilot')}
+            className={`group w-9 h-9 flex items-center justify-center text-[#18181B] dark:text-[#D1D5DB] dark:hover:text-white hover:opacity-80 bg-transparent transition-all drop-shadow-sm cursor-pointer hover:scale-105 active:scale-95 rounded-xl ${
+              currentRoute === '/copilot' ? 'ring-2 ring-indigo-500 bg-indigo-500/10' : ''
+            }`}
+            title="Copilot for Vplay"
+            aria-label="Mở Copilot for Vplay"
+          >
+            <img
+              src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+              alt="Copilot for Vplay"
+              referrerPolicy="no-referrer"
+              className="w-5 h-5 object-contain transition-transform duration-700 ease-out group-hover:rotate-[360deg]"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+              }}
+            />
+          </button>
+
+          {/* Windows-style Copilot Flyout Menu (no entry/exit animation) */}
+          {copilotMenuOpen && (
+            <div
+              className="absolute right-0 top-full mt-2 w-[285px] sm:w-[305px] rounded-[20px] bg-white/95 dark:bg-[#1E1E24]/95 backdrop-blur-2xl p-2 shadow-[0_16px_40px_rgba(0,0,0,0.35)] z-50 select-none pointer-events-auto text-[#1F2937] dark:text-[#E4E4E7] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3"
+            >
+              {/* Header label */}
+              <div className="px-3 pt-2 pb-2 text-[12px] font-medium text-[#6B7280] dark:text-[#9CA3AF]">
+                Copilot in Vplay (preview)
+              </div>
+
+              {/* Menu items */}
+              <div className="space-y-1">
+                {/* Item 1: Open Copilot in Vplay */}
+                <button
+                  id="btn-copilot-menu-open-vplay"
+                  onClick={() => {
+                    setCopilotMenuOpen(false);
+                    navigate('/copilot');
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[13px] font-medium text-[#1F2937] dark:text-[#F3F4F6] hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-left group"
+                >
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    alt="Copilot"
+                    referrerPolicy="no-referrer"
+                    className="w-4 h-4 object-contain shrink-0 group-hover:scale-110 transition-transform"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                    }}
+                  />
+                  <span className="truncate">Open Copilot in Vplay</span>
+                </button>
+
+                {/* Item 2: Open as standalone */}
+                <button
+                  id="btn-copilot-menu-open-standalone"
+                  onClick={() => {
+                    setCopilotMenuOpen(false);
+                    navigate('/copilot-standalone');
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[13px] font-medium text-[#1F2937] dark:text-[#F3F4F6] hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-left group"
+                >
+                  <List className="w-4 h-4 shrink-0 text-[#6B7280] dark:text-[#9CA3AF] group-hover:text-cyan-400 transition-colors" />
+                  <span className="truncate">Open as standalone</span>
+                </button>
+
+                {/* Item 3: Open as window */}
+                <button
+                  id="btn-copilot-menu-open-window"
+                  onClick={() => {
+                    setCopilotMenuOpen(false);
+                    if (onOpenCopilotWindow) {
+                      onOpenCopilotWindow();
+                    }
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[13px] font-medium text-[#1F2937] dark:text-[#F3F4F6] hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer text-left group"
+                >
+                  <Pencil className="w-4 h-4 shrink-0 text-[#6B7280] dark:text-[#9CA3AF] group-hover:text-purple-400 transition-colors" />
+                  <span className="truncate">Open as window</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

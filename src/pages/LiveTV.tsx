@@ -17,7 +17,8 @@ import {
   Heart,
   Share2,
   CheckCircle2,
-  Sliders
+  Sliders,
+  X
 } from 'lucide-react';
 
 interface LiveTVProps {
@@ -287,15 +288,24 @@ export const LiveTV: React.FC<LiveTVProps> = ({
             </div>
 
             {/* Search Input */}
-            <div className="relative mb-3 search-box-capsule rounded-full">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-[#8E8E93]" />
+            <div className="w-full h-[40px] flex items-center px-3.5 mb-3 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+              <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kênh truyền hình..."
-                className="w-full pl-9 pr-4 py-2 rounded-full bg-[#171719] border border-[#34343C] text-xs text-white placeholder-[#8E8E93] focus:outline-none"
+                className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                  title="Xóa tìm kiếm"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             {/* Category filter tabs */}

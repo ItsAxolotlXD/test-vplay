@@ -26,7 +26,6 @@ import {
   Star,
   Search,
   Lock,
-  Gem,
   Cpu,
   Server
 } from 'lucide-react';
@@ -186,17 +185,24 @@ export const VPremiumView: React.FC<VPremiumViewProps> = ({ initialSubTab = 'vba
 
         {/* Search & Status Box */}
         <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
-          <div className="relative w-full sm:w-64 search-box-capsule rounded-full transition-all">
-            <div className="flex items-center px-3 py-1.5 w-full">
-              <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm gói dịch vụ..."
-                className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none"
-              />
-            </div>
+          <div className="relative w-full sm:w-64 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
+            <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm gói dịch vụ..."
+              className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                title="Xóa tìm kiếm"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="px-3.5 py-1.5 rounded-full bg-[#1E1E22] border border-[#2D2D35] flex items-center gap-2 text-xs">

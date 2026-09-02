@@ -42,7 +42,8 @@ import {
   SlidersHorizontal,
   AlertTriangle,
   RotateCw,
-  Youtube
+  Youtube,
+  Box
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -934,6 +935,19 @@ export default function StartMenu({
                   <span className="text-[9px] text-white/40 mt-0.5">CPU & Proxy</span>
                 </button>
 
+                {/* Tile: Splash Screen */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    window.dispatchEvent(new CustomEvent('vplay:replay_splash'));
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-pink-950/40 border border-white/5 hover:border-pink-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Sparkles className="w-5 h-5 text-pink-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Splash Screen</span>
+                  <span className="text-[9px] text-pink-400/70 mt-0.5">Khởi động Vplay</span>
+                </button>
+
                 {/* Tile: Bảng gỡ lỗi F3 */}
                 <button
                   onClick={() => {
@@ -945,6 +959,19 @@ export default function StartMenu({
                   <Terminal className="w-5 h-5 text-indigo-400 mb-1" />
                   <span className="text-[11px] font-bold text-white/90">Bảng Gỡ Lỗi F3</span>
                   <span className="text-[9px] text-white/40 mt-0.5">Minecraft Style FPS</span>
+                </button>
+
+                {/* Tile: Minecraft Container GUI */}
+                <button
+                  onClick={() => {
+                    onClose();
+                    setActiveTab('toolbox');
+                  }}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-emerald-950/40 border border-white/5 hover:border-emerald-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                  <Box className="w-5 h-5 text-emerald-400 mb-1" />
+                  <span className="text-[11px] font-bold text-white/90">Minecraft GUI</span>
+                  <span className="text-[9px] text-emerald-400/70 mt-0.5">Kho Đồ & Rương 3D</span>
                 </button>
 
                 {/* Tile: Adjust Logos */}
