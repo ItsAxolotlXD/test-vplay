@@ -1639,18 +1639,19 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                       </div>
                       <div>
                         <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                          V-Arcade 5 Trò Chơi Ore UI:
+                          V-Games & Arcade Ore UI:
                         </span>
                         <span className="text-[11px] text-zinc-500 dark:text-zinc-400 ml-1.5 hidden md:inline">
-                          Caro XO, Oẳn tù tì, Nối từ TV/EN, Đếm số 1-N, Rắn săn mồi
+                          Vòng Quay May Mắn, Caro XO, Oẳn tù tì, Nối từ, Rắn săn mồi
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {[
-                        { id: "caro", label: "Caro XO" },
-                        { id: "rps", label: "Oẳn Tù Tì" },
+                        { id: "wheel_of_fortune", label: "Vòng Quay 🎡" },
+                        { id: "tic_tac_toe", label: "Caro XO" },
+                        { id: "rock_paper_scissors", label: "Oẳn Tù Tì" },
                         { id: "word_chain", label: "Nối Từ" },
                         { id: "snake", label: "Rắn Săn Mồi" }
                       ].map((game) => (

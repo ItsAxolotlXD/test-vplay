@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { playPopSound } from '../utils/sound';
 import ExploreVietnamTab from './ExploreVietnamTab';
@@ -61,14 +61,14 @@ interface VAppDefinition {
 const VAPPS_LIST: VAppDefinition[] = [
   {
     id: 'v_arcade',
-    name: 'V-Arcade Minigames',
-    tagline: '5 Trò Chơi Ore UI Siêu Cuốn',
-    description: 'Caro XO thông minh, Oẳn Tù Tì đối kháng, Nối Từ Tiếng Việt & Anh, Đếm Số 1->N phản xạ và Rắn Săn Mồi tốc độ cao đấu với NPC.',
+    name: 'V-Games & Arcade Zone',
+    tagline: 'Vòng Quay May Mắn & Game Cổ Điển',
+    description: 'Vòng Quay May Mắn Wheels of Fortune tùy biến tạo vòng quay, Caro XO, Oẳn Tù Tì đối kháng, Nối Từ TV & EN, Đếm Số 1->N và Rắn Săn Mồi.',
     category: 'Trò chơi (Arcade)',
-    badge: 'Hot • 5 Trò',
-    themeGradient: 'from-emerald-600/20 via-teal-900/10 to-transparent',
-    icon: <Gamepad2 className="w-8 h-8 text-emerald-400" />,
-    tags: ['Caro XO', 'Rắn Săn Mồi', 'Nối Từ', 'Oẳn Tù Tì'],
+    badge: 'Hot • Vòng Quay & Games',
+    themeGradient: 'from-amber-500/20 via-emerald-600/20 to-transparent',
+    icon: <Gamepad2 className="w-8 h-8 text-amber-400" />,
+    tags: ['Wheels of Fortune', 'Vòng Quay May Mắn', 'Caro XO', 'Rắn Săn Mồi'],
   },
   {
     id: 'v_xplore',
@@ -174,15 +174,37 @@ const VAPPS_LIST: VAppDefinition[] = [
 interface VAppsViewProps {
   initialAppId?: VAppId;
   selectedGameId?: string | null;
+  navigate?: (route: string, state?: any) => void;
 }
+
+const APP_ROUTES: Record<VAppId, string> = {
+  v_arcade: '/v-arcade',
+  v_xplore: '/v-files',
+  explore_vietnam: '/explore-vietnam',
+  v_box: '/v-box',
+  v_learn: '/v-study',
+  v_calc: '/v-calc',
+  v_reminders: '/v-reminders',
+  v_notes: '/v-notes',
+  v_furniture: '/v-furniture',
+  v_minecraft: '/minecraft',
+};
 
 export const VAppsView: React.FC<VAppsViewProps> = ({
   initialAppId = 'v_arcade',
   selectedGameId = null,
+  navigate,
 }) => {
   const [activeApp, setActiveApp] = useState<VAppId>(initialAppId);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sync activeApp when initialAppId changes (e.g. user clicks direct sidebar tab)
+  useEffect(() => {
+    if (initialAppId) {
+      setActiveApp(initialAppId);
+    }
+  }, [initialAppId]);
 
   const categories = [
     'Tất cả',
@@ -195,6 +217,10 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
 
   const handleSelectApp = (appId: VAppId) => {
     playPopSound();
+    if (navigate && APP_ROUTES[appId]) {
+      navigate(APP_ROUTES[appId]);
+      return;
+    }
     setActiveApp(appId);
     const container = document.getElementById('active-app-execution-container');
     if (container) {
@@ -456,17 +482,28 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       )}
 
       {/* 5. ACTIVE APP EXECUTION ENGINE */}
-      <div id="active-app-execution-container" className="rounded-[30px] overflow-hidden border border-[#2D2D35] shadow-2xl bg-[#18191C]">
+      <div 
+        id="active-app-execution-container" 
+        className={`overflow-hidden border border-[#2D2D35] shadow-2xl bg-[#18191C] ${
+          activeApp === 'v_minecraft' ? 'rounded-none border-2 border-[#444]' : 'rounded-[30px]'
+        }`}
+      >
         {/* App Top Toolbar */}
-        <div className="px-6 py-4 border-b border-[#2D2D35] bg-[#1E1E22] flex items-center justify-between">
+        <div className={`px-6 py-4 border-b border-[#2D2D35] bg-[#1E1E22] flex items-center justify-between ${
+          activeApp === 'v_minecraft' ? 'rounded-none' : ''
+        }`}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#2D2D35] flex items-center justify-center text-emerald-300">
+            <div className={`w-9 h-9 bg-[#2D2D35] flex items-center justify-center text-emerald-300 ${
+              activeApp === 'v_minecraft' ? 'rounded-none' : 'rounded-xl'
+            }`}>
               {currentApp.icon}
             </div>
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <span>{currentApp.name}</span>
-                <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <span className={`text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 ${
+                  activeApp === 'v_minecraft' ? 'rounded-none font-mono' : 'rounded-full'
+                }`}>
                   {currentApp.badge}
                 </span>
               </h3>
@@ -480,7 +517,9 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
                 const el = document.getElementById('waves-vapps-view');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-3.5 py-1.5 rounded-full bg-[#2A2A35] hover:bg-[#3A3A48] text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+              className={`px-3.5 py-1.5 bg-[#2A2A35] hover:bg-[#3A3A48] text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeApp === 'v_minecraft' ? 'rounded-none' : 'rounded-full'
+              }`}
             >
               <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
               <span>Xem Kho App</span>

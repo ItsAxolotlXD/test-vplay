@@ -12,11 +12,17 @@ import {
   User,
   RotateCcw,
   RotateCw,
-  Sparkles
+  Sparkles,
+  Flag,
+  ChevronRight
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG } from '../hooks/useSettings';
 
-export const Settings: React.FC = () => {
+interface SettingsProps {
+  navigate?: (route: string) => void;
+}
+
+export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const { settings, updateSetting } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
@@ -85,6 +91,36 @@ export const Settings: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Feature Flags Quick Entry Card */}
+        {(matchesSearch('Feature Flags') || matchesSearch('Cờ tính năng') || matchesSearch('Thử nghiệm') || matchesSearch('Experimental')) && (
+          <div 
+            onClick={() => navigate ? navigate('/feature-flags') : window.location.assign('/feature-flags')}
+            className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-r from-cyan-950/40 via-[#1E1D24] to-[#1E1D24] border border-cyan-500/30 hover:border-cyan-500/60 shadow-lg flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Flag className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">
+                    Feature Flags
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    EXPERIMENTAL
+                  </span>
+                </div>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">
+                  Bật/tắt các cờ tính năng thử nghiệm, AI Copilot, tối ưu luồng video và gỡ lỗi
+                </p>
+              </div>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-cyan-500/20 flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors shrink-0">
+              <ChevronRight className="w-4 h-4" />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2. Section 1: Giao diện */}

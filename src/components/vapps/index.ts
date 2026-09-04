@@ -4,6 +4,7 @@ export { VBooksTab } from "./VBooksTab";
 export { VCalcTab } from "./VCalcTab";
 export { VRemindersTab } from "./VRemindersTab";
 export { VArcadeTab } from "./VArcadeTab";
+export { WheelOfFortuneGame } from "./WheelOfFortuneGame";
 export { VRecorderTab } from "./VRecorderTab";
 export { VOfficeTab } from "./VOfficeTab";
 export { VXploreTab } from "./VXploreTab";

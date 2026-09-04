@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface MinecraftItemIconProps {
   iconType: string;
+  imageUrl?: string;
   enchanted?: boolean;
   className?: string;
   size?: number;
@@ -9,10 +10,17 @@ interface MinecraftItemIconProps {
 
 export const MinecraftItemIcon: React.FC<MinecraftItemIconProps> = ({
   iconType,
+  imageUrl,
   enchanted = false,
   className = '',
   size = 32
 }) => {
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [imageUrl]);
+
   // SVG Pixel art representation of Minecraft items
   const renderItemSvg = () => {
     switch (iconType) {
@@ -240,6 +248,17 @@ export const MinecraftItemIcon: React.FC<MinecraftItemIconProps> = ({
         );
 
       // FOOD & APPLES
+      case 'apple':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M8 1h1v2h-1z M9 2h1v1h-1z" fill="#604124" />
+            <path d="M5 3h6v2h2v6h-1v2h-2v1h-4v-1h-2v-2h-1v-6h2z" fill="#E81717" />
+            <path d="M6 5h4v5h2v-4h-1v-1h-4z" fill="#FF5555" />
+            <path d="M6 6h2v2h-2z" fill="#FFFFFF" />
+            <path d="M5 10h4v2h-4z M11 8h1v2h-1z" fill="#990E0E" />
+          </svg>
+        );
+
       case 'enchanted_golden_apple':
       case 'golden_apple':
         return (
@@ -261,6 +280,118 @@ export const MinecraftItemIcon: React.FC<MinecraftItemIconProps> = ({
             <path d="M5 6h6v4h-6z" fill="#994D25" />
             <path d="M7 7h3v2h-3z" fill="#D68051" />
             <path d="M4 10h6v1h-6z" fill="#47200D" />
+          </svg>
+        );
+
+      case 'raw_beef':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M3 5h10v6h-2v2h-6v-2h-2z" fill="#9C2222" />
+            <path d="M4 6h8v4h-8z" fill="#C93636" />
+            <path d="M6 7h4v2h-4z" fill="#F05656" />
+            <path d="M10 6h2v2h-2z" fill="#E8DDD5" />
+            <path d="M4 10h6v1h-6z" fill="#6B1616" />
+          </svg>
+        );
+
+      case 'bread':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M2 7h12v4h-1v1h-10v-1h-1z" fill="#8B4D1B" />
+            <path d="M3 6h10v5h-10z" fill="#B8752B" />
+            <path d="M4 5h8v2h-8z" fill="#D4943E" />
+            <path d="M5 6h1v3h-1z M8 6h1v3h-1z M11 6h1v3h-1z" fill="#F0BC6D" />
+          </svg>
+        );
+
+      case 'wheat':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M7 1h2v3h-2z M5 4h6v3h-6z M4 7h8v4h-8z M7 11h2v4h-2z" fill="#CC9F33" />
+            <path d="M6 5h4v2h-4z M5 8h6v2h-6z" fill="#E8C358" />
+            <path d="M7 11h1v4h-1z" fill="#5F7526" />
+          </svg>
+        );
+
+      case 'coal':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M5 4h6v2h2v4h-2v2h-5v-1h-3v-4h2z" fill="#1C1C1E" />
+            <path d="M6 5h4v2h1v3h-2v1h-3z" fill="#303036" />
+            <path d="M7 6h2v2h-2z" fill="#484852" />
+            <path d="M4 9h2v1h-2z" fill="#111114" />
+          </svg>
+        );
+
+      case 'gold_ore':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <rect x="0" y="0" width="16" height="16" fill="#727272" />
+            <path d="M2 3h3v2h-3z M9 4h3v2h-3z M4 9h4v3h-4z M11 10h3v3h-3z" fill="#F8C526" />
+            <path d="M3 4h1v1h-1z M10 5h1v1h-1z M5 10h2v1h-2z M12 11h1v1h-1z" fill="#FDE37E" />
+            <path d="M1 2h2v1h-2z M8 3h2v1h-2z M3 8h2v1h-2z M10 9h2v1h-2z" fill="#555555" />
+          </svg>
+        );
+
+      case 'raw_gold':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M5 3h6v2h3v5h-2v3h-6v-2h-3v-5h2z" fill="#D49917" />
+            <path d="M6 4h4v2h2v4h-2v2h-4z" fill="#F8C526" />
+            <path d="M7 5h2v2h-2z M9 8h2v2h-2z" fill="#FDE37E" />
+            <path d="M4 8h2v3h-2z" fill="#A8750C" />
+          </svg>
+        );
+
+      case 'stick':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M12 2h2v2h-2z M10 4h2v2h-2z M8 6h2v2h-2z M6 8h2v2h-2z M4 10h2v2h-2z M2 12h2v2h-2z" fill="#6B4B27" />
+            <path d="M11 3h2v1h-2z M9 5h2v1h-2z M7 7h2v1h-2z M5 9h2v1h-2z M3 11h2v1h-2z" fill="#8C6335" />
+          </svg>
+        );
+
+      case 'torch':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M7 6h2v8h-2z" fill="#6B4B27" />
+            <path d="M6 3h4v3h-4z" fill="#3D2919" />
+            <path d="M7 2h2v3h-2z" fill="#FFC822" />
+            <path d="M7 1h2v1h-2z" fill="#FF5500" />
+            <path d="M8 3h1v1h-1z" fill="#FFFFFF" />
+          </svg>
+        );
+
+      case 'crafting_table':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <rect x="1" y="1" width="14" height="14" fill="#845A31" />
+            <rect x="2" y="2" width="12" height="4" fill="#A06E3B" />
+            <rect x="3" y="7" width="4" height="6" fill="#54381C" />
+            <rect x="9" y="7" width="4" height="6" fill="#54381C" />
+            <path d="M2 2h12v1h-12z" fill="#C48E50" />
+          </svg>
+        );
+
+      case 'furnace':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <rect x="1" y="1" width="14" height="14" fill="#5A5A5A" />
+            <rect x="3" y="3" width="10" height="4" fill="#3A3A3A" />
+            <rect x="4" y="8" width="8" height="6" fill="#222222" />
+            <rect x="5" y="9" width="6" height="4" fill="#E65100" />
+            <rect x="6" y="10" width="4" height="2" fill="#FFD54F" />
+          </svg>
+        );
+
+      case 'milk_bucket':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M4 3h8v2h-1v8h-6v-8h-1z" fill="#8C8C8C" />
+            <path d="M5 4h6v1h-6z" fill="#FFFFFF" />
+            <path d="M5 5h6v7h-6z" fill="#F5F5F5" />
+            <path d="M6 7h4v4h-4z" fill="#FFFFFF" />
+            <path d="M4 4h1v1h-1z M11 4h1v1h-1z" fill="#5A5A5A" />
           </svg>
         );
 
@@ -366,6 +497,17 @@ export const MinecraftItemIcon: React.FC<MinecraftItemIconProps> = ({
         );
 
       // POTIONS
+      case 'water_bottle':
+        return (
+          <svg viewBox="0 0 16 16" width="100%" height="100%">
+            <path d="M7 1h2v2h-2z" fill="#845A31" />
+            <path d="M6 3h4v3h-4z" fill="#CCCCCC" />
+            <path d="M4 6h8v7h-1v1h-6v-1h-1z" fill="#B4CDCD" />
+            <path d="M5 8h6v5h-6z" fill="#385DC6" />
+            <path d="M6 9h2v2h-2z" fill="#75A5FF" />
+          </svg>
+        );
+
       case 'potion_red':
       case 'potion_purple':
       case 'splash_potion_cyan':
@@ -390,7 +532,7 @@ export const MinecraftItemIcon: React.FC<MinecraftItemIconProps> = ({
       default:
         return (
           <svg viewBox="0 0 16 16" width="100%" height="100%">
-            <rect x="2" y="2" width="12" height="12" fill="#777" rx="2" />
+            <rect x="2" y="2" width="12" height="12" fill="#777" rx="0" />
             <circle cx="8" cy="8" r="3" fill="#FFF" />
           </svg>
         );
@@ -402,14 +544,28 @@ export const MinecraftItemIcon: React.FC<MinecraftItemIconProps> = ({
       className={`relative flex items-center justify-center select-none ${className}`}
       style={{ width: size, height: size }}
     >
-      <div className="w-full h-full filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]">
-        {renderItemSvg()}
+      <div className="w-full h-full filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)] flex items-center justify-center">
+        {imageUrl && !imageError ? (
+          <img
+            src={imageUrl}
+            alt={iconType}
+            referrerPolicy="no-referrer"
+            loading="lazy"
+            onError={() => setImageError(true)}
+            className="w-full h-full object-contain pointer-events-none select-none"
+            style={{
+              imageRendering: 'pixelated',
+            }}
+          />
+        ) : (
+          renderItemSvg()
+        )}
       </div>
 
       {/* Enchantment Glint / Animated Shimmer Overlay */}
       {enchanted && (
         <div 
-          className="absolute inset-0 pointer-events-none mix-blend-color-dodge opacity-80 rounded animate-pulse"
+          className="absolute inset-0 pointer-events-none mix-blend-color-dodge opacity-80 rounded-none animate-pulse"
           style={{
             background: 'linear-gradient(135deg, rgba(170,0,255,0.4) 0%, rgba(255,0,255,0.6) 50%, rgba(0,229,255,0.4) 100%)',
             boxShadow: 'inset 0 0 6px rgba(186,85,211,0.8)'

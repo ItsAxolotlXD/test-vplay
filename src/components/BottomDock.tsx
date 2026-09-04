@@ -8,7 +8,8 @@ import {
   Search,
   Users,
   Coins,
-  Smartphone
+  Smartphone,
+  Flag
 } from 'lucide-react';
 
 interface BottomDockProps {
@@ -35,6 +36,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
     { id: 'dock-news', label: 'Tin tức', icon: Megaphone, route: '/news' },
     { id: 'dock-friends', label: 'Bạn bè & Người dùng', icon: Users, route: '/friends' },
     { id: 'dock-bet', label: 'Sàn cược Orbs VIP', icon: Coins, route: '/bet-arena' },
+    { id: 'dock-flags', label: 'Feature Flags', icon: Flag, route: '/feature-flags' },
     { id: 'dock-settings', label: 'Cài đặt', icon: SettingsIcon, route: '/settings' },
   ];
 

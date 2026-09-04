@@ -36,7 +36,8 @@ import {
   Cloud,
   LayoutGrid,
   Zap,
-  Box
+  Box,
+  Flag
 } from 'lucide-react';
 import { Channel } from '../data/channels';
 import { NEWS_LIST } from './NewsView';
@@ -345,6 +346,14 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       description: 'Tùy chọn mở Copilot AI Assistant hoặc Search Tab khi nhấn phím tìm kiếm',
       route: '/settings',
       icon: <Sparkles className="w-5 h-5 text-purple-400" />,
+    },
+    {
+      id: 'feature-flags',
+      title: 'Feature Flags (Cờ tính năng)',
+      category: 'Cài đặt hệ thống',
+      description: 'Quản lý cờ tính năng thử nghiệm, AI, hiệu năng trình phát và gỡ lỗi',
+      route: '/feature-flags',
+      icon: <Flag className="w-5 h-5 text-cyan-400" />,
     },
   ], []);
 

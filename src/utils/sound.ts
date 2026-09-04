@@ -175,5 +175,102 @@ export const playCardSound = () => {
     gain.connect(ctx.destination);
 
     whiteNoise.start(now);
+    whiteNoise.stop(now + 0.08);
+  } catch (err) {}
+};
+
+let lastTickSoundTime = 0;
+
+export const playWheelTickSound = (intensity = 1.0) => {
+  try {
+    const nowTime = performance.now();
+    // Throttle slightly if ticks arrive too fast
+    if (nowTime - lastTickSoundTime < 28) return;
+    lastTickSoundTime = nowTime;
+
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // High snappy wooden/metallic peg tick
+    osc.type = 'triangle';
+    const pitch = 550 + Math.min(intensity, 2) * 200;
+    osc.frequency.setValueAtTime(pitch, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.022);
+
+    const volume = Math.min(0.28, 0.15 + intensity * 0.08);
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.022);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.022);
+  } catch (err) {}
+};
+
+export const playWheelSpinStartSound = () => {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    // Rising whoosh sound
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.exponentialRampToValueAtTime(750, now + 0.35);
+
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.2, now + 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.4);
+  } catch (err) {}
+};
+
+export const playWheelCelebrationSound = () => {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    // Grand celebration fanfare: C5, G5, C6, E6
+    const notes = [
+      { f: 523.25, d: 0.12, t: 0 },
+      { f: 659.25, d: 0.12, t: 0.1 },
+      { f: 783.99, d: 0.14, t: 0.2 },
+      { f: 1046.50, d: 0.35, t: 0.32 },
+      { f: 1318.51, d: 0.45, t: 0.45 },
+    ];
+
+    notes.forEach((note) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const startTime = now + note.t;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(note.f, startTime);
+
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.25, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + note.d);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + note.d);
+    });
   } catch (err) {}
 };

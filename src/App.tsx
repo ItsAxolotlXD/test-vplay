@@ -16,13 +16,20 @@ import { Favorites } from './pages/Favorites';
 import { Toolbox } from './pages/Toolbox';
 import { About } from './pages/About';
 import { Settings } from './pages/Settings';
+import { FeatureFlags } from './pages/FeatureFlags';
 import { FriendsAndPeople } from './pages/FriendsAndPeople';
 import { BetArenaPage } from './pages/BetArenaPage';
 import { CopilotTab } from './components/CopilotTab';
 import { CopilotStandaloneView } from './components/CopilotStandaloneView';
 import { CopilotFloatingWindow } from './components/CopilotFloatingWindow';
 import { VAppsView } from './components/VAppsView';
+import { VArcadeTab, VXploreTab, VFurnitureTab, VCalcTab, VRemindersTab } from './components/vapps';
+import ExploreVietnamTab from './components/ExploreVietnamTab';
+import VplayVBoxTab from './components/VplayVBoxTab';
+import VStudyTab from './components/VStudyTab';
+import { VNotesView } from './components/VNotesView';
 import { VPremiumView } from './components/VPremiumView';
+import { MinecraftContainerEmulator } from './components/minecraft/MinecraftContainerEmulator';
 import { SearchTab } from './components/SearchTab';
 import VplayVertical from './components/VplayVertical';
 import { CHANNELS_DATA } from './data/channels';
@@ -298,10 +305,42 @@ export default function App() {
           />
         );
 
+      case '/v-arcade':
+      case '/v-games':
+        return <VArcadeTab initialGameId={routeState?.gameId || null} />;
+
+      case '/v-files':
+      case '/v-xplore':
+        return <VXploreTab />;
+
+      case '/explore-vietnam':
+        return <ExploreVietnamTab />;
+
+      case '/v-box':
+        return <VplayVBoxTab />;
+
+      case '/v-study':
+      case '/v-learn':
+        return <VStudyTab />;
+
+      case '/v-calc':
+        return <VCalcTab />;
+
+      case '/v-reminders':
+        return <VRemindersTab />;
+
+      case '/v-notes':
+        return <VNotesView />;
+
+      case '/v-furniture':
+        return <VFurnitureTab />;
+
       case '/v-space':
       case '/v-apps':
+      case '/space-360':
         return (
           <VAppsView
+            navigate={navigate}
             initialAppId={routeState?.appId || 'v_arcade'}
             selectedGameId={routeState?.gameId || null}
           />
@@ -371,18 +410,20 @@ export default function App() {
       case '/mc-container':
       case '/minecraft-chest':
         return (
-          <Toolbox
-            initialTab="mc-container"
-            onSelectChannel={setCurrentChannel}
-            navigate={navigate}
-          />
+          <div className="w-full rounded-none p-4 sm:p-6 md:p-8 bg-[#18191C] border border-[#2D2D35] shadow-xl">
+            <MinecraftContainerEmulator />
+          </div>
         );
 
       case '/about':
         return <About />;
 
       case '/settings':
-        return <Settings />;
+        return <Settings navigate={navigate} />;
+
+      case '/feature-flags':
+      case '/flags':
+        return <FeatureFlags navigate={navigate} />;
 
       default:
         return (
@@ -439,6 +480,7 @@ export default function App() {
       {/* Sidebar Navigation (Desktop + Mobile Drawer) */}
       <Sidebar
         currentRoute={currentRoute}
+        routeState={routeState}
         navigate={navigate}
         onOpenSearch={handleOpenSearch}
         onSelectChannel={setCurrentChannel}

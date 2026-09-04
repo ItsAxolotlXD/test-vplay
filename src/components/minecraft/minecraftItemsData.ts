@@ -9,6 +9,7 @@ export interface MinecraftItem {
   durability?: { current: number; max: number };
   color?: string;
   iconType: string;
+  imageUrl?: string;
 }
 
 export interface InventorySlot {
@@ -411,6 +412,73 @@ export const MINECRAFT_ITEMS_DATABASE: MinecraftItem[] = [
     iconType: 'emerald'
   },
   {
+    id: 'gold_ore',
+    name: 'Block of Gold Ore',
+    category: 'building',
+    maxStack: 64,
+    rarity: 'uncommon',
+    lore: ['Natural ore block found deep underground', 'Smelt in a Furnace to extract Raw Gold'],
+    iconType: 'gold_ore',
+    imageUrl: 'https://minecraft.wiki/images/Gold_Ore_JE7_BE4.png?9817a'
+  },
+  {
+    id: 'raw_gold',
+    name: 'Raw Gold',
+    category: 'valuable',
+    maxStack: 64,
+    rarity: 'uncommon',
+    lore: ['Smelted from Gold Ore', 'Can be further smelted into Gold Ingots in a Furnace or crafted into blocks'],
+    iconType: 'raw_gold',
+    imageUrl: 'https://minecraft.wiki/images/thumb/Raw_Gold_JE2_BE1.png/120px-Raw_Gold_JE2_BE1.png?88da6'
+  },
+  {
+    id: 'coal',
+    name: 'Coal',
+    category: 'valuable',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['Essential furnace fuel (smelts 8 items in Furnace)', 'Used to craft Torches and Campfires'],
+    iconType: 'coal',
+    imageUrl: 'https://minecraft.wiki/images/Coal_JE4_BE3.png?165e9'
+  },
+  {
+    id: 'stick',
+    name: 'Stick',
+    category: 'tools',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['Essential crafting component for tools and torches'],
+    iconType: 'stick'
+  },
+  {
+    id: 'torch',
+    name: 'Torch',
+    category: 'building',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['Light Level: 14', 'Crafted from 1 Coal + 1 Stick'],
+    iconType: 'torch',
+    imageUrl: 'https://minecraft.wiki/images/Torch_JE4_BE2.png?fbba5'
+  },
+  {
+    id: 'crafting_table_item',
+    name: 'Crafting Table',
+    category: 'building',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['Provides a 3x3 crafting grid to craft advanced items'],
+    iconType: 'crafting_table'
+  },
+  {
+    id: 'furnace_item',
+    name: 'Furnace',
+    category: 'building',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['Smelts ores, cooks food, and refines materials using fuel'],
+    iconType: 'furnace'
+  },
+  {
     id: 'gold_ingot',
     name: 'Gold Ingot',
     category: 'valuable',
@@ -504,13 +572,34 @@ export const MINECRAFT_ITEMS_DATABASE: MinecraftItem[] = [
     iconType: 'golden_apple'
   },
   {
+    id: 'apple',
+    name: 'Apple',
+    category: 'food',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['+4 Hunger (2 bars), 2.4 Saturation', 'Food item dropped by oak leaves'],
+    iconType: 'apple',
+    imageUrl: 'https://minecraft.wiki/images/Apple_JE3_BE3.png?3853a'
+  },
+  {
     id: 'cooked_beef',
     name: 'Cooked Beef',
     category: 'food',
     maxStack: 64,
     rarity: 'common',
-    lore: ['+8 Hunger, 12.8 Saturation', 'Top tier survival food'],
-    iconType: 'cooked_beef'
+    lore: ['+8 Hunger (4 bars), 12.8 Saturation', 'Top tier survival food (Steak)'],
+    iconType: 'cooked_beef',
+    imageUrl: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/04/Steak_JE4_BE3.png/revision/latest?cb=20190504055306'
+  },
+  {
+    id: 'milk_bucket',
+    name: 'Milk',
+    category: 'food',
+    maxStack: 1,
+    rarity: 'common',
+    lore: ['Obtained from cows using an iron bucket', 'Removes all active status effects and potion boosts'],
+    iconType: 'milk_bucket',
+    imageUrl: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/4e/Milk_Bucket_JE1_BE1.png/revision/latest?cb=20200130100629'
   },
   {
     id: 'golden_carrot',
@@ -522,13 +611,34 @@ export const MINECRAFT_ITEMS_DATABASE: MinecraftItem[] = [
     iconType: 'golden_carrot'
   },
   {
+    id: 'raw_beef',
+    name: 'Raw Beef',
+    category: 'food',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['+3 Hunger (1.5 bars), 1.8 Saturation', 'Smelt in a Furnace to make Cooked Beef (Steak)'],
+    iconType: 'raw_beef',
+    imageUrl: 'https://minecraft.wiki/images/Raw_Beef_JE4_BE3.png?f3d10'
+  },
+  {
     id: 'bread',
     name: 'Bread',
     category: 'food',
     maxStack: 64,
     rarity: 'common',
-    lore: ['+5 Hunger, 6.0 Saturation'],
-    iconType: 'bread'
+    lore: ['+5 Hunger (2.5 bars), 6.0 Saturation', 'Food staple crafted from 3 Wheat horizontally'],
+    iconType: 'bread',
+    imageUrl: 'https://minecraft.wiki/images/Bread_JE3_BE3.png?e1046'
+  },
+  {
+    id: 'wheat',
+    name: 'Wheat',
+    category: 'food',
+    maxStack: 64,
+    rarity: 'common',
+    lore: ['Agricultural crop', 'Craft 3 Wheat horizontally in a Crafting Table to bake Bread'],
+    iconType: 'wheat',
+    imageUrl: 'https://minecraft.wiki/images/Wheat_JE2_BE2.png?c39ee'
   },
   {
     id: 'cake',
@@ -570,11 +680,13 @@ export const MINECRAFT_ITEMS_DATABASE: MinecraftItem[] = [
   // BUILDING & BLOCKS
   {
     id: 'oak_planks',
-    name: 'Oak Planks',
+    name: 'Oak Wood Planks',
     category: 'building',
     maxStack: 64,
     rarity: 'common',
-    iconType: 'oak_planks'
+    lore: ['Crafted from Oak Wood Logs', 'Fundamental building and crafting material'],
+    iconType: 'oak_planks',
+    imageUrl: 'https://minecraft.wiki/images/Oak_Planks.png?d9efa'
   },
   {
     id: 'stone',
@@ -826,6 +938,16 @@ export const MINECRAFT_ITEMS_DATABASE: MinecraftItem[] = [
 
   // BREWING & POTIONS
   {
+    id: 'water_bottle',
+    name: 'Water Bottle',
+    category: 'brewing',
+    maxStack: 1,
+    rarity: 'common',
+    lore: ['No Effects', 'Base ingredient for brewing all potions in the Brewing Stand'],
+    iconType: 'water_bottle',
+    imageUrl: 'https://minecraft.wiki/images/Water_Bottle_JE2.png?acae5'
+  },
+  {
     id: 'potion_healing',
     name: 'Potion of Healing II',
     category: 'brewing',
@@ -916,7 +1038,141 @@ export interface LoadoutPreset {
   playerItems: { slot: number; itemId: string; count: number }[];
 }
 
+export interface SmeltingRecipe {
+  inputItemId: string;
+  outputItemId: string;
+  name: string;
+}
+
+export const SMELTING_RECIPES: SmeltingRecipe[] = [
+  { inputItemId: 'gold_ore', outputItemId: 'raw_gold', name: 'Quặng vàng -> Vàng thô (Gold Ore -> Raw Gold)' },
+  { inputItemId: 'raw_gold', outputItemId: 'gold_ingot', name: 'Vàng thô -> Thỏi vàng (Raw Gold -> Gold Ingot)' },
+  { inputItemId: 'raw_beef', outputItemId: 'cooked_beef', name: 'Thịt bò sống -> Thịt bò nướng (Raw Beef -> Cooked Beef)' },
+  { inputItemId: 'cobblestone', outputItemId: 'stone', name: 'Đá cuội -> Đá khối (Cobblestone -> Stone)' },
+];
+
+export const FUEL_ITEMS: Record<string, number> = {
+  coal: 800,        // 8 items (100 ticks per item)
+  blaze_rod: 1200,  // 12 items
+  oak_planks: 150,  // 1.5 items
+  stick: 50         // 0.5 item
+};
+
+export interface CraftingRecipe {
+  id: string;
+  name: string;
+  outputItemId: string;
+  outputCount: number;
+  description: string;
+  ingredientsPreview: { itemId: string; count: number }[];
+}
+
+export const CRAFTING_RECIPES: CraftingRecipe[] = [
+  {
+    id: 'bread',
+    name: 'Bánh mì (Bread)',
+    outputItemId: 'bread',
+    outputCount: 1,
+    description: '3 Lúa mì (Wheat) đặt thành 1 hàng ngang',
+    ingredientsPreview: [{ itemId: 'wheat', count: 3 }]
+  },
+  {
+    id: 'crafting_table',
+    name: 'Bàn chế tạo (Crafting Table)',
+    outputItemId: 'crafting_table_item',
+    outputCount: 1,
+    description: '4 Ván gỗ sồi (Oak Planks) xếp dạng ô vuông 2x2',
+    ingredientsPreview: [{ itemId: 'oak_planks', count: 4 }]
+  },
+  {
+    id: 'stick',
+    name: 'Gậy gỗ (Sticks)',
+    outputItemId: 'stick',
+    outputCount: 4,
+    description: '2 Ván gỗ sồi (Oak Planks) xếp thành cột dọc',
+    ingredientsPreview: [{ itemId: 'oak_planks', count: 2 }]
+  },
+  {
+    id: 'torch',
+    name: 'Đuốc (Torches)',
+    outputItemId: 'torch',
+    outputCount: 4,
+    description: '1 Than đá (Coal) đặt phía trên 1 Gậy gỗ (Stick)',
+    ingredientsPreview: [{ itemId: 'coal', count: 1 }, { itemId: 'stick', count: 1 }]
+  },
+  {
+    id: 'golden_apple',
+    name: 'Táo vàng (Golden Apple)',
+    outputItemId: 'golden_apple',
+    outputCount: 1,
+    description: '1 Táo đỏ (Apple) ở giữa bao quanh bởi 8 Thỏi vàng (Gold Ingots)',
+    ingredientsPreview: [{ itemId: 'apple', count: 1 }, { itemId: 'gold_ingot', count: 8 }]
+  }
+];
+
 export const PRESET_LOADOUTS: LoadoutPreset[] = [
+  {
+    id: 'furnace_smelter',
+    name: '🔥 Furnace & Lò Nung Luyện Kim',
+    description: 'Luyện Quặng vàng (Gold Ore -> Raw Gold), Nướng thịt bò (Raw Beef -> Cooked Beef), Than đá (Coal) & Thỏi vàng',
+    containerType: 'furnace',
+    containerItems: [],
+    playerItems: [
+      { slot: 27, itemId: 'gold_ore', count: 32 },
+      { slot: 28, itemId: 'coal', count: 64 },
+      { slot: 29, itemId: 'raw_beef', count: 32 },
+      { slot: 30, itemId: 'bread', count: 16 },
+      { slot: 31, itemId: 'raw_gold', count: 16 },
+      { slot: 32, itemId: 'cooked_beef', count: 16 },
+      { slot: 33, itemId: 'oak_planks', count: 64 }
+    ]
+  },
+  {
+    id: 'crafting_workshop',
+    name: '🛠️ Crafting Table & Xưởng Chế Tạo',
+    description: 'Chế tạo Bánh mì (Bread) từ Lúa mì (Wheat), Đuốc (Coal + Stick), Bàn chế tạo (Oak Planks)',
+    containerType: 'crafting_table',
+    containerItems: [],
+    playerItems: [
+      { slot: 27, itemId: 'wheat', count: 64 },
+      { slot: 28, itemId: 'oak_planks', count: 64 },
+      { slot: 29, itemId: 'coal', count: 64 },
+      { slot: 30, itemId: 'stick', count: 32 },
+      { slot: 31, itemId: 'bread', count: 16 },
+      { slot: 32, itemId: 'apple', count: 16 },
+      { slot: 33, itemId: 'gold_ingot', count: 32 }
+    ]
+  },
+  {
+    id: 'survival_starter',
+    name: 'Survival Pantry & Builder Kit',
+    description: 'Kho lương thực: Bánh mì (Bread), Than đá (Coal), Bò sống & bít tết, Quặng vàng, Vàng thô, Bình nước, Gỗ sồi & Sữa',
+    containerType: 'chest',
+    containerItems: [
+      { slot: 0, itemId: 'apple', count: 32 },
+      { slot: 1, itemId: 'cooked_beef', count: 64 },
+      { slot: 2, itemId: 'bread', count: 32 },
+      { slot: 3, itemId: 'raw_beef', count: 32 },
+      { slot: 4, itemId: 'coal', count: 64 },
+      { slot: 5, itemId: 'gold_ore', count: 32 },
+      { slot: 6, itemId: 'raw_gold', count: 16 },
+      { slot: 7, itemId: 'water_bottle', count: 1 },
+      { slot: 8, itemId: 'milk_bucket', count: 1 },
+      { slot: 9, itemId: 'oak_planks', count: 64 },
+      { slot: 10, itemId: 'wheat', count: 64 },
+      { slot: 11, itemId: 'stick', count: 32 },
+      { slot: 12, itemId: 'torch', count: 32 },
+      { slot: 18, itemId: 'oak_planks', count: 64 },
+    ],
+    playerItems: [
+      { slot: 27, itemId: 'cooked_beef', count: 32 },
+      { slot: 28, itemId: 'bread', count: 16 },
+      { slot: 29, itemId: 'coal', count: 32 },
+      { slot: 30, itemId: 'gold_ore', count: 16 },
+      { slot: 31, itemId: 'raw_beef', count: 16 },
+      { slot: 32, itemId: 'oak_planks', count: 64 },
+    ]
+  },
   {
     id: 'end_fight',
     name: 'End Dragon Slayer Kit',

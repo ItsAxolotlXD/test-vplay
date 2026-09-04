@@ -6,7 +6,10 @@ import {
   MinecraftItem,
   MINECRAFT_ITEMS_DATABASE,
   PRESET_LOADOUTS,
-  LoadoutPreset
+  LoadoutPreset,
+  SMELTING_RECIPES,
+  CRAFTING_RECIPES,
+  FUEL_ITEMS
 } from './minecraftItemsData';
 import { MinecraftItemIcon } from './MinecraftItemIcon';
 import { mcAudio } from './minecraftAudio';
@@ -30,7 +33,9 @@ import {
   X,
   Info,
   Maximize2,
-  Minimize2
+  Minimize2,
+  BookOpen,
+  ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -88,12 +93,15 @@ export const MinecraftContainerEmulator: React.FC = () => {
     count: 0
   });
 
-  // Furnace State (Input, Fuel, Output)
+  // Furnace State (Input, Fuel, Output, and burn timer)
   const [furnaceInput, setFurnaceInput] = useState<InventorySlot>({ slotIndex: 0, item: null, count: 0 });
   const [furnaceFuel, setFurnaceFuel] = useState<InventorySlot>({ slotIndex: 1, item: null, count: 0 });
   const [furnaceOutput, setFurnaceOutput] = useState<InventorySlot>({ slotIndex: 2, item: null, count: 0 });
   const [smeltProgress, setSmeltProgress] = useState(0);
-  const [isBurning, setIsBurning] = useState(false);
+  const [burnFuelRemaining, setBurnFuelRemaining] = useState(0);
+  const [burnFuelMax, setBurnFuelMax] = useState(800);
+  const isBurning = burnFuelRemaining > 0;
+  const [isRecipeBookOpen, setIsRecipeBookOpen] = useState(true);
 
   // Held cursor item
   const [cursorItem, setCursorItem] = useState<CursorState>({ item: null, count: 0 });
@@ -122,7 +130,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
   const [anvilLoreLines, setAnvilLoreLines] = useState('');
   const [anvilIsEnchanted, setAnvilIsEnchanted] = useState(true);
 
-  // Initial Load: Load Preset 0 (End Fight Kit)
+  // Initial Load: Load Preset 0 (Furnace Smelter Kit)
   useEffect(() => {
     applyPreset(PRESET_LOADOUTS[0]);
   }, []);
@@ -136,51 +144,598 @@ export const MinecraftContainerEmulator: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Furnace Smelting Loop Simulation
-  useEffect(() => {
-    if (containerType !== 'furnace') return;
-    let timer: any = null;
+  // Crafting Recipe Evaluator
+  const evaluateCraftingRecipe = useCallback((grid: InventorySlot[]): { item: MinecraftItem; count: number } | null => {
+    const ids = grid.map((s) => (s.item && s.count > 0 ? s.item.id : null));
+    const countNonEmpty = ids.filter(Boolean).length;
+    if (countNonEmpty === 0) return null;
 
-    if (furnaceInput.item && furnaceFuel.item && furnaceInput.count > 0 && furnaceFuel.count > 0) {
-      setIsBurning(true);
-      timer = setInterval(() => {
-        setSmeltProgress((prev) => {
-          if (prev >= 100) {
-            // Finished 1 smelt cycle
-            mcAudio.playPop(1.4);
-            // Deduct 1 input
-            setFurnaceInput((curr) => {
-              const newCount = curr.count - 1;
-              return {
-                ...curr,
-                count: newCount,
-                item: newCount > 0 ? curr.item : null
-              };
-            });
-            // Produce output
-            setFurnaceOutput((curr) => {
-              const resultItem = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'iron_ingot') || MINECRAFT_ITEMS_DATABASE[0];
-              const newCount = curr.item ? curr.count + 1 : 1;
-              return {
-                ...curr,
-                item: resultItem,
-                count: Math.min(newCount, 64)
-              };
-            });
-            return 0;
-          }
-          return prev + 5;
-        });
-      }, 150);
-    } else {
-      setIsBurning(false);
-      setSmeltProgress(0);
+    // 1. Bread (Bánh mì): 3 Wheat in any horizontal row
+    const rows = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8]
+    ];
+    for (const r of rows) {
+      if (ids[r[0]] === 'wheat' && ids[r[1]] === 'wheat' && ids[r[2]] === 'wheat' && countNonEmpty === 3) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'bread');
+        if (item) return { item, count: 1 };
+      }
     }
 
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [containerType, furnaceInput, furnaceFuel]);
+    // 2. Crafting Table: 4 Oak Planks in 2x2
+    const quads = [
+      [0, 1, 3, 4],
+      [1, 2, 4, 5],
+      [3, 4, 6, 7],
+      [4, 5, 7, 8]
+    ];
+    for (const q of quads) {
+      if (q.every((idx) => ids[idx] === 'oak_planks') && countNonEmpty === 4) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'crafting_table_item');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 3. Sticks: 2 Oak Planks vertical
+    const vertPairs = [
+      [0, 3],
+      [3, 6],
+      [1, 4],
+      [4, 7],
+      [2, 5],
+      [5, 8]
+    ];
+    for (const p of vertPairs) {
+      if (ids[p[0]] === 'oak_planks' && ids[p[1]] === 'oak_planks' && countNonEmpty === 2) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'stick');
+        if (item) return { item, count: 4 };
+      }
+    }
+
+    // 4. Torches: 1 Coal above 1 Stick
+    for (const p of vertPairs) {
+      if (ids[p[0]] === 'coal' && ids[p[1]] === 'stick' && countNonEmpty === 2) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'torch');
+        if (item) return { item, count: 4 };
+      }
+    }
+
+    // 5. Golden Apple: 1 Apple in center (index 4) + 8 Gold Ingots
+    if (ids[4] === 'apple' && countNonEmpty === 9) {
+      const isSurrounded = [0, 1, 2, 3, 5, 6, 7, 8].every((idx) => ids[idx] === 'gold_ingot');
+      if (isSurrounded) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'golden_apple');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 6. Block of Gold Ore: 9 Raw Gold
+    if (countNonEmpty === 9 && ids.every((id) => id === 'raw_gold')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'gold_ore');
+      if (item) return { item, count: 1 };
+    }
+
+    // 7. Single Wood / Log -> 4 Oak Planks
+    if (countNonEmpty === 1 && ids.some((id) => id === 'oak_wood')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'oak_planks');
+      if (item) return { item, count: 4 };
+    }
+
+    return null;
+  }, []);
+
+  // Update crafting output whenever crafting grid changes
+  useEffect(() => {
+    const res = evaluateCraftingRecipe(craftingGrid);
+    if (res) {
+      setCraftingOutput({ slotIndex: 9, item: res.item, count: res.count });
+    } else {
+      setCraftingOutput({ slotIndex: 9, item: null, count: 0 });
+    }
+  }, [craftingGrid, evaluateCraftingRecipe]);
+
+  // Crafting Table: Take Output
+  const handleCraftOutputClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!craftingOutput.item || craftingOutput.count === 0) return;
+
+    const craftedItem = craftingOutput.item;
+    const craftedCount = craftingOutput.count;
+    const isShift = e.shiftKey;
+
+    if (isShift) {
+      let placed = false;
+      setPlayerSlots((prev) => {
+        const next = [...prev];
+        for (let i = 0; i < 36; i++) {
+          if (next[i].item?.id === craftedItem.id && next[i].count + craftedCount <= craftedItem.maxStack) {
+            next[i] = { ...next[i], count: next[i].count + craftedCount };
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          for (let i = 0; i < 36; i++) {
+            if (!next[i].item || next[i].count === 0) {
+              next[i] = { slotIndex: i, item: craftedItem, count: craftedCount };
+              placed = true;
+              break;
+            }
+          }
+        }
+        return next;
+      });
+      if (!placed) return;
+    } else {
+      if (!cursorItem.item) {
+        setCursorItem({ item: craftedItem, count: craftedCount });
+      } else if (cursorItem.item.id === craftedItem.id && cursorItem.count + craftedCount <= craftedItem.maxStack) {
+        setCursorItem({ item: cursorItem.item, count: cursorItem.count + craftedCount });
+      } else {
+        return;
+      }
+    }
+
+    // Deduct 1 from all filled crafting grid slots
+    setCraftingGrid((prev) =>
+      prev.map((s) => {
+        if (s.item && s.count > 0) {
+          const newCount = s.count - 1;
+          return {
+            ...s,
+            count: newCount,
+            item: newCount > 0 ? s.item : null
+          };
+        }
+        return s;
+      })
+    );
+
+    mcAudio.playPop(1.4);
+  };
+
+  // Crafting Table: Click on grid slots (0-8)
+  const handleCraftingSlotClick = (e: React.MouseEvent, index: number) => {
+    e.preventDefault();
+    const isRightClick = e.button === 2;
+    const isShiftClick = e.shiftKey;
+    const current = craftingGrid[index];
+
+    // Shift click -> return this slot back to player inventory
+    if (isShiftClick && current.item && current.count > 0) {
+      mcAudio.playPop(1.1);
+      let remaining = current.count;
+      setPlayerSlots((prev) => {
+        const next = [...prev];
+        for (let i = 0; i < 36; i++) {
+          if (next[i].item?.id === current.item!.id && next[i].count < next[i].item!.maxStack) {
+            const space = next[i].item!.maxStack - next[i].count;
+            const add = Math.min(space, remaining);
+            next[i] = { ...next[i], count: next[i].count + add };
+            remaining -= add;
+            if (remaining <= 0) break;
+          }
+        }
+        if (remaining > 0) {
+          for (let i = 0; i < 36; i++) {
+            if (!next[i].item || next[i].count === 0) {
+              next[i] = { slotIndex: i, item: current.item, count: remaining };
+              remaining = 0;
+              break;
+            }
+          }
+        }
+        return next;
+      });
+
+      setCraftingGrid((prev) => {
+        const next = [...prev];
+        next[index] = {
+          ...current,
+          item: remaining > 0 ? current.item : null,
+          count: remaining
+        };
+        return next;
+      });
+      return;
+    }
+
+    // Right click
+    if (isRightClick) {
+      if (cursorItem.item && cursorItem.count > 0) {
+        if (!current.item || current.count === 0) {
+          setCraftingGrid((prev) => {
+            const next = [...prev];
+            next[index] = { slotIndex: index, item: cursorItem.item, count: 1 };
+            return next;
+          });
+          const newCount = cursorItem.count - 1;
+          setCursorItem({ item: newCount > 0 ? cursorItem.item : null, count: newCount });
+          mcAudio.playPop(1.0);
+        } else if (current.item.id === cursorItem.item.id && current.count < current.item.maxStack) {
+          setCraftingGrid((prev) => {
+            const next = [...prev];
+            next[index] = { ...current, count: current.count + 1 };
+            return next;
+          });
+          const newCount = cursorItem.count - 1;
+          setCursorItem({ item: newCount > 0 ? cursorItem.item : null, count: newCount });
+          mcAudio.playPop(1.0);
+        }
+      } else if (current.item && current.count > 0) {
+        const take = Math.ceil(current.count / 2);
+        const leave = current.count - take;
+        setCursorItem({ item: current.item, count: take });
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[index] = { ...current, item: leave > 0 ? current.item : null, count: leave };
+          return next;
+        });
+        mcAudio.playPop(0.95);
+      }
+      return;
+    }
+
+    // Left click
+    if (!cursorItem.item || cursorItem.count === 0) {
+      if (current.item && current.count > 0) {
+        setCursorItem({ item: current.item, count: current.count });
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[index] = { slotIndex: index, item: null, count: 0 };
+          return next;
+        });
+        mcAudio.playPop(1.0);
+      }
+    } else {
+      if (!current.item || current.count === 0) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[index] = { slotIndex: index, item: cursorItem.item, count: cursorItem.count };
+          return next;
+        });
+        setCursorItem({ item: null, count: 0 });
+        mcAudio.playPop(1.0);
+      } else if (current.item.id === cursorItem.item.id) {
+        const max = current.item.maxStack;
+        const space = max - current.count;
+        if (space > 0) {
+          const add = Math.min(space, cursorItem.count);
+          setCraftingGrid((prev) => {
+            const next = [...prev];
+            next[index] = { ...current, count: current.count + add };
+            return next;
+          });
+          const rem = cursorItem.count - add;
+          setCursorItem({ item: rem > 0 ? cursorItem.item : null, count: rem });
+          mcAudio.playPop(1.05);
+        }
+      } else {
+        const temp = { ...current };
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[index] = { slotIndex: index, item: cursorItem.item, count: cursorItem.count };
+          return next;
+        });
+        setCursorItem({ item: temp.item, count: temp.count });
+        mcAudio.playPop(1.1);
+      }
+    }
+  };
+
+  // Quick populate recipe into crafting grid
+  const applyCraftingRecipe = (recipeId: string) => {
+    mcAudio.playPop(1.2);
+    clearCraftingGrid(false);
+
+    if (recipeId === 'bread') {
+      const wheat = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'wheat');
+      if (wheat) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[3] = { slotIndex: 3, item: wheat, count: 1 };
+          next[4] = { slotIndex: 4, item: wheat, count: 1 };
+          next[5] = { slotIndex: 5, item: wheat, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'crafting_table') {
+      const planks = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'oak_planks');
+      if (planks) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[0] = { slotIndex: 0, item: planks, count: 1 };
+          next[1] = { slotIndex: 1, item: planks, count: 1 };
+          next[3] = { slotIndex: 3, item: planks, count: 1 };
+          next[4] = { slotIndex: 4, item: planks, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'stick') {
+      const planks = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'oak_planks');
+      if (planks) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[1] = { slotIndex: 1, item: planks, count: 1 };
+          next[4] = { slotIndex: 4, item: planks, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'torch') {
+      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+      const stick = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'stick');
+      if (coal && stick) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[1] = { slotIndex: 1, item: coal, count: 1 };
+          next[4] = { slotIndex: 4, item: stick, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'golden_apple') {
+      const apple = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'apple');
+      const gold = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'gold_ingot');
+      if (apple && gold) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          [0, 1, 2, 3, 5, 6, 7, 8].forEach((idx) => {
+            next[idx] = { slotIndex: idx, item: gold, count: 1 };
+          });
+          next[4] = { slotIndex: 4, item: apple, count: 1 };
+          return next;
+        });
+      }
+    }
+  };
+
+  // Clear Crafting Grid and return items to player inventory
+  const clearCraftingGrid = (playSound = true) => {
+    if (playSound) mcAudio.playPop(1.0);
+    craftingGrid.forEach((slot) => {
+      if (slot.item && slot.count > 0) {
+        let remaining = slot.count;
+        setPlayerSlots((prev) => {
+          const next = [...prev];
+          for (let i = 0; i < 36; i++) {
+            if (next[i].item?.id === slot.item!.id && next[i].count < next[i].item!.maxStack) {
+              const space = next[i].item!.maxStack - next[i].count;
+              const add = Math.min(space, remaining);
+              next[i] = { ...next[i], count: next[i].count + add };
+              remaining -= add;
+              if (remaining <= 0) break;
+            }
+          }
+          if (remaining > 0) {
+            for (let i = 0; i < 36; i++) {
+              if (!next[i].item || next[i].count === 0) {
+                next[i] = { slotIndex: i, item: slot.item, count: remaining };
+                remaining = 0;
+                break;
+              }
+            }
+          }
+          return next;
+        });
+      }
+    });
+
+    setCraftingGrid(Array.from({ length: 9 }, (_, i) => ({ slotIndex: i, item: null, count: 0 })));
+  };
+
+  // Furnace Smelting Loop Simulation with authentic Burn Timer and Smelt Progress
+  useEffect(() => {
+    if (containerType !== 'furnace') return;
+    const timer = setInterval(() => {
+      const recipe = SMELTING_RECIPES.find((r) => r.inputItemId === furnaceInput.item?.id);
+      const outputDef = recipe ? MINECRAFT_ITEMS_DATABASE.find((i) => i.id === recipe.outputItemId) : null;
+      const canAcceptOutput =
+        !furnaceOutput.item ||
+        (outputDef && furnaceOutput.item.id === outputDef.id && furnaceOutput.count < furnaceOutput.item.maxStack);
+
+      setBurnFuelRemaining((currentFuel) => {
+        if (currentFuel > 0) {
+          const nextFuel = Math.max(0, currentFuel - 10);
+          if (recipe && outputDef && canAcceptOutput && furnaceInput.count > 0) {
+            setSmeltProgress((prevProg) => {
+              if (prevProg >= 100) {
+                mcAudio.playPop(1.4);
+                // Deduct 1 input
+                setFurnaceInput((currIn) => {
+                  const count = currIn.count - 1;
+                  return {
+                    ...currIn,
+                    count,
+                    item: count > 0 ? currIn.item : null
+                  };
+                });
+                // Produce 1 output
+                setFurnaceOutput((currOut) => {
+                  const count = currOut.item ? currOut.count + 1 : 1;
+                  return {
+                    slotIndex: 2,
+                    item: outputDef,
+                    count: Math.min(count, outputDef.maxStack)
+                  };
+                });
+                return 0;
+              }
+              return prevProg + 6;
+            });
+          } else {
+            setSmeltProgress((p) => Math.max(0, p - 2));
+          }
+          return nextFuel;
+        } else {
+          // If fuel ran out, check if we can ignite fuel in fuel slot
+          if (recipe && outputDef && canAcceptOutput && furnaceInput.count > 0 && furnaceFuel.item && furnaceFuel.count > 0) {
+            const fuelVal = FUEL_ITEMS[furnaceFuel.item.id] || (furnaceFuel.item.id === 'coal' ? 800 : 0);
+            if (fuelVal > 0) {
+              setFurnaceFuel((currF) => {
+                const count = currF.count - 1;
+                return {
+                  ...currF,
+                  count,
+                  item: count > 0 ? currF.item : null
+                };
+              });
+              setBurnFuelMax(fuelVal);
+              mcAudio.playPop(1.1);
+              return fuelVal;
+            }
+          }
+          setSmeltProgress((p) => Math.max(0, p - 2));
+          return 0;
+        }
+      });
+    }, 100);
+
+    return () => clearInterval(timer);
+  }, [containerType, furnaceInput, furnaceFuel, furnaceOutput]);
+
+  // Furnace Slot Click Handler
+  const handleFurnaceSlotClick = (e: React.MouseEvent, type: 'input' | 'fuel' | 'output') => {
+    e.preventDefault();
+    const isRightClick = e.button === 2;
+    const isShiftClick = e.shiftKey;
+
+    if (type === 'output') {
+      if (!furnaceOutput.item || furnaceOutput.count === 0) return;
+      const item = furnaceOutput.item;
+      const count = furnaceOutput.count;
+
+      if (isShiftClick) {
+        // Shift click -> move directly to player inventory
+        let placed = false;
+        setPlayerSlots((prev) => {
+          const next = [...prev];
+          for (let i = 0; i < 36; i++) {
+            if (next[i].item?.id === item.id && next[i].count + count <= item.maxStack) {
+              next[i] = { ...next[i], count: next[i].count + count };
+              placed = true;
+              break;
+            }
+          }
+          if (!placed) {
+            for (let i = 0; i < 36; i++) {
+              if (!next[i].item || next[i].count === 0) {
+                next[i] = { slotIndex: i, item, count };
+                placed = true;
+                break;
+              }
+            }
+          }
+          return next;
+        });
+        if (placed) {
+          setFurnaceOutput({ slotIndex: 2, item: null, count: 0 });
+          mcAudio.playPop(1.3);
+        }
+      } else {
+        // Collect into cursor
+        if (!cursorItem.item) {
+          setCursorItem({ item, count });
+          setFurnaceOutput({ slotIndex: 2, item: null, count: 0 });
+          mcAudio.playPop(1.3);
+        } else if (cursorItem.item.id === item.id && cursorItem.count + count <= item.maxStack) {
+          setCursorItem({ item, count: cursorItem.count + count });
+          setFurnaceOutput({ slotIndex: 2, item: null, count: 0 });
+          mcAudio.playPop(1.3);
+        }
+      }
+      return;
+    }
+
+    // Input or Fuel slot
+    const current = type === 'input' ? furnaceInput : furnaceFuel;
+    const setTarget = type === 'input' ? setFurnaceInput : setFurnaceFuel;
+
+    if (isShiftClick && current.item && current.count > 0) {
+      // Shift click to player
+      let remaining = current.count;
+      setPlayerSlots((prev) => {
+        const next = [...prev];
+        for (let i = 0; i < 36; i++) {
+          if (next[i].item?.id === current.item!.id && next[i].count < next[i].item!.maxStack) {
+            const space = next[i].item!.maxStack - next[i].count;
+            const add = Math.min(space, remaining);
+            next[i] = { ...next[i], count: next[i].count + add };
+            remaining -= add;
+            if (remaining <= 0) break;
+          }
+        }
+        if (remaining > 0) {
+          for (let i = 0; i < 36; i++) {
+            if (!next[i].item || next[i].count === 0) {
+              next[i] = { slotIndex: i, item: current.item, count: remaining };
+              remaining = 0;
+              break;
+            }
+          }
+        }
+        return next;
+      });
+      setTarget({
+        ...current,
+        item: remaining > 0 ? current.item : null,
+        count: remaining
+      });
+      mcAudio.playPop(1.1);
+      return;
+    }
+
+    if (isRightClick) {
+      if (cursorItem.item && cursorItem.count > 0) {
+        if (!current.item || current.count === 0) {
+          setTarget({ slotIndex: current.slotIndex, item: cursorItem.item, count: 1 });
+          const newCount = cursorItem.count - 1;
+          setCursorItem({ item: newCount > 0 ? cursorItem.item : null, count: newCount });
+          mcAudio.playPop(1.0);
+        } else if (current.item.id === cursorItem.item.id && current.count < current.item.maxStack) {
+          setTarget({ ...current, count: current.count + 1 });
+          const newCount = cursorItem.count - 1;
+          setCursorItem({ item: newCount > 0 ? cursorItem.item : null, count: newCount });
+          mcAudio.playPop(1.0);
+        }
+      } else if (current.item && current.count > 0) {
+        const take = Math.ceil(current.count / 2);
+        const leave = current.count - take;
+        setCursorItem({ item: current.item, count: take });
+        setTarget({ ...current, item: leave > 0 ? current.item : null, count: leave });
+        mcAudio.playPop(0.95);
+      }
+      return;
+    }
+
+    // Left click
+    if (!cursorItem.item || cursorItem.count === 0) {
+      if (current.item && current.count > 0) {
+        setCursorItem({ item: current.item, count: current.count });
+        setTarget({ slotIndex: current.slotIndex, item: null, count: 0 });
+        mcAudio.playPop(1.0);
+      }
+    } else {
+      if (!current.item || current.count === 0) {
+        setTarget({ slotIndex: current.slotIndex, item: cursorItem.item, count: cursorItem.count });
+        setCursorItem({ item: null, count: 0 });
+        mcAudio.playPop(1.0);
+      } else if (current.item.id === cursorItem.item.id) {
+        const space = current.item.maxStack - current.count;
+        if (space > 0) {
+          const add = Math.min(space, cursorItem.count);
+          setTarget({ ...current, count: current.count + add });
+          const rem = cursorItem.count - add;
+          setCursorItem({ item: rem > 0 ? cursorItem.item : null, count: rem });
+          mcAudio.playPop(1.05);
+        }
+      } else {
+        const temp = { ...current };
+        setTarget({ slotIndex: current.slotIndex, item: cursorItem.item, count: cursorItem.count });
+        setCursorItem({ item: temp.item, count: temp.count });
+        mcAudio.playPop(1.1);
+      }
+    }
+  };
 
   // Handle Preset Load
   const applyPreset = (preset: LoadoutPreset) => {
@@ -256,9 +811,81 @@ export const MinecraftContainerEmulator: React.FC = () => {
     const isShiftClick = e.shiftKey;
     const current = getSlot(area, index);
 
-    // 1. SHIFT + LEFT CLICK: Quick Move between container and player inventory
+    // 1. SHIFT + LEFT CLICK: Quick Move
     if (isShiftClick && current.item && current.count > 0) {
       mcAudio.playPop(1.1);
+
+      // Special Case A: Player inventory -> Crafting Table 3x3 grid
+      if (area === 'player' && containerType === 'crafting_table') {
+        let remaining = current.count;
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          for (let i = 0; i < 9; i++) {
+            if (next[i].item?.id === current.item!.id && next[i].count < next[i].item!.maxStack) {
+              const space = next[i].item!.maxStack - next[i].count;
+              const add = Math.min(space, remaining);
+              next[i] = { ...next[i], count: next[i].count + add };
+              remaining -= add;
+              if (remaining <= 0) break;
+            }
+          }
+          if (remaining > 0) {
+            for (let i = 0; i < 9; i++) {
+              if (!next[i].item || next[i].count === 0) {
+                next[i] = { slotIndex: i, item: current.item, count: remaining };
+                remaining = 0;
+                break;
+              }
+            }
+          }
+          return next;
+        });
+        setPlayerSlots((prev) => {
+          const next = [...prev];
+          next[index] = { ...current, item: remaining > 0 ? current.item : null, count: remaining };
+          return next;
+        });
+        return;
+      }
+
+      // Special Case B: Player inventory -> Furnace
+      if (area === 'player' && containerType === 'furnace') {
+        const isFuel = !!FUEL_ITEMS[current.item.id] || current.item.id === 'coal' || current.item.id === 'blaze_rod' || current.item.id === 'oak_planks' || current.item.id === 'stick';
+        let remaining = current.count;
+
+        if (isFuel) {
+          if (!furnaceFuel.item || (furnaceFuel.item.id === current.item.id && furnaceFuel.count < current.item.maxStack)) {
+            const space = furnaceFuel.item ? current.item.maxStack - furnaceFuel.count : current.item.maxStack;
+            const add = Math.min(space, remaining);
+            setFurnaceFuel({
+              slotIndex: 1,
+              item: current.item,
+              count: (furnaceFuel.item ? furnaceFuel.count : 0) + add
+            });
+            remaining -= add;
+          }
+        } else {
+          if (!furnaceInput.item || (furnaceInput.item.id === current.item.id && furnaceInput.count < current.item.maxStack)) {
+            const space = furnaceInput.item ? current.item.maxStack - furnaceInput.count : current.item.maxStack;
+            const add = Math.min(space, remaining);
+            setFurnaceInput({
+              slotIndex: 0,
+              item: current.item,
+              count: (furnaceInput.item ? furnaceInput.count : 0) + add
+            });
+            remaining -= add;
+          }
+        }
+
+        setPlayerSlots((prev) => {
+          const next = [...prev];
+          next[index] = { ...current, item: remaining > 0 ? current.item : null, count: remaining };
+          return next;
+        });
+        return;
+      }
+
+      // Standard Move between container and player inventory
       const targetArea = area === 'container' ? 'player' : 'container';
       const targetList = targetArea === 'container' ? [...containerSlots] : [...playerSlots];
       let remainingCount = current.count;
@@ -660,7 +1287,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
             <span>Emulate Minecraft Container GUI</span>
-            <span className="text-xs font-mono font-normal px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="text-xs font-mono font-normal px-2.5 py-1 rounded-none bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
               Interactive v1.21
             </span>
           </h2>
@@ -677,7 +1304,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
               mcAudio.playClick();
               setIsCreativeDrawerOpen(true);
             }}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+            className="px-3.5 py-2 rounded-none bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95 border-2 border-emerald-400/40"
             title="Mở bảng Creative để lấy bất kỳ item nào"
           >
             <Plus className="w-4 h-4" />
@@ -687,7 +1314,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           {/* Random Dungeon Loot */}
           <button
             onClick={handleFillRandomLoot}
-            className="px-3 py-2 rounded-xl bg-[#282832] hover:bg-[#343442] text-slate-200 hover:text-white border border-[#3E3E4C] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="px-3 py-2 rounded-none bg-[#282832] hover:bg-[#343442] text-slate-200 hover:text-white border border-[#3E3E4C] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
             title="Đổ đầy rương với vật phẩm ngẫu nhiên"
           >
             <Shuffle className="w-3.5 h-3.5 text-[#00E5FF]" />
@@ -697,7 +1324,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           {/* Export JSON */}
           <button
             onClick={handleExportJSON}
-            className="px-3 py-2 rounded-xl bg-[#282832] hover:bg-[#343442] text-slate-200 hover:text-white border border-[#3E3E4C] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="px-3 py-2 rounded-none bg-[#282832] hover:bg-[#343442] text-slate-200 hover:text-white border border-[#3E3E4C] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
             title="Xuất bố cục kho đồ ra JSON"
           >
             {copiedMessage ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Download className="w-3.5 h-3.5" />}
@@ -707,7 +1334,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           {/* Import JSON */}
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="px-3 py-2 rounded-xl bg-[#282832] hover:bg-[#343442] text-slate-200 hover:text-white border border-[#3E3E4C] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="px-3 py-2 rounded-none bg-[#282832] hover:bg-[#343442] text-slate-200 hover:text-white border border-[#3E3E4C] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
             title="Nhập bố cục từ JSON"
           >
             <Upload className="w-3.5 h-3.5" />
@@ -720,7 +1347,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
               const muted = mcAudio.toggleMute();
               setIsMuted(muted);
             }}
-            className="p-2 rounded-xl bg-[#282832] hover:bg-[#343442] text-slate-300 hover:text-white border border-[#3E3E4C] text-xs transition-all cursor-pointer"
+            className="p-2 rounded-none bg-[#282832] hover:bg-[#343442] text-slate-300 hover:text-white border border-[#3E3E4C] text-xs transition-all cursor-pointer"
             title={isMuted ? 'Bật âm thanh Minecraft' : 'Tắt âm thanh'}
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
@@ -729,7 +1356,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           {/* Clear All */}
           <button
             onClick={() => handleClear('all')}
-            className="p-2 rounded-xl bg-[#282832] hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 border border-[#3E3E4C] hover:border-rose-500/40 text-xs transition-all cursor-pointer"
+            className="p-2 rounded-none bg-[#282832] hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 border border-[#3E3E4C] hover:border-rose-500/40 text-xs transition-all cursor-pointer"
             title="Xóa sạch rương và kho đồ"
           >
             <Trash2 className="w-4 h-4" />
@@ -746,7 +1373,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           <button
             key={preset.id}
             onClick={() => applyPreset(preset)}
-            className="px-3 py-1.5 rounded-full bg-[#1C1C22] hover:bg-[#2A2A34] text-slate-300 hover:text-white border border-[#343440] text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+            className="px-3 py-1.5 rounded-none bg-[#1C1C22] hover:bg-[#2A2A34] text-slate-300 hover:text-white border border-[#343440] text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
           >
             <Sparkles className="w-3 h-3 text-[#FFD600]" />
             <span>{preset.name}</span>
@@ -766,7 +1393,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
                 mcAudio.playChestOpen();
                 setContainerType(type);
               }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 border ${
+              className={`px-4 py-2 rounded-none text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 border-2 ${
                 isActive
                   ? 'bg-[#E50914] text-white border-[#E50914] shadow-md shadow-[#E50914]/25'
                   : 'bg-[#18181E] text-slate-400 hover:text-white hover:bg-[#24242E] border-[#2C2C38]'
@@ -782,7 +1409,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
       {/* Main Minecraft GUI Box Container */}
       <div className="flex justify-center items-start">
         <div 
-          className="mc-gui-frame p-4 sm:p-6 rounded-2xl shadow-2xl relative border-4 border-[#373737] max-w-full overflow-x-auto"
+          className="mc-gui-frame p-4 sm:p-6 rounded-none shadow-2xl relative border-4 border-[#373737] max-w-full overflow-x-auto"
           style={{
             backgroundColor: activeConfig.color || '#C6C6C6',
             boxShadow: 'inset 3px 3px 0px #FFFFFF, inset -3px -3px 0px #555555, 0 20px 40px rgba(0,0,0,0.6)'
@@ -800,7 +1427,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleSort('container')}
-                className="px-2.5 py-1 rounded bg-[#8B8B8B] hover:bg-[#9E9E9E] text-black text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                className="px-2.5 py-1 rounded-none bg-[#8B8B8B] hover:bg-[#9E9E9E] text-black text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
                 title="Tự động gom và sắp xếp rương"
               >
                 <ArrowUpDown className="w-3 h-3" />
@@ -809,7 +1436,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
 
               <button
                 onClick={() => handleClear('container')}
-                className="px-2.5 py-1 rounded bg-[#8B8B8B] hover:bg-red-300 text-black text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                className="px-2.5 py-1 rounded-none bg-[#8B8B8B] hover:bg-red-300 text-black text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
                 title="Dọn sạch rương"
               >
                 <Trash2 className="w-3 h-3" />
@@ -819,86 +1446,302 @@ export const MinecraftContainerEmulator: React.FC = () => {
           </div>
 
           {/* CONTAINER SLOTS GRID */}
-          {containerType === 'furnace' ? (
-            /* Special Furnace GUI Layout */
-            <div className="flex flex-col items-center py-4 px-6 bg-[#C6C6C6] rounded-lg">
-              <div className="flex items-center gap-8">
-                {/* Input Slot & Fuel Slot */}
-                <div className="flex flex-col items-center gap-3">
+          {containerType === 'crafting_table' ? (
+            /* Dedicated Crafting Table 3x3 Screen */
+            <div className="flex flex-col gap-3 py-2 px-3 sm:px-6 bg-[#C6C6C6] rounded-none">
+              {/* Recipe Book Quick Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#A0A0A0]">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsRecipeBookOpen(!isRecipeBookOpen)}
+                    className="px-2.5 py-1 rounded-none bg-[#4A6E2E] hover:bg-[#5A8538] text-white text-[11px] font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-xs border border-[#2E4A1A]"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>{isRecipeBookOpen ? 'Ẩn sách công thức' : 'Mở sách công thức'}</span>
+                  </button>
+                  <span className="text-[11px] font-mono text-[#555]">
+                    Lưới chế tạo 3x3 tiêu chuẩn
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => clearCraftingGrid(true)}
+                  className="px-2.5 py-1 rounded-none bg-[#8B8B8B] hover:bg-amber-300 text-black text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                  title="Chuyển toàn bộ nguyên liệu trên bàn về kho đồ"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Dọn lưới</span>
+                </button>
+              </div>
+
+              {/* Collapsible Recipe Quick-List */}
+              {isRecipeBookOpen && (
+                <div className="bg-[#B0B0B0] p-2.5 border-2 border-[#555] rounded-none flex flex-wrap items-center gap-1.5 shadow-inner">
+                  <span className="text-[10px] font-mono font-bold text-[#333] uppercase mr-1 shrink-0">
+                    Công thức nhanh:
+                  </span>
+                  <button
+                    onClick={() => applyCraftingRecipe('bread')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🥖 Bánh mì (3 Lúa mì)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('crafting_table')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🛠️ Bàn chế tạo (4 Ván gỗ)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('torch')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🔥 Đuốc (Than + Gậy)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('stick')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🪵 Gậy gỗ (2 Ván gỗ)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('golden_apple')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🍏 Táo vàng (8 Thỏi vàng + Táo)</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Crafting Grid & Output Section */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 py-4">
+                {/* 3x3 Crafting Grid */}
+                <div className="flex flex-col items-center">
+                  <span className="text-[11px] font-mono font-bold text-[#4F4F4F] mb-1.5">
+                    Lưới chế tạo (Crafting 3x3)
+                  </span>
+                  <div
+                    className="grid grid-cols-3 gap-[3px] p-2 bg-[#8B8B8B] rounded-none border-2 border-[#373737]"
+                    style={{
+                      boxShadow: 'inset 2px 2px 0px #373737, inset -2px -2px 0px #FFFFFF'
+                    }}
+                  >
+                    {craftingGrid.map((slot, index) => (
+                      <SlotCell
+                        key={index}
+                        slot={slot}
+                        onClick={(e) => handleCraftingSlotClick(e, index)}
+                        onContextMenu={(e) => handleCraftingSlotClick(e, index)}
+                        onMouseEnter={() => slot.item && setHoveredSlot(slot as any)}
+                        onMouseLeave={() => setHoveredSlot(null)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Crafting Arrow Pointer */}
+                <div className="flex flex-col items-center justify-center">
+                  <div className="p-2 bg-[#A0A0A0] border border-[#555] shadow-xs">
+                    <ArrowRight className="w-8 h-8 text-[#373737]" />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-[#555] mt-1">Chế tạo</span>
+                </div>
+
+                {/* Crafting Output Slot */}
+                <div className="flex flex-col items-center">
+                  <span className="text-[11px] font-mono font-bold text-[#4F4F4F] mb-1.5">
+                    Thành phẩm (Output)
+                  </span>
+                  <div
+                    className="p-2 bg-[#8B8B8B] rounded-none border-3 border-[#373737]"
+                    style={{
+                      boxShadow: 'inset 3px 3px 0px #373737, inset -3px -3px 0px #FFFFFF'
+                    }}
+                  >
+                    <SlotCell
+                      slot={craftingOutput}
+                      size={52}
+                      onClick={handleCraftOutputClick}
+                      onContextMenu={handleCraftOutputClick}
+                      onMouseEnter={() => craftingOutput.item && setHoveredSlot(craftingOutput as any)}
+                      onMouseLeave={() => setHoveredSlot(null)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : containerType === 'furnace' ? (
+            /* Dedicated Furnace GUI Layout */
+            <div className="flex flex-col gap-3 py-2 px-3 sm:px-6 bg-[#C6C6C6] rounded-none">
+              {/* Furnace Quick Actions Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#A0A0A0]">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono font-bold text-[#333] uppercase">
+                    Nạp nhanh lò nung:
+                  </span>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const goldOre = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'gold_ore');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (goldOre) setFurnaceInput({ slotIndex: 0, item: goldOre, count: 32 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🧈 Quặng vàng -&gt; Vàng thô</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const rawGold = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'raw_gold');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (rawGold) setFurnaceInput({ slotIndex: 0, item: rawGold, count: 32 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>✨ Vàng thô -&gt; Thỏi vàng</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const rawBeef = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'raw_beef');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (rawBeef) setFurnaceInput({ slotIndex: 0, item: rawBeef, count: 32 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🥩 Bò sống -&gt; Bò nướng</span>
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => {
+                    mcAudio.playPop(1.1);
+                    // Return all furnace items to player
+                    [furnaceInput, furnaceFuel, furnaceOutput].forEach((slot) => {
+                      if (slot.item && slot.count > 0) {
+                        let remaining = slot.count;
+                        setPlayerSlots((prev) => {
+                          const next = [...prev];
+                          for (let i = 0; i < 36; i++) {
+                            if (next[i].item?.id === slot.item!.id && next[i].count < next[i].item!.maxStack) {
+                              const add = Math.min(next[i].item!.maxStack - next[i].count, remaining);
+                              next[i] = { ...next[i], count: next[i].count + add };
+                              remaining -= add;
+                              if (remaining <= 0) break;
+                            }
+                          }
+                          if (remaining > 0) {
+                            for (let i = 0; i < 36; i++) {
+                              if (!next[i].item || next[i].count === 0) {
+                                next[i] = { slotIndex: i, item: slot.item, count: remaining };
+                                remaining = 0;
+                                break;
+                              }
+                            }
+                          }
+                          return next;
+                        });
+                      }
+                    });
+                    setFurnaceInput({ slotIndex: 0, item: null, count: 0 });
+                    setFurnaceFuel({ slotIndex: 1, item: null, count: 0 });
+                    setFurnaceOutput({ slotIndex: 2, item: null, count: 0 });
+                    setSmeltProgress(0);
+                    setBurnFuelRemaining(0);
+                  }}
+                  className="px-2.5 py-1 rounded-none bg-[#8B8B8B] hover:bg-amber-300 text-black text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                  title="Thu hồi toàn bộ vật phẩm trong lò nung về túi đồ"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Thu hồi lò</span>
+                </button>
+              </div>
+
+              {/* Main Furnace Components Layout */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 py-4">
+                {/* Left: Input slot + Flame + Fuel slot */}
+                <div className="flex flex-col items-center gap-2">
                   <div className="flex flex-col items-center">
-                    <span className="text-[10px] text-[#4F4F4F] font-mono font-bold mb-1">Vật liệu</span>
+                    <span className="text-[11px] text-[#4F4F4F] font-mono font-bold mb-1">
+                      Vật liệu nung (Input)
+                    </span>
                     <SlotCell
                       slot={furnaceInput}
-                      onClick={(e) => {
-                        // Quick input slot interaction
-                        if (cursorItem.item) {
-                          setFurnaceInput({ slotIndex: 0, item: cursorItem.item, count: cursorItem.count });
-                          setCursorItem({ item: null, count: 0 });
-                          mcAudio.playPop(1.0);
-                        } else if (furnaceInput.item) {
-                          setCursorItem({ item: furnaceInput.item, count: furnaceInput.count });
-                          setFurnaceInput({ slotIndex: 0, item: null, count: 0 });
-                          mcAudio.playPop(1.0);
-                        }
-                      }}
+                      onClick={(e) => handleFurnaceSlotClick(e, 'input')}
+                      onContextMenu={(e) => handleFurnaceSlotClick(e, 'input')}
                       onMouseEnter={() => furnaceInput.item && setHoveredSlot(furnaceInput as any)}
                       onMouseLeave={() => setHoveredSlot(null)}
                     />
                   </div>
 
-                  {/* Animated Flame */}
-                  <div className="flex items-center justify-center h-6">
-                    <Flame className={`w-5 h-5 ${isBurning ? 'text-amber-500 animate-pulse scale-110' : 'text-[#888]'}`} />
+                  {/* Animated Flame with Fuel Percentage */}
+                  <div className="flex flex-col items-center justify-center my-1 relative" title={isBurning ? `Nhiệt độ lò đang cháy: ${Math.round((burnFuelRemaining / burnFuelMax) * 100)}%` : 'Lò nung chưa kích hoạt'}>
+                    <div className="relative w-7 h-7 flex items-center justify-center">
+                      <Flame
+                        className={`w-6 h-6 transition-transform ${
+                          isBurning
+                            ? 'text-amber-500 animate-pulse scale-125 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]'
+                            : 'text-[#777]'
+                        }`}
+                      />
+                    </div>
+                    {isBurning && (
+                      <span className="text-[9px] font-mono font-bold text-amber-700">
+                        {Math.round((burnFuelRemaining / burnFuelMax) * 100)}%
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex flex-col items-center">
-                    <span className="text-[10px] text-[#4F4F4F] font-mono font-bold mb-1">Nhiên liệu</span>
+                    <span className="text-[11px] text-[#4F4F4F] font-mono font-bold mb-1">
+                      Nhiên liệu (Fuel: Than...)
+                    </span>
                     <SlotCell
                       slot={furnaceFuel}
-                      onClick={(e) => {
-                        if (cursorItem.item) {
-                          setFurnaceFuel({ slotIndex: 1, item: cursorItem.item, count: cursorItem.count });
-                          setCursorItem({ item: null, count: 0 });
-                          mcAudio.playPop(1.0);
-                        } else if (furnaceFuel.item) {
-                          setCursorItem({ item: furnaceFuel.item, count: furnaceFuel.count });
-                          setFurnaceFuel({ slotIndex: 1, item: null, count: 0 });
-                          mcAudio.playPop(1.0);
-                        }
-                      }}
+                      onClick={(e) => handleFurnaceSlotClick(e, 'fuel')}
+                      onContextMenu={(e) => handleFurnaceSlotClick(e, 'fuel')}
                       onMouseEnter={() => furnaceFuel.item && setHoveredSlot(furnaceFuel as any)}
                       onMouseLeave={() => setHoveredSlot(null)}
                     />
                   </div>
                 </div>
 
-                {/* Smelting Progress Arrow */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-16 h-4 bg-[#8B8B8B] rounded border border-[#373737] overflow-hidden">
-                    <div 
-                      className="h-full bg-emerald-500 transition-all duration-150"
+                {/* Center: Smelting Progress Arrow */}
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-mono font-bold text-[#444]">
+                    {isBurning ? 'Đang nung...' : 'Chờ nạp liệu'}
+                  </span>
+                  <div className="w-24 h-5 bg-[#8B8B8B] rounded-none border-2 border-[#373737] overflow-hidden shadow-inner p-0.5">
+                    <div
+                      className="h-full bg-linear-to-r from-amber-500 to-emerald-500 transition-all duration-150"
                       style={{ width: `${smeltProgress}%` }}
                     />
                   </div>
-                  <span className="text-[10px] font-mono font-bold text-[#444]">
-                    {smeltProgress > 0 ? `${smeltProgress}%` : 'Sẵn sàng'}
+                  <span className="text-[11px] font-mono font-bold text-[#373737]">
+                    {smeltProgress > 0 ? `${smeltProgress}%` : '0%'}
                   </span>
                 </div>
 
-                {/* Output Slot */}
+                {/* Right: Output Slot */}
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] text-[#4F4F4F] font-mono font-bold mb-1">Thành phẩm</span>
-                  <div className="p-1 bg-[#8B8B8B] rounded border-2 border-[#373737]">
+                  <span className="text-[11px] text-[#4F4F4F] font-mono font-bold mb-1">
+                    Thành phẩm (Output)
+                  </span>
+                  <div
+                    className="p-2 bg-[#8B8B8B] rounded-none border-3 border-[#373737]"
+                    style={{
+                      boxShadow: 'inset 3px 3px 0px #373737, inset -3px -3px 0px #FFFFFF'
+                    }}
+                  >
                     <SlotCell
                       slot={furnaceOutput}
-                      size={44}
-                      onClick={(e) => {
-                        if (furnaceOutput.item) {
-                          setCursorItem({ item: furnaceOutput.item, count: furnaceOutput.count });
-                          setFurnaceOutput({ slotIndex: 2, item: null, count: 0 });
-                          mcAudio.playPop(1.2);
-                        }
-                      }}
+                      size={52}
+                      onClick={(e) => handleFurnaceSlotClick(e, 'output')}
+                      onContextMenu={(e) => handleFurnaceSlotClick(e, 'output')}
                       onMouseEnter={() => furnaceOutput.item && setHoveredSlot(furnaceOutput as any)}
                       onMouseLeave={() => setHoveredSlot(null)}
                     />
@@ -907,9 +1750,9 @@ export const MinecraftContainerEmulator: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* Standard Grid Slots Container */
+            /* Standard Grid Slots Container (Chest, Barrel, Shulker, Dispenser...) */
             <div 
-              className="grid gap-[3px] p-2 bg-[#8B8B8B] rounded border-2 border-[#373737]"
+              className="grid gap-[3px] p-2 bg-[#8B8B8B] rounded-none border-2 border-[#373737]"
               style={{
                 gridTemplateColumns: `repeat(${activeConfig.cols}, minmax(0, 1fr))`,
                 boxShadow: 'inset 2px 2px 0px #373737, inset -2px -2px 0px #FFFFFF'
@@ -941,7 +1784,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleSort('player')}
-                className="px-2 py-0.5 rounded bg-[#8B8B8B] hover:bg-[#9E9E9E] text-black text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
+                className="px-2 py-0.5 rounded-none bg-[#8B8B8B] hover:bg-[#9E9E9E] text-black text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
                 title="Sắp xếp kho đồ người chơi"
               >
                 <ArrowUpDown className="w-3 h-3" />
@@ -952,7 +1795,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
 
           {/* PLAYER INVENTORY: Main 27 Storage Slots (3 rows of 9) */}
           <div 
-            className="grid grid-cols-9 gap-[3px] p-2 bg-[#8B8B8B] rounded border-2 border-[#373737]"
+            className="grid grid-cols-9 gap-[3px] p-2 bg-[#8B8B8B] rounded-none border-2 border-[#373737]"
             style={{
               boxShadow: 'inset 2px 2px 0px #373737, inset -2px -2px 0px #FFFFFF'
             }}
@@ -973,7 +1816,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           {/* PLAYER HOTBAR: 9 Quick Slots */}
           <div className="pt-2">
             <div 
-              className="grid grid-cols-9 gap-[3px] p-2 bg-[#8B8B8B] rounded border-2 border-[#373737]"
+              className="grid grid-cols-9 gap-[3px] p-2 bg-[#8B8B8B] rounded-none border-2 border-[#373737]"
               style={{
                 boxShadow: 'inset 2px 2px 0px #373737, inset -2px -2px 0px #FFFFFF'
               }}
@@ -1014,6 +1857,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
           <div className="relative">
             <MinecraftItemIcon
               iconType={cursorItem.item.iconType}
+              imageUrl={cursorItem.item.imageUrl}
               enchanted={cursorItem.item.enchanted}
               size={36}
             />
@@ -1035,7 +1879,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
       {/* MINECRAFT AUTHENTIC ITEM TOOLTIP */}
       {hoveredSlot && hoveredSlot.item && !cursorItem.item && (
         <div
-          className="fixed pointer-events-none z-99999 p-2.5 rounded text-xs select-none max-w-xs shadow-2xl"
+          className="fixed pointer-events-none z-99999 p-2.5 rounded-none text-xs select-none max-w-xs shadow-2xl"
           style={{
             left: mousePos.x + 16,
             top: mousePos.y + 16,
@@ -1103,7 +1947,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsCreativeDrawerOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                className="p-1 rounded-none text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1118,7 +1962,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
                   placeholder="Tìm kiếm item (Sword, Pickaxe, Apple, TNT)..."
                   value={creativeSearch}
                   onChange={(e) => setCreativeSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#22222C] border border-[#343440] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                  className="w-full pl-9 pr-3 py-2 rounded-none bg-[#22222C] border border-[#343440] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
@@ -1137,10 +1981,10 @@ export const MinecraftContainerEmulator: React.FC = () => {
                   <button
                     key={cat.id}
                     onClick={() => setCreativeCategory(cat.id)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-none text-[11px] font-bold whitespace-nowrap transition-colors cursor-pointer border ${
                       creativeCategory === cat.id
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-[#22222C] text-slate-400 hover:text-white'
+                        ? 'bg-emerald-600 text-white border-emerald-500'
+                        : 'bg-[#22222C] text-slate-400 hover:text-white border-[#343440]'
                     }`}
                   >
                     {cat.label}
@@ -1156,11 +2000,12 @@ export const MinecraftContainerEmulator: React.FC = () => {
                   <button
                     key={item.id}
                     onClick={() => handleSpawnCreativeItem(item)}
-                    className="p-2 rounded-xl bg-[#22222C] hover:bg-[#2F2F3D] border border-[#333342] hover:border-emerald-500 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group active:scale-95 shadow-xs"
+                    className="p-2 rounded-none bg-[#22222C] hover:bg-[#2F2F3D] border border-[#333342] hover:border-emerald-500 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group active:scale-95 shadow-xs"
                     title={`Lấy ${item.name} (${item.maxStack}x)`}
                   >
                     <MinecraftItemIcon
                       iconType={item.iconType}
+                      imageUrl={item.imageUrl}
                       enchanted={item.enchanted}
                       size={32}
                     />
@@ -1188,7 +2033,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-[#1C1C24] border border-[#333340] rounded-2xl p-6 shadow-2xl space-y-4"
+              className="w-full max-w-md bg-[#1C1C24] border-2 border-[#333340] rounded-none p-6 shadow-2xl space-y-4"
             >
               <div className="flex items-center justify-between border-b border-[#2C2C38] pb-3">
                 <div className="flex items-center gap-2 text-amber-400">
@@ -1197,7 +2042,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setIsAnvilModalOpen(false)}
-                  className="p-1 text-slate-400 hover:text-white rounded-lg"
+                  className="p-1 text-slate-400 hover:text-white rounded-none border border-[#343440] hover:bg-[#2A2A34]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1210,7 +2055,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
                     type="text"
                     value={anvilItemName}
                     onChange={(e) => setAnvilItemName(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-[#14141A] border border-[#2D2D38] text-white focus:outline-none focus:border-amber-400 font-mono"
+                    className="w-full p-2.5 rounded-none bg-[#14141A] border border-[#2D2D38] text-white focus:outline-none focus:border-amber-400 font-mono"
                   />
                 </div>
 
@@ -1220,7 +2065,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
                     rows={4}
                     value={anvilLoreLines}
                     onChange={(e) => setAnvilLoreLines(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-[#14141A] border border-[#2D2D38] text-white focus:outline-none focus:border-amber-400 font-mono resize-none"
+                    className="w-full p-2.5 rounded-none bg-[#14141A] border border-[#2D2D38] text-white focus:outline-none focus:border-amber-400 font-mono resize-none"
                     placeholder="Sharpness V&#10;Unbreaking III&#10;Mending"
                   />
                 </div>
@@ -1230,7 +2075,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
                     type="checkbox"
                     checked={anvilIsEnchanted}
                     onChange={(e) => setAnvilIsEnchanted(e.target.checked)}
-                    className="w-4 h-4 rounded accent-amber-500"
+                    className="w-4 h-4 rounded-none accent-amber-500"
                   />
                   <span>Bật hiệu ứng lấp lánh Phù Phép (Enchantment Glint)</span>
                 </label>
@@ -1239,13 +2084,13 @@ export const MinecraftContainerEmulator: React.FC = () => {
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   onClick={() => setIsAnvilModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-[#252530] text-slate-300 hover:text-white text-xs font-semibold"
+                  className="px-4 py-2 rounded-none bg-[#252530] text-slate-300 hover:text-white text-xs font-semibold border border-[#3A3A46]"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleSaveAnvil}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold shadow-md"
+                  className="px-4 py-2 rounded-none bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold shadow-md border-2 border-amber-300"
                 >
                   Áp Dụng Đe (Anvil)
                 </button>
@@ -1263,7 +2108,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-lg bg-[#1C1C24] border border-[#333340] rounded-2xl p-6 shadow-2xl space-y-4"
+              className="w-full max-w-lg bg-[#1C1C24] border-2 border-[#333340] rounded-none p-6 shadow-2xl space-y-4"
             >
               <div className="flex items-center justify-between border-b border-[#2C2C38] pb-3">
                 <div className="flex items-center gap-2 text-white">
@@ -1272,7 +2117,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setIsImportModalOpen(false)}
-                  className="p-1 text-slate-400 hover:text-white rounded-lg"
+                  className="p-1 text-slate-400 hover:text-white rounded-none border border-[#343440] hover:bg-[#2A2A34]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1285,20 +2130,20 @@ export const MinecraftContainerEmulator: React.FC = () => {
                   value={importJsonText}
                   onChange={(e) => setImportJsonText(e.target.value)}
                   placeholder="Dán JSON đã xuất trước đó vào đây..."
-                  className="w-full p-3 rounded-xl bg-[#14141A] border border-[#2D2D38] text-white font-mono focus:outline-none focus:border-[#00E5FF] resize-none"
+                  className="w-full p-3 rounded-none bg-[#14141A] border border-[#2D2D38] text-white font-mono focus:outline-none focus:border-[#00E5FF] resize-none"
                 />
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   onClick={() => setIsImportModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-[#252530] text-slate-300 hover:text-white text-xs font-semibold"
+                  className="px-4 py-2 rounded-none bg-[#252530] text-slate-300 hover:text-white text-xs font-semibold border border-[#3A3A46]"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleApplyImport}
-                  className="px-4 py-2 rounded-xl bg-[#00E5FF] hover:bg-[#33EAFF] text-black text-xs font-bold shadow-md"
+                  className="px-4 py-2 rounded-none bg-[#00E5FF] hover:bg-[#33EAFF] text-black text-xs font-bold shadow-md border-2 border-cyan-300"
                 >
                   Tải vào Kho đồ
                 </button>
@@ -1356,6 +2201,7 @@ const SlotCell: React.FC<SlotCellProps> = ({
         <div className="relative pointer-events-none">
           <MinecraftItemIcon
             iconType={slot.item.iconType}
+            imageUrl={slot.item.imageUrl}
             enchanted={slot.item.enchanted}
             size={size - 10}
           />

@@ -23,7 +23,16 @@ import {
   Coins,
   Users,
   Smartphone,
-  RotateCw
+  RotateCw,
+  Flag,
+  Gamepad2,
+  Folder,
+  MapPin,
+  GraduationCap,
+  Calculator,
+  Bell,
+  StickyNote,
+  Armchair
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -35,6 +44,7 @@ import { DiscordWelcomeModal } from './DiscordWelcomeModal';
 
 interface SidebarProps {
   currentRoute: string;
+  routeState?: any;
   navigate: (route: string, state?: any) => void;
   onOpenSearch: () => void;
   selectedChannel?: Channel | null;
@@ -47,6 +57,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentRoute,
+  routeState,
   navigate,
   onOpenSearch,
   onSelectChannel,
@@ -60,6 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { favoriteChannelIds } = useFavorites();
   const { orbs, addOrbs } = useOrbs();
 
+  const [isSpace360Expanded, setIsSpace360Expanded] = useState(true);
   const [isLiveTvExpanded, setIsLiveTvExpanded] = useState(false);
   const [isFavoritesExpanded, setIsFavoritesExpanded] = useState(false);
   const [isToolboxExpanded, setIsToolboxExpanded] = useState(false);
@@ -86,6 +98,83 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isActive = (route: string) => {
     if (route === '/' && currentRoute === '/') return true;
     if (route !== '/' && currentRoute.startsWith(route)) return true;
+    return false;
+  };
+
+  const isSpace360AppActive = (appId: string) => {
+    if (appId === 'v_minecraft') {
+      return (
+        currentRoute.startsWith('/minecraft') ||
+        currentRoute.startsWith('/mc-container') ||
+        routeState?.appId === 'v_minecraft'
+      );
+    }
+    if (appId === 'v_arcade') {
+      return (
+        currentRoute === '/v-arcade' ||
+        currentRoute === '/v-games' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          (!routeState?.appId || routeState?.appId === 'v_arcade'))
+      );
+    }
+    if (appId === 'v_xplore') {
+      return (
+        currentRoute === '/v-files' ||
+        currentRoute === '/v-xplore' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_xplore')
+      );
+    }
+    if (appId === 'explore_vietnam') {
+      return (
+        currentRoute === '/explore-vietnam' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'explore_vietnam')
+      );
+    }
+    if (appId === 'v_box') {
+      return (
+        currentRoute === '/v-box' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_box')
+      );
+    }
+    if (appId === 'v_learn') {
+      return (
+        currentRoute === '/v-study' ||
+        currentRoute === '/v-learn' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_learn')
+      );
+    }
+    if (appId === 'v_calc') {
+      return (
+        currentRoute === '/v-calc' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_calc')
+      );
+    }
+    if (appId === 'v_reminders') {
+      return (
+        currentRoute === '/v-reminders' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_reminders')
+      );
+    }
+    if (appId === 'v_notes') {
+      return (
+        currentRoute === '/v-notes' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_notes')
+      );
+    }
+    if (appId === 'v_furniture') {
+      return (
+        currentRoute === '/v-furniture' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_furniture')
+      );
+    }
     return false;
   };
 
@@ -396,20 +485,244 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="truncate">News</span>
         </button>
 
-        {/* 5. Space 360 */}
-        <button
-          id={isMobile ? 'mobile-nav-item-space360' : 'nav-item-space360'}
-          onClick={() => handleNavClick('/v-space')}
-          title="Space 360"
-          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
-            isActive('/v-space') || isActive('/space-360') || isActive('/v-apps')
-              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
-              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
-          }`}
-        >
-          <LayoutGrid className="w-5 h-5 shrink-0" />
-          <span className="truncate">Space 360</span>
-        </button>
+        {/* 5. Space 360 (Tách thành từng tab chuyên biệt) */}
+        <div className="w-full flex flex-col gap-1">
+          <button
+            id={isMobile ? 'mobile-nav-item-space360' : 'nav-item-space360'}
+            onClick={() => setIsSpace360Expanded((prev) => !prev)}
+            title="Space 360 - Kho ứng dụng"
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+              isActive('/v-space') ||
+              isActive('/space-360') ||
+              isActive('/v-apps') ||
+              isActive('/v-arcade') ||
+              isActive('/v-games') ||
+              isActive('/v-files') ||
+              isActive('/explore-vietnam') ||
+              isActive('/v-box') ||
+              isActive('/v-study') ||
+              isActive('/v-calc') ||
+              isActive('/v-reminders') ||
+              isActive('/v-notes') ||
+              isActive('/v-furniture')
+                ? 'bg-[#2B2B36] text-white font-bold border border-[#E6005A]/40 shadow-sm'
+                : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+            }`}
+          >
+            <div className="flex items-center gap-3.5 truncate">
+              <LayoutGrid className="w-5 h-5 shrink-0 text-[#E6005A]" />
+              <span className="truncate font-bold">Space 360</span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="px-2 py-0.5 text-[9px] font-mono font-bold bg-[#E6005A]/20 text-[#FF4D8B] border border-[#E6005A]/30 rounded-full">
+                10 Apps
+              </span>
+              {isSpace360Expanded ? (
+                <ChevronDown className="w-4 h-4 text-[#A1A1AA]" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-[#A1A1AA]" />
+              )}
+            </div>
+          </button>
+
+          {/* Space 360 Individual Tabs */}
+          <AnimatePresence initial={false}>
+            {isSpace360Expanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.18 }}
+                className="pl-3 pr-0.5 py-1 flex flex-col gap-1 border-l-2 border-[#E6005A]/30 ml-4 overflow-hidden"
+              >
+                {/* Tab: Tất cả Space 360 */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-all' : 'space360-tab-all'}
+                  onClick={() => handleNavClick('/v-space', { appId: 'v_arcade' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    (currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') && !routeState?.appId
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Sparkles className="w-4 h-4 text-pink-400 shrink-0" />
+                    <span className="truncate">Tất cả Space 360</span>
+                  </div>
+                </button>
+
+                {/* Tab 1: V-Games & Arcade (Vòng Quay May Mắn, Caro XO, Rắn...) */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-arcade' : 'space360-tab-arcade'}
+                  onClick={() => handleNavClick('/v-arcade', { appId: 'v_arcade' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_arcade')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Gamepad2 className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="truncate">V-Games & Arcade</span>
+                  </div>
+                  <span className="px-1.5 py-0.5 text-[8.5px] font-bold bg-amber-500/20 text-amber-300 rounded font-mono">
+                    HOT
+                  </span>
+                </button>
+
+                {/* Tab 2: V-Files Explorer */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-files' : 'space360-tab-files'}
+                  onClick={() => handleNavClick('/v-files', { appId: 'v_xplore' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_xplore')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Folder className="w-4 h-4 text-purple-400 shrink-0" />
+                    <span className="truncate">V-Files Explorer</span>
+                  </div>
+                </button>
+
+                {/* Tab 3: Explore Vietnam 360 */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-vietnam' : 'space360-tab-vietnam'}
+                  onClick={() => handleNavClick('/explore-vietnam', { appId: 'explore_vietnam' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('explore_vietnam')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span className="truncate">Explore Vietnam 360</span>
+                  </div>
+                  <span className="px-1.5 py-0.5 text-[8.5px] font-bold bg-rose-500/20 text-rose-300 rounded font-mono">
+                    63
+                  </span>
+                </button>
+
+                {/* Tab 4: V-Box Media */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-vbox' : 'space360-tab-vbox'}
+                  onClick={() => handleNavClick('/v-box', { appId: 'v_box' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_box')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Tv className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="truncate">V-Box Media</span>
+                  </div>
+                </button>
+
+                {/* Tab 5: V-Study Pomodoro */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-study' : 'space360-tab-study'}
+                  onClick={() => handleNavClick('/v-study', { appId: 'v_learn' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_learn')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <GraduationCap className="w-4 h-4 text-sky-400 shrink-0" />
+                    <span className="truncate">V-Study Pomodoro</span>
+                  </div>
+                </button>
+
+                {/* Tab 6: V-Calc Express */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-calc' : 'space360-tab-calc'}
+                  onClick={() => handleNavClick('/v-calc', { appId: 'v_calc' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_calc')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Calculator className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span className="truncate">V-Calc Express</span>
+                  </div>
+                </button>
+
+                {/* Tab 7: V-Reminders Alarm */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-reminders' : 'space360-tab-reminders'}
+                  onClick={() => handleNavClick('/v-reminders', { appId: 'v_reminders' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_reminders')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Bell className="w-4 h-4 text-amber-300 shrink-0" />
+                    <span className="truncate">V-Reminders Alarm</span>
+                  </div>
+                </button>
+
+                {/* Tab 8: V-Notes Smart */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-notes' : 'space360-tab-notes'}
+                  onClick={() => handleNavClick('/v-notes', { appId: 'v_notes' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_notes')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <StickyNote className="w-4 h-4 text-yellow-400 shrink-0" />
+                    <span className="truncate">V-Notes Smart</span>
+                  </div>
+                </button>
+
+                {/* Tab 9: V-Furniture 3D */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-furniture' : 'space360-tab-furniture'}
+                  onClick={() => handleNavClick('/v-furniture', { appId: 'v_furniture' })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_furniture')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Armchair className="w-4 h-4 text-lime-400 shrink-0" />
+                    <span className="truncate">V-Furniture 3D</span>
+                  </div>
+                </button>
+
+                {/* Tab 10: Minecraft Container GUI */}
+                <button
+                  id={isMobile ? 'mobile-space360-tab-minecraft' : 'space360-tab-minecraft'}
+                  onClick={() => handleNavClick('/minecraft')}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-none text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive('v_minecraft')
+                      ? 'bg-[#E6005A] text-white font-bold shadow-xs'
+                      : 'text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Box className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="truncate">Minecraft Container GUI</span>
+                  </div>
+                  <span className="px-1.5 py-0.5 text-[8.5px] font-bold bg-emerald-500/20 text-emerald-300 rounded-none font-mono">
+                    GUI
+                  </span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* 6. Waves Premium */}
         <button
@@ -471,7 +784,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           id={isMobile ? 'mobile-nav-item-minecraft' : 'nav-item-minecraft'}
           onClick={() => handleNavClick('/minecraft')}
           title="Minecraft Container GUI"
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-none transition-all cursor-pointer ${
             isActive('/minecraft') || isActive('/minecraft-gui') || isActive('/minecraft-container') || isActive('/mc-container')
               ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
               : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
@@ -481,7 +794,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Box className="w-5 h-5 shrink-0 text-emerald-400" />
             <span className="truncate">Minecraft Container GUI</span>
           </div>
-          <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-none">
             GUI
           </span>
         </button>
@@ -679,7 +992,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </button>
 
-        {/* 10. Settings */}
+        {/* 10. Feature Flags */}
+        <button
+          id={isMobile ? 'mobile-nav-item-feature-flags' : 'nav-item-feature-flags'}
+          onClick={() => handleNavClick('/feature-flags')}
+          title="Feature Flags"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/feature-flags') || isActive('/flags')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <Flag className="w-5 h-5 shrink-0 text-cyan-400" />
+            <span className="truncate">Feature Flags</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-full">
+            FLAGS
+          </span>
+        </button>
+
+        {/* 11. Settings */}
         <button
           id={isMobile ? 'mobile-nav-item-settings' : 'nav-item-settings'}
           onClick={() => handleNavClick('/settings')}
@@ -872,12 +1205,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
                 <button
                   onClick={() => handleNavClick('/v-space')}
-                  title="Space 360"
+                  title="Space 360 (Tất cả ứng dụng)"
                   className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/v-space') || isActive('/space-360') || isActive('/v-apps') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <LayoutGrid className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
+                  <LayoutGrid className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-[#E6005A]" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/v-arcade', { appId: 'v_arcade' })}
+                  title="V-Games & Arcade (Vòng quay, Caro, Rắn...)"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isSpace360AppActive('v_arcade') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Gamepad2 className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-amber-400" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/v-files', { appId: 'v_xplore' })}
+                  title="V-Files Explorer"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isSpace360AppActive('v_xplore') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Folder className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-purple-400" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/explore-vietnam', { appId: 'explore_vietnam' })}
+                  title="Explore Vietnam 360"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isSpace360AppActive('explore_vietnam') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <MapPin className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-rose-400" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/v-premium')}
@@ -909,7 +1269,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   onClick={() => handleNavClick('/minecraft')}
                   title="Minecraft Container GUI"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-none flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/minecraft') || isActive('/minecraft-gui') || isActive('/minecraft-container') || isActive('/mc-container') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
@@ -941,6 +1301,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }`}
                 >
                   <Info className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/feature-flags')}
+                  title="Feature Flags"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/feature-flags') || isActive('/flags') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Flag className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-cyan-400" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/settings')}
