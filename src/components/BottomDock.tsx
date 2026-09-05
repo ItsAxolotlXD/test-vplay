@@ -9,7 +9,8 @@ import {
   Users,
   Coins,
   Smartphone,
-  Flag
+  Flag,
+  Radio
 } from 'lucide-react';
 
 interface BottomDockProps {
@@ -34,6 +35,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
     { id: 'dock-tv', label: 'Truyền hình', icon: Tv, route: '/live-tv' },
     { id: 'dock-vertical', label: 'Vplay Vertical', icon: Smartphone, route: '/vertical' },
     { id: 'dock-news', label: 'Tin tức', icon: Megaphone, route: '/news' },
+    { id: 'dock-vflow', label: 'Mạng xã hội V-Flow', icon: Radio, route: '/v-flow' },
     { id: 'dock-friends', label: 'Bạn bè & Người dùng', icon: Users, route: '/friends' },
     { id: 'dock-bet', label: 'Sàn cược Orbs VIP', icon: Coins, route: '/bet-arena' },
     { id: 'dock-flags', label: 'Feature Flags', icon: Flag, route: '/feature-flags' },

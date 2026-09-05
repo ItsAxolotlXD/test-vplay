@@ -210,16 +210,243 @@ export const MinecraftContainerEmulator: React.FC = () => {
       }
     }
 
-    // 6. Block of Gold Ore: 9 Raw Gold
+    // 6. Mace (1.21 Tricky Trials): 1 Heavy Core directly above 1 Breeze Rod
+    for (const p of vertPairs) {
+      if (ids[p[0]] === 'heavy_core' && ids[p[1]] === 'breeze_rod' && countNonEmpty === 2) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mace');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 7. Eye of Ender: 1 Ender Pearl + 1 Blaze Powder (anywhere in grid)
+    if (countNonEmpty === 2 && ids.includes('ender_pearl') && ids.includes('blaze_powder')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'eye_of_ender');
+      if (item) return { item, count: 1 };
+    }
+
+    // 8. Golden Carrot: 1 Carrot in center (index 4) + 8 Gold Ingots
+    if (ids[4] === 'carrot' && countNonEmpty === 9) {
+      const isSurrounded = [0, 1, 2, 3, 5, 6, 7, 8].every((idx) => ids[idx] === 'gold_ingot');
+      if (isSurrounded) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'golden_carrot');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 9. Block of Diamond: 9 Diamonds
+    if (countNonEmpty === 9 && ids.every((id) => id === 'diamond')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'diamond_block');
+      if (item) return { item, count: 1 };
+    }
+
+    // 10. Block of Iron: 9 Iron Ingots
+    if (countNonEmpty === 9 && ids.every((id) => id === 'iron_ingot')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'iron_block');
+      if (item) return { item, count: 1 };
+    }
+
+    // 11. Block of Gold: 9 Gold Ingots
+    if (countNonEmpty === 9 && ids.every((id) => id === 'gold_ingot')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'gold_block');
+      if (item) return { item, count: 1 };
+    }
+
+    // 12. Netherite Ingot: 4 Netherite Scraps + 4 Gold Ingots
+    if (countNonEmpty === 8) {
+      const scrapCount = ids.filter((id) => id === 'netherite_scrap').length;
+      const goldCount = ids.filter((id) => id === 'gold_ingot').length;
+      if (scrapCount === 4 && goldCount === 4) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'netherite_ingot');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 13. Crafter (1.21 Redstone): 5 Iron Ingots + 1 Crafting Table + 2 Redstone + 1 Dropper
+    if (countNonEmpty === 9) {
+      const ironCount = ids.filter((id) => id === 'iron_ingot').length;
+      const tableCount = ids.filter((id) => id === 'crafting_table_item').length;
+      const redstoneCount = ids.filter((id) => id === 'redstone_dust').length;
+      const dropperCount = ids.filter((id) => id === 'dropper_item').length;
+      if (ironCount === 5 && tableCount === 1 && redstoneCount === 2 && dropperCount === 1) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'crafter');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 14. Block of Gold Ore / Raw Gold Block: 9 Raw Gold
     if (countNonEmpty === 9 && ids.every((id) => id === 'raw_gold')) {
       const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'gold_ore');
       if (item) return { item, count: 1 };
     }
 
-    // 7. Single Wood / Log -> 4 Oak Planks
-    if (countNonEmpty === 1 && ids.some((id) => id === 'oak_wood')) {
+    // 15. Single Wood / Log -> 4 Oak Planks
+    if (countNonEmpty === 1 && (ids.some((id) => id === 'oak_wood_log') || ids.some((id) => id === 'oak_wood'))) {
       const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'oak_planks');
       if (item) return { item, count: 4 };
+    }
+
+    // 16. Cherry Log -> 4 Cherry Planks (1.20)
+    if (countNonEmpty === 1 && (ids.some((id) => id === 'cherry_log') || ids.some((id) => id === 'cherry_wood') || ids.some((id) => id === 'stripped_cherry_log'))) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'cherry_planks');
+      if (item) return { item, count: 4 };
+    }
+
+    // 17. Block of Bamboo -> 2 Bamboo Planks (1.20)
+    if (countNonEmpty === 1 && (ids.some((id) => id === 'bamboo_block') || ids.some((id) => id === 'stripped_bamboo_block'))) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'bamboo_planks');
+      if (item) return { item, count: 2 };
+    }
+
+    // 18. Brush 1.20: Copper Ingot + Stick (or with feather/gem)
+    if (countNonEmpty === 2 || countNonEmpty === 3) {
+      const hasCopper = ids.some((id) => id === 'copper_ingot');
+      const hasStick = ids.some((id) => id === 'stick');
+      if (hasCopper && hasStick) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'brush');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 19. Decorated Pot 1.20: 4 Pottery Sherds
+    if (countNonEmpty === 4 && ids.filter((id) => id && id.includes('pottery_sherd')).length === 4) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'decorated_pot');
+      if (item) return { item, count: 1 };
+    }
+
+    // 20. Calibrated Sculk Sensor 1.20: 1 Sculk + 3 Amethyst Shards
+    if (countNonEmpty === 4) {
+      const sculkCount = ids.filter((id) => id === 'sculk' || id === 'sculk_catalyst').length;
+      const amethystCount = ids.filter((id) => id === 'amethyst_shard').length;
+      if (sculkCount === 1 && amethystCount === 3) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'calibrated_sculk_sensor');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 21. Bamboo Raft 1.20: 5 Bamboo Planks
+    if (countNonEmpty === 5 && ids.filter((id) => id === 'bamboo_planks').length === 5) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'bamboo_raft');
+      if (item) return { item, count: 1 };
+    }
+
+    // 22. Bamboo Mosaic 1.20: 2 or 4 Bamboo Planks
+    if (countNonEmpty === 2 && ids.filter((id) => id === 'bamboo_planks').length === 2) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'bamboo_mosaic');
+      if (item) return { item, count: 1 };
+    }
+
+    // 23. Chiseled Bookshelf 1.20: 6 Planks (Oak, Cherry, or Bamboo)
+    if (countNonEmpty === 6) {
+      const plankCount = ids.filter((id) => id === 'oak_planks' || id === 'cherry_planks' || id === 'bamboo_planks').length;
+      if (plankCount === 6) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'chiseled_bookshelf');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 24. Mangrove Log -> 4 Mangrove Planks (1.19)
+    if (countNonEmpty === 1 && (ids.some((id) => id === 'mangrove_log') || ids.some((id) => id === 'mangrove_wood') || ids.some((id) => id === 'stripped_mangrove_log'))) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mangrove_planks');
+      if (item) return { item, count: 4 };
+    }
+
+    // 25. Packed Mud (1.19): 1 Mud + 1 Wheat
+    if (countNonEmpty === 2 && ids.includes('mud') && ids.includes('wheat')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'packed_mud');
+      if (item) return { item, count: 1 };
+    }
+
+    // 26. Mud Bricks (1.19): 4 Packed Mud in 2x2
+    if (countNonEmpty === 4 && ids.filter((id) => id === 'packed_mud').length === 4) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mud_bricks');
+      if (item) return { item, count: 4 };
+    }
+
+    // 27. Muddy Mangrove Roots (1.19): 1 Mangrove Roots + 1 Mud
+    if (countNonEmpty === 2 && ids.includes('mangrove_roots') && ids.includes('mud')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'muddy_mangrove_roots');
+      if (item) return { item, count: 1 };
+    }
+
+    // 28. Recovery Compass (1.19): 1 Compass in center (slot 4) + 8 Echo Shards
+    if (ids[4] === 'compass' && countNonEmpty === 9) {
+      const isSurroundedByEchoShards = [0, 1, 2, 3, 5, 6, 7, 8].every((idx) => ids[idx] === 'echo_shard');
+      if (isSurroundedByEchoShards) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'recovery_compass');
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 29. Music Disc 5 (1.19): 9 Disc Fragments (5)
+    if (countNonEmpty === 9 && ids.every((id) => id === 'disc_fragment_5')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'music_disc_5');
+      if (item) return { item, count: 1 };
+    }
+
+    // 30. Mangrove Boat (1.19): 5 Mangrove Planks
+    if (countNonEmpty === 5 && ids.filter((id) => id === 'mangrove_planks').length === 5) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mangrove_boat');
+      if (item) return { item, count: 1 };
+    }
+
+    // 31. Boat with Chest (1.19): 1 Boat + 1 Chest
+    if (countNonEmpty === 2 && ids.includes('chest')) {
+      const boatMap: Record<string, string> = {
+        oak_boat: 'oak_chest_boat',
+        mangrove_boat: 'mangrove_chest_boat',
+        spruce_boat: 'spruce_chest_boat',
+        birch_boat: 'birch_chest_boat',
+        jungle_boat: 'jungle_chest_boat',
+        acacia_boat: 'acacia_chest_boat',
+        dark_oak_boat: 'dark_oak_chest_boat',
+      };
+      const boatId = ids.find((id) => id && id.endsWith('_boat'));
+      if (boatId && boatMap[boatId]) {
+        const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === boatMap[boatId]);
+        if (item) return { item, count: 1 };
+      }
+    }
+
+    // 32. Mangrove Stairs (1.19): 6 Mangrove Planks
+    if (countNonEmpty === 6 && ids.filter((id) => id === 'mangrove_planks').length === 6) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mangrove_stairs');
+      if (item) return { item, count: 4 };
+    }
+
+    // 33. Mangrove Slab (1.19): 3 Mangrove Planks
+    if (countNonEmpty === 3 && ids.filter((id) => id === 'mangrove_planks').length === 3) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mangrove_slab');
+      if (item) return { item, count: 6 };
+    }
+
+    // 34. Mangrove Pressure Plate (1.19): 2 Mangrove Planks
+    if (countNonEmpty === 2 && ids.filter((id) => id === 'mangrove_planks').length === 2) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mangrove_pressure_plate');
+      if (item) return { item, count: 1 };
+    }
+
+    // 35. Mangrove Button (1.19): 1 Mangrove Plank
+    if (countNonEmpty === 1 && ids.includes('mangrove_planks')) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mangrove_button');
+      if (item) return { item, count: 1 };
+    }
+
+    // 36. Mud Brick Stairs (1.19): 6 Mud Bricks
+    if (countNonEmpty === 6 && ids.filter((id) => id === 'mud_bricks').length === 6) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mud_brick_stairs');
+      if (item) return { item, count: 4 };
+    }
+
+    // 37. Mud Brick Slab (1.19): 3 Mud Bricks
+    if (countNonEmpty === 3 && ids.filter((id) => id === 'mud_bricks').length === 3) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mud_brick_slab');
+      if (item) return { item, count: 6 };
+    }
+
+    // 38. Mud Brick Wall (1.19): 6 Mud Bricks
+    if (countNonEmpty === 6 && ids.filter((id) => id === 'mud_bricks').length === 6) {
+      const item = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'mud_brick_wall');
+      if (item) return { item, count: 6 };
     }
 
     return null;
@@ -483,6 +710,140 @@ export const MinecraftContainerEmulator: React.FC = () => {
             next[idx] = { slotIndex: idx, item: gold, count: 1 };
           });
           next[4] = { slotIndex: 4, item: apple, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'mace') {
+      const core = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'heavy_core');
+      const breeze = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'breeze_rod');
+      if (core && breeze) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[1] = { slotIndex: 1, item: core, count: 1 };
+          next[4] = { slotIndex: 4, item: breeze, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'eye_of_ender') {
+      const pearl = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'ender_pearl');
+      const powder = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'blaze_powder');
+      if (pearl && powder) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[3] = { slotIndex: 3, item: pearl, count: 1 };
+          next[4] = { slotIndex: 4, item: powder, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'golden_carrot') {
+      const carrot = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'carrot');
+      const gold = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'gold_ingot');
+      if (carrot && gold) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          [0, 1, 2, 3, 5, 6, 7, 8].forEach((idx) => {
+            next[idx] = { slotIndex: idx, item: gold, count: 1 };
+          });
+          next[4] = { slotIndex: 4, item: carrot, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'diamond_block') {
+      const diamond = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'diamond');
+      if (diamond) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          for (let i = 0; i < 9; i++) {
+            next[i] = { slotIndex: i, item: diamond, count: 1 };
+          }
+          return next;
+        });
+      }
+    } else if (recipeId === 'crafter') {
+      const iron = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'iron_ingot');
+      const table = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'crafting_table_item');
+      const redstone = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'redstone_dust');
+      const dropper = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'dropper_item');
+      if (iron && table && redstone && dropper) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[0] = { slotIndex: 0, item: iron, count: 1 };
+          next[1] = { slotIndex: 1, item: iron, count: 1 };
+          next[2] = { slotIndex: 2, item: iron, count: 1 };
+          next[3] = { slotIndex: 3, item: iron, count: 1 };
+          next[4] = { slotIndex: 4, item: table, count: 1 };
+          next[5] = { slotIndex: 5, item: iron, count: 1 };
+          next[6] = { slotIndex: 6, item: redstone, count: 1 };
+          next[7] = { slotIndex: 7, item: dropper, count: 1 };
+          next[8] = { slotIndex: 8, item: redstone, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'brush') {
+      const copper = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'copper_ingot');
+      const stick = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'stick');
+      if (copper && stick) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[1] = { slotIndex: 1, item: copper, count: 1 };
+          next[4] = { slotIndex: 4, item: stick, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'decorated_pot') {
+      const sherd = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'angler_pottery_sherd') ||
+                    MINECRAFT_ITEMS_DATABASE.find((i) => i.id?.includes('pottery_sherd'));
+      if (sherd) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[1] = { slotIndex: 1, item: sherd, count: 1 };
+          next[3] = { slotIndex: 3, item: sherd, count: 1 };
+          next[5] = { slotIndex: 5, item: sherd, count: 1 };
+          next[7] = { slotIndex: 7, item: sherd, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'cherry_planks') {
+      const log = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'cherry_log');
+      if (log) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[4] = { slotIndex: 4, item: log, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'bamboo_planks') {
+      const bambooBlock = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'bamboo_block');
+      if (bambooBlock) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[4] = { slotIndex: 4, item: bambooBlock, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'bamboo_raft') {
+      const planks = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'bamboo_planks');
+      if (planks) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[3] = { slotIndex: 3, item: planks, count: 1 };
+          next[5] = { slotIndex: 5, item: planks, count: 1 };
+          next[6] = { slotIndex: 6, item: planks, count: 1 };
+          next[7] = { slotIndex: 7, item: planks, count: 1 };
+          next[8] = { slotIndex: 8, item: planks, count: 1 };
+          return next;
+        });
+      }
+    } else if (recipeId === 'calibrated_sculk_sensor') {
+      const sculk = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'sculk');
+      const shard = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'amethyst_shard');
+      if (sculk && shard) {
+        setCraftingGrid((prev) => {
+          const next = [...prev];
+          next[0] = { slotIndex: 0, item: shard, count: 1 };
+          next[1] = { slotIndex: 1, item: shard, count: 1 };
+          next[2] = { slotIndex: 2, item: shard, count: 1 };
+          next[4] = { slotIndex: 4, item: sculk, count: 1 };
           return next;
         });
       }
@@ -1220,7 +1581,26 @@ export const MinecraftContainerEmulator: React.FC = () => {
 
   // Filtered Creative Items
   const filteredCreativeItems = MINECRAFT_ITEMS_DATABASE.filter((item) => {
-    const matchCat = creativeCategory === 'all' || item.category === creativeCategory;
+    const is119Item =
+      item.id.includes('mangrove') ||
+      item.id.includes('mud') ||
+      item.id.includes('sculk') ||
+      item.id.includes('frog') ||
+      item.id.includes('tadpole') ||
+      item.id.includes('goat_horn') ||
+      item.id.includes('echo_shard') ||
+      item.id.includes('recovery_compass') ||
+      item.id.includes('disc_fragment_5') ||
+      item.id.includes('music_disc_5') ||
+      item.id.includes('swift_sneak') ||
+      item.id.includes('chest_boat') ||
+      item.id.includes('warden') ||
+      item.id.includes('allay') ||
+      item.id.includes('reinforced_deepslate');
+
+    const matchCat =
+      creativeCategory === 'all' ||
+      (creativeCategory === '1.19' ? is119Item : item.category === creativeCategory);
     const matchSearch =
       creativeSearch === '' ||
       item.name.toLowerCase().includes(creativeSearch.toLowerCase()) ||
@@ -1476,7 +1856,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
 
               {/* Collapsible Recipe Quick-List */}
               {isRecipeBookOpen && (
-                <div className="bg-[#B0B0B0] p-2.5 border-2 border-[#555] rounded-none flex flex-wrap items-center gap-1.5 shadow-inner">
+                <div className="bg-[#B0B0B0] p-2.5 border-2 border-[#555] rounded-none flex flex-wrap items-center gap-1.5 shadow-inner max-h-36 overflow-y-auto">
                   <span className="text-[10px] font-mono font-bold text-[#333] uppercase mr-1 shrink-0">
                     Công thức nhanh:
                   </span>
@@ -1505,10 +1885,40 @@ export const MinecraftContainerEmulator: React.FC = () => {
                     <span>🪵 Gậy gỗ (2 Ván gỗ)</span>
                   </button>
                   <button
+                    onClick={() => applyCraftingRecipe('mace')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-[#6D28D9] border border-[#7C3AED] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🔨 Chùy Mace 1.21 (Heavy Core + Breeze)</span>
+                  </button>
+                  <button
                     onClick={() => applyCraftingRecipe('golden_apple')}
-                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-amber-700 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
                   >
                     <span>🍏 Táo vàng (8 Thỏi vàng + Táo)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('golden_carrot')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-amber-600 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🥕 Cà rốt vàng (8 Thỏi vàng + Cà rốt)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('eye_of_ender')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-emerald-800 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>👁️ Mắt Ender (Ender Pearl + Bột lửa)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('diamond_block')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-cyan-700 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>💎 Khối kim cương (9 Kim cương)</span>
+                  </button>
+                  <button
+                    onClick={() => applyCraftingRecipe('crafter')}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-rose-700 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>⚙️ Crafter 1.21 (Sắt + Redstone)</span>
                   </button>
                 </div>
               )}
@@ -1587,9 +1997,9 @@ export const MinecraftContainerEmulator: React.FC = () => {
                       if (goldOre) setFurnaceInput({ slotIndex: 0, item: goldOre, count: 32 });
                       if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
                     }}
-                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-amber-800 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
                   >
-                    <span>🧈 Quặng vàng -&gt; Vàng thô</span>
+                    <span>🧈 Quặng vàng</span>
                   </button>
                   <button
                     onClick={() => {
@@ -1599,9 +2009,45 @@ export const MinecraftContainerEmulator: React.FC = () => {
                       if (rawGold) setFurnaceInput({ slotIndex: 0, item: rawGold, count: 32 });
                       if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
                     }}
-                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-amber-600 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
                   >
-                    <span>✨ Vàng thô -&gt; Thỏi vàng</span>
+                    <span>✨ Vàng thô</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const ironOre = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'iron_ore');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (ironOre) setFurnaceInput({ slotIndex: 0, item: ironOre, count: 32 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-slate-700 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>⚙️ Quặng sắt</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const rawIron = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'raw_iron');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (rawIron) setFurnaceInput({ slotIndex: 0, item: rawIron, count: 32 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-slate-800 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🔩 Sắt thô</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const ancientDebris = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'ancient_debris');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (ancientDebris) setFurnaceInput({ slotIndex: 0, item: ancientDebris, count: 8 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-purple-900 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🔥 Ancient Debris</span>
                   </button>
                   <button
                     onClick={() => {
@@ -1611,9 +2057,33 @@ export const MinecraftContainerEmulator: React.FC = () => {
                       if (rawBeef) setFurnaceInput({ slotIndex: 0, item: rawBeef, count: 32 });
                       if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
                     }}
-                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-black border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-red-800 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
                   >
-                    <span>🥩 Bò sống -&gt; Bò nướng</span>
+                    <span>🥩 Thịt bò</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const sand = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'sand');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (sand) setFurnaceInput({ slotIndex: 0, item: sand, count: 32 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-yellow-800 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🏖️ Cát -&gt; Kính</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      mcAudio.playPop(1.2);
+                      const wetSponge = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'wet_sponge');
+                      const coal = MINECRAFT_ITEMS_DATABASE.find((i) => i.id === 'coal');
+                      if (wetSponge) setFurnaceInput({ slotIndex: 0, item: wetSponge, count: 8 });
+                      if (coal) setFurnaceFuel({ slotIndex: 1, item: coal, count: 32 });
+                    }}
+                    className="px-2 py-1 bg-[#D4D4D4] hover:bg-white text-[11px] font-mono font-bold text-emerald-800 border border-[#555] flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>🧽 Sấy bọt biển</span>
                   </button>
                 </div>
 
@@ -1970,6 +2440,7 @@ export const MinecraftContainerEmulator: React.FC = () => {
               <div className="flex gap-1 overflow-x-auto no-scrollbar text-xs">
                 {[
                   { id: 'all', label: 'Tất cả' },
+                  { id: '1.19', label: '🐸 1.19 The Wild' },
                   { id: 'combat', label: 'Vũ khí' },
                   { id: 'tools', label: 'Công cụ' },
                   { id: 'valuable', label: 'Kho báu' },

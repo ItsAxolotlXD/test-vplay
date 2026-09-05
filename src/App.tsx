@@ -31,6 +31,8 @@ import { VNotesView } from './components/VNotesView';
 import { VPremiumView } from './components/VPremiumView';
 import { MinecraftContainerEmulator } from './components/minecraft/MinecraftContainerEmulator';
 import { SearchTab } from './components/SearchTab';
+import { VFlowTab } from './components/vflow/VFlowTab';
+import { ChatRoomView } from './components/chat/ChatRoomView';
 import VplayVertical from './components/VplayVertical';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -289,6 +291,18 @@ export default function App() {
           />
         );
 
+      case '/v-flow':
+      case '/vflow':
+      case '/flow':
+      case '/social':
+        return (
+          <VFlowTab
+            navigate={navigate}
+            onSelectChannel={setCurrentChannel}
+            routeState={routeState}
+          />
+        );
+
       case '/copilot':
       case '/copilot-standalone':
         return (
@@ -382,6 +396,12 @@ export default function App() {
             navigate={navigate}
           />
         );
+
+      case '/chat':
+      case '/chat-room':
+      case '/phong-chat':
+      case '/discord':
+        return <ChatRoomView />;
 
       case '/bet-arena':
       case '/orbs-bet':

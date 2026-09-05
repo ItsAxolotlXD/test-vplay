@@ -307,6 +307,16 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
                 <span className="text-xs text-purple-200 font-medium">Orbs của bạn:</span>
                 <span className="text-xs font-black text-purple-300 font-mono">{orbs.toLocaleString()}</span>
               </div>
+
+              <button
+                onClick={() => navigate('/v-flow')}
+                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#E6005A]/30 to-rose-900/30 hover:from-[#E6005A]/50 hover:to-rose-800/50 border border-rose-500/40 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                title="Khám phá mạng xã hội V-Flow kết nối toàn bộ 100 cư dân"
+              >
+                <Radio className="w-3.5 h-3.5 text-[#FF4D8B] animate-pulse" />
+                <span className="text-xs text-rose-200 font-bold">100 Bạn Bè Đều Dùng V-Flow</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono font-bold">MẠNG XÃ HỘI</span>
+              </button>
             </div>
           </div>
 
@@ -781,6 +791,19 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
                         <span>Tặng</span>
                       </button>
                     </div>
+
+                    {/* V-Flow Social Feed Link */}
+                    <button
+                      onClick={() => {
+                        playPopSound();
+                        navigate('/v-flow', { authorUser: user });
+                      }}
+                      className="mt-2 w-full py-1.5 px-2 rounded-lg bg-gradient-to-r from-rose-950/30 via-[#262430] to-[#201F28] hover:from-rose-900/50 hover:to-rose-800/50 border border-rose-500/30 text-rose-200 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                      title={`Xem bài viết của ${user.name} trên V-Flow`}
+                    >
+                      <Radio className="w-3 h-3 text-rose-400" />
+                      <span>Bài viết V-Flow</span>
+                    </button>
                   </div>
                 );
               })}
@@ -839,6 +862,17 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
                           <span className="hidden sm:inline">Cùng xem</span>
                         </button>
                       )}
+
+                      <button
+                        onClick={() => {
+                          playPopSound();
+                          navigate('/v-flow', { authorUser: user });
+                        }}
+                        className="p-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 hover:text-white transition-colors cursor-pointer"
+                        title={`Xem bài viết V-Flow của ${user.name}`}
+                      >
+                        <Radio className="w-4 h-4 text-rose-400" />
+                      </button>
 
                       <button
                         onClick={() => handleOpenChat(user)}
@@ -967,6 +1001,36 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
                   <span className="text-zinc-400">Kênh yêu thích:</span>
                   <span className="font-bold text-white">{selectedUser.favoriteChannel || 'VTV3 HD'}</span>
                 </div>
+              </div>
+
+              {/* V-Flow Social Presence */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/40 via-[#262430] to-[#201F28] border border-rose-500/30 flex items-center justify-between gap-3 shadow-md">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+                    <Radio className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-white truncate">Mạng xã hội V-Flow</span>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 font-mono font-bold">HOẠT ĐỘNG</span>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 truncate mt-0.5">
+                      Đã đăng bài chia sẻ trên dòng thời gian
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    const u = selectedUser;
+                    setSelectedUser(null);
+                    playPopSound();
+                    navigate('/v-flow', { authorUser: u });
+                  }}
+                  className="px-3 py-2 rounded-xl bg-[#E6005A] hover:bg-[#FF1A75] text-white text-xs font-bold transition-all cursor-pointer shrink-0 shadow-xs flex items-center gap-1"
+                >
+                  <span>Xem bài viết</span>
+                </button>
               </div>
 
               {/* Action Buttons */}

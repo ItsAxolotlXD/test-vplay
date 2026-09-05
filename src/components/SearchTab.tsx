@@ -3,47 +3,41 @@ import {
   Search,
   X,
   Mic,
+  Home,
   Tv,
-  Gamepad2,
-  Crown,
+  Film,
   Megaphone,
-  Sliders,
-  Sparkles,
-  Play,
-  Star,
+  Waves,
   Layers,
-  ArrowRight,
-  Compass,
-  Check,
-  Clock,
-  Trash2,
-  Tag,
-  Radio,
-  FileText,
-  Settings,
-  HardDrive,
-  Building2,
-  BadgeCheck,
+  Gamepad2,
   Folder,
-  Swords,
-  Coins,
-  Flame,
-  Volume2,
-  TrendingUp,
-  SlidersHorizontal,
-  ChevronRight,
-  ShieldCheck,
-  Cloud,
-  LayoutGrid,
-  Zap,
+  MapPin,
+  GraduationCap,
+  Calculator,
+  Bell,
+  StickyNote,
+  Armchair,
   Box,
-  Flag
+  Crown,
+  Users,
+  Coins,
+  Heart,
+  Sliders,
+  Info,
+  Flag,
+  Settings,
+  Sparkles,
+  ArrowRight,
+  Radio,
+  Swords,
+  Flame,
+  LayoutGrid,
+  MessageSquare
 } from 'lucide-react';
 import { Channel } from '../data/channels';
 import { NEWS_LIST } from './NewsView';
 import { playPopSound } from '../utils/sound';
 import { useSettings } from '../hooks/useSettings';
-import { useFavorites } from '../hooks/useFavorites';
 
 interface SearchTabProps {
   navigate: (route: string, state?: any) => void;
@@ -51,1008 +45,774 @@ interface SearchTabProps {
   channels: Channel[];
 }
 
-type SearchCategoryFilter = 
-  | 'all' 
-  | 'channels' 
-  | 'apps' 
-  | 'bet' 
-  | 'premium' 
-  | 'news' 
-  | 'settings' 
-  | 'toolbox';
-
-const RECENT_SEARCHES_KEY = 'vplay_search_tab_recents';
-
 export const SearchTab: React.FC<SearchTabProps> = ({
   navigate,
   onSelectChannel,
   channels
 }) => {
   const { settings } = useSettings();
-  const { favoriteChannelIds, toggleFavoriteChannel, isChannelFavorite } = useFavorites();
   const [query, setQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<SearchCategoryFilter>('all');
   const [isListening, setIsListening] = useState(false);
   const [voiceToast, setVoiceToast] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Focus search input on mount
+  // Auto-focus the search input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Recent Searches State
-  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // fallback
-    }
-    return ['VTV1 HD', 'Bầu Cua Tôm Cá', 'V-Arcade', 'Pro Cloud 200GB', 'Explore Vietnam'];
-  });
+  // 1. Sidebar Tabs Dataset - Full coverage of all Sidebar navigation tabs & sub-sections
+  const sidebarTabsList = useMemo(
+    () => [
+      {
+        id: 'sidebar_home',
+        name: 'Trang Chủ (Home)',
+        tagline: 'Tab Sidebar • Kênh thịnh hành, tiếp tục xem & đề xuất đặc sắc',
+        route: '/',
+        icon: <Home className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['home', 'trang chủ', 'chính', 'menu', 'tổng quan', 'bảng tin', 'mặc định']
+      },
+      {
+        id: 'sidebar_copilot',
+        name: 'Copilot for Vplay',
+        tagline: 'Tab Sidebar • Trợ lý AI thông minh giải đáp câu hỏi và gợi ý phim, kênh',
+        route: '/copilot',
+        icon: <Sparkles className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['copilot', 'ai', 'trợ lý', 'gemini', 'chat', 'hỏi đáp', 'tìm kiếm ai']
+      },
+      {
+        id: 'sidebar_livetv',
+        name: 'Truyền Hình Trực Tiếp (Live TV)',
+        tagline: 'Tab Sidebar • Hàng trăm kênh truyền hình trực tuyến HD trong và ngoài nước',
+        route: '/live-tv',
+        icon: <Tv className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['live tv', 'truyền hình', 'kênh tv', 'trực tiếp', 'vtv', 'htv', 'thể thao', 'xem tivi']
+      },
+      {
+        id: 'sidebar_shorts',
+        name: 'Video Ngắn (V-Play Shorts)',
+        tagline: 'Tab Sidebar • Video ngắn dạng đứng lướt dọc mượt mà, nội dung giải trí',
+        route: '/vertical',
+        icon: <Film className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['shorts', 'vertical', 'video ngắn', 'tiktok', 'reels', 'lướt video', 'clip']
+      },
+      {
+        id: 'sidebar_news',
+        name: 'Bản Tin & Thời Sự (News)',
+        tagline: 'Tab Sidebar • Điểm tin thời sự, văn hóa, thể thao cập nhật 24/7',
+        route: '/news',
+        icon: <Megaphone className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['news', 'bản tin', 'tin tức', 'thời sự', 'báo chí', 'thế giới', 'nóng']
+      },
+      {
+        id: 'sidebar_vflow',
+        name: 'Mạng Xã Hội V-Flow (Social)',
+        tagline: 'Tab Sidebar • Mạng xã hội Vplay, chia sẻ khoảnh khắc, bài viết & story',
+        route: '/v-flow',
+        icon: <Waves className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-flow', 'vflow', 'mạng xã hội', 'social', 'cộng đồng', 'bài viết', 'story', 'post']
+      },
+      {
+        id: 'sidebar_vspace',
+        name: 'Space 360 / V-Apps Hub',
+        tagline: 'Tab Sidebar • Trung tâm kho ứng dụng đa tiện ích và không gian trải nghiệm',
+        route: '/v-space',
+        icon: <Layers className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['space 360', 'v-space', 'v-apps', 'kho ứng dụng', 'tiện ích', 'hệ sinh thái']
+      },
+      {
+        id: 'sidebar_arcade',
+        name: 'Kho Trò Chơi (V-Games & Arcade)',
+        tagline: 'Tab Sidebar • Minigame HTML5 Caro XO, Vòng Quay, Xếp Gạch, Flappy Bird',
+        route: '/v-arcade',
+        state: { appId: 'v_arcade' },
+        icon: <Gamepad2 className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-arcade', 'v-games', 'chơi game', 'trò chơi', 'game', 'caro', 'vòng quay', 'mini game']
+      },
+      {
+        id: 'sidebar_files',
+        name: 'Trình Quản Lý Tệp (V-Files Explorer)',
+        tagline: 'Tab Sidebar • Quản lý tệp tin, xem tài liệu và lưu trữ đám mây',
+        route: '/v-files',
+        state: { appId: 'v_xplore' },
+        icon: <Folder className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-files', 'v-xplore', 'quản lý tệp', 'file', 'explorer', 'lưu trữ', 'drive']
+      },
+      {
+        id: 'sidebar_explore_vn',
+        name: 'Khám Phá Việt Nam (Explore Vietnam 360)',
+        tagline: 'Tab Sidebar • Bản đồ du lịch 63 tỉnh thành & danh lam thắng cảnh',
+        route: '/explore-vietnam',
+        state: { appId: 'explore_vietnam' },
+        icon: <MapPin className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['explore vietnam', 'việt nam', 'bản đồ', 'du lịch', '63 tỉnh thành', 'địa danh']
+      },
+      {
+        id: 'sidebar_vbox',
+        name: 'V-Box 3D Workspace',
+        tagline: 'Tab Sidebar • Không gian làm việc mô phỏng 3D tương tác',
+        route: '/v-box',
+        state: { appId: 'v_box' },
+        icon: <Box className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-box', 'hộp 3d', 'không gian 3d', 'workspace', 'mô hình']
+      },
+      {
+        id: 'sidebar_vstudy',
+        name: 'Không Gian Học Tập (V-Study Pomodoro)',
+        tagline: 'Tab Sidebar • Không gian học tập tập trung kết hợp đồng hồ Pomodoro',
+        route: '/v-study',
+        state: { appId: 'v_learn' },
+        icon: <GraduationCap className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-study', 'v-learn', 'pomodoro', 'học tập', 'đồng hồ', 'tập trung', 'study']
+      },
+      {
+        id: 'sidebar_vcalc',
+        name: 'Máy Tính Đa Năng (V-Calc Express)',
+        tagline: 'Tab Sidebar • Máy tính khoa học, đại số và quy đổi đơn vị đo lường',
+        route: '/v-calc',
+        state: { appId: 'v_calc' },
+        icon: <Calculator className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-calc', 'máy tính', 'calculator', 'tính toán', 'đổi đơn vị', 'toán']
+      },
+      {
+        id: 'sidebar_vreminders',
+        name: 'Nhắc Việc & Lịch Hẹn (V-Reminders)',
+        tagline: 'Tab Sidebar • Quản lý công việc cần làm, nhắc nhở và chuông báo',
+        route: '/v-reminders',
+        state: { appId: 'v_reminders' },
+        icon: <Bell className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-reminders', 'nhắc việc', 'báo thức', 'todo', 'lịch hẹn', 'chuông']
+      },
+      {
+        id: 'sidebar_vnotes',
+        name: 'Sổ Ghi Chú Nhanh (V-Notes)',
+        tagline: 'Tab Sidebar • Ghi chú tức thì, lưu ý tưởng và tự động đồng bộ',
+        route: '/v-notes',
+        state: { appId: 'v_notes' },
+        icon: <StickyNote className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-notes', 'ghi chú', 'notes', 'sổ tay', 'lưu trữ nhanh']
+      },
+      {
+        id: 'sidebar_vfurniture',
+        name: 'Nội Thất & Decor 3D (V-Furniture)',
+        tagline: 'Tab Sidebar • Bố trí sắp xếp nội thất phòng và không gian sống 3D',
+        route: '/v-furniture',
+        state: { appId: 'v_furniture' },
+        icon: <Armchair className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['v-furniture', 'nội thất', 'decor', '3d', 'phòng ốc', 'thiết kế']
+      },
+      {
+        id: 'sidebar_minecraft',
+        name: 'Minecraft Container GUI (1.19 / 1.20)',
+        tagline: 'Tab Sidebar • Rương đồ mô phỏng The Wild 1.19, Warden, Sculk & Crafting',
+        route: '/minecraft',
+        icon: <Box className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['minecraft', 'rương đồ', 'container gui', '1.19', 'the wild', 'warden', 'sculk', 'chế tạo', 'crafting table']
+      },
+      {
+        id: 'sidebar_premium',
+        name: 'Vplay VIP Premium',
+        tagline: 'Tab Sidebar • Quyền lợi thành viên VIP, xem không quảng cáo, mở khóa tính năng',
+        route: '/v-premium',
+        icon: <Crown className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['premium', 'vip', 'gói cước', 'nâng cấp', 'đặc quyền', 'vplay premium']
+      },
+      {
+        id: 'sidebar_chat',
+        name: 'Phòng Chat Discord (Chat & Voice)',
+        tagline: 'Tab Sidebar • Kênh chat văn bản & kênh thoại đàm thoại trực tiếp phong cách Discord',
+        route: '/chat',
+        icon: <MessageSquare className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['phòng chat', 'chat', 'discord', 'kênh thoại', 'voice', 'kênh chat', 'trò chuyện', 'đàm thoại', 'voice call']
+      },
+      {
+        id: 'sidebar_friends',
+        name: 'Bạn Bè & Kết Nối (Friends)',
+        tagline: 'Tab Sidebar • Danh sách bạn bè, tương tác và trò chuyện cùng nhau',
+        route: '/friends',
+        icon: <Users className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['friends', 'bạn bè', 'kết nối', 'người quen', 'chat', 'danh bạ']
+      },
+      {
+        id: 'sidebar_bet_arena',
+        name: 'Sàn Cược Orbs (Bet Arena)',
+        tagline: 'Tab Sidebar • Đặt cược Orbs: Bầu Cua Tôm Cá, Lật Xu, Bài Cào & Tài Xỉu',
+        route: '/bet-arena',
+        icon: <Coins className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['bet arena', 'sàn cược', 'bầu cua', 'lật xu', 'bài cào', 'tài xỉu', 'orbs', 'casino']
+      },
+      {
+        id: 'sidebar_favorites',
+        name: 'Kênh Yêu Thích (Favorites)',
+        tagline: 'Tab Sidebar • Danh sách các kênh truyền hình bạn đã lưu và thường xem',
+        route: '/favorites',
+        icon: <Heart className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['favorites', 'yêu thích', 'kênh yêu thích', 'đã lưu', 'đánh dấu', 'bookmark']
+      },
+      {
+        id: 'sidebar_toolbox',
+        name: 'Hộp Công Cụ Kỹ Thuật (Toolbox)',
+        tagline: 'Tab Sidebar • Bộ công cụ phát sóng Safe Area, Color Bars, M3U Tester, Timecode',
+        route: '/toolbox',
+        icon: <Sliders className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['toolbox', 'hộp công cụ', 'tiện ích', 'safe area', 'color bars', 'm3u tester', 'timecode']
+      },
+      {
+        id: 'sidebar_about',
+        name: 'Giới Thiệu Vplay (About)',
+        tagline: 'Tab Sidebar • Thông tin phiên bản, bản quyền và đội ngũ sáng lập Vplay',
+        route: '/about',
+        icon: <Info className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['about', 'giới thiệu', 'thông tin', 'phiên bản', 'vplay info', 'liên hệ']
+      },
+      {
+        id: 'sidebar_flags',
+        name: 'Cờ Tính Năng (Feature Flags)',
+        tagline: 'Tab Sidebar • Trình quản lý bật / tắt các tính năng thử nghiệm chuyên sâu',
+        route: '/feature-flags',
+        icon: <Flag className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['feature flags', 'flags', 'cờ tính năng', 'thử nghiệm', 'tính năng mới', 'lab']
+      },
+      {
+        id: 'sidebar_settings',
+        name: 'Cài Đặt Hệ Thống (Settings)',
+        tagline: 'Tab Sidebar • Tùy biến giao diện, kiểu thanh dock/sidebar, âm thanh & hiệu ứng',
+        route: '/settings',
+        icon: <Settings className="w-4.5 h-4.5 text-[#FF4D8D]" />,
+        tags: ['settings', 'cài đặt', 'giao diện', 'tùy chọn', 'âm thanh', 'cấu hình', 'sidebar']
+      }
+    ],
+    []
+  );
 
-  const saveRecentSearch = (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    setRecentSearches((prev) => {
-      const filtered = prev.filter((item) => item.toLowerCase() !== trimmed.toLowerCase());
-      const updated = [trimmed, ...filtered].slice(0, 8);
-      try {
-        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
-      } catch {}
-      return updated;
+  // 2. Built-in Apps Dataset
+  const appsList = useMemo(
+    () => [
+      {
+        id: 'v_flow',
+        name: 'V-Flow Social',
+        tagline: 'Mạng Xã Hội Giải Trí, Khoảnh Khắc & Thảo Luận Vplay',
+        category: 'Mạng xã hội',
+        route: '/v-flow',
+        appId: 'v_flow',
+        icon: <Radio className="w-4 h-4 text-rose-400" />,
+        tags: ['V-Flow', 'Mạng Xã Hội', 'Social', 'Bài Viết', 'Story', 'Cộng Đồng']
+      },
+      {
+        id: 'v_arcade',
+        name: 'V-Games & Arcade Hub',
+        tagline: 'Kho Trò Chơi Mini HTML5 Đổi Thưởng Orbs',
+        category: 'Trò chơi',
+        route: '/v-arcade',
+        appId: 'v_arcade',
+        icon: <Gamepad2 className="w-4 h-4 text-amber-400" />,
+        tags: ['Vòng Quay May Mắn', 'Caro XO', 'Rắn Săn Mồi', 'Xếp Gạch', 'Flappy Bird']
+      },
+      {
+        id: 'v_xplore',
+        name: 'V-Files Explorer',
+        tagline: 'Trình Quản Lý Tệp Tin & Lưu Trữ Đám Mây',
+        category: 'Tiện ích',
+        route: '/v-files',
+        appId: 'v_xplore',
+        icon: <Folder className="w-4 h-4 text-purple-400" />,
+        tags: ['Quản Lý Tệp', 'V-Files', 'Explorer', 'Cloud Drive']
+      },
+      {
+        id: 'explore_vietnam',
+        name: 'Explore Vietnam 360',
+        tagline: 'Bản Đồ 63 Tỉnh Thành & Danh Lam Thắng Cảnh',
+        category: 'Du lịch',
+        route: '/explore-vietnam',
+        appId: 'explore_vietnam',
+        icon: <MapPin className="w-4 h-4 text-rose-400" />,
+        tags: ['Bản Đồ', 'Việt Nam', '63 Tỉnh Thành', 'Du Lịch']
+      },
+      {
+        id: 'v_learn',
+        name: 'V-Study Pomodoro',
+        tagline: 'Không Gian Học Tập Tập Trung & Đồng Hồ Pomodoro',
+        category: 'Giáo dục',
+        route: '/v-study',
+        appId: 'v_learn',
+        icon: <GraduationCap className="w-4 h-4 text-sky-400" />,
+        tags: ['Pomodoro', 'Học Tập', 'Study', 'Đồng Hồ']
+      },
+      {
+        id: 'v_calc',
+        name: 'V-Calc Express',
+        tagline: 'Máy Tính Khoa Học Đa Năng & Đổi Đơn Vị',
+        category: 'Tiện ích',
+        route: '/v-calc',
+        appId: 'v_calc',
+        icon: <Calculator className="w-4 h-4 text-cyan-400" />,
+        tags: ['Máy Tính', 'Calculator', 'Toán Học']
+      },
+      {
+        id: 'v_minecraft',
+        name: 'Minecraft Container GUI',
+        tagline: 'Bộ Rương Đồ Tương Tác 1.19 & 1.20 Pixel Art',
+        category: 'Tiện ích',
+        route: '/minecraft',
+        appId: 'v_minecraft',
+        icon: <Box className="w-4 h-4 text-emerald-400" />,
+        tags: ['Minecraft Chest', 'Container GUI', 'Rương Đồ', 'The Wild Update 1.19', '1.20']
+      }
+    ],
+    []
+  );
+
+  // 3. Casino Minigames Dataset
+  const betGamesList = useMemo(
+    () => [
+      {
+        id: 'baucua',
+        title: 'Bầu Cua Tôm Cá 3D',
+        category: 'Sàn cược Orbs',
+        route: '/bet-arena',
+        icon: <Flame className="w-4 h-4 text-amber-400" />,
+        tags: ['Bầu Cua', 'Tôm Cá', 'Cược Orbs']
+      },
+      {
+        id: 'latxu',
+        title: 'Lật Xu Sấp Ngửa 3D',
+        category: 'Sàn cược Orbs',
+        route: '/bet-arena',
+        icon: <Coins className="w-4 h-4 text-yellow-300" />,
+        tags: ['Lật Xu', 'Sấp Ngửa', '50/50']
+      },
+      {
+        id: 'danhbai',
+        title: 'Bài Cào 3 Cây PvP',
+        category: 'Sàn cược Orbs',
+        route: '/bet-arena',
+        icon: <Swords className="w-4 h-4 text-rose-400" />,
+        tags: ['Bài Cào', '3 Cây', 'Đối Kháng']
+      },
+      {
+        id: 'xucxac',
+        title: 'Xúc Xắc Tài Xỉu (Sicbo)',
+        category: 'Sàn cược Orbs',
+        route: '/bet-arena',
+        icon: <Flame className="w-4 h-4 text-purple-400" />,
+        tags: ['Tài Xỉu', 'Sicbo', 'Xúc Xắc']
+      }
+    ],
+    []
+  );
+
+  // 4. Settings Shortcuts Dataset
+  const settingsList = useMemo(
+    () => [
+      {
+        id: 'theme',
+        title: 'Chủ đề Giao diện (Sáng / Tối)',
+        category: 'Cài đặt',
+        route: '/settings',
+        icon: <Settings className="w-4 h-4 text-indigo-400" />
+      },
+      {
+        id: 'sidebar',
+        title: 'Thanh điều hướng Sidebar / Dock',
+        category: 'Cài đặt',
+        route: '/settings',
+        icon: <LayoutGrid className="w-4 h-4 text-cyan-400" />
+      },
+      {
+        id: 'copilot',
+        title: 'Hợp nhất Spotlight với Copilot',
+        category: 'Cài đặt',
+        route: '/settings',
+        icon: <Sparkles className="w-4 h-4 text-purple-400" />
+      },
+      {
+        id: 'feature-flags',
+        title: 'Feature Flags (Cờ tính năng)',
+        category: 'Cài đặt',
+        route: '/feature-flags',
+        icon: <Flag className="w-4 h-4 text-cyan-400" />
+      }
+    ],
+    []
+  );
+
+  // Search matches calculation
+  const q = query.trim().toLowerCase();
+
+  // Matched Sidebar Tabs
+  const matchedSidebarTabs = useMemo(() => {
+    if (!q) return [];
+    return sidebarTabsList
+      .filter(
+        (tab) =>
+          tab.name.toLowerCase().includes(q) ||
+          tab.tagline.toLowerCase().includes(q) ||
+          tab.tags.some((tag) => tag.toLowerCase().includes(q))
+      )
+      .slice(0, 6);
+  }, [sidebarTabsList, q]);
+
+  const matchedChannels = useMemo(() => {
+    if (!q) return [];
+    return channels
+      .filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          (c.shortName && c.shortName.toLowerCase().includes(q)) ||
+          (c.category && c.category.toLowerCase().includes(q)) ||
+          (c.channelNumber && c.channelNumber.toString().includes(q))
+      )
+      .slice(0, 6);
+  }, [channels, q]);
+
+  const matchedApps = useMemo(() => {
+    if (!q) return [];
+    return appsList
+      .filter(
+        (a) =>
+          a.name.toLowerCase().includes(q) ||
+          a.tagline.toLowerCase().includes(q) ||
+          a.tags.some((t) => t.toLowerCase().includes(q))
+      )
+      .slice(0, 4);
+  }, [appsList, q]);
+
+  const matchedBetGames = useMemo(() => {
+    if (!q) return [];
+    return betGamesList
+      .filter(
+        (g) =>
+          g.title.toLowerCase().includes(q) ||
+          g.tags.some((t) => t.toLowerCase().includes(q))
+      )
+      .slice(0, 3);
+  }, [betGamesList, q]);
+
+  const matchedNews = useMemo(() => {
+    if (!q) return [];
+    return NEWS_LIST.filter(
+      (n) =>
+        n.title.toLowerCase().includes(q) ||
+        (n.excerpt && n.excerpt.toLowerCase().includes(q))
+    ).slice(0, 3);
+  }, [q]);
+
+  const matchedSettings = useMemo(() => {
+    if (!q) return [];
+    return settingsList
+      .filter((s) => s.title.toLowerCase().includes(q))
+      .slice(0, 3);
+  }, [settingsList, q]);
+
+  // Unified list of flat results for keyboard navigation & live search dropdown
+  const flatResults = useMemo(() => {
+    const list: {
+      type: 'sidebar' | 'channel' | 'app' | 'bet' | 'news' | 'setting';
+      title: string;
+      subtitle?: string;
+      icon: React.ReactNode;
+      action: () => void;
+    }[] = [];
+
+    // Prioritize matched sidebar tabs first!
+    matchedSidebarTabs.forEach((tab) => {
+      list.push({
+        type: 'sidebar',
+        title: tab.name,
+        subtitle: tab.tagline,
+        icon: tab.icon,
+        action: () => {
+          playPopSound();
+          navigate(tab.route, tab.state);
+        }
+      });
     });
-  };
 
-  const removeRecentSearch = (text: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setRecentSearches((prev) => {
-      const updated = prev.filter((item) => item !== text);
-      try {
-        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
-      } catch {}
-      return updated;
+    matchedChannels.forEach((ch) => {
+      list.push({
+        type: 'channel',
+        title: ch.name,
+        subtitle: ch.category || 'Kênh truyền hình HD',
+        icon: <Tv className="w-4.5 h-4.5 text-cyan-400" />,
+        action: () => {
+          playPopSound();
+          onSelectChannel(ch);
+          navigate(`/live-tv?channel=${ch.slug}`);
+        }
+      });
     });
-  };
 
-  const clearAllRecents = () => {
-    setRecentSearches([]);
-    try {
-      localStorage.removeItem(RECENT_SEARCHES_KEY);
-    } catch {}
-  };
+    matchedApps.forEach((app) => {
+      list.push({
+        type: 'app',
+        title: app.name,
+        subtitle: app.tagline,
+        icon: app.icon,
+        action: () => {
+          playPopSound();
+          navigate(app.route, { appId: app.appId });
+        }
+      });
+    });
 
-  const triggerToastMsg = (msg: string) => {
-    setVoiceToast(msg);
-    setTimeout(() => setVoiceToast(null), 3000);
-  };
+    matchedBetGames.forEach((g) => {
+      list.push({
+        type: 'bet',
+        title: g.title,
+        subtitle: g.category,
+        icon: g.icon,
+        action: () => {
+          playPopSound();
+          navigate(g.route);
+        }
+      });
+    });
 
-  // Voice Search Handler
+    matchedNews.forEach((n) => {
+      list.push({
+        type: 'news',
+        title: n.title,
+        subtitle: 'Tin tức & Thời sự',
+        icon: <Megaphone className="w-4.5 h-4.5 text-amber-400" />,
+        action: () => {
+          playPopSound();
+          navigate('/news');
+        }
+      });
+    });
+
+    matchedSettings.forEach((s) => {
+      list.push({
+        type: 'setting',
+        title: s.title,
+        subtitle: s.category,
+        icon: s.icon,
+        action: () => {
+          playPopSound();
+          navigate(s.route);
+        }
+      });
+    });
+
+    return list;
+  }, [
+    matchedSidebarTabs,
+    matchedChannels,
+    matchedApps,
+    matchedBetGames,
+    matchedNews,
+    matchedSettings,
+    navigate,
+    onSelectChannel
+  ]);
+
+  // Handle Voice Search
   const handleVoiceSearch = () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      triggerToastMsg('Trình duyệt không hỗ trợ nhận diện giọng nói');
+      setVoiceToast('Trình duyệt không hỗ trợ nhận diện giọng nói');
+      setTimeout(() => setVoiceToast(null), 3000);
       return;
     }
 
     try {
       const recognition = new SpeechRecognition();
       recognition.lang = 'vi-VN';
+      recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
 
-      setIsListening(true);
-      triggerToastMsg('Đang lắng nghe... Hãy nói từ khóa');
-
-      recognition.start();
+      recognition.onstart = () => {
+        setIsListening(true);
+        setVoiceToast('Đang lắng nghe giọng nói của bạn...');
+      };
 
       recognition.onresult = (event: any) => {
-        const speechResult = event.results[0][0].transcript;
-        setQuery(speechResult);
-        saveRecentSearch(speechResult);
+        const transcript = event.results[0][0].transcript;
+        setQuery(transcript);
+        setVoiceToast(`Đã nhận diện: "${transcript}"`);
+        setTimeout(() => setVoiceToast(null), 3000);
         setIsListening(false);
-        triggerToastMsg(`Đã nhận: "${speechResult}"`);
       };
 
       recognition.onerror = () => {
+        setVoiceToast('Không thể nhận diện giọng nói. Vui lòng thử lại!');
+        setTimeout(() => setVoiceToast(null), 3000);
         setIsListening(false);
-        triggerToastMsg('Lỗi nhận diện giọng nói');
       };
 
       recognition.onend = () => {
         setIsListening(false);
       };
+
+      recognition.start();
     } catch {
+      setVoiceToast('Lỗi micro hoặc quyền truy cập mic bị từ chối');
+      setTimeout(() => setVoiceToast(null), 3000);
       setIsListening(false);
-      triggerToastMsg('Không thể kích hoạt micro');
     }
   };
 
-  // Static App Dataset
-  const appsList = useMemo(() => [
-    {
-      id: 'v_arcade',
-      name: 'V-Arcade Minigames',
-      tagline: '5 Trò Chơi Ore UI Siêu Cuốn (Caro, Rắn săn mồi, Nối từ)',
-      category: 'Trò chơi (Arcade)',
-      route: '/v-space',
-      appId: 'v_arcade',
-      icon: <Gamepad2 className="w-5 h-5 text-emerald-400" />,
-      tags: ['Caro XO', 'Rắn Săn Mồi', 'Nối Từ', 'Oẳn Tù Tì'],
-    },
-    {
-      id: 'v_xplore',
-      name: 'V-Files Explorer',
-      tagline: 'Trình Quản Lý Tệp, Danh Sách Phát M3U8 & V-Cloud',
-      category: 'Tiện ích & Tệp tin',
-      route: '/v-space',
-      appId: 'v_xplore',
-      icon: <Folder className="w-5 h-5 text-purple-400" />,
-      tags: ['File Manager', 'M3U8 Playlists', 'Cloud Backup'],
-    },
-    {
-      id: 'explore_vietnam',
-      name: 'Explore Vietnam 360',
-      tagline: 'Bản Đồ Du Lịch 63 Tỉnh Thành & Đặc Sản Văn Hóa',
-      category: 'Học tập & Văn hóa',
-      route: '/v-space',
-      appId: 'explore_vietnam',
-      icon: <Compass className="w-5 h-5 text-rose-400" />,
-      tags: ['63 Tỉnh Thành', 'Ẩm Thực', 'Du Lịch'],
-    },
-    {
-      id: 'v_box',
-      name: 'V-Box Media Player',
-      tagline: 'Kho Video & Truyền Hình Chọn Lọc',
-      category: 'Giải trí & Media',
-      route: '/v-space',
-      appId: 'v_box',
-      icon: <Tv className="w-5 h-5 text-amber-400" />,
-      tags: ['Video Clip', 'Phát Lại', 'Giải Trí'],
-    },
-    {
-      id: 'v_learn',
-      name: 'V-Study Pomodoro',
-      tagline: 'Học Tập Sâu, Bộ Thẻ Flashcard & Mục Tiêu',
-      category: 'Học tập & Văn hóa',
-      route: '/v-space',
-      appId: 'v_learn',
-      icon: <Sparkles className="w-5 h-5 text-sky-400" />,
-      tags: ['Pomodoro', 'Flashcards', 'Tập Trung'],
-    },
-    {
-      id: 'v_calc',
-      name: 'V-Calc Express',
-      tagline: 'Máy Tính Biểu Thức Khoa Học Đa Năng',
-      category: 'Tiện ích & Tệp tin',
-      route: '/v-space',
-      appId: 'v_calc',
-      icon: <Sliders className="w-5 h-5 text-cyan-400" />,
-      tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi'],
-    },
-    {
-      id: 'v_minecraft',
-      name: 'Minecraft Container GUI',
-      tagline: 'Mô Phỏng Kho Đồ & Rương Minecraft Pixel Art Chuẩn Sandbox',
-      category: 'Tiện ích & Tệp tin',
-      route: '/minecraft',
-      appId: 'v_minecraft',
-      icon: <Box className="w-5 h-5 text-emerald-400" />,
-      tags: ['Minecraft Chest', 'Container GUI', 'Pixel Art', 'Rương Đồ', 'Kho Đồ', 'Inventory'],
-    },
-  ], []);
-
-  // Casino Minigames Dataset
-  const betGamesList = useMemo(() => [
-    {
-      id: 'baucua',
-      title: 'Bầu Cua Tôm Cá 3D',
-      category: 'Dân gian Việt Nam',
-      multiplier: 'x1 đến x3',
-      excerpt: 'Cược 6 linh vật truyền thống Bầu, Cua, Tôm, Cá, Gà, Nai với tỷ lệ thưởng x3.',
-      icon: <Flame className="w-5 h-5 text-amber-400" />,
-    },
-    {
-      id: 'latxu',
-      title: 'Lật Xu Sấp Ngửa 3D',
-      category: 'Xác suất 50/50',
-      multiplier: 'x1.98',
-      excerpt: 'Dự đoán mặt Sấp hoặc Ngửa đồng xu vàng nguyên chất với tốc độ 5 giây.',
-      icon: <Coins className="w-5 h-5 text-yellow-300" />,
-    },
-    {
-      id: 'danhbai',
-      title: 'Bài Cào 3 Cây PvP',
-      category: 'Game bài đối kháng',
-      multiplier: 'Thắng trọn ván',
-      excerpt: 'Đếm nút 1-9 hoặc so sánh Ba Tây, Liêng, Sáp để phân định thắng thua.',
-      icon: <Swords className="w-5 h-5 text-rose-400" />,
-    },
-    {
-      id: 'xucxac',
-      title: 'Xúc Xắc Tài Xỉu (Sicbo)',
-      category: 'Xúc xắc High-Roller',
-      multiplier: 'x1.98 đến x30',
-      excerpt: 'Tổng 3 viên xúc xắc: Tài (11-17) hoặc Xỉu (4-10). Nổ Bão x30 cược.',
-      icon: <Flame className="w-5 h-5 text-purple-400" />,
-    },
-  ], []);
-
-  // Premium & Cloud Plans Dataset
-  const premiumList = useMemo(() => [
-    {
-      id: 'vbank',
-      title: 'V-Bank & Ví Quặng Ore',
-      category: 'Tài chính & Ví Ore',
-      price: 'Miễn phí kích hoạt',
-      excerpt: 'Nạp quặng Ore, chuyển điểm và giao dịch nội bộ hệ sinh thái Waves.',
-      subTab: 'vbank' as const,
-      icon: <Building2 className="w-5 h-5 text-amber-400" />,
-    },
-    {
-      id: 'pro_200gb',
-      title: 'Gói Pro Cloud 200 GB (Khuyên Dùng)',
-      category: 'V-Cloud Storage',
-      price: '69.000đ / tháng',
-      excerpt: '200 GB bộ nhớ NVMe SSD siêu tốc, lưu trữ playlist M3U8 và tặng 500 Ore.',
-      subTab: 'storage' as const,
-      icon: <Cloud className="w-5 h-5 text-emerald-400" />,
-    },
-    {
-      id: 'diamond_2tb',
-      title: 'Gói Diamond VIP 2 TB (Ultimate)',
-      category: 'V-Cloud Storage',
-      price: '225.000đ / tháng',
-      excerpt: '2.000 GB dung lượng đám mây, tặng kèm Tích Xanh Waves Verified vĩnh viễn.',
-      subTab: 'storage' as const,
-      icon: <Crown className="w-5 h-5 text-purple-400" />,
-    },
-    {
-      id: 'verified',
-      title: 'Waves Verified (Tích Xanh Chính Chủ)',
-      category: 'Xác minh & Huy hiệu',
-      price: 'Đặc quyền VIP',
-      excerpt: 'Huy hiệu Tích Xanh chính chủ, bảo vệ tên người dùng và ưu tiên phát sóng.',
-      subTab: 'verified' as const,
-      icon: <BadgeCheck className="w-5 h-5 text-sky-400" />,
-    },
-  ], []);
-
-  // Settings Shortcuts Dataset
-  const settingsList = useMemo(() => [
-    {
-      id: 'theme',
-      title: 'Chủ đề Giao diện (Sáng / Tối)',
-      category: 'Cài đặt hệ thống',
-      description: 'Chuyển đổi giữa chế độ nền tối Dark Luxury và nền sáng Light Mode',
-      route: '/settings',
-      icon: <Settings className="w-5 h-5 text-indigo-400" />,
-    },
-    {
-      id: 'sidebar',
-      title: 'Thanh điều hướng Sidebar / Dock',
-      category: 'Cài đặt bố cục',
-      description: 'Tùy chọn ghim menu sang cạnh trái hoặc dùng thanh Dock nổi bên dưới',
-      route: '/settings',
-      icon: <LayoutGrid className="w-5 h-5 text-cyan-400" />,
-    },
-    {
-      id: 'copilot',
-      title: 'Hợp nhất Spotlight với Copilot',
-      category: 'Cài đặt tìm kiếm',
-      description: 'Tùy chọn mở Copilot AI Assistant hoặc Search Tab khi nhấn phím tìm kiếm',
-      route: '/settings',
-      icon: <Sparkles className="w-5 h-5 text-purple-400" />,
-    },
-    {
-      id: 'feature-flags',
-      title: 'Feature Flags (Cờ tính năng)',
-      category: 'Cài đặt hệ thống',
-      description: 'Quản lý cờ tính năng thử nghiệm, AI, hiệu năng trình phát và gỡ lỗi',
-      route: '/feature-flags',
-      icon: <Flag className="w-5 h-5 text-cyan-400" />,
-    },
-  ], []);
-
-  // Filtered Data Calculation
-  const q = query.trim().toLowerCase();
-
-  const filteredChannels = useMemo(() => {
-    if (selectedFilter !== 'all' && selectedFilter !== 'channels') return [];
-    if (!q) return channels.slice(0, 12);
-    return channels.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        (c.shortName && c.shortName.toLowerCase().includes(q)) ||
-        (c.category && c.category.toLowerCase().includes(q)) ||
-        (c.channelNumber && c.channelNumber.toString().includes(q))
-    );
-  }, [channels, q, selectedFilter]);
-
-  const filteredApps = useMemo(() => {
-    if (selectedFilter !== 'all' && selectedFilter !== 'apps') return [];
-    if (!q) return appsList;
-    return appsList.filter(
-      (a) =>
-        a.name.toLowerCase().includes(q) ||
-        a.tagline.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }, [appsList, q, selectedFilter]);
-
-  const filteredBetGames = useMemo(() => {
-    if (selectedFilter !== 'all' && selectedFilter !== 'bet') return [];
-    if (!q) return betGamesList;
-    return betGamesList.filter(
-      (g) =>
-        g.title.toLowerCase().includes(q) ||
-        g.category.toLowerCase().includes(q) ||
-        g.excerpt.toLowerCase().includes(q)
-    );
-  }, [betGamesList, q, selectedFilter]);
-
-  const filteredPremium = useMemo(() => {
-    if (selectedFilter !== 'all' && selectedFilter !== 'premium') return [];
-    if (!q) return premiumList;
-    return premiumList.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.excerpt.toLowerCase().includes(q)
-    );
-  }, [premiumList, q, selectedFilter]);
-
-  const filteredNews = useMemo(() => {
-    if (selectedFilter !== 'all' && selectedFilter !== 'news') return [];
-    if (!q) return NEWS_LIST.slice(0, 4);
-    return NEWS_LIST.filter(
-      (n) =>
-        n.title.toLowerCase().includes(q) ||
-        (n.excerpt && n.excerpt.toLowerCase().includes(q)) ||
-        (n.formattedArticle?.lead && n.formattedArticle.lead.toLowerCase().includes(q))
-    );
-  }, [q, selectedFilter]);
-
-  const filteredSettings = useMemo(() => {
-    if (selectedFilter !== 'all' && selectedFilter !== 'settings') return [];
-    if (!q) return settingsList;
-    return settingsList.filter(
-      (s) =>
-        s.title.toLowerCase().includes(q) ||
-        s.category.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q)
-    );
-  }, [settingsList, q, selectedFilter]);
-
-  const totalResultsCount =
-    filteredChannels.length +
-    filteredApps.length +
-    filteredBetGames.length +
-    filteredPremium.length +
-    filteredNews.length +
-    filteredSettings.length;
-
-  const categories: { id: SearchCategoryFilter; label: string; count?: number }[] = [
-    { id: 'all', label: 'Tất cả' },
-    { id: 'channels', label: 'Kênh Truyền Hình', count: filteredChannels.length },
-    { id: 'apps', label: 'Space 360 & Trò Chơi', count: filteredApps.length },
-    { id: 'bet', label: 'Sàn Cược Orbs', count: filteredBetGames.length },
-    { id: 'premium', label: 'V-Cloud & Premium', count: filteredPremium.length },
-    { id: 'news', label: 'Tin Tức', count: filteredNews.length },
-    { id: 'settings', label: 'Cài Đặt Hệ Thống', count: filteredSettings.length },
-  ];
-
-  const handleSelectChannel = (channel: Channel) => {
-    playPopSound();
-    saveRecentSearch(channel.name);
-    onSelectChannel(channel);
-    navigate(`/live-tv?channel=${channel.slug}`);
-  };
-
-  const handleQuickKeyword = (kw: string) => {
-    playPopSound();
-    setQuery(kw);
-    saveRecentSearch(kw);
-    inputRef.current?.focus();
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % Math.max(1, flatResults.length));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + flatResults.length) % Math.max(1, flatResults.length));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (flatResults.length > 0) {
+        const target = flatResults[selectedIndex] || flatResults[0];
+        target.action();
+      }
+    } else if (e.key === 'Escape') {
+      setQuery('');
+    }
   };
 
   return (
-    <div className="space-y-8 pb-20 text-left select-none animate-in fade-in duration-300">
-      {/* 1. HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-cyan-400 font-bold uppercase tracking-wider mb-1">
-            <Search className="w-4 h-4 text-cyan-400" />
-            <span>SPOTLIGHT SEARCH TAB • TRUNG TÂM TÌM KIẾM TOÀN TRANG</span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Tìm Kiếm Toàn Diện Hệ Thống
-          </h1>
-          <p className="text-xs sm:text-sm text-[#9CA3AF] mt-1">
-            Tra cứu hơn 70+ kênh truyền hình HD/4K, ứng dụng Space 360, trò chơi Sàn Cược Orbs, gói lưu trữ V-Cloud và lối tắt cài đặt nhanh.
-          </p>
-        </div>
+    <div className="w-full min-h-[85vh] flex flex-col items-center justify-start pt-6 sm:pt-10 md:pt-12 pb-16 px-4 select-none animate-in fade-in duration-200">
+      {/* Top Search Bar Container */}
+      <div className="w-full max-w-2xl relative">
+        {/* THE SINGLE SEARCH BAR AT TOP WITH THICK BORDER MATCHING SELECTED SIDEBAR TAB (#E6005A) */}
+        <div className="relative flex items-center w-full h-14 sm:h-15 rounded-2xl bg-[#1C1B23] border-[2.5px] border-[#E6005A] shadow-xl shadow-[#E6005A]/20 focus-within:ring-4 focus-within:ring-[#E6005A]/25 focus-within:border-[#E6005A] transition-all px-4">
+          <Search className="w-5 h-5 text-[#E6005A] shrink-0 mr-3 pointer-events-none" />
 
-        {/* Action button: Search settings */}
-        <div className="flex items-center gap-2.5 self-start sm:self-auto">
-          <button
-            onClick={() => navigate('/settings')}
-            className="px-4 py-2 rounded-full bg-[#1E1E22] hover:bg-[#2A2A32] border border-[#34343E] text-zinc-300 hover:text-white text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-          >
-            <Sliders className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Cài đặt tìm kiếm</span>
-          </button>
-        </div>
-      </div>
+          <input
+            ref={inputRef}
+            id="standalone-search-input"
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Tìm kiếm các tab sidebar, kênh TV, ứng dụng, minigame..."
+            className="flex-1 bg-transparent text-white text-base placeholder-[#8A8A93] focus:outline-none font-medium truncate"
+          />
 
-      {/* 2. HERO SEARCH CAPSULE BOX */}
-      <div className="p-6 sm:p-8 rounded-[30px] bg-[#1A1A22] border border-[#2D2D35] shadow-2xl relative overflow-hidden">
-        {/* Glow ambient background */}
-        <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-cyan-600/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 space-y-4">
-          {/* Main Input Box */}
-          <div className="relative flex items-center w-full rounded-full spotlight-bubble-box search-box-capsule transition-all p-2 border-0 shadow-lg">
-            <div className="pl-4 pr-3 text-zinc-400">
-              <Search className="w-6 h-6 text-cyan-400" />
-            </div>
-
-            <input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && query.trim()) {
-                  saveRecentSearch(query);
-                }
-              }}
-              placeholder="Nhập tên kênh (VTV1, HBO), ứng dụng (Caro, V-Files), cược (Bầu cua), hoặc cài đặt..."
-              className="w-full py-3 bg-transparent text-sm sm:text-base text-white placeholder-[#71717A] focus:outline-none font-medium truncate"
-            />
-
-            {/* Clear Button */}
-            {query && (
-              <button
-                onClick={() => {
-                  setQuery('');
-                  inputRef.current?.focus();
-                }}
-                className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer mr-1"
-                title="Xóa nội dung tìm kiếm"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Voice Search Button */}
+          {/* Clear Button */}
+          {query && (
             <button
-              onClick={handleVoiceSearch}
-              className={`p-3 rounded-full transition-all cursor-pointer flex items-center justify-center mr-1 ${
-                isListening
-                  ? 'bg-rose-600 text-white animate-pulse shadow-lg shadow-rose-600/40'
-                  : 'bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white'
-              }`}
-              title="Tìm kiếm bằng giọng nói"
-            >
-              <Mic className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Voice Toast Message */}
-          {voiceToast && (
-            <div className="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{voiceToast}</span>
-            </div>
-          )}
-
-          {/* Recent Searches Row */}
-          {recentSearches.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap pt-1 text-xs">
-              <div className="flex items-center gap-1.5 text-zinc-400 font-semibold text-[11px] uppercase tracking-wider">
-                <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Gần đây:</span>
-              </div>
-
-              {recentSearches.map((rec) => (
-                <div
-                  key={rec}
-                  onClick={() => handleQuickKeyword(rec)}
-                  className="group px-3 py-1 rounded-xl bg-[#22222C] hover:bg-cyan-950/60 border border-[#343440] hover:border-cyan-500/40 text-zinc-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <span>{rec}</span>
-                  <button
-                    onClick={(e) => removeRecentSearch(rec, e)}
-                    className="opacity-60 hover:opacity-100 hover:text-rose-400 p-0.5 rounded"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-
-              <button
-                onClick={clearAllRecents}
-                className="text-[11px] text-zinc-500 hover:text-rose-400 transition-colors ml-auto cursor-pointer"
-              >
-                Xóa tất cả
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 3. CATEGORY PILLS */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-        {categories.map((cat) => {
-          const isSelected = selectedFilter === cat.id;
-          return (
-            <button
-              key={cat.id}
               onClick={() => {
-                playPopSound();
-                setSelectedFilter(cat.id);
+                setQuery('');
+                inputRef.current?.focus();
               }}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
-                isSelected
-                  ? 'bg-gradient-purple-active text-white shadow-md glow-purple-sm font-bold'
-                  : 'bg-[#1E1E22] text-[#A1A1AA] hover:text-white border border-[#32323A]'
-              }`}
+              className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors mr-1 cursor-pointer"
+              title="Xóa tìm kiếm (Esc)"
             >
-              <span>{cat.label}</span>
-              {typeof cat.count === 'number' && (
-                <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                    isSelected
-                      ? 'bg-white/20 text-white'
-                      : 'bg-[#2A2A32] text-zinc-400'
-                  }`}
-                >
-                  {cat.count}
-                </span>
-              )}
+              <X className="w-4 h-4" />
             </button>
-          );
-        })}
-      </div>
+          )}
 
-      {/* 4. RESULTS COUNT SUMMARY BAR */}
-      <div className="flex items-center justify-between px-2 text-xs text-[#9CA3AF]">
-        <div className="flex items-center gap-2">
-          <span>Tìm thấy</span>
-          <span className="font-mono font-bold text-cyan-300 text-sm">{totalResultsCount}</span>
-          <span>kết quả {query ? `cho từ khóa "${query}"` : 'trong toàn bộ hệ sinh thái'}</span>
-        </div>
-        {query && (
+          {/* Voice Search Button */}
           <button
-            onClick={() => setQuery('')}
-            className="text-cyan-400 hover:underline cursor-pointer"
+            onClick={handleVoiceSearch}
+            className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+              isListening
+                ? 'bg-[#E6005A] text-white animate-pulse shadow-md shadow-[#E6005A]/50'
+                : 'text-zinc-400 hover:text-white hover:bg-white/10'
+            }`}
+            title="Tìm kiếm bằng giọng nói"
           >
-            Đặt lại tìm kiếm
+            <Mic className="w-4.5 h-4.5" />
           </button>
+        </div>
+
+        {/* Voice recognition status toast */}
+        {voiceToast && (
+          <div className="mt-2.5 px-3.5 py-2 rounded-xl bg-[#2A1520] border border-[#E6005A]/40 text-[#FF6699] text-xs font-medium flex items-center gap-2 shadow-lg animate-in fade-in duration-150">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span>{voiceToast}</span>
+          </div>
+        )}
+
+        {/* LIVE RESULTS DROPDOWN: Only shown when typing */}
+        {q.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-2.5 rounded-2xl bg-[#18171F] border border-[#333240] shadow-2xl overflow-hidden z-50 max-h-[64vh] overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-top-2 duration-150">
+            {flatResults.length > 0 ? (
+              <div className="p-2 space-y-1">
+                {flatResults.map((item, idx) => {
+                  const isSelected = idx === selectedIndex;
+                  return (
+                    <div
+                      key={idx}
+                      onClick={item.action}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#272532] border-2 border-[#E6005A] text-white shadow-md shadow-[#E6005A]/15'
+                          : 'hover:bg-[#201F2A] text-zinc-300 border-2 border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8.5 h-8.5 rounded-lg bg-[#121118] border border-white/5 flex items-center justify-center shrink-0">
+                          {item.icon}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-sm text-white truncate flex items-center gap-2">
+                            <span>{item.title}</span>
+                            {item.type === 'sidebar' && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#E6005A] text-white tracking-wide">
+                                SIDEBAR
+                              </span>
+                            )}
+                          </div>
+                          {item.subtitle && (
+                            <div className="text-xs text-zinc-400 truncate">
+                              {item.subtitle}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`text-[11px] font-medium px-2 py-0.5 rounded ${
+                            item.type === 'sidebar'
+                              ? 'bg-[#E6005A]/20 text-[#FF4D8D] border border-[#E6005A]/40'
+                              : 'bg-white/5 text-zinc-400'
+                          }`}
+                        >
+                          {item.type === 'sidebar'
+                            ? 'Tab Sidebar'
+                            : item.type === 'channel'
+                            ? 'Kênh TV'
+                            : item.type === 'app'
+                            ? 'Ứng dụng'
+                            : item.type === 'bet'
+                            ? 'Sàn cược'
+                            : item.type === 'news'
+                            ? 'Tin tức'
+                            : 'Cài đặt'}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-zinc-500" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-8 text-center text-zinc-400 space-y-1">
+                <p className="text-sm font-semibold text-zinc-300">
+                  Không tìm thấy kết quả cho "{query}"
+                </p>
+                <p className="text-xs text-zinc-500">
+                  Hãy thử tìm tên tab trên Sidebar (Trang chủ, Live TV, V-Flow, Kho Game, Minecraft, Cài đặt), kênh TV hoặc tiện ích.
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
-
-      {/* 5. SEARCH RESULTS MAIN BODY */}
-      {totalResultsCount === 0 ? (
-        /* Empty State */
-        <div className="p-12 rounded-[30px] bg-[#1E1E22] border border-[#2D2D35] flex flex-col items-center justify-center text-center space-y-4 shadow-xl">
-          <div className="w-16 h-16 rounded-3xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
-            <Search className="w-8 h-8 opacity-70" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-white">Không tìm thấy kết quả phù hợp</h3>
-            <p className="text-xs text-[#9CA3AF] max-w-md mt-1 leading-relaxed">
-              Hãy thử từ khóa ngắn hơn, kiểm tra lỗi chính tả hoặc chọn tab bộ lọc khác như "Kênh Truyền Hình" hay "Space 360".
-            </p>
-          </div>
-          <div className="flex gap-2 flex-wrap justify-center pt-2">
-            {['VTV1', 'Caro XO', 'Bầu Cua', 'Pro Cloud', 'Thời sự'].map((suggest) => (
-              <button
-                key={suggest}
-                onClick={() => handleQuickKeyword(suggest)}
-                className="px-3.5 py-1.5 rounded-full bg-[#282830] hover:bg-[#343440] text-cyan-300 text-xs font-semibold border border-white/10 transition-all cursor-pointer"
-              >
-                {suggest}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {/* SECTION 5.1: KÊNH TRUYỀN HÌNH */}
-          {filteredChannels.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-cyan-950/70 border border-cyan-500/40 flex items-center justify-center text-cyan-300">
-                    <Tv className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white">Kênh Truyền Hình Live TV</h2>
-                    <span className="text-[11px] text-zinc-400 font-mono">
-                      {filteredChannels.length} kênh khả dụng
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigate('/live-tv')}
-                  className="text-xs text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                >
-                  <span>Mở Sảnh Live TV</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredChannels.map((channel) => (
-                  <div
-                    key={channel.id}
-                    onClick={() => handleSelectChannel(channel)}
-                    className="p-4 rounded-[22px] bg-[#1E1E22] border border-[#2D2D35] hover:border-cyan-500/60 hover:bg-[#25252C] transition-all cursor-pointer flex items-center justify-between gap-3 shadow-md group"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* Channel Number / Logo avatar */}
-                      <div className="w-11 h-11 rounded-2xl bg-[#14141A] border border-[#32323E] flex items-center justify-center text-cyan-300 font-mono font-black text-xs shrink-0 group-hover:scale-105 transition-transform">
-                        {channel.channelNumber ? `#${channel.channelNumber}` : <Tv className="w-5 h-5 text-cyan-400" />}
-                      </div>
-
-                      <div className="min-w-0">
-                        <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors truncate">
-                          {channel.name}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px] text-zinc-400 truncate">
-                            {channel.category || 'Tổng Hợp'}
-                          </span>
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                            HD
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelectChannel(channel);
-                      }}
-                      className="w-8 h-8 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition-transform"
-                      title="Phát kênh ngay"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SECTION 5.2: SPACE 360 & MINI-APPS */}
-          {filteredApps.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-950/70 border border-emerald-500/40 flex items-center justify-center text-emerald-300">
-                    <Gamepad2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white">Space 360 & Kho Ứng Dụng Mini</h2>
-                    <span className="text-[11px] text-zinc-400 font-mono">
-                      {filteredApps.length} mini-app
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigate('/v-space')}
-                  className="text-xs text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                >
-                  <span>Xem Toàn Bộ Space 360</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredApps.map((app) => (
-                  <div
-                    key={app.id}
-                    onClick={() => {
-                      playPopSound();
-                      saveRecentSearch(app.name);
-                      navigate(app.route, { appId: app.appId });
-                    }}
-                    className="p-5 rounded-[24px] bg-[#1E1E22] border border-[#2D2D35] hover:border-emerald-500/60 hover:bg-[#25252C] transition-all cursor-pointer flex flex-col justify-between shadow-md group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-11 h-11 rounded-2xl bg-[#141A17] border border-emerald-500/30 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                          {app.icon}
-                        </div>
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold uppercase">
-                          {app.category}
-                        </span>
-                      </div>
-
-                      <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                        {app.name}
-                      </h3>
-                      <p className="text-xs text-[#9CA3AF] mt-1 line-clamp-2 leading-relaxed">
-                        {app.tagline}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-[#2A2A30] flex items-center justify-between text-xs text-emerald-300 font-bold">
-                      <div className="flex items-center gap-1 text-[11px] text-zinc-400 font-normal">
-                        <span>#{app.tags[0]}</span>
-                      </div>
-                      <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        <span>Khởi Chạy</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SECTION 5.3: SÀN CƯỢC ORBS CASINO */}
-          {filteredBetGames.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-purple-950/70 border border-purple-500/40 flex items-center justify-center text-purple-300">
-                    <Coins className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white">Sàn Cược Orbs VIP</h2>
-                    <span className="text-[11px] text-zinc-400 font-mono">
-                      {filteredBetGames.length} sảnh cá cược Provably Fair
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigate('/bet-arena')}
-                  className="text-xs text-purple-400 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                >
-                  <span>Mở Sàn Cược Đấu Trường</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {filteredBetGames.map((game) => (
-                  <div
-                    key={game.id}
-                    onClick={() => {
-                      playPopSound();
-                      saveRecentSearch(game.title);
-                      navigate('/bet-arena');
-                    }}
-                    className="p-5 rounded-[24px] bg-[#1E1E22] border border-[#2D2D35] hover:border-purple-500/60 hover:bg-[#25252C] transition-all cursor-pointer flex flex-col justify-between shadow-md group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 rounded-2xl bg-[#1C1726] border border-purple-500/30 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                          {game.icon}
-                        </div>
-                        <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-mono font-bold">
-                          {game.multiplier}
-                        </span>
-                      </div>
-
-                      <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">
-                        {game.title}
-                      </h3>
-                      <p className="text-xs text-[#9CA3AF] mt-1 line-clamp-2 leading-relaxed">
-                        {game.excerpt}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-[#2A2A30] flex items-center justify-between text-xs text-purple-300 font-bold">
-                      <span className="text-[10px] text-amber-400 font-mono">100% Orbs</span>
-                      <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        <span>Vào Cược</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SECTION 5.4: V-PREMIUM & V-CLOUD */}
-          {filteredPremium.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-sky-950/70 border border-sky-500/40 flex items-center justify-center text-sky-300">
-                    <Crown className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white">Waves Premium & Gói V-Cloud</h2>
-                    <span className="text-[11px] text-zinc-400 font-mono">
-                      {filteredPremium.length} gói dịch vụ
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigate('/v-premium')}
-                  className="text-xs text-sky-400 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                >
-                  <span>Mở Sảnh V-Premium</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {filteredPremium.map((plan) => (
-                  <div
-                    key={plan.id}
-                    onClick={() => {
-                      playPopSound();
-                      saveRecentSearch(plan.title);
-                      navigate('/v-premium', { subTab: plan.subTab });
-                    }}
-                    className="p-5 rounded-[24px] bg-[#1E1E22] border border-[#2D2D35] hover:border-sky-500/60 hover:bg-[#25252C] transition-all cursor-pointer flex flex-col justify-between shadow-md group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 rounded-2xl bg-[#141A22] border border-sky-500/30 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                          {plan.icon}
-                        </div>
-                        <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[10px] font-bold uppercase">
-                          {plan.category}
-                        </span>
-                      </div>
-
-                      <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">
-                        {plan.title}
-                      </h3>
-                      <p className="text-xs text-[#9CA3AF] mt-1 line-clamp-2 leading-relaxed">
-                        {plan.excerpt}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-[#2A2A30] flex items-center justify-between text-xs text-sky-300 font-bold">
-                      <span className="text-[11px] text-amber-300 font-mono">{plan.price}</span>
-                      <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        <span>Chi Tiết</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SECTION 5.5: TIN TỨC & BÁO CHÍ */}
-          {filteredNews.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-rose-950/70 border border-rose-500/40 flex items-center justify-center text-rose-300">
-                    <Megaphone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white">Tin Tức & Thông Báo</h2>
-                    <span className="text-[11px] text-zinc-400 font-mono">
-                      {filteredNews.length} bài viết
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigate('/news')}
-                  className="text-xs text-rose-400 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                >
-                  <span>Xem Trang Tin Tức</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {filteredNews.map((article) => (
-                  <div
-                    key={article.id}
-                    onClick={() => {
-                      playPopSound();
-                      saveRecentSearch(article.title);
-                      navigate(`/news/${article.id}`);
-                    }}
-                    className="p-5 rounded-[24px] bg-[#1E1E22] border border-[#2D2D35] hover:border-rose-500/60 hover:bg-[#25252C] transition-all cursor-pointer flex flex-col justify-between shadow-md group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold uppercase">
-                          Bản Tin Vplay
-                        </span>
-                        <span className="text-[11px] text-zinc-400 font-mono">{article.date}</span>
-                      </div>
-
-                      <h3 className="text-base font-bold text-white group-hover:text-rose-300 transition-colors leading-snug">
-                        {article.title}
-                      </h3>
-                      <p className="text-xs text-[#9CA3AF] mt-1.5 line-clamp-2 leading-relaxed">
-                        {article.excerpt}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-[#2A2A30] flex items-center justify-between text-xs text-rose-300 font-bold">
-                      <span className="text-zinc-400 font-normal">Ban Biên Tập Vplay</span>
-                      <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        <span>Đọc Bản Tin</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SECTION 5.6: CÀI ĐẶT HỆ THỐNG */}
-          {filteredSettings.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-indigo-950/70 border border-indigo-500/40 flex items-center justify-center text-indigo-300">
-                    <Settings className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white">Lối Tắt Cài Đặt Hệ Thống</h2>
-                    <span className="text-[11px] text-zinc-400 font-mono">
-                      {filteredSettings.length} tùy chỉnh nhanh
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => navigate('/settings')}
-                  className="text-xs text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                >
-                  <span>Mở Trang Cài Đặt</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {filteredSettings.map((set) => (
-                  <div
-                    key={set.id}
-                    onClick={() => {
-                      playPopSound();
-                      saveRecentSearch(set.title);
-                      navigate(set.route);
-                    }}
-                    className="p-4 rounded-[22px] bg-[#1E1E22] border border-[#2D2D35] hover:border-indigo-500/60 hover:bg-[#25252C] transition-all cursor-pointer flex items-center justify-between gap-3 shadow-md group"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-2xl bg-[#181824] border border-indigo-500/30 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
-                        {set.icon}
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors truncate">
-                          {set.title}
-                        </h4>
-                        <span className="text-[11px] text-zinc-400 truncate block">
-                          {set.description}
-                        </span>
-                      </div>
-                    </div>
-
-                    <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-white shrink-0" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
+
+export default SearchTab;
+

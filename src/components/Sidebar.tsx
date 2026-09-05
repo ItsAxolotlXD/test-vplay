@@ -32,7 +32,8 @@ import {
   Calculator,
   Bell,
   StickyNote,
-  Armchair
+  Armchair,
+  MessageSquare
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -485,6 +486,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="truncate">News</span>
         </button>
 
+        {/* 4.5 V-Flow (Mạng xã hội) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-vflow' : 'nav-item-vflow'}
+          onClick={() => handleNavClick('/v-flow')}
+          title="Mạng xã hội V-Flow"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/v-flow') || isActive('/vflow') || isActive('/flow')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <Radio className="w-5 h-5 shrink-0 text-rose-400" />
+            <span className="truncate">V-Flow</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-400/30 rounded-full">
+            FLOW
+          </span>
+        </button>
+
         {/* 5. Space 360 (Tách thành từng tab chuyên biệt) */}
         <div className="w-full flex flex-col gap-1">
           <button
@@ -739,7 +760,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="truncate">Waves Premium</span>
         </button>
 
-        {/* 7. Friends & People (Community) */}
+        {/* 7. Phòng Chat (Kênh Chat & Kênh Thoại Discord) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-chat' : 'nav-item-chat'}
+          onClick={() => handleNavClick('/chat')}
+          title="Phòng Chat (Kênh Chat & Kênh Thoại Discord)"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/chat') || isActive('/chat-room') || isActive('/phong-chat') || isActive('/discord')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <MessageSquare className="w-5 h-5 shrink-0 text-[#FF4D8D]" />
+            <span className="truncate">Phòng Chat</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-[#E6005A]/20 text-[#FF4D8D] border border-[#E6005A]/40 rounded-full">
+            VOICE
+          </span>
+        </button>
+
+        {/* 8. Friends & People (Community) */}
         <button
           id={isMobile ? 'mobile-nav-item-friends' : 'nav-item-friends'}
           onClick={() => handleNavClick('/friends')}
@@ -1204,6 +1245,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <Megaphone className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
                 <button
+                  onClick={() => handleNavClick('/v-flow')}
+                  title="Mạng xã hội V-Flow"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/v-flow') || isActive('/vflow') || isActive('/flow') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Radio className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-rose-400" />
+                </button>
+                <button
                   onClick={() => handleNavClick('/v-space')}
                   title="Space 360 (Tất cả ứng dụng)"
                   className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
@@ -1247,6 +1297,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }`}
                 >
                   <Waves className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
+                </button>
+                <button
+                  onClick={() => handleNavClick('/chat')}
+                  title="Phòng Chat (Kênh Chat & Kênh Thoại Discord)"
+                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/chat') || isActive('/chat-room') || isActive('/phong-chat') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <MessageSquare className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-[#FF4D8D]" />
                 </button>
                 <button
                   onClick={() => handleNavClick('/friends')}

@@ -24,7 +24,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   fontScale: 1,
   autoScrollBanner: true,
   autoHideSidebar: false,
-  mergeSpotlightToCopilot: true,
+  mergeSpotlightToCopilot: false,
   copilotSlashSuggestions: true,
   searchCategories: true,
   searchNews: true,
