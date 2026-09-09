@@ -38,9 +38,14 @@ import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
 import { useSettings } from './hooks/useSettings';
 import { useFavorites } from './hooks/useFavorites';
+import { useFeatureFlags } from './hooks/useFeatureFlags';
 
 export default function App() {
   const { settings } = useSettings();
+  const { flags } = useFeatureFlags();
+  const isTopBarMode = settings.navigationMode 
+    ? settings.navigationMode === 'topbar' 
+    : (flags.top_bar !== false);
   const { favoriteChannelIds, toggleFavoriteChannel } = useFavorites();
   // Security & Construction Gate State: saved in localStorage so the device only requires entering password once
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -496,7 +501,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#141416] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative">
+    <div className="min-h-screen bg-[#1B0912] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative">
       {/* Sidebar Navigation (Desktop + Mobile Drawer) */}
       <Sidebar
         currentRoute={currentRoute}
@@ -512,20 +517,24 @@ export default function App() {
 
       {/* Main App Container */}
       <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 ${
-        !settings.dockToSidebar 
-          ? 'md:pl-0 pb-20' 
-          : isEffectiveCollapsed 
-            ? 'md:pl-[80px]' 
-            : 'md:pl-[290px]'
+        isTopBarMode
+          ? 'pl-0'
+          : !settings.dockToSidebar 
+            ? 'md:pl-0 pb-20' 
+            : isEffectiveCollapsed 
+              ? 'md:pl-[80px]' 
+              : 'md:pl-[290px]'
       }`}>
-        {/* TopBar Header */}
-        <TopBar
-          currentRoute={currentRoute}
-          navigate={navigate}
-          onOpenSearch={handleOpenSearch}
-          onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
-          onOpenCopilotWindow={() => toggleCopilotFloating(true)}
-        />
+        {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar */}
+        <div className={!isTopBarMode ? 'md:hidden' : ''}>
+          <TopBar
+            currentRoute={currentRoute}
+            navigate={navigate}
+            onOpenSearch={handleOpenSearch}
+            onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
+            onOpenCopilotWindow={() => toggleCopilotFloating(true)}
+          />
+        </div>
 
         {/* Dynamic Page Content with smooth fade */}
         <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out ${

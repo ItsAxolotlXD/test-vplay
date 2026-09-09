@@ -66,28 +66,29 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
               onSelectChannel(ch);
               navigate(`/live-tv?channel=${ch.slug}`);
             }}
-            className="min-w-[280px] sm:min-w-[320px] rounded-[26px] bg-[#1E1E22] border border-[#2D2D35] hover:border-[#C83DFF]/60 hover:bg-[#25252C] transition-all p-4 cursor-pointer group shadow-lg flex flex-col justify-between"
+            className="min-w-[260px] sm:min-w-[290px] rounded-[22px] bg-[#22171E] hover:bg-[#2A1B25] transition-all p-3.5 cursor-pointer group shadow-lg flex flex-col justify-between border-0"
           >
             {/* Top row: Channel Logo + Live badge */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#141416] border border-white/10 flex items-center justify-center p-1 overflow-hidden">
+                <div className="w-8 h-8 rounded-xl bg-[#170E13] flex items-center justify-center p-1 overflow-hidden border-0">
                   <img
                     src={ch.logo}
                     alt={ch.name}
                     referrerPolicy="no-referrer"
-                    className="max-w-full max-h-full object-contain"
+                    className="max-w-full max-h-full object-contain channel-logo-img filter drop-shadow"
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
                   />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-white group-hover:text-[#C83DFF] transition-colors truncate block">
+                  <span className="text-xs font-bold text-white group-hover:text-[#FF3366] transition-colors truncate block">
                     {ch.shortName || ch.name}
                   </span>
-                  <span className="text-[10px] text-[#8E8E93]">{ch.category}</span>
+                  <span className="text-[10px] text-[#A1959C]">{ch.category}</span>
                 </div>
               </div>
 
-              <span className="px-2 py-0.5 rounded-full bg-[#FF2020]/20 text-[#FF4D4D] border border-[#FF2020]/40 text-[10px] font-extrabold flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded-full bg-[#FF2020]/25 text-[#FF6666] text-[9px] font-extrabold flex items-center gap-1 border-0">
                 <Radio className="w-2.5 h-2.5 animate-pulse" />
                 <span>LIVE</span>
               </span>

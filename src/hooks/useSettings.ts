@@ -4,6 +4,7 @@ export interface SystemSettings {
   userName: string;
   theme: 'light' | 'dark';
   dockToSidebar: boolean;
+  navigationMode: 'sidebar' | 'topbar';
   fontScale: number; // 0: 85%, 1: 100%, 2: 115%, 3: 130%
   autoScrollBanner: boolean;
   autoHideSidebar: boolean;
@@ -19,8 +20,9 @@ export interface SystemSettings {
 
 export const DEFAULT_SETTINGS: SystemSettings = {
   userName: 'User',
-  theme: 'light',
+  theme: 'dark',
   dockToSidebar: true,
+  navigationMode: 'topbar',
   fontScale: 1,
   autoScrollBanner: true,
   autoHideSidebar: false,
@@ -52,19 +54,34 @@ export const getStoredSettings = (): SystemSettings => {
       base.userName = legacyUser.trim();
     }
 
+    // Determine initial navigationMode if not saved yet
+    let fallbackNavMode: 'sidebar' | 'topbar' = 'topbar';
+    try {
+      const rawFlags = localStorage.getItem('waves_feature_flags');
+      if (rawFlags) {
+        const parsedFlags = JSON.parse(rawFlags);
+        if (parsedFlags.top_bar === false) {
+          fallbackNavMode = 'sidebar';
+        }
+      }
+    } catch {}
+    base.navigationMode = fallbackNavMode;
+
     if (saved) {
       const parsed = JSON.parse(saved);
+      const navMode = parsed.navigationMode || (parsed.dockToSidebar === false ? 'sidebar' : fallbackNavMode);
       return { 
         ...base, 
         ...parsed,
+        navigationMode: navMode,
         userName: parsed.userName || legacyUser || 'User',
-        theme: parsed.theme || (legacyTheme === 'dark' ? 'dark' : 'light')
+        theme: 'dark'
       };
     } else if (legacyTheme || legacyUser) {
       return {
         ...base,
         userName: legacyUser || 'User',
-        theme: legacyTheme === 'dark' ? 'dark' : 'light'
+        theme: 'dark'
       };
     }
   } catch {}
@@ -75,14 +92,9 @@ export const getStoredSettings = (): SystemSettings => {
 export const applySystemSettings = (settings: SystemSettings) => {
   if (typeof document === 'undefined') return;
 
-  // Apply theme
-  if (settings.theme === 'light') {
-    document.documentElement.classList.add('light-mode');
-    document.documentElement.classList.remove('dark');
-  } else {
-    document.documentElement.classList.remove('light-mode');
-    document.documentElement.classList.add('dark');
-  }
+  // App is dark mode only
+  document.documentElement.classList.remove('light-mode');
+  document.documentElement.classList.add('dark');
 
   // Apply font scale
   const scaleVal = FONT_SCALE_CONFIG[settings.fontScale]?.scale || '1';
@@ -124,6 +136,15 @@ export const useSettings = () => {
         }
         if (key === 'userName') {
           localStorage.setItem('copilot_username', (value as string) || 'User');
+        }
+        if (key === 'navigationMode') {
+          try {
+            const rawFlags = localStorage.getItem('waves_feature_flags');
+            const flagsObj = rawFlags ? JSON.parse(rawFlags) : {};
+            flagsObj.top_bar = (value === 'topbar');
+            localStorage.setItem('waves_feature_flags', JSON.stringify(flagsObj));
+            window.dispatchEvent(new CustomEvent('vplay:flags_updated', { detail: flagsObj }));
+          } catch {}
         }
       } catch {}
       return updated;

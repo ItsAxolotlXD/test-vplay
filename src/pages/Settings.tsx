@@ -14,9 +14,13 @@ import {
   RotateCw,
   Sparkles,
   Flag,
-  ChevronRight
+  ChevronRight,
+  Layout,
+  PanelLeft,
+  PanelTop
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG } from '../hooks/useSettings';
+import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -24,6 +28,7 @@ interface SettingsProps {
 
 export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const { settings, updateSetting } = useSettings();
+  const { flags, setFlag } = useFeatureFlags();
   const [searchQuery, setSearchQuery] = useState('');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
@@ -129,6 +134,10 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
         matchesSearch('Sáng') ||
         matchesSearch('Tối') ||
         matchesSearch('Theme') ||
+        matchesSearch('Thanh điều hướng') ||
+        matchesSearch('Sidebar') ||
+        matchesSearch('Top bar') ||
+        matchesSearch('Bố cục') ||
         matchesSearch('Dock sang Sidebar') ||
         matchesSearch('Cỡ chữ ứng dụng')) && (
         <section 
@@ -143,57 +152,143 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                 Giao diện
               </h2>
               <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
-                Tùy biến chế độ sáng/tối, thanh Dock, Sidebar và tỷ lệ cỡ chữ toàn hệ thống
+                Tùy biến thanh điều hướng (Sidebar hoặc Top bar), thanh Dock và tỷ lệ cỡ chữ toàn hệ thống
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
-            {/* Card 0: Chế độ giao diện (Light / Dark) - Placed at the very top of Interface section */}
-            {(matchesSearch('Chế độ giao diện') || matchesSearch('Giao diện') || matchesSearch('Sáng') || matchesSearch('Tối') || matchesSearch('Theme') || matchesSearch('Light') || matchesSearch('Dark')) && (
+            {/* Card 0: Chế độ giao diện (Dark Mode mặc định) */}
+            {(matchesSearch('Chế độ giao diện') || matchesSearch('Giao diện') || matchesSearch('Theme') || matchesSearch('Dark')) && (
               <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
                 <div>
-                  <div className="font-semibold text-white text-sm">
-                    Chế độ giao diện
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <Moon className="w-4 h-4 text-[#FF3366]" />
+                    <span>Chế độ giao diện Dark Mode</span>
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Chuyển đổi giao diện Sáng (Light mode) và Tối (Dark mode)
+                    Ứng dụng Vplay hoạt động ở chế độ nền tối chuyên biệt (#1B0912) tối ưu thị giác cho trải nghiệm truyền hình.
                   </div>
                 </div>
 
-                {/* Theme Selector Capsule */}
-                <div className="flex items-center p-1 rounded-full bg-[#18181B] shrink-0 theme-segmented-box border border-transparent">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#18181B] text-xs font-bold text-[#FF6699] shrink-0 border-0">
+                  <span className="w-2 h-2 rounded-full bg-[#FF3366]" />
+                  <span>DARK ONLY</span>
+                </div>
+              </div>
+            )}
+
+            {/* Card 1: Bố cục thanh điều hướng (Sidebar hoặc Top bar) */}
+            {(matchesSearch('Thanh điều hướng') ||
+              matchesSearch('Sidebar') ||
+              matchesSearch('Top bar') ||
+              matchesSearch('Bố cục') ||
+              matchesSearch('Giao diện')) && (
+              <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-3.5 transition-colors">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <Layout className="w-4.5 h-4.5 text-[#E50914]" />
+                      <span>Thanh điều hướng chính</span>
+                    </div>
+                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                      Lựa chọn giao diện điều hướng: thanh Sidebar bên cạnh hoặc thanh Top bar phía trên cùng.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Grid 2 tùy chọn: Sidebar hoặc Top bar */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Tùy chọn 1: Sidebar */}
                   <button
-                    id="btn-theme-light"
+                    id="setting-nav-sidebar"
                     type="button"
-                    onClick={() => updateSetting('theme', 'light')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      settings.theme === 'light'
-                        ? 'bg-[#E50914] text-white shadow-md'
-                        : 'text-[#9CA3AF] hover:text-white'
+                    onClick={() => {
+                      updateSetting('navigationMode', 'sidebar');
+                      setFlag('top_bar', false);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                      (settings.navigationMode === 'sidebar' || (!settings.navigationMode && flags.top_bar === false))
+                        ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
+                        : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
                     }`}
                   >
-                    <Sun className="w-3.5 h-3.5" />
-                    <span>Sáng</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                          (settings.navigationMode === 'sidebar' || (!settings.navigationMode && flags.top_bar === false))
+                            ? 'bg-[#E50914]/20 text-[#E50914]'
+                            : 'bg-white/5 text-gray-400 group-hover:text-white'
+                        }`}>
+                          <PanelLeft className="w-4.5 h-4.5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-white block">Sidebar</span>
+                          <span className="text-[11px] text-gray-400">Thanh bên trái</span>
+                        </div>
+                      </div>
+
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                        (settings.navigationMode === 'sidebar' || (!settings.navigationMode && flags.top_bar === false))
+                          ? 'bg-[#E50914] text-white'
+                          : 'border border-white/20 text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-[#9CA3AF] mt-3 leading-relaxed">
+                      Giao diện thanh menu dọc bên trái đầy đủ với đồng hồ số, ô tìm kiếm nhanh, các danh mục và nút thu gọn.
+                    </p>
                   </button>
+
+                  {/* Tùy chọn 2: Top bar */}
                   <button
-                    id="btn-theme-dark"
+                    id="setting-nav-topbar"
                     type="button"
-                    onClick={() => updateSetting('theme', 'dark')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      settings.theme === 'dark'
-                        ? 'bg-[#E50914] text-white shadow-md'
-                        : 'text-[#9CA3AF] hover:text-white'
+                    onClick={() => {
+                      updateSetting('navigationMode', 'topbar');
+                      setFlag('top_bar', true);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                      (settings.navigationMode === 'topbar' || (!settings.navigationMode && flags.top_bar !== false))
+                        ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
+                        : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
                     }`}
                   >
-                    <Moon className="w-3.5 h-3.5" />
-                    <span>Tối</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                          (settings.navigationMode === 'topbar' || (!settings.navigationMode && flags.top_bar !== false))
+                            ? 'bg-[#E50914]/20 text-[#E50914]'
+                            : 'bg-white/5 text-gray-400 group-hover:text-white'
+                        }`}>
+                          <PanelTop className="w-4.5 h-4.5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-white block">Top bar</span>
+                          <span className="text-[11px] text-gray-400">Thanh trên cùng</span>
+                        </div>
+                      </div>
+
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                        (settings.navigationMode === 'topbar' || (!settings.navigationMode && flags.top_bar !== false))
+                          ? 'bg-[#E50914] text-white'
+                          : 'border border-white/20 text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-[#9CA3AF] mt-3 leading-relaxed">
+                      Thanh điều hướng ngang hiện đại phong cách truyền hình với logo Vplay, danh mục Truyền Hình và menu Xem thêm.
+                    </p>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Card 1: Dock sang Sidebar (No Border) */}
+            {/* Card 2: Dock sang Sidebar (No Border) */}
             {matchesSearch('Dock sang Sidebar') && (
               <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
                 <div>
@@ -201,7 +296,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     Dock sang Sidebar
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Chuyển thanh điều hướng dưới cùng sang thanh Sidebar bên trái
+                    Chuyển thanh điều hướng dưới cùng sang thanh Sidebar bên trái (khi sử dụng chế độ Sidebar)
                   </div>
                 </div>
 

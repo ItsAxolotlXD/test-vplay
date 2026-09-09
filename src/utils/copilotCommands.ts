@@ -821,34 +821,37 @@ Cú pháp:
       };
     }
 
-    const newTheme: "light" | "dark" = isLight ? "light" : "dark";
     try {
       const saved = localStorage.getItem("waves_system_settings");
       const current = saved ? JSON.parse(saved) : {};
-      const updated = { ...current, theme: newTheme };
+      const updated = { ...current, theme: "dark" };
       localStorage.setItem("waves_system_settings", JSON.stringify(updated));
-      localStorage.setItem("waves_theme", newTheme);
+      localStorage.setItem("waves_theme", "dark");
 
-      if (newTheme === "light") {
-        document.documentElement.classList.add("light-mode");
-        document.documentElement.classList.remove("dark");
-      } else {
-        document.documentElement.classList.remove("light-mode");
-        document.documentElement.classList.add("dark");
-      }
+      document.documentElement.classList.remove("light-mode");
+      document.documentElement.classList.add("dark");
       window.dispatchEvent(new Event("waves_settings_change"));
     } catch (e) {
       console.error(e);
     }
 
+    if (isLight) {
+      return {
+        handled: true,
+        replyText: `✨ **Vplay** hiện tại hoạt động độc quyền ở chế độ **Dark Mode (#1B0912)** để mang lại trải nghiệm xem truyền hình điện ảnh và bảo vệ mắt tối ưu nhất!`,
+        action: {
+          type: "theme",
+          payload: "dark"
+        }
+      };
+    }
+
     return {
       handled: true,
-      replyText: `✨ **Copilot for Vplay** đã chuyển giao diện sang chế độ **${
-        newTheme === "light" ? "Sáng (Light Mode)" : "Tối (Dark Mode)"
-      }** thành công!`,
+      replyText: `✨ **Vplay** đang ở chế độ **Dark Mode (#1B0912)** hoàn hảo cho trải nghiệm truyền hình.`,
       action: {
         type: "theme",
-        payload: newTheme
+        payload: "dark"
       }
     };
   }

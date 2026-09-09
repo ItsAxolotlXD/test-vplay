@@ -46,6 +46,15 @@ export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
 
   // 2. Giao diện & Trải nghiệm (UI & Experience)
   {
+    id: 'flag_top_bar',
+    key: 'top_bar',
+    name: 'Top bar (Thanh điều hướng trên cùng)',
+    description: 'Chuyển đổi thanh Sidebar thành thanh điều hướng Top bar phong cách VTVgo với Logo Vplay, Home, Truyền hình, Video Ngắn, Tin tức, V-Flow, Phòng Chat, Sàn cược và menu Xem thêm chứa các ứng dụng khác.',
+    category: 'ui',
+    badge: 'STABLE',
+    defaultValue: true,
+  },
+  {
     id: 'flag_home_banner_slider',
     key: 'home_banner_slider',
     name: 'Trượt tự động Banner Trang Chủ',
@@ -226,14 +235,33 @@ export const useFeatureFlags = () => {
         } catch {}
       }
     };
+    const handleCustom = (e: Event) => {
+      const custom = e as CustomEvent;
+      if (custom.detail) {
+        setFlags(custom.detail);
+      }
+    };
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener('vplay:flags_updated', handleCustom);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('vplay:flags_updated', handleCustom);
+    };
   }, []);
 
   const saveFlags = (newFlags: Record<string, boolean>) => {
     setFlags(newFlags);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newFlags));
+      if ('top_bar' in newFlags) {
+        try {
+          const raw = localStorage.getItem('waves_system_settings');
+          const current = raw ? JSON.parse(raw) : {};
+          current.navigationMode = newFlags.top_bar ? 'topbar' : 'sidebar';
+          localStorage.setItem('waves_system_settings', JSON.stringify(current));
+          window.dispatchEvent(new Event('waves_settings_change'));
+        } catch {}
+      }
       // Dispatch custom event for immediate same-window listeners
       window.dispatchEvent(new CustomEvent('vplay:flags_updated', { detail: newFlags }));
     } catch (err) {

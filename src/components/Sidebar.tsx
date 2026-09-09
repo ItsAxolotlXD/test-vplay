@@ -39,6 +39,7 @@ import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSettings } from '../hooks/useSettings';
 import { useOrbs } from '../hooks/useOrbs';
+import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { CHANNELS_DATA } from '../data/channels';
 import { Channel } from '../types';
 import { DiscordWelcomeModal } from './DiscordWelcomeModal';
@@ -68,6 +69,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile
 }) => {
   const { settings } = useSettings();
+  const { flags } = useFeatureFlags();
+  const isTopBarMode = settings.navigationMode 
+    ? settings.navigationMode === 'topbar' 
+    : (flags.top_bar !== false);
   const { timeString, dateString } = useClock();
   const { favoriteChannelIds } = useFavorites();
   const { orbs, addOrbs } = useOrbs();
@@ -77,6 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isFavoritesExpanded, setIsFavoritesExpanded] = useState(false);
   const [isToolboxExpanded, setIsToolboxExpanded] = useState(false);
   const [isHelpExpanded, setIsHelpExpanded] = useState(false);
+  const [isMoreExpanded, setIsMoreExpanded] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const [isDiscordModalOpen, setIsDiscordModalOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -195,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Top Header: Clock + Monochrome Logo + Close/Collapse Button */}
       <div className="px-5 pt-5 pb-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3.5 pl-1.5">
-          {/* Brand Logo (Dark mode logo vs Light mode logo) */}
+          {/* Brand Logo */}
           <div 
             onClick={() => handleNavClick('/')} 
             className="cursor-pointer flex items-center justify-center p-0 hover:opacity-85 transition-opacity"
@@ -203,17 +209,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             {!logoError ? (
               <img 
-                src={settings.theme === 'light'
-                  ? "https://static.wikia.nocookie.net/ep-deo/images/f/f3/Vplay_light_mode.png/revision/latest/scale-to-width-down/1000?cb=20260829062448"
-                  : "https://static.wikia.nocookie.net/ep-deo/images/f/f8/Vpla.png/revision/latest/scale-to-width-down/1000?cb=20260829062528"
-                } 
+                src="https://static.wikia.nocookie.net/ep-deo/images/f/f8/Vpla.png/revision/latest/scale-to-width-down/1000?cb=20260829062528" 
                 alt="Vplay Logo" 
                 referrerPolicy="no-referrer"
-                className="h-8 max-w-[125px] w-auto object-contain shrink-0"
+                className="h-8 max-w-[125px] w-auto object-contain shrink-0 filter drop-shadow"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
                 onError={() => setLogoError(true)}
               />
             ) : (
-              <span className="text-white dark:text-white light:text-[#111827] font-black text-2xl tracking-tighter">V</span>
+              <span className="text-white font-black text-2xl tracking-tighter">V</span>
             )}
           </div>
 
@@ -344,60 +348,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Scrollable Navigation Menu */}
       <div className="flex-1 overflow-y-auto pb-6 text-sm font-medium sidebar-scroller no-scrollbar px-4 pt-1 space-y-2.5">
-        {/* 1. Copilot for Vplay (AI) - Placed at Top above Home */}
-        <button
-          id={isMobile ? 'mobile-nav-item-copilot' : 'nav-item-copilot'}
-          onClick={() => handleNavClick('/copilot')}
-          title="Copilot for Vplay"
-          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
-            isActive('/copilot')
-              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
-              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
-          }`}
-        >
-          <img
-            src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-            alt="Copilot for Vplay"
-            referrerPolicy="no-referrer"
-            className="w-5 h-5 object-contain shrink-0"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-            }}
-          />
-          <span className="truncate">Copilot for Vplay</span>
-        </button>
-
-        {/* 2. Home (Primary Tab) */}
-        <button
-          id={isMobile ? 'mobile-nav-item-home' : 'nav-item-home'}
-          onClick={() => handleNavClick('/')}
-          title="Home"
-          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all duration-200 cursor-pointer ${
-            isActive('/') && currentRoute === '/'
-              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
-              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
-          }`}
-        >
-          <img
-            src="https://static.wikia.nocookie.net/ep-deo/images/6/6e/New_hom.png/revision/latest?cb=20260722124341"
-            alt="Home"
-            referrerPolicy="no-referrer"
-            className={`w-5 h-5 object-contain shrink-0 ${
-              isActive('/') && currentRoute === '/' ? 'brightness-0 invert' : 'sidebar-nav-home-icon'
-            }`}
-            onError={(e) => {
-              (e.target as HTMLElement).style.display = 'none';
-            }}
-          />
-          <span className="truncate">Home</span>
-        </button>
-
-        {/* 2. Live TV with Accordion */}
+        {/* 1. Live TV with Accordion */}
         <div className="w-full">
           <button
             id={isMobile ? 'mobile-nav-item-live-tv' : 'nav-item-live-tv'}
             onClick={() => handleNavClick('/live-tv')}
-            title="Live TV"
+            title="Truyền hình"
             className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
               isActive('/live-tv')
                 ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
@@ -406,7 +362,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <div className="flex items-center gap-3.5 truncate">
               <Tv className="w-5 h-5 shrink-0" />
-              <span className="truncate">Live TV</span>
+              <span className="truncate">Truyền hình</span>
             </div>
             <div
               onClick={(e) => {
@@ -451,31 +407,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
-        {/* 3. Vertical TV / Shorts */}
-        <button
-          id={isMobile ? 'mobile-nav-item-vertical' : 'nav-item-vertical'}
-          onClick={() => handleNavClick('/vertical')}
-          title="Vplay Vertical"
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
-            isActive('/vertical') || isActive('/shorts') || isActive('/vplay-vertical')
-              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
-              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
-          }`}
-        >
-          <div className="flex items-center gap-3.5 truncate">
-            <Smartphone className="w-5 h-5 shrink-0" />
-            <span className="truncate">Vertical</span>
-          </div>
-          <span className="px-2 py-0.5 text-[9.5px] font-mono font-black bg-gradient-to-r from-rose-500/20 to-orange-500/20 text-rose-300 border border-rose-400/40 rounded-full">
-            SHORTS
-          </span>
-        </button>
-
-        {/* 4. News */}
+        {/* 2. Tin tức */}
         <button
           id={isMobile ? 'mobile-nav-item-news' : 'nav-item-news'}
           onClick={() => handleNavClick('/news')}
-          title="News"
+          title="Tin tức"
           className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
             isActive('/news')
               ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
@@ -483,8 +419,93 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <Megaphone className="w-5 h-5 shrink-0" />
-          <span className="truncate">News</span>
+          <span className="truncate">Tin tức</span>
         </button>
+
+        {/* 3. Dropdown Menu "Xem thêm..." (Chứa tất cả các tab còn lại) */}
+        <div className="w-full">
+          <button
+            id={isMobile ? 'mobile-nav-item-more' : 'nav-item-more'}
+            onClick={() => setIsMoreExpanded((prev) => !prev)}
+            title="Xem thêm..."
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+              isMoreExpanded
+                ? 'bg-[#2F2F36] text-white font-bold'
+                : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+            }`}
+          >
+            <div className="flex items-center gap-3.5 truncate">
+              <Sparkles className="w-5 h-5 shrink-0 text-amber-400" />
+              <span className="truncate">Xem thêm...</span>
+            </div>
+            <ChevronDown className={`w-4 h-4 opacity-70 transition-transform duration-200 ${isMoreExpanded ? 'rotate-180 text-[#E6005A]' : ''}`} />
+          </button>
+
+          <AnimatePresence>
+            {isMoreExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-2 space-y-2 pl-2 border-l border-white/10"
+              >
+                {/* Home */}
+                <button
+                  id={isMobile ? 'mobile-nav-item-home' : 'nav-item-home'}
+                  onClick={() => handleNavClick('/')}
+                  title="Home"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all cursor-pointer ${
+                    isActive('/') && currentRoute === '/'
+                      ? 'bg-[#E6005A] text-white font-bold'
+                      : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Home className="w-4 h-4 shrink-0" />
+                  <span className="truncate">Trang chủ (Home)</span>
+                </button>
+
+                {/* Copilot for Vplay */}
+                <button
+                  id={isMobile ? 'mobile-nav-item-copilot' : 'nav-item-copilot'}
+                  onClick={() => handleNavClick('/copilot')}
+                  title="Copilot for Vplay"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all cursor-pointer ${
+                    isActive('/copilot')
+                      ? 'bg-[#E6005A] text-white font-bold'
+                      : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <img
+                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+                    alt="Copilot for Vplay"
+                    referrerPolicy="no-referrer"
+                    className="w-4 h-4 object-contain shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
+                    }}
+                  />
+                  <span className="truncate">Copilot AI</span>
+                </button>
+
+                {/* Vertical TV / Shorts */}
+                <button
+                  id={isMobile ? 'mobile-nav-item-vertical' : 'nav-item-vertical'}
+                  onClick={() => handleNavClick('/vertical')}
+                  title="Vplay Vertical"
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] transition-all cursor-pointer ${
+                    isActive('/vertical') || isActive('/shorts') || isActive('/vplay-vertical')
+                      ? 'bg-[#E6005A] text-white font-bold'
+                      : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 truncate">
+                    <Smartphone className="w-4 h-4 shrink-0" />
+                    <span className="truncate">Vertical Shorts</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-black bg-gradient-to-r from-rose-500/20 to-orange-500/20 text-rose-300 border border-rose-400/40 rounded-full">
+                    SHORTS
+                  </span>
+                </button>
 
         {/* 4.5 V-Flow (Mạng xã hội) */}
         <button
@@ -1085,22 +1106,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
             F5
           </span>
         </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
 
   return (
     <>
-      {/* 1. Desktop Persistent Sidebar (Only when dockToSidebar is true or desktop) */}
-      {settings.dockToSidebar && (
+      {/* 1. Desktop Persistent Sidebar (Only when dockToSidebar is true and top_bar flag is false) */}
+      {settings.dockToSidebar && !isTopBarMode && (
         <aside 
           id="waves-desktop-sidebar"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className={`hidden md:flex flex-col h-screen bg-[#242429] border-r border-[#34343C] select-none shrink-0 fixed top-0 left-0 z-40 overflow-hidden transition-all duration-300 ease-in-out ${
+          className={`hidden md:flex flex-col h-screen border-r border-white/5 select-none shrink-0 fixed top-0 left-0 z-40 overflow-hidden transition-all duration-300 ease-in-out ${
             effectiveCollapsed ? 'w-[80px]' : 'w-[290px]'
           }`}
         >
+          {/* Progressive Blur Layer System (gradually decreasing opacity from top to bottom) */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
+            <div className="absolute inset-0 backdrop-blur-[32px] [mask-image:linear-gradient(to_bottom,black_0%,black_10%,transparent_35%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_10%,transparent_35%)]" />
+            <div className="absolute inset-0 backdrop-blur-[20px] [mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_60%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_60%)]" />
+            <div className="absolute inset-0 backdrop-blur-[12px] [mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_80%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_80%)]" />
+            <div className="absolute inset-0 backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)]" />
+            <div className="absolute inset-0 backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)]" />
+            {/* Background tint gradually decreasing opacity from top to bottom */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1B0912]/98 via-[#1B0912]/70 to-[#1B0912]/20" />
+          </div>
           {!effectiveCollapsed ? (
             renderSidebarBody(false)
           ) : (
@@ -1176,215 +1211,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
               </div>
 
-              {/* Mini nav icons */}
+              {/* Mini nav icons - Only 3 items: Truyền hình, Tin tức, and Xem thêm... */}
               <div className="w-full flex-1 overflow-y-auto pb-4 space-y-2.5 flex flex-col items-center no-scrollbar">
-                {/* 1. Copilot (Top above Home) */}
+                {/* 1. Truyền hình */}
                 <button
-                  onClick={() => handleNavClick('/copilot')}
-                  title="Copilot for Vplay"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/copilot') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <img
-                    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-                    alt="Copilot for Vplay"
-                    referrerPolicy="no-referrer"
-                    className="w-5 h-5 min-w-[20px] min-h-[20px] object-contain shrink-0"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
-                    }}
-                  />
-                </button>
-
-                {/* 2. Home (Primary Tab) */}
-                <button
-                  onClick={() => handleNavClick('/')}
-                  title="Home"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/') && currentRoute === '/' ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <img
-                    src="https://static.wikia.nocookie.net/ep-deo/images/6/6e/New_hom.png/revision/latest?cb=20260722124341"
-                    alt="Home"
-                    referrerPolicy="no-referrer"
-                    className={`w-5 h-5 min-w-[20px] min-h-[20px] object-contain shrink-0 ${
-                      isActive('/') && currentRoute === '/' ? 'brightness-0 invert' : 'sidebar-nav-home-icon'
-                    }`}
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
-                    }}
-                  />
-                </button>
-                <button
+                  id="mini-nav-item-live-tv"
                   onClick={() => handleNavClick('/live-tv')}
-                  title="Live TV"
+                  title="Truyền hình"
                   className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/live-tv') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
                   <Tv className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
+
+                {/* 2. Tin tức */}
                 <button
-                  onClick={() => handleNavClick('/vertical')}
-                  title="Vplay Vertical"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/vertical') || isActive('/shorts') || isActive('/vplay-vertical') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Smartphone className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
-                </button>
-                <button
+                  id="mini-nav-item-news"
                   onClick={() => handleNavClick('/news')}
-                  title="News"
+                  title="Tin tức"
                   className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/news') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
                   <Megaphone className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
                 </button>
+
+                {/* 3. Xem thêm... (Mở rộng menu) */}
                 <button
-                  onClick={() => handleNavClick('/v-flow')}
-                  title="Mạng xã hội V-Flow"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/v-flow') || isActive('/vflow') || isActive('/flow') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
+                  id="mini-nav-item-more"
+                  onClick={onToggleCollapse}
+                  title="Xem thêm... (Mở rộng menu)"
+                  className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36] transition-all cursor-pointer group"
                 >
-                  <Radio className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-rose-400" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/v-space')}
-                  title="Space 360 (Tất cả ứng dụng)"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/v-space') || isActive('/space-360') || isActive('/v-apps') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <LayoutGrid className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-[#E6005A]" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/v-arcade', { appId: 'v_arcade' })}
-                  title="V-Games & Arcade (Vòng quay, Caro, Rắn...)"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isSpace360AppActive('v_arcade') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Gamepad2 className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-amber-400" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/v-files', { appId: 'v_xplore' })}
-                  title="V-Files Explorer"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isSpace360AppActive('v_xplore') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Folder className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-purple-400" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/explore-vietnam', { appId: 'explore_vietnam' })}
-                  title="Explore Vietnam 360"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isSpace360AppActive('explore_vietnam') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <MapPin className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-rose-400" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/v-premium')}
-                  title="Waves Premium"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/v-premium') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Waves className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/chat')}
-                  title="Phòng Chat (Kênh Chat & Kênh Thoại Discord)"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/chat') || isActive('/chat-room') || isActive('/phong-chat') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <MessageSquare className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-[#FF4D8D]" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/friends')}
-                  title="Friends & People (100+ người dùng)"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/friends') || isActive('/people') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Users className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/bet-arena')}
-                  title="Sàn cược Orbs (Bầu Cua, Lật Xu, Bài Cào, Tài Xỉu)"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/bet-arena') || isActive('/orbs-bet') || isActive('/casino') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Coins className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-amber-400" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/minecraft')}
-                  title="Minecraft Container GUI"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-none flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/minecraft') || isActive('/minecraft-gui') || isActive('/minecraft-container') || isActive('/mc-container') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Box className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-emerald-400" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/favorites')}
-                  title="Favorites"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/favorites') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Heart className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/toolbox')}
-                  title="Toolbox"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/toolbox') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Box className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/about')}
-                  title="About"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/about') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Info className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/feature-flags')}
-                  title="Feature Flags"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/feature-flags') || isActive('/flags') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Flag className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-cyan-400" />
-                </button>
-                <button
-                  onClick={() => handleNavClick('/settings')}
-                  title="Cài đặt"
-                  className={`w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/settings') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
-                  }`}
-                >
-                  <Settings className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0" />
-                </button>
-                <button
-                  onClick={() => window.location.reload()}
-                  title="Tải lại ứng dụng (Reload App)"
-                  className="w-11 h-11 min-w-[44px] min-h-[44px] shrink-0 rounded-[14px] flex items-center justify-center p-0 text-[#A1A1AA] hover:text-white hover:bg-[#2F2F36] transition-all group cursor-pointer"
-                >
-                  <RotateCw className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-cyan-400 group-hover:rotate-180 transition-transform duration-500" />
+                  <Sparkles className="w-5 h-5 min-w-[20px] min-h-[20px] shrink-0 text-amber-400 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
             </div>
@@ -1407,15 +1267,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={onCloseMobile}
             />
 
-            {/* Mobile Drawer with smooth deceleration ease */}
+            {/* Mobile Drawer with smooth deceleration ease & Progressive Blur */}
             <motion.div
               id="waves-mobile-sidebar"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-[290px] sm:w-[320px] max-w-[85vw] h-full bg-[#242429] border-r border-[#34343C] flex flex-col shadow-2xl z-10 overflow-hidden"
+              className="relative w-[290px] sm:w-[320px] max-w-[85vw] h-full border-r border-white/5 flex flex-col shadow-2xl z-10 overflow-hidden"
             >
+              {/* Progressive Blur Layer System on Mobile Sidebar */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
+                <div className="absolute inset-0 backdrop-blur-[32px] [mask-image:linear-gradient(to_bottom,black_0%,black_10%,transparent_35%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_10%,transparent_35%)]" />
+                <div className="absolute inset-0 backdrop-blur-[20px] [mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_60%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_60%)]" />
+                <div className="absolute inset-0 backdrop-blur-[12px] [mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_80%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_80%)]" />
+                <div className="absolute inset-0 backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)]" />
+                <div className="absolute inset-0 backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#1B0912]/98 via-[#1B0912]/70 to-[#1B0912]/20" />
+              </div>
               {renderSidebarBody(true)}
             </motion.div>
           </div>

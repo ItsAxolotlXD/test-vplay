@@ -855,7 +855,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
       const core = key.substring(10, key.length - 5);
       if (core === "VietnamWildLive") return "Vietnam Wild Live";
       if (core === "VTV6Test") return "VTV6 Test Stream";
-      if (core.startsWith("VTVgo")) return "VTVgo " + core.substring(5);
+      if (core.startsWith("VTVgo")) return "Vplay " + core.substring(5);
       return core.replace(/([A-Z])/g, ' $1').trim();
     }
     return key;

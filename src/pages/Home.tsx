@@ -117,16 +117,16 @@ export const Home: React.FC<HomeProps> = ({
           navigate={navigate}
         />
 
-        {/* 3. Kênh truyền hình (Channels Grid) */}
-        <section className="space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* 3. Kênh truyền hình - Đề xuất cho bạn (Channels Grid) */}
+        <section className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                <Tv className="w-6 h-6 text-[#E50914]" />
-                <span>Kênh truyền hình</span>
+                <Tv className="w-6 h-6 text-[#FF2020]" />
+                <span>Đề xuất cho bạn</span>
               </h2>
-              <p className="text-xs text-[#9CA3AF] mt-0.5">
-                Hạ tầng tiếp sóng các đài truyền hình quốc gia và địa phương chất lượng cao
+              <p className="text-xs text-[#A1959C] mt-0.5">
+                Các kênh truyền hình trực tuyến được tuyển chọn và đề xuất theo sở thích của bạn
               </p>
             </div>
 
@@ -136,10 +136,10 @@ export const Home: React.FC<HomeProps> = ({
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border-0 ${
                     selectedCategory === cat
-                      ? 'bg-gradient-purple-active text-white shadow-md glow-purple-sm'
-                      : 'bg-[#222226] text-[#A1A1AA] hover:text-white hover:bg-[#2C2C32] border border-[#32323A]'
+                      ? 'bg-gradient-to-r from-[#FF2020] to-[#E6005A] text-white shadow-md'
+                      : 'bg-[#251821] text-[#A1959C] hover:text-white hover:bg-[#311F2B]'
                   }`}
                 >
                   {cat}
@@ -148,8 +148,8 @@ export const Home: React.FC<HomeProps> = ({
             </div>
           </div>
 
-          {/* Channel Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {/* Channel Cards Grid - Compact and responsive */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {filteredChannels.map((channel) => (
               <ChannelCard
                 key={channel.id}
