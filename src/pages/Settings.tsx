@@ -19,7 +19,7 @@ import {
   PanelLeft,
   PanelTop
 } from 'lucide-react';
-import { useSettings, FONT_SCALE_CONFIG } from '../hooks/useSettings';
+import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
 interface SettingsProps {
@@ -139,6 +139,12 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
         matchesSearch('Top bar') ||
         matchesSearch('Bố cục') ||
         matchesSearch('Dock sang Sidebar') ||
+        matchesSearch('Phông chữ') ||
+        matchesSearch('Font') ||
+        matchesSearch('Integer') ||
+        matchesSearch('Alata') ||
+        matchesSearch('Google Sans') ||
+        matchesSearch('Montserrat') ||
         matchesSearch('Cỡ chữ ứng dụng')) && (
         <section 
           id="settings-section-interface"
@@ -320,6 +326,96 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               </div>
             )}
 
+            {/* Card 1.5: Phông chữ (Checkbox List: Integer, Alata, Google Sans, Montserrat) */}
+            {(matchesSearch('Phông chữ') ||
+              matchesSearch('Font') ||
+              matchesSearch('Integer') ||
+              matchesSearch('Alata') ||
+              matchesSearch('Google Sans') ||
+              matchesSearch('Montserrat') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-font-family"
+                className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-3.5 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <Type className="w-4.5 h-4.5 text-[#E50914]" />
+                      <span>Phông chữ</span>
+                    </div>
+                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                      Chọn phông chữ hiển thị cho ứng dụng. Tùy chọn sẽ được áp dụng ngay lập tức cho toàn bộ giao diện.
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/90 border border-white/10 shrink-0">
+                    {FONT_FAMILY_CONFIG.find(f => f.id === settings.fontFamily)?.name || 'Integer'}
+                  </span>
+                </div>
+
+                {/* Checkbox Options List */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  {FONT_FAMILY_CONFIG.map((font) => {
+                    const isSelected = settings.fontFamily === font.id;
+                    return (
+                      <button
+                        key={font.id}
+                        id={`setting-font-${font.id}`}
+                        type="button"
+                        onClick={() => updateSetting('fontFamily', font.id)}
+                        className={`p-3.5 rounded-2xl border text-left flex items-start gap-3.5 transition-all cursor-pointer relative group ${
+                          isSelected
+                            ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
+                            : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
+                        }`}
+                      >
+                        {/* Checkbox Box Element */}
+                        <div 
+                          className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 ${
+                            isSelected
+                              ? 'bg-[#E50914] border-[#E50914] text-white shadow-sm'
+                              : 'border-[#4B4B58] bg-[#141419] text-transparent group-hover:border-[#71717A]'
+                          }`}
+                          aria-checked={isSelected}
+                          role="checkbox"
+                        >
+                          <Check className={`w-3.5 h-3.5 stroke-[3] transition-transform ${isSelected ? 'scale-100' : 'scale-50 opacity-0'}`} />
+                        </div>
+
+                        {/* Font Title & Preview */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span 
+                              className={`text-sm font-semibold transition-colors ${
+                                isSelected ? 'text-white' : 'text-gray-200 group-hover:text-white'
+                              }`}
+                              style={{ fontFamily: font.cssFamily }}
+                            >
+                              {font.name}
+                            </span>
+                            {font.badge && (
+                              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-[#E50914]/20 text-[#FF4D6D] border border-[#E50914]/30">
+                                {font.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-[#9CA3AF] mt-1 leading-snug">
+                            {font.subtext}
+                          </p>
+                          <div 
+                            className="text-xs text-white/70 mt-2 px-2 py-1 rounded-lg bg-black/20 border border-white/5 truncate tracking-wide"
+                            style={{ fontFamily: font.cssFamily }}
+                          >
+                            Vplay: Truyền hình trực tuyến 2026
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Card 2: Cỡ chữ ứng dụng (Liquid Glass Pill Slider Style) */}
             {matchesSearch('Cỡ chữ ứng dụng') && (
               <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-4">
@@ -331,6 +427,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                       Cỡ chữ ứng dụng
                     </span>
                   </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/90 border border-white/10">
+                    Phông chữ: {FONT_FAMILY_CONFIG.find(f => f.id === settings.fontFamily)?.name || 'Integer'}
+                  </span>
                 </div>
 
                 {/* Liquid Glass Capsule Slider Container */}

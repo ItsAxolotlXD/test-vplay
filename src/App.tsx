@@ -19,6 +19,7 @@ import { Settings } from './pages/Settings';
 import { FeatureFlags } from './pages/FeatureFlags';
 import { FriendsAndPeople } from './pages/FriendsAndPeople';
 import { BetArenaPage } from './pages/BetArenaPage';
+import { LoyaltyPage } from './pages/LoyaltyPage';
 import { CopilotTab } from './components/CopilotTab';
 import { CopilotStandaloneView } from './components/CopilotStandaloneView';
 import { CopilotFloatingWindow } from './components/CopilotFloatingWindow';
@@ -288,11 +289,14 @@ export default function App() {
       case '/search':
       case '/spotlight':
       case '/tim-kiem':
+      case '/portal':
+      case '/chuyen-trang':
         return (
           <SearchTab
             navigate={navigate}
             onSelectChannel={setCurrentChannel}
             channels={channels}
+            routeState={routeState}
           />
         );
 
@@ -408,6 +412,7 @@ export default function App() {
       case '/discord':
         return <ChatRoomView />;
 
+      case '/loyalty':
       case '/bet-arena':
       case '/orbs-bet':
       case '/sancuoc':
@@ -415,8 +420,9 @@ export default function App() {
       case '/casino':
       case '/bet':
         return (
-          <BetArenaPage
+          <LoyaltyPage
             navigate={navigate}
+            initialTab={routeState?.tab || (currentRoute === '/loyalty' ? 'rewards' : 'arena')}
           />
         );
 
@@ -435,9 +441,10 @@ export default function App() {
       case '/mc-container':
       case '/minecraft-chest':
         return (
-          <div className="w-full rounded-none p-4 sm:p-6 md:p-8 bg-[#18191C] border border-[#2D2D35] shadow-xl">
-            <MinecraftContainerEmulator />
-          </div>
+          <VAppsView
+            navigate={navigate}
+            initialAppId="v_minecraft"
+          />
         );
 
       case '/about':

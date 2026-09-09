@@ -30,7 +30,18 @@ import {
   Radio,
   MessageSquare,
   Users,
-  Coins
+  Coins,
+  Gamepad2,
+  Folder,
+  MapPin,
+  Box,
+  GraduationCap,
+  Calculator,
+  FileText,
+  Layers,
+  ArrowRight,
+  StickyNote,
+  Armchair
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
@@ -38,7 +49,7 @@ import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
 interface TopBarProps {
   currentRoute: string;
-  navigate: (route: string) => void;
+  navigate: (route: string, state?: any) => void;
   onOpenSearch: () => void;
   onOpenMobileMenu?: () => void;
   onOpenCopilotWindow?: () => void;
@@ -91,6 +102,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   // Dropdowns & Modals State
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [isSpaceMenuOpen, setIsSpaceMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userProfileOpen, setUserProfileOpen] = useState(false);
   
@@ -120,6 +132,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const handleMoreMouseLeave = () => {
     moreMenuTimerRef.current = setTimeout(() => {
       setMoreMenuOpen(false);
+      setIsSpaceMenuOpen(false);
     }, 250);
   };
 
@@ -128,6 +141,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     const handleClickOutside = (e: MouseEvent) => {
       if (moreMenuDropdownRef.current && !moreMenuDropdownRef.current.contains(e.target as Node)) {
         setMoreMenuOpen(false);
+        setIsSpaceMenuOpen(false);
       }
       if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
         setNotificationsOpen(false);
@@ -161,22 +175,9 @@ export const TopBar: React.FC<TopBarProps> = ({
     <>
       <header 
         id="vplay-topbar-header"
-        className="w-full sticky top-0 z-50 select-none transition-colors duration-200"
+        className="w-full sticky top-0 z-50 select-none bg-[#1B0912]/80 backdrop-blur-xl border-b border-white/[0.08] transition-colors duration-200"
+        style={{ WebkitBackdropFilter: 'blur(24px)', backdropFilter: 'blur(24px)' }}
       >
-        {/* Progressive Blur Layer System */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
-          <div className="absolute inset-0 backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]" />
-          <div className="absolute inset-0 backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_85%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_85%)]" />
-          <div className="absolute inset-0 backdrop-blur-[14px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_65%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_65%)]" />
-          <div className="absolute inset-0 backdrop-blur-[26px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_35%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_35%)]" />
-          
-          {/* Dark Background set to #1B0912 */}
-          <div className="absolute inset-0 bg-[#1B0912]/92 transition-colors duration-200" />
-
-          {/* Hairline subtle divider */}
-          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/[0.08]" />
-        </div>
-
         <div className="w-full max-w-[1780px] mx-auto px-4 md:px-6 lg:px-8 h-16 md:h-[68px] flex items-center justify-between gap-3 md:gap-4">
           
           {/* LEFT & CENTER NAV GROUP */}
@@ -199,25 +200,21 @@ export const TopBar: React.FC<TopBarProps> = ({
                 - Truyền Hình
                 - Xem thêm v (với Dropdown Menu có Loyalty bên trong)
             */}
-            <nav className="hidden md:flex items-center gap-2 lg:gap-4 h-full text-white">
+            <nav className="hidden md:flex items-center gap-2 lg:gap-3 h-full text-white">
               
-              {/* Item 1: Truyền Hình */}
+              {/* Item 1: Truyền hình */}
               <button
                 id="topbar-nav-live-tv"
                 onClick={() => navigate('/live-tv')}
-                className={`relative px-3.5 py-2 rounded-xl text-[14.5px] font-medium transition-all flex items-center gap-2 cursor-pointer group ${
+                className={`relative px-4 py-2 rounded-full text-[14.5px] font-medium transition-all flex items-center gap-2 cursor-pointer group ${
                   isLiveTVActive
-                    ? 'text-white bg-white/10 font-bold'
+                    ? 'text-white bg-white/15 font-bold'
                     : 'text-white/90 hover:text-white hover:bg-white/10'
                 }`}
                 title="Truyền hình Vplay"
               >
                 <Tv className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                <span className="font-medium tracking-wide">Truyền Hình</span>
-
-                {isLiveTVActive && (
-                  <span className="absolute bottom-0 left-2 right-2 h-[3px] bg-red-600 rounded-full shadow-[0_0_10px_#E60000]" />
-                )}
+                <span className="font-medium tracking-wide">Truyền hình</span>
               </button>
 
               {/* Item 2: Xem thêm v with Dropdown Menu */}
@@ -230,9 +227,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <button
                   id="topbar-nav-more"
                   onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                  className={`relative px-3.5 py-2 rounded-xl text-[14.5px] font-medium transition-all flex items-center gap-1.5 cursor-pointer group ${
+                  className={`relative px-4 py-2 rounded-full text-[14.5px] font-medium transition-all flex items-center gap-1.5 cursor-pointer group ${
                     moreMenuOpen
-                      ? 'text-white bg-white/10 font-bold'
+                      ? 'text-white bg-white/15 font-bold'
                       : 'text-white/90 hover:text-white hover:bg-white/10'
                   }`}
                   aria-expanded={moreMenuOpen}
@@ -241,31 +238,32 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-white/80 ${
                     moreMenuOpen ? 'rotate-180 text-white' : ''
                   }`} />
-
-                  {/* Red highlight bar underneath "Xem thêm" */}
-                  <span className={`absolute bottom-0 left-0 right-0 h-[3px] bg-red-600 rounded-full transition-opacity duration-200 ${
-                    moreMenuOpen ? 'opacity-100 shadow-[0_0_12px_#E60000]' : 'opacity-80'
-                  }`} />
                 </button>
 
-                {/* UPDATED "XEM THÊM" DROPDOWN MENU WITH SCROLLBAR */}
+                {/* "XEM THÊM" DROPDOWN MENU WITH ANIMATION EXPANDING FROM TOP-LEFT (MAX 5 ITEMS VISIBLE, SCROLLBAR, BORDERLESS) */}
                 <AnimatePresence>
                   {moreMenuOpen && (
                     <motion.div
                       id="topbar-more-dropdown-menu"
-                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                      transition={{ duration: 0.15, ease: 'easeOut' }}
-                      className="absolute left-0 top-full mt-2 w-[290px] max-h-[380px] overflow-y-auto rounded-2xl p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.9)] z-50 border border-white/10 bg-[#1B0912]/98 backdrop-blur-2xl text-white [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.25)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/25 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-white/5"
+                      initial={{ opacity: 0, scale: 0.75, originX: 0, originY: 0 }}
+                      animate={{ opacity: 1, scale: 1, originX: 0, originY: 0 }}
+                      exit={{ opacity: 0, scale: 0.75, originX: 0, originY: 0 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      style={{
+                        WebkitBackdropFilter: 'blur(32px)',
+                        backdropFilter: 'blur(32px)',
+                        transformOrigin: 'top left'
+                      }}
+                      className="absolute left-0 top-full mt-2 w-[310px] max-h-[238px] overflow-y-auto rounded-2xl p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.3)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-white/5 origin-top-left"
                     >
-                      <div className="space-y-1 py-1 pr-1">
+                      <div className="space-y-1 py-0.5 pr-1">
                         
                         {/* 1. Copilot for Vplay */}
                         <button
                           id="more-item-copilot"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             navigate('/copilot');
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
@@ -284,6 +282,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                           id="more-item-content-portal"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             navigate('/channels');
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
@@ -292,30 +291,41 @@ export const TopBar: React.FC<TopBarProps> = ({
                           <span>Cổng nội dung</span>
                         </button>
 
-                        {/* 3. Cổng tin tức (News) */}
+                        {/* 3. Cổng thông tin (News) */}
                         <button
                           id="more-item-news"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             navigate('/news');
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
                           <Newspaper className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                          <span>Cổng tin tức (News)</span>
+                          <span>Cổng thông tin</span>
                         </button>
 
-                        {/* 4. Cổng không gian (Space 360) */}
+                        {/* 4. Cổng không gian (Space 360) - Dẫn trực tiếp đến tab Space 360 */}
                         <button
                           id="more-item-space-360"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             navigate('/space-360');
                           }}
-                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                          title="Chuyển đến Cổng không gian (Space 360)"
                         >
-                          <Compass className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                          <span>Cổng không gian (Space 360)</span>
+                          <div className="flex items-center gap-3.5">
+                            <Compass className="w-5 h-5 shrink-0 text-emerald-400 group-hover:scale-105 transition-transform" />
+                            <span>Cổng không gian</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 font-mono font-bold">
+                              Space 360
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
                         </button>
 
                         {/* 5. Cổng kết nối (V-Flow) */}
@@ -323,6 +333,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                           id="more-item-vflow"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             navigate('/v-flow');
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
@@ -336,6 +347,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                           id="more-item-vchat"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             navigate('/chat');
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
@@ -352,6 +364,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                           id="more-item-activation-code"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             setIsActivationModalOpen(true);
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
@@ -360,20 +373,21 @@ export const TopBar: React.FC<TopBarProps> = ({
                           <span>Mã kích hoạt</span>
                         </button>
 
-                        {/* 8. Loyalty (Chuyển vào Xem thêm dưới Mã kích hoạt) */}
+                        {/* 8. Loyalty (Hợp nhất Sàn cược Orbs & Loyalty Club) */}
                         <button
                           id="more-item-loyalty"
                           onClick={() => {
                             setMoreMenuOpen(false);
-                            setIsLoyaltyModalOpen(true);
+                            setIsSpaceMenuOpen(false);
+                            navigate('/loyalty');
                           }}
-                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-amber-300 hover:text-amber-200 hover:bg-white/10 transition-colors cursor-pointer group"
                         >
                           <div className="relative flex items-center justify-center">
-                            <User className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                            <Sparkles className="w-2.5 h-2.5 text-amber-400 absolute -top-1 -right-1" />
+                            <Coins className="w-5 h-5 shrink-0 text-amber-400 group-hover:scale-110 transition-transform" />
+                            <Sparkles className="w-2.5 h-2.5 text-amber-300 absolute -top-1 -right-1" />
                           </div>
-                          <span>Loyalty</span>
+                          <span className="font-semibold">Loyalty</span>
                         </button>
 
                         {/* 9. Danh sách bạn bè */}
@@ -381,25 +395,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                           id="more-item-friends"
                           onClick={() => {
                             setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
                             navigate('/friends');
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
                           <Users className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
                           <span>Danh sách bạn bè</span>
-                        </button>
-
-                        {/* 10. Sàn cược Orbs */}
-                        <button
-                          id="more-item-bet-arena"
-                          onClick={() => {
-                            setMoreMenuOpen(false);
-                            navigate('/bet-arena');
-                          }}
-                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-amber-300 hover:text-amber-200 hover:bg-white/10 transition-colors cursor-pointer group"
-                        >
-                          <Coins className="w-5 h-5 shrink-0 text-amber-400 group-hover:scale-110 transition-transform" />
-                          <span className="font-semibold">Sàn cược Orbs</span>
                         </button>
 
                       </div>
@@ -425,11 +427,11 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 id="btn-topbar-search"
                 onClick={onOpenSearch}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-white/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
                 title="Tìm kiếm chương trình (⌘K / Ctrl+K)"
                 aria-label="Tìm kiếm"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
               </button>
 
               {/* 2. Notification Bell Icon */}
@@ -437,7 +439,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <button
                   id="btn-topbar-notifications"
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
-                  className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl transition-all relative cursor-pointer ${
+                  className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all relative cursor-pointer ${
                     notificationsOpen
                       ? 'text-white bg-white/15'
                       : 'text-white/90 hover:text-white hover:bg-white/10'
@@ -445,13 +447,16 @@ export const TopBar: React.FC<TopBarProps> = ({
                   title="Thông báo phát sóng"
                   aria-label="Thông báo phát sóng"
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
                   <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-600 animate-pulse" />
                 </button>
 
                 {/* Notification Flyout */}
                 {notificationsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-white/10 p-3 shadow-2xl z-50 bg-[#1B0912]/98 backdrop-blur-2xl text-white animate-in fade-in zoom-in-95 duration-150">
+                  <div 
+                    className="absolute right-0 mt-2 w-80 rounded-2xl p-3 shadow-2xl z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white animate-in fade-in zoom-in-95 duration-150"
+                    style={{ WebkitBackdropFilter: 'blur(32px)', backdropFilter: 'blur(32px)' }}
+                  >
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
                       <span className="text-xs font-bold uppercase tracking-wider text-gray-300">Thông báo phát sóng</span>
                       <span className="text-[11px] text-red-400 font-medium cursor-pointer hover:underline">Đã đọc tất cả</span>
@@ -482,7 +487,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 id="btn-topbar-copilot"
                 onClick={() => navigate('/copilot')}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-white/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer group relative"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer group relative"
                 title="Trợ lý AI Copilot"
                 aria-label="Trợ lý AI Copilot"
               >
@@ -510,7 +515,10 @@ export const TopBar: React.FC<TopBarProps> = ({
 
               {/* User Account Flyout */}
               {userProfileOpen && (
-                <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-white/10 p-3.5 shadow-2xl z-50 bg-[#1B0912]/98 backdrop-blur-2xl text-white animate-in fade-in zoom-in-95 duration-150">
+                <div 
+                  className="absolute right-0 mt-2 w-72 rounded-2xl p-3.5 shadow-2xl z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white animate-in fade-in zoom-in-95 duration-150"
+                  style={{ WebkitBackdropFilter: 'blur(32px)', backdropFilter: 'blur(32px)' }}
+                >
                   <div className="flex items-center gap-3 pb-3 mb-3 border-b border-white/10">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-orange-500 flex items-center justify-center font-bold text-white">
                       V

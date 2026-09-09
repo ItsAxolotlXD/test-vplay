@@ -38,17 +38,20 @@ import { Channel } from '../data/channels';
 import { NEWS_LIST } from './NewsView';
 import { playPopSound } from '../utils/sound';
 import { useSettings } from '../hooks/useSettings';
+import { SearchPortalsView } from './SearchPortalsView';
 
 interface SearchTabProps {
   navigate: (route: string, state?: any) => void;
   onSelectChannel: (channel: Channel) => void;
   channels: Channel[];
+  routeState?: any;
 }
 
 export const SearchTab: React.FC<SearchTabProps> = ({
   navigate,
   onSelectChannel,
-  channels
+  channels,
+  routeState
 }) => {
   const { settings } = useSettings();
   const [query, setQuery] = useState('');
@@ -678,9 +681,9 @@ export const SearchTab: React.FC<SearchTabProps> = ({
     <div className="w-full min-h-[85vh] flex flex-col items-center justify-start pt-6 sm:pt-10 md:pt-12 pb-16 px-4 select-none animate-in fade-in duration-200">
       {/* Top Search Bar Container */}
       <div className="w-full max-w-2xl relative">
-        {/* THE SINGLE SEARCH BAR AT TOP WITH THICK BORDER MATCHING SELECTED SIDEBAR TAB (#E6005A) */}
-        <div className="relative flex items-center w-full h-14 sm:h-15 rounded-2xl bg-[#1C1B23] border-[2.5px] border-[#E6005A] shadow-xl shadow-[#E6005A]/20 focus-within:ring-4 focus-within:ring-[#E6005A]/25 focus-within:border-[#E6005A] transition-all px-4">
-          <Search className="w-5 h-5 text-[#E6005A] shrink-0 mr-3 pointer-events-none" />
+        {/* THE SINGLE SEARCH BAR AT TOP */}
+        <div className="relative flex items-center w-full h-14 sm:h-15 rounded-2xl bg-[#1C1B23] border border-transparent focus-within:border-zinc-500 transition-all px-4">
+          <Search className="w-5 h-5 text-gray-400 stroke-[1.4] shrink-0 mr-3 pointer-events-none" strokeWidth={1.4} />
 
           <input
             ref={inputRef}
@@ -692,7 +695,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Tìm kiếm các tab sidebar, kênh TV, ứng dụng, minigame..."
+            placeholder="Find and search"
             className="flex-1 bg-transparent text-white text-base placeholder-[#8A8A93] focus:outline-none font-medium truncate"
           />
 
@@ -810,6 +813,14 @@ export const SearchTab: React.FC<SearchTabProps> = ({
           </div>
         )}
       </div>
+
+      {/* SPECIAL CIRCULAR PORTALS SECTION & DEDICATED TABS */}
+      <SearchPortalsView
+        channels={channels}
+        onSelectChannel={onSelectChannel}
+        navigate={navigate}
+        initialPortal={routeState?.portal}
+      />
     </div>
   );
 };

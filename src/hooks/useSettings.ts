@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 
+export type FontFamilyOption = 'integer' | 'alata' | 'google-sans' | 'montserrat';
+
 export interface SystemSettings {
   userName: string;
   theme: 'light' | 'dark';
   dockToSidebar: boolean;
   navigationMode: 'sidebar' | 'topbar';
+  fontFamily: FontFamilyOption;
   fontScale: number; // 0: 85%, 1: 100%, 2: 115%, 3: 130%
   autoScrollBanner: boolean;
   autoHideSidebar: boolean;
@@ -23,6 +26,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   theme: 'dark',
   dockToSidebar: true,
   navigationMode: 'topbar',
+  fontFamily: 'alata',
   fontScale: 1,
   autoScrollBanner: true,
   autoHideSidebar: false,
@@ -35,6 +39,42 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   searchToolbox: true,
   searchSettings: true,
 };
+
+export interface FontFamilyItem {
+  id: FontFamilyOption;
+  name: string;
+  subtext: string;
+  cssFamily: string;
+  badge?: string;
+}
+
+export const FONT_FAMILY_CONFIG: FontFamilyItem[] = [
+  {
+    id: 'alata',
+    name: 'Alata',
+    subtext: 'Phông chữ phong cách hình học độc đáo, dứt khoát và ấn tượng',
+    cssFamily: "'Alata', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    badge: 'Mặc định',
+  },
+  {
+    id: 'integer',
+    name: 'Integer',
+    subtext: 'Phông chữ hiện đại, hình khối sắc nét chuẩn giao diện số (Inter / Integer)',
+    cssFamily: "'Inter', 'Integer', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+  {
+    id: 'google-sans',
+    name: 'Google Sans',
+    subtext: 'Phông chữ mềm mại, thân thiện phong cách Material Design của Google',
+    cssFamily: "'Google Sans', 'Open Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+  {
+    id: 'montserrat',
+    name: 'Montserrat',
+    subtext: 'Phông chữ hình học cân đối, thanh lịch và độ nét cao trên mọi màn hình',
+    cssFamily: "'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+];
 
 export const FONT_SCALE_CONFIG = [
   { label: 'Nhỏ (85%)', value: 85, badge: 'Nhỏ (85%)', scale: '0.88' },
@@ -70,9 +110,15 @@ export const getStoredSettings = (): SystemSettings => {
     if (saved) {
       const parsed = JSON.parse(saved);
       const navMode = parsed.navigationMode || (parsed.dockToSidebar === false ? 'sidebar' : fallbackNavMode);
+      let font: FontFamilyOption = 'alata';
+      if (parsed.fontFamily && ['alata', 'integer', 'google-sans', 'montserrat'].includes(parsed.fontFamily)) {
+        // If it was previous integer default, migrate to Alata
+        font = parsed.fontFamily === 'integer' ? 'alata' : parsed.fontFamily;
+      }
       return { 
         ...base, 
         ...parsed,
+        fontFamily: font,
         navigationMode: navMode,
         userName: parsed.userName || legacyUser || 'User',
         theme: 'dark'
@@ -88,7 +134,7 @@ export const getStoredSettings = (): SystemSettings => {
   return DEFAULT_SETTINGS;
 };
 
-// Apply side-effects (theme class, font-scale property)
+// Apply side-effects (theme class, font-scale property, font-family)
 export const applySystemSettings = (settings: SystemSettings) => {
   if (typeof document === 'undefined') return;
 
@@ -99,6 +145,11 @@ export const applySystemSettings = (settings: SystemSettings) => {
   // Apply font scale
   const scaleVal = FONT_SCALE_CONFIG[settings.fontScale]?.scale || '1';
   document.documentElement.style.setProperty('--waves-font-scale', scaleVal);
+
+  // Apply font family
+  const selectedFont = FONT_FAMILY_CONFIG.find(f => f.id === settings.fontFamily) || FONT_FAMILY_CONFIG[0];
+  document.documentElement.style.setProperty('--waves-font-family', selectedFont.cssFamily);
+  document.body.style.fontFamily = selectedFont.cssFamily;
 };
 
 export const useSettings = () => {

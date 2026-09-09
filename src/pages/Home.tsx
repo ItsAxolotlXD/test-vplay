@@ -7,6 +7,7 @@ import { CHANNELS_DATA } from '../data/channels';
 import { NEWS_DATA } from '../data/news';
 import { Channel, NewsArticle } from '../types';
 import { Tv, Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers } from 'lucide-react';
+import { PortalsCircularSection } from '../components/PortalsCircularSection';
 
 interface HomeProps {
   navigate: (route: string, state?: any) => void;
@@ -39,7 +40,37 @@ export const Home: React.FC<HomeProps> = ({
       />
 
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-12">
-        {/* 2. Copilot is coming to Vplay - Featured Banner Thumbnail */}
+        {/* 2. Chuyên trang banner tròn */}
+        <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-b from-[#1C1A24] via-[#181620] to-[#14131A] p-6 sm:p-8 shadow-xl">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-[#E6005A]" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+                Chuyên trang
+              </h2>
+            </div>
+
+            <button
+              id="btn-home-view-all-portals"
+              onClick={() => navigate('/search')}
+              className="flex items-center gap-1.5 text-xs font-semibold text-[#E6005A] hover:text-[#FF6699] transition-colors cursor-pointer"
+            >
+              <span>Xem tất cả</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <PortalsCircularSection
+            onSelectPortal={(portalId) => {
+              navigate('/search', { portal: portalId });
+            }}
+            showSectionHeader={false}
+          />
+        </section>
+
+        {/* 3. Copilot is coming to Vplay - Featured Banner Thumbnail */}
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-[#1A1A20] via-[#241C2B] to-[#1A1A20] border border-[#3E344A] p-6 sm:p-8 shadow-xl">
           <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#E6005A]/20 to-[#A800FF]/15 blur-3xl pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 sm:gap-8 justify-between">
