@@ -279,7 +279,9 @@ export const SearchPortalsView: React.FC<SearchPortalsViewProps> = ({
                       alt={activeCategory.title}
                       referrerPolicy="no-referrer"
                       className={`w-full h-full ${
-                        activeCategory.image.includes('vtv_') || activeCategory.image.endsWith('.png')
+                        activeCategory.image.includes('vtv_') ||
+                        activeCategory.image.includes('.png') ||
+                        activeCategory.image.includes('wikia.nocookie.net')
                           ? 'object-contain p-3 sm:p-5'
                           : 'object-cover'
                       }`}

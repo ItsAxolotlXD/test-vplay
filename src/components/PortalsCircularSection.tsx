@@ -64,7 +64,7 @@ export const PortalsCircularSection: React.FC<PortalsCircularSectionProps> = ({
         {PORTAL_CATEGORIES.map((portal) => {
           const isActive = activePortalId === portal.id;
           const hasError = imageErrors[portal.id];
-          const isLogo = portal.image.includes('vtv_') || portal.image.endsWith('.png');
+          const isLogo = portal.image.includes('vtv_') || portal.image.includes('.png') || portal.image.includes('wikia.nocookie.net');
 
           return (
             <button

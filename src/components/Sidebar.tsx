@@ -32,9 +32,18 @@ import {
   GraduationCap,
   Calculator,
   Bell,
+  Clock,
+  Phone,
+  Globe,
+  CalendarDays,
+  Image as ImageIcon,
+  Camera,
+  Ticket,
+  CloudSun,
   StickyNote,
   Armchair,
-  MessageSquare
+  MessageSquare,
+  Tablet
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -160,6 +169,72 @@ export const Sidebar: React.FC<SidebarProps> = ({
         currentRoute === '/v-calc' ||
         ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
           routeState?.appId === 'v_calc')
+      );
+    }
+    if (appId === 'v_clock') {
+      return (
+        currentRoute === '/v-clock' ||
+        currentRoute === '/clock' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_clock')
+      );
+    }
+    if (appId === 'v_phone') {
+      return (
+        currentRoute === '/v-phone' ||
+        currentRoute === '/phone' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_phone')
+      );
+    }
+    if (appId === 'v_browser') {
+      return (
+        currentRoute === '/v-browser' ||
+        currentRoute === '/browser' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_browser')
+      );
+    }
+    if (appId === 'v_calendar') {
+      return (
+        currentRoute === '/v-calendar' ||
+        currentRoute === '/calendar' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_calendar')
+      );
+    }
+    if (appId === 'v_gallery') {
+      return (
+        currentRoute === '/v-gallery' ||
+        currentRoute === '/gallery' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_gallery')
+      );
+    }
+    if (appId === 'v_camera') {
+      return (
+        currentRoute === '/v-camera' ||
+        currentRoute === '/camera' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_camera')
+      );
+    }
+    if (appId === 'v_ticket') {
+      return (
+        currentRoute === '/v-ticket' ||
+        currentRoute === '/ticket' ||
+        currentRoute === '/dat-ve' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_ticket')
+      );
+    }
+    if (appId === 'v_weather') {
+      return (
+        currentRoute === '/v-weather' ||
+        currentRoute === '/weather' ||
+        currentRoute === '/thoi-tiet' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_weather')
       );
     }
     if (appId === 'v_reminders') {
@@ -468,6 +543,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* ================= GROUP 2 ================= */}
+        {/* VplayOS (iPadOS Tablet Experience) */}
+        <button
+          id={isMobile ? "mobile-nav-item-vplayos" : "nav-item-vplayos"}
+          onClick={() => handleNavClick("/vplayos")}
+          title="VplayOS (Mô phỏng iPadOS Tablet)"
+          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive("/vplayos") || isActive("/vplay-os") || isActive("/ipados")
+              ? "bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20"
+              : "text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]"
+          }`}
+        >
+          <div className="flex items-center gap-3.5 truncate">
+            <Tablet className="w-5 h-5 shrink-0 text-cyan-400" />
+            <span className="truncate">VplayOS</span>
+          </div>
+          <span className="px-2 py-0.5 text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-full">
+            TABLET
+          </span>
+        </button>
+
         {/* 5. Space 360 */}
         <div className="w-full flex flex-col gap-1">
           <button
@@ -499,7 +594,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="px-2 py-0.5 text-[9px] font-mono font-bold bg-white/10 rounded-full">
-                10 Apps
+                17 Apps
               </span>
               <div
                 onClick={(e) => {
@@ -585,6 +680,126 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="flex items-center gap-2.5 truncate">
                     <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
                     <span className="truncate">Explore Vietnam 360</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-clock" : "space360-tab-clock"}
+                  onClick={() => handleNavClick("/v-clock", { appId: "v_clock" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_clock")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Clock className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span className="truncate">V-Clock (Đồng Hồ)</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-phone" : "space360-tab-phone"}
+                  onClick={() => handleNavClick("/v-phone", { appId: "v_phone" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_phone")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Phone className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span className="truncate">Điện Thoại V-Phone</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-browser" : "space360-tab-browser"}
+                  onClick={() => handleNavClick("/v-browser", { appId: "v_browser" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_browser")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Globe className="w-4 h-4 text-sky-400 shrink-0" />
+                    <span className="truncate">Trình Duyệt Web</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-calendar" : "space360-tab-calendar"}
+                  onClick={() => handleNavClick("/v-calendar", { appId: "v_calendar" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_calendar")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <CalendarDays className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="truncate">Lịch Vạn Niên 360</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-gallery" : "space360-tab-gallery"}
+                  onClick={() => handleNavClick("/v-gallery", { appId: "v_gallery" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_gallery")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <ImageIcon className="w-4 h-4 text-purple-400 shrink-0" />
+                    <span className="truncate">Thư Viện V-Gallery</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-camera" : "space360-tab-camera"}
+                  onClick={() => handleNavClick("/v-camera", { appId: "v_camera" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_camera")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Camera className="w-4 h-4 text-pink-400 shrink-0" />
+                    <span className="truncate">Máy Ảnh V-Camera</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-ticket" : "space360-tab-ticket"}
+                  onClick={() => handleNavClick("/v-ticket", { appId: "v_ticket" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_ticket")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Ticket className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="truncate">Đặt Vé V-Ticket</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-weather" : "space360-tab-weather"}
+                  onClick={() => handleNavClick("/v-weather", { appId: "v_weather" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_weather")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <CloudSun className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span className="truncate">Thời Tiết 360</span>
                   </div>
                 </button>
 

@@ -24,7 +24,21 @@ import { CopilotTab } from './components/CopilotTab';
 import { CopilotStandaloneView } from './components/CopilotStandaloneView';
 import { CopilotFloatingWindow } from './components/CopilotFloatingWindow';
 import { VAppsView } from './components/VAppsView';
-import { VArcadeTab, VXploreTab, VFurnitureTab, VCalcTab, VRemindersTab } from './components/vapps';
+import {
+  VArcadeTab,
+  VXploreTab,
+  VFurnitureTab,
+  VCalcTab,
+  VRemindersTab,
+  VClockTab,
+  VPhoneTab,
+  VBrowserTab,
+  VCalendarTab,
+  VGalleryTab,
+  VCameraTab,
+  VTicketTab,
+  VWeatherTab,
+} from './components/vapps';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
 import VplayVBoxTab from './components/VplayVBoxTab';
 import VStudyTab from './components/VStudyTab';
@@ -34,6 +48,7 @@ import { MinecraftContainerEmulator } from './components/minecraft/MinecraftCont
 import { SearchTab } from './components/SearchTab';
 import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
+import { VplayOSView } from './components/VplayOSView';
 import VplayVertical from './components/VplayVertical';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -349,6 +364,40 @@ export default function App() {
       case '/v-calc':
         return <VCalcTab />;
 
+      case '/v-clock':
+      case '/clock':
+        return <VClockTab />;
+
+      case '/v-phone':
+      case '/phone':
+        return <VPhoneTab />;
+
+      case '/v-browser':
+      case '/browser':
+        return <VBrowserTab />;
+
+      case '/v-calendar':
+      case '/calendar':
+        return <VCalendarTab />;
+
+      case '/v-gallery':
+      case '/gallery':
+        return <VGalleryTab />;
+
+      case '/v-camera':
+      case '/camera':
+        return <VCameraTab />;
+
+      case '/v-ticket':
+      case '/ticket':
+      case '/dat-ve':
+        return <VTicketTab />;
+
+      case '/v-weather':
+      case '/weather':
+      case '/thoi-tiet':
+        return <VWeatherTab />;
+
       case '/v-reminders':
         return <VRemindersTab />;
 
@@ -366,6 +415,18 @@ export default function App() {
             navigate={navigate}
             initialAppId={routeState?.appId || 'v_arcade'}
             selectedGameId={routeState?.gameId || null}
+          />
+        );
+
+      case '/vplayos':
+      case '/vplay-os':
+      case '/ipados':
+      case '/tablet':
+        return (
+          <VplayOSView
+            navigate={navigate}
+            onSelectChannel={setCurrentChannel}
+            channels={channels}
           />
         );
 
@@ -503,6 +564,22 @@ export default function App() {
           navigate(`/live-tv?channel=${ch.slug}`);
         }}
         navigate={navigate}
+      />
+    );
+  }
+
+  // If in VplayOS Full Screen Mode (True full-screen OS experience without outer web chrome)
+  if (
+    currentRoute === '/vplayos' ||
+    currentRoute === '/vplay-os' ||
+    currentRoute === '/ipados' ||
+    currentRoute === '/tablet'
+  ) {
+    return (
+      <VplayOSView
+        navigate={navigate}
+        onSelectChannel={setCurrentChannel}
+        channels={channels}
       />
     );
   }

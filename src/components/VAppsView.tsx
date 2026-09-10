@@ -4,7 +4,21 @@ import { playPopSound } from '../utils/sound';
 import ExploreVietnamTab from './ExploreVietnamTab';
 import VplayVBoxTab from './VplayVBoxTab';
 import VStudyTab from './VStudyTab';
-import { VArcadeTab, VCalcTab, VRemindersTab, VXploreTab, VFurnitureTab } from './vapps';
+import {
+  VArcadeTab,
+  VCalcTab,
+  VRemindersTab,
+  VXploreTab,
+  VFurnitureTab,
+  VClockTab,
+  VPhoneTab,
+  VBrowserTab,
+  VCalendarTab,
+  VGalleryTab,
+  VCameraTab,
+  VTicketTab,
+  VWeatherTab,
+} from './vapps';
 import { VNotesView } from './VNotesView';
 import { MinecraftContainerEmulator } from './minecraft/MinecraftContainerEmulator';
 import { VFlowTab } from './vflow/VFlowTab';
@@ -19,6 +33,14 @@ import {
   GraduationCap,
   Calculator,
   Bell,
+  Clock,
+  Phone,
+  Globe,
+  CalendarDays,
+  Image as ImageIcon,
+  Camera,
+  Ticket,
+  CloudSun,
   StickyNote,
   Armchair,
   Box,
@@ -44,6 +66,14 @@ export type VAppId =
   | 'v_box'
   | 'v_learn'
   | 'v_calc'
+  | 'v_clock'
+  | 'v_phone'
+  | 'v_browser'
+  | 'v_calendar'
+  | 'v_gallery'
+  | 'v_camera'
+  | 'v_ticket'
+  | 'v_weather'
   | 'v_reminders'
   | 'v_notes'
   | 'v_furniture'
@@ -146,6 +176,110 @@ export const VAPPS_LIST: VAppDefinition[] = [
     glowClass: 'shadow-[0_10px_30px_rgba(13,148,136,0.35)]',
     icon: Calculator,
     tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi Đơn Vị'],
+  },
+  {
+    id: 'v_clock',
+    name: 'Đồng Hồ V-Clock',
+    tagline: 'Báo Thức • Đếm Giờ • Giờ Quốc Tế',
+    description: 'Báo thức thông minh đa năng, bấm giờ thể thao từng vòng, hẹn giờ đếm ngược và tra cứu giờ chuẩn quốc tế hơn 30 quốc gia.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Đồng Hồ',
+    gradientBg: 'bg-gradient-to-br from-[#06B6D4] via-[#0284C7] to-[#4F46E5]',
+    borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(6,182,212,0.35)]',
+    icon: Clock,
+    tags: ['V-Clock', 'Đồng Hồ', 'Báo Thức', 'Đếm Giờ', 'Bấm Giờ', 'Giờ Quốc Tế', 'World Clock', 'Timer'],
+  },
+  {
+    id: 'v_phone',
+    name: 'Điện Thoại V-Phone',
+    tagline: 'Bàn Phím & Danh Bạ',
+    description: 'Bàn phím gọi số với hiệu ứng âm thanh DTMF chân thực, danh bạ liên hệ cá nhân và các đầu số cứu hộ khẩn cấp quốc gia 113, 114, 115.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Điện Thoại',
+    gradientBg: 'bg-gradient-to-br from-[#E11D48] via-[#BE123C] to-[#881337]',
+    borderClass: 'border-[#FB7185]/50 group-hover:border-[#FB7185]',
+    glowClass: 'shadow-[0_10px_30px_rgba(225,29,72,0.35)]',
+    icon: Phone,
+    tags: ['Điện Thoại', 'Bàn Phím', 'Danh Bạ', 'Khẩn Cấp', 'DTMF', 'Hotline', 'V-Phone'],
+  },
+  {
+    id: 'v_browser',
+    name: 'Trình Duyệt V-Browser',
+    tagline: 'Duyệt Web & Tin Tức',
+    description: 'Trình duyệt web tích hợp đa tab, điểm báo điện tử 24/7, tra cứu bách khoa toàn thư Wikipedia và cổng tin tức truyền hình.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Trình Duyệt',
+    gradientBg: 'bg-gradient-to-br from-[#0284C7] via-[#0369A1] to-[#075985]',
+    borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(2,132,199,0.35)]',
+    icon: Globe,
+    tags: ['Trình Duyệt', 'Browser', 'Duyệt Web', 'Wikipedia', 'Tin Tức', 'VnExpress', 'VTV'],
+  },
+  {
+    id: 'v_calendar',
+    name: 'Lịch Vạn Niên 360',
+    tagline: 'Âm Dương Lịch & Sự Kiện',
+    description: 'Lịch Vạn Niên song song Âm - Dương lịch, tra cứu ngày hoàng đạo, các ngày Lễ Tết truyền thống Việt Nam và quản lý sự kiện.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Lịch',
+    gradientBg: 'bg-gradient-to-br from-[#059669] via-[#047857] to-[#065F46]',
+    borderClass: 'border-[#34D399]/50 group-hover:border-[#34D399]',
+    glowClass: 'shadow-[0_10px_30px_rgba(5,150,105,0.35)]',
+    icon: CalendarDays,
+    tags: ['Lịch', 'Âm Lịch', 'Dương Lịch', 'Lịch Vạn Niên', 'Sự Kiện', 'Lễ Tết', 'Calendar'],
+  },
+  {
+    id: 'v_gallery',
+    name: 'Thư Viện V-Gallery',
+    tagline: 'Kho Ảnh 4K & Album',
+    description: 'Bộ sưu tập ảnh danh thắng Việt Nam, hậu trường trường quay truyền hình, trình chiếu slideshow toàn màn hình và lưu trữ ảnh cá nhân.',
+    category: 'Giải trí & Media',
+    badge: 'Thư Viện',
+    gradientBg: 'bg-gradient-to-br from-[#7C3AED] via-[#6D28D9] to-[#5B21B6]',
+    borderClass: 'border-[#A78BFA]/50 group-hover:border-[#A78BFA]',
+    glowClass: 'shadow-[0_10px_30px_rgba(124,58,237,0.35)]',
+    icon: ImageIcon,
+    tags: ['Thư Viện', 'Kho Ảnh', 'Album', 'Danh Thắng', 'Gallery', 'Hậu Trường', '4K'],
+  },
+  {
+    id: 'v_camera',
+    name: 'Máy Ảnh V-Camera',
+    tagline: 'Chụp Ảnh & Bộ Lọc',
+    description: 'Chụp ảnh trực tiếp từ webcam hoặc trường quay ảo, bộ lọc nghệ thuật Vintage, Cyberpunk, TV Scanlines và hẹn giờ tự động.',
+    category: 'Giải trí & Media',
+    badge: 'Camera',
+    gradientBg: 'bg-gradient-to-br from-[#E11D48] via-[#C026D3] to-[#7E22CE]',
+    borderClass: 'border-[#F472B6]/50 group-hover:border-[#F472B6]',
+    glowClass: 'shadow-[0_10px_30px_rgba(192,38,211,0.35)]',
+    icon: Camera,
+    tags: ['Camera', 'Máy Ảnh', 'Chụp Ảnh', 'Bộ Lọc', 'Webcam', 'Vintage', 'Scanlines'],
+  },
+  {
+    id: 'v_ticket',
+    name: 'Đặt Vé V-Ticket',
+    tagline: 'Vé Phim, Concert & TV',
+    description: 'Hệ thống đặt vé xem phim chiếu rạp, đại nhạc hội Liveshow, vé khán giả trường quay VTV và vé tàu du lịch với mã QR điện tử.',
+    category: 'Giải trí & Media',
+    badge: 'Đặt Vé',
+    gradientBg: 'bg-gradient-to-br from-[#D97706] via-[#B45309] to-[#78350F]',
+    borderClass: 'border-[#FBBF24]/50 group-hover:border-[#FBBF24]',
+    glowClass: 'shadow-[0_10px_30px_rgba(217,119,6,0.35)]',
+    icon: Ticket,
+    tags: ['Đặt Vé', 'Vé Xem Phim', 'Concert', 'Liveshow', 'Vé TV Show', 'QR Code', 'Ticket'],
+  },
+  {
+    id: 'v_weather',
+    name: 'Thời Tiết V-Weather',
+    tagline: 'Dự Báo & Khí Tượng 360',
+    description: 'Dự báo thời tiết chi tiết 63 tỉnh thành Việt Nam, nhiệt độ theo giờ, chất lượng không khí AQI, chỉ số UV và dự báo 7 ngày.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Thời Tiết',
+    gradientBg: 'bg-gradient-to-br from-[#0284C7] via-[#0EA5E9] to-[#06B6D4]',
+    borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(14,165,233,0.35)]',
+    icon: CloudSun,
+    tags: ['Thời Tiết', 'Dự Báo', 'Khí Tượng', 'Nhiệt Độ', 'AQI', 'Tia UV', 'Weather'],
   },
   {
     id: 'v_reminders',
@@ -292,6 +426,30 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'v_calc':
         navigate('/v-calc');
+        break;
+      case 'v_clock':
+        navigate('/v-clock');
+        break;
+      case 'v_phone':
+        navigate('/v-phone');
+        break;
+      case 'v_browser':
+        navigate('/v-browser');
+        break;
+      case 'v_calendar':
+        navigate('/v-calendar');
+        break;
+      case 'v_gallery':
+        navigate('/v-gallery');
+        break;
+      case 'v_camera':
+        navigate('/v-camera');
+        break;
+      case 'v_ticket':
+        navigate('/v-ticket');
+        break;
+      case 'v_weather':
+        navigate('/v-weather');
         break;
       case 'v_reminders':
         navigate('/v-reminders');
@@ -560,6 +718,14 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
               {activeApp === 'v_box' && <VplayVBoxTab />}
               {activeApp === 'v_learn' && <VStudyTab />}
               {activeApp === 'v_calc' && <VCalcTab />}
+              {activeApp === 'v_clock' && <VClockTab />}
+              {activeApp === 'v_phone' && <VPhoneTab />}
+              {activeApp === 'v_browser' && <VBrowserTab />}
+              {activeApp === 'v_calendar' && <VCalendarTab />}
+              {activeApp === 'v_gallery' && <VGalleryTab />}
+              {activeApp === 'v_camera' && <VCameraTab />}
+              {activeApp === 'v_ticket' && <VTicketTab />}
+              {activeApp === 'v_weather' && <VWeatherTab />}
               {activeApp === 'v_reminders' && <VRemindersTab />}
               {activeApp === 'v_notes' && <VNotesView />}
               {activeApp === 'v_furniture' && <VFurnitureTab />}
