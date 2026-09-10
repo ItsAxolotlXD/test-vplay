@@ -33,7 +33,8 @@ import {
   LayoutGrid,
   Sparkle,
   Layers,
-  ArrowUp
+  ArrowUp,
+  LucideIcon
 } from 'lucide-react';
 
 export type VAppId =
@@ -57,9 +58,10 @@ export interface VAppDefinition {
   description: string;
   category: 'Trò chơi (Arcade)' | 'Tiện ích & Tệp tin' | 'Học tập & Văn hóa' | 'Giải trí & Media';
   badge: string;
-  image: string;
-  themeGradient: string;
-  icon: React.ReactNode;
+  gradientBg: string;
+  borderClass: string;
+  glowClass: string;
+  icon: LucideIcon;
   tags: string[];
 }
 
@@ -72,9 +74,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Vòng Quay May Mắn Wheels of Fortune, Cờ Caro XO, Oẳn Tù Tì đối kháng, Nối Từ TV & EN, Đếm Số và Rắn Săn Mồi cổ điển.',
     category: 'Trò chơi (Arcade)',
     badge: 'Hot',
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-amber-500/20 via-emerald-600/20 to-transparent',
-    icon: <Gamepad2 className="w-8 h-8 text-amber-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#FF4500] via-[#FF007A] to-[#7B2CBF]',
+    borderClass: 'border-[#FF5E7E]/50 group-hover:border-[#FF5E7E]',
+    glowClass: 'shadow-[0_10px_30px_rgba(255,0,122,0.35)]',
+    icon: Gamepad2,
     tags: ['Wheels of Fortune', 'Vòng Quay May Mắn', 'Caro XO', 'Rắn Săn Mồi'],
   },
   {
@@ -84,9 +87,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Quản lý tệp đa năng phong cách Windows Explorer, xem trước media, phát danh sách phát M3U8 và sao lưu dữ liệu đám mây V-Cloud.',
     category: 'Tiện ích & Tệp tin',
     badge: 'Tệp Tin',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-purple-600/20 via-indigo-900/10 to-transparent',
-    icon: <Folder className="w-8 h-8 text-purple-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#6A11CB] via-[#4338CA] to-[#2575FC]',
+    borderClass: 'border-[#818CF8]/50 group-hover:border-[#818CF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(67,56,202,0.35)]',
+    icon: Folder,
     tags: ['File Manager', 'M3U8 Playlists', 'V-Cloud Backup'],
   },
   {
@@ -96,9 +100,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Bản đồ tương tác 63 tỉnh thành Việt Nam, tra cứu danh lam thắng cảnh, ẩm thực đặc sản, văn hóa truyền thống và thông tin địa lý.',
     category: 'Học tập & Văn hóa',
     badge: 'Bản Sắc',
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-rose-600/20 via-pink-900/10 to-transparent',
-    icon: <MapPin className="w-8 h-8 text-rose-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#DC2626] via-[#E11D48] to-[#991B1B]',
+    borderClass: 'border-[#FB7185]/50 group-hover:border-[#FB7185]',
+    glowClass: 'shadow-[0_10px_30px_rgba(225,29,72,0.35)]',
+    icon: MapPin,
     tags: ['63 Tỉnh Thành', 'Ẩm Thực', 'Danh Lam Thắng Cảnh'],
   },
   {
@@ -108,9 +113,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Bộ sưu tập video giải trí đặc sắc, các clip phát lại chất lượng cao, luồng phát sóng chọn lọc và tin tức tổng hợp.',
     category: 'Giải trí & Media',
     badge: 'Media',
-    image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-amber-600/20 via-orange-900/10 to-transparent',
-    icon: <Tv className="w-8 h-8 text-amber-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#F59E0B] via-[#EA580C] to-[#C2410C]',
+    borderClass: 'border-[#FBBF24]/50 group-hover:border-[#FBBF24]',
+    glowClass: 'shadow-[0_10px_30px_rgba(245,158,11,0.35)]',
+    icon: Tv,
     tags: ['Video Clip', 'Phát Lại', 'Giải Trí HD'],
   },
 
@@ -122,9 +128,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Công cụ hỗ trợ học tập đắc lực: Đồng hồ đếm ngược Pomodoro tập trung sâu, quản lý bộ thẻ Flashcard và theo dõi tiến độ mục tiêu.',
     category: 'Học tập & Văn hóa',
     badge: 'Học Tập',
-    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-sky-600/20 via-blue-900/10 to-transparent',
-    icon: <GraduationCap className="w-8 h-8 text-sky-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#0284C7] via-[#2563EB] to-[#1D4ED8]',
+    borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(2,132,199,0.35)]',
+    icon: GraduationCap,
     tags: ['Pomodoro', 'Flashcards', 'Ghi Nhớ'],
   },
   {
@@ -134,9 +141,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Máy tính bỏ túi khoa học hỗ trợ tính toán biểu thức phức tạp, lưu lịch sử phép tính và quy đổi đơn vị đo lường linh hoạt.',
     category: 'Tiện ích & Tệp tin',
     badge: 'Khoa Học',
-    image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-cyan-600/20 via-teal-900/10 to-transparent',
-    icon: <Calculator className="w-8 h-8 text-cyan-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#0D9488] via-[#0891B2] to-[#0369A1]',
+    borderClass: 'border-[#2DD4BF]/50 group-hover:border-[#2DD4BF]',
+    glowClass: 'shadow-[0_10px_30px_rgba(13,148,136,0.35)]',
+    icon: Calculator,
     tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi Đơn Vị'],
   },
   {
@@ -146,9 +154,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Lên lịch nhắc nhở đón xem chương trình truyền hình yêu thích, các công việc quan trọng kèm chuông báo âm thanh cảnh báo sống động.',
     category: 'Tiện ích & Tệp tin',
     badge: 'Báo Thức',
-    image: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-orange-600/20 via-amber-900/10 to-transparent',
-    icon: <Bell className="w-8 h-8 text-orange-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#EA580C] via-[#DC2626] to-[#991B1B]',
+    borderClass: 'border-[#FB923C]/50 group-hover:border-[#FB923C]',
+    glowClass: 'shadow-[0_10px_30px_rgba(234,88,12,0.35)]',
+    icon: Bell,
     tags: ['Chuông Báo', 'Lịch Xem TV', 'Task Alert'],
   },
   {
@@ -158,9 +167,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Soạn thảo văn bản ghi chú với hệ thống dán nhãn màu sắc phong phú, quản lý dạng thẻ Sticky Notes và tìm kiếm thông minh.',
     category: 'Tiện ích & Tệp tin',
     badge: 'Ghi Chép',
-    image: 'https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-yellow-600/20 via-amber-900/10 to-transparent',
-    icon: <StickyNote className="w-8 h-8 text-yellow-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#EAB308] via-[#CA8A04] to-[#A16207]',
+    borderClass: 'border-[#FDE047]/50 group-hover:border-[#FDE047]',
+    glowClass: 'shadow-[0_10px_30px_rgba(234,179,8,0.35)]',
+    icon: StickyNote,
     tags: ['Ghi Chú Nhanh', 'Sticky Notes', 'Đồng Bộ'],
   },
 
@@ -172,9 +182,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Trải nghiệm không gian nội thất phòng xem truyền hình, tùy biến ánh sáng, sofa thư giãn và bài trí rạp hát tại gia.',
     category: 'Tiện ích & Tệp tin',
     badge: '3D Room',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-lime-600/20 via-emerald-900/10 to-transparent',
-    icon: <Armchair className="w-8 h-8 text-lime-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#65A30D] via-[#16A34A] to-[#15803D]',
+    borderClass: 'border-[#A3E635]/50 group-hover:border-[#A3E635]',
+    glowClass: 'shadow-[0_10px_30px_rgba(101,163,13,0.35)]',
+    icon: Armchair,
     tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn'],
   },
   {
@@ -184,9 +195,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Trải nghiệm rương chứa đồ Chest, Double Chest, Ender Chest, Shulker Box, Hopper và Lò nung với âm thanh Web Audio chân thực.',
     category: 'Trò chơi (Arcade)',
     badge: 'Sandbox',
-    image: 'https://images.unsplash.com/photo-1627856013091-fed6e4e30025?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-emerald-600/20 via-green-900/10 to-transparent',
-    icon: <Box className="w-8 h-8 text-emerald-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#059669] via-[#047857] to-[#064E3B]',
+    borderClass: 'border-[#34D399]/50 group-hover:border-[#34D399]',
+    glowClass: 'shadow-[0_10px_30px_rgba(5,150,105,0.35)]',
+    icon: Box,
     tags: ['Minecraft Chest', 'Container GUI', 'Pixel Art', 'Inventory'],
   },
   {
@@ -196,9 +208,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Không gian tương tác trực tiếp cộng đồng Vplay, phát thanh radio, chia sẻ cảm nghĩ và dòng thời gian cập nhật liên tục.',
     category: 'Giải trí & Media',
     badge: 'Kết Nối',
-    image: 'https://images.unsplash.com/photo-1516251193007-45ef944ab0c6?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-blue-600/20 via-indigo-900/10 to-transparent',
-    icon: <Radio className="w-8 h-8 text-blue-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#3B82F6] via-[#1D4ED8] to-[#4338CA]',
+    borderClass: 'border-[#60A5FA]/50 group-hover:border-[#60A5FA]',
+    glowClass: 'shadow-[0_10px_30px_rgba(59,130,246,0.35)]',
+    icon: Radio,
     tags: ['V-Flow', 'Mạng Xã Hội', 'Radio Live', 'Tương Tác'],
   },
   {
@@ -208,9 +221,10 @@ export const VAPPS_LIST: VAppDefinition[] = [
     description: 'Phòng trò chuyện trực tuyến, giao lưu kết nối bạn bè xem truyền hình trên toàn quốc với biểu tượng cảm xúc phong phú.',
     category: 'Giải trí & Media',
     badge: 'Cộng Đồng',
-    image: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=600&auto=format&fit=crop',
-    themeGradient: 'from-fuchsia-600/20 via-pink-900/10 to-transparent',
-    icon: <MessageSquare className="w-8 h-8 text-fuchsia-400" />,
+    gradientBg: 'bg-gradient-to-br from-[#DB2777] via-[#9333EA] to-[#7C3AED]',
+    borderClass: 'border-[#F472B6]/50 group-hover:border-[#F472B6]',
+    glowClass: 'shadow-[0_10px_30px_rgba(219,39,119,0.35)]',
+    icon: MessageSquare,
     tags: ['V-Chat', 'Phòng Chat', 'Cộng Đồng', 'Kết Nối'],
   },
 ];
@@ -229,7 +243,6 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   const [activeApp, setActiveApp] = useState<VAppId>(initialAppId);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   // Sync activeApp when initialAppId changes
   useEffect(() => {
@@ -237,10 +250,6 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       setActiveApp(initialAppId);
     }
   }, [initialAppId]);
-
-  const handleImageError = (id: string) => {
-    setImageErrors((prev) => ({ ...prev, [id]: true }));
-  };
 
   const categories = [
     'Tất cả',
@@ -397,12 +406,12 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         </div>
       </div>
 
-      {/* 3. BẢNG BANNER TRÒN CỦA SPACE 360: MỖI DÒNG 4 ỨNG DỤNG (Thiết kế hoàn toàn giống trang Chuyên Trang) */}
+      {/* 3. BẢNG BANNER TRÒN CỦA SPACE 360: MỖI DÒNG 4 ỨNG DỤNG (Banner tròn, có viền, màu gradient và iconography) */}
       <div className="py-2 mb-10">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-9 sm:gap-y-12 gap-x-4 sm:gap-x-8 max-w-5xl mx-auto">
           {filteredApps.map((app) => {
             const isActive = activeApp === app.id;
-            const hasError = imageErrors[app.id];
+            const AppIcon = app.icon;
 
             return (
               <button
@@ -411,35 +420,40 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
                 onClick={() => handleSelectApp(app.id)}
                 className="flex flex-col items-center group cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
               >
-                {/* Enlarged Borderless Circular Banner */}
-                <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full overflow-hidden bg-[#16151D] shadow-2xl relative transition-all duration-300 group-hover:scale-108 group-active:scale-95">
-                  {!hasError ? (
-                    <img
-                      src={app.image}
-                      alt={app.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      onError={() => handleImageError(app.id)}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#241F2B] to-[#16141D]">
-                      {app.icon}
-                    </div>
-                  )}
+                {/* Circular Banner: tròn, có viền, màu gradient và iconography của ứng dụng */}
+                <div
+                  className={`w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full relative flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-108 group-active:scale-95 ${app.gradientBg} border-2 sm:border-[3px] ${
+                    isActive
+                      ? 'border-white ring-4 ring-[#FF4081]/70 shadow-[0_0_32px_rgba(255,64,129,0.65)] scale-105'
+                      : `${app.borderClass} ${app.glowClass}`
+                  }`}
+                >
+                  {/* Subtle glossy top sheen reflection */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 via-transparent to-black/35 pointer-events-none" />
 
-                  {/* Subtle inner hover glow gradient */}
-                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                  {/* Concentric inner radial halo for depth */}
+                  <div className="absolute w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-white/10 blur-sm pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
-                  {/* Borderless Badge at top right */}
+                  {/* Iconography of the application */}
+                  <div className="relative z-10 flex items-center justify-center text-white drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)] group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300">
+                    <AppIcon className="w-12 h-12 sm:w-16 sm:h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 stroke-[1.8]" />
+                  </div>
+
+                  {/* Subtle inner hover glow */}
+                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 pointer-events-none" />
+
+                  {/* App Badge at top-right */}
                   {app.badge && (
-                    <span className="absolute top-2 right-2 sm:top-3 sm:right-3 text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#E6005A] text-white shadow-lg pointer-events-none">
+                    <span className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/20 shadow-lg pointer-events-none z-20">
                       {app.badge}
                     </span>
                   )}
 
-                  {/* Active Indicator Ring */}
+                  {/* Active Indicator Pulse Dot */}
                   {isActive && (
-                    <div className="absolute inset-0 rounded-full ring-4 ring-[#FF4081] pointer-events-none" />
+                    <div className="absolute bottom-2.5 inset-x-0 flex justify-center pointer-events-none z-20">
+                      <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse" />
+                    </div>
                   )}
                 </div>
 
@@ -487,10 +501,10 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         {/* App Top Toolbar */}
         <div className="px-6 py-4 bg-[#1E1E24] flex items-center justify-between border-0">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 bg-[#2D2D35] flex items-center justify-center text-emerald-300 ${
+            <div className={`w-10 h-10 ${currentApp.gradientBg} border border-white/25 shadow-md flex items-center justify-center text-white ${
               activeApp === 'v_minecraft' ? 'rounded-none' : 'rounded-2xl'
             }`}>
-              {currentApp.icon}
+              <currentApp.icon className="w-5 h-5 text-white drop-shadow" />
             </div>
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
