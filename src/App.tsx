@@ -581,7 +581,8 @@ export default function App() {
               : 'md:pl-[290px]'
       }`}>
         {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar */}
-        <div className={!isTopBarMode ? 'md:hidden' : ''}>
+          <div className={!isTopBarMode ? 'md:hidden h-16' : 'h-16 md:h-[68px]'}>
+
           <TopBar
             currentRoute={currentRoute}
             navigate={navigate}

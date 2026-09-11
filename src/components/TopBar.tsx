@@ -588,6 +588,17 @@ export const TopBar: React.FC<TopBarProps> = ({
           </div>
 
         </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-full h-10 opacity-80"
+          style={{
+            WebkitBackdropFilter: 'blur(18px)',
+            backdropFilter: 'blur(18px)',
+            maskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, black 0%, transparent 100%)',
+            background: 'linear-gradient(to bottom, rgba(27, 9, 18, 0.42), transparent)',
+          }}
+        />
       </header>
 
       {/* =========================================================================
