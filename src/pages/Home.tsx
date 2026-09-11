@@ -41,13 +41,13 @@ export const Home: React.FC<HomeProps> = ({
 
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-12">
         {/* 2. Chuyên trang banner tròn */}
-        <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-b from-[#1C1A24] via-[#181620] to-[#14131A] p-6 sm:p-8 shadow-xl">
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-[#E6005A]" />
+        <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-b from-[#1C1A24] via-[#181620] to-[#14131A] p-6 sm:p-10 md:p-12 shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-[#E6005A]" />
               </div>
-              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white">
                 Chuyên trang
               </h2>
             </div>

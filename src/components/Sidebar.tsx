@@ -42,8 +42,7 @@ import {
   CloudSun,
   StickyNote,
   Armchair,
-  MessageSquare,
-  Tablet
+  MessageSquare
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -82,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { flags } = useFeatureFlags();
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
-    : (flags.top_bar !== false);
+    : true;
   const { timeString, dateString } = useClock();
   const { favoriteChannelIds } = useFavorites();
   const { orbs, addOrbs } = useOrbs();
@@ -543,26 +542,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* ================= GROUP 2 ================= */}
-        {/* VplayOS (iPadOS Tablet Experience) */}
-        <button
-          id={isMobile ? "mobile-nav-item-vplayos" : "nav-item-vplayos"}
-          onClick={() => handleNavClick("/vplayos")}
-          title="VplayOS (Mô phỏng iPadOS Tablet)"
-          className={`w-full flex items-center justify-between px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
-            isActive("/vplayos") || isActive("/vplay-os") || isActive("/ipados")
-              ? "bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20"
-              : "text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]"
-          }`}
-        >
-          <div className="flex items-center gap-3.5 truncate">
-            <Tablet className="w-5 h-5 shrink-0 text-cyan-400" />
-            <span className="truncate">VplayOS</span>
-          </div>
-          <span className="px-2 py-0.5 text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-full">
-            TABLET
-          </span>
-        </button>
-
         {/* 5. Space 360 */}
         <div className="w-full flex flex-col gap-1">
           <button

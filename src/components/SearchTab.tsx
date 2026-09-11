@@ -38,6 +38,7 @@ import { Channel } from '../data/channels';
 import { NEWS_LIST } from './NewsView';
 import { playPopSound } from '../utils/sound';
 import { useSettings } from '../hooks/useSettings';
+import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { SearchPortalsView } from './SearchPortalsView';
 
 interface SearchTabProps {
@@ -54,6 +55,8 @@ export const SearchTab: React.FC<SearchTabProps> = ({
   routeState
 }) => {
   const { settings } = useSettings();
+  const { flags } = useFeatureFlags();
+  const showVoiceSearch = flags.voice_search_integration !== false;
   const [query, setQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [voiceToast, setVoiceToast] = useState<string | null>(null);
@@ -714,17 +717,19 @@ export const SearchTab: React.FC<SearchTabProps> = ({
           )}
 
           {/* Voice Search Button */}
-          <button
-            onClick={handleVoiceSearch}
-            className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
-              isListening
-                ? 'bg-[#E6005A] text-white animate-pulse shadow-md shadow-[#E6005A]/50'
-                : 'text-zinc-400 hover:text-white hover:bg-white/10'
-            }`}
-            title="Tìm kiếm bằng giọng nói"
-          >
-            <Mic className="w-4.5 h-4.5" />
-          </button>
+          {showVoiceSearch && (
+            <button
+              onClick={handleVoiceSearch}
+              className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                isListening
+                  ? 'bg-[#E6005A] text-white animate-pulse shadow-md shadow-[#E6005A]/50'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
+              }`}
+              title="Tìm kiếm bằng giọng nói"
+            >
+              <Mic className="w-4.5 h-4.5" />
+            </button>
+          )}
         </div>
 
         {/* Voice recognition status toast */}

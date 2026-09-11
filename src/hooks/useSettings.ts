@@ -7,6 +7,7 @@ export interface SystemSettings {
   theme: 'light' | 'dark';
   dockToSidebar: boolean;
   navigationMode: 'sidebar' | 'topbar';
+  floatyBar: boolean;
   fontFamily: FontFamilyOption;
   fontScale: number; // 0: 85%, 1: 100%, 2: 115%, 3: 130%
   autoScrollBanner: boolean;
@@ -26,6 +27,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   theme: 'dark',
   dockToSidebar: true,
   navigationMode: 'topbar',
+  floatyBar: false,
   fontFamily: 'alata',
   fontScale: 1,
   autoScrollBanner: true,
@@ -120,6 +122,7 @@ export const getStoredSettings = (): SystemSettings => {
         ...parsed,
         fontFamily: font,
         navigationMode: navMode,
+        floatyBar: typeof parsed.floatyBar === 'boolean' ? parsed.floatyBar : false,
         userName: parsed.userName || legacyUser || 'User',
         theme: 'dark'
       };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 import { BottomDock } from './components/BottomDock';
+import { FloatyBar } from './components/FloatyBar';
 import { SpotlightModal } from './components/SpotlightModal';
 import { CustomStreamModal } from './components/CustomStreamModal';
 import { WelcomeModal } from './components/WelcomeModal';
@@ -48,7 +49,6 @@ import { MinecraftContainerEmulator } from './components/minecraft/MinecraftCont
 import { SearchTab } from './components/SearchTab';
 import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
-import { VplayOSView } from './components/VplayOSView';
 import VplayVertical from './components/VplayVertical';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -59,9 +59,10 @@ import { useFeatureFlags } from './hooks/useFeatureFlags';
 export default function App() {
   const { settings } = useSettings();
   const { flags } = useFeatureFlags();
+  const isFloatyMode = Boolean(settings.floatyBar);
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
-    : (flags.top_bar !== false);
+    : true;
   const { favoriteChannelIds, toggleFavoriteChannel } = useFavorites();
   // Security & Construction Gate State: saved in localStorage so the device only requires entering password once
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -418,18 +419,6 @@ export default function App() {
           />
         );
 
-      case '/vplayos':
-      case '/vplay-os':
-      case '/ipados':
-      case '/tablet':
-        return (
-          <VplayOSView
-            navigate={navigate}
-            onSelectChannel={setCurrentChannel}
-            channels={channels}
-          />
-        );
-
       case '/v-premium':
         return (
           <VPremiumView
@@ -568,57 +557,49 @@ export default function App() {
     );
   }
 
-  // If in VplayOS Full Screen Mode (True full-screen OS experience without outer web chrome)
-  if (
-    currentRoute === '/vplayos' ||
-    currentRoute === '/vplay-os' ||
-    currentRoute === '/ipados' ||
-    currentRoute === '/tablet'
-  ) {
-    return (
-      <VplayOSView
-        navigate={navigate}
-        onSelectChannel={setCurrentChannel}
-        channels={channels}
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#1B0912] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative">
-      {/* Sidebar Navigation (Desktop + Mobile Drawer) */}
-      <Sidebar
-        currentRoute={currentRoute}
-        routeState={routeState}
-        navigate={navigate}
-        onOpenSearch={handleOpenSearch}
-        onSelectChannel={setCurrentChannel}
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={toggleSidebarCollapse}
-        isMobileOpen={isMobileSidebarOpen}
-        onCloseMobile={() => setIsMobileSidebarOpen(false)}
-      />
+      {/* Sidebar Navigation: Only rendered when Floaty bar is disabled */}
+      {!isFloatyMode && (
+        <Sidebar
+          currentRoute={currentRoute}
+          routeState={routeState}
+          navigate={navigate}
+          onOpenSearch={handleOpenSearch}
+          onSelectChannel={setCurrentChannel}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={toggleSidebarCollapse}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
 
       {/* Main App Container */}
       <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 ${
-        isTopBarMode
-          ? 'pl-0'
-          : !settings.dockToSidebar 
-            ? 'md:pl-0 pb-20' 
-            : isEffectiveCollapsed 
-              ? 'md:pl-[80px]' 
-              : 'md:pl-[290px]'
+        isFloatyMode
+          ? 'pl-0 pb-28 sm:pb-32'
+          : isTopBarMode
+            ? 'pl-0'
+            : !settings.dockToSidebar 
+              ? 'md:pl-0 pb-20' 
+              : isEffectiveCollapsed 
+                ? 'md:pl-[80px]' 
+                : 'md:pl-[290px]'
       }`}>
-        {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar */}
-        <div className={!isTopBarMode ? 'md:hidden' : ''}>
-          <TopBar
-            currentRoute={currentRoute}
-            navigate={navigate}
-            onOpenSearch={handleOpenSearch}
-            onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
-            onOpenCopilotWindow={() => toggleCopilotFloating(true)}
-          />
-        </div>
+        {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar.
+            When Floaty bar is active, topbar is completely replaced by Floaty bar. */}
+        {!isFloatyMode && (
+          <div className={`sticky top-0 z-50 w-full shrink-0 ${!isTopBarMode ? 'md:hidden' : ''}`}>
+            <TopBar
+              currentRoute={currentRoute}
+              navigate={navigate}
+              onOpenSearch={handleOpenSearch}
+              onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
+              onOpenCopilotWindow={() => toggleCopilotFloating(true)}
+            />
+          </div>
+        )}
 
         {/* Dynamic Page Content with smooth fade */}
         <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out ${
@@ -630,8 +611,17 @@ export default function App() {
         </main>
       </div>
 
-      {/* Bottom Dock Navigation (When dockToSidebar is false) */}
-      {!settings.dockToSidebar && (
+      {/* Floaty Bar Navigation: Active when floatyBar setting is enabled */}
+      {isFloatyMode && (
+        <FloatyBar
+          currentRoute={currentRoute}
+          navigate={navigate}
+          onOpenSearch={handleOpenSearch}
+        />
+      )}
+
+      {/* Bottom Dock Navigation (When dockToSidebar is false and not in floaty mode) */}
+      {!settings.dockToSidebar && !isFloatyMode && (
         <BottomDock
           currentRoute={currentRoute}
           navigate={navigate}

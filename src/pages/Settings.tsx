@@ -17,7 +17,8 @@ import {
   ChevronRight,
   Layout,
   PanelLeft,
-  PanelTop
+  PanelTop,
+  Compass
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -131,6 +132,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {/* 2. Section 1: Giao diện */}
       {(matchesSearch('Giao diện') ||
         matchesSearch('Chế độ giao diện') ||
+        matchesSearch('Floaty bar') ||
+        matchesSearch('Floaty') ||
+        matchesSearch('Navigation bar') ||
+        matchesSearch('Navigation bar that floats on your screen') ||
+        matchesSearch('floats') ||
         matchesSearch('Sáng') ||
         matchesSearch('Tối') ||
         matchesSearch('Theme') ||
@@ -158,12 +164,62 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                 Giao diện
               </h2>
               <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
-                Tùy biến thanh điều hướng (Sidebar hoặc Top bar), thanh Dock và tỷ lệ cỡ chữ toàn hệ thống
+                Tùy biến thanh điều hướng (Sidebar, Top bar hoặc Floaty bar), thanh Dock và tỷ lệ cỡ chữ toàn hệ thống
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
+            {/* Card: Floaty bar */}
+            {(matchesSearch('Floaty bar') ||
+              matchesSearch('Floaty') ||
+              matchesSearch('Navigation bar') ||
+              matchesSearch('Navigation bar that floats on your screen') ||
+              matchesSearch('floats') ||
+              matchesSearch('Thanh điều hướng') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-floaty-bar"
+                className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors border border-cyan-500/20 shadow-md"
+              >
+                <div>
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <Compass className="w-4.5 h-4.5 text-cyan-400" />
+                    <span>Floaty bar</span>
+                    {settings.floatyBar && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        ĐANG BẬT
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    Navigation bar that floats on your screen
+                  </div>
+                  <div className="text-[11px] text-gray-400 mt-1">
+                    Khi bật, thanh Top bar và Sidebar sẽ trở thành thanh điều hướng lơ lửng dạng pill ở dưới màn hình (tối đa 4 tabs/trang, chuyển trang mũi tên 2 cực).
+                  </div>
+                </div>
+
+                {/* Red/Cyan Toggle Switch */}
+                <button
+                  id="toggle-floaty-bar"
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.floatyBar}
+                  onClick={() => updateSetting('floatyBar', !settings.floatyBar)}
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
+                    settings.floatyBar ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  }`}
+                >
+                  <span
+                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.floatyBar ? 'translate-x-5.5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
             {/* Card 0: Chế độ giao diện (Dark Mode mặc định) */}
             {(matchesSearch('Chế độ giao diện') || matchesSearch('Giao diện') || matchesSearch('Theme') || matchesSearch('Dark')) && (
               <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
@@ -211,10 +267,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     type="button"
                     onClick={() => {
                       updateSetting('navigationMode', 'sidebar');
-                      setFlag('top_bar', false);
                     }}
                     className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
-                      (settings.navigationMode === 'sidebar' || (!settings.navigationMode && flags.top_bar === false))
+                      settings.navigationMode === 'sidebar'
                         ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
                         : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
                     }`}
@@ -222,7 +277,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                          (settings.navigationMode === 'sidebar' || (!settings.navigationMode && flags.top_bar === false))
+                          settings.navigationMode === 'sidebar'
                             ? 'bg-[#E50914]/20 text-[#E50914]'
                             : 'bg-white/5 text-gray-400 group-hover:text-white'
                         }`}>
@@ -235,7 +290,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                       </div>
 
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        (settings.navigationMode === 'sidebar' || (!settings.navigationMode && flags.top_bar === false))
+                        settings.navigationMode === 'sidebar'
                           ? 'bg-[#E50914] text-white'
                           : 'border border-white/20 text-transparent'
                       }`}>
@@ -254,10 +309,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     type="button"
                     onClick={() => {
                       updateSetting('navigationMode', 'topbar');
-                      setFlag('top_bar', true);
                     }}
                     className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
-                      (settings.navigationMode === 'topbar' || (!settings.navigationMode && flags.top_bar !== false))
+                      settings.navigationMode !== 'sidebar'
                         ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
                         : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
                     }`}
@@ -265,7 +319,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                          (settings.navigationMode === 'topbar' || (!settings.navigationMode && flags.top_bar !== false))
+                          settings.navigationMode !== 'sidebar'
                             ? 'bg-[#E50914]/20 text-[#E50914]'
                             : 'bg-white/5 text-gray-400 group-hover:text-white'
                         }`}>
@@ -278,7 +332,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                       </div>
 
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        (settings.navigationMode === 'topbar' || (!settings.navigationMode && flags.top_bar !== false))
+                        settings.navigationMode !== 'sidebar'
                           ? 'bg-[#E50914] text-white'
                           : 'border border-white/20 text-transparent'
                       }`}>

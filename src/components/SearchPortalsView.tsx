@@ -131,7 +131,7 @@ export const SearchPortalsView: React.FC<SearchPortalsViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-7 text-white select-none animate-in fade-in duration-300">
+    <div className="w-full max-w-5xl mx-auto mt-7 text-white select-none animate-in fade-in duration-300">
       {/* Category Pills Navigation Bar */}
       <div className="w-full overflow-x-auto no-scrollbar pb-2 mb-6">
         <div className="flex items-center gap-2 min-w-max">
@@ -269,11 +269,11 @@ export const SearchPortalsView: React.FC<SearchPortalsViewProps> = ({
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Header Banner - Enlarged and Borderless */}
           {activeCategory && (
-            <div className={`relative overflow-hidden rounded-[32px] p-6 sm:p-10 md:p-12 bg-gradient-to-r ${activeCategory.accentGradient} shadow-2xl border-0`}>
-              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-5 sm:gap-7">
+            <div className={`relative overflow-hidden rounded-[36px] p-8 sm:p-12 md:p-14 bg-gradient-to-r ${activeCategory.accentGradient} shadow-2xl border-0`}>
+              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 sm:gap-8">
+                <div className="flex items-center gap-6 sm:gap-8">
                   {/* Enlarged Borderless Portal Circular Avatar */}
-                  <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-full overflow-hidden bg-[#16151D] shadow-2xl shrink-0 flex items-center justify-center">
+                  <div className="w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full overflow-hidden bg-[#16151D] shadow-2xl shrink-0 flex items-center justify-center">
                     <img
                       src={activeCategory.image}
                       alt={activeCategory.title}
@@ -282,20 +282,20 @@ export const SearchPortalsView: React.FC<SearchPortalsViewProps> = ({
                         activeCategory.image.includes('vtv_') ||
                         activeCategory.image.includes('.png') ||
                         activeCategory.image.includes('wikia.nocookie.net')
-                          ? 'object-contain p-3 sm:p-5'
+                          ? 'object-contain p-4 sm:p-6'
                           : 'object-cover'
                       }`}
                     />
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <span className="text-xs sm:text-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-black/40 text-white backdrop-blur-md inline-block">
                       {activeCategory.badge}
                     </span>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight">
+                    <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
                       {activeCategory.title}
                     </h2>
-                    <p className="text-xs sm:text-sm text-white/80 font-medium">
+                    <p className="text-xs sm:text-base text-white/85 font-medium">
                       Chuyên trang chính thức • 100 bài viết & bản tin tuyển chọn
                     </p>
                   </div>

@@ -27,7 +27,7 @@
   body {
     background-color: #1B0912;
     color: #F3F4F6;
-    overflow-x: hidden;
+    overflow-x: clip;
     font-family: var(--waves-font-family, 'Alata', system-ui, -apple-system, sans-serif) !important;
   }
 }

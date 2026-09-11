@@ -41,8 +41,7 @@ import {
   Layers,
   ArrowRight,
   StickyNote,
-  Armchair,
-  Tablet
+  Armchair
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
@@ -115,6 +114,18 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [isLoyaltyModalOpen, setIsLoyaltyModalOpen] = useState(false);
   const [isBuyPackageModalOpen, setIsBuyPackageModalOpen] = useState(false);
 
+  // Dynamic Scroll State for Progressive Blur elevation
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Form states inside modals
   const [activationCode, setActivationCode] = useState('');
   const [activationStatus, setActivationStatus] = useState<string | null>(null);
@@ -176,9 +187,35 @@ export const TopBar: React.FC<TopBarProps> = ({
     <>
       <header 
         id="vplay-topbar-header"
-        className="w-full sticky top-0 z-50 select-none bg-[#1B0912]/80 backdrop-blur-xl border-b border-white/[0.08] transition-colors duration-200"
-        style={{ WebkitBackdropFilter: 'blur(24px)', backdropFilter: 'blur(24px)' }}
+        className={`w-full sticky top-0 z-50 select-none transition-all duration-300 relative ${
+          isScrolled 
+            ? 'shadow-[0_6px_24px_rgba(0,0,0,0.3)]' 
+            : 'shadow-none'
+        }`}
       >
+        {/* Progressive Blur Layer System with reduced tint opacity and no divider */}
+        <div className="absolute inset-0 pointer-events-none overflow-visible -z-10" aria-hidden="true">
+          {/* Multi-tier gradient blurred backdrops */}
+          <div className="absolute inset-0 backdrop-blur-[36px] [mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_55%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_55%)]" />
+          <div className="absolute inset-0 backdrop-blur-[24px] [mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_75%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_75%)]" />
+          <div className="absolute inset-0 backdrop-blur-[14px] [mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_90%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_90%)]" />
+          <div className="absolute inset-0 backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_98%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_98%)]" />
+          <div className="absolute inset-0 backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,black_90%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_90%,transparent_100%)]" />
+          
+          {/* Soft progressive blur apron extending 14px beneath top bar for seamless background fade */}
+          <div className="absolute -bottom-3.5 left-0 right-0 h-3.5 backdrop-blur-[8px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]" />
+
+          {/* Background tint gradient with reduced opacity and no divider border */}
+          <div className={`absolute inset-0 transition-opacity duration-300 ${
+            isLightMode
+              ? isScrolled 
+                ? 'bg-gradient-to-b from-white/70 via-white/45 to-white/20' 
+                : 'bg-gradient-to-b from-white/50 via-white/30 to-white/10'
+              : isScrolled
+                ? 'bg-gradient-to-b from-[#1B0912]/75 via-[#1B0912]/50 to-[#1B0912]/25'
+                : 'bg-gradient-to-b from-[#1B0912]/55 via-[#1B0912]/35 to-[#1B0912]/15'
+          }`} />
+        </div>
         <div className="w-full max-w-[1780px] mx-auto px-4 md:px-6 lg:px-8 h-16 md:h-[68px] flex items-center justify-between gap-3 md:gap-4">
           
           {/* LEFT & CENTER NAV GROUP */}
@@ -259,26 +296,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                     >
                       <div className="space-y-1 py-0.5 pr-1">
                         
-                        {/* 0. VplayOS (iPadOS Tablet Experience) */}
-                        <button
-                          id="more-item-vplayos"
-                          onClick={() => {
-                            setMoreMenuOpen(false);
-                            setIsSpaceMenuOpen(false);
-                            navigate('/vplayos');
-                          }}
-                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white hover:bg-white/10 transition-colors cursor-pointer group bg-gradient-to-r from-cyan-500/15 via-blue-500/10 to-transparent border border-cyan-400/20"
-                          title="VplayOS - Hệ điều hành mô phỏng iPadOS Tablet"
-                        >
-                          <div className="flex items-center gap-3.5">
-                            <Tablet className="w-5 h-5 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
-                            <span className="font-bold text-cyan-200">VplayOS</span>
-                          </div>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/25 text-cyan-300 font-mono font-bold">
-                            iPadOS
-                          </span>
-                        </button>
-
                         {/* 1. Copilot for Vplay */}
                         <button
                           id="more-item-copilot"

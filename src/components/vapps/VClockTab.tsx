@@ -29,140 +29,14 @@ import {
   History as LapIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import {
+  clockAudio,
+  CustomAlarmSound,
+  ALARM_TONE_PRESETS
+} from './clockAudio';
+import { AlarmSoundModal } from './AlarmSoundModal';
 
-// ==================== AUDIO SYNTHESIZER (WEB AUDIO API) ====================
-class ClockAudioEngine {
-  private ctx: AudioContext | null = null;
-  private alarmInterval: number | null = null;
-
-  private getContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null;
-    const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtxClass) return null;
-    if (!this.ctx || this.ctx.state === 'closed') {
-      this.ctx = new AudioCtxClass();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
-    }
-    return this.ctx;
-  }
-
-  // Soft mechanical tick
-  playTick() {
-    try {
-      const ctx = this.getContext();
-      if (!ctx) return;
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(1400, now);
-      osc.frequency.exponentialRampToValueAtTime(180, now + 0.015);
-
-      gain.gain.setValueAtTime(0.04, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.015);
-    } catch {}
-  }
-
-  // Clean button / lap beep
-  playBeep(freq = 880, duration = 0.08) {
-    try {
-      const ctx = this.getContext();
-      if (!ctx) return;
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + duration);
-    } catch {}
-  }
-
-  // Timer complete fanfare chime
-  playTimerComplete() {
-    try {
-      const ctx = this.getContext();
-      if (!ctx) return;
-      const now = ctx.currentTime;
-      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
-      notes.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        const start = now + idx * 0.1;
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, start);
-
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(0.2, start + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(start);
-        osc.stop(start + 0.42);
-      });
-    } catch {}
-  }
-
-  // Repeating alarm sound
-  startAlarmRinging() {
-    this.stopAlarmRinging();
-    const playBurst = () => {
-      try {
-        const ctx = this.getContext();
-        if (!ctx) return;
-        const now = ctx.currentTime;
-
-        // Two rapid high chime bursts
-        [0, 0.15, 0.3, 0.45].forEach((offset, idx) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          const t = now + offset;
-          const freq = idx % 2 === 0 ? 987.77 : 1318.51; // B5 and E6
-
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(freq, t);
-
-          gain.gain.setValueAtTime(0.15, t);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(t);
-          osc.stop(t + 0.12);
-        });
-      } catch {}
-    };
-
-    playBurst();
-    this.alarmInterval = window.setInterval(playBurst, 1400);
-  }
-
-  stopAlarmRinging() {
-    if (this.alarmInterval) {
-      clearInterval(this.alarmInterval);
-      this.alarmInterval = null;
-    }
-  }
-}
-
-const audio = new ClockAudioEngine();
+const audio = clockAudio;
 
 // ==================== WORLD TIMEZONE DATA ====================
 export interface WorldCity {
@@ -208,7 +82,7 @@ export interface AlarmItem {
   label: string;
   enabled: boolean;
   days: number[]; // 0 = Sun, 1 = Mon ... 6 = Sat, empty = once
-  soundTone: 'chime' | 'digital' | 'nature';
+  soundTone?: string;
 }
 
 const DEFAULT_ALARMS: AlarmItem[] = [
@@ -348,6 +222,64 @@ export const VClockTab: React.FC = () => {
   const [activeRingingAlarm, setActiveRingingAlarm] = useState<AlarmItem | null>(null);
   const lastTriggeredMinuteRef = useRef<string>('');
 
+  // ---------- CUSTOM ALARM SOUNDS STATE ----------
+  const [customSounds, setCustomSounds] = useState<CustomAlarmSound[]>(() => {
+    try {
+      const saved = localStorage.getItem('v_clock_custom_sounds');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [defaultAlarmTone, setDefaultAlarmTone] = useState<string>(() => {
+    try {
+      return localStorage.getItem('v_clock_default_tone') || 'chime';
+    } catch {
+      return 'chime';
+    }
+  });
+  const [isSoundModalOpen, setIsSoundModalOpen] = useState<boolean>(false);
+  const [soundModalTargetAlarmId, setSoundModalTargetAlarmId] = useState<string | null>(null);
+  const [newAlarmSoundTone, setNewAlarmSoundTone] = useState<string>('chime');
+  const [previewingAlarmId, setPreviewingAlarmId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('v_clock_custom_sounds', JSON.stringify(customSounds));
+    } catch {}
+  }, [customSounds]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('v_clock_default_tone', defaultAlarmTone);
+    } catch {}
+  }, [defaultAlarmTone]);
+
+  const getSoundInfo = (toneId?: string) => {
+    const id = toneId || defaultAlarmTone;
+    const custom = customSounds.find((s) => s.id === id);
+    if (custom) {
+      return {
+        id,
+        name: custom.name,
+        isVideo: custom.sourceType === 'video_extracted',
+        badge: custom.sourceType === 'video_extracted' ? '🎬 Video' : '🎵 Âm thanh',
+        isCustom: true
+      };
+    }
+    const preset = ALARM_TONE_PRESETS.find((p) => p.id === id);
+    if (preset) {
+      return {
+        id,
+        name: preset.name,
+        isVideo: false,
+        badge: preset.tag,
+        isCustom: false
+      };
+    }
+    return { id: 'chime', name: 'Giai Điệu Vplay', isVideo: false, badge: 'Mặc định', isCustom: false };
+  };
+
   // ---------- STOPWATCH STATE ----------
   const [stopwatchTime, setStopwatchTime] = useState<number>(0); // ms
   const [isStopwatchRunning, setIsStopwatchRunning] = useState<boolean>(false);
@@ -407,11 +339,11 @@ export const VClockTab: React.FC = () => {
         lastTriggeredMinuteRef.current = timeString;
         setActiveRingingAlarm(match);
         if (soundEnabled) {
-          audio.startAlarmRinging();
+          audio.startAlarmRinging(match.soundTone || defaultAlarmTone, customSounds);
         }
       }
     }
-  }, [currentTime, alarms, activeRingingAlarm, soundEnabled]);
+  }, [currentTime, alarms, activeRingingAlarm, soundEnabled, defaultAlarmTone, customSounds]);
 
   // Handle Stopwatch
   useEffect(() => {
@@ -573,11 +505,41 @@ export const VClockTab: React.FC = () => {
       label: newAlarmLabel.trim() || 'Báo thức',
       enabled: true,
       days: newAlarmDays,
-      soundTone: 'chime',
+      soundTone: newAlarmSoundTone || defaultAlarmTone,
     };
     setAlarms((prev) => [...prev, newAlarm].sort((a, b) => a.time.localeCompare(b.time)));
     setIsAddAlarmOpen(false);
     if (soundEnabled) audio.playBeep(1000);
+  };
+
+  const handleOpenSoundModalForAlarm = (alarmId: string | null) => {
+    setSoundModalTargetAlarmId(alarmId);
+    setIsSoundModalOpen(true);
+  };
+
+  const handleSelectSoundTone = (toneId: string) => {
+    if (soundModalTargetAlarmId) {
+      setAlarms((prev) =>
+        prev.map((a) => (a.id === soundModalTargetAlarmId ? { ...a, soundTone: toneId } : a))
+      );
+    } else {
+      setDefaultAlarmTone(toneId);
+      setNewAlarmSoundTone(toneId);
+    }
+  };
+
+  const handleTogglePreviewAlarm = (alarm: AlarmItem) => {
+    if (previewingAlarmId === alarm.id) {
+      audio.stopAlarmRinging();
+      audio.stopPreview();
+      setPreviewingAlarmId(null);
+      return;
+    }
+
+    setPreviewingAlarmId(alarm.id);
+    audio.previewSound(alarm.soundTone || defaultAlarmTone, customSounds, () => {
+      setPreviewingAlarmId(null);
+    });
   };
 
   const handleDismissAlarm = () => {
@@ -1043,20 +1005,40 @@ export const VClockTab: React.FC = () => {
                 Đặt chuông nhắc nhở công việc, học tập và xem các chương trình trực tiếp trên V-Play
               </p>
             </div>
-            <button
-              id="vclock-btn-open-add-alarm"
-              onClick={() => setIsAddAlarmOpen(true)}
-              className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 cursor-pointer shrink-0"
-            >
-              <Plus className="w-5 h-5 stroke-[2.5]" />
-              <span>Thêm Báo Thức Mới</span>
-            </button>
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <button
+                id="vclock-btn-open-sound-modal"
+                onClick={() => handleOpenSoundModalForAlarm(null)}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#1A1F33] hover:bg-[#202742] text-cyan-300 hover:text-white border border-cyan-500/40 font-bold text-xs sm:text-sm shadow-lg transition-all cursor-pointer"
+                title="Cài đặt và tải file âm thanh MP3/WAV hoặc trích xuất từ video"
+              >
+                <Volume2 className="w-4 h-4 text-cyan-400" />
+                <span>Đổi Âm Thanh Báo Thức</span>
+                {customSounds.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-cyan-400 text-slate-950 text-[10px] font-black">
+                    {customSounds.length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                id="vclock-btn-open-add-alarm"
+                onClick={() => setIsAddAlarmOpen(true)}
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 cursor-pointer shrink-0"
+              >
+                <Plus className="w-5 h-5 stroke-[2.5]" />
+                <span>Thêm Báo Thức Mới</span>
+              </button>
+            </div>
           </div>
 
           {/* Alarm Cards List */}
           <div className="space-y-3">
             {alarms.map((alarm) => {
               const remaining = alarm.enabled ? getRemainingTimeText(alarm.time) : 'Đang tắt';
+              const soundMeta = getSoundInfo(alarm.soundTone);
+              const isPreviewing = previewingAlarmId === alarm.id;
+
               return (
                 <div
                   key={alarm.id}
@@ -1072,8 +1054,8 @@ export const VClockTab: React.FC = () => {
                       <span>{alarm.time}</span>
                     </div>
 
-                    <div className="space-y-1">
-                      <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                    <div className="space-y-1.5">
+                      <div className="text-sm sm:text-base font-bold text-white flex items-center gap-2 flex-wrap">
                         <span>{alarm.label}</span>
                         {alarm.enabled && (
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">
@@ -1082,23 +1064,39 @@ export const VClockTab: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Repeat Days Chips */}
-                      <div className="flex flex-wrap gap-1">
-                        {DAY_NAMES.map((dayName, idx) => {
-                          const isSelected = alarm.days.includes(idx);
-                          return (
-                            <span
-                              key={dayName}
-                              className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded ${
-                                isSelected
-                                  ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-400/30'
-                                  : 'text-slate-500'
-                              }`}
-                            >
-                              {dayName}
-                            </span>
-                          );
-                        })}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Repeat Days Chips */}
+                        <div className="flex flex-wrap gap-1">
+                          {DAY_NAMES.map((dayName, idx) => {
+                            const isSelected = alarm.days.includes(idx);
+                            return (
+                              <span
+                                key={dayName}
+                                className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded ${
+                                  isSelected
+                                    ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-400/30'
+                                    : 'text-slate-500'
+                                }`}
+                              >
+                                {dayName}
+                              </span>
+                            );
+                          })}
+                        </div>
+
+                        {/* Sound badge with quick change */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenSoundModalForAlarm(alarm.id)}
+                          className="text-[11px] font-medium text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 px-2 py-0.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer"
+                          title="Nhấp để đổi âm thanh cho báo thức này"
+                        >
+                          <Volume2 className="w-3 h-3 text-cyan-400" />
+                          <span className="max-w-[130px] truncate">{soundMeta.name}</span>
+                          <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-400/20 text-cyan-200">
+                            {soundMeta.badge}
+                          </span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1106,15 +1104,25 @@ export const VClockTab: React.FC = () => {
                   {/* Right Actions: Test Tone, Delete, Toggle On/Off */}
                   <div className="flex items-center gap-3 self-end sm:self-auto">
                     <button
-                      onClick={() => {
-                        audio.startAlarmRinging();
-                        setTimeout(() => audio.stopAlarmRinging(), 2000);
-                      }}
-                      className="p-2 rounded-xl text-slate-400 hover:text-cyan-300 hover:bg-white/10 transition-all text-xs flex items-center gap-1 cursor-pointer"
-                      title="Nghe thử chuông báo"
+                      onClick={() => handleTogglePreviewAlarm(alarm)}
+                      className={`p-2 rounded-xl transition-all text-xs flex items-center gap-1.5 cursor-pointer ${
+                        isPreviewing
+                          ? 'bg-cyan-400 text-slate-950 font-bold animate-pulse shadow-md shadow-cyan-400/40'
+                          : 'text-slate-400 hover:text-cyan-300 hover:bg-white/10'
+                      }`}
+                      title={isPreviewing ? 'Dừng phát' : 'Nghe thử chuông báo này'}
                     >
-                      <Volume2 className="w-4 h-4" />
-                      <span className="text-[11px] hidden sm:inline">Thử chuông</span>
+                      {isPreviewing ? (
+                        <>
+                          <Pause className="w-4 h-4 fill-current" />
+                          <span className="text-[11px]">Đang thử...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Volume2 className="w-4 h-4" />
+                          <span className="text-[11px] hidden sm:inline">Thử chuông</span>
+                        </>
+                      )}
                     </button>
 
                     <button
@@ -1221,6 +1229,63 @@ export const VClockTab: React.FC = () => {
                       })}
                     </div>
                   </div>
+
+                  {/* Sound Tone Selection */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Âm Thanh Chuông Báo</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSoundModalTargetAlarmId(null);
+                          setIsSoundModalOpen(true);
+                        }}
+                        className="text-[11px] text-cyan-400 hover:text-cyan-300 underline font-semibold cursor-pointer"
+                      >
+                        Quản lý / Tải file
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={newAlarmSoundTone}
+                        onChange={(e) => setNewAlarmSoundTone(e.target.value)}
+                        className="flex-1 bg-[#111422] border border-white/15 focus:border-cyan-400 rounded-2xl px-3.5 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
+                      >
+                        <optgroup label="Giai điệu tích hợp (Presets)">
+                          {ALARM_TONE_PRESETS.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name} ({p.tag})
+                            </option>
+                          ))}
+                        </optgroup>
+                        {customSounds.length > 0 && (
+                          <optgroup label="Âm thanh tự tải / trích xuất">
+                            {customSounds.map((s) => (
+                              <option key={s.id} value={s.id}>
+                                {s.sourceType === 'video_extracted' ? '🎬' : '🎵'} {s.name} (~{s.duration}s)
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          audio.previewSound(newAlarmSoundTone || defaultAlarmTone, customSounds);
+                        }}
+                        className="px-3.5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-cyan-300 text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
+                        title="Nghe thử âm thanh đang chọn"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                        <span>Thử</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-white/10">
@@ -1251,9 +1316,17 @@ export const VClockTab: React.FC = () => {
                 <h3 className="text-3xl font-black font-mono text-cyan-300 mb-1">
                   {activeRingingAlarm.time}
                 </h3>
-                <p className="text-base font-bold text-white mb-6">
+                <p className="text-base font-bold text-white mb-2">
                   {activeRingingAlarm.label}
                 </p>
+
+                {/* Ringing Sound Indicator */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-semibold mb-6">
+                  <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                  <span className="truncate max-w-[200px]">
+                    Chuông: {getSoundInfo(activeRingingAlarm.soundTone).name}
+                  </span>
+                </div>
 
                 <div className="space-y-2.5">
                   <button
@@ -1272,6 +1345,23 @@ export const VClockTab: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Sound Management & Extraction Modal */}
+          <AlarmSoundModal
+            isOpen={isSoundModalOpen}
+            onClose={() => {
+              setIsSoundModalOpen(false);
+              setSoundModalTargetAlarmId(null);
+            }}
+            selectedToneId={
+              soundModalTargetAlarmId
+                ? (alarms.find((a) => a.id === soundModalTargetAlarmId)?.soundTone || defaultAlarmTone)
+                : defaultAlarmTone
+            }
+            onSelectTone={handleSelectSoundTone}
+            customSounds={customSounds}
+            onUpdateCustomSounds={setCustomSounds}
+          />
         </div>
       )}
 

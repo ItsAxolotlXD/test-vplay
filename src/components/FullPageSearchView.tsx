@@ -35,6 +35,7 @@ import {
 import { Channel, Category } from "../data/channels";
 import { NEWS_LIST } from "./NewsView";
 import { playPopSound } from "../utils/sound";
+import { useFeatureFlags } from "../hooks/useFeatureFlags";
 
 export interface SpotlightSearchSettings {
   fullPageSearch?: boolean;
@@ -87,6 +88,8 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
   triggerToast,
   onOpenSearchSettings,
 }) => {
+  const { flags } = useFeatureFlags();
+  const showVoiceSearch = flags.voice_search_integration !== false;
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [isListening, setIsListening] = useState(false);
@@ -688,22 +691,24 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
                   </button>
                 )}
 
-                <button
-                  type="button"
-                  onClick={handleVoiceSearch}
-                  className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
-                    isListening
-                      ? "bg-rose-500 text-white animate-pulse shadow-[0_0_12px_rgba(244,63,94,0.6)]"
-                      : "bg-white/10 hover:bg-white/20 text-cyan-400 hover:text-cyan-300"
-                  }`}
-                  title="Tìm kiếm bằng giọng nói"
-                >
-                  {isListening ? (
-                    <MicOff className="w-4 h-4" />
-                  ) : (
-                    <Mic className="w-4 h-4" />
-                  )}
-                </button>
+                {showVoiceSearch && (
+                  <button
+                    type="button"
+                    onClick={handleVoiceSearch}
+                    className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                      isListening
+                        ? "bg-rose-500 text-white animate-pulse shadow-[0_0_12px_rgba(244,63,94,0.6)]"
+                        : "bg-white/10 hover:bg-white/20 text-cyan-400 hover:text-cyan-300"
+                    }`}
+                    title="Tìm kiếm bằng giọng nói"
+                  >
+                    {isListening ? (
+                      <MicOff className="w-4 h-4" />
+                    ) : (
+                      <Mic className="w-4 h-4" />
+                    )}
+                  </button>
+                )}
               </div>
             </div>
 

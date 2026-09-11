@@ -60,7 +60,7 @@ export const PortalsCircularSection: React.FC<PortalsCircularSectionProps> = ({
       {/* Grid: 3 circular portals per row */}
       {/* Row 1: Tin tức, Thể thao, Ẩm thực */}
       {/* Row 2: Chính trị, Văn hóa, Giải trí */}
-      <div className="grid grid-cols-3 gap-y-9 sm:gap-y-12 gap-x-4 sm:gap-x-10 max-w-4xl mx-auto py-4">
+      <div className="grid grid-cols-3 gap-y-10 sm:gap-y-14 md:gap-y-16 gap-x-6 sm:gap-x-12 md:gap-x-16 max-w-5xl mx-auto py-6 sm:py-8">
         {PORTAL_CATEGORIES.map((portal) => {
           const isActive = activePortalId === portal.id;
           const hasError = imageErrors[portal.id];
@@ -74,20 +74,20 @@ export const PortalsCircularSection: React.FC<PortalsCircularSectionProps> = ({
               className="flex flex-col items-center group cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
             >
               {/* Enlarged Borderless Circular Banner */}
-              <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 lg:w-48 lg:h-48 rounded-full overflow-hidden bg-[#16151D] shadow-2xl relative transition-all duration-300 group-hover:scale-108 group-active:scale-95">
+              <div className="w-32 h-32 sm:w-44 sm:h-44 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden bg-[#16151D] shadow-2xl relative transition-all duration-300 group-hover:scale-108 group-active:scale-95">
                 {!hasError ? (
                   <img
                     src={portal.image}
                     alt={portal.title}
                     referrerPolicy="no-referrer"
                     className={`w-full h-full ${
-                      isLogo ? 'object-contain p-3 sm:p-5' : 'object-cover'
+                      isLogo ? 'object-contain p-4 sm:p-6 md:p-8' : 'object-cover'
                     } group-hover:scale-110 transition-transform duration-300`}
                     onError={() => handleImageError(portal.id)}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#241F2B] to-[#16141D]">
-                    {getFallbackIcon(portal.id, 'w-12 h-12 text-white/80')}
+                    {getFallbackIcon(portal.id, 'w-14 h-14 text-white/80')}
                   </div>
                 )}
 
@@ -96,7 +96,7 @@ export const PortalsCircularSection: React.FC<PortalsCircularSectionProps> = ({
 
                 {/* Borderless Badge */}
                 {portal.badge && (
-                  <span className="absolute top-2 right-2 sm:top-3 sm:right-3 text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-[#E6005A] text-white shadow-lg">
+                  <span className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 text-[10px] sm:text-xs md:text-sm font-bold px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-[#E6005A] text-white shadow-lg">
                     {portal.badge}
                   </span>
                 )}
@@ -104,7 +104,7 @@ export const PortalsCircularSection: React.FC<PortalsCircularSectionProps> = ({
 
               {/* Title underneath (no description) */}
               <span
-                className={`mt-3 sm:mt-4 text-sm sm:text-base md:text-lg font-bold transition-colors text-center tracking-tight ${
+                className={`mt-3.5 sm:mt-5 text-sm sm:text-lg md:text-xl font-bold transition-colors text-center tracking-tight ${
                   isActive ? 'text-[#FF4081]' : 'text-white/90 group-hover:text-[#FF4081]'
                 }`}
               >
