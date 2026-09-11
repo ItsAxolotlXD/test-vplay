@@ -48,7 +48,6 @@ import { MinecraftContainerEmulator } from './components/minecraft/MinecraftCont
 import { SearchTab } from './components/SearchTab';
 import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
-import { VplayOSView } from './components/VplayOSView';
 import VplayVertical from './components/VplayVertical';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -418,18 +417,6 @@ export default function App() {
           />
         );
 
-      case '/vplayos':
-      case '/vplay-os':
-      case '/ipados':
-      case '/tablet':
-        return (
-          <VplayOSView
-            navigate={navigate}
-            onSelectChannel={setCurrentChannel}
-            channels={channels}
-          />
-        );
-
       case '/v-premium':
         return (
           <VPremiumView
@@ -564,22 +551,6 @@ export default function App() {
           navigate(`/live-tv?channel=${ch.slug}`);
         }}
         navigate={navigate}
-      />
-    );
-  }
-
-  // If in VplayOS Full Screen Mode (True full-screen OS experience without outer web chrome)
-  if (
-    currentRoute === '/vplayos' ||
-    currentRoute === '/vplay-os' ||
-    currentRoute === '/ipados' ||
-    currentRoute === '/tablet'
-  ) {
-    return (
-      <VplayOSView
-        navigate={navigate}
-        onSelectChannel={setCurrentChannel}
-        channels={channels}
       />
     );
   }

@@ -259,26 +259,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                     >
                       <div className="space-y-1 py-0.5 pr-1">
                         
-                        {/* 0. VplayOS (iPadOS Tablet Experience) */}
-                        <button
-                          id="more-item-vplayos"
-                          onClick={() => {
-                            setMoreMenuOpen(false);
-                            setIsSpaceMenuOpen(false);
-                            navigate('/vplayos');
-                          }}
-                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white hover:bg-white/10 transition-colors cursor-pointer group bg-gradient-to-r from-cyan-500/15 via-blue-500/10 to-transparent border border-cyan-400/20"
-                          title="VplayOS - Hệ điều hành mô phỏng iPadOS Tablet"
-                        >
-                          <div className="flex items-center gap-3.5">
-                            <Tablet className="w-5 h-5 shrink-0 text-cyan-400 group-hover:scale-110 transition-transform" />
-                            <span className="font-bold text-cyan-200">VplayOS</span>
-                          </div>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/25 text-cyan-300 font-mono font-bold">
-                            iPadOS
-                          </span>
-                        </button>
-
                         {/* 1. Copilot for Vplay */}
                         <button
                           id="more-item-copilot"
@@ -798,7 +778,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 </div>
                 <div>
                   <h3 className="text-xl font-bold">Lịch phát sóng hôm nay</h3>
-                  <p className="text-xs text-gray-400">Lịch trình các chương trình truyền hình đài VTV</p>
+                  <p className="text-xs text-gray-400">Lịch trình các chư��ng trình truyền hình đài VTV</p>
                 </div>
               </div>
 
