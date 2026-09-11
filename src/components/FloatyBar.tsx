@@ -17,31 +17,53 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-// Custom high-fidelity monochrome white Copilot Icon component
+// Custom Copilot Icon matching TopBar with remote SVG, pulsing dot, and vector fallback
 export const CopilotCustomIcon: React.FC<{ active?: boolean; className?: string }> = ({
   active = false,
-  className = 'w-6 h-6 sm:w-6.5 sm:h-6.5',
+  className = 'w-5.5 h-5.5 sm:w-6 sm:h-6',
 }) => {
+  const [hasError, setHasError] = useState(false);
+
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={`${className} transition-transform duration-200 text-white ${
-        active ? 'scale-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.85)]' : 'group-hover:scale-110 opacity-90'
-      }`}
-    >
-      <path
-        d="M7 13.5C7 10 9.8 7 13.3 7H17.5C19.4 7 21 8.6 21 10.5V12C21 15.6 18.2 18.5 14.7 18.5H10.5C8.6 18.5 7 16.9 7 15V13.5Z"
-        fill="currentColor"
-        fillOpacity={active ? '0.95' : '0.8'}
-      />
-      <path
-        d="M17 10.5C17 14 14.2 17 10.7 17H6.5C4.6 17 3 15.4 3 13.5V12C3 8.4 5.8 5.5 9.3 5.5H13.5C15.4 5.5 17 7.1 17 9V10.5Z"
-        fill="currentColor"
-      />
-      <circle cx="10" cy="11.2" r="1.5" fill="#121118" />
-      <circle cx="14" cy="12.8" r="1.5" fill="#121118" />
-    </svg>
+    <div className="relative flex items-center justify-center">
+      {!hasError ? (
+        <img
+          src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+          alt="Copilot"
+          referrerPolicy="no-referrer"
+          onError={() => setHasError(true)}
+          className={`${className} object-contain transition-transform duration-300 group-hover:scale-110 ${
+            active ? 'scale-105' : ''
+          }`}
+        />
+      ) : (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+          <defs>
+            <linearGradient id="copilot-ribbon-1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0078D4" />
+              <stop offset="45%" stopColor="#8764B8" />
+              <stop offset="100%" stopColor="#F7630C" />
+            </linearGradient>
+            <linearGradient id="copilot-ribbon-2" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#20DFB3" />
+              <stop offset="55%" stopColor="#0078D4" />
+              <stop offset="100%" stopColor="#E04355" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M7 13.5C7 10 9.8 7 13.3 7H17.5C19.4 7 21 8.6 21 10.5V12C21 15.6 18.2 18.5 14.7 18.5H10.5C8.6 18.5 7 16.9 7 15V13.5Z"
+            fill="url(#copilot-ribbon-1)"
+          />
+          <path
+            d="M17 10.5C17 14 14.2 17 10.7 17H6.5C4.6 17 3 15.4 3 13.5V12C3 8.4 5.8 5.5 9.3 5.5H13.5C15.4 5.5 17 7.1 17 9V10.5Z"
+            fill="url(#copilot-ribbon-2)"
+          />
+          <circle cx="10" cy="11.2" r="1.5" fill="#FFFFFF" />
+          <circle cx="14" cy="12.8" r="1.5" fill="#FFFFFF" />
+        </svg>
+      )}
+      <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#E6005A] animate-pulse pointer-events-none" />
+    </div>
   );
 };
 
@@ -241,7 +263,7 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
           </button>
 
           {/* 4-Tab Viewport with Zero-Delay Simultaneous Slide Animation */}
-          <div className="w-[224px] sm:w-[244px] overflow-hidden flex items-center justify-center relative min-h-[48px] sm:min-h-[50px]">
+          <div className="w-[236px] sm:w-[256px] overflow-hidden flex items-center justify-center relative min-h-[48px] sm:min-h-[50px]">
             <AnimatePresence custom={direction} mode="popLayout" initial={false}>
               <motion.div
                 key={currentPage}
@@ -250,7 +272,7 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="flex items-center justify-between w-full px-1"
+                className="flex items-center justify-between w-full px-1.5"
               >
                 {pages[currentPage].map((item) => {
                   const active = isActive(item.route, item.id);
@@ -265,16 +287,16 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
                       onClick={() => handleTabClick(item)}
                       title={item.title}
                       aria-label={item.title}
-                      className={`group relative w-12 h-12 sm:w-12.5 sm:h-12.5 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
+                      className={`group relative flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
                         active
-                          ? 'bg-white/25 text-white shadow-[0_0_16px_rgba(255,255,255,0.25)] ring-1 ring-white/40 scale-105'
-                          : 'text-white/75 hover:text-white hover:bg-white/10 hover:scale-105 active:scale-95'
+                          ? 'w-14 sm:w-15 h-9.5 sm:h-10 rounded-full bg-white/20 text-white'
+                          : 'w-10 h-10 sm:w-10.5 sm:h-10.5 rounded-full text-white/75 hover:text-white hover:bg-white/10 active:scale-95'
                       }`}
                     >
                       {CustomIcon ? (
-                        <CustomIcon active={active} className="w-6 h-6 sm:w-6.5 sm:h-6.5 text-white" />
+                        <CustomIcon active={active} className="w-5.5 h-5.5 sm:w-6 sm:h-6" />
                       ) : Icon ? (
-                        <Icon className="w-6 h-6 sm:w-6.5 sm:h-6.5 stroke-[2] text-white" />
+                        <Icon className="w-5.5 h-5.5 sm:w-6 sm:h-6 stroke-[2] text-white" />
                       ) : null}
                     </button>
                   );
