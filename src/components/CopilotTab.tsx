@@ -29,13 +29,21 @@ import {
   Heart,
   Info,
   SlidersHorizontal,
-  ChevronLeft
+  ChevronLeft,
+  Music,
+  Video,
+  Image as ImageIcon,
+  Disc3,
+  Clapperboard
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { processCopilotCommand, SearchCategoryGroup, SearchItem } from "../utils/copilotCommands";
 import { CopilotMarkdown } from "./CopilotMarkdown";
 import { CopilotBetArena } from "./CopilotBetArena";
 import { useSettings } from "../hooks/useSettings";
+import { CopilotMusicGenerator } from "./copilot/CopilotMusicGenerator";
+import { CopilotImageGenerator } from "./copilot/CopilotImageGenerator";
+import { CopilotVideoGenerator } from "./copilot/CopilotVideoGenerator";
 
 export interface CopilotMessage {
   role: "user" | "model";
@@ -81,6 +89,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
   const [isVIntelLoading, setIsVIntelLoading] = useState(false);
   const [spinCount, setSpinCount] = useState(0);
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState(false);
+  const [activeCopilotFeature, setActiveCopilotFeature] = useState<'chat' | 'music' | 'image' | 'video'>('chat');
 
   // Sessions state initialization
   const [sessions, setSessions] = useState<CopilotSession[]>(() => {
@@ -270,6 +279,24 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
   const handleSend = async (customPrompt?: string) => {
     const promptToSend = customPrompt || vIntelQuery;
     if (!promptToSend.trim() || isVIntelLoading) return;
+
+    // Check for quick feature slash shortcuts
+    const lower = promptToSend.trim().toLowerCase();
+    if (lower.startsWith("/music") || lower.startsWith("/nhac") || lower.startsWith("/tao-nhac") || lower.startsWith("/song")) {
+      setActiveCopilotFeature("music");
+      setVIntelQuery("");
+      return;
+    }
+    if (lower.startsWith("/image") || lower.startsWith("/anh") || lower.startsWith("/ve") || lower.startsWith("/draw") || lower.startsWith("/art")) {
+      setActiveCopilotFeature("image");
+      setVIntelQuery("");
+      return;
+    }
+    if (lower.startsWith("/video") || lower.startsWith("/phim") || lower.startsWith("/clip") || lower.startsWith("/tao-video")) {
+      setActiveCopilotFeature("video");
+      setVIntelQuery("");
+      return;
+    }
 
     const userMsg: CopilotMessage = { role: "user", text: promptToSend, timestamp: Date.now() };
     const updatedHistory = [...currentMessages, userMsg];
@@ -550,8 +577,82 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
         </div>
       </div>
 
+      {/* Mode Selector Navigation Pills: Chat, Music Studio, Image Studio, Video Studio */}
+      <div className="shrink-0 mb-3 flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+        <button
+          id="copilot-mode-chat"
+          onClick={() => setActiveCopilotFeature("chat")}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            activeCopilotFeature === "chat"
+              ? "bg-[#E50914] text-white shadow-md shadow-[#E50914]/25 scale-102"
+              : "bg-white/70 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10"
+          }`}
+        >
+          <Bot className="w-3.5 h-3.5" />
+          <span>Trò chuyện (Chat)</span>
+        </button>
+
+        <button
+          id="copilot-mode-music"
+          onClick={() => setActiveCopilotFeature("music")}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            activeCopilotFeature === "music"
+              ? "bg-gradient-to-r from-[#E6005A] to-purple-600 text-white shadow-md shadow-pink-500/25 scale-102"
+              : "bg-white/70 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10"
+          }`}
+        >
+          <Music className="w-3.5 h-3.5 text-pink-400" />
+          <span>Music Generator (Tạo Nhạc AI)</span>
+        </button>
+
+        <button
+          id="copilot-mode-image"
+          onClick={() => setActiveCopilotFeature("image")}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            activeCopilotFeature === "image"
+              ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md shadow-purple-500/25 scale-102"
+              : "bg-white/70 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10"
+          }`}
+        >
+          <ImageIcon className="w-3.5 h-3.5 text-purple-400" />
+          <span>Image Generator (Tạo Ảnh AI)</span>
+        </button>
+
+        <button
+          id="copilot-mode-video"
+          onClick={() => setActiveCopilotFeature("video")}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            activeCopilotFeature === "video"
+              ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-102"
+              : "bg-white/70 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10"
+          }`}
+        >
+          <Video className="w-3.5 h-3.5 text-blue-400" />
+          <span>Video Generator (Tạo Video AI)</span>
+        </button>
+      </div>
+
+      {activeCopilotFeature === "music" && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <CopilotMusicGenerator onBackToChat={() => setActiveCopilotFeature("chat")} />
+        </div>
+      )}
+
+      {activeCopilotFeature === "image" && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <CopilotImageGenerator onBackToChat={() => setActiveCopilotFeature("chat")} />
+        </div>
+      )}
+
+      {activeCopilotFeature === "video" && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <CopilotVideoGenerator onBackToChat={() => setActiveCopilotFeature("chat")} />
+        </div>
+      )}
+
       {/* Main Layout Area (with collapsible Chat History Sidebar) */}
-      <div className="flex-1 flex min-h-0 overflow-hidden relative bg-transparent gap-3">
+      {activeCopilotFeature === "chat" && (
+        <div className="flex-1 flex min-h-0 overflow-hidden relative bg-transparent gap-3">
         {/* Chat History Panel (Desktop Drawer / Mobile Overlay) */}
         <AnimatePresence>
           {isHistoryDrawerOpen && (
@@ -991,9 +1092,38 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
             )}
           </div>
 
-          {/* Text Input Area with Spotlight Search Box Design Style */}
-          {/* Requirement: No magnifying glass by default; only show magnifying glass when typing /search */}
-          <div className="shrink-0 mt-3 pt-2">
+          {/* Quick AI Generators & Text Input Area */}
+          <div className="shrink-0 mt-3 pt-1 space-y-2">
+            {/* Quick generator action chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-1 text-xs">
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0 mr-1">
+                AI Studio:
+              </span>
+              <button
+                onClick={() => setActiveCopilotFeature("music")}
+                className="px-3 py-1 rounded-full bg-pink-500/10 hover:bg-pink-500/20 text-[#E6005A] dark:text-pink-300 font-semibold flex items-center gap-1.5 border border-pink-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
+              >
+                <Music className="w-3 h-3 text-[#E6005A]" />
+                <span>🎵 Tạo bài hát Lofi</span>
+              </button>
+
+              <button
+                onClick={() => setActiveCopilotFeature("image")}
+                className="px-3 py-1 rounded-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-300 font-semibold flex items-center gap-1.5 border border-purple-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
+              >
+                <ImageIcon className="w-3 h-3 text-purple-500" />
+                <span>🎨 Vẽ ảnh Cyberpunk</span>
+              </button>
+
+              <button
+                onClick={() => setActiveCopilotFeature("video")}
+                className="px-3 py-1 rounded-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold flex items-center gap-1.5 border border-blue-500/20 transition-all cursor-pointer active:scale-95 shrink-0"
+              >
+                <Video className="w-3 h-3 text-blue-500" />
+                <span>🎬 Tạo video TV Intro</span>
+              </button>
+            </div>
+
             <div className="w-full h-[52px] sm:h-[56px] flex items-center justify-between px-3.5 sm:px-4 rounded-full spotlight-bubble-box search-box-capsule text-sm transition-all">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 {/* Conditionally rendered Magnifying Glass: Only visible when query starts with /search */}
@@ -1060,6 +1190,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

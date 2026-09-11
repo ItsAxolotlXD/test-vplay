@@ -82,6 +82,9 @@ import {
   VRecorderTab
 } from "./vapps";
 import { VNotesView } from "./VNotesView";
+import { CopilotMusicGenerator } from "./copilot/CopilotMusicGenerator";
+import { CopilotImageGenerator } from "./copilot/CopilotImageGenerator";
+import { CopilotVideoGenerator } from "./copilot/CopilotVideoGenerator";
 
 export interface CopilotMessage {
   role: "user" | "model";
@@ -294,6 +297,45 @@ export const SPACE360_APPS: Space360AppItem[] = [
     icon: Mic,
     accentColor: "text-rose-500 border-rose-500/30 bg-rose-500/10",
     bgGradient: "from-rose-500/20 via-pink-900/30 to-red-900/30"
+  },
+  {
+    id: "v_music_gen",
+    name: "Copilot Music Studio",
+    shortName: "Sáng Tác Nhạc AI",
+    tagline: "Tạo giai điệu, hợp âm & bài hát theo phong cách",
+    description: "Công cụ sáng tác nhạc bằng AI với bộ tổng hợp âm thanh Web Audio, mô phỏng synth & piano thực tế.",
+    category: "media",
+    categoryLabel: "Âm nhạc",
+    badge: "AI Studio",
+    icon: Music,
+    accentColor: "text-pink-500 border-pink-500/30 bg-pink-500/10",
+    bgGradient: "from-pink-500/20 via-purple-900/30 to-indigo-900/30"
+  },
+  {
+    id: "v_image_gen",
+    name: "Copilot Image Studio",
+    shortName: "Tạo Ảnh Nghệ Thuật AI",
+    tagline: "Biến mô tả chữ thành tác phẩm hình ảnh sắc nét",
+    description: "Studio tạo ảnh AI chất lượng cao, đa dạng phong cách điện ảnh, anime, 3D render, cyberpunk.",
+    category: "media",
+    categoryLabel: "Đồ họa",
+    badge: "AI Studio",
+    icon: ImageIcon,
+    accentColor: "text-purple-500 border-purple-500/30 bg-purple-500/10",
+    bgGradient: "from-purple-500/20 via-pink-900/30 to-rose-900/30"
+  },
+  {
+    id: "v_video_gen",
+    name: "Copilot Video Studio",
+    shortName: "Tạo Video Storyboard AI",
+    tagline: "Lên kịch bản video nhiều phân cảnh & xuất WebM",
+    description: "Bộ dựng video phân cảnh AI thông minh: vẽ khung hình động, chuyển động camera và xuất video trực tiếp.",
+    category: "media",
+    categoryLabel: "Phim ảnh",
+    badge: "AI Studio",
+    icon: Video,
+    accentColor: "text-blue-500 border-blue-500/30 bg-blue-500/10",
+    bgGradient: "from-blue-500/20 via-indigo-900/30 to-purple-900/30"
   }
 ];
 
@@ -1410,8 +1452,35 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                 </div>
               </div>
 
-              {/* SUGGESTION PILLS (2 Rows matching the screenshot) */}
-              <div className="flex flex-col items-center gap-2.5 max-w-2xl w-full mb-8">
+              {/* SUGGESTION PILLS (AI Studio Features + Quick Prompts) */}
+              <div className="flex flex-col items-center gap-2.5 max-w-3xl w-full mb-8">
+                {/* AI Studio Generative Features: Music, Image, Video */}
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-1">
+                  <button
+                    onClick={() => setActiveSpace360App("v_music_gen")}
+                    className="px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer border shadow-xs hover:scale-105 active:scale-95 flex items-center gap-2 bg-pink-500/10 hover:bg-pink-500/20 border-pink-500/30 text-pink-600 dark:text-pink-400"
+                  >
+                    <Music className="w-3.5 h-3.5 text-pink-500" />
+                    <span>🎵 Sáng tác Nhạc AI (Music Studio)</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveSpace360App("v_image_gen")}
+                    className="px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer border shadow-xs hover:scale-105 active:scale-95 flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 border-purple-500/30 text-purple-600 dark:text-purple-400"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5 text-purple-500" />
+                    <span>🎨 Tạo Ảnh Nghệ Thuật (Image Studio)</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveSpace360App("v_video_gen")}
+                    className="px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer border shadow-xs hover:scale-105 active:scale-95 flex items-center gap-2 bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/30 text-blue-600 dark:text-blue-400"
+                  >
+                    <Video className="w-3.5 h-3.5 text-blue-500" />
+                    <span>🎬 Tạo Video Storyboard (Video Studio)</span>
+                  </button>
+                </div>
+
                 {/* Row 1 */}
                 <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
                   <button
@@ -1426,7 +1495,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                   </button>
 
                   <button
-                    onClick={() => handlePillClick("🖼️ Create an image")}
+                    onClick={() => setActiveSpace360App("v_image_gen")}
                     className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer border shadow-2xs hover:scale-105 active:scale-95 flex items-center gap-1.5 ${
                       isDark
                         ? "bg-white/5 hover:bg-white/10 text-zinc-300 border-white/10"
@@ -2566,6 +2635,24 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                   {activeSpace360App === "v_recorder" && (
                     <div className="h-full">
                       <VRecorderTab />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_music_gen" && (
+                    <div className="h-full">
+                      <CopilotMusicGenerator onBackToChat={() => setActiveSpace360App(null)} />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_image_gen" && (
+                    <div className="h-full">
+                      <CopilotImageGenerator onBackToChat={() => setActiveSpace360App(null)} />
+                    </div>
+                  )}
+
+                  {activeSpace360App === "v_video_gen" && (
+                    <div className="h-full">
+                      <CopilotVideoGenerator onBackToChat={() => setActiveSpace360App(null)} />
                     </div>
                   )}
                 </div>
