@@ -150,8 +150,50 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'vplay_lang_file_content';
+const SETTINGS_STORAGE_KEY = 'waves_system_settings';
+
+const ENGLISH_UI: Record<string, string> = {
+  'space360.title': 'Space 360',
+  'space360.description': 'A unified collection of mini-apps and interactive tools.',
+  'space360.search': 'Search Space 360 apps...',
+  'space360.all': 'All',
+  'space360.games': 'Games & Arcade',
+  'space360.utilities': 'Utilities & Files',
+  'space360.learning': 'Learning & Culture',
+  'space360.media': 'Entertainment & Media',
+  'space360.open': 'Open',
+  'space360.list': 'App list',
+  'space360.fullscreen': 'Open full screen',
+  'space360.empty': 'No apps match your search.',
+  'space360.showAll': 'Show all apps',
+  'settings.language.title': 'Accessibility & language',
+  'settings.language.description': 'Customize how Space 360 looks and supports your daily use.',
+  'settings.language.label': 'App language',
+  'settings.language.help': 'Vietnamese is the default. Changes apply across supported screens.',
+};
+
+const getStoredAppLanguage = (): 'vi' | 'en' => {
+  try {
+    const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const parsed = saved ? JSON.parse(saved) : null;
+    return parsed?.appLanguage === 'en' ? 'en' : 'vi';
+  } catch {
+    return 'vi';
+  }
+};
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [appLanguage, setAppLanguage] = useState<'vi' | 'en'>(getStoredAppLanguage);
+
+  useEffect(() => {
+    const syncLanguage = () => setAppLanguage(getStoredAppLanguage());
+    window.addEventListener('waves_settings_change', syncLanguage);
+    window.addEventListener('storage', syncLanguage);
+    return () => {
+      window.removeEventListener('waves_settings_change', syncLanguage);
+      window.removeEventListener('storage', syncLanguage);
+    };
+  }, []);
   const [langRawContent, setLangRawContentState] = useState<string>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -227,8 +269,12 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLangRawContent(DEFAULT_VPLAY_LANG);
   };
 
-  // Translation function t(key, fallback)
+  // Translation function t(key, fallback). Built-in English labels take priority
+  // over the editable Vietnamese language file when English is selected.
   const t = (key: string, fallback?: string): string => {
+    if (appLanguage === 'en' && ENGLISH_UI[key]) {
+      return ENGLISH_UI[key];
+    }
     if (Object.prototype.hasOwnProperty.call(langMap, key)) {
       return langMap[key];
     }

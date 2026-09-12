@@ -23,6 +23,7 @@ import { VNotesView } from './VNotesView';
 import { MinecraftContainerEmulator } from './minecraft/MinecraftContainerEmulator';
 import { VFlowTab } from './vflow/VFlowTab';
 import { ChatRoomView } from './chat/ChatRoomView';
+import { useLang } from '../context/LanguageContext';
 import {
   Compass,
   Sparkles,
@@ -375,8 +376,9 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   navigate,
 }) => {
   const [activeApp, setActiveApp] = useState<VAppId>(initialAppId);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLang();
 
   // Sync activeApp when initialAppId changes
   useEffect(() => {
@@ -386,12 +388,12 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   }, [initialAppId]);
 
   const categories = [
-    'Tất cả',
-    'Trò chơi (Arcade)',
-    'Tiện ích & Tệp tin',
-    'Học tập & Văn hóa',
-    'Giải trí & Media',
-    'Đang mở'
+    { id: 'all', label: t('space360.all', 'Tất cả') },
+    { id: 'games', label: t('space360.games', 'Trò chơi (Arcade)') },
+    { id: 'utilities', label: t('space360.utilities', 'Tiện ích & Tệp tin') },
+    { id: 'learning', label: t('space360.learning', 'Học tập & Văn hóa') },
+    { id: 'media', label: t('space360.media', 'Giải trí & Media') },
+    { id: 'open', label: t('space360.open', 'Đang mở') }
   ];
 
   const handleSelectApp = (appId: VAppId) => {
@@ -477,10 +479,11 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   const filteredApps = useMemo(() => {
     return VAPPS_LIST.filter((app) => {
       let matchCat = true;
-      if (selectedCategory === 'Đang mở') {
+      const selectedCategoryLabel = categories.find((category) => category.id === selectedCategory)?.label;
+      if (selectedCategory === 'open') {
         matchCat = app.id === activeApp;
-      } else if (selectedCategory !== 'Tất cả') {
-        matchCat = app.category === selectedCategory;
+      } else if (selectedCategory !== 'all') {
+        matchCat = app.category === selectedCategoryLabel;
       }
 
       const matchSearch =
@@ -502,13 +505,13 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       <div className="w-full overflow-x-auto no-scrollbar pb-2 mb-6">
         <div className="flex items-center gap-2 min-w-max">
           {categories.map((cat) => {
-            const isSelected = selectedCategory === cat;
+            const isSelected = selectedCategory === cat.id;
             return (
               <button
-                key={cat}
+                key={cat.id}
                 onClick={() => {
                   playPopSound();
-                  setSelectedCategory(cat);
+                  setSelectedCategory(cat.id);
                 }}
                 className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border-0 ${
                   isSelected
@@ -516,7 +519,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
                     : 'bg-[#1E1E24] text-[#A1A1AA] hover:text-white hover:bg-[#2A2A34]'
                 }`}
               >
-                {cat}
+                {cat.label}
               </button>
             );
           })}
@@ -639,7 +642,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
             <button
               onClick={() => {
                 setSearchQuery('');
-                setSelectedCategory('Tất cả');
+                setSelectedCategory('all');
               }}
               className="mt-3 px-4 py-1.5 rounded-full bg-[#E6005A] text-white text-xs font-bold"
             >
