@@ -18,7 +18,8 @@ import {
   Layout,
   PanelLeft,
   PanelTop,
-  Compass
+  Compass,
+  Monitor
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -44,6 +45,17 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
     setInputUserName(finalVal);
     setIsNameSaved(true);
     setTimeout(() => setIsNameSaved(false), 2000);
+  };
+
+  const [oobeResetTriggered, setOobeResetTriggered] = useState(false);
+
+  const handleResetOobe = () => {
+    try {
+      localStorage.removeItem('vplay_oobe_completed');
+    } catch {}
+    setOobeResetTriggered(true);
+    window.dispatchEvent(new CustomEvent('vplay:open_oobe'));
+    setTimeout(() => setOobeResetTriggered(false), 2000);
   };
 
   const matchesSearch = (text: string) => {
@@ -799,6 +811,34 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     </button>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Card 0.5: Reset OOBE Setup Screen */}
+            {(matchesSearch('OOBE') || matchesSearch('Reset OOBE') || matchesSearch('Thiết lập lần đầu') || matchesSearch('Setup') || matchesSearch('Windows') || matchesSearch("Who's going to use Vplay") || matchesSearch('Khởi động')) && (
+              <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
+                <div>
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <Monitor className="w-4 h-4 text-[#0078D4]" />
+                    <span>Màn hình thiết lập OOBE lần đầu</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0078D4]/20 text-[#38A6FF] border border-[#0078D4]/30">
+                      Windows 11 OOBE
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    Trải nghiệm lại màn hình chào mừng và thiết lập &ldquo;Who&apos;s going to use Vplay?&rdquo; phong cách Windows Out-of-Box Experience
+                  </div>
+                </div>
+
+                <button
+                  id="btn-reset-oobe"
+                  type="button"
+                  onClick={handleResetOobe}
+                  className="h-10 px-4 rounded-xl text-xs font-semibold bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0 self-start sm:self-auto"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>{oobeResetTriggered ? 'Đang mở OOBE...' : 'Reset OOBE'}</span>
+                </button>
               </div>
             )}
 

@@ -7,6 +7,7 @@ import { SpotlightModal } from './components/SpotlightModal';
 import { CustomStreamModal } from './components/CustomStreamModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { SplashScreen } from './components/SplashScreen';
+import { OobeSetupModal } from './components/OobeSetupModal';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
 import { LiveTV } from './pages/LiveTV';
@@ -57,7 +58,7 @@ import { useFavorites } from './hooks/useFavorites';
 import { useFeatureFlags } from './hooks/useFeatureFlags';
 
 export default function App() {
-  const { settings } = useSettings();
+  const { settings, updateSetting } = useSettings();
   const { flags } = useFeatureFlags();
   const isFloatyMode = Boolean(settings.floatyBar);
   const isTopBarMode = settings.navigationMode 
@@ -137,6 +138,31 @@ export default function App() {
     window.addEventListener('vplay:replay_splash', handleReplaySplash);
     return () => window.removeEventListener('vplay:replay_splash', handleReplaySplash);
   }, []);
+
+  // OOBE First-time Setup Modal State
+  const [isOobeOpen, setIsOobeOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('vplay_oobe_completed') !== 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handleOpenOobe = () => {
+      setIsOobeOpen(true);
+    };
+    window.addEventListener('vplay:open_oobe', handleOpenOobe);
+    return () => window.removeEventListener('vplay:open_oobe', handleOpenOobe);
+  }, []);
+
+  const handleCompleteOobe = (name: string) => {
+    try {
+      localStorage.setItem('vplay_oobe_completed', 'true');
+    } catch {}
+    updateSetting('userName', name);
+    setIsOobeOpen(false);
+  };
 
   // Modals state
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
@@ -644,6 +670,14 @@ export default function App() {
           }}
         />
       )}
+
+      {/* Windows 11 Style OOBE First-Time Setup Modal */}
+      <OobeSetupModal
+        isOpen={isOobeOpen && !showSplashScreen}
+        onClose={() => setIsOobeOpen(false)}
+        onComplete={handleCompleteOobe}
+        initialName={settings.userName}
+      />
 
       {/* Startup / Refresh Welcome Modal */}
       <WelcomeModal
