@@ -20,7 +20,7 @@ import {
 // Custom Copilot Icon matching TopBar with remote SVG, pulsing dot, and vector fallback
 export const CopilotCustomIcon: React.FC<{ active?: boolean; className?: string }> = ({
   active = false,
-  className = 'w-5.5 h-5.5 sm:w-6 sm:h-6',
+  className = 'w-6 h-6 sm:w-6.5 sm:h-6.5',
 }) => {
   const [hasError, setHasError] = useState(false);
 
@@ -248,8 +248,8 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
       className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 select-none pointer-events-auto"
     >
       <div className="relative flex flex-col items-center">
-        {/* Main Pill Bar with reduced backdrop blur opacity */}
-        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-full bg-[#121118]/45 backdrop-blur-xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.45)] ring-1 ring-white/5">
+        {/* Main Pill Bar with reduced backdrop blur opacity and no indicator */}
+        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-full bg-[#121118]/25 backdrop-blur-md border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.25)]">
           {/* Left Polar Arrow Button */}
           <button
             id="floaty-bar-prev-page"
@@ -257,13 +257,13 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
             onClick={handlePrevPage}
             aria-label="Trang trước"
             title="Trang trước"
-            className="w-10 h-10 sm:w-10.5 sm:h-10.5 rounded-full flex items-center justify-center text-white/75 hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer shrink-0"
+            className="w-10 h-10 sm:w-10.5 sm:h-10.5 rounded-full flex items-center justify-center text-white hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer shrink-0 border-0 shadow-none"
           >
-            <ChevronLeft className="w-6 h-6 stroke-[2.5] text-white" />
+            <ChevronLeft className="w-6.5 h-6.5 stroke-[2.5] text-white" />
           </button>
 
           {/* 4-Tab Viewport with Zero-Delay Simultaneous Slide Animation */}
-          <div className="w-[236px] sm:w-[256px] overflow-hidden flex items-center justify-center relative min-h-[48px] sm:min-h-[50px]">
+          <div className="w-[244px] sm:w-[268px] overflow-hidden flex items-center justify-center relative min-h-[48px] sm:min-h-[50px]">
             <AnimatePresence custom={direction} mode="popLayout" initial={false}>
               <motion.div
                 key={currentPage}
@@ -287,16 +287,16 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
                       onClick={() => handleTabClick(item)}
                       title={item.title}
                       aria-label={item.title}
-                      className={`group relative flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
+                      className={`group relative flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 border-0 shadow-none outline-none ${
                         active
-                          ? 'w-14 sm:w-15 h-9.5 sm:h-10 rounded-full bg-white/20 text-white'
-                          : 'w-10 h-10 sm:w-10.5 sm:h-10.5 rounded-full text-white/75 hover:text-white hover:bg-white/10 active:scale-95'
+                          ? 'w-14 sm:w-15 h-10 sm:h-10.5 rounded-full bg-white/20 text-white'
+                          : 'w-10.5 h-10.5 sm:w-11 sm:h-11 rounded-full text-white hover:text-white hover:bg-white/10 active:scale-95'
                       }`}
                     >
                       {CustomIcon ? (
-                        <CustomIcon active={active} className="w-5.5 h-5.5 sm:w-6 sm:h-6" />
+                        <CustomIcon active={active} className="w-6 h-6 sm:w-6.5 sm:h-6.5" />
                       ) : Icon ? (
-                        <Icon className="w-5.5 h-5.5 sm:w-6 sm:h-6 stroke-[2] text-white" />
+                        <Icon className="w-6 h-6 sm:w-6.5 sm:h-6.5 stroke-[2] text-white" />
                       ) : null}
                     </button>
                   );
@@ -312,9 +312,9 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
             onClick={handleNextPage}
             aria-label="Trang kế tiếp"
             title="Trang kế tiếp"
-            className="w-10 h-10 sm:w-10.5 sm:h-10.5 rounded-full flex items-center justify-center text-white/75 hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer shrink-0"
+            className="w-10 h-10 sm:w-10.5 sm:h-10.5 rounded-full flex items-center justify-center text-white hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer shrink-0 border-0 shadow-none"
           >
-            <ChevronRight className="w-6 h-6 stroke-[2.5] text-white" />
+            <ChevronRight className="w-6.5 h-6.5 stroke-[2.5] text-white" />
           </button>
         </div>
       </div>

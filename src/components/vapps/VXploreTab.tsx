@@ -308,26 +308,30 @@ export const VXploreTab: React.FC = () => {
   const selectedFile = (activeCategory === 'trash' ? recycleBin : files).find((f) => f.id === selectedFileId);
 
   return (
-    <div className="w-full bg-[#242628] border-4 border-[#141414] shadow-2xl font-jura select-none text-white space-y-0.5">
-      {/* 1. TOP WINDOW TITLE BAR (WINDOWS FILE EXPLORER / ORE UI STYLE) */}
-      <div className="bg-[#1f2022] border-b-2 border-[#141414] p-2 sm:p-3 flex items-center justify-between shadow-[inset_1px_1px_0_#3f4246]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-purple-600 border-2 border-[#141414] flex items-center justify-center text-white shadow-[inset_1px_1px_0_#c084fc]">
-            <Folder className="w-4 h-4 fill-white" />
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6 space-y-5 select-none pb-16 text-white">
+      {/* 1. TOP HEADER - V-FLOW STYLE */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#2D2D38]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/25 shrink-0">
+            <Folder className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="font-black text-xs sm:text-sm text-white uppercase tracking-wider font-jura flex items-center gap-2">
-              <span>V-FILES FILE MANAGER</span>
-              <span className="bg-[#a855f7] text-white px-2 py-0.5 text-[9px] font-bold font-mono border border-[#141414]">
-                WINDOWS EXPLORER ORE UI
-              </span>
-            </h2>
-            <p className="text-[10px] text-zinc-400 font-mono">Quản lý tệp, sao lưu M3U8 & dữ liệu đám mây Vplay</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                V-Files
+                <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  QUẢN LÝ TỆP & CLOUD
+                </span>
+              </h1>
+            </div>
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
+              Quản lý tệp tin, sao lưu danh sách phát M3U8 & dữ liệu đám mây Vplay
+            </p>
           </div>
         </div>
 
         {/* Quick Storage Status Pill */}
-        <div className="hidden sm:flex items-center gap-2 bg-[#141414] px-3 py-1 border border-zinc-700 text-[11px] font-mono">
+        <div className="flex items-center gap-2.5 bg-[#1F1E24] px-3.5 py-1.5 rounded-full border border-[#2D2D38] text-xs font-mono self-start sm:self-auto">
           <HardDrive className="w-3.5 h-3.5 text-purple-400" />
           <span className="text-zinc-300">Ổ C: 4.2 GB / 15 GB</span>
           <span className="text-zinc-600">|</span>
@@ -336,28 +340,28 @@ export const VXploreTab: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. TOP ORE UI TOOLBAR RIBBON */}
-      <div className="bg-[#2d2f32] border-b-2 border-[#141414] p-2 flex flex-wrap items-center justify-between gap-2 shadow-[inset_1px_1px_0_#5a5d61]">
-        {/* Left Actions: New Folder, Upload, Create Text, Delete */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <VplayPrimaryButton
+      {/* 2. V-FLOW TOOLBAR RIBBON */}
+      <div className="bg-[#1F1E24] rounded-2xl border border-[#2D2D38] p-3 flex flex-wrap items-center justify-between gap-2 shadow-md">
+        {/* Left Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
             onClick={() => {
               playPopSound();
               setIsNewFolderModal(true);
             }}
-            className="!py-1.5 !px-2.5 text-xs font-bold"
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
           >
-            <FolderPlus className="w-3.5 h-3.5 inline mr-1 text-amber-300" />
+            <FolderPlus className="w-3.5 h-3.5 text-amber-300" />
             <span>Thư Mục Mới</span>
-          </VplayPrimaryButton>
+          </button>
 
-          <VplaySecondaryButton
+          <button
             onClick={() => fileInputRef.current?.click()}
-            className="!py-1.5 !px-2.5 text-xs font-bold"
+            className="px-3.5 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-200 border border-[#3E3D4D] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
           >
-            <Upload className="w-3.5 h-3.5 inline mr-1 text-sky-400" />
+            <Upload className="w-3.5 h-3.5 text-sky-400" />
             <span>Tải Tệp Lên</span>
-          </VplaySecondaryButton>
+          </button>
           <input
             type="file"
             ref={fileInputRef}
@@ -366,46 +370,46 @@ export const VXploreTab: React.FC = () => {
             className="hidden"
           />
 
-          <VplaySecondaryButton
+          <button
             onClick={() => {
               playPopSound();
               setIsNewTextModal(true);
             }}
-            className="!py-1.5 !px-2.5 text-xs font-bold"
+            className="px-3.5 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-200 border border-[#3E3D4D] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5 inline mr-1 text-emerald-400" />
+            <Plus className="w-3.5 h-3.5 text-emerald-400" />
             <span>Tạo Ghi Chú</span>
-          </VplaySecondaryButton>
+          </button>
 
           {activeCategory === 'trash' ? (
-            <VplaySecondaryButton
+            <button
               onClick={handleRestoreFromTrash}
               disabled={!selectedFileId}
-              className="!py-1.5 !px-2.5 text-xs font-bold"
+              className="px-3.5 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] disabled:opacity-40 text-emerald-300 border border-[#3E3D4D] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <RotateCw className="w-3.5 h-3.5 inline mr-1 text-emerald-400" />
+              <RotateCw className="w-3.5 h-3.5" />
               <span>Khôi Phục</span>
-            </VplaySecondaryButton>
+            </button>
           ) : (
-            <VplaySecondaryButton
+            <button
               onClick={handleDeleteSelected}
               disabled={!selectedFileId}
-              className="!py-1.5 !px-2.5 text-xs font-bold hover:!bg-rose-700 hover:!text-white"
+              className="px-3.5 py-2 rounded-xl bg-[#2A2933] hover:bg-rose-900/50 disabled:opacity-40 text-rose-300 border border-[#3E3D4D] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5 inline mr-1 text-rose-400" />
+              <Trash2 className="w-3.5 h-3.5" />
               <span>Xóa Tệp</span>
-            </VplaySecondaryButton>
+            </button>
           )}
         </div>
 
         {/* Right Actions: View Toggle */}
-        <div className="flex items-center gap-1 border-l-2 border-[#141414] pl-2">
+        <div className="flex items-center gap-1 bg-[#18171E] p-1 rounded-xl border border-[#2D2D38]">
           <button
             onClick={() => setViewMode('grid')}
-            className={`p-1.5 border border-[#141414] font-bold ${
+            className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'grid'
-                ? 'bg-purple-600 text-white shadow-[inset_1px_1px_0_#c084fc]'
-                : 'bg-[#1f2022] text-zinc-400 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-zinc-400 hover:text-white'
             }`}
             title="Chế độ lưới (Grid)"
           >
@@ -413,10 +417,10 @@ export const VXploreTab: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={`p-1.5 border border-[#141414] font-bold ${
+            className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'list'
-                ? 'bg-purple-600 text-white shadow-[inset_1px_1px_0_#c084fc]'
-                : 'bg-[#1f2022] text-zinc-400 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-zinc-400 hover:text-white'
             }`}
             title="Chế độ danh sách (List)"
           >
@@ -426,19 +430,18 @@ export const VXploreTab: React.FC = () => {
       </div>
 
       {/* 3. BREADCRUMB ADDRESS BAR & SEARCH */}
-      <div className="bg-[#1e2022] border-b-2 border-[#141414] p-2 flex flex-col sm:flex-row items-center gap-2">
-        {/* Navigation Buttons */}
+      <div className="bg-[#1F1E24] rounded-2xl border border-[#2D2D38] p-2.5 flex flex-col sm:flex-row items-center gap-2">
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => setCurrentPath('C:\\Vplay')}
-            className="p-1.5 bg-[#2d2f32] border border-[#141414] text-zinc-300 hover:text-white"
+            className="p-1.5 rounded-xl bg-[#18171E] border border-[#2D2D38] text-zinc-300 hover:text-white transition-all cursor-pointer"
             title="Trở về thư mục gốc C:\\Vplay"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentPath('C:\\Vplay')}
-            className="p-1.5 bg-[#2d2f32] border border-[#141414] text-zinc-300 hover:text-white"
+            className="p-1.5 rounded-xl bg-[#18171E] border border-[#2D2D38] text-zinc-300 hover:text-white transition-all cursor-pointer"
             title="Lên 1 cấp thư mục"
           >
             <ArrowUp className="w-4 h-4" />
@@ -446,146 +449,70 @@ export const VXploreTab: React.FC = () => {
         </div>
 
         {/* Path Address Bar */}
-        <div className="flex-1 w-full bg-[#141414] border-2 border-[#141414] px-3 py-1 flex items-center gap-2 font-mono text-xs text-purple-300 shadow-inner">
+        <div className="flex-1 w-full bg-[#18171E] border border-[#2D2D38] rounded-xl px-3 py-1.5 flex items-center gap-2 font-mono text-xs text-purple-300">
           <HardDrive className="w-3.5 h-3.5 text-purple-400 shrink-0" />
           <span className="truncate">{currentPath}</span>
         </div>
 
         {/* Search Bar */}
-        <div className="relative w-full sm:w-60 shrink-0">
-          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
+        <div className="relative w-full sm:w-64 shrink-0">
+          <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Tìm kiếm tệp V-Files..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#141414] border-2 border-[#141414] pl-8 pr-3 py-1 text-xs text-white placeholder-zinc-500 font-mono focus:outline-none focus:border-purple-500"
+            className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-zinc-500 font-sans focus:outline-none focus:border-purple-500/60"
           />
         </div>
       </div>
 
       {/* 4. MAIN LAYOUT: SIDEBAR + FILE EXPLORER VIEW */}
-      <div className="grid grid-cols-1 md:grid-cols-12 min-h-[460px] divide-y-2 md:divide-y-0 md:divide-x-2 divide-[#141414]">
-        
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
         {/* LEFT SIDEBAR NAVIGATION */}
-        <div className="md:col-span-3 bg-[#242628] p-3 space-y-3 font-jura">
-          <div className="text-[10px] font-bold uppercase font-mono text-zinc-400 tracking-wider">
-            QUICK ACCESS & DRIVES
+        <div className="md:col-span-3 rounded-2xl bg-[#1F1E24] border border-[#2D2D38] p-3 space-y-2 shadow-lg">
+          <div className="text-[10px] font-bold uppercase font-mono text-zinc-400 tracking-wider px-2 pt-1">
+            DANH MỤC LƯU TRỮ
           </div>
 
-          <div className="space-y-1 text-xs font-bold">
-            <button
-              onClick={() => {
-                playPopSound();
-                setActiveCategory('all');
-              }}
-              className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 border ${
-                activeCategory === 'all'
-                  ? 'bg-purple-600 text-white border-purple-400 shadow-[inset_1px_1px_0_#c084fc]'
-                  : 'bg-[#2d2f32] text-zinc-300 hover:bg-[#35383b] border-[#141414]'
-              }`}
-            >
-              <HardDrive className="w-4 h-4 text-purple-300" />
-              <span>Tất cả tệp (Drive C:)</span>
-            </button>
-
-            <button
-              onClick={() => {
-                playPopSound();
-                setActiveCategory('cloud');
-              }}
-              className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 border ${
-                activeCategory === 'cloud'
-                  ? 'bg-purple-600 text-white border-purple-400 shadow-[inset_1px_1px_0_#c084fc]'
-                  : 'bg-[#2d2f32] text-zinc-300 hover:bg-[#35383b] border-[#141414]'
-              }`}
-            >
-              <Cloud className="w-4 h-4 text-sky-400" />
-              <span>V-Cloud Storage (V:)</span>
-            </button>
-
-            <button
-              onClick={() => {
-                playPopSound();
-                setActiveCategory('documents');
-              }}
-              className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 border ${
-                activeCategory === 'documents'
-                  ? 'bg-purple-600 text-white border-purple-400 shadow-[inset_1px_1px_0_#c084fc]'
-                  : 'bg-[#2d2f32] text-zinc-300 hover:bg-[#35383b] border-[#141414]'
-              }`}
-            >
-              <FileText className="w-4 h-4 text-sky-400" />
-              <span>Tài Liệu & Notes</span>
-            </button>
-
-            <button
-              onClick={() => {
-                playPopSound();
-                setActiveCategory('videos');
-              }}
-              className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 border ${
-                activeCategory === 'videos'
-                  ? 'bg-purple-600 text-white border-purple-400 shadow-[inset_1px_1px_0_#c084fc]'
-                  : 'bg-[#2d2f32] text-zinc-300 hover:bg-[#35383b] border-[#141414]'
-              }`}
-            >
-              <Film className="w-4 h-4 text-rose-400" />
-              <span>Videos & M3U8 TV</span>
-            </button>
-
-            <button
-              onClick={() => {
-                playPopSound();
-                setActiveCategory('pictures');
-              }}
-              className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 border ${
-                activeCategory === 'pictures'
-                  ? 'bg-purple-600 text-white border-purple-400 shadow-[inset_1px_1px_0_#c084fc]'
-                  : 'bg-[#2d2f32] text-zinc-300 hover:bg-[#35383b] border-[#141414]'
-              }`}
-            >
-              <ImageIcon className="w-4 h-4 text-emerald-400" />
-              <span>Hình Ảnh</span>
-            </button>
-
-            <button
-              onClick={() => {
-                playPopSound();
-                setActiveCategory('music');
-              }}
-              className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 border ${
-                activeCategory === 'music'
-                  ? 'bg-purple-600 text-white border-purple-400 shadow-[inset_1px_1px_0_#c084fc]'
-                  : 'bg-[#2d2f32] text-zinc-300 hover:bg-[#35383b] border-[#141414]'
-              }`}
-            >
-              <Music className="w-4 h-4 text-purple-400" />
-              <span>Âm Nhạc (Audio)</span>
-            </button>
-
-            <button
-              onClick={() => {
-                playPopSound();
-                setActiveCategory('trash');
-              }}
-              className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 border ${
-                activeCategory === 'trash'
-                  ? 'bg-rose-700 text-white border-rose-400 shadow-[inset_1px_1px_0_#fda4af]'
-                  : 'bg-[#2d2f32] text-zinc-300 hover:bg-[#35383b] border-[#141414]'
-              }`}
-            >
-              <Trash2 className="w-4 h-4 text-rose-400" />
-              <span>Thùng Rác ({recycleBin.length})</span>
-            </button>
+          <div className="space-y-1 text-xs font-semibold">
+            {[
+              { id: 'all', label: 'Tất cả tệp (Drive C:)', icon: HardDrive, color: 'text-purple-300' },
+              { id: 'cloud', label: 'V-Cloud Storage (V:)', icon: Cloud, color: 'text-sky-400' },
+              { id: 'documents', label: 'Tài Liệu & Notes', icon: FileText, color: 'text-amber-400' },
+              { id: 'videos', label: 'Videos & M3U8 TV', icon: Film, color: 'text-rose-400' },
+              { id: 'pictures', label: 'Hình Ảnh', icon: ImageIcon, color: 'text-emerald-400' },
+              { id: 'music', label: 'Âm Nhạc (Audio)', icon: Music, color: 'text-purple-400' },
+              { id: 'trash', label: `Thùng Rác (${recycleBin.length})`, icon: Trash2, color: 'text-rose-400' },
+            ].map((cat) => {
+              const Icon = cat.icon;
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    playPopSound();
+                    setActiveCategory(cat.id as any);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-xl flex items-center gap-2.5 transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md font-bold'
+                      : 'text-zinc-400 hover:text-white hover:bg-[#282733]'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : cat.color}`} />
+                  <span className="truncate">{cat.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Selected File Details Widget */}
           {selectedFile && (
-            <div className="mt-4 p-3 bg-[#1e2022] border-2 border-[#141414] space-y-2 text-xs">
+            <div className="mt-4 p-3.5 rounded-xl bg-[#18171E] border border-[#2D2D38] space-y-2 text-xs">
               <div className="text-[10px] font-bold font-mono text-purple-300 uppercase flex items-center gap-1">
                 <Info className="w-3.5 h-3.5 text-purple-400" />
-                <span>Chi tiết tệp được chọn</span>
+                <span>Chi tiết tệp</span>
               </div>
               <div className="font-bold text-white break-all line-clamp-2">{selectedFile.name}</div>
               <div className="text-[11px] font-mono text-zinc-400 space-y-0.5">
@@ -594,28 +521,28 @@ export const VXploreTab: React.FC = () => {
                 <div>Cập nhật: <span className="text-zinc-300">{selectedFile.dateModified}</span></div>
               </div>
               {selectedFile.content && (
-                <VplayPrimaryButton
+                <button
                   onClick={() => setPreviewFile(selectedFile)}
-                  className="!py-1 text-xs font-bold w-full mt-1"
+                  className="w-full py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer mt-2"
                 >
-                  <Eye className="w-3.5 h-3.5 inline mr-1" /> Mở Xem Tệp
-                </VplayPrimaryButton>
+                  <Eye className="w-3.5 h-3.5" /> Mở Xem Tệp
+                </button>
               )}
             </div>
           )}
         </div>
 
         {/* RIGHT FILE EXPLORER BROWSER AREA */}
-        <div className="md:col-span-9 bg-[#2d2f32] p-3 sm:p-4 overflow-y-auto custom-scrollbar">
+        <div className="md:col-span-9 rounded-2xl bg-[#1F1E24] border border-[#2D2D38] p-4 min-h-[460px] shadow-lg">
           {displayedFiles.length === 0 ? (
-            <div className="py-20 text-center space-y-3 text-zinc-400">
+            <div className="py-24 text-center space-y-3 text-zinc-400">
               <Folder className="w-12 h-12 mx-auto text-zinc-600" />
-              <div className="font-bold text-sm">Thư mục trống hoặc không tìm thấy tệp trùng khớp</div>
-              <p className="text-xs font-mono text-zinc-500">Thêm tệp mới hoặc thay đổi từ khóa tìm kiếm</p>
+              <div className="font-bold text-sm text-zinc-300">Thư mục trống hoặc không tìm thấy tệp trùng khớp</div>
+              <p className="text-xs text-zinc-500">Thêm tệp mới hoặc thay đổi từ khóa tìm kiếm</p>
             </div>
           ) : viewMode === 'grid' ? (
             /* GRID VIEW */
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
               {displayedFiles.map((file) => {
                 const isSelected = selectedFileId === file.id;
 
@@ -630,17 +557,17 @@ export const VXploreTab: React.FC = () => {
                       if (file.content) setPreviewFile(file);
                     }}
                     className={`
-                      p-3 border-2 cursor-pointer flex flex-col items-center text-center justify-between space-y-2 select-none relative transition-none active:translate-y-[1px]
+                      p-3.5 rounded-2xl border cursor-pointer flex flex-col items-center text-center justify-between space-y-2 select-none relative transition-all active:scale-95
                       ${
                         isSelected
-                          ? 'bg-purple-900/60 border-purple-400 text-white shadow-[inset_2px_2px_0_#c084fc,inset_-2px_-2px_0_#581c87]'
-                          : 'bg-[#242628] hover:bg-[#323538] border-[#141414] text-zinc-200 shadow-[inset_1px_1px_0_#414549]'
+                          ? 'bg-[#282736] border-purple-500 shadow-lg text-white'
+                          : 'bg-[#18171E] hover:bg-[#22212B] border-[#2D2D38] text-zinc-200'
                       }
                     `}
                   >
                     {/* Cloud Badge */}
                     {file.isCloud && (
-                      <span className="absolute top-1.5 right-1.5 bg-sky-500 text-black text-[9px] font-black px-1 font-mono">
+                      <span className="absolute top-2 right-2 bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono">
                         CLOUD
                       </span>
                     )}
@@ -650,7 +577,7 @@ export const VXploreTab: React.FC = () => {
 
                     {/* File Name */}
                     <div className="w-full">
-                      <div className="text-xs font-bold line-clamp-2 leading-tight break-all font-jura">
+                      <div className="text-xs font-bold line-clamp-2 leading-snug break-all">
                         {file.name}
                       </div>
                       <div className="text-[10px] font-mono text-zinc-400 mt-1">{file.size}</div>
@@ -662,17 +589,17 @@ export const VXploreTab: React.FC = () => {
           ) : (
             /* LIST VIEW */
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse font-jura text-xs">
+              <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="bg-[#1f2022] border-2 border-[#141414] text-zinc-400 font-mono uppercase text-[10px]">
-                    <th className="p-2 font-bold">Tên Tệp</th>
-                    <th className="p-2 font-bold">Loại</th>
-                    <th className="p-2 font-bold">Kích Thước</th>
-                    <th className="p-2 font-bold">Ngày Chỉnh Sửa</th>
-                    <th className="p-2 font-bold text-right">Lưu Trữ</th>
+                  <tr className="border-b border-[#2D2D38] text-zinc-400 font-mono uppercase text-[10px]">
+                    <th className="pb-3 font-bold">Tên Tệp</th>
+                    <th className="pb-3 font-bold">Loại</th>
+                    <th className="pb-3 font-bold">Kích Thước</th>
+                    <th className="pb-3 font-bold">Ngày Chỉnh Sửa</th>
+                    <th className="pb-3 font-bold text-right">Lưu Trữ</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y-2 divide-[#141414]">
+                <tbody className="divide-y divide-[#2D2D38]/50">
                   {displayedFiles.map((file) => {
                     const isSelected = selectedFileId === file.id;
 
@@ -687,28 +614,28 @@ export const VXploreTab: React.FC = () => {
                           if (file.content) setPreviewFile(file);
                         }}
                         className={`
-                          cursor-pointer select-none
+                          cursor-pointer transition-colors
                           ${
                             isSelected
-                              ? 'bg-purple-900/60 text-white font-bold'
-                              : 'bg-[#242628] hover:bg-[#323538] text-zinc-300'
+                              ? 'bg-purple-900/30 text-white font-bold'
+                              : 'hover:bg-white/5 text-zinc-300'
                           }
                         `}
                       >
-                        <td className="p-2 flex items-center gap-2">
+                        <td className="py-2.5 flex items-center gap-2">
                           <span className="scale-75 shrink-0">{getFileIcon(file.type)}</span>
-                          <span className="truncate font-bold">{file.name}</span>
+                          <span className="truncate font-medium">{file.name}</span>
                         </td>
-                        <td className="p-2 uppercase font-mono text-[10px] text-zinc-400">{file.type}</td>
-                        <td className="p-2 font-mono text-amber-300">{file.size}</td>
-                        <td className="p-2 font-mono text-zinc-400">{file.dateModified}</td>
-                        <td className="p-2 text-right">
+                        <td className="py-2.5 uppercase font-mono text-[10px] text-zinc-400">{file.type}</td>
+                        <td className="py-2.5 font-mono text-amber-300">{file.size}</td>
+                        <td className="py-2.5 font-mono text-zinc-400">{file.dateModified}</td>
+                        <td className="py-2.5 text-right">
                           {file.isCloud ? (
-                            <span className="bg-sky-500 text-black text-[9px] font-black px-1.5 py-0.5 font-mono">
+                            <span className="bg-sky-500/20 text-sky-300 text-[9px] font-bold px-2 py-0.5 rounded-full border border-sky-500/30 font-mono">
                               V-CLOUD
                             </span>
                           ) : (
-                            <span className="bg-[#141414] text-purple-300 text-[9px] font-bold px-1.5 py-0.5 border border-zinc-700 font-mono">
+                            <span className="bg-[#18171E] text-purple-300 text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#2D2D38] font-mono">
                               DRIVE C:
                             </span>
                           )}
@@ -721,56 +648,54 @@ export const VXploreTab: React.FC = () => {
             </div>
           )}
         </div>
-
       </div>
 
       {/* 5. FOOTER STATUS BAR */}
-      <div className="bg-[#1f2022] border-t-2 border-[#141414] p-2 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-zinc-400 gap-1">
+      <div className="p-3 rounded-2xl bg-[#1F1E24] border border-[#2D2D38] flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-400 gap-2">
         <div>
           Hiển thị: <b className="text-white">{displayedFiles.length}</b> tệp • Đã chọn:{' '}
           <b className="text-purple-300">{selectedFile ? selectedFile.name : 'Không có'}</b>
         </div>
         <div className="flex items-center gap-2">
           <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-          <span>V-Files Ore UI v2.5 • Windows Explorer Experience</span>
+          <span>V-Files • Không gian lưu trữ đám mây tốc độ cao</span>
         </div>
       </div>
 
       {/* MODAL: PREVIEW FILE CONTENT */}
       {previewFile && (
-        <div className="fixed inset-0 z-[99990] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="absolute inset-0" onClick={() => setPreviewFile(null)} />
-          <div className="relative z-10 w-full max-w-2xl bg-[#2b2d30] border-4 border-[#141414] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div className="bg-[#1f2022] border-b-2 border-[#141414] p-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
+        <div className="fixed inset-0 z-[99990] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md">
+          <div className="relative z-10 w-full max-w-2xl bg-[#1F1E24] border border-[#343440] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="p-4 border-b border-[#2D2D38] flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
                 {getFileIcon(previewFile.type)}
                 <div>
-                  <h3 className="font-extrabold text-sm text-white font-jura">{previewFile.name}</h3>
+                  <h3 className="font-bold text-sm text-white">{previewFile.name}</h3>
                   <span className="text-[10px] text-purple-300 font-mono">{previewFile.size} • {previewFile.path}</span>
                 </div>
               </div>
               <button
                 onClick={() => setPreviewFile(null)}
-                className="w-7 h-7 bg-[#c6c6c6] hover:bg-rose-600 hover:text-white text-black font-bold border-2 border-[#141414] flex items-center justify-center"
+                className="p-1 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 bg-[#141414] overflow-y-auto flex-1 font-mono text-xs text-zinc-200">
+            <div className="p-4 bg-[#14131A] overflow-y-auto flex-1 font-mono text-xs text-zinc-200">
               {previewFile.type === 'image' && previewFile.content ? (
-                <img src={previewFile.content} alt={previewFile.name} className="max-h-96 mx-auto object-contain" />
+                <img src={previewFile.content} alt={previewFile.name} className="max-h-96 mx-auto object-contain rounded-xl" />
               ) : previewFile.type === 'text' || previewFile.type === 'code' ? (
-                <pre className="whitespace-pre-wrap font-mono leading-relaxed p-3 bg-zinc-950 border border-zinc-800 text-emerald-400">
+                <pre className="whitespace-pre-wrap font-mono leading-relaxed p-3.5 bg-[#18171E] rounded-xl border border-[#2D2D38] text-emerald-400">
                   {previewFile.content || 'Không có nội dung bản xem trước.'}
                 </pre>
               ) : previewFile.type === 'playlist' ? (
-                <div className="space-y-3 p-3 bg-zinc-950 border border-zinc-800">
+                <div className="space-y-3 p-3.5 bg-[#18171E] rounded-xl border border-[#2D2D38]">
                   <div className="text-amber-300 font-bold">#EXTM3U PLAYLIST CONTENT</div>
                   <div className="text-xs text-sky-400 font-mono">{previewFile.content}</div>
                 </div>
               ) : (
-                <div className="py-10 text-center text-zinc-400 font-jura space-y-2">
+                <div className="py-12 text-center text-zinc-400 space-y-2">
                   <File className="w-10 h-10 mx-auto text-zinc-600" />
                   <div>Tệp định dạng nhị phân ({previewFile.type.toUpperCase()})</div>
                   <div className="text-xs font-mono text-zinc-500">Kích thước: {previewFile.size}</div>
@@ -778,10 +703,13 @@ export const VXploreTab: React.FC = () => {
               )}
             </div>
 
-            <div className="bg-[#1f2022] border-t-2 border-[#141414] p-3 flex items-center justify-end">
-              <VplaySecondaryButton onClick={() => setPreviewFile(null)} fullWidth={false} className="!py-1.5 !px-4 text-xs">
+            <div className="p-3 border-t border-[#2D2D38] flex items-center justify-end">
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="px-4 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-200 text-xs font-semibold cursor-pointer"
+              >
                 Đóng Bản Xem Trước
-              </VplaySecondaryButton>
+              </button>
             </div>
           </div>
         </div>
@@ -790,22 +718,28 @@ export const VXploreTab: React.FC = () => {
       {/* MODAL: NEW FOLDER */}
       {isNewFolderModal && (
         <div className="fixed inset-0 z-[99990] flex items-center justify-center p-3 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-md bg-[#2b2d30] border-4 border-[#141414] p-4 space-y-4">
-            <h3 className="font-extrabold text-sm text-white uppercase font-jura">TẠO THƯ MỤC MỚI</h3>
+          <div className="w-full max-w-md bg-[#1F1E24] border border-[#343440] rounded-2xl p-5 space-y-4 shadow-2xl">
+            <h3 className="font-bold text-sm text-white">TẠO THƯ MỤC MỚI</h3>
             <input
               type="text"
               placeholder="Nhập tên thư mục..."
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
-              className="w-full bg-[#141414] border-2 border-[#141414] p-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/60"
             />
-            <div className="flex justify-end gap-2">
-              <VplaySecondaryButton onClick={() => setIsNewFolderModal(false)} fullWidth={false} className="!py-1.5 text-xs">
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setIsNewFolderModal(false)}
+                className="px-4 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-300 text-xs font-semibold cursor-pointer"
+              >
                 Hủy
-              </VplaySecondaryButton>
-              <VplayPrimaryButton onClick={handleCreateFolder} fullWidth={false} className="!py-1.5 text-xs">
+              </button>
+              <button
+                onClick={handleCreateFolder}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold cursor-pointer"
+              >
                 Tạo Thư Mục
-              </VplayPrimaryButton>
+              </button>
             </div>
           </div>
         </div>
@@ -814,29 +748,35 @@ export const VXploreTab: React.FC = () => {
       {/* MODAL: NEW TEXT FILE / NOTE */}
       {isNewTextModal && (
         <div className="fixed inset-0 z-[99990] flex items-center justify-center p-3 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-lg bg-[#2b2d30] border-4 border-[#141414] p-4 space-y-3">
-            <h3 className="font-extrabold text-sm text-white uppercase font-jura">TẠO TỆP GHI CHÚ MỚI</h3>
+          <div className="w-full max-w-lg bg-[#1F1E24] border border-[#343440] rounded-2xl p-5 space-y-3.5 shadow-2xl">
+            <h3 className="font-bold text-sm text-white">TẠO TỆP GHI CHÚ MỚI</h3>
             <input
               type="text"
               placeholder="Tên tệp (ví dụ: GhiChu_TV.txt)..."
               value={newFileName}
               onChange={(e) => setNewFileName(e.target.value)}
-              className="w-full bg-[#141414] border-2 border-[#141414] p-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/60"
             />
             <textarea
               rows={5}
               placeholder="Nội dung ghi chú..."
               value={newFileContent}
               onChange={(e) => setNewFileContent(e.target.value)}
-              className="w-full bg-[#141414] border-2 border-[#141414] p-2 text-xs text-white font-mono focus:outline-none focus:border-purple-500"
+              className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500/60 resize-none"
             />
-            <div className="flex justify-end gap-2">
-              <VplaySecondaryButton onClick={() => setIsNewTextModal(false)} fullWidth={false} className="!py-1.5 text-xs">
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setIsNewTextModal(false)}
+                className="px-4 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-300 text-xs font-semibold cursor-pointer"
+              >
                 Hủy
-              </VplaySecondaryButton>
-              <VplayPrimaryButton onClick={handleCreateTextFile} fullWidth={false} className="!py-1.5 text-xs">
+              </button>
+              <button
+                onClick={handleCreateTextFile}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold cursor-pointer"
+              >
                 Lưu Tệp Ghi Chú
-              </VplayPrimaryButton>
+              </button>
             </div>
           </div>
         </div>

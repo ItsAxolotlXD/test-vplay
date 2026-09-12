@@ -247,23 +247,23 @@ export const VWeatherTab: React.FC = () => {
   const aqiStatus = getAqiStatus(currentWeather.aqi);
 
   return (
-    <div id="v-weather-app" className="w-full text-white selection:bg-cyan-500/30">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#081826] via-[#0E263D] to-[#071522] border border-cyan-500/25 rounded-3xl p-5 sm:p-6 mb-6 shadow-[0_10px_35px_rgba(6,182,212,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 p-0.5 shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center shrink-0">
-            <div className="w-full h-full bg-[#06121E] rounded-[14px] flex items-center justify-center">
-              <CloudSun className="w-6 h-6 text-cyan-400" />
-            </div>
+    <div id="v-weather-app" className="w-full text-white">
+      {/* Header Banner - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <CloudSun className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white">Thời Tiết 360</h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Weather • Thời Tiết 360
+              </h1>
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 Khí Tượng Số
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
               Dự báo 24 giờ & 7 ngày tới • Chất lượng không khí AQI • Bức xạ tia UV & rada mây vệ tinh
             </p>
           </div>
@@ -277,8 +277,8 @@ export const VWeatherTab: React.FC = () => {
               onClick={() => setSelectedCityName(cityName)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
                 selectedCityName === cityName
-                  ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-slate-950 font-black shadow-md'
-                  : 'bg-black/40 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10'
+                  ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                  : 'bg-[#2A2933] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
               }`}
             >
               {cityName}
@@ -290,18 +290,18 @@ export const VWeatherTab: React.FC = () => {
       {/* Main Weather Overview Dashboard */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Big Weather Card (7 cols) */}
-        <div className="lg:col-span-7 bg-gradient-to-br from-[#0B2134] via-[#0D2942] to-[#071624] border border-cyan-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <div className="flex items-center gap-2 text-cyan-400">
+              <div className="flex items-center gap-2 text-amber-400">
                 <MapPin className="w-4 h-4" />
                 <span className="text-sm font-bold">{currentWeather.region}</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-white mt-1">{currentWeather.city}</h2>
-              <p className="text-sm text-cyan-200 mt-1 font-medium">{currentWeather.condition}</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mt-1">{currentWeather.city}</h2>
+              <p className="text-sm text-[#9CA3AF] mt-1 font-medium">{currentWeather.condition}</p>
             </div>
 
-            <div className="p-3 bg-white/5 rounded-3xl backdrop-blur-md border border-white/10">
+            <div className="p-3 bg-[#18171E] rounded-2xl border border-[#2D2D38]">
               {renderWeatherIcon(currentWeather.iconType, 'w-16 h-16 sm:w-20 sm:h-20')}
             </div>
           </div>
@@ -372,8 +372,8 @@ export const VWeatherTab: React.FC = () => {
         {/* Right Hourly & Weekly Forecast (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* 24h Hourly Forecast strip */}
-          <div className="bg-[#0B1E2E] border border-white/10 rounded-3xl p-5 shadow-xl">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-3 flex items-center gap-1.5">
+          <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-5 shadow-xl">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Dự Báo Theo Giờ (24h)</span>
             </h3>
@@ -382,19 +382,19 @@ export const VWeatherTab: React.FC = () => {
               {currentWeather.hourly.map((h, i) => (
                 <div
                   key={i}
-                  className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 min-w-[72px] shrink-0 text-center space-y-2"
+                  className="flex flex-col items-center justify-between p-3 rounded-xl bg-[#18171E] border border-[#2D2D38] min-w-[72px] shrink-0 text-center space-y-2"
                 >
-                  <span className="text-[11px] text-slate-400 font-mono">{h.time}</span>
+                  <span className="text-[11px] text-[#9CA3AF] font-mono">{h.time}</span>
                   <div>{renderWeatherIcon(h.icon, 'w-6 h-6')}</div>
-                  <span className="text-sm font-black font-mono text-white">{h.temp}°</span>
+                  <span className="text-sm font-bold font-mono text-white">{h.temp}°</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* 7-Day Forecast */}
-          <div className="bg-[#0B1E2E] border border-white/10 rounded-3xl p-5 shadow-xl">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-3 flex items-center gap-1.5">
+          <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-5 shadow-xl">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               <span>Dự Báo 7 Ngày Tới</span>
             </h3>

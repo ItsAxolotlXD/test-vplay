@@ -60,7 +60,7 @@ export const PortalsCircularSection: React.FC<PortalsCircularSectionProps> = ({
       {/* Grid: 3 circular portals per row */}
       {/* Row 1: Tin tức, Thể thao, Ẩm thực */}
       {/* Row 2: Chính trị, Văn hóa, Giải trí */}
-      <div className="grid grid-cols-3 gap-y-10 sm:gap-y-14 md:gap-y-16 gap-x-6 sm:gap-x-12 md:gap-x-16 max-w-5xl mx-auto py-6 sm:py-8">
+      <div className="grid grid-cols-3 gap-y-12 sm:gap-y-16 md:gap-y-20 gap-x-8 sm:gap-x-14 md:gap-x-20 max-w-6xl mx-auto py-6 sm:py-10">
         {PORTAL_CATEGORIES.map((portal) => {
           const isActive = activePortalId === portal.id;
           const hasError = imageErrors[portal.id];
@@ -74,20 +74,20 @@ export const PortalsCircularSection: React.FC<PortalsCircularSectionProps> = ({
               className="flex flex-col items-center group cursor-pointer bg-transparent border-0 p-0 focus:outline-none"
             >
               {/* Enlarged Borderless Circular Banner */}
-              <div className="w-32 h-32 sm:w-44 sm:h-44 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden bg-[#16151D] shadow-2xl relative transition-all duration-300 group-hover:scale-108 group-active:scale-95">
+              <div className="w-36 h-36 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full overflow-hidden bg-[#16151D] shadow-2xl relative transition-all duration-300 group-hover:scale-105 group-active:scale-95">
                 {!hasError ? (
                   <img
                     src={portal.image}
                     alt={portal.title}
                     referrerPolicy="no-referrer"
                     className={`w-full h-full ${
-                      isLogo ? 'object-contain p-4 sm:p-6 md:p-8' : 'object-cover'
+                      isLogo ? 'object-contain p-5 sm:p-7 md:p-9' : 'object-cover'
                     } group-hover:scale-110 transition-transform duration-300`}
                     onError={() => handleImageError(portal.id)}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#241F2B] to-[#16141D]">
-                    {getFallbackIcon(portal.id, 'w-14 h-14 text-white/80')}
+                    {getFallbackIcon(portal.id, 'w-16 h-16 text-white/80')}
                   </div>
                 )}
 

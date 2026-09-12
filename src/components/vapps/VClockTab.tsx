@@ -667,44 +667,38 @@ export const VClockTab: React.FC = () => {
   const timerS = timerRemaining % 60;
 
   return (
-    <div id="v-clock-app" className="w-full text-white selection:bg-cyan-500/30">
-      {/* 1. APP HEADER & NAVIGATION TABS */}
-      <div className="bg-gradient-to-r from-[#0F172A] via-[#1E1B4B] to-[#0F172A] border border-cyan-500/20 rounded-3xl p-5 sm:p-7 mb-6 shadow-[0_10px_35px_rgba(6,182,212,0.15)] relative overflow-hidden">
-        {/* Decorative Background Glows */}
-        <div className="absolute -right-10 -top-10 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-10 -bottom-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-600 to-indigo-600 p-0.5 shadow-[0_0_24px_rgba(6,182,212,0.4)] flex items-center justify-center shrink-0">
-              <div className="w-full h-full bg-[#0B0F19] rounded-[14px] flex items-center justify-center">
-                <Clock className="w-7 h-7 text-cyan-400 animate-pulse" />
-              </div>
+    <div id="v-clock-app" className="w-full text-white">
+      {/* 1. APP HEADER & NAVIGATION TABS - V-Flow Style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl relative overflow-hidden">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+              <Clock className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                  Đồng Hồ V-Clock
+                <h1 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
+                  V-Clock • Thời Gian & Báo Thức
                 </h1>
-                <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
-                  Studio 360
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  Đồng hồ chuẩn
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 mt-0.5">
+              <p className="text-xs text-[#9CA3AF] mt-0.5">
                 Báo thức thông minh • Bấm giờ thể thao • Hẹn giờ đếm ngược • Giờ quốc tế
               </p>
             </div>
           </div>
 
           {/* Quick Settings: 12/24H & Sound Toggle */}
-          <div className="flex items-center gap-2 self-start md:self-auto bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10">
+          <div className="flex items-center gap-2 self-start md:self-auto bg-[#18171E] p-1.5 rounded-xl border border-[#2D2D38]">
             <button
               id="vclock-toggle-24h"
               onClick={() => setUse24Hour((p) => !p)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 use24Hour
-                  ? 'bg-cyan-500 text-black shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                  : 'text-[#9CA3AF] hover:text-white'
               }`}
               title="Chuyển chế độ 24 giờ / 12 giờ"
             >
@@ -714,10 +708,10 @@ export const VClockTab: React.FC = () => {
             <button
               id="vclock-toggle-sound"
               onClick={() => setSoundEnabled((p) => !p)}
-              className={`p-2 rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`p-2 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
                 soundEnabled
-                  ? 'bg-white/10 text-cyan-400 hover:bg-white/20'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-[#2A2933] text-amber-400 border border-[#3E3D4D]'
+                  : 'text-[#9CA3AF] hover:text-white'
               }`}
               title={soundEnabled ? 'Âm thanh: Đang bật' : 'Âm thanh: Đã tắt'}
             >
@@ -727,22 +721,22 @@ export const VClockTab: React.FC = () => {
         </div>
 
         {/* 4 Feature Tabs */}
-        <div className="mt-6 flex flex-wrap gap-2 border-t border-white/10 pt-4">
+        <div className="mt-5 flex flex-wrap gap-2 border-t border-[#2D2D38] pt-4">
           <button
             id="vclock-tab-world"
             onClick={() => {
               setActiveSubTab('world');
               if (soundEnabled) audio.playBeep(800);
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
               activeSubTab === 'world'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_4px_16px_rgba(6,182,212,0.4)]'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+                : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
             }`}
           >
             <Globe2 className="w-4 h-4" />
             <span>Giờ Quốc Tế</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-black/30 font-mono">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#18171E] font-mono border border-[#2D2D38]">
               {worldCities.length}
             </span>
           </button>
@@ -753,15 +747,15 @@ export const VClockTab: React.FC = () => {
               setActiveSubTab('alarm');
               if (soundEnabled) audio.playBeep(800);
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
               activeSubTab === 'alarm'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_4px_16px_rgba(6,182,212,0.4)]'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+                : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
             }`}
           >
             <Bell className="w-4 h-4" />
             <span>Báo Thức</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-black/30 font-mono">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#18171E] font-mono border border-[#2D2D38]">
               {alarms.filter((a) => a.enabled).length}/{alarms.length}
             </span>
           </button>
@@ -772,14 +766,14 @@ export const VClockTab: React.FC = () => {
               setActiveSubTab('stopwatch');
               if (soundEnabled) audio.playBeep(800);
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
               activeSubTab === 'stopwatch'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_4px_16px_rgba(6,182,212,0.4)]'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+                : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
             }`}
           >
             <Zap className="w-4 h-4" />
-            <span>Bấm Giờ (Stopwatch)</span>
+            <span>Bấm Giờ</span>
             {isStopwatchRunning && (
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             )}
@@ -791,16 +785,16 @@ export const VClockTab: React.FC = () => {
               setActiveSubTab('timer');
               if (soundEnabled) audio.playBeep(800);
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
               activeSubTab === 'timer'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_4px_16px_rgba(6,182,212,0.4)]'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+                : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
             }`}
           >
             <Timer className="w-4 h-4" />
-            <span>Đếm Ngược (Timer)</span>
+            <span>Đếm Ngược</span>
             {isTimerRunning && (
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
             )}
           </button>
         </div>
@@ -812,14 +806,14 @@ export const VClockTab: React.FC = () => {
       {activeSubTab === 'world' && (
         <div className="space-y-6">
           {/* Main Local Clock Hero Banner */}
-          <div className="bg-[#141824] border border-cyan-500/30 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+          <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
             <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
               <MiniAnalogClock date={currentTime} size={110} />
               <div>
                 <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
                   <span className="text-xl">🇻🇳</span>
                   <h2 className="text-lg font-bold text-white">Giờ Địa Phương (Việt Nam)</h2>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">
+                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">
                     GMT+7 Hà Nội / TP.HCM
                   </span>
                 </div>
@@ -829,11 +823,11 @@ export const VClockTab: React.FC = () => {
                       ? currentTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
                       : currentTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: true })}
                   </span>
-                  <span className="text-xl sm:text-2xl text-cyan-400">
+                  <span className="text-xl sm:text-2xl text-amber-400">
                     :{String(currentTime.getSeconds()).padStart(2, '0')}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1 capitalize">
+                <p className="text-xs sm:text-sm text-[#9CA3AF] mt-1 capitalize">
                   {currentTime.toLocaleDateString('vi-VN', {
                     weekday: 'long',
                     year: 'numeric',
@@ -848,9 +842,9 @@ export const VClockTab: React.FC = () => {
             <button
               id="vclock-btn-open-add-city"
               onClick={() => setIsAddCityOpen(true)}
-              className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 cursor-pointer shrink-0"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-bold text-xs uppercase shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer shrink-0"
             >
-              <Plus className="w-5 h-5 stroke-[2.5]" />
+              <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Thêm Thành Phố</span>
             </button>
           </div>

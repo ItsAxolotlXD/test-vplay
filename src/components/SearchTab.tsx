@@ -138,7 +138,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_files',
-        name: 'Trình Quản Lý Tệp (V-Files Explorer)',
+        name: 'Trình Quản Lý Tệp (V-Files)',
         tagline: 'Tab Sidebar • Quản lý tệp tin, xem tài liệu và lưu trữ đám mây',
         route: '/v-files',
         state: { appId: 'v_xplore' },
@@ -147,7 +147,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_explore_vn',
-        name: 'Khám Phá Việt Nam (Explore Vietnam 360)',
+        name: 'Khám Phá Việt Nam (Explore Vietnam)',
         tagline: 'Tab Sidebar • Bản đồ du lịch 63 tỉnh thành & danh lam thắng cảnh',
         route: '/explore-vietnam',
         state: { appId: 'explore_vietnam' },
@@ -156,7 +156,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_vbox',
-        name: 'V-Box 3D Workspace',
+        name: 'V-Box',
         tagline: 'Tab Sidebar • Không gian làm việc mô phỏng 3D tương tác',
         route: '/v-box',
         state: { appId: 'v_box' },
@@ -165,7 +165,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_vstudy',
-        name: 'Không Gian Học Tập (V-Study Pomodoro)',
+        name: 'Không Gian Học Tập (V-Study)',
         tagline: 'Tab Sidebar • Không gian học tập tập trung kết hợp đồng hồ Pomodoro',
         route: '/v-study',
         state: { appId: 'v_learn' },
@@ -174,7 +174,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_vcalc',
-        name: 'Máy Tính Đa Năng (V-Calc Express)',
+        name: 'Máy Tính Đa Năng (V-Calc)',
         tagline: 'Tab Sidebar • Máy tính khoa học, đại số và quy đổi đơn vị đo lường',
         route: '/v-calc',
         state: { appId: 'v_calc' },
@@ -210,7 +210,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_minecraft',
-        name: 'Minecraft Container GUI (1.19 / 1.20)',
+        name: 'Minecraft',
         tagline: 'Tab Sidebar • Rương đồ mô phỏng The Wild 1.19, Warden, Sculk & Crafting',
         route: '/minecraft',
         icon: <Box className="w-4.5 h-4.5 text-[#FF4D8D]" />,
@@ -317,7 +317,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'v_xplore',
-        name: 'V-Files Explorer',
+        name: 'V-Files',
         tagline: 'Trình Quản Lý Tệp Tin & Lưu Trữ Đám Mây',
         category: 'Tiện ích',
         route: '/v-files',
@@ -327,7 +327,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'explore_vietnam',
-        name: 'Explore Vietnam 360',
+        name: 'Explore Vietnam',
         tagline: 'Bản Đồ 63 Tỉnh Thành & Danh Lam Thắng Cảnh',
         category: 'Du lịch',
         route: '/explore-vietnam',
@@ -337,7 +337,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'v_learn',
-        name: 'V-Study Pomodoro',
+        name: 'V-Study',
         tagline: 'Không Gian Học Tập Tập Trung & Đồng Hồ Pomodoro',
         category: 'Giáo dục',
         route: '/v-study',
@@ -347,7 +347,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'v_calc',
-        name: 'V-Calc Express',
+        name: 'V-Calc',
         tagline: 'Máy Tính Khoa Học Đa Năng & Đổi Đơn Vị',
         category: 'Tiện ích',
         route: '/v-calc',
@@ -357,7 +357,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'v_minecraft',
-        name: 'Minecraft Container GUI',
+        name: 'Minecraft',
         tagline: 'Bộ Rương Đồ Tương Tác 1.19 & 1.20 Pixel Art',
         category: 'Tiện ích',
         route: '/minecraft',

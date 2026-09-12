@@ -215,23 +215,23 @@ export const VGalleryTab: React.FC = () => {
   };
 
   return (
-    <div id="v-gallery-app" className="w-full text-white selection:bg-purple-500/30">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#170E28] via-[#24133A] to-[#120B21] border border-purple-500/25 rounded-3xl p-5 sm:p-6 mb-6 shadow-[0_10px_35px_rgba(168,85,247,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-600 p-0.5 shadow-[0_0_20px_rgba(168,85,247,0.4)] flex items-center justify-center shrink-0">
-            <div className="w-full h-full bg-[#120921] rounded-[14px] flex items-center justify-center">
-              <ImageIcon className="w-6 h-6 text-purple-400" />
-            </div>
+    <div id="v-gallery-app" className="w-full text-white">
+      {/* Header Banner - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <ImageIcon className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white">Thư Viện Ảnh V-Gallery</h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Gallery • Thư Viện Ảnh 360
+              </h1>
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 Ultra HD Media
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
               Kho ảnh danh thắng Việt Nam • Hậu trường đài truyền hình • Tự động lưu ảnh từ V-Camera
             </p>
           </div>
@@ -249,7 +249,7 @@ export const VGalleryTab: React.FC = () => {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
           >
             <Upload className="w-4 h-4" />
             <span>Tải Ảnh Lên</span>
@@ -263,10 +263,10 @@ export const VGalleryTab: React.FC = () => {
           <button
             key={album}
             onClick={() => setSelectedAlbum(album)}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer shrink-0 border ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 border ${
               selectedAlbum === album
-                ? 'bg-purple-600 border-purple-400 text-white shadow-md'
-                : 'bg-[#150D24] border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 border-transparent text-white shadow-md'
+                : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
             }`}
           >
             {album === 'Camera' && '📸 '}
@@ -277,17 +277,17 @@ export const VGalleryTab: React.FC = () => {
             <span>{album}</span>
           </button>
         ))}
-        <span className="text-xs text-slate-500 ml-auto hidden sm:inline">
+        <span className="text-xs text-[#9CA3AF] ml-auto hidden sm:inline">
           {filteredItems.length} hình ảnh
         </span>
       </div>
 
       {/* Gallery Photo Grid */}
       {filteredItems.length === 0 ? (
-        <div className="bg-[#130B21] border border-white/10 rounded-3xl p-12 text-center">
-          <FolderOpen className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+        <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-12 text-center">
+          <FolderOpen className="w-12 h-12 text-[#9CA3AF] mx-auto mb-3" />
           <h3 className="text-sm font-bold text-slate-300">Chưa có hình ảnh nào trong mục này</h3>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[#9CA3AF] mt-1">
             Hãy chụp ảnh mới từ ứng dụng V-Camera hoặc bấm &quot;Tải Ảnh Lên&quot; từ thiết bị.
           </p>
         </div>
@@ -297,7 +297,7 @@ export const VGalleryTab: React.FC = () => {
             <div
               key={item.id}
               onClick={() => handleOpenLightbox(item)}
-              className="group relative bg-[#130B21] border border-white/10 hover:border-purple-500/40 rounded-2xl overflow-hidden shadow-md cursor-pointer transition-all duration-200 aspect-square flex flex-col justify-end"
+              className="group relative bg-[#1F1E24] border border-[#2D2D38] hover:border-[#3E3D4D] rounded-xl overflow-hidden shadow-md cursor-pointer transition-all duration-200 aspect-square flex flex-col justify-end"
             >
               <img
                 src={item.url}

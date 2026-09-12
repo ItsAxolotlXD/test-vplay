@@ -269,11 +269,11 @@ export const SearchPortalsView: React.FC<SearchPortalsViewProps> = ({
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Header Banner - Enlarged and Borderless */}
           {activeCategory && (
-            <div className={`relative overflow-hidden rounded-[36px] p-8 sm:p-12 md:p-14 bg-gradient-to-r ${activeCategory.accentGradient} shadow-2xl border-0`}>
+            <div className={`relative overflow-hidden rounded-[40px] p-10 sm:p-14 md:p-16 bg-gradient-to-r ${activeCategory.accentGradient} shadow-2xl border-0`}>
               <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 sm:gap-8">
                 <div className="flex items-center gap-6 sm:gap-8">
                   {/* Enlarged Borderless Portal Circular Avatar */}
-                  <div className="w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full overflow-hidden bg-[#16151D] shadow-2xl shrink-0 flex items-center justify-center">
+                  <div className="w-32 h-32 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-full overflow-hidden bg-[#16151D] shadow-2xl shrink-0 flex items-center justify-center">
                     <img
                       src={activeCategory.image}
                       alt={activeCategory.title}
@@ -282,20 +282,20 @@ export const SearchPortalsView: React.FC<SearchPortalsViewProps> = ({
                         activeCategory.image.includes('vtv_') ||
                         activeCategory.image.includes('.png') ||
                         activeCategory.image.includes('wikia.nocookie.net')
-                          ? 'object-contain p-4 sm:p-6'
+                          ? 'object-contain p-5 sm:p-7'
                           : 'object-cover'
                       }`}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <span className="text-xs sm:text-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-black/40 text-white backdrop-blur-md inline-block">
+                    <span className="text-xs sm:text-sm font-bold uppercase tracking-wider px-3.5 py-1 rounded-full bg-black/40 text-white backdrop-blur-md inline-block">
                       {activeCategory.badge}
                     </span>
-                    <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
+                    <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
                       {activeCategory.title}
                     </h2>
-                    <p className="text-xs sm:text-base text-white/85 font-medium">
+                    <p className="text-xs sm:text-base md:text-lg text-white/90 font-medium">
                       Chuyên trang chính thức • 100 bài viết & bản tin tuyển chọn
                     </p>
                   </div>

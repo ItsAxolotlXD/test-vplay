@@ -30,7 +30,7 @@ export const LiveTV: React.FC<LiveTVProps> = () => {
             href="https://v0-vplay-preview.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#E50914] to-[#E6005A] text-white font-bold text-sm sm:text-base shadow-[0_8px_30px_rgba(229,9,20,0.35)] hover:shadow-[0_12px_40px_rgba(230,0,90,0.55)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+            className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-gradient-to-r from-[#FF0000] to-[#E6007A] text-white font-bold text-sm sm:text-base shadow-lg shadow-red-500/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
           >
             <span>Check official website</span>
             <ExternalLink className="w-4 h-4 stroke-[2.5]" />

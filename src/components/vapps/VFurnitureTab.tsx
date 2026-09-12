@@ -493,67 +493,67 @@ export const VFurnitureTab: React.FC = () => {
   });
 
   return (
-    <div className="w-full bg-[#232528] border-2 border-[#141414] text-white font-montserrat shadow-2xl rounded-none overflow-hidden select-none space-y-0">
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans space-y-6">
       
-      {/* 1. TOP BANNER HEADER */}
-      <div className="bg-[#1a1c1e] border-b-2 border-[#141414] p-3 sm:p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      {/* 1. TOP BANNER HEADER - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
-            <Armchair className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <Armchair className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-black text-sm sm:text-base text-white uppercase tracking-wider font-jura">
-                V-FURNITURE • CỬA HÀNG GIA DỤNG ONLINE
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Furniture • Cửa Hàng Gia Dụng Online
               </h1>
-              <span className="bg-[#a855f7] text-white px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
-                ORBS STORE
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                Orbs Store
               </span>
             </div>
-            <p className="text-[11px] text-zinc-300 font-jura">
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
               Trang trí nhà cửa & thiết bị điện gia dụng Vplay - Thanh toán 100% bằng Khoáng vật Orbs
             </p>
           </div>
         </div>
 
         {/* ORBS BALANCE CARD & FREE CLAIM BUTTON */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end bg-[#2a2c30] p-2 border-2 border-[#141414] shadow-inner">
-          <div className="flex items-center gap-2 font-mono">
-            <div className="w-7 h-7 rounded-full bg-purple-500/20 border border-purple-500 flex items-center justify-center text-purple-400 shrink-0">
-              <Coins className="w-4 h-4 animate-pulse" />
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end bg-[#18171E] p-2.5 px-3.5 rounded-xl border border-[#2D2D38] shadow-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+              <Coins className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-[9px] text-zinc-400 uppercase font-bold">Số dư Khoáng vật Orbs</div>
-              <div className="text-xs sm:text-sm font-black text-purple-300">
-                {oreBalance.toLocaleString()} <span className="text-[10px] text-purple-400 font-bold">ORBS</span>
+              <div className="text-[10px] text-[#9CA3AF] uppercase font-semibold">Số dư Khoáng vật Orbs</div>
+              <div className="text-xs sm:text-sm font-bold text-amber-400">
+                {oreBalance.toLocaleString()} <span className="text-[10px] text-[#9CA3AF] font-medium">ORBS</span>
               </div>
             </div>
           </div>
 
           <button
             onClick={handleClaimFreeOre}
-            className="bg-[#28960b] hover:bg-[#32b312] text-white px-2.5 py-1.5 text-[11px] font-bold font-mono border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69,inset_-1px_-1px_0_#1b5e20] flex items-center gap-1 active:translate-y-[1px]"
+            className="bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white px-3 py-1.5 text-xs font-bold rounded-lg shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
             title="Thưởng thêm 500 Orbs miễn phí"
           >
-            <Gift className="w-3.5 h-3.5 text-yellow-300" />
+            <Gift className="w-3.5 h-3.5 text-white" />
             <span>+500 Orbs</span>
           </button>
         </div>
       </div>
 
       {/* 2. NAVIGATION SUB-TABS & SEARCH BAR */}
-      <div className="bg-[#2f3135] border-b-2 border-[#141414] p-2 sm:p-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-3 sm:p-4 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
           <button
             onClick={() => {
               playPopSound();
               setActiveTab("store");
             }}
-            className={`px-3 py-1.5 text-xs font-bold font-jura border-2 border-[#141414] flex items-center gap-1.5 transition-none active:translate-y-[1px] ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === "store"
-                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
-                : "bg-[#232528] hover:bg-[#383a3f] text-zinc-300"
+                ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
+                : "bg-[#2A2933] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white"
             }`}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
@@ -565,16 +565,16 @@ export const VFurnitureTab: React.FC = () => {
               playPopSound();
               setActiveTab("cart");
             }}
-            className={`relative px-3 py-1.5 text-xs font-bold font-jura border-2 border-[#141414] flex items-center gap-1.5 transition-none active:translate-y-[1px] ${
+            className={`relative px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === "cart"
-                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
-                : "bg-[#232528] hover:bg-[#383a3f] text-zinc-300"
+                ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
+                : "bg-[#2A2933] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white"
             }`}
           >
             <ShoppingCart className="w-3.5 h-3.5" />
             <span>Giỏ hàng</span>
             {cart.length > 0 && (
-              <span className="ml-1 bg-amber-500 text-black px-1.5 py-0.2 text-[10px] font-black rounded-full border border-black">
+              <span className="ml-1 bg-amber-500 text-black px-1.5 py-0.2 text-[10px] font-black rounded-full">
                 {cart.reduce((s, i) => s + i.quantity, 0)}
               </span>
             )}
@@ -585,10 +585,10 @@ export const VFurnitureTab: React.FC = () => {
               playPopSound();
               setActiveTab("purchases");
             }}
-            className={`px-3 py-1.5 text-xs font-bold font-jura border-2 border-[#141414] flex items-center gap-1.5 transition-none active:translate-y-[1px] ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === "purchases"
-                ? "bg-[#28960b] text-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]"
-                : "bg-[#232528] hover:bg-[#383a3f] text-zinc-300"
+                ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
+                : "bg-[#2A2933] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white"
             }`}
           >
             <PackageCheck className="w-3.5 h-3.5" />
@@ -599,20 +599,20 @@ export const VFurnitureTab: React.FC = () => {
         {/* Search Bar if in store mode */}
         {activeTab === "store" && (
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Tìm đồ gia dụng, bàn, ghế, tủ..."
+              placeholder="Tìm đồ gia dụng, bàn, ghế..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#161719] border-2 border-[#141414] pl-8 pr-3 py-1 text-xs text-white placeholder-zinc-500 font-mono focus:outline-none focus:border-amber-500"
+              className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl pl-9 pr-7 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2 top-2 text-zinc-400 hover:text-white"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-white"
               >
-                <X className="w-3 h-3" />
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
@@ -621,24 +621,24 @@ export const VFurnitureTab: React.FC = () => {
 
       {/* TOAST MESSAGE NOTIFICATION */}
       {toastMessage && (
-        <div className="bg-[#28960b] border-b-2 border-[#141414] px-4 py-2 text-xs font-bold font-mono text-white flex items-center justify-between animate-in slide-in-from-top duration-200">
+        <div className="bg-amber-500/20 border border-amber-500/40 rounded-xl px-4 py-2.5 text-xs font-medium text-amber-300 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-yellow-300 shrink-0" />
+            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
             <span>{toastMessage}</span>
           </div>
-          <button onClick={() => setToastMessage(null)} className="text-white hover:text-black">
+          <button onClick={() => setToastMessage(null)} className="text-amber-400 hover:text-white cursor-pointer">
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
       {/* 3. MAIN TAB BODY CONTENT */}
-      <div className="p-3 sm:p-5 min-h-[480px]">
+      <div className="min-h-[480px]">
         {/* VIEW 1: STORE FRONT */}
         {activeTab === "store" && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Category Filter Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
               {[
                 { id: "all", label: "Tất cả đồ gia dụng" },
                 { id: "living", label: "🛋️ Phòng khách" },
@@ -653,10 +653,10 @@ export const VFurnitureTab: React.FC = () => {
                     playPopSound();
                     setSelectedCategory(cat.id);
                   }}
-                  className={`px-3 py-1 text-xs font-bold font-mono border-2 border-[#141414] whitespace-nowrap active:translate-y-[1px] ${
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl whitespace-nowrap transition-all cursor-pointer ${
                     selectedCategory === cat.id
-                      ? "bg-amber-500 text-black border-amber-400 font-black shadow-[inset_1px_1px_0_#fde047]"
-                      : "bg-[#1f2023] hover:bg-[#2c2e33] text-zinc-300"
+                      ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
+                      : "bg-[#2A2933] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white"
                   }`}
                 >
                   {cat.label}
@@ -666,10 +666,10 @@ export const VFurnitureTab: React.FC = () => {
 
             {/* Products Grid */}
             {filteredProducts.length === 0 ? (
-              <div className="p-12 text-center bg-[#1f2023] border-2 border-[#141414] space-y-2">
-                <Armchair className="w-12 h-12 text-zinc-600 mx-auto" />
-                <p className="text-sm font-bold text-zinc-400 font-jura">Không tìm thấy sản phẩm phù hợp</p>
-                <p className="text-xs text-zinc-500 font-mono">Thử thay đổi từ khóa tìm kiếm hoặc chọn danh mục khác</p>
+              <div className="p-12 text-center bg-[#1F1E24] border border-[#2D2D38] rounded-2xl space-y-2">
+                <Armchair className="w-12 h-12 text-slate-600 mx-auto" />
+                <p className="text-sm font-bold text-slate-400">Không tìm thấy sản phẩm phù hợp</p>
+                <p className="text-xs text-[#9CA3AF]">Thử thay đổi từ khóa tìm kiếm hoặc chọn danh mục khác</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -677,73 +677,73 @@ export const VFurnitureTab: React.FC = () => {
                   <div
                     key={product.id}
                     onClick={() => setSelectedProduct(product)}
-                    className="group bg-[#2a2c30] hover:bg-[#32353a] border-2 border-[#141414] hover:border-amber-500/80 p-3 flex flex-col justify-between space-y-3 cursor-pointer shadow-lg transition-all active:translate-y-[1px]"
+                    className="group bg-[#1F1E24] hover:bg-[#23222B] border border-[#2D2D38] hover:border-[#3E3D4D] rounded-2xl p-3.5 flex flex-col justify-between space-y-3 cursor-pointer shadow-lg transition-all"
                   >
                     <div>
                       {/* Image Thumbnail with badge */}
-                      <div className="relative aspect-video w-full bg-[#161719] border border-[#141414] overflow-hidden mb-2.5">
+                      <div className="relative aspect-video w-full bg-[#18171E] border border-[#2D2D38] rounded-xl overflow-hidden mb-3">
                         <img
                           src={product.image}
                           alt={product.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         {product.badge && (
-                          <span className="absolute top-2 left-2 bg-amber-500 text-black px-2 py-0.5 text-[9px] font-black font-mono border border-black shadow">
+                          <span className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-rose-500 text-white px-2 py-0.5 text-[9px] font-bold rounded-md shadow">
                             {product.badge}
                           </span>
                         )}
-                        <span className="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm text-zinc-200 px-2 py-0.5 text-[9px] font-mono border border-white/20">
+                        <span className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-slate-200 px-2 py-0.5 text-[9px] rounded-md border border-white/10">
                           {product.categoryName}
                         </span>
                       </div>
 
                       {/* Product Title & Rating */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
-                          <span className="flex items-center gap-1 text-amber-400 font-bold">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] text-[#9CA3AF]">
+                          <span className="flex items-center gap-1 text-amber-400 font-semibold">
                             <Star className="w-3 h-3 fill-amber-400" />
                             {product.rating} ({product.reviewCount})
                           </span>
-                          <span className="text-emerald-400 text-[10px]">✓ Còn hàng</span>
+                          <span className="text-emerald-400 text-[10px] font-medium">✓ Còn hàng</span>
                         </div>
 
-                        <h3 className="font-bold text-sm text-white font-jura line-clamp-1 group-hover:text-amber-400 transition-colors">
+                        <h3 className="font-bold text-sm text-white line-clamp-1 group-hover:text-amber-400 transition-colors">
                           {product.name}
                         </h3>
 
-                        <p className="text-[11px] text-zinc-400 line-clamp-2 leading-tight">
+                        <p className="text-[11px] text-[#9CA3AF] line-clamp-2 leading-relaxed">
                           {product.tagline}
                         </p>
                       </div>
                     </div>
 
                     {/* Price & Action Buttons */}
-                    <div className="pt-2 border-t border-black/30 space-y-2">
+                    <div className="pt-3 border-t border-[#2D2D38] space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-[10px] text-zinc-400 font-mono">Giá Orbs</div>
-                          <div className="text-sm font-black text-purple-300 font-mono flex items-center gap-1">
+                          <div className="text-[10px] text-[#9CA3AF]">Giá Orbs</div>
+                          <div className="text-sm font-bold text-amber-400 flex items-center gap-1">
                             <span>{product.priceOre.toLocaleString()}</span>
-                            <span className="text-[10px] text-purple-400">ORBS</span>
+                            <span className="text-[10px] text-[#9CA3AF]">ORBS</span>
                           </div>
                         </div>
 
                         {product.originalPriceOre && (
                           <div className="text-right">
-                            <div className="text-[9px] text-zinc-500 line-through font-mono">
+                            <div className="text-[10px] text-slate-500 line-through">
                               {product.originalPriceOre.toLocaleString()} ORBS
                             </div>
                           </div>
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-1.5 pt-1">
+                      <div className="grid grid-cols-2 gap-2 pt-1">
                         <button
                           onClick={(e) => handleAddToCart(product, e)}
-                          className="w-full bg-[#3b3e43] hover:bg-[#474b51] text-white py-1.5 text-[11px] font-bold font-mono border border-[#141414] shadow active:translate-y-[1px] flex items-center justify-center gap-1"
+                          className="w-full bg-[#2A2933] hover:bg-[#32303D] text-white py-2 text-xs font-semibold rounded-xl border border-[#3E3D4D] shadow-sm flex items-center justify-center gap-1 cursor-pointer transition-all"
                         >
-                          <ShoppingCart className="w-3 h-3 text-amber-400" />
-                          <span>+ Giỏ hàng</span>
+                          <ShoppingCart className="w-3.5 h-3.5 text-amber-400" />
+                          <span>+ Giỏ</span>
                         </button>
 
                         <button
@@ -751,7 +751,7 @@ export const VFurnitureTab: React.FC = () => {
                             e.stopPropagation();
                             handleBuyDirect(product);
                           }}
-                          className="w-full bg-[#28960b] hover:bg-[#31b312] text-white py-1.5 text-[11px] font-bold font-mono border border-[#141414] shadow-[inset_1px_1px_0_#89dc69] active:translate-y-[1px] flex items-center justify-center gap-1"
+                          className="w-full bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white py-2 text-xs font-bold rounded-xl shadow-md flex items-center justify-center gap-1 cursor-pointer transition-all"
                         >
                           <span>Mua Ngay</span>
                         </button>
@@ -767,88 +767,88 @@ export const VFurnitureTab: React.FC = () => {
         {/* VIEW 2: SHOPPING CART */}
         {activeTab === "cart" && (
           <div className="space-y-4 max-w-3xl mx-auto">
-            <div className="bg-[#1a1c1e] p-3 border-2 border-[#141414] flex items-center justify-between">
+            <div className="bg-[#1F1E24] p-4 rounded-2xl border border-[#2D2D38] flex items-center justify-between shadow-lg">
               <div className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 text-amber-400" />
-                <h2 className="font-bold text-sm text-white font-jura">
-                  GIỎ HÀNG ORE CỦA BẠN ({cart.reduce((s, i) => s + i.quantity, 0)} món)
+                <ShoppingCart className="w-5 h-5 text-amber-400" />
+                <h2 className="font-bold text-sm sm:text-base text-white">
+                  GIỎ HÀNG ORBS CỦA BẠN ({cart.reduce((s, i) => s + i.quantity, 0)} món)
                 </h2>
               </div>
 
               {cart.length > 0 && (
                 <button
                   onClick={() => setCart([])}
-                  className="text-xs text-rose-400 hover:text-rose-300 font-mono flex items-center gap-1"
+                  className="text-xs text-rose-400 hover:text-rose-300 font-medium flex items-center gap-1 cursor-pointer transition-colors"
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-3.5 h-3.5" />
                   <span>Xóa tất cả</span>
                 </button>
               )}
             </div>
 
             {cart.length === 0 ? (
-              <div className="p-12 text-center bg-[#1f2023] border-2 border-[#141414] space-y-3">
-                <ShoppingCart className="w-12 h-12 text-zinc-600 mx-auto" />
-                <p className="text-sm font-bold text-zinc-300 font-jura">Giỏ hàng gia dụng của bạn đang trống</p>
-                <p className="text-xs text-zinc-500 font-mono">
+              <div className="p-12 text-center bg-[#1F1E24] border border-[#2D2D38] rounded-2xl space-y-3 shadow-lg">
+                <ShoppingCart className="w-12 h-12 text-slate-600 mx-auto" />
+                <p className="text-sm font-bold text-slate-300">Giỏ hàng gia dụng của bạn đang trống</p>
+                <p className="text-xs text-[#9CA3AF]">
                   Hãy quay lại Cửa Hàng và chọn những vật dụng ưng ý cho căn nhà của bạn!
                 </p>
                 <button
                   onClick={() => setActiveTab("store")}
-                  className="bg-[#28960b] text-white px-4 py-2 text-xs font-bold font-mono border-2 border-[#141414] shadow active:translate-y-[1px]"
+                  className="bg-gradient-to-r from-amber-500 to-rose-500 text-white px-5 py-2 text-xs font-bold rounded-xl shadow-md cursor-pointer"
                 >
                   Khám phá Cửa Hàng
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {/* Cart list */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {cart.map((item) => (
                     <div
                       key={item.product.id}
-                      className="bg-[#2a2c30] border-2 border-[#141414] p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                      className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md"
                     >
                       <div className="flex items-center gap-3">
                         <img
                           src={item.product.image}
                           alt={item.product.name}
-                          className="w-16 h-12 object-cover border border-[#141414] bg-black/40 shrink-0"
+                          className="w-16 h-14 object-cover rounded-xl border border-[#2D2D38] bg-black/40 shrink-0"
                         />
                         <div>
-                          <h4 className="font-bold text-xs sm:text-sm text-white font-jura">
+                          <h4 className="font-bold text-xs sm:text-sm text-white">
                             {item.product.name}
                           </h4>
-                          <div className="text-[10px] text-zinc-400 font-mono">
-                            {item.product.categoryName} • {item.product.priceOre.toLocaleString()} Ore / cái
+                          <div className="text-[11px] text-[#9CA3AF] mt-0.5">
+                            {item.product.categoryName} • {item.product.priceOre.toLocaleString()} Orbs / cái
                           </div>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                         {/* Quantity controls */}
-                        <div className="flex items-center gap-1 bg-[#161719] border border-[#141414] p-1">
+                        <div className="flex items-center gap-1.5 bg-[#18171E] border border-[#2D2D38] rounded-xl p-1">
                           <button
                             onClick={() => handleUpdateQuantity(item.product.id, -1)}
-                            className="w-6 h-6 bg-[#383a3f] hover:bg-[#474b51] text-white flex items-center justify-center font-bold text-xs"
+                            className="w-7 h-7 bg-[#2A2933] hover:bg-[#32303D] text-white rounded-lg flex items-center justify-center font-bold text-xs cursor-pointer"
                           >
-                            <Minus className="w-3 h-3" />
+                            <Minus className="w-3.5 h-3.5" />
                           </button>
-                          <span className="w-8 text-center text-xs font-mono font-bold text-white">
+                          <span className="w-8 text-center text-xs font-bold text-white">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => handleUpdateQuantity(item.product.id, 1)}
-                            className="w-6 h-6 bg-[#383a3f] hover:bg-[#474b51] text-white flex items-center justify-center font-bold text-xs"
+                            className="w-7 h-7 bg-[#2A2933] hover:bg-[#32303D] text-white rounded-lg flex items-center justify-center font-bold text-xs cursor-pointer"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-3.5 h-3.5" />
                           </button>
                         </div>
 
                         {/* Subtotal */}
                         <div className="text-right min-w-[90px]">
-                          <div className="text-[9px] text-zinc-400 font-mono">Thành tiền</div>
-                          <div className="text-xs font-black text-purple-300 font-mono">
+                          <div className="text-[10px] text-[#9CA3AF]">Thành tiền</div>
+                          <div className="text-xs font-bold text-amber-400">
                             {(item.product.priceOre * item.quantity).toLocaleString()} ORBS
                           </div>
                         </div>
@@ -856,7 +856,7 @@ export const VFurnitureTab: React.FC = () => {
                         {/* Remove */}
                         <button
                           onClick={() => handleRemoveFromCart(item.product.id)}
-                          className="text-zinc-500 hover:text-rose-400 p-1"
+                          className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
                           title="Xóa món này"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -867,32 +867,32 @@ export const VFurnitureTab: React.FC = () => {
                 </div>
 
                 {/* Summary & Checkout Box */}
-                <div className="bg-[#1f2023] border-2 border-[#141414] p-4 space-y-3">
-                  <div className="flex items-center justify-between text-xs font-mono text-zinc-300">
+                <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-5 space-y-3.5 shadow-xl">
+                  <div className="flex items-center justify-between text-xs text-[#9CA3AF]">
                     <span>Tổng tiền hàng Orbs:</span>
-                    <span className="text-purple-300 font-bold">{cartTotalOre.toLocaleString()} ORBS</span>
+                    <span className="text-amber-400 font-bold">{cartTotalOre.toLocaleString()} ORBS</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs font-mono text-emerald-400">
+                  <div className="flex items-center justify-between text-xs text-emerald-400">
                     <span>Phí giao hàng Vplay Express:</span>
-                    <span>MIỄN PHÍ (0 ORBS)</span>
+                    <span className="font-semibold">MIỄN PHÍ (0 ORBS)</span>
                   </div>
-                  <div className="border-t border-black/30 pt-2 flex items-center justify-between">
+                  <div className="border-t border-[#2D2D38] pt-3 flex items-center justify-between">
                     <div>
-                      <div className="text-xs font-bold text-white font-jura">TỔNG CỘNG THANH TOÁN:</div>
-                      <div className="text-xs text-zinc-400 font-mono">
+                      <div className="text-xs font-bold text-white uppercase">TỔNG CỘNG THANH TOÁN:</div>
+                      <div className="text-xs text-[#9CA3AF] mt-0.5">
                         Số dư sau thanh toán: {(oreBalance - cartTotalOre).toLocaleString()} ORBS
                       </div>
                     </div>
-                    <div className="text-base font-black text-purple-300 font-mono">
+                    <div className="text-lg font-bold text-amber-400">
                       {cartTotalOre.toLocaleString()} ORBS
                     </div>
                   </div>
 
                   <button
                     onClick={handleCheckoutCart}
-                    className="w-full bg-[#28960b] hover:bg-[#32b312] text-white py-2.5 text-xs font-bold font-mono border-2 border-[#141414] shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20] active:translate-y-[1px] flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white py-3 text-xs sm:text-sm font-bold rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-yellow-300" />
+                    <CheckCircle2 className="w-4 h-4 text-white" />
                     <span>XÁC NHẬN THANH TOÁN BẰNG ORBS</span>
                   </button>
                 </div>
@@ -904,64 +904,64 @@ export const VFurnitureTab: React.FC = () => {
         {/* VIEW 3: PURCHASED ITEMS / INVENTORY */}
         {activeTab === "purchases" && (
           <div className="space-y-4 max-w-4xl mx-auto">
-            <div className="bg-[#1a1c1e] p-3 border-2 border-[#141414] flex items-center justify-between">
+            <div className="bg-[#1F1E24] p-4 rounded-2xl border border-[#2D2D38] flex items-center justify-between shadow-lg">
               <div className="flex items-center gap-2">
-                <Home className="w-4 h-4 text-emerald-400" />
-                <h2 className="font-bold text-sm text-white font-jura">
+                <Home className="w-5 h-5 text-emerald-400" />
+                <h2 className="font-bold text-sm sm:text-base text-white">
                   KHO ĐỒ GIA DỤNG ĐÃ SỞ HỮU ({purchases.length} món)
                 </h2>
               </div>
-              <span className="text-[10px] text-zinc-400 font-mono">Tự động đồng bộ với Vplay Local Store</span>
+              <span className="text-xs text-[#9CA3AF]">Tự động đồng bộ với Vplay Local Store</span>
             </div>
 
             {purchases.length === 0 ? (
-              <div className="p-12 text-center bg-[#1f2023] border-2 border-[#141414] space-y-3">
-                <PackageCheck className="w-12 h-12 text-zinc-600 mx-auto" />
-                <p className="text-sm font-bold text-zinc-300 font-jura">Bạn chưa mua vật dụng gia dụng nào</p>
-                <p className="text-xs text-zinc-500 font-mono">
-                  Sử dụng Khoáng Thạch Ore để trang bị ngay cho phòng khách, phòng bếp hoặc phòng ngủ của bạn!
+              <div className="p-12 text-center bg-[#1F1E24] border border-[#2D2D38] rounded-2xl space-y-3 shadow-lg">
+                <PackageCheck className="w-12 h-12 text-slate-600 mx-auto" />
+                <p className="text-sm font-bold text-slate-300">Bạn chưa mua vật dụng gia dụng nào</p>
+                <p className="text-xs text-[#9CA3AF]">
+                  Sử dụng Khoáng Thạch Orbs để trang bị ngay cho phòng khách, phòng bếp hoặc phòng ngủ của bạn!
                 </p>
                 <button
                   onClick={() => setActiveTab("store")}
-                  className="bg-[#28960b] text-white px-4 py-2 text-xs font-bold font-mono border-2 border-[#141414] shadow active:translate-y-[1px]"
+                  className="bg-gradient-to-r from-amber-500 to-rose-500 text-white px-5 py-2 text-xs font-bold rounded-xl shadow-md cursor-pointer"
                 >
                   Đến Cửa Hàng Ngay
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {purchases.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-[#2a2c30] border-2 border-[#141414] p-3.5 flex items-start gap-3 shadow-md"
+                    className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 flex items-start gap-3.5 shadow-md"
                   >
                     <img
                       src={item.product.image}
                       alt={item.product.name}
-                      className="w-20 h-20 object-cover border-2 border-[#141414] bg-black shrink-0"
+                      className="w-20 h-20 object-cover rounded-xl border border-[#2D2D38] bg-black shrink-0"
                     />
 
                     <div className="flex-1 space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-1.5 py-0.2 text-[9px] font-mono font-bold">
+                        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold rounded-md">
                           ✓ {item.deliveryStatus}
                         </span>
-                        <span className="text-[9px] text-zinc-500 font-mono">{item.purchaseDate}</span>
+                        <span className="text-[10px] text-slate-500">{item.purchaseDate}</span>
                       </div>
 
-                      <h4 className="font-bold text-xs sm:text-sm text-white font-jura">
+                      <h4 className="font-bold text-xs sm:text-sm text-white">
                         {item.product.name}
                       </h4>
 
-                      <div className="text-[10px] text-zinc-400 font-mono flex items-center justify-between">
+                      <div className="text-xs text-[#9CA3AF] flex items-center justify-between">
                         <span>Số lượng: x{item.quantity}</span>
-                        <span className="text-amber-400 font-bold">{item.totalOre.toLocaleString()} ORE</span>
+                        <span className="text-amber-400 font-bold">{item.totalOre.toLocaleString()} ORBS</span>
                       </div>
 
-                      <div className="pt-2 border-t border-black/30 flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                      <div className="pt-2 border-t border-[#2D2D38] flex items-center justify-between text-[11px] text-[#9CA3AF]">
                         <span className="flex items-center gap-1 text-sky-400">
-                          <ShieldCheck className="w-3 h-3" />
-                          <span>Bảo hành chính hãng Vplay</span>
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>Bảo hành chính hãng</span>
                         </span>
 
                         <button
@@ -969,7 +969,7 @@ export const VFurnitureTab: React.FC = () => {
                             playPopSound();
                             showToast(`🏠 "${item.product.name}" đã được bố trí trong căn hộ Vplay của bạn!`);
                           }}
-                          className="bg-[#383a3f] hover:bg-[#484c52] text-white px-2 py-0.5 text-[10px] font-bold border border-[#141414] active:translate-y-[1px]"
+                          className="bg-[#2A2933] hover:bg-[#32303D] text-white px-2.5 py-1 text-[11px] font-semibold rounded-lg border border-[#3E3D4D] cursor-pointer"
                         >
                           Sử dụng / Đặt vị trí
                         </button>
@@ -991,70 +991,70 @@ export const VFurnitureTab: React.FC = () => {
             onClick={() => setSelectedProduct(null)}
           />
 
-          <div className="relative z-10 w-full max-w-2xl bg-[#2b2d30] border-4 border-[#141414] shadow-[0_16px_40px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="relative z-10 w-full max-w-2xl bg-[#1F1E24] border border-[#2D2D38] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             {/* Modal Header */}
-            <div className="bg-[#1f2022] border-b-2 border-[#141414] p-3 sm:p-4 flex items-center justify-between">
+            <div className="bg-[#18171E] border-b border-[#2D2D38] p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Armchair className="w-5 h-5 text-amber-400" />
-                <h3 className="font-black text-sm sm:text-base text-white font-jura uppercase">
+                <h3 className="font-bold text-sm sm:text-base text-white uppercase">
                   CHI TIẾT SẢN PHẨM GIA DỤNG
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedProduct(null)}
-                className="w-7 h-7 bg-[#c6c6c6] hover:bg-rose-600 hover:text-white text-black font-bold border-2 border-[#141414] flex items-center justify-center shadow active:translate-y-[1px]"
+                className="w-8 h-8 bg-[#2A2933] hover:bg-[#32303D] text-[#9CA3AF] hover:text-white rounded-xl border border-[#3E3D4D] flex items-center justify-center cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-4">
-              <div className="aspect-video w-full bg-black border-2 border-[#141414] overflow-hidden relative">
+            <div className="p-4 sm:p-6 overflow-y-auto no-scrollbar space-y-4">
+              <div className="aspect-video w-full bg-black rounded-xl border border-[#2D2D38] overflow-hidden relative">
                 <img
                   src={selectedProduct.image}
                   alt={selectedProduct.name}
                   className="w-full h-full object-cover"
                 />
                 {selectedProduct.badge && (
-                  <span className="absolute top-3 left-3 bg-amber-500 text-black px-2.5 py-1 text-xs font-black font-mono border border-black shadow">
+                  <span className="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white px-2.5 py-1 text-xs font-bold rounded-lg shadow">
                     {selectedProduct.badge}
                   </span>
                 )}
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-mono text-emerald-400 font-bold">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-emerald-400 font-semibold">
                     Danh mục: {selectedProduct.categoryName}
                   </span>
-                  <span className="text-xs font-mono text-amber-400 flex items-center gap-1 font-bold">
+                  <span className="text-xs text-amber-400 flex items-center gap-1 font-semibold">
                     <Star className="w-3.5 h-3.5 fill-amber-400" />
                     {selectedProduct.rating} ({selectedProduct.reviewCount} đánh giá)
                   </span>
                 </div>
 
-                <h2 className="font-extrabold text-lg text-white font-jura">
+                <h2 className="font-bold text-lg text-white">
                   {selectedProduct.name}
                 </h2>
-                <p className="text-xs text-amber-300/90 font-mono mt-0.5">
+                <p className="text-xs text-amber-400 mt-0.5">
                   {selectedProduct.tagline}
                 </p>
-                <p className="text-xs text-zinc-300 font-montserrat leading-relaxed mt-2 bg-[#202225] p-3 border border-[#141414]">
+                <p className="text-xs text-[#9CA3AF] leading-relaxed mt-2 bg-[#18171E] p-3.5 rounded-xl border border-[#2D2D38]">
                   {selectedProduct.description}
                 </p>
               </div>
 
               {/* Technical Specifications */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-white uppercase font-jura tracking-wider">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">
                   THÔNG SỐ KỸ THUẬT & CHẤT LIỆU
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   {Object.entries(selectedProduct.specs).map(([k, v]) => (
-                    <div key={k} className="bg-[#1e2022] p-2 border border-[#141414] flex justify-between">
-                      <span className="text-zinc-400">{k}:</span>
-                      <span className="text-white font-bold">{v}</span>
+                    <div key={k} className="bg-[#18171E] p-2.5 rounded-xl border border-[#2D2D38] flex justify-between">
+                      <span className="text-[#9CA3AF]">{k}:</span>
+                      <span className="text-white font-semibold">{v}</span>
                     </div>
                   ))}
                 </div>
@@ -1062,11 +1062,11 @@ export const VFurnitureTab: React.FC = () => {
             </div>
 
             {/* Modal Footer Actions */}
-            <div className="bg-[#1f2022] border-t-2 border-[#141414] p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="bg-[#18171E] border-t border-[#2D2D38] p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div>
-                <div className="text-[10px] text-zinc-400 font-mono">Giá thanh toán Orbs</div>
-                <div className="text-lg font-black text-purple-300 font-mono">
-                  {selectedProduct.priceOre.toLocaleString()} <span className="text-xs">ORBS</span>
+                <div className="text-[10px] text-[#9CA3AF]">Giá thanh toán Orbs</div>
+                <div className="text-lg font-bold text-amber-400">
+                  {selectedProduct.priceOre.toLocaleString()} <span className="text-xs text-[#9CA3AF]">ORBS</span>
                 </div>
               </div>
 
@@ -1076,14 +1076,14 @@ export const VFurnitureTab: React.FC = () => {
                     handleAddToCart(selectedProduct);
                     setSelectedProduct(null);
                   }}
-                  className="flex-1 sm:flex-none bg-[#3b3e43] hover:bg-[#474b51] text-white px-4 py-2 text-xs font-bold font-mono border-2 border-[#141414] active:translate-y-[1px]"
+                  className="flex-1 sm:flex-none bg-[#2A2933] hover:bg-[#32303D] text-white px-4 py-2.5 text-xs font-semibold rounded-xl border border-[#3E3D4D] cursor-pointer"
                 >
                   + Thêm giỏ hàng
                 </button>
 
                 <button
                   onClick={() => handleBuyDirect(selectedProduct)}
-                  className="flex-1 sm:flex-none bg-[#28960b] hover:bg-[#32b312] text-white px-5 py-2 text-xs font-bold font-mono border-2 border-[#141414] shadow-[inset_1px_1px_0_#89dc69] active:translate-y-[1px]"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white px-5 py-2.5 text-xs font-bold rounded-xl shadow-md cursor-pointer"
                 >
                   Mua Ngay Bằng Orbs
                 </button>
@@ -1094,12 +1094,12 @@ export const VFurnitureTab: React.FC = () => {
       )}
 
       {/* FOOTER BAR */}
-      <div className="bg-[#1c1d20] border-t-2 border-[#141414] p-2.5 text-center text-[10px] text-zinc-400 font-mono flex items-center justify-between">
-        <span className="flex items-center gap-1">
-          <Truck className="w-3.5 h-3.5 text-emerald-400" />
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-3 px-4 text-xs text-[#9CA3AF] flex items-center justify-between">
+        <span className="flex items-center gap-1.5">
+          <Truck className="w-4 h-4 text-emerald-400" />
           <span>Vplay Express Delivery • Giao hàng tận nhà 24/7</span>
         </span>
-        <span>V-Furniture Orbs UI v1.0</span>
+        <span className="text-slate-500 text-[11px]">V-Furniture Engine</span>
       </div>
     </div>
   );

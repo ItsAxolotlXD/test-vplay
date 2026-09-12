@@ -628,7 +628,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Gamepad2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="truncate">V-Games (Arcade)</span>
+                    <span className="truncate">V-Games</span>
                   </div>
                 </button>
 
@@ -643,7 +643,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Folder className="w-4 h-4 text-purple-400 shrink-0" />
-                    <span className="truncate">V-Files Explorer</span>
+                    <span className="truncate">V-Files</span>
                   </div>
                 </button>
 
@@ -658,7 +658,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span className="truncate">Explore Vietnam 360</span>
+                    <span className="truncate">Explore Vietnam</span>
                   </div>
                 </button>
 
@@ -673,7 +673,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Clock className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="truncate">V-Clock (Đồng Hồ)</span>
+                    <span className="truncate">V-Clock</span>
                   </div>
                 </button>
 
@@ -688,7 +688,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Phone className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span className="truncate">Điện Thoại V-Phone</span>
+                    <span className="truncate">V-Phone</span>
                   </div>
                 </button>
 
@@ -703,7 +703,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Globe className="w-4 h-4 text-sky-400 shrink-0" />
-                    <span className="truncate">Trình Duyệt Web</span>
+                    <span className="truncate">V-Browser</span>
                   </div>
                 </button>
 
@@ -718,7 +718,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <CalendarDays className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="truncate">Lịch Vạn Niên 360</span>
+                    <span className="truncate">Lịch Vạn Niên</span>
                   </div>
                 </button>
 
@@ -733,7 +733,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <ImageIcon className="w-4 h-4 text-purple-400 shrink-0" />
-                    <span className="truncate">Thư Viện V-Gallery</span>
+                    <span className="truncate">V-Gallery</span>
                   </div>
                 </button>
 
@@ -748,7 +748,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Camera className="w-4 h-4 text-pink-400 shrink-0" />
-                    <span className="truncate">Máy Ảnh V-Camera</span>
+                    <span className="truncate">V-Camera</span>
                   </div>
                 </button>
 
@@ -763,7 +763,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Ticket className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="truncate">Đặt Vé V-Ticket</span>
+                    <span className="truncate">V-Ticket</span>
                   </div>
                 </button>
 
@@ -778,7 +778,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <CloudSun className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="truncate">Thời Tiết 360</span>
+                    <span className="truncate">V-Weather</span>
                   </div>
                 </button>
 
@@ -793,7 +793,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Box className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="truncate">Minecraft Container</span>
+                    <span className="truncate">Minecraft</span>
                   </div>
                   <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-bold bg-emerald-500/20 text-emerald-300 rounded-md">
                     MC

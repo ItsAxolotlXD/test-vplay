@@ -189,21 +189,19 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
   });
 
   /* =========================================================================
-     VIEW: ACTIVE GAME STAGE (LIQUID GLASS THEME)
+     VIEW: ACTIVE GAME STAGE (V-FLOW THEME)
      ========================================================================= */
   if (activeGame) {
     return (
-      <div className="w-full max-w-6xl mx-auto space-y-5 select-none font-sans text-white animate-fade-in">
+      <div className="w-full max-w-6xl mx-auto space-y-5 select-none font-sans text-white animate-fade-in pb-16">
         {/* Navigation Breadcrumb & Sound Controls Bar */}
-        <div className="bg-white/[0.09] backdrop-blur-[24px] saturate-[180%] rounded-[20px] p-4 sm:p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] border border-white/15 flex flex-wrap items-center justify-between gap-3 relative overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
+        <div className="bg-[#1F1E24] rounded-2xl p-4 sm:p-5 shadow-lg border border-[#2D2D38] flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={() => {
               setActiveGame(null);
               playPopSound();
             }}
-            className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 backdrop-blur-md text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 active:scale-95 shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.2)]"
+            className="px-4 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-200 border border-[#3E3D4D] text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 active:scale-95"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Quay Lại Sảnh Trò Chơi</span>
@@ -215,7 +213,7 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
                 setSoundEnabled(!soundEnabled);
                 playPopSound();
               }}
-              className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 backdrop-blur-md text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="px-3.5 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-200 border border-[#3E3D4D] text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
               title="Bật/Tắt âm thanh"
             >
               {soundEnabled ? (
@@ -233,7 +231,7 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
                 setActiveGame(null);
                 playPopSound();
               }}
-              className="px-4 py-2.5 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/30 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+              className="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
               title="Thoát Game về Lobby"
             >
               <X className="w-4 h-4 stroke-[2.5]" />
@@ -253,10 +251,10 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
                   setActiveGame(g);
                   playPopSound();
                 }}
-                className={`px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-md border transition-all whitespace-nowrap cursor-pointer shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.2)] active:scale-95 flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border flex items-center gap-1.5 ${
                   isCur
-                    ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white border-white/25 shadow-md"
-                    : "bg-white/[0.06] hover:bg-white/15 text-white/70 hover:text-white border-white/10"
+                    ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md"
+                    : "bg-[#1F1E24] hover:bg-[#2A2933] text-zinc-400 hover:text-white border-[#2D2D38]"
                 }`}
               >
                 <Gamepad2 className="w-3.5 h-3.5" />
@@ -267,12 +265,10 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
         </div>
 
         {/* Game Title Bar Header */}
-        <div className="bg-white/[0.09] backdrop-blur-[24px] saturate-[180%] rounded-[20px] p-5 sm:p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] border border-white/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
+        <div className="bg-[#1F1E24] rounded-2xl p-4 sm:p-5 border border-[#2D2D38] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
           <div className="flex items-center gap-3.5">
             <div
-              className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${activeGame.gradient} flex items-center justify-center text-white shadow-lg shadow-black/20 shrink-0`}
+              className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${activeGame.gradient} flex items-center justify-center text-white shadow-lg shrink-0`}
             >
               <Gamepad2 className="w-6 h-6" />
             </div>
@@ -280,7 +276,7 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
               <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                 {activeGame.title}
               </h2>
-              <p className="text-xs text-white/70 font-sans mt-0.5">
+              <p className="text-xs text-[#9CA3AF] font-sans mt-0.5">
                 {activeGame.categoryLabel} • Độ khó: {activeGame.difficulty} • Kỷ lục:{" "}
                 <span className="text-amber-400 font-bold">
                   {highScores[activeGame.id] || 0} pts
@@ -292,7 +288,7 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={(e) => toggleFavorite(activeGame.id, e)}
-              className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-amber-300 text-xs font-semibold backdrop-blur-md border border-white/15 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+              className="px-3.5 py-1.5 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-300 border border-[#3E3D4D] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
             >
               <Star
                 className={`w-4 h-4 ${
@@ -306,10 +302,8 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
           </div>
         </div>
 
-        {/* The Game Arena Container (Liquid Glass) */}
-        <div className="w-full bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] rounded-[24px] p-5 sm:p-8 min-h-[420px] flex flex-col items-center justify-center relative shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] border border-white/15 overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
+        {/* The Game Arena Container */}
+        <div className="w-full bg-[#1F1E24] rounded-2xl p-5 sm:p-8 min-h-[420px] flex flex-col items-center justify-center relative border border-[#2D2D38] shadow-xl overflow-hidden">
           {activeGame.id === "wheel_of_fortune" && (
             <WheelOfFortuneGame
               soundEnabled={soundEnabled}
@@ -355,7 +349,7 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
         </div>
 
         {/* Footer Instructions & Rules */}
-        <div className="bg-white/[0.07] backdrop-blur-[20px] rounded-[18px] p-4 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/70 font-sans shadow-md">
+        <div className="bg-[#1F1E24] rounded-2xl p-4 border border-[#2D2D38] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#9CA3AF] shadow-md">
           <div className="flex items-center gap-2.5">
             <HelpCircle className="w-4.5 h-4.5 text-amber-400 shrink-0" />
             <span>{activeGame.description}</span>
@@ -365,7 +359,7 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
               setActiveGame(null);
               playPopSound();
             }}
-            className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0"
+            className="px-4 py-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-200 border border-[#3E3D4D] text-xs font-semibold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Quay Lại Kho Game
           </button>
@@ -375,70 +369,66 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
   }
 
   /* =========================================================================
-     VIEW: ARCADE LOBBY (LIQUID GLASS THEME MATCHING NewsView.tsx)
+     VIEW: ARCADE LOBBY (V-FLOW THEME)
      ========================================================================= */
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 select-none font-sans text-white">
-      {/* Top Banner Header (Liquid Glass) */}
-      <div className="bg-white/[0.09] backdrop-blur-[24px] saturate-[180%] rounded-[20px] p-6 sm:p-7 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] border border-white/15 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
-        <div className="flex items-center gap-4 z-10">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25 shrink-0">
-            <Gamepad2 className="w-8 h-8 animate-pulse" />
+    <div className="w-full max-w-6xl mx-auto space-y-6 select-none font-sans text-white pb-16">
+      {/* Top Banner Header (V-Flow) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#2D2D38]">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center shadow-lg shadow-amber-500/25 shrink-0">
+            <Gamepad2 className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                V-GAMES & ARCADE ZONE
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                V-Games
+                <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  TRÒ CHƠI & ARCADE
+                </span>
               </h1>
-              <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white uppercase tracking-wider shadow-md shadow-amber-500/20">
-                Liquid Glass • {ARCADE_5_GAMES.length} Trò Chơi
-              </span>
             </div>
-            <p className="text-xs sm:text-sm text-white/70 mt-1 max-w-2xl leading-relaxed">
-              Trải nghiệm Vòng Quay May Mắn tùy biến và các trò chơi cổ điển đồ họa mượt mà: Cờ Caro XO, Oẳn Tù Tì, Nối Từ, Đếm Số & Rắn Săn Mồi!
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
+              Vòng Quay May Mắn, Cờ Caro XO, Oẳn Tù Tì, Nối Từ, Đếm Số & Rắn Săn Mồi
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 self-end md:self-auto z-10">
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
           <button
             onClick={() => {
               setSoundEnabled(!soundEnabled);
               playPopSound();
             }}
-            className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 backdrop-blur-md text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.2)]"
+            className="px-3.5 py-1.5 rounded-full bg-[#1F1E24] hover:bg-[#282733] text-zinc-300 border border-[#2D2D38] text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
             title="Bật/Tắt âm thanh"
           >
             {soundEnabled ? (
-              <Volume2 className="w-4 h-4 text-emerald-400" />
+              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
             ) : (
-              <VolumeX className="w-4 h-4 text-rose-400" />
+              <VolumeX className="w-3.5 h-3.5 text-rose-400" />
             )}
             <span>{soundEnabled ? "ÂM THANH BẬT" : "ÂM THANH TẮT"}</span>
           </button>
         </div>
       </div>
 
-      {/* Category Pills & Search Bar (Liquid Glass) */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] rounded-[20px] p-3.5 sm:p-4 border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] relative overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
+      {/* Category Pills & Search Bar */}
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#1F1E24] rounded-2xl p-3 border border-[#2D2D38] shadow-md">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Tìm kiếm trò chơi V-Games..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-[20px] text-xs font-semibold text-white placeholder-gray-400 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)] focus:outline-none focus:bg-white/15 focus:border-white/30"
+              className="w-full pl-10 pr-3.5 py-2 rounded-xl bg-[#18171E] border border-[#2D2D38] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/60"
             />
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono text-white/70 shrink-0">
-            <span className="text-amber-400 font-bold text-sm">{filteredGames.length}</span> / {ARCADE_5_GAMES.length} trò chơi có sẵn
+          <div className="flex items-center gap-2 text-xs font-mono text-[#9CA3AF] shrink-0">
+            <span className="text-amber-400 font-bold text-sm">{filteredGames.length}</span> / {ARCADE_5_GAMES.length} trò chơi
           </div>
         </div>
 
@@ -456,10 +446,10 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
                 setSelectedCategory(cat.id);
                 playPopSound();
               }}
-              className={`rounded-full px-4 py-2 text-xs font-semibold backdrop-blur-md border transition-all cursor-pointer shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.2)] active:scale-95 flex items-center gap-2 whitespace-nowrap ${
+              className={`rounded-xl px-3.5 py-2 text-xs font-semibold border transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 whitespace-nowrap ${
                 selectedCategory === cat.id
-                  ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white border-white/25 shadow-md"
-                  : "bg-white/[0.07] hover:bg-white/15 text-white/70 hover:text-white border-white/10"
+                  ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md"
+                  : "bg-[#1F1E24] hover:bg-[#282733] text-zinc-400 hover:text-white border-[#2D2D38]"
               }`}
             >
               {cat.id === "favorites" && (
@@ -471,7 +461,7 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
         </div>
       </div>
 
-      {/* Grid of 6 Games (Liquid Glass Cards) */}
+      {/* Grid of Games */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredGames.map((game) => {
           const isFav = favoriteGames.includes(game.id);
@@ -483,25 +473,23 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
                 setActiveGame(game);
                 playPopSound();
               }}
-              className="group bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] rounded-[22px] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] border border-white/15 hover:border-amber-400/40 hover:bg-white/[0.13] transition-all duration-300 relative overflow-hidden flex flex-col justify-between cursor-pointer"
+              className="group bg-[#1F1E24] rounded-2xl p-5 border border-[#2D2D38] hover:border-amber-500/50 hover:bg-[#24232B] transition-all duration-200 flex flex-col justify-between cursor-pointer shadow-lg active:scale-[0.99]"
             >
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
               <div>
                 {/* Top Card Banner */}
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div
-                    className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${game.gradient} flex items-center justify-center text-white shadow-lg shadow-black/20 group-hover:scale-105 transition-transform`}
+                    className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${game.gradient} flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform`}
                   >
                     <Gamepad2 className="w-6 h-6" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-amber-300 border border-white/15 backdrop-blur-md">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#18171E] text-amber-300 border border-[#2D2D38]">
                       {game.badge}
                     </span>
                     <button
                       onClick={(e) => toggleFavorite(game.id, e)}
-                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white/60 hover:text-amber-400 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-amber-400 transition-colors cursor-pointer"
                       title="Yêu thích"
                     >
                       <Star
@@ -515,25 +503,25 @@ export const VArcadeTab: React.FC<VArcadeTabProps> = ({ initialGameId }) => {
 
                 {/* Title & Info */}
                 <div className="mb-4">
-                  <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-amber-300 transition-colors line-clamp-1 mb-1.5">
+                  <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors line-clamp-1 mb-1.5">
                     {game.title}
                   </h3>
-                  <p className="text-xs text-white/70 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#9CA3AF] line-clamp-2 leading-relaxed">
                     {game.description}
                   </p>
                 </div>
               </div>
 
-              {/* Card Footer Info with Liquid Glass Play Button */}
-              <div className="space-y-3 pt-3.5 border-t border-white/10">
-                <div className="flex items-center justify-between text-xs text-white/60 font-sans">
+              {/* Card Footer Info */}
+              <div className="space-y-3 pt-3.5 border-t border-[#2D2D38]">
+                <div className="flex items-center justify-between text-xs text-[#9CA3AF]">
                   <span className="flex items-center gap-1 text-amber-400 font-bold">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {game.rating}
                   </span>
                   <span className="text-emerald-400 font-semibold">{game.difficulty}</span>
                 </div>
 
-                <button className="w-full py-3 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 border border-white/25 active:scale-95 cursor-pointer flex items-center justify-center gap-2 transition-all">
+                <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2 transition-all">
                   <Play className="w-4 h-4 fill-current" /> CHƠI NGAY
                 </button>
               </div>
@@ -571,20 +559,20 @@ const OpponentBar: React.FC<{
   };
 
   return (
-    <div className="w-full mb-5 p-4 rounded-2xl bg-white/[0.08] backdrop-blur-[20px] border border-white/15 flex flex-col gap-3 shadow-md relative overflow-hidden">
+    <div className="w-full mb-5 p-4 rounded-2xl bg-[#18171E] border border-[#2D2D38] flex flex-col gap-3 shadow-md relative overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Mode Buttons */}
-        <div className="flex items-center gap-2 bg-black/20 p-1.5 rounded-full border border-white/10">
+        <div className="flex items-center gap-1.5 bg-[#1F1E24] p-1 rounded-xl border border-[#2D2D38]">
           <button
             type="button"
             onClick={() => {
               setGameMode("npc");
               playPopSound();
             }}
-            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
               gameMode === "npc"
                 ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
-                : "text-white/70 hover:text-white"
+                : "text-zinc-400 hover:text-white"
             }`}
           >
             <Bot className="w-4 h-4" /> Chơi Với NPC
@@ -595,10 +583,10 @@ const OpponentBar: React.FC<{
               setGameMode("pvp");
               playPopSound();
             }}
-            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
               gameMode === "pvp"
                 ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
-                : "text-white/70 hover:text-white"
+                : "text-zinc-400 hover:text-white"
             }`}
           >
             <Users className="w-4 h-4" /> 2 Người Chơi
@@ -614,7 +602,7 @@ const OpponentBar: React.FC<{
                 setShowNpcPicker(!showNpcPicker);
                 playPopSound();
               }}
-              className="px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95 backdrop-blur-md"
+              className="px-3.5 py-1.5 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-white border border-[#3E3D4D] text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all active:scale-95"
             >
               <img
                 src={selectedNpc.avatar}
@@ -632,7 +620,7 @@ const OpponentBar: React.FC<{
             <button
               type="button"
               onClick={handleRandomize}
-              className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-amber-300 border border-white/15 cursor-pointer flex items-center justify-center transition-all active:scale-95"
+              className="p-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-amber-300 border border-[#3E3D4D] cursor-pointer flex items-center justify-center transition-all active:scale-95"
               title="Đổi đối thủ NPC ngẫu nhiên"
             >
               <Shuffle className="w-4 h-4" />
@@ -643,15 +631,15 @@ const OpponentBar: React.FC<{
 
       {/* NPC Picker Drawer Dropdown */}
       {showNpcPicker && gameMode === "npc" && (
-        <div className="mt-2 p-3.5 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/20 shadow-2xl space-y-3 animate-fade-in z-20">
-          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
+        <div className="mt-2 p-3.5 rounded-2xl bg-[#1F1E24] border border-[#2D2D38] shadow-2xl space-y-3 animate-fade-in z-20">
+          <div className="flex items-center justify-between gap-2 border-b border-[#2D2D38] pb-2">
             <span className="text-xs font-bold text-amber-300 uppercase">
               Chọn NPC Đối Thủ
             </span>
             <button
               type="button"
               onClick={() => setShowNpcPicker(false)}
-              className="text-white/60 hover:text-white cursor-pointer"
+              className="text-zinc-400 hover:text-white cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -662,7 +650,7 @@ const OpponentBar: React.FC<{
             placeholder="Tìm kiếm NPC bạn bè..."
             value={pickerSearch}
             onChange={(e) => setPickerSearch(e.target.value)}
-            className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white placeholder-white/50 focus:outline-none focus:border-amber-400"
+            className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
           />
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
@@ -677,8 +665,8 @@ const OpponentBar: React.FC<{
                 }}
                 className={`p-2 rounded-xl border text-xs flex items-center gap-2 text-left cursor-pointer transition-all ${
                   selectedNpc.id === npc.id
-                    ? "bg-amber-500/20 border-amber-400 text-amber-200"
-                    : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10"
+                    ? "bg-amber-500/20 border-amber-500/40 text-amber-200"
+                    : "bg-[#18171E] border-[#2D2D38] text-zinc-300 hover:bg-[#25242E]"
                 }`}
               >
                 <img

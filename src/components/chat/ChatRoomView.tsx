@@ -411,19 +411,19 @@ export const ChatRoomView: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-68px)] flex bg-[#121118] text-zinc-100 overflow-hidden font-sans border-t border-[#262533] select-none">
+    <div className="w-full h-[calc(100vh-68px)] flex bg-[#18171E] text-white overflow-hidden font-sans border-t border-[#2D2D38] select-none">
       {/* 1. LEFT PANEL: Server Header & Channels List (Width: 260px) */}
-      <div className="w-64 sm:w-72 bg-[#171622] border-r border-[#262533] flex flex-col shrink-0">
+      <div className="w-64 sm:w-72 bg-[#1F1E24] border-r border-[#2D2D38] flex flex-col shrink-0">
         {/* Server Header */}
-        <div className="h-14 px-4 border-b border-[#262533] flex items-center justify-between bg-[#1A1926] shadow-sm">
+        <div className="h-14 px-4 border-b border-[#2D2D38] flex items-center justify-between bg-[#18171E] shadow-sm">
           <div className="flex items-center gap-2.5 truncate">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E6005A] to-[#FF4D8D] flex items-center justify-center text-white font-black text-sm shadow-md shadow-[#E6005A]/30 shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0">
               V
             </div>
             <div className="min-w-0">
-              <div className="text-xs sm:text-sm font-black text-white flex items-center gap-1 truncate">
-                <span>Vplay Discord Hub</span>
-                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <div className="text-xs sm:text-sm font-bold text-white flex items-center gap-1 truncate">
+                <span>V-Chat • Cộng Đồng</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               </div>
               <div className="text-[10px] text-emerald-400 flex items-center gap-1 font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -434,12 +434,12 @@ export const ChatRoomView: React.FC = () => {
         </div>
 
         {/* Channel Categories & Channel List */}
-        <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4">
+        <div className="flex-1 overflow-y-auto no-scrollbar px-2 py-3 space-y-4">
           {/* CATEGORY 1: KÊNH VĂN BẢN (Text channels) */}
           <div className="space-y-1">
             <button
               onClick={() => setTextCategoryOpen(!textCategoryOpen)}
-              className="w-full flex items-center justify-between px-2 py-1 text-[11px] font-bold text-zinc-400 uppercase tracking-wider hover:text-zinc-200 cursor-pointer group"
+              className="w-full flex items-center justify-between px-2 py-1 text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider hover:text-white cursor-pointer group"
             >
               <span className="flex items-center gap-1">
                 {textCategoryOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -466,17 +466,17 @@ export const ChatRoomView: React.FC = () => {
                         }}
                         className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-[#E6005A] text-white shadow-md shadow-[#E6005A]/25'
-                            : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#201F2C]'
+                            ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                            : 'text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
                         }`}
                       >
                         <div className="flex items-center gap-2 truncate">
-                          <Hash className={`w-4 h-4 shrink-0 ${isSelected ? 'text-white' : 'text-zinc-500'}`} />
+                          <Hash className={`w-4 h-4 shrink-0 ${isSelected ? 'text-white' : 'text-[#9CA3AF]'}`} />
                           <span className="truncate">{ch.name}</span>
                         </div>
 
                         {ch.unreadCount && ch.unreadCount > 0 && !isSelected ? (
-                          <span className="px-1.5 py-0.2 text-[9px] font-mono font-bold bg-[#E6005A] text-white rounded-full">
+                          <span className="px-1.5 py-0.2 text-[9px] font-mono font-bold bg-amber-500 text-black rounded-full">
                             {ch.unreadCount}
                           </span>
                         ) : null}
@@ -491,7 +491,7 @@ export const ChatRoomView: React.FC = () => {
           <div className="space-y-1">
             <button
               onClick={() => setVoiceCategoryOpen(!voiceCategoryOpen)}
-              className="w-full flex items-center justify-between px-2 py-1 text-[11px] font-bold text-zinc-400 uppercase tracking-wider hover:text-zinc-200 cursor-pointer group"
+              className="w-full flex items-center justify-between px-2 py-1 text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider hover:text-white cursor-pointer group"
             >
               <span className="flex items-center gap-1">
                 {voiceCategoryOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -520,10 +520,10 @@ export const ChatRoomView: React.FC = () => {
                           }}
                           className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                             isConnectedHere
-                              ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/40'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                               : isSelected
-                              ? 'bg-[#222130] text-white'
-                              : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#201F2C]'
+                              ? 'bg-[#2A2933] text-white'
+                              : 'text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
                           }`}
                         >
                           <div className="flex items-center gap-2 truncate">
@@ -548,7 +548,7 @@ export const ChatRoomView: React.FC = () => {
                             {participantsInRoom.map((p) => (
                               <div
                                 key={p.id}
-                                className="flex items-center justify-between py-1 px-2 rounded-lg bg-black/20 text-[11px] text-zinc-300"
+                                className="flex items-center justify-between py-1 px-2 rounded-lg bg-black/30 text-[11px] text-zinc-300"
                               >
                                 <div className="flex items-center gap-2 truncate">
                                   <div className="relative">
@@ -587,15 +587,15 @@ export const ChatRoomView: React.FC = () => {
           </div>
         </div>
 
-        {/* VOICE CONNECTED STATUS BAR (Discord signature) */}
+        {/* VOICE CONNECTED STATUS BAR */}
         {connectedVoiceChannelId && (
-          <div className="px-3 py-2 bg-[#121E19] border-t border-emerald-500/30 flex items-center justify-between text-xs">
+          <div className="px-3 py-2 bg-[#18171E] border-t border-emerald-500/30 flex items-center justify-between text-xs">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
                 <Radio className="w-3 h-3 animate-pulse" />
                 <span>Đã kết nối thoại</span>
               </div>
-              <div className="text-[10px] text-zinc-400 truncate">
+              <div className="text-[10px] text-[#9CA3AF] truncate">
                 {channels.find((c) => c.id === connectedVoiceChannelId)?.name}
               </div>
             </div>
@@ -612,8 +612,8 @@ export const ChatRoomView: React.FC = () => {
           </div>
         )}
 
-        {/* USER PROFILE STATUS BAR AT BOTTOM OF CHANNELS (Discord signature) */}
-        <div className="h-15 px-3 bg-[#13121A] border-t border-[#262533] flex items-center justify-between relative">
+        {/* USER PROFILE STATUS BAR AT BOTTOM OF CHANNELS */}
+        <div className="h-15 px-3 bg-[#18171E] border-t border-[#2D2D38] flex items-center justify-between relative">
           {/* User info */}
           <div 
             onClick={() => setShowStatusMenu(!showStatusMenu)}
@@ -623,10 +623,10 @@ export const ChatRoomView: React.FC = () => {
               <img
                 src={CURRENT_USER.avatar}
                 alt={CURRENT_USER.name}
-                className="w-9 h-9 rounded-full bg-[#181722] border border-white/10 object-cover"
+                className="w-9 h-9 rounded-full bg-[#1F1E24] border border-white/10 object-cover"
               />
               <span
-                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#13121A] ${
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#18171E] ${
                   myUserStatus === 'online'
                     ? 'bg-emerald-500'
                     : myUserStatus === 'idle'
@@ -640,14 +640,14 @@ export const ChatRoomView: React.FC = () => {
               <div className="text-xs font-bold text-white truncate">
                 {CURRENT_USER.name}
               </div>
-              <div className="text-[10px] text-zinc-400 font-mono truncate">
+              <div className="text-[10px] text-[#9CA3AF] font-mono truncate">
                 {CURRENT_USER.tag}
               </div>
             </div>
           </div>
 
           {/* User Quick Audio Controls: Mic, Deafen, Settings */}
-          <div className="flex items-center gap-0.5 text-zinc-400">
+          <div className="flex items-center gap-0.5 text-[#9CA3AF]">
             <button
               onClick={handleToggleMute}
               title={isMicMuted ? 'Bật Mic' : 'Tắt Mic'}
@@ -683,8 +683,8 @@ export const ChatRoomView: React.FC = () => {
 
           {/* Status Changer Popup */}
           {showStatusMenu && (
-            <div className="absolute bottom-16 left-3 w-48 bg-[#21202D] border border-[#343346] rounded-2xl shadow-2xl p-2 z-50 space-y-1">
-              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400 border-b border-white/5 mb-1">
+            <div className="absolute bottom-16 left-3 w-48 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl shadow-2xl p-2 z-50 space-y-1">
+              <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF] border-b border-white/5 mb-1">
                 Trạng thái người dùng
               </div>
               <button
@@ -695,7 +695,7 @@ export const ChatRoomView: React.FC = () => {
                 className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs hover:bg-white/10 text-left cursor-pointer"
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span className="font-semibold text-zinc-200">Trực tuyến (Online)</span>
+                <span className="font-semibold text-white">Trực tuyến (Online)</span>
               </button>
               <button
                 onClick={() => {
@@ -705,7 +705,7 @@ export const ChatRoomView: React.FC = () => {
                 className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs hover:bg-white/10 text-left cursor-pointer"
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="font-semibold text-zinc-200">Chờ (Idle)</span>
+                <span className="font-semibold text-white">Chờ (Idle)</span>
               </button>
               <button
                 onClick={() => {
@@ -715,7 +715,7 @@ export const ChatRoomView: React.FC = () => {
                 className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs hover:bg-white/10 text-left cursor-pointer"
               >
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                <span className="font-semibold text-zinc-200">Không làm phiền</span>
+                <span className="font-semibold text-white">Không làm phiền</span>
               </button>
             </div>
           )}
@@ -723,9 +723,9 @@ export const ChatRoomView: React.FC = () => {
       </div>
 
       {/* 2. CENTER PANEL: Channel Content (Text Chat or Voice Stage) */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#161520]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#18171E]">
         {/* Top Header Bar */}
-        <div className="h-14 px-4 sm:px-6 border-b border-[#262533] flex items-center justify-between bg-[#191824] shrink-0">
+        <div className="h-14 px-4 sm:px-6 border-b border-[#2D2D38] flex items-center justify-between bg-[#1F1E24] shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             {currentChannel.type === 'text' ? (
               <Hash className="w-5 h-5 text-zinc-400 shrink-0" />
@@ -824,13 +824,13 @@ export const ChatRoomView: React.FC = () => {
             />
 
             {/* Input Bar */}
-            <div className="p-4 bg-[#161520] shrink-0 border-t border-[#232230]">
+            <div className="p-4 bg-[#18171E] shrink-0 border-t border-[#2D2D38]">
               {/* Reply preview bar */}
               {replyMessage && (
-                <div className="mb-2 px-3 py-1.5 rounded-xl bg-[#232230] border border-white/5 flex items-center justify-between text-xs text-zinc-300">
+                <div className="mb-2 px-3 py-1.5 rounded-xl bg-[#1F1E24] border border-[#2D2D38] flex items-center justify-between text-xs text-zinc-300">
                   <div className="flex items-center gap-2 truncate">
-                    <span className="text-zinc-500">Đang trả lời</span>
-                    <span className="font-bold text-[#E6005A]">@{replyMessage.author.name}:</span>
+                    <span className="text-[#9CA3AF]">Đang trả lời</span>
+                    <span className="font-bold text-amber-400">@{replyMessage.author.name}:</span>
                     <span className="truncate text-zinc-400 max-w-sm">{replyMessage.content}</span>
                   </div>
                   <button
@@ -843,14 +843,14 @@ export const ChatRoomView: React.FC = () => {
               )}
 
               {/* Chat Input Box */}
-              <div className="relative rounded-2xl bg-[#201F2B] border border-[#313042] focus-within:border-[#E6005A] transition-all flex items-center px-4 py-2.5 shadow-inner">
+              <div className="relative rounded-2xl bg-[#1F1E24] border border-[#2D2D38] focus-within:border-amber-500/50 transition-all flex items-center px-4 py-2.5 shadow-inner">
                 {/* Plus action (Commands / Upload) */}
                 <button
                   onClick={() => {
                     setInputContent('/copilot ');
                   }}
                   title="Dùng lệnh AI / Lệnh Bot"
-                  className="w-7 h-7 rounded-lg bg-white/5 hover:bg-[#E6005A] hover:text-white text-zinc-400 flex items-center justify-center transition-all mr-2 shrink-0 cursor-pointer"
+                  className="w-7 h-7 rounded-lg bg-[#2A2933] hover:bg-gradient-to-r hover:from-amber-500 hover:to-rose-500 hover:text-white text-[#9CA3AF] flex items-center justify-center transition-all mr-2 shrink-0 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -872,7 +872,7 @@ export const ChatRoomView: React.FC = () => {
                       : `Nhắn tin tại #${currentChannel.name} (Gõ /copilot, /roll, /flip)...`
                   }
                   disabled={currentChannel.isLocked}
-                  className="flex-1 bg-transparent text-sm text-white placeholder-zinc-500 outline-none disabled:opacity-50"
+                  className="flex-1 bg-transparent text-sm text-white placeholder-[#9CA3AF] outline-none disabled:opacity-50"
                 />
 
                 {/* Emoji toggle */}
@@ -880,15 +880,15 @@ export const ChatRoomView: React.FC = () => {
                   <button
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     title="Biểu tượng cảm xúc"
-                    className="p-2 text-zinc-400 hover:text-amber-400 transition-colors cursor-pointer"
+                    className="p-2 text-[#9CA3AF] hover:text-amber-400 transition-colors cursor-pointer"
                   >
                     <Smile className="w-5 h-5" />
                   </button>
 
                   {/* Emoji Picker Popup */}
                   {showEmojiPicker && (
-                    <div className="absolute bottom-12 right-0 w-64 bg-[#232230] border border-[#363548] rounded-2xl shadow-2xl p-3 z-50">
-                      <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">
+                    <div className="absolute bottom-12 right-0 w-64 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl shadow-2xl p-3 z-50">
+                      <div className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-2">
                         Cảm xúc phổ biến
                       </div>
                       <div className="grid grid-cols-4 gap-2">
@@ -913,36 +913,36 @@ export const ChatRoomView: React.FC = () => {
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputContent.trim() || currentChannel.isLocked}
-                  className="ml-1 p-2 rounded-xl bg-[#E6005A] hover:bg-[#FF1A75] text-white disabled:opacity-30 disabled:hover:bg-[#E6005A] transition-all cursor-pointer shadow-md shadow-[#E6005A]/20"
+                  className="ml-1 p-2 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white disabled:opacity-30 transition-all cursor-pointer shadow-md"
                 >
                   <Send className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Slash Command Quick Chips */}
-              <div className="mt-2 flex items-center gap-2 overflow-x-auto text-[11px] text-zinc-400 py-1 scrollbar-none">
+              <div className="mt-2 flex items-center gap-2 overflow-x-auto text-[11px] text-[#9CA3AF] py-1 no-scrollbar">
                 <span className="text-[10px] uppercase font-bold text-zinc-500 shrink-0">Lệnh nhanh:</span>
                 <button
                   onClick={() => setInputContent('/copilot ')}
-                  className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-[#E6005A]/20 hover:text-white border border-white/5 transition-all shrink-0 cursor-pointer font-mono"
+                  className="px-2 py-0.5 rounded-md bg-[#2A2933] hover:bg-amber-500/20 hover:text-amber-300 border border-[#3E3D4D] transition-all shrink-0 cursor-pointer font-mono"
                 >
                   /copilot [hỏi đáp]
                 </button>
                 <button
                   onClick={() => setInputContent('/roll')}
-                  className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-[#E6005A]/20 hover:text-white border border-white/5 transition-all shrink-0 cursor-pointer font-mono"
+                  className="px-2 py-0.5 rounded-md bg-[#2A2933] hover:bg-amber-500/20 hover:text-amber-300 border border-[#3E3D4D] transition-all shrink-0 cursor-pointer font-mono"
                 >
                   /roll (xúc xắc)
                 </button>
                 <button
                   onClick={() => setInputContent('/flip')}
-                  className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-[#E6005A]/20 hover:text-white border border-white/5 transition-all shrink-0 cursor-pointer font-mono"
+                  className="px-2 py-0.5 rounded-md bg-[#2A2933] hover:bg-amber-500/20 hover:text-amber-300 border border-[#3E3D4D] transition-all shrink-0 cursor-pointer font-mono"
                 >
                   /flip (tung xu)
                 </button>
                 <button
                   onClick={() => setInputContent('/tv VTV3 HD')}
-                  className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-[#E6005A]/20 hover:text-white border border-white/5 transition-all shrink-0 cursor-pointer font-mono"
+                  className="px-2 py-0.5 rounded-md bg-[#2A2933] hover:bg-amber-500/20 hover:text-amber-300 border border-[#3E3D4D] transition-all shrink-0 cursor-pointer font-mono"
                 >
                   /tv [kênh]
                 </button>
@@ -954,10 +954,10 @@ export const ChatRoomView: React.FC = () => {
 
       {/* 3. RIGHT PANEL: Members List (Width: 240px, Toggleable) */}
       {showMemberList && (
-        <div className="w-60 bg-[#171622] border-l border-[#262533] flex flex-col shrink-0 overflow-y-auto p-3 space-y-4 select-none hidden lg:block">
+        <div className="w-60 bg-[#1F1E24] border-l border-[#2D2D38] flex flex-col shrink-0 overflow-y-auto no-scrollbar p-3 space-y-4 select-none hidden lg:block">
           {/* Group 1: Ban Quản Trị & Bot */}
           <div className="space-y-1">
-            <div className="px-2 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+            <div className="px-2 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">
               Quản Trị & Bot — 2
             </div>
             {members
@@ -974,13 +974,13 @@ export const ChatRoomView: React.FC = () => {
                       alt={mem.name}
                       className="w-8 h-8 rounded-full bg-black/40 border border-white/10 object-cover"
                     />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#171622]" />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#1F1E24]" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold truncate group-hover:text-white" style={{ color: mem.roleColor }}>
                       {mem.name}
                     </div>
-                    <div className="text-[10px] text-zinc-500 truncate">
+                    <div className="text-[10px] text-[#9CA3AF] truncate">
                       {mem.activity || mem.roleName}
                     </div>
                   </div>
@@ -990,7 +990,7 @@ export const ChatRoomView: React.FC = () => {
 
           {/* Group 2: VIP Members */}
           <div className="space-y-1">
-            <div className="px-2 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+            <div className="px-2 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">
               Thành Viên VIP — {members.filter((m) => m.role === 'vip' || m.role === 'mod').length}
             </div>
             {members
@@ -1007,13 +1007,13 @@ export const ChatRoomView: React.FC = () => {
                       alt={mem.name}
                       className="w-8 h-8 rounded-full bg-black/40 border border-white/10 object-cover"
                     />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#171622]" />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#1F1E24]" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold truncate group-hover:text-white" style={{ color: mem.roleColor }}>
                       {mem.name}
                     </div>
-                    <div className="text-[10px] text-zinc-500 truncate">
+                    <div className="text-[10px] text-[#9CA3AF] truncate">
                       {mem.activity}
                     </div>
                   </div>
@@ -1023,7 +1023,7 @@ export const ChatRoomView: React.FC = () => {
 
           {/* Group 3: Trực tuyến (Online) */}
           <div className="space-y-1">
-            <div className="px-2 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+            <div className="px-2 text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider">
               Trực tuyến — {members.filter((m) => m.status === 'online' && m.role === 'member').length + 1}
             </div>
             {/* You */}
@@ -1035,7 +1035,7 @@ export const ChatRoomView: React.FC = () => {
                 avatar: CURRENT_USER.avatar,
                 role: 'owner',
                 roleName: CURRENT_USER.badge || 'Bạn (Thành Viên)',
-                roleColor: '#E6005A',
+                roleColor: '#F59E0B',
                 status: 'online',
                 activity: CURRENT_USER.activity || 'Đang ở phòng chat Vplay',
                 customStatus: CURRENT_USER.bio
@@ -1046,15 +1046,15 @@ export const ChatRoomView: React.FC = () => {
                 <img
                   src={CURRENT_USER.avatar}
                   alt={CURRENT_USER.name}
-                  className="w-8 h-8 rounded-full bg-black/40 border border-[#E6005A] object-cover"
+                  className="w-8 h-8 rounded-full bg-black/40 border border-amber-500 object-cover"
                 />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#171622]" />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#1F1E24]" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-[#E6005A] truncate">
+                <div className="text-xs font-bold text-amber-400 truncate">
                   {CURRENT_USER.name} (Bạn)
                 </div>
-                <div className="text-[10px] text-zinc-500 truncate">
+                <div className="text-[10px] text-[#9CA3AF] truncate">
                   Trực tuyến
                 </div>
               </div>
@@ -1075,7 +1075,7 @@ export const ChatRoomView: React.FC = () => {
                       className="w-8 h-8 rounded-full bg-black/40 border border-white/10 object-cover"
                     />
                     <span
-                      className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#171622] ${
+                      className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#1F1E24] ${
                         mem.status === 'idle' ? 'bg-amber-500' : 'bg-emerald-500'
                       }`}
                     />
@@ -1084,7 +1084,7 @@ export const ChatRoomView: React.FC = () => {
                     <div className="text-xs font-bold text-zinc-300 truncate group-hover:text-white">
                       {mem.name}
                     </div>
-                    <div className="text-[10px] text-zinc-500 truncate">
+                    <div className="text-[10px] text-[#9CA3AF] truncate">
                       {mem.activity || 'Trực tuyến'}
                     </div>
                   </div>
@@ -1111,7 +1111,7 @@ export const ChatRoomView: React.FC = () => {
                       alt={mem.name}
                       className="w-8 h-8 rounded-full grayscale bg-black/40 border border-white/5 object-cover"
                     />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-zinc-600 border-2 border-[#171622]" />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-zinc-600 border-2 border-[#1F1E24]" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold text-zinc-400 truncate group-hover:text-white">
@@ -1135,13 +1135,13 @@ export const ChatRoomView: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm rounded-3xl bg-[#1E1D2A] border border-[#343348] overflow-hidden shadow-2xl relative"
+              className="w-full max-w-sm rounded-3xl bg-[#1F1E24] border border-[#2D2D38] overflow-hidden shadow-2xl relative"
             >
               {/* Header Banner */}
               <div 
                 className="h-24 relative"
                 style={{
-                  background: `linear-gradient(135deg, ${selectedProfileMember.roleColor}80, #14131A)`
+                  background: `linear-gradient(135deg, ${selectedProfileMember.roleColor}80, #18171E)`
                 }}
               >
                 <button
@@ -1158,10 +1158,10 @@ export const ChatRoomView: React.FC = () => {
                   <img
                     src={selectedProfileMember.avatar}
                     alt={selectedProfileMember.name}
-                    className="w-20 h-20 rounded-full border-4 border-[#1E1D2A] bg-[#121118] object-cover shadow-lg"
+                    className="w-20 h-20 rounded-full border-4 border-[#1F1E24] bg-[#18171E] object-cover shadow-lg"
                   />
                   <span
-                    className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-[#1E1D2A] ${
+                    className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-[#1F1E24] ${
                       selectedProfileMember.status === 'online'
                         ? 'bg-emerald-500'
                         : selectedProfileMember.status === 'idle'
@@ -1176,7 +1176,7 @@ export const ChatRoomView: React.FC = () => {
                     <h3 className="text-lg font-black text-white">
                       {selectedProfileMember.name}
                     </h3>
-                    <p className="text-xs text-zinc-400 font-mono">
+                    <p className="text-xs text-[#9CA3AF] font-mono">
                       {selectedProfileMember.tag}
                     </p>
                   </div>
@@ -1188,7 +1188,7 @@ export const ChatRoomView: React.FC = () => {
                   )}
 
                   <div className="space-y-1">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF]">
                       Vai trò
                     </div>
                     <span
@@ -1205,7 +1205,7 @@ export const ChatRoomView: React.FC = () => {
 
                   {selectedProfileMember.activity && (
                     <div className="space-y-1">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF]">
                         Hoạt động
                       </div>
                       <div className="text-xs text-zinc-300 font-medium">
@@ -1220,13 +1220,13 @@ export const ChatRoomView: React.FC = () => {
                         setInputContent(`@${selectedProfileMember.name} `);
                         setSelectedProfileMember(null);
                       }}
-                      className="flex-1 py-2.5 rounded-xl bg-[#E6005A] hover:bg-[#FF1A75] text-white font-bold text-xs shadow-md shadow-[#E6005A]/25 transition-all cursor-pointer text-center"
+                      className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer text-center"
                     >
                       Nhắc đến (@Mention)
                     </button>
                     <button
                       onClick={() => setSelectedProfileMember(null)}
-                      className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 font-semibold text-xs transition-colors cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl bg-[#2A2933] hover:bg-[#3E3D4D] text-[#9CA3AF] hover:text-white font-semibold text-xs transition-colors cursor-pointer border border-[#3E3D4D]"
                     >
                       Đóng
                     </button>

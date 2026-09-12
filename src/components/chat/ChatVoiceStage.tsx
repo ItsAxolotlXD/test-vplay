@@ -63,9 +63,9 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
   }, [isConnected, participants]);
 
   return (
-    <div className="flex-1 flex flex-col bg-[#14131A] text-zinc-200 overflow-hidden relative select-none">
+    <div className="flex-1 flex flex-col bg-[#18171E] text-white overflow-hidden relative select-none">
       {/* Voice Stage Header */}
-      <div className="h-14 px-6 border-b border-[#262531] flex items-center justify-between bg-[#191822] shrink-0">
+      <div className="h-14 px-6 border-b border-[#2D2D38] flex items-center justify-between bg-[#1F1E24] shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
             <Volume2 className="w-4 h-4 animate-pulse" />
@@ -77,7 +77,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
                 Kênh Thoại Voice
               </span>
             </h2>
-            <p className="text-[11px] text-zinc-400 truncate max-w-md">
+            <p className="text-[11px] text-[#9CA3AF] truncate max-w-md">
               {channel.topic || 'Đàm thoại âm thanh đa kênh chất lượng cao'}
             </p>
           </div>
@@ -89,7 +89,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
               <Signal className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
               <span>RTC 14ms • Opus 128k</span>
             </div>
-            <span className="text-zinc-400 flex items-center gap-1">
+            <span className="text-[#9CA3AF] flex items-center gap-1">
               <Users className="w-3.5 h-3.5" />
               {participants.length} đang nghe
             </span>
@@ -98,10 +98,10 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
       </div>
 
       {/* Center Voice Stage Area */}
-      <div className="flex-1 p-6 overflow-y-auto flex flex-col items-center justify-center">
+      <div className="flex-1 p-6 overflow-y-auto no-scrollbar flex flex-col items-center justify-center">
         {!isConnected ? (
           /* Join Prompt Banner */
-          <div className="max-w-md w-full text-center space-y-6 bg-[#1D1C27] border border-[#2F2E3E] rounded-3xl p-8 shadow-2xl">
+          <div className="max-w-md w-full text-center space-y-6 bg-[#1F1E24] border border-[#2D2D38] rounded-3xl p-8 shadow-2xl">
             <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto shadow-inner">
               <Volume2 className="w-9 h-9" />
             </div>
@@ -110,8 +110,8 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
               <h3 className="text-xl font-bold text-white">
                 Tham gia {channel.name}
               </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Đàm thoại trực tiếp với các thành viên trong cộng đồng Vplay. Hỗ trợ mic, tai nghe và chia sẻ màn hình mô phỏng chuẩn Discord.
+              <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                Đàm thoại trực tiếp với các thành viên trong cộng đồng Vplay. Hỗ trợ mic, tai nghe và chia sẻ màn hình mô phỏng chất lượng cao.
               </p>
             </div>
 
@@ -126,7 +126,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
             </div>
 
             {participants.length > 0 && (
-              <div className="pt-4 border-t border-white/5 text-xs text-zinc-400">
+              <div className="pt-4 border-t border-[#2D2D38] text-xs text-[#9CA3AF]">
                 <span>Hiện đang có trong phòng: </span>
                 <span className="text-zinc-200 font-medium">
                   {participants.map((p) => p.name).join(', ')}
@@ -139,25 +139,25 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
           <div className="w-full h-full flex flex-col items-center justify-center space-y-6">
             {/* Screen share area if active */}
             {isScreenSharing && (
-              <div className="w-full max-w-3xl aspect-video rounded-2xl bg-[#0F0E14] border border-[#3A394D] overflow-hidden relative shadow-2xl flex flex-col">
-                <div className="h-8 px-4 bg-[#1B1A24] border-b border-white/5 flex items-center justify-between text-xs text-zinc-300">
+              <div className="w-full max-w-3xl aspect-video rounded-2xl bg-[#121118] border border-[#2D2D38] overflow-hidden relative shadow-2xl flex flex-col">
+                <div className="h-8 px-4 bg-[#18171E] border-b border-[#2D2D38] flex items-center justify-between text-xs text-zinc-300">
                   <span className="flex items-center gap-2 font-medium">
-                    <Monitor className="w-3.5 h-3.5 text-rose-400" />
+                    <Monitor className="w-3.5 h-3.5 text-amber-400" />
                     Chia sẻ màn hình trực tiếp • 1080p 60fps
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     LIVE
                   </span>
                 </div>
-                <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-[#12111A] to-[#1A1926] p-6 text-center">
+                <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-[#121118] to-[#18171E] p-6 text-center">
                   <div className="space-y-3">
-                    <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mx-auto">
+                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto">
                       <Tv className="w-8 h-8" />
                     </div>
                     <div className="text-sm font-semibold text-zinc-200">
                       Đang phát sóng luồng màn hình trực tiếp
                     </div>
-                    <div className="text-xs text-zinc-500 max-w-sm">
+                    <div className="text-xs text-[#9CA3AF] max-w-sm">
                       Mọi người trong phòng thoại đang theo dõi nội dung của bạn với độ trễ siêu thấp.
                     </div>
                   </div>
@@ -175,8 +175,8 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
                     key={p.id}
                     className={`relative rounded-2xl p-5 flex flex-col items-center justify-center transition-all ${
                       isSpeakingNow
-                        ? 'bg-[#1F2429] border-2 border-emerald-500 shadow-xl shadow-emerald-500/20 scale-[1.02]'
-                        : 'bg-[#1C1B26] border border-[#2D2C3C]'
+                        ? 'bg-[#22272E] border-2 border-emerald-500 shadow-xl shadow-emerald-500/20 scale-[1.02]'
+                        : 'bg-[#1F1E24] border border-[#2D2D38]'
                     }`}
                   >
                     {/* Speaking animated halo */}
@@ -184,7 +184,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
                       <img
                         src={p.avatar}
                         alt={p.name}
-                        className={`w-16 h-16 rounded-full bg-[#121118] border-2 transition-all object-cover ${
+                        className={`w-16 h-16 rounded-full bg-[#18171E] border-2 transition-all object-cover ${
                           isSpeakingNow
                             ? 'border-emerald-400 ring-4 ring-emerald-500/30 animate-pulse'
                             : 'border-white/10'
@@ -192,7 +192,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
                       />
                       {/* Speaking indicator dot */}
                       {isSpeakingNow && (
-                        <span className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-[#1C1B26] rounded-full flex items-center justify-center shadow">
+                        <span className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-[#1F1E24] rounded-full flex items-center justify-center shadow">
                           <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
                         </span>
                       )}
@@ -203,7 +203,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
                       <div className="text-xs font-bold text-white truncate px-1">
                         {p.name}
                       </div>
-                      <div className="text-[10px] text-zinc-400 font-mono truncate">
+                      <div className="text-[10px] text-[#9CA3AF] font-mono truncate">
                         {p.role}
                       </div>
                     </div>
@@ -221,7 +221,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
                         </span>
                       )}
                       {p.isScreenSharing && (
-                        <span className="p-1 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30" title="Đang chia sẻ màn hình">
+                        <span className="p-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30" title="Đang chia sẻ màn hình">
                           <Monitor className="w-3 h-3" />
                         </span>
                       )}
@@ -241,7 +241,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
 
       {/* Voice Controls Bar at Bottom (Only when connected) */}
       {isConnected && (
-        <div className="h-20 px-8 bg-[#181722] border-t border-[#272635] flex items-center justify-between shrink-0">
+        <div className="h-20 px-8 bg-[#1F1E24] border-t border-[#2D2D38] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="text-xs font-semibold text-emerald-400 flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
@@ -258,7 +258,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
               className={`p-3.5 rounded-2xl transition-all font-medium text-sm flex items-center gap-2 cursor-pointer ${
                 isMuted
                   ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30'
-                  : 'bg-[#2A2938] text-white hover:bg-[#353447] border border-white/10'
+                  : 'bg-[#2A2933] text-white hover:bg-[#3E3D4D] border border-[#3E3D4D]'
               }`}
             >
               {isMuted ? <MicOff className="w-5 h-5 text-rose-400" /> : <Mic className="w-5 h-5 text-emerald-400" />}
@@ -274,7 +274,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
               className={`p-3.5 rounded-2xl transition-all font-medium text-sm flex items-center gap-2 cursor-pointer ${
                 isDeafened
                   ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30'
-                  : 'bg-[#2A2938] text-white hover:bg-[#353447] border border-white/10'
+                  : 'bg-[#2A2933] text-white hover:bg-[#3E3D4D] border border-[#3E3D4D]'
               }`}
             >
               {isDeafened ? <VolumeX className="w-5 h-5 text-rose-400" /> : <Headphones className="w-5 h-5 text-cyan-400" />}
@@ -289,11 +289,11 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
               title={isScreenSharing ? 'Dừng chia sẻ' : 'Chia sẻ màn hình'}
               className={`p-3.5 rounded-2xl transition-all font-medium text-sm flex items-center gap-2 cursor-pointer ${
                 isScreenSharing
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                  : 'bg-[#2A2938] text-white hover:bg-[#353447] border border-white/10'
+                  ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-lg'
+                  : 'bg-[#2A2933] text-white hover:bg-[#3E3D4D] border border-[#3E3D4D]'
               }`}
             >
-              <Monitor className="w-5 h-5 text-purple-400" />
+              <Monitor className="w-5 h-5 text-amber-400" />
               <span className="hidden sm:inline text-xs font-semibold">
                 {isScreenSharing ? 'Dừng Live' : 'Phát Màn hình'}
               </span>

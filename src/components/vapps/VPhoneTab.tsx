@@ -351,36 +351,36 @@ export const VPhoneTab: React.FC = () => {
   );
 
   return (
-    <div id="v-phone-app" className="w-full text-white selection:bg-rose-500/30">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#1A0B2E] via-[#2A123E] to-[#120B24] border border-rose-500/20 rounded-3xl p-5 sm:p-6 mb-6 shadow-[0_10px_35px_rgba(244,63,94,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-rose-500 via-pink-500 to-purple-600 p-0.5 shadow-[0_0_20px_rgba(244,63,94,0.4)] flex items-center justify-center shrink-0">
-            <div className="w-full h-full bg-[#160B24] rounded-[14px] flex items-center justify-center">
-              <Phone className="w-6 h-6 text-rose-400" />
-            </div>
+    <div id="v-phone-app" className="w-full text-white">
+      {/* Header Banner - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <Phone className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white">Điện Thoại V-Phone</h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30">
-                VoIP 360
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Phone • Điện Thoại & Danh Bạ
+              </h1>
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                VoIP & Cứu hộ
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
               Bàn phím số DTMF • Danh bạ thông minh • Đường dây nóng V-Play & Cứu hộ khẩn cấp
             </p>
           </div>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/10 self-start md:self-auto">
+        <div className="flex items-center gap-1.5 bg-[#18171E] p-1.5 rounded-xl border border-[#2D2D38] self-start md:self-auto">
           <button
             onClick={() => setActiveSubTab('dialer')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'dialer'
-                ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                : 'text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
             }`}
           >
             <PhoneCall className="w-3.5 h-3.5" />
@@ -388,10 +388,10 @@ export const VPhoneTab: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveSubTab('contacts')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'contacts'
-                ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                : 'text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -399,10 +399,10 @@ export const VPhoneTab: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveSubTab('recents')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'recents'
-                ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                : 'text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -410,13 +410,13 @@ export const VPhoneTab: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveSubTab('emergency')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'emergency'
-                ? 'bg-gradient-to-r from-red-600 to-rose-700 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                : 'text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
             }`}
           >
-            <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+            <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
             <span>Khẩn Cấp</span>
           </button>
         </div>

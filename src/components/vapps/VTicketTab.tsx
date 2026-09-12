@@ -197,49 +197,49 @@ export const VTicketTab: React.FC = () => {
   };
 
   return (
-    <div id="v-ticket-app" className="w-full text-white selection:bg-amber-500/30">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#1C1405] via-[#2A1D08] to-[#140E04] border border-amber-500/25 rounded-3xl p-5 sm:p-6 mb-6 shadow-[0_10px_35px_rgba(245,158,11,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 p-0.5 shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center justify-center shrink-0">
-            <div className="w-full h-full bg-[#160F04] rounded-[14px] flex items-center justify-center">
-              <Ticket className="w-6 h-6 text-amber-400" />
-            </div>
+    <div id="v-ticket-app" className="w-full text-white">
+      {/* Header Banner - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <Ticket className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white">Đặt Vé V-Ticket 360</h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Ticket • Đặt Vé Trực Tuyến 360
+              </h1>
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 E-Ticketing
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
               Vé xem phim chiếu rạp • Liveshow & Concert • Khán giả trường quay VTV • Mã QR điện tử
             </p>
           </div>
         </div>
 
         {/* Tab switch */}
-        <div className="flex items-center gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-white/10 self-start md:self-auto">
+        <div className="flex items-center gap-1.5 bg-[#18171E] p-1.5 rounded-xl border border-[#2D2D38] self-start md:self-auto">
           <button
             onClick={() => {
               setActiveTab('events');
               setSelectedEvent(null);
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'events'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                : 'text-[#9CA3AF] hover:text-white'
             }`}
           >
             Sự Kiện & Lịch Chiếu
           </button>
           <button
             onClick={() => setActiveTab('my-tickets')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'my-tickets'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
+                : 'text-[#9CA3AF] hover:text-white'
             }`}
           >
             Vé Của Tôi ({myTickets.length})
@@ -257,10 +257,10 @@ export const VTicketTab: React.FC = () => {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer shrink-0 border ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 border ${
                     selectedCategory === cat
-                      ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-md font-black'
-                      : 'bg-[#181105] border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                      ? 'bg-gradient-to-r from-amber-500 to-rose-500 border-transparent text-white shadow-md'
+                      : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
                   }`}
                 >
                   {cat === 'Phim' && '🎬 '}

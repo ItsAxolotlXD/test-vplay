@@ -309,22 +309,22 @@ export const VCameraTab: React.FC = () => {
       {/* Hidden processing canvas */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#200A18] via-[#2F1024] to-[#160710] border border-rose-500/25 rounded-3xl p-5 sm:p-6 mb-6 shadow-[0_10px_35px_rgba(244,63,94,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-rose-500 via-pink-500 to-amber-500 p-0.5 shadow-[0_0_20px_rgba(244,63,94,0.4)] flex items-center justify-center shrink-0">
-            <div className="w-full h-full bg-[#170814] rounded-[14px] flex items-center justify-center">
-              <Camera className="w-6 h-6 text-rose-400" />
-            </div>
+      {/* Header Banner - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <Camera className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white">Máy Ảnh V-Camera 360</h1>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30">
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Camera • Máy Ảnh Live 360
+              </h1>
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 Live Shutter
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
               Chụp ảnh camera trực tiếp • Bộ lọc nghệ thuật Vintage, Cyberpunk, TV Scanlines • Tự động đồng bộ V-Gallery
             </p>
           </div>
@@ -336,8 +336,8 @@ export const VCameraTab: React.FC = () => {
             onClick={() => setFlashEnabled((f) => !f)}
             className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               flashEnabled
-                ? 'bg-amber-500/20 border-amber-400/50 text-amber-300'
-                : 'bg-white/5 border-white/10 text-slate-400'
+                ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
+                : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
             }`}
             title="Đèn flash chớp sáng"
           >
@@ -349,8 +349,8 @@ export const VCameraTab: React.FC = () => {
             onClick={() => setTimerDuration((t) => (t === 0 ? 3 : t === 3 ? 5 : t === 5 ? 10 : 0))}
             className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               timerDuration > 0
-                ? 'bg-rose-500/20 border-rose-400/50 text-rose-300'
-                : 'bg-white/5 border-white/10 text-slate-400'
+                ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
+                : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
             }`}
             title="Hẹn giờ đếm ngược"
           >
@@ -364,7 +364,7 @@ export const VCameraTab: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Viewfinder Canvas (8 cols) */}
         <div className="lg:col-span-8 flex flex-col items-center">
-          <div className="w-full bg-[#120717] border border-rose-500/30 rounded-3xl p-4 sm:p-5 relative overflow-hidden shadow-2xl flex flex-col items-center justify-center min-h-[460px]">
+          <div className="w-full bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 relative overflow-hidden shadow-xl flex flex-col items-center justify-center min-h-[460px]">
             {/* Flash Overlay Effect */}
             <div
               className={`absolute inset-0 bg-white z-40 transition-opacity duration-200 pointer-events-none ${
@@ -502,9 +502,9 @@ export const VCameraTab: React.FC = () => {
         {/* Right Filter & Preview Column (4 cols) */}
         <div className="lg:col-span-4 space-y-4">
           {/* Real-time Color Filter Presets */}
-          <div className="bg-[#14081A] border border-white/10 rounded-3xl p-5 shadow-xl">
+          <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-5 shadow-xl">
             <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-rose-400" />
+              <Sparkles className="w-4 h-4 text-amber-400" />
               <span>Bộ Lọc Màu Nghệ Thuật</span>
             </h3>
 
@@ -520,14 +520,14 @@ export const VCameraTab: React.FC = () => {
                 <button
                   key={filt.id}
                   onClick={() => setActiveFilter(filt.id as FilterType)}
-                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                     activeFilter === filt.id
-                      ? 'bg-rose-500/20 border-rose-400 text-white shadow-md'
-                      : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                      ? 'bg-amber-500/20 border-amber-500 text-white shadow-md'
+                      : 'bg-[#18171E] border-[#2D2D38] text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
                   }`}
                 >
                   <div className="text-xs font-bold text-white">{filt.name}</div>
-                  <div className="text-[10px] text-slate-400 mt-0.5 leading-snug">{filt.desc}</div>
+                  <div className="text-[10px] text-[#9CA3AF] mt-0.5 leading-snug">{filt.desc}</div>
                 </button>
               ))}
             </div>
@@ -535,7 +535,7 @@ export const VCameraTab: React.FC = () => {
 
           {/* Last Photo Action Card */}
           {lastPhoto && (
-            <div className="bg-[#14081A] border border-rose-500/30 rounded-3xl p-5 shadow-xl">
+            <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-5 shadow-xl">
               <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
                 <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
                   <Check className="w-4 h-4 text-emerald-400" />

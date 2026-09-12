@@ -182,13 +182,33 @@ export const VCalcTab: React.FC = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 text-left">
-      {/* Mode Switcher Navigation */}
-      <div className="flex items-center justify-between gap-3 p-2 rounded-2xl bg-white/[0.08] backdrop-blur-[20px] saturate-[180%] border border-white/20 shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
-        <div className="flex items-center gap-1.5 overflow-x-auto">
+      {/* V-Flow App Header */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 bg-gradient-to-br from-amber-500 to-rose-500 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md">
+            <Calculator className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Calc • Máy Tính Đa Năng
+              </h1>
+              <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">
+                Cơ bản & Khoa học
+              </span>
+            </div>
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
+              Tính toán số học, hàm lượng giác khoa học và bộ chuyển đổi đơn vị đo lường thông minh.
+            </p>
+          </div>
+        </div>
+
+        {/* Mode Switcher Navigation */}
+        <div className="flex items-center gap-2 bg-[#18171E] p-1.5 rounded-xl border border-[#2D2D38]">
           {[
             { id: "basic", name: "Cơ bản", icon: Calculator },
             { id: "scientific", name: "Khoa học", icon: Binary },
-            { id: "converter", name: "Chuyển đổi đơn vị", icon: ArrowRightLeft },
+            { id: "converter", name: "Chuyển đổi", icon: ArrowRightLeft },
           ].map((mode) => {
             const IconComponent = mode.icon;
             const isActive = calcMode === mode.id;
@@ -199,36 +219,27 @@ export const VCalcTab: React.FC = () => {
                   playPopSound();
                   setCalcMode(mode.id as any);
                 }}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                   isActive
-                    ? "bg-white/25 text-white border border-white/30 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.6)]"
-                    : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+                    ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
+                    : "text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]"
                 }`}
               >
-                <IconComponent className="w-4 h-4" />
+                <IconComponent className="w-3.5 h-3.5" />
                 <span>{mode.name}</span>
               </button>
             );
           })}
         </div>
-
-        {calcMode === "scientific" && (
-          <button
-            onClick={() => setIsRad(!isRad)}
-            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-sky-300 cursor-pointer shadow-sm"
-          >
-            {isRad ? "RAD" : "DEG"}
-          </button>
-        )}
       </div>
 
       {calcMode !== "converter" ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Main Glassmorphism Calculator Body */}
-          <div className="lg:col-span-8 rounded-3xl bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] border border-white/20 p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] flex flex-col space-y-4">
+          {/* Main Calculator Body */}
+          <div className="lg:col-span-8 rounded-2xl bg-[#1F1E24] border border-[#2D2D38] p-6 shadow-xl flex flex-col space-y-4">
             {/* Display screen */}
-            <div className="p-4 rounded-2xl bg-black/40 border border-white/15 text-right space-y-1 shadow-inner">
-              <div className="text-xs text-white/50 min-h-[16px] font-mono tracking-wider">
+            <div className="p-4 rounded-xl bg-[#18171E] border border-[#2D2D38] text-right space-y-1">
+              <div className="text-xs text-[#9CA3AF] min-h-[16px] font-mono tracking-wider">
                 {equation}
               </div>
               <div className="text-3xl sm:text-4xl font-mono font-bold text-white tracking-tight break-all">
@@ -238,7 +249,7 @@ export const VCalcTab: React.FC = () => {
 
             {/* Scientific Function Row */}
             {calcMode === "scientific" && (
-              <div className="grid grid-cols-5 gap-2 pt-1 border-t border-white/10">
+              <div className="grid grid-cols-5 gap-2 pt-1 border-t border-[#2D2D38]">
                 {["sin", "cos", "tan", "sqrt", "sqr", "log", "ln", "1/x", "+/-", "π"].map((fn) => (
                   <button
                     key={fn}
@@ -246,7 +257,7 @@ export const VCalcTab: React.FC = () => {
                       if (fn === "π") handleNumClick("π");
                       else handleScientific(fn);
                     }}
-                    className="py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 text-xs font-bold font-mono transition-all active:scale-95 shadow-sm"
+                    className="py-2.5 rounded-xl bg-[#2A2933] hover:bg-[#343340] border border-[#3E3D4D] text-white text-xs font-bold font-mono transition-all active:scale-95 shadow-sm cursor-pointer"
                   >
                     {fn}
                   </button>
@@ -281,7 +292,7 @@ export const VCalcTab: React.FC = () => {
               <CalcGlassBtn text=")" onClick={() => handleNumClick(")")} />
               <button
                 onClick={handleEquals}
-                className="py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-lg shadow-lg shadow-emerald-500/30 active:scale-95 transition-all cursor-pointer flex items-center justify-center border border-white/20"
+                className="py-3 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-black text-lg shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer flex items-center justify-center border-none"
               >
                 <Equal className="w-5 h-5" />
               </button>
@@ -289,10 +300,10 @@ export const VCalcTab: React.FC = () => {
           </div>
 
           {/* Calculation History Panel */}
-          <div className="lg:col-span-4 rounded-3xl bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] border border-white/20 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.35),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] flex flex-col">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+          <div className="lg:col-span-4 rounded-2xl bg-[#1F1E24] border border-[#2D2D38] p-5 shadow-xl flex flex-col">
+            <div className="flex items-center justify-between border-b border-[#2D2D38] pb-3 mb-3">
               <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <History className="w-4 h-4 text-emerald-400" /> Lịch sử tính toán
+                <History className="w-4 h-4 text-amber-400" /> Lịch sử tính toán
               </span>
               {history.length > 0 && (
                 <button
@@ -300,7 +311,7 @@ export const VCalcTab: React.FC = () => {
                     playPopSound();
                     setHistory([]);
                   }}
-                  className="text-[11px] text-white/50 hover:text-white cursor-pointer"
+                  className="text-[11px] text-[#9CA3AF] hover:text-white cursor-pointer"
                 >
                   Xóa
                 </button>
@@ -308,16 +319,16 @@ export const VCalcTab: React.FC = () => {
             </div>
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 max-h-[380px] font-mono text-xs">
               {history.length === 0 ? (
-                <div className="text-center py-16 text-white/40 text-xs">
+                <div className="text-center py-16 text-[#9CA3AF] text-xs">
                   Chưa có lịch sử tính toán nào.
                 </div>
               ) : (
                 history.map((item, idx) => (
                   <div
                     key={idx}
-                    className="p-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-right"
+                    className="p-2.5 rounded-xl bg-[#18171E] border border-[#2D2D38] text-right"
                   >
-                    <span className="text-emerald-300 font-semibold">{item}</span>
+                    <span className="text-amber-400 font-semibold">{item}</span>
                   </div>
                 ))
               )}
@@ -326,8 +337,8 @@ export const VCalcTab: React.FC = () => {
         </div>
       ) : (
         /* CONVERTER INTERFACE */
-        <div className="rounded-3xl bg-white/[0.08] backdrop-blur-[24px] saturate-[180%] border border-white/20 p-6 sm:p-8 shadow-[0_12px_40px_rgba(0,0,0,0.35),inset_0.5px_0.5px_0px_rgba(255,255,255,0.4)] max-w-xl mx-auto space-y-6">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-white/10">
+        <div className="rounded-2xl bg-[#1F1E24] border border-[#2D2D38] p-6 sm:p-8 shadow-xl max-w-xl mx-auto space-y-6">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#2D2D38]">
             {[
               { id: "length", name: "Độ dài" },
               { id: "weight", name: "Khối lượng" },
@@ -353,10 +364,10 @@ export const VCalcTab: React.FC = () => {
                     setToUnit("MB");
                   }
                 }}
-                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                   converterType === t.id
-                    ? "bg-white/25 text-white border border-white/30 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.5)]"
-                    : "bg-white/5 text-white/60 hover:text-white"
+                    ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
+                    : "bg-[#2A2933] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white"
                 }`}
               >
                 {t.name}
@@ -366,7 +377,7 @@ export const VCalcTab: React.FC = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-white/70 mb-1 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-[#9CA3AF] mb-1 uppercase tracking-wider">
                 Giá trị ban đầu
               </label>
               <div className="flex gap-2">
@@ -374,12 +385,12 @@ export const VCalcTab: React.FC = () => {
                   type="number"
                   value={fromVal}
                   onChange={(e) => setFromVal(e.target.value)}
-                  className="w-full bg-white/[0.08] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-sky-400 font-mono"
+                  className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl px-3.5 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-amber-500 font-mono"
                 />
                 <select
                   value={fromUnit}
                   onChange={(e) => setFromUnit(e.target.value)}
-                  className="bg-[#1a1426] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none cursor-pointer"
+                  className="bg-[#2A2933] border border-[#3E3D4D] rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none cursor-pointer"
                 >
                   {converterType === "length" &&
                     ["mm", "cm", "m", "km", "inch", "ft", "mile"].map((u) => (
@@ -410,23 +421,23 @@ export const VCalcTab: React.FC = () => {
             </div>
 
             <div className="flex justify-center my-2">
-              <div className="p-2.5 rounded-full bg-white/15 border border-white/20 text-white shadow-md">
+              <div className="p-2.5 rounded-full bg-[#2A2933] border border-[#3E3D4D] text-amber-400 shadow-md">
                 <ArrowRightLeft className="w-4 h-4 rotate-90" />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-white/70 mb-1 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-[#9CA3AF] mb-1 uppercase tracking-wider">
                 Kết quả chuyển đổi
               </label>
               <div className="flex gap-2">
-                <div className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm font-bold text-emerald-300 font-mono flex items-center shadow-inner">
+                <div className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl px-3.5 py-2.5 text-sm font-bold text-amber-400 font-mono flex items-center">
                   {getConvertedResult()}
                 </div>
                 <select
                   value={toUnit}
                   onChange={(e) => setToUnit(e.target.value)}
-                  className="bg-[#1a1426] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none cursor-pointer"
+                  className="bg-[#2A2933] border border-[#3E3D4D] rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none cursor-pointer"
                 >
                   {converterType === "length" &&
                     ["mm", "cm", "m", "km", "inch", "ft", "mile"].map((u) => (
@@ -471,14 +482,14 @@ const CalcGlassBtn: React.FC<{
 }> = ({ text, onClick, action, danger, highlight }) => (
   <button
     onClick={onClick}
-    className={`py-3.5 rounded-2xl font-bold text-sm transition-all cursor-pointer border active:scale-95 shadow-sm ${
+    className={`py-3.5 rounded-xl font-bold text-sm transition-all cursor-pointer border active:scale-95 shadow-sm ${
       danger
-        ? "bg-rose-500/30 hover:bg-rose-500/40 text-rose-200 border-rose-400/40 shadow-rose-500/20"
+        ? "bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border-rose-500/30 shadow-rose-500/10"
         : action
-        ? "bg-indigo-500/30 hover:bg-indigo-500/40 text-indigo-200 border-indigo-400/40 shadow-indigo-500/20"
+        ? "bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white border-none shadow-amber-500/20"
         : highlight
-        ? "bg-amber-500/30 hover:bg-amber-500/40 text-amber-200 border-amber-400/40 shadow-amber-500/20"
-        : "bg-white/10 hover:bg-white/20 text-white border-white/20 shadow-[inset_0.5px_0.5px_0px_rgba(255,255,255,0.3)]"
+        ? "bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border-amber-500/30 shadow-amber-500/10"
+        : "bg-[#2A2933] hover:bg-[#343340] text-white border-[#3E3D4D]"
     }`}
   >
     {text}

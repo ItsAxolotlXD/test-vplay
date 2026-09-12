@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
-import { ArrowLeft, Compass, ZoomIn, ZoomOut, RotateCcw, Grab } from "lucide-react";
-import { VplayPrimaryButton } from "./ui/VplayPrimaryButton";
-import { VplaySecondaryButton } from "./ui/VplaySecondaryButton";
+import { ArrowLeft, Compass, ZoomIn, ZoomOut, RotateCcw, Grab, MapPin, Sparkles } from "lucide-react";
+import { playPopSound } from "../utils/sound";
 
 interface ExploreVietnamTabProps {
   onBack?: () => void;
@@ -18,14 +17,17 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
 
   // Handle Zoom buttons
   const handleZoomIn = () => {
+    playPopSound();
     setScale((prev) => Math.min(prev + 0.25, 4));
   };
 
   const handleZoomOut = () => {
+    playPopSound();
     setScale((prev) => Math.max(prev - 0.25, 0.5));
   };
 
   const handleReset = () => {
+    playPopSound();
     setScale(1);
     setPosition({ x: 0, y: 0 });
   };
@@ -61,43 +63,43 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
   };
 
   return (
-    <div className="space-y-4 select-none">
-      {/* ORE UI HEADER BAR */}
-      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6 space-y-5 select-none pb-12">
+      {/* V-FLOW HEADER BAR */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#2D2D38]">
         <div className="flex items-center gap-3">
           {onBack && (
             <button
               onClick={onBack}
-              className="bg-[#c6c6c6] hover:bg-[#383b3e] hover:text-white text-[#141414] p-2 border-2 border-[#141414] shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91] active:translate-y-[1px]"
+              className="p-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-300 border border-[#3E3D4D] transition-all cursor-pointer"
               title="Quay lại"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
           )}
-          <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
             <Compass className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm sm:text-base font-black text-white uppercase tracking-wider font-jura">
-                EXPLORE VIETNAM (BẢN ĐỒ VIỆT NAM)
-              </h2>
-              <span className="bg-[#89dc69] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
-                Ore UI Map
-              </span>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                Explore Vietnam
+                <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  ĐỊA LÝ & DU LỊCH
+                </span>
+              </h1>
             </div>
-            <p className="text-[11px] text-zinc-300 font-jura">
-              Bản đồ hành chính các tỉnh thành Việt Nam. Cuộn chuột để phóng to/thu nhỏ hoặc nhấn giữ kéo bản đồ.
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
+              Bản đồ hành chính các tỉnh thành Việt Nam • Tương tác thu phóng & di chuyển trực quan
             </p>
           </div>
         </div>
 
-        {/* Custom Toolbar */}
-        <div className="flex items-center gap-2 bg-[#1f2022] p-1.5 border-2 border-[#141414] self-start md:self-center shadow-lg">
+        {/* Action Controls Toolbar - V-Flow Pills */}
+        <div className="flex items-center gap-2 self-start sm:self-auto bg-[#1F1E24] p-1.5 rounded-2xl border border-[#2D2D38]">
           <button
             onClick={handleZoomIn}
             disabled={scale >= 4}
-            className="p-2 bg-[#383b3e] hover:bg-[#4a4d50] text-white disabled:opacity-40 border-2 border-[#141414] shadow active:translate-y-[1px]"
+            className="p-2 rounded-xl bg-[#18171E] hover:bg-[#262530] text-zinc-200 hover:text-white disabled:opacity-40 border border-[#2D2D38] transition-all cursor-pointer"
             title="Phóng to"
           >
             <ZoomIn className="w-4 h-4" />
@@ -105,23 +107,22 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
           <button
             onClick={handleZoomOut}
             disabled={scale <= 0.5}
-            className="p-2 bg-[#383b3e] hover:bg-[#4a4d50] text-white disabled:opacity-40 border-2 border-[#141414] shadow active:translate-y-[1px]"
+            className="p-2 rounded-xl bg-[#18171E] hover:bg-[#262530] text-zinc-200 hover:text-white disabled:opacity-40 border border-[#2D2D38] transition-all cursor-pointer"
             title="Thu nhỏ"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
-          <div className="h-4 w-[2px] bg-[#141414] mx-1" />
-          <VplayPrimaryButton
+          <button
             onClick={handleReset}
-            className="!py-1.5 !px-3 text-xs font-bold flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Đặt lại ({Math.round(scale * 100)}%)</span>
-          </VplayPrimaryButton>
+          </button>
         </div>
       </div>
 
-      {/* Map Display Frame */}
+      {/* Map Display Frame - Sleek V-Flow Card */}
       <div
         ref={containerRef}
         onWheel={handleWheel}
@@ -129,14 +130,14 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUpOrLeave}
         onMouseLeave={handleMouseUpOrLeave}
-        className={`w-full h-[65vh] md:h-[72vh] border-2 border-[#141414] shadow-2xl relative bg-[#1f2022] flex items-center justify-center select-none overflow-hidden ${
+        className={`w-full h-[65vh] md:h-[72vh] rounded-3xl border border-[#2D2D38] shadow-2xl relative bg-[#14131A] flex items-center justify-center select-none overflow-hidden ${
           isDragging ? "cursor-grabbing" : "cursor-grab"
         }`}
       >
         {/* Floating guidance notice */}
-        <div className="absolute top-3 left-3 z-10 bg-[#141414] border border-zinc-700 px-3 py-1.5 flex items-center gap-2 text-[10px] text-zinc-300 font-mono shadow-md">
-          <Grab className="w-3.5 h-3.5 text-[#89dc69]" />
-          <span>Kéo thả di chuyển • Cuộn chuột phóng to/thu nhỏ</span>
+        <div className="absolute top-4 left-4 z-10 bg-[#1F1E24]/90 backdrop-blur-md border border-[#343440] px-3.5 py-1.5 rounded-full flex items-center gap-2 text-xs text-zinc-300 font-medium shadow-lg">
+          <Grab className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Kéo thả để di chuyển • Cuộn chuột để phóng to/thu nhỏ</span>
         </div>
 
         {/* Map Image container with CSS Transforms */}
@@ -150,11 +151,10 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
             src={mapImageUrl}
             alt="Bản đồ Việt Nam"
             referrerPolicy="no-referrer"
-            className="max-w-full max-h-[60vh] md:max-h-[68vh] object-contain shadow-2xl pointer-events-none"
+            className="max-w-full max-h-[60vh] md:max-h-[68vh] object-contain rounded-xl shadow-2xl pointer-events-none"
           />
         </div>
       </div>
     </div>
   );
 }
-

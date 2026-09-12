@@ -193,22 +193,22 @@ export const VNotesTab: React.FC = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 text-white font-sans">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-6 rounded-3xl bg-gradient-to-r from-red-950/60 via-zinc-900/90 to-zinc-950 border border-red-500/30 shadow-2xl backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <div className="p-3.5 bg-gradient-to-br from-red-600 to-red-800 rounded-2xl shadow-lg shadow-red-600/30">
-            <FileText className="w-8 h-8 text-white" />
+      {/* Header Banner - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <FileText className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-white uppercase">
-                V-Notes
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Notes • Ghi Chú & Soạn Thảo
               </h1>
-              <span className="text-[10px] px-2.5 py-0.5 bg-[#208b3a] text-white font-black uppercase tracking-wider rounded-none">
-                Ore UI Rich Text
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                Rich Text
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
               Trình ghi chú thông minh hỗ trợ định dạng văn bản nâng cao, gắn thẻ và lưu trữ cục bộ.
             </p>
           </div>
@@ -216,7 +216,7 @@ export const VNotesTab: React.FC = () => {
 
         <button
           onClick={handleCreateNote}
-          className="flex items-center gap-2 px-5 py-3 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 active:translate-y-0.5 text-white font-bold text-xs uppercase tracking-wider rounded-none shadow-lg transition-all cursor-pointer shrink-0 active:scale-95"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" /> Tạo Ghi Chú Mới
         </button>
@@ -225,29 +225,29 @@ export const VNotesTab: React.FC = () => {
       {/* Main Workspace Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[620px]">
         {/* Left Sidebar: Notes List */}
-        <div className="lg:col-span-4 bg-[#18181c] border border-white/10 rounded-3xl p-4 flex flex-col gap-4 shadow-xl">
+        <div className="lg:col-span-4 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 flex flex-col gap-4 shadow-xl">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Tìm kiếm ghi chú..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition-all"
+              className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-all"
             />
           </div>
 
           {/* Category Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
             {["all", "Công việc", "Học tập", "Cá nhân", "Dự án"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer rounded-none ${
+                className={`px-3 py-1.5 text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer rounded-xl ${
                   selectedCategory === cat
-                    ? "bg-[#208b3a] text-white shadow-md"
-                    : "bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white"
+                    ? "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md"
+                    : "bg-[#2A2933] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white"
                 }`}
               >
                 {cat === "all" ? "Tất cả" : cat}
@@ -313,22 +313,22 @@ export const VNotesTab: React.FC = () => {
 
         {/* Right Editor Area */}
         {activeNote ? (
-          <div className="lg:col-span-8 bg-[#18181c] border border-white/10 rounded-3xl p-5 sm:p-6 flex flex-col shadow-xl">
+          <div className="lg:col-span-8 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-5 sm:p-6 flex flex-col shadow-xl">
             {/* Editor Top Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4 mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2D2D38] pb-4 mb-4">
               <input
                 type="text"
                 value={activeNote.title}
                 onChange={(e) => handleUpdateNote("title", e.target.value)}
                 placeholder="Tiêu đề ghi chú..."
-                className="bg-transparent text-xl font-bold text-white focus:outline-none w-full sm:w-auto flex-1 placeholder-zinc-600"
+                className="bg-transparent text-xl font-bold text-white focus:outline-none w-full sm:w-auto flex-1 placeholder-slate-500"
               />
 
               <div className="flex items-center gap-2">
                 <select
                   value={activeNote.category}
                   onChange={(e) => handleUpdateNote("category", e.target.value)}
-                  className="bg-zinc-900 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-red-500 cursor-pointer"
+                  className="bg-[#18171E] border border-[#2D2D38] rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 cursor-pointer"
                 >
                   <option value="Công việc">Công việc</option>
                   <option value="Học tập">Học tập</option>
@@ -339,10 +339,10 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={() => handleToggleStick(activeNote.id)}
                   title={stuckIds.includes(activeNote.id) ? "Bỏ ghim khỏi màn hình" : "Stick to screen (Ghim vào màn hình)"}
-                  className={`px-3 py-1.5 rounded-none text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                     stuckIds.includes(activeNote.id)
-                      ? "bg-[#208b3a] hover:bg-[#2dc653] border-b-4 border-[#125322] active:border-b-0 active:translate-y-1 text-white shadow-md"
-                      : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white shadow-md"
+                      ? "bg-amber-500/20 border border-amber-500/50 text-amber-300 shadow-sm"
+                      : "bg-[#2A2933] hover:bg-[#32303D] border border-[#3E3D4D] text-[#9CA3AF] hover:text-white shadow-sm"
                   }`}
                 >
                   <StickyNote className="w-3.5 h-3.5" />
@@ -352,7 +352,7 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={copyContent}
                   title="Sao chép văn bản"
-                  className="p-2 bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 rounded-none text-white transition-all cursor-pointer shadow-md"
+                  className="p-2 bg-[#2A2933] hover:bg-[#32303D] border border-[#3E3D4D] rounded-xl text-[#9CA3AF] hover:text-white transition-all cursor-pointer shadow-sm"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                 </button>
@@ -360,10 +360,10 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={() => handleTogglePin(activeNote.id)}
                   title={activeNote.isPinned ? "Bỏ ghim" : "Ghim lên đầu"}
-                  className={`p-2 rounded-none transition-all cursor-pointer ${
+                  className={`p-2 rounded-xl border transition-all cursor-pointer ${
                     activeNote.isPinned
-                      ? "bg-amber-600 hover:bg-amber-500 border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 text-white shadow-md"
-                      : "bg-[#2a2d36] hover:bg-[#383c48] border-2 border-[#484c5c] border-b-4 border-[#181a20] active:border-b-0 active:translate-y-1 text-white shadow-md"
+                      ? "bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-sm"
+                      : "bg-[#2A2933] hover:bg-[#32303D] border-[#3E3D4D] text-[#9CA3AF] hover:text-white shadow-sm"
                   }`}
                 >
                   <Pin className="w-4 h-4" />
@@ -372,7 +372,7 @@ export const VNotesTab: React.FC = () => {
                 <button
                   onClick={() => handleDeleteNote(activeNote.id)}
                   title="Xóa ghi chú"
-                  className="p-2 bg-red-600 hover:bg-red-500 border-b-4 border-red-800 active:border-b-0 active:translate-y-1 text-white rounded-none transition-all cursor-pointer shadow-md"
+                  className="p-2 bg-[#2A2933] hover:bg-rose-500/20 border border-[#3E3D4D] text-[#9CA3AF] hover:text-rose-300 rounded-xl transition-all cursor-pointer shadow-sm"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -380,19 +380,19 @@ export const VNotesTab: React.FC = () => {
             </div>
 
             {/* Rich Formatting Toolbar */}
-            <div className="flex flex-wrap items-center gap-1 p-2 bg-zinc-900/80 border border-white/10 rounded-2xl mb-4">
+            <div className="flex flex-wrap items-center gap-1 p-2 bg-[#18171E] border border-[#2D2D38] rounded-xl mb-4">
               <ToolbarButton icon={<Bold className="w-4 h-4" />} title="Bold" onClick={() => applyFormat("bold")} />
               <ToolbarButton icon={<Italic className="w-4 h-4" />} title="Italic" onClick={() => applyFormat("italic")} />
               <ToolbarButton icon={<Underline className="w-4 h-4" />} title="Underline" onClick={() => applyFormat("underline")} />
               <ToolbarButton icon={<Strikethrough className="w-4 h-4" />} title="Strikethrough" onClick={() => applyFormat("strikeThrough")} />
-              <div className="h-4 w-px bg-white/10 mx-1" />
+              <div className="h-4 w-px bg-[#2D2D38] mx-1" />
               <ToolbarButton icon={<Heading1 className="w-4 h-4" />} title="Heading 1" onClick={() => applyFormat("formatBlock", "<h1>")} />
               <ToolbarButton icon={<Heading2 className="w-4 h-4" />} title="Heading 2" onClick={() => applyFormat("formatBlock", "<h2>")} />
-              <div className="h-4 w-px bg-white/10 mx-1" />
+              <div className="h-4 w-px bg-[#2D2D38] mx-1" />
               <ToolbarButton icon={<List className="w-4 h-4" />} title="Bullet List" onClick={() => applyFormat("insertUnorderedList")} />
               <ToolbarButton icon={<ListOrdered className="w-4 h-4" />} title="Numbered List" onClick={() => applyFormat("insertOrderedList")} />
-              <div className="h-4 w-px bg-white/10 mx-1" />
-              <ToolbarButton icon={<Highlighter className="w-4 h-4 text-yellow-400" />} title="Highlight" onClick={() => applyFormat("backColor", "#fef08a")} />
+              <div className="h-4 w-px bg-[#2D2D38] mx-1" />
+              <ToolbarButton icon={<Highlighter className="w-4 h-4 text-amber-400" />} title="Highlight" onClick={() => applyFormat("backColor", "#fef08a")} />
             </div>
 
             {/* Content Editable Body using ref to maintain cursor position */}
@@ -401,20 +401,20 @@ export const VNotesTab: React.FC = () => {
               contentEditable
               suppressContentEditableWarning
               onInput={(e) => handleUpdateNote("content", e.currentTarget.innerHTML)}
-              className="flex-1 bg-zinc-900/40 border border-white/5 rounded-2xl p-4 text-sm text-zinc-200 focus:outline-none focus:border-red-500/50 min-h-[350px] overflow-y-auto leading-relaxed font-sans"
+              className="flex-1 bg-[#18171E] border border-[#2D2D38] rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50 min-h-[350px] overflow-y-auto leading-relaxed font-sans"
             />
 
             {/* Footer Metadata */}
-            <div className="flex items-center justify-between mt-4 text-[11px] text-zinc-500 border-t border-white/5 pt-3">
+            <div className="flex items-center justify-between mt-4 text-[11px] text-[#9CA3AF] border-t border-[#2D2D38] pt-3">
               <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" /> Lần cuối cập nhật: {activeNote.updatedAt}
+                <Calendar className="w-3.5 h-3.5 text-amber-400" /> Lần cuối cập nhật: {activeNote.updatedAt}
               </span>
-              <span>V-Notes Ore UI Engine</span>
+              <span>V-Notes Engine</span>
             </div>
           </div>
         ) : (
-          <div className="lg:col-span-8 bg-[#18181c] border border-white/10 rounded-3xl p-12 flex flex-col items-center justify-center text-center text-zinc-500 shadow-xl">
-            <FileText className="w-16 h-16 mb-4 text-zinc-600" />
+          <div className="lg:col-span-8 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-12 flex flex-col items-center justify-center text-center text-[#9CA3AF] shadow-xl">
+            <FileText className="w-16 h-16 mb-4 text-slate-600" />
             <p className="text-sm font-semibold">Chọn hoặc tạo một ghi chú để bắt đầu chỉnh sửa</p>
           </div>
         )}
@@ -437,10 +437,10 @@ const NoteCard: React.FC<{
   return (
     <div
       onClick={onClick}
-      className={`p-3.5 rounded-2xl border transition-all cursor-pointer relative group ${
+      className={`p-3.5 rounded-xl border transition-all cursor-pointer relative group ${
         isActive
-          ? "bg-red-950/40 border-red-500/60 shadow-lg shadow-red-900/20"
-          : "bg-zinc-900/60 hover:bg-zinc-900 border-white/5 hover:border-white/20"
+          ? "bg-[#18171E] border-amber-500/60 shadow-lg"
+          : "bg-[#18171E] hover:bg-[#201F29] border-[#2D2D38] hover:border-[#3E3D4D]"
       }`}
     >
       <div className="flex items-start justify-between gap-2 mb-1.5">
@@ -455,7 +455,7 @@ const NoteCard: React.FC<{
                 onToggleStick();
               }}
               className={`p-1 rounded-md hover:bg-white/10 ${
-                isStuck ? "text-emerald-400" : "text-zinc-500 hover:text-white"
+                isStuck ? "text-amber-400" : "text-slate-500 hover:text-white"
               }`}
               title={isStuck ? "Đã ghim màn hình" : "Stick to screen"}
             >
@@ -468,7 +468,7 @@ const NoteCard: React.FC<{
               onTogglePin();
             }}
             className={`p-1 rounded-md hover:bg-white/10 ${
-              note.isPinned ? "text-amber-400" : "text-zinc-500 hover:text-white"
+              note.isPinned ? "text-amber-400" : "text-slate-500 hover:text-white"
             }`}
             title={note.isPinned ? "Bỏ ghim" : "Ghim bài"}
           >
@@ -477,15 +477,15 @@ const NoteCard: React.FC<{
         </div>
       </div>
 
-      <p className="text-[11px] text-zinc-400 line-clamp-2 mb-2 leading-relaxed">
+      <p className="text-[11px] text-[#9CA3AF] line-clamp-2 mb-2 leading-relaxed">
         {plainTextContent || "Chưa có nội dung..."}
       </p>
 
       <div className="flex items-center justify-between text-[10px]">
-        <span className="px-2 py-0.5 rounded-md bg-white/5 text-zinc-400 font-semibold">
+        <span className="px-2 py-0.5 rounded-md bg-[#2A2933] text-[#9CA3AF] font-semibold border border-[#3E3D4D]">
           {note.category}
         </span>
-        <span className="text-zinc-500">{note.updatedAt.split(" ")[1] || note.updatedAt}</span>
+        <span className="text-slate-500">{note.updatedAt.split(" ")[1] || note.updatedAt}</span>
       </div>
     </div>
   );

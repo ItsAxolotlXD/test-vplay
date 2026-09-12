@@ -176,11 +176,33 @@ export const VBrowserTab: React.FC = () => {
   const isCurrentBookmarked = bookmarkedUrls.includes(currentTab?.url || '');
 
   return (
-    <div id="v-browser-app" className="w-full text-white selection:bg-sky-500/30">
-      {/* 1. Browser Window Frame */}
-      <div className="bg-[#0D131F] border border-sky-500/25 rounded-3xl overflow-hidden shadow-[0_15px_45px_rgba(2,132,199,0.2)]">
+    <div id="v-browser-app" className="w-full text-white">
+      {/* 1. Header Banner - V-Flow style */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-500 shadow-md flex items-center justify-center text-white shrink-0">
+            <Globe className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">
+                V-Browser • Trình Duyệt Web
+              </h1>
+              <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                Web Portal 360
+              </span>
+            </div>
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
+              Duyệt web đa tab • Tin tức tổng hợp • Kho tri thức Wikipedia & Truyền hình trực tuyến
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Browser Window Frame */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl overflow-hidden shadow-xl">
         {/* Tabs Bar */}
-        <div className="bg-[#090D17] border-b border-white/10 px-3 pt-3 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <div className="bg-[#18171E] border-b border-[#2D2D38] px-3 pt-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {tabs.map((tab) => {
             const isActive = tab.id === activeTabId;
             return (
@@ -192,8 +214,8 @@ export const VBrowserTab: React.FC = () => {
                 }}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-t-xl text-xs font-medium max-w-[200px] cursor-pointer transition-all border-t border-x ${
                   isActive
-                    ? 'bg-[#0D131F] border-white/15 text-white shadow-sm'
-                    : 'bg-transparent border-transparent text-slate-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#1F1E24] border-[#2D2D38] text-white shadow-sm font-semibold'
+                    : 'bg-transparent border-transparent text-[#9CA3AF] hover:text-white hover:bg-[#2A2933]'
                 }`}
               >
                 <span>{tab.favicon || '🌐'}</span>
@@ -201,7 +223,7 @@ export const VBrowserTab: React.FC = () => {
                 {tabs.length > 1 && (
                   <button
                     onClick={(e) => handleCloseTab(e, tab.id)}
-                    className="p-0.5 rounded-full hover:bg-white/20 text-slate-400 hover:text-white ml-auto"
+                    className="p-0.5 rounded-full hover:bg-white/20 text-[#9CA3AF] hover:text-white ml-auto"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -212,7 +234,7 @@ export const VBrowserTab: React.FC = () => {
 
           <button
             onClick={handleAddNewTab}
-            className="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer ml-1"
+            className="p-1.5 rounded-lg hover:bg-[#2A2933] text-[#9CA3AF] hover:text-white transition-colors cursor-pointer ml-1"
             title="Mở tab mới"
           >
             <Plus className="w-4 h-4" />
@@ -220,25 +242,25 @@ export const VBrowserTab: React.FC = () => {
         </div>
 
         {/* Navigation & Address Bar */}
-        <div className="bg-[#121A2A] border-b border-white/10 p-2.5 sm:p-3 flex items-center gap-2">
+        <div className="bg-[#1F1E24] border-b border-[#2D2D38] p-2.5 sm:p-3 flex items-center gap-2">
           <div className="flex items-center gap-1">
             <button
               onClick={() => handleNavigate('https://vplay.vn')}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-[#9CA3AF] hover:text-white hover:bg-[#2A2933] transition-colors cursor-pointer"
               title="Quay lại"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleNavigate(inputUrl)}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-[#9CA3AF] hover:text-white hover:bg-[#2A2933] transition-colors cursor-pointer"
               title="Làm mới"
             >
-              <RotateCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-sky-400' : ''}`} />
+              <RotateCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-400' : ''}`} />
             </button>
             <button
               onClick={() => handleNavigate('https://vplay.vn', 'Vplay Portal')}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-[#9CA3AF] hover:text-white hover:bg-[#2A2933] transition-colors cursor-pointer"
               title="Về trang chủ Vplay"
             >
               <Home className="w-4 h-4" />
@@ -251,7 +273,7 @@ export const VBrowserTab: React.FC = () => {
               e.preventDefault();
               handleNavigate(inputUrl);
             }}
-            className="flex-1 flex items-center bg-[#090D17] border border-white/15 focus-within:border-sky-400 rounded-xl px-3 py-1.5 text-xs transition-colors"
+            className="flex-1 flex items-center bg-[#18171E] border border-[#2D2D38] focus-within:border-amber-500 rounded-xl px-3 py-1.5 text-xs transition-colors"
           >
             <Lock className="w-3.5 h-3.5 text-emerald-400 mr-2 shrink-0" />
             <input
@@ -259,9 +281,9 @@ export const VBrowserTab: React.FC = () => {
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
               placeholder="Nhập địa chỉ web (URL) hoặc từ khóa tìm kiếm..."
-              className="w-full bg-transparent text-white placeholder-slate-500 focus:outline-none font-mono"
+              className="w-full bg-transparent text-white placeholder-[#9CA3AF] focus:outline-none font-mono"
             />
-            {isLoading && <span className="text-[10px] text-sky-400 font-mono animate-pulse">Đang tải...</span>}
+            {isLoading && <span className="text-[10px] text-amber-400 font-mono animate-pulse">Đang tải...</span>}
           </form>
 
           {/* Action buttons */}
@@ -269,7 +291,7 @@ export const VBrowserTab: React.FC = () => {
             <button
               onClick={() => handleToggleBookmark(currentTab.url)}
               className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                isCurrentBookmarked ? 'text-amber-400' : 'text-slate-400 hover:text-white'
+                isCurrentBookmarked ? 'text-amber-400' : 'text-[#9CA3AF] hover:text-white'
               }`}
               title="Lưu dấu trang"
             >
@@ -280,7 +302,7 @@ export const VBrowserTab: React.FC = () => {
               href={currentTab.url}
               target="_blank"
               rel="noreferrer"
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-[#9CA3AF] hover:text-white hover:bg-[#2A2933] transition-colors cursor-pointer"
               title="Mở sang tab trình duyệt máy tính"
             >
               <ExternalLink className="w-4 h-4" />
@@ -289,13 +311,13 @@ export const VBrowserTab: React.FC = () => {
         </div>
 
         {/* Quick Bookmarks Strip */}
-        <div className="bg-[#0F1624] px-4 py-2 border-b border-white/5 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
-          <Bookmark className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+        <div className="bg-[#18171E] px-4 py-2 border-b border-[#2D2D38] flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+          <Bookmark className="w-3.5 h-3.5 text-amber-400 shrink-0" />
           {DEFAULT_BOOKMARKS.map((bm) => (
             <button
               key={bm.name}
               onClick={() => handleNavigate(bm.url, bm.name)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-sky-500/20 text-slate-300 hover:text-white border border-white/5 transition-all cursor-pointer shrink-0"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#2A2933] hover:bg-amber-500/20 text-[#9CA3AF] hover:text-white border border-[#3E3D4D] transition-all cursor-pointer shrink-0"
             >
               <span>{bm.icon}</span>
               <span className="truncate max-w-[120px]">{bm.name}</span>
@@ -304,7 +326,7 @@ export const VBrowserTab: React.FC = () => {
         </div>
 
         {/* Browser Content Area */}
-        <div className="p-4 sm:p-6 min-h-[520px] bg-[#0A0E18]">
+        <div className="p-4 sm:p-6 min-h-[520px] bg-[#141318]">
           {/* Article Detail View if open */}
           {readingArticle ? (
             <div className="max-w-3xl mx-auto bg-[#131A2B] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl">
