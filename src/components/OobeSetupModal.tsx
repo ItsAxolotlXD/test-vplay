@@ -53,8 +53,11 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
   const [fontFamily, setFontFamily] = useState<FontFamilyOption>(initialFontFamily);
   const [termsAccepted, setTermsAccepted] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isPreparing, setIsPreparing] = useState<boolean>(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const preparationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nextStepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,8 +67,20 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
       setFontFamily(initialFontFamily);
       setTermsAccepted(true);
       setIsSubmitting(false);
+      setIsPreparing(false);
     }
   }, [isOpen, initialName, initialNavStyle, initialFontFamily]);
+
+  useEffect(() => {
+    return () => {
+      if (preparationTimerRef.current) {
+        clearTimeout(preparationTimerRef.current);
+      }
+      if (nextStepTimerRef.current) {
+        clearTimeout(nextStepTimerRef.current);
+      }
+    };
+  }, []);
 
   // Focus input when moving to step 2
   useEffect(() => {
@@ -77,8 +92,30 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
     }
   }, [currentStep]);
 
+  const handleNextStep = (nextStep: OobeStep) => {
+    if (isSubmitting || isPreparing) return;
+
+    setIsSubmitting(true);
+    nextStepTimerRef.current = setTimeout(() => {
+      setCurrentStep(nextStep);
+      setIsSubmitting(false);
+      nextStepTimerRef.current = null;
+    }, 5000);
+  };
+
+  const handleTermsAccept = () => {
+    if (!termsAccepted || isPreparing) return;
+
+    setIsPreparing(true);
+    preparationTimerRef.current = setTimeout(() => {
+      setCurrentStep(7);
+      setIsPreparing(false);
+      preparationTimerRef.current = null;
+    }, 15000);
+  };
+
   const handleFinish = () => {
-    if (isSubmitting) return;
+    if (isSubmitting || isPreparing) return;
     setIsSubmitting(true);
 
     const finalName = userName.trim() || 'User';
@@ -138,8 +175,8 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
             <X className="w-4 h-4" />
           </button>
 
-          {/* Submitting "Just a moment..." Windows 11 Overlay */}
-          {isSubmitting ? (
+          {/* Windows 11 style loading overlays */}
+          {isSubmitting || isPreparing ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -149,7 +186,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <div className="w-10 h-10 border-3 border-transparent border-t-[#0067C0] border-r-[#0067C0] rounded-full animate-spin" />
               </div>
               <p className="text-base sm:text-lg font-normal text-[#1A1A1A] font-sans tracking-tight">
-                Just a moment...
+                {isPreparing ? 'Preparing for your first use' : 'Just a moment...'}
               </p>
             </motion.div>
           ) : null}
@@ -323,7 +360,6 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                       Account Sign-In Unavailable
                     </h1>
 
-                    {/* Exact requested text */}
                     <div className="mt-4 p-4 rounded-lg bg-[#F3F3F3] border border-[#E5E5E5] text-sm text-[#1A1A1A] font-medium leading-relaxed font-sans">
                       This feature is currently under construction or not available in your country/region. Please use a local account.
                     </div>
@@ -743,6 +779,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <button
                   type="button"
                   onClick={() => {
+                    if (isPreparing) return;
                     if (currentStep === 7) setCurrentStep(6);
                     else if (currentStep === 6) setCurrentStep(5);
                     else if (currentStep === 5) setCurrentStep(4);
@@ -764,7 +801,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <button
                   id="btn-oobe-step1-next"
                   type="button"
-                  onClick={() => setCurrentStep(2)}
+                  onClick={() => handleNextStep(2)}
                   className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <span>Next</span>
@@ -776,7 +813,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <button
                   id="btn-oobe-step2-next"
                   type="button"
-                  onClick={() => setCurrentStep(3)}
+                  onClick={() => handleNextStep(3)}
                   className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <span>Next</span>
@@ -798,7 +835,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <button
                   id="btn-oobe-step3-next"
                   type="button"
-                  onClick={() => setCurrentStep(4)}
+                  onClick={() => handleNextStep(4)}
                   className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <span>Next</span>
@@ -810,7 +847,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <button
                   id="btn-oobe-step4-next"
                   type="button"
-                  onClick={() => setCurrentStep(5)}
+                  onClick={() => handleNextStep(5)}
                   className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <span>Next</span>
@@ -822,7 +859,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <button
                   id="btn-oobe-step5-next"
                   type="button"
-                  onClick={() => setCurrentStep(6)}
+                  onClick={() => handleNextStep(6)}
                   className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <span>Next</span>
@@ -834,11 +871,12 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                 <button
                   id="btn-oobe-step6-accept"
                   type="button"
-                  disabled={!termsAccepted}
-                  onClick={() => setCurrentStep(7)}
+                  onClick={handleTermsAccept}
+                  disabled={!termsAccepted || isPreparing}
                   className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
                 >
-                  <span>Accept</span>
+                  {isPreparing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  <span>{isPreparing ? 'Preparing...' : 'Accept'}</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )}

@@ -18,11 +18,14 @@ import {
   VCameraTab,
   VTicketTab,
   VWeatherTab,
+  VStocksTab,
+  VHealthTab,
 } from './vapps';
 import { VNotesView } from './VNotesView';
 import { MinecraftContainerEmulator } from './minecraft/MinecraftContainerEmulator';
 import { VFlowTab } from './vflow/VFlowTab';
 import { ChatRoomView } from './chat/ChatRoomView';
+import { useLang } from '../context/LanguageContext';
 import {
   Compass,
   Sparkles,
@@ -41,6 +44,8 @@ import {
   Camera,
   Ticket,
   CloudSun,
+  TrendingUp,
+  HeartPulse,
   StickyNote,
   Armchair,
   Box,
@@ -74,6 +79,8 @@ export type VAppId =
   | 'v_camera'
   | 'v_ticket'
   | 'v_weather'
+  | 'v_stocks'
+  | 'v_health'
   | 'v_reminders'
   | 'v_notes'
   | 'v_furniture'
@@ -282,6 +289,32 @@ export const VAPPS_LIST: VAppDefinition[] = [
     tags: ['Thời Tiết', 'Dự Báo', 'Khí Tượng', 'Nhiệt Độ', 'AQI', 'Tia UV', 'Weather'],
   },
   {
+    id: 'v_stocks',
+    name: 'V-Stocks Market',
+    tagline: 'Theo Dõi Thị Trường',
+    description: 'Bảng giá mô phỏng, danh mục yêu thích và các chỉ số nổi bật giúp bạn theo dõi thị trường trong một giao diện trực quan.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Market',
+    gradientBg: 'bg-gradient-to-br from-[#0F766E] via-[#0891B2] to-[#1D4ED8]',
+    borderClass: 'border-[#67E8F9]/50 group-hover:border-[#67E8F9]',
+    glowClass: 'shadow-[0_10px_30px_rgba(8,145,178,0.35)]',
+    icon: TrendingUp,
+    tags: ['Stocks', 'Market', 'VN-Index', 'Danh Mục'],
+  },
+  {
+    id: 'v_health',
+    name: 'V-Health Care',
+    tagline: 'Sức Khỏe Mỗi Ngày',
+    description: 'Theo dõi thói quen vận động, giấc ngủ và các mục tiêu sức khỏe hằng ngày trong một trung tâm riêng tư, dễ sử dụng.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Wellness',
+    gradientBg: 'bg-gradient-to-br from-[#047857] via-[#059669] to-[#0F766E]',
+    borderClass: 'border-[#6EE7B7]/50 group-hover:border-[#6EE7B7]',
+    glowClass: 'shadow-[0_10px_30px_rgba(5,150,105,0.35)]',
+    icon: HeartPulse,
+    tags: ['Health', 'Wellness', 'Thói Quen', 'Sức Khỏe'],
+  },
+  {
     id: 'v_reminders',
     name: 'V-Reminders Alarm',
     tagline: 'Nhắc Việc & Hẹn Giờ',
@@ -375,8 +408,9 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   navigate,
 }) => {
   const [activeApp, setActiveApp] = useState<VAppId>(initialAppId);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLang();
 
   // Sync activeApp when initialAppId changes
   useEffect(() => {
@@ -386,12 +420,12 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   }, [initialAppId]);
 
   const categories = [
-    'Tất cả',
-    'Trò chơi (Arcade)',
-    'Tiện ích & Tệp tin',
-    'Học tập & Văn hóa',
-    'Giải trí & Media',
-    'Đang mở'
+    { id: 'all', label: t('space360.all', 'Tất cả') },
+    { id: 'games', label: t('space360.games', 'Trò chơi (Arcade)') },
+    { id: 'utilities', label: t('space360.utilities', 'Tiện ích & Tệp tin') },
+    { id: 'learning', label: t('space360.learning', 'Học tập & Văn hóa') },
+    { id: 'media', label: t('space360.media', 'Giải trí & Media') },
+    { id: 'open', label: t('space360.open', 'Đang mở') }
   ];
 
   const handleSelectApp = (appId: VAppId) => {
@@ -451,6 +485,12 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       case 'v_weather':
         navigate('/v-weather');
         break;
+      case 'v_stocks':
+        navigate('/v-stocks');
+        break;
+      case 'v_health':
+        navigate('/v-health');
+        break;
       case 'v_reminders':
         navigate('/v-reminders');
         break;
@@ -477,10 +517,11 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   const filteredApps = useMemo(() => {
     return VAPPS_LIST.filter((app) => {
       let matchCat = true;
-      if (selectedCategory === 'Đang mở') {
+      const selectedCategoryLabel = categories.find((category) => category.id === selectedCategory)?.label;
+      if (selectedCategory === 'open') {
         matchCat = app.id === activeApp;
-      } else if (selectedCategory !== 'Tất cả') {
-        matchCat = app.category === selectedCategory;
+      } else if (selectedCategory !== 'all') {
+        matchCat = app.category === selectedCategoryLabel;
       }
 
       const matchSearch =
@@ -496,19 +537,19 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   const currentApp = VAPPS_LIST.find((a) => a.id === activeApp) || VAPPS_LIST[0];
 
   return (
-    <div id="waves-vapps-view" className="w-full max-w-5xl mx-auto pb-16 text-left select-none animate-in fade-in duration-300">
+    <div id="waves-vapps-view" className="w-full max-w-6xl mx-auto pb-16 text-left select-none animate-in fade-in duration-300">
       
       {/* 1. CATEGORY PILLS (Phù hợp với ngôn ngữ thiết kế của Chuyên Trang) */}
       <div className="w-full overflow-x-auto no-scrollbar pb-2 mb-6">
         <div className="flex items-center gap-2 min-w-max">
           {categories.map((cat) => {
-            const isSelected = selectedCategory === cat;
+            const isSelected = selectedCategory === cat.id;
             return (
               <button
-                key={cat}
+                key={cat.id}
                 onClick={() => {
                   playPopSound();
-                  setSelectedCategory(cat);
+                  setSelectedCategory(cat.id);
                 }}
                 className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border-0 ${
                   isSelected
@@ -516,7 +557,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
                     : 'bg-[#1E1E24] text-[#A1A1AA] hover:text-white hover:bg-[#2A2A34]'
                 }`}
               >
-                {cat}
+                {cat.label}
               </button>
             );
           })}
@@ -526,14 +567,14 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       {/* 2. SECTION HEADER (Tương tự Chuyên Trang) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 rounded-2xl bg-[#E6005A]/15 text-[#FF4D8B] ring-1 ring-[#E6005A]/30 flex items-center justify-center shrink-0 shadow-lg shadow-[#E6005A]/15">
             <Compass className="w-6 h-6" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
               <span>Cổng không gian (Space 360)</span>
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#E6005A]/20 text-[#FF4D8B]">
-                12 Ứng dụng
+                {VAPPS_LIST.length} Ứng dụng
               </span>
             </h1>
             <p className="text-xs sm:text-sm text-[#9CA3AF] mt-0.5">
@@ -565,8 +606,8 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       </div>
 
       {/* 3. BẢNG BANNER TRÒN CỦA SPACE 360: MỖI DÒNG 4 ỨNG DỤNG (Banner tròn, có viền, màu gradient và iconography) */}
-      <div className="py-2 mb-10">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-9 sm:gap-y-12 gap-x-4 sm:gap-x-8 max-w-5xl mx-auto">
+      <div className="mb-10 rounded-[32px] border border-white/10 bg-[#14141B]/70 p-4 sm:p-7 shadow-2xl shadow-black/20">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 max-w-6xl mx-auto">
           {filteredApps.map((app) => {
             const isActive = activeApp === app.id;
             const AppIcon = app.icon;
@@ -639,7 +680,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
             <button
               onClick={() => {
                 setSearchQuery('');
-                setSelectedCategory('Tất cả');
+                setSelectedCategory('all');
               }}
               className="mt-3 px-4 py-1.5 rounded-full bg-[#E6005A] text-white text-xs font-bold"
             >
@@ -725,8 +766,10 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
               {activeApp === 'v_gallery' && <VGalleryTab />}
               {activeApp === 'v_camera' && <VCameraTab />}
               {activeApp === 'v_ticket' && <VTicketTab />}
-              {activeApp === 'v_weather' && <VWeatherTab />}
-              {activeApp === 'v_reminders' && <VRemindersTab />}
+  {activeApp === 'v_weather' && <VWeatherTab />}
+  {activeApp === 'v_stocks' && <VStocksTab />}
+  {activeApp === 'v_health' && <VHealthTab />}
+  {activeApp === 'v_reminders' && <VRemindersTab />}
               {activeApp === 'v_notes' && <VNotesView />}
               {activeApp === 'v_furniture' && <VFurnitureTab />}
               {activeApp === 'v_minecraft' && <MinecraftContainerEmulator />}

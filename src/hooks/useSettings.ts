@@ -9,6 +9,7 @@ export interface SystemSettings {
   navigationMode: 'sidebar' | 'topbar';
   floatyBar: boolean;
   fontFamily: FontFamilyOption;
+  appLanguage: 'vi' | 'en';
   fontScale: number; // 0: 85%, 1: 100%, 2: 115%, 3: 130%
   autoScrollBanner: boolean;
   autoHideSidebar: boolean;
@@ -29,6 +30,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   navigationMode: 'topbar',
   floatyBar: false,
   fontFamily: 'alata',
+  appLanguage: 'vi',
   fontScale: 1,
   autoScrollBanner: true,
   autoHideSidebar: false,
@@ -144,6 +146,9 @@ export const applySystemSettings = (settings: SystemSettings) => {
   // App is dark mode only
   document.documentElement.classList.remove('light-mode');
   document.documentElement.classList.add('dark');
+
+  // Keep the document language in sync so native controls and assistive technologies follow the preference.
+  document.documentElement.lang = settings.appLanguage === 'en' ? 'en' : 'vi';
 
   // Apply font scale
   const scaleVal = FONT_SCALE_CONFIG[settings.fontScale]?.scale || '1';

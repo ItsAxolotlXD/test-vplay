@@ -7,7 +7,7 @@ import { SpotlightModal } from './components/SpotlightModal';
 import { CustomStreamModal } from './components/CustomStreamModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { SplashScreen } from './components/SplashScreen';
-import { OobeSetupModal } from './components/OobeSetupModal';
+import { OobeSetupModal, OobeSetupConfig } from './components/OobeSetupModal';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
 import { LiveTV } from './pages/LiveTV';
@@ -156,11 +156,14 @@ export default function App() {
     return () => window.removeEventListener('vplay:open_oobe', handleOpenOobe);
   }, []);
 
-  const handleCompleteOobe = (name: string) => {
+  const handleCompleteOobe = (config: OobeSetupConfig) => {
     try {
       localStorage.setItem('vplay_oobe_completed', 'true');
     } catch {}
-    updateSetting('userName', name);
+    updateSetting('userName', config.userName);
+    updateSetting('navigationMode', config.navStyle === 'floaty' ? 'topbar' : config.navStyle);
+    updateSetting('floatyBar', config.navStyle === 'floaty');
+    updateSetting('fontFamily', config.fontFamily);
     setIsOobeOpen(false);
   };
 

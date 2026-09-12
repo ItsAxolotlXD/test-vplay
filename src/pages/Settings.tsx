@@ -19,10 +19,13 @@ import {
   PanelLeft,
   PanelTop,
   Compass,
-  Monitor
+  Monitor,
+  Languages,
+  Accessibility
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { useLang } from '../context/LanguageContext';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -31,6 +34,7 @@ interface SettingsProps {
 export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const { settings, updateSetting } = useSettings();
   const { flags, setFlag } = useFeatureFlags();
+  const { t } = useLang();
   const [searchQuery, setSearchQuery] = useState('');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
@@ -706,7 +710,39 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
         </section>
       )}
 
-      {/* 4. Section 3: Copilot for Vplay */}
+      {/* 4. Section 3: Ngôn ngữ ứng dụng */}
+      {(matchesSearch('Ngôn ngữ') || matchesSearch('Language') || matchesSearch('Tiếng Việt') || matchesSearch('English') || matchesSearch('Trợ năng')) && (
+        <section id="settings-section-language" className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4">
+          <div className="flex items-start gap-3">
+            <Accessibility className="w-5 h-5 text-[#E50914] shrink-0 mt-0.5" aria-hidden="true" />
+            <div>
+<h2 className="text-base font-bold text-white leading-tight">{t('settings.language.title', 'Trợ năng & ngôn ngữ')}</h2>
+  <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">{t('settings.language.description', 'Tùy chỉnh cách Space 360 hiển thị và hỗ trợ bạn sử dụng hằng ngày.')}</p>
+            </div>
+          </div>
+          <div className="p-4 rounded-[20px] bg-[#28272E] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+<div className="font-semibold text-white text-sm flex items-center gap-2"><Languages className="w-4 h-4 text-cyan-300" aria-hidden="true" /> {t('settings.language.label', 'Ngôn ngữ ứng dụng')}</div>
+  <div className="text-xs text-[#9CA3AF] mt-1">{t('settings.language.help', 'Tiếng Việt là mặc định. Thay đổi sẽ áp dụng cho toàn bộ giao diện hỗ trợ.')}</div>
+            </div>
+            <div className="flex items-center gap-1 rounded-xl bg-[#1E1D22] p-1" role="group" aria-label="Ngôn ngữ ứng dụng">
+              {(['vi', 'en'] as const).map((language) => (
+                <button
+                  key={language}
+                  type="button"
+                  aria-pressed={settings.appLanguage === language}
+                  onClick={() => updateSetting('appLanguage', language)}
+                  className={`min-w-24 rounded-lg px-3 py-2 text-xs font-bold transition-all cursor-pointer ${settings.appLanguage === language ? 'bg-[#E50914] text-white shadow-md' : 'text-[#A1A1AA] hover:text-white'}`}
+                >
+                  {language === 'vi' ? 'Tiếng Việt' : 'English'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5. Section 4: Copilot for Vplay */}
       {(matchesSearch('Copilot') ||
         matchesSearch('Trợ lý ảo') ||
         matchesSearch('Tên người dùng') ||
