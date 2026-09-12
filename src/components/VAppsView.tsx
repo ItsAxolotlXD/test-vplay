@@ -18,6 +18,8 @@ import {
   VCameraTab,
   VTicketTab,
   VWeatherTab,
+  VStocksTab,
+  VHealthTab,
 } from './vapps';
 import { VNotesView } from './VNotesView';
 import { MinecraftContainerEmulator } from './minecraft/MinecraftContainerEmulator';
@@ -42,6 +44,8 @@ import {
   Camera,
   Ticket,
   CloudSun,
+  TrendingUp,
+  HeartPulse,
   StickyNote,
   Armchair,
   Box,
@@ -75,6 +79,8 @@ export type VAppId =
   | 'v_camera'
   | 'v_ticket'
   | 'v_weather'
+  | 'v_stocks'
+  | 'v_health'
   | 'v_reminders'
   | 'v_notes'
   | 'v_furniture'
@@ -283,6 +289,32 @@ export const VAPPS_LIST: VAppDefinition[] = [
     tags: ['Thời Tiết', 'Dự Báo', 'Khí Tượng', 'Nhiệt Độ', 'AQI', 'Tia UV', 'Weather'],
   },
   {
+    id: 'v_stocks',
+    name: 'V-Stocks Market',
+    tagline: 'Theo Dõi Thị Trường',
+    description: 'Bảng giá mô phỏng, danh mục yêu thích và các chỉ số nổi bật giúp bạn theo dõi thị trường trong một giao diện trực quan.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Market',
+    gradientBg: 'bg-gradient-to-br from-[#0F766E] via-[#0891B2] to-[#1D4ED8]',
+    borderClass: 'border-[#67E8F9]/50 group-hover:border-[#67E8F9]',
+    glowClass: 'shadow-[0_10px_30px_rgba(8,145,178,0.35)]',
+    icon: TrendingUp,
+    tags: ['Stocks', 'Market', 'VN-Index', 'Danh Mục'],
+  },
+  {
+    id: 'v_health',
+    name: 'V-Health Care',
+    tagline: 'Sức Khỏe Mỗi Ngày',
+    description: 'Theo dõi thói quen vận động, giấc ngủ và các mục tiêu sức khỏe hằng ngày trong một trung tâm riêng tư, dễ sử dụng.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Wellness',
+    gradientBg: 'bg-gradient-to-br from-[#047857] via-[#059669] to-[#0F766E]',
+    borderClass: 'border-[#6EE7B7]/50 group-hover:border-[#6EE7B7]',
+    glowClass: 'shadow-[0_10px_30px_rgba(5,150,105,0.35)]',
+    icon: HeartPulse,
+    tags: ['Health', 'Wellness', 'Thói Quen', 'Sức Khỏe'],
+  },
+  {
     id: 'v_reminders',
     name: 'V-Reminders Alarm',
     tagline: 'Nhắc Việc & Hẹn Giờ',
@@ -453,6 +485,12 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       case 'v_weather':
         navigate('/v-weather');
         break;
+      case 'v_stocks':
+        navigate('/v-stocks');
+        break;
+      case 'v_health':
+        navigate('/v-health');
+        break;
       case 'v_reminders':
         navigate('/v-reminders');
         break;
@@ -536,7 +574,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
               <span>Cổng không gian (Space 360)</span>
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#E6005A]/20 text-[#FF4D8B]">
-                12 Ứng dụng
+                {VAPPS_LIST.length} Ứng dụng
               </span>
             </h1>
             <p className="text-xs sm:text-sm text-[#9CA3AF] mt-0.5">
@@ -728,8 +766,10 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
               {activeApp === 'v_gallery' && <VGalleryTab />}
               {activeApp === 'v_camera' && <VCameraTab />}
               {activeApp === 'v_ticket' && <VTicketTab />}
-              {activeApp === 'v_weather' && <VWeatherTab />}
-              {activeApp === 'v_reminders' && <VRemindersTab />}
+  {activeApp === 'v_weather' && <VWeatherTab />}
+  {activeApp === 'v_stocks' && <VStocksTab />}
+  {activeApp === 'v_health' && <VHealthTab />}
+  {activeApp === 'v_reminders' && <VRemindersTab />}
               {activeApp === 'v_notes' && <VNotesView />}
               {activeApp === 'v_furniture' && <VFurnitureTab />}
               {activeApp === 'v_minecraft' && <MinecraftContainerEmulator />}
