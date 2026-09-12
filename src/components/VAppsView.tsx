@@ -496,7 +496,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   const currentApp = VAPPS_LIST.find((a) => a.id === activeApp) || VAPPS_LIST[0];
 
   return (
-    <div id="waves-vapps-view" className="w-full max-w-5xl mx-auto pb-16 text-left select-none animate-in fade-in duration-300">
+    <div id="waves-vapps-view" className="w-full max-w-6xl mx-auto pb-16 text-left select-none animate-in fade-in duration-300">
       
       {/* 1. CATEGORY PILLS (Phù hợp với ngôn ngữ thiết kế của Chuyên Trang) */}
       <div className="w-full overflow-x-auto no-scrollbar pb-2 mb-6">
@@ -526,7 +526,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       {/* 2. SECTION HEADER (Tương tự Chuyên Trang) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 rounded-2xl bg-[#E6005A]/15 text-[#FF4D8B] ring-1 ring-[#E6005A]/30 flex items-center justify-center shrink-0 shadow-lg shadow-[#E6005A]/15">
             <Compass className="w-6 h-6" />
           </div>
           <div>
@@ -565,8 +565,8 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       </div>
 
       {/* 3. BẢNG BANNER TRÒN CỦA SPACE 360: MỖI DÒNG 4 ỨNG DỤNG (Banner tròn, có viền, màu gradient và iconography) */}
-      <div className="py-2 mb-10">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-9 sm:gap-y-12 gap-x-4 sm:gap-x-8 max-w-5xl mx-auto">
+      <div className="mb-10 rounded-[32px] border border-white/10 bg-[#14141B]/70 p-4 sm:p-7 shadow-2xl shadow-black/20">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 max-w-6xl mx-auto">
           {filteredApps.map((app) => {
             const isActive = activeApp === app.id;
             const AppIcon = app.icon;
