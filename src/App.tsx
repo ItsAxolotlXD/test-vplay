@@ -40,6 +40,8 @@ import {
   VCameraTab,
   VTicketTab,
   VWeatherTab,
+  VStockTab,
+  VHealthTab,
 } from './components/vapps';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
 import VplayVBoxTab from './components/VplayVBoxTab';
@@ -51,6 +53,7 @@ import { SearchTab } from './components/SearchTab';
 import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
 import VplayVertical from './components/VplayVertical';
+import { ArrowLeft } from 'lucide-react';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
 import { useSettings } from './hooks/useSettings';
@@ -160,10 +163,21 @@ export default function App() {
     try {
       localStorage.setItem('vplay_oobe_completed', 'true');
     } catch {}
-    updateSetting('userName', config.userName);
-    updateSetting('navigationMode', config.navStyle === 'floaty' ? 'topbar' : config.navStyle);
-    updateSetting('floatyBar', config.navStyle === 'floaty');
-    updateSetting('fontFamily', config.fontFamily);
+    if (config.userName) {
+      updateSetting('userName', config.userName);
+    }
+    if (config.navStyle === 'floaty') {
+      updateSetting('floatyBar', true);
+    } else if (config.navStyle === 'sidebar') {
+      updateSetting('navigationMode', 'sidebar');
+      updateSetting('floatyBar', false);
+    } else if (config.navStyle === 'topbar') {
+      updateSetting('navigationMode', 'topbar');
+      updateSetting('floatyBar', false);
+    }
+    if (config.fontFamily) {
+      updateSetting('fontFamily', config.fontFamily);
+    }
     setIsOobeOpen(false);
   };
 
@@ -291,6 +305,27 @@ export default function App() {
       return <Article slug={slug} navigate={navigate} />;
     }
 
+    const renderSpace360App = (title: string, component: React.ReactNode) => (
+      <div className="w-full max-w-6xl mx-auto space-y-4 pb-12 animate-in fade-in duration-200">
+        <div className="flex items-center justify-between px-2 pt-1 pb-1">
+          <button
+            onClick={() => navigate('/space-360')}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1E1E24] hover:bg-[#2A2A34] text-xs font-semibold text-[#A1A1AA] hover:text-white transition-all cursor-pointer border border-white/5 shadow-sm"
+            title="Quay lại Space 360"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-pink-400" />
+            <span>Trở về Space 360</span>
+          </button>
+          <div className="flex items-center gap-2 text-xs text-zinc-400">
+            <span className="text-zinc-500 hover:text-zinc-300 cursor-pointer" onClick={() => navigate('/space-360')}>Space 360</span>
+            <span className="text-zinc-600">/</span>
+            <span className="font-semibold text-white">{title}</span>
+          </div>
+        </div>
+        <div>{component}</div>
+      </div>
+    );
+
     switch (currentRoute) {
       case '/':
       case '/home':
@@ -375,67 +410,82 @@ export default function App() {
 
       case '/v-arcade':
       case '/v-games':
-        return <VArcadeTab initialGameId={routeState?.gameId || null} />;
+        return renderSpace360App('V-Games', <VArcadeTab initialGameId={routeState?.gameId || null} />);
 
       case '/v-files':
       case '/v-xplore':
-        return <VXploreTab />;
+        return renderSpace360App('V-Files', <VXploreTab />);
 
       case '/explore-vietnam':
-        return <ExploreVietnamTab />;
+        return renderSpace360App('Explore Vietnam', <ExploreVietnamTab onBack={() => navigate('/space-360')} />);
 
       case '/v-box':
-        return <VplayVBoxTab />;
+        return renderSpace360App('V-Box', <VplayVBoxTab onBack={() => navigate('/space-360')} />);
 
       case '/v-study':
       case '/v-learn':
-        return <VStudyTab />;
+        return renderSpace360App('V-Study', <VStudyTab onBack={() => navigate('/space-360')} />);
 
       case '/v-calc':
-        return <VCalcTab />;
+        return renderSpace360App('V-Calc', <VCalcTab />);
 
       case '/v-clock':
       case '/clock':
-        return <VClockTab />;
+        return renderSpace360App('V-Clock', <VClockTab />);
 
       case '/v-phone':
       case '/phone':
-        return <VPhoneTab />;
+        return renderSpace360App('V-Phone', <VPhoneTab />);
 
       case '/v-browser':
       case '/browser':
-        return <VBrowserTab />;
+        return renderSpace360App('V-Browser', <VBrowserTab />);
 
       case '/v-calendar':
       case '/calendar':
-        return <VCalendarTab />;
+        return renderSpace360App('Lịch Vạn Niên', <VCalendarTab />);
 
       case '/v-gallery':
       case '/gallery':
-        return <VGalleryTab />;
+        return renderSpace360App('V-Gallery', <VGalleryTab />);
 
       case '/v-camera':
       case '/camera':
-        return <VCameraTab />;
+        return renderSpace360App('V-Camera', <VCameraTab />);
 
       case '/v-ticket':
       case '/ticket':
       case '/dat-ve':
-        return <VTicketTab />;
+        return renderSpace360App('V-Ticket', <VTicketTab />);
 
       case '/v-weather':
       case '/weather':
       case '/thoi-tiet':
-        return <VWeatherTab />;
+        return renderSpace360App('V-Weather', <VWeatherTab />);
 
       case '/v-reminders':
-        return <VRemindersTab />;
+        return renderSpace360App('V-Reminders', <VRemindersTab />);
 
       case '/v-notes':
-        return <VNotesView />;
+        return renderSpace360App('V-Notes', <VNotesView />);
 
       case '/v-furniture':
-        return <VFurnitureTab />;
+        return renderSpace360App('V-Furniture', <VFurnitureTab />);
+
+      case '/v-stock':
+      case '/stock':
+        return renderSpace360App('V-Stock', <VStockTab />);
+
+      case '/v-health':
+      case '/health':
+        return renderSpace360App('V-Health', <VHealthTab />);
+
+      case '/minecraft':
+      case '/minecraft-gui':
+      case '/minecraft-container':
+      case '/mc-container':
+      case '/minecraft-chest':
+        return renderSpace360App('Minecraft', <MinecraftContainerEmulator />);
 
       case '/v-space':
       case '/v-apps':
@@ -511,18 +561,6 @@ export default function App() {
             initialTab={routeState?.tab || 'safe-area'}
             onSelectChannel={setCurrentChannel}
             navigate={navigate}
-          />
-        );
-
-      case '/minecraft':
-      case '/minecraft-gui':
-      case '/minecraft-container':
-      case '/mc-container':
-      case '/minecraft-chest':
-        return (
-          <VAppsView
-            navigate={navigate}
-            initialAppId="v_minecraft"
           />
         );
 
@@ -680,6 +718,8 @@ export default function App() {
         onClose={() => setIsOobeOpen(false)}
         onComplete={handleCompleteOobe}
         initialName={settings.userName}
+        initialNavStyle={settings.floatyBar ? 'floaty' : settings.navigationMode === 'sidebar' ? 'sidebar' : 'topbar'}
+        initialFontFamily={settings.fontFamily}
       />
 
       {/* Startup / Refresh Welcome Modal */}

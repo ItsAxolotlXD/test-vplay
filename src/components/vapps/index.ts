@@ -17,5 +17,5 @@ export { VGalleryTab } from "./VGalleryTab";
 export { VCameraTab } from "./VCameraTab";
 export { VTicketTab } from "./VTicketTab";
 export { VWeatherTab } from "./VWeatherTab";
-export { VStocksTab } from "./VStocksTab";
+export { VStockTab } from "./VStockTab";
 export { VHealthTab } from "./VHealthTab";

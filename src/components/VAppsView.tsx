@@ -1,31 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useMemo } from 'react';
 import { playPopSound } from '../utils/sound';
-import ExploreVietnamTab from './ExploreVietnamTab';
-import VplayVBoxTab from './VplayVBoxTab';
-import VStudyTab from './VStudyTab';
-import {
-  VArcadeTab,
-  VCalcTab,
-  VRemindersTab,
-  VXploreTab,
-  VFurnitureTab,
-  VClockTab,
-  VPhoneTab,
-  VBrowserTab,
-  VCalendarTab,
-  VGalleryTab,
-  VCameraTab,
-  VTicketTab,
-  VWeatherTab,
-  VStocksTab,
-  VHealthTab,
-} from './vapps';
-import { VNotesView } from './VNotesView';
-import { MinecraftContainerEmulator } from './minecraft/MinecraftContainerEmulator';
-import { VFlowTab } from './vflow/VFlowTab';
-import { ChatRoomView } from './chat/ChatRoomView';
-import { useLang } from '../context/LanguageContext';
 import {
   Compass,
   Sparkles,
@@ -44,8 +18,6 @@ import {
   Camera,
   Ticket,
   CloudSun,
-  TrendingUp,
-  HeartPulse,
   StickyNote,
   Armchair,
   Box,
@@ -53,14 +25,9 @@ import {
   MessageSquare,
   Search,
   X,
-  ChevronRight,
   ArrowRight,
-  CheckCircle2,
-  Maximize2,
-  LayoutGrid,
-  Sparkle,
-  Layers,
-  ArrowUp,
+  TrendingUp,
+  Activity,
   LucideIcon
 } from 'lucide-react';
 
@@ -79,14 +46,14 @@ export type VAppId =
   | 'v_camera'
   | 'v_ticket'
   | 'v_weather'
-  | 'v_stocks'
-  | 'v_health'
   | 'v_reminders'
   | 'v_notes'
   | 'v_furniture'
   | 'v_minecraft'
   | 'v_flow'
-  | 'v_chat';
+  | 'v_chat'
+  | 'v_stock'
+  | 'v_health';
 
 export interface VAppDefinition {
   id: VAppId;
@@ -106,7 +73,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   // Hàng 1 (4 ứng dụng)
   {
     id: 'v_arcade',
-    name: 'V-Games Arcade',
+    name: 'V-Games',
     tagline: 'Vòng Quay & Mini Games',
     description: 'Vòng Quay May Mắn Wheels of Fortune, Cờ Caro XO, Oẳn Tù Tì đối kháng, Nối Từ TV & EN, Đếm Số và Rắn Săn Mồi cổ điển.',
     category: 'Trò chơi (Arcade)',
@@ -115,11 +82,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FF5E7E]/50 group-hover:border-[#FF5E7E]',
     glowClass: 'shadow-[0_10px_30px_rgba(255,0,122,0.35)]',
     icon: Gamepad2,
-    tags: ['Wheels of Fortune', 'Vòng Quay May Mắn', 'Caro XO', 'Rắn Săn Mồi'],
+    tags: ['Wheels of Fortune', 'Vòng Quay May Mắn', 'Caro XO', 'Rắn Săn Mồi', 'V-Games', 'Arcade'],
   },
   {
     id: 'v_xplore',
-    name: 'V-Files Explorer',
+    name: 'V-Files',
     tagline: 'Quản Lý Tệp Ore UI',
     description: 'Quản lý tệp đa năng phong cách Windows Explorer, xem trước media, phát danh sách phát M3U8 và sao lưu dữ liệu đám mây V-Cloud.',
     category: 'Tiện ích & Tệp tin',
@@ -128,11 +95,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#818CF8]/50 group-hover:border-[#818CF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(67,56,202,0.35)]',
     icon: Folder,
-    tags: ['File Manager', 'M3U8 Playlists', 'V-Cloud Backup'],
+    tags: ['File Manager', 'M3U8 Playlists', 'V-Cloud Backup', 'V-Files', 'Explorer'],
   },
   {
     id: 'explore_vietnam',
-    name: 'Explore Vietnam 360',
+    name: 'Explore Vietnam',
     tagline: 'Khám Phá 63 Tỉnh Thành',
     description: 'Bản đồ tương tác 63 tỉnh thành Việt Nam, tra cứu danh lam thắng cảnh, ẩm thực đặc sản, văn hóa truyền thống và thông tin địa lý.',
     category: 'Học tập & Văn hóa',
@@ -141,11 +108,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FB7185]/50 group-hover:border-[#FB7185]',
     glowClass: 'shadow-[0_10px_30px_rgba(225,29,72,0.35)]',
     icon: MapPin,
-    tags: ['63 Tỉnh Thành', 'Ẩm Thực', 'Danh Lam Thắng Cảnh'],
+    tags: ['63 Tỉnh Thành', 'Ẩm Thực', 'Danh Lam Thắng Cảnh', 'Explore Vietnam'],
   },
   {
     id: 'v_box',
-    name: 'V-Box Media Player',
+    name: 'V-Box',
     tagline: 'Kho Video & Truyền Hình',
     description: 'Bộ sưu tập video giải trí đặc sắc, các clip phát lại chất lượng cao, luồng phát sóng chọn lọc và tin tức tổng hợp.',
     category: 'Giải trí & Media',
@@ -154,13 +121,13 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FBBF24]/50 group-hover:border-[#FBBF24]',
     glowClass: 'shadow-[0_10px_30px_rgba(245,158,11,0.35)]',
     icon: Tv,
-    tags: ['Video Clip', 'Phát Lại', 'Giải Trí HD'],
+    tags: ['Video Clip', 'Phát Lại', 'Giải Trí HD', 'V-Box'],
   },
 
   // Hàng 2 (4 ứng dụng)
   {
     id: 'v_learn',
-    name: 'V-Study Pomodoro',
+    name: 'V-Study',
     tagline: 'Flashcard & Tập Trung',
     description: 'Công cụ hỗ trợ học tập đắc lực: Đồng hồ đếm ngược Pomodoro tập trung sâu, quản lý bộ thẻ Flashcard và theo dõi tiến độ mục tiêu.',
     category: 'Học tập & Văn hóa',
@@ -169,11 +136,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(2,132,199,0.35)]',
     icon: GraduationCap,
-    tags: ['Pomodoro', 'Flashcards', 'Ghi Nhớ'],
+    tags: ['Pomodoro', 'Flashcards', 'Ghi Nhớ', 'V-Study'],
   },
   {
     id: 'v_calc',
-    name: 'V-Calc Express',
+    name: 'V-Calc',
     tagline: 'Máy Tính Biểu Thức',
     description: 'Máy tính bỏ túi khoa học hỗ trợ tính toán biểu thức phức tạp, lưu lịch sử phép tính và quy đổi đơn vị đo lường linh hoạt.',
     category: 'Tiện ích & Tệp tin',
@@ -182,11 +149,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#2DD4BF]/50 group-hover:border-[#2DD4BF]',
     glowClass: 'shadow-[0_10px_30px_rgba(13,148,136,0.35)]',
     icon: Calculator,
-    tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi Đơn Vị'],
+    tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi Đơn Vị', 'V-Calc'],
   },
   {
     id: 'v_clock',
-    name: 'Đồng Hồ V-Clock',
+    name: 'V-Clock',
     tagline: 'Báo Thức • Đếm Giờ • Giờ Quốc Tế',
     description: 'Báo thức thông minh đa năng, bấm giờ thể thao từng vòng, hẹn giờ đếm ngược và tra cứu giờ chuẩn quốc tế hơn 30 quốc gia.',
     category: 'Tiện ích & Tệp tin',
@@ -199,7 +166,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   },
   {
     id: 'v_phone',
-    name: 'Điện Thoại V-Phone',
+    name: 'V-Phone',
     tagline: 'Bàn Phím & Danh Bạ',
     description: 'Bàn phím gọi số với hiệu ứng âm thanh DTMF chân thực, danh bạ liên hệ cá nhân và các đầu số cứu hộ khẩn cấp quốc gia 113, 114, 115.',
     category: 'Tiện ích & Tệp tin',
@@ -212,7 +179,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   },
   {
     id: 'v_browser',
-    name: 'Trình Duyệt V-Browser',
+    name: 'V-Browser',
     tagline: 'Duyệt Web & Tin Tức',
     description: 'Trình duyệt web tích hợp đa tab, điểm báo điện tử 24/7, tra cứu bách khoa toàn thư Wikipedia và cổng tin tức truyền hình.',
     category: 'Tiện ích & Tệp tin',
@@ -221,11 +188,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(2,132,199,0.35)]',
     icon: Globe,
-    tags: ['Trình Duyệt', 'Browser', 'Duyệt Web', 'Wikipedia', 'Tin Tức', 'VnExpress', 'VTV'],
+    tags: ['Trình Duyệt', 'Browser', 'Duyệt Web', 'Wikipedia', 'Tin Tức', 'VnExpress', 'VTV', 'V-Browser'],
   },
   {
     id: 'v_calendar',
-    name: 'Lịch Vạn Niên 360',
+    name: 'Lịch Vạn Niên',
     tagline: 'Âm Dương Lịch & Sự Kiện',
     description: 'Lịch Vạn Niên song song Âm - Dương lịch, tra cứu ngày hoàng đạo, các ngày Lễ Tết truyền thống Việt Nam và quản lý sự kiện.',
     category: 'Học tập & Văn hóa',
@@ -238,7 +205,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   },
   {
     id: 'v_gallery',
-    name: 'Thư Viện V-Gallery',
+    name: 'V-Gallery',
     tagline: 'Kho Ảnh 4K & Album',
     description: 'Bộ sưu tập ảnh danh thắng Việt Nam, hậu trường trường quay truyền hình, trình chiếu slideshow toàn màn hình và lưu trữ ảnh cá nhân.',
     category: 'Giải trí & Media',
@@ -247,11 +214,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#A78BFA]/50 group-hover:border-[#A78BFA]',
     glowClass: 'shadow-[0_10px_30px_rgba(124,58,237,0.35)]',
     icon: ImageIcon,
-    tags: ['Thư Viện', 'Kho Ảnh', 'Album', 'Danh Thắng', 'Gallery', 'Hậu Trường', '4K'],
+    tags: ['Thư Viện', 'Kho Ảnh', 'Album', 'Danh Thắng', 'Gallery', 'Hậu Trường', '4K', 'V-Gallery'],
   },
   {
     id: 'v_camera',
-    name: 'Máy Ảnh V-Camera',
+    name: 'V-Camera',
     tagline: 'Chụp Ảnh & Bộ Lọc',
     description: 'Chụp ảnh trực tiếp từ webcam hoặc trường quay ảo, bộ lọc nghệ thuật Vintage, Cyberpunk, TV Scanlines và hẹn giờ tự động.',
     category: 'Giải trí & Media',
@@ -260,11 +227,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#F472B6]/50 group-hover:border-[#F472B6]',
     glowClass: 'shadow-[0_10px_30px_rgba(192,38,211,0.35)]',
     icon: Camera,
-    tags: ['Camera', 'Máy Ảnh', 'Chụp Ảnh', 'Bộ Lọc', 'Webcam', 'Vintage', 'Scanlines'],
+    tags: ['Camera', 'Máy Ảnh', 'Chụp Ảnh', 'Bộ Lọc', 'Webcam', 'Vintage', 'Scanlines', 'V-Camera'],
   },
   {
     id: 'v_ticket',
-    name: 'Đặt Vé V-Ticket',
+    name: 'V-Ticket',
     tagline: 'Vé Phim, Concert & TV',
     description: 'Hệ thống đặt vé xem phim chiếu rạp, đại nhạc hội Liveshow, vé khán giả trường quay VTV và vé tàu du lịch với mã QR điện tử.',
     category: 'Giải trí & Media',
@@ -273,11 +240,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FBBF24]/50 group-hover:border-[#FBBF24]',
     glowClass: 'shadow-[0_10px_30px_rgba(217,119,6,0.35)]',
     icon: Ticket,
-    tags: ['Đặt Vé', 'Vé Xem Phim', 'Concert', 'Liveshow', 'Vé TV Show', 'QR Code', 'Ticket'],
+    tags: ['Đặt Vé', 'Vé Xem Phim', 'Concert', 'Liveshow', 'Vé TV Show', 'QR Code', 'Ticket', 'V-Ticket'],
   },
   {
     id: 'v_weather',
-    name: 'Thời Tiết V-Weather',
+    name: 'V-Weather',
     tagline: 'Dự Báo & Khí Tượng 360',
     description: 'Dự báo thời tiết chi tiết 63 tỉnh thành Việt Nam, nhiệt độ theo giờ, chất lượng không khí AQI, chỉ số UV và dự báo 7 ngày.',
     category: 'Tiện ích & Tệp tin',
@@ -286,37 +253,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(14,165,233,0.35)]',
     icon: CloudSun,
-    tags: ['Thời Tiết', 'Dự Báo', 'Khí Tượng', 'Nhiệt Độ', 'AQI', 'Tia UV', 'Weather'],
-  },
-  {
-    id: 'v_stocks',
-    name: 'V-Stocks Market',
-    tagline: 'Theo Dõi Thị Trường',
-    description: 'Bảng giá mô phỏng, danh mục yêu thích và các chỉ số nổi bật giúp bạn theo dõi thị trường trong một giao diện trực quan.',
-    category: 'Tiện ích & Tệp tin',
-    badge: 'Market',
-    gradientBg: 'bg-gradient-to-br from-[#0F766E] via-[#0891B2] to-[#1D4ED8]',
-    borderClass: 'border-[#67E8F9]/50 group-hover:border-[#67E8F9]',
-    glowClass: 'shadow-[0_10px_30px_rgba(8,145,178,0.35)]',
-    icon: TrendingUp,
-    tags: ['Stocks', 'Market', 'VN-Index', 'Danh Mục'],
-  },
-  {
-    id: 'v_health',
-    name: 'V-Health Care',
-    tagline: 'Sức Khỏe Mỗi Ngày',
-    description: 'Theo dõi thói quen vận động, giấc ngủ và các mục tiêu sức khỏe hằng ngày trong một trung tâm riêng tư, dễ sử dụng.',
-    category: 'Tiện ích & Tệp tin',
-    badge: 'Wellness',
-    gradientBg: 'bg-gradient-to-br from-[#047857] via-[#059669] to-[#0F766E]',
-    borderClass: 'border-[#6EE7B7]/50 group-hover:border-[#6EE7B7]',
-    glowClass: 'shadow-[0_10px_30px_rgba(5,150,105,0.35)]',
-    icon: HeartPulse,
-    tags: ['Health', 'Wellness', 'Thói Quen', 'Sức Khỏe'],
+    tags: ['Thời Tiết', 'Dự Báo', 'Khí Tượng', 'Nhiệt Độ', 'AQI', 'Tia UV', 'Weather', 'V-Weather'],
   },
   {
     id: 'v_reminders',
-    name: 'V-Reminders Alarm',
+    name: 'V-Reminders',
     tagline: 'Nhắc Việc & Hẹn Giờ',
     description: 'Lên lịch nhắc nhở đón xem chương trình truyền hình yêu thích, các công việc quan trọng kèm chuông báo âm thanh cảnh báo sống động.',
     category: 'Tiện ích & Tệp tin',
@@ -325,11 +266,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FB923C]/50 group-hover:border-[#FB923C]',
     glowClass: 'shadow-[0_10px_30px_rgba(234,88,12,0.35)]',
     icon: Bell,
-    tags: ['Chuông Báo', 'Lịch Xem TV', 'Task Alert'],
+    tags: ['Chuông Báo', 'Lịch Xem TV', 'Task Alert', 'V-Reminders'],
   },
   {
     id: 'v_notes',
-    name: 'V-Notes Smart',
+    name: 'V-Notes',
     tagline: 'Sticky Notes Thông Minh',
     description: 'Soạn thảo văn bản ghi chú với hệ thống dán nhãn màu sắc phong phú, quản lý dạng thẻ Sticky Notes và tìm kiếm thông minh.',
     category: 'Tiện ích & Tệp tin',
@@ -338,13 +279,13 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FDE047]/50 group-hover:border-[#FDE047]',
     glowClass: 'shadow-[0_10px_30px_rgba(234,179,8,0.35)]',
     icon: StickyNote,
-    tags: ['Ghi Chú Nhanh', 'Sticky Notes', 'Đồng Bộ'],
+    tags: ['Ghi Chú Nhanh', 'Sticky Notes', 'Đồng Bộ', 'V-Notes'],
   },
 
   // Hàng 3 (4 ứng dụng)
   {
     id: 'v_furniture',
-    name: 'V-Furniture 3D',
+    name: 'V-Furniture',
     tagline: 'Bài Trí Phòng Khách TV',
     description: 'Trải nghiệm không gian nội thất phòng xem truyền hình, tùy biến ánh sáng, sofa thư giãn và bài trí rạp hát tại gia.',
     category: 'Tiện ích & Tệp tin',
@@ -353,11 +294,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#A3E635]/50 group-hover:border-[#A3E635]',
     glowClass: 'shadow-[0_10px_30px_rgba(101,163,13,0.35)]',
     icon: Armchair,
-    tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn'],
+    tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn', 'V-Furniture'],
   },
   {
     id: 'v_minecraft',
-    name: 'Minecraft Container',
+    name: 'Minecraft',
     tagline: 'Mô Phỏng Rương Đồ Pixel Art',
     description: 'Trải nghiệm rương chứa đồ Chest, Double Chest, Ender Chest, Shulker Box, Hopper và Lò nung với âm thanh Web Audio chân thực.',
     category: 'Trò chơi (Arcade)',
@@ -366,11 +307,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#34D399]/50 group-hover:border-[#34D399]',
     glowClass: 'shadow-[0_10px_30px_rgba(5,150,105,0.35)]',
     icon: Box,
-    tags: ['Minecraft Chest', 'Container GUI', 'Pixel Art', 'Inventory'],
+    tags: ['Minecraft Chest', 'Container GUI', 'Pixel Art', 'Inventory', 'Minecraft'],
   },
   {
     id: 'v_flow',
-    name: 'Cổng kết nối V-Flow',
+    name: 'V-Flow',
     tagline: 'Mạng Xã Hội & Radio Live',
     description: 'Không gian tương tác trực tiếp cộng đồng Vplay, phát thanh radio, chia sẻ cảm nghĩ và dòng thời gian cập nhật liên tục.',
     category: 'Giải trí & Media',
@@ -383,7 +324,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   },
   {
     id: 'v_chat',
-    name: 'Cổng trò chuyện V-Chat',
+    name: 'V-Chat',
     tagline: 'Phòng Chat Trực Tiếp',
     description: 'Phòng trò chuyện trực tuyến, giao lưu kết nối bạn bè xem truyền hình trên toàn quốc với biểu tượng cảm xúc phong phú.',
     category: 'Giải trí & Media',
@@ -393,6 +334,32 @@ export const VAPPS_LIST: VAppDefinition[] = [
     glowClass: 'shadow-[0_10px_30px_rgba(219,39,119,0.35)]',
     icon: MessageSquare,
     tags: ['V-Chat', 'Phòng Chat', 'Cộng Đồng', 'Kết Nối'],
+  },
+  {
+    id: 'v_stock',
+    name: 'V-Stock',
+    tagline: 'Chứng Khoán & Đầu Tư',
+    description: 'Bảng giá chứng khoán trực tuyến VN-Index, HNX, UPCoM, biểu đồ kỹ thuật hình nến, phân tích kỹ thuật và quản lý danh mục đầu tư.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Tài Chính',
+    gradientBg: 'bg-gradient-to-br from-[#10B981] via-[#059669] to-[#047857]',
+    borderClass: 'border-[#34D399]/50 group-hover:border-[#34D399]',
+    glowClass: 'shadow-[0_10px_30px_rgba(16,185,129,0.35)]',
+    icon: TrendingUp,
+    tags: ['V-Stock', 'Chứng Khoán', 'VN-Index', 'Tài Chính', 'Cổ Phiếu', 'Đầu Tư'],
+  },
+  {
+    id: 'v_health',
+    name: 'V-Health',
+    tagline: 'Sức Khỏe & Thể Chất',
+    description: 'Theo dõi chỉ số sức khỏe BMI, huyết áp, nhịp tim, nhắc nhở uống nước, vận động thể chất và thư viện bài tập thể dục tại nhà.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Sức Khỏe',
+    gradientBg: 'bg-gradient-to-br from-[#EC4899] via-[#E11D48] to-[#BE123C]',
+    borderClass: 'border-[#FB7185]/50 group-hover:border-[#FB7185]',
+    glowClass: 'shadow-[0_10px_30px_rgba(236,72,153,0.35)]',
+    icon: Activity,
+    tags: ['V-Health', 'Sức Khỏe', 'BMI', 'Nhịp Tim', 'Uống Nước', 'Y Tế'],
   },
 ];
 
@@ -407,121 +374,101 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   selectedGameId = null,
   navigate,
 }) => {
-  const [activeApp, setActiveApp] = useState<VAppId>(initialAppId);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [searchQuery, setSearchQuery] = useState('');
-  const { t } = useLang();
-
-  // Sync activeApp when initialAppId changes
-  useEffect(() => {
-    if (initialAppId) {
-      setActiveApp(initialAppId);
-    }
-  }, [initialAppId]);
 
   const categories = [
-    { id: 'all', label: t('space360.all', 'Tất cả') },
-    { id: 'games', label: t('space360.games', 'Trò chơi (Arcade)') },
-    { id: 'utilities', label: t('space360.utilities', 'Tiện ích & Tệp tin') },
-    { id: 'learning', label: t('space360.learning', 'Học tập & Văn hóa') },
-    { id: 'media', label: t('space360.media', 'Giải trí & Media') },
-    { id: 'open', label: t('space360.open', 'Đang mở') }
+    'Tất cả',
+    'Trò chơi (Arcade)',
+    'Tiện ích & Tệp tin',
+    'Học tập & Văn hóa',
+    'Giải trí & Media'
   ];
-
-  const handleSelectApp = (appId: VAppId) => {
-    playPopSound();
-    setActiveApp(appId);
-    // Smooth scroll to execution container
-    setTimeout(() => {
-      const container = document.getElementById('active-app-execution-container');
-      if (container) {
-        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 50);
-  };
 
   const handleOpenDedicatedTab = (appId: VAppId) => {
     if (!navigate) return;
     switch (appId) {
       case 'v_arcade':
-        navigate('/v-arcade');
+        navigate('/v-arcade', { appId: 'v_arcade', gameId: selectedGameId });
         break;
       case 'v_xplore':
-        navigate('/v-files');
+        navigate('/v-files', { appId: 'v_xplore' });
         break;
       case 'explore_vietnam':
-        navigate('/explore-vietnam');
+        navigate('/explore-vietnam', { appId: 'explore_vietnam' });
         break;
       case 'v_box':
-        navigate('/v-box');
+        navigate('/v-box', { appId: 'v_box' });
         break;
       case 'v_learn':
-        navigate('/v-study');
+        navigate('/v-study', { appId: 'v_learn' });
         break;
       case 'v_calc':
-        navigate('/v-calc');
+        navigate('/v-calc', { appId: 'v_calc' });
         break;
       case 'v_clock':
-        navigate('/v-clock');
+        navigate('/v-clock', { appId: 'v_clock' });
         break;
       case 'v_phone':
-        navigate('/v-phone');
+        navigate('/v-phone', { appId: 'v_phone' });
         break;
       case 'v_browser':
-        navigate('/v-browser');
+        navigate('/v-browser', { appId: 'v_browser' });
         break;
       case 'v_calendar':
-        navigate('/v-calendar');
+        navigate('/v-calendar', { appId: 'v_calendar' });
         break;
       case 'v_gallery':
-        navigate('/v-gallery');
+        navigate('/v-gallery', { appId: 'v_gallery' });
         break;
       case 'v_camera':
-        navigate('/v-camera');
+        navigate('/v-camera', { appId: 'v_camera' });
         break;
       case 'v_ticket':
-        navigate('/v-ticket');
+        navigate('/v-ticket', { appId: 'v_ticket' });
         break;
       case 'v_weather':
-        navigate('/v-weather');
-        break;
-      case 'v_stocks':
-        navigate('/v-stocks');
-        break;
-      case 'v_health':
-        navigate('/v-health');
+        navigate('/v-weather', { appId: 'v_weather' });
         break;
       case 'v_reminders':
-        navigate('/v-reminders');
+        navigate('/v-reminders', { appId: 'v_reminders' });
         break;
       case 'v_notes':
-        navigate('/v-notes');
+        navigate('/v-notes', { appId: 'v_notes' });
         break;
       case 'v_furniture':
-        navigate('/v-furniture');
+        navigate('/v-furniture', { appId: 'v_furniture' });
         break;
       case 'v_minecraft':
-        navigate('/minecraft');
+        navigate('/minecraft', { appId: 'v_minecraft' });
         break;
       case 'v_flow':
-        navigate('/v-flow');
+        navigate('/v-flow', { appId: 'v_flow' });
         break;
       case 'v_chat':
-        navigate('/chat');
+        navigate('/chat', { appId: 'v_chat' });
+        break;
+      case 'v_stock':
+        navigate('/v-stock', { appId: 'v_stock' });
+        break;
+      case 'v_health':
+        navigate('/v-health', { appId: 'v_health' });
         break;
       default:
         navigate('/space-360');
     }
   };
 
+  const handleSelectApp = (appId: VAppId) => {
+    playPopSound();
+    handleOpenDedicatedTab(appId);
+  };
+
   const filteredApps = useMemo(() => {
     return VAPPS_LIST.filter((app) => {
       let matchCat = true;
-      const selectedCategoryLabel = categories.find((category) => category.id === selectedCategory)?.label;
-      if (selectedCategory === 'open') {
-        matchCat = app.id === activeApp;
-      } else if (selectedCategory !== 'all') {
-        matchCat = app.category === selectedCategoryLabel;
+      if (selectedCategory !== 'Tất cả') {
+        matchCat = app.category === selectedCategory;
       }
 
       const matchSearch =
@@ -532,24 +479,22 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
 
       return matchCat && matchSearch;
     });
-  }, [selectedCategory, searchQuery, activeApp]);
-
-  const currentApp = VAPPS_LIST.find((a) => a.id === activeApp) || VAPPS_LIST[0];
+  }, [selectedCategory, searchQuery]);
 
   return (
-    <div id="waves-vapps-view" className="w-full max-w-6xl mx-auto pb-16 text-left select-none animate-in fade-in duration-300">
+    <div id="waves-vapps-view" className="w-full max-w-5xl mx-auto pb-16 text-left select-none animate-in fade-in duration-300">
       
-      {/* 1. CATEGORY PILLS (Phù hợp với ngôn ngữ thiết kế của Chuyên Trang) */}
+      {/* 1. CATEGORY PILLS */}
       <div className="w-full overflow-x-auto no-scrollbar pb-2 mb-6">
         <div className="flex items-center gap-2 min-w-max">
           {categories.map((cat) => {
-            const isSelected = selectedCategory === cat.id;
+            const isSelected = selectedCategory === cat;
             return (
               <button
-                key={cat.id}
+                key={cat}
                 onClick={() => {
                   playPopSound();
-                  setSelectedCategory(cat.id);
+                  setSelectedCategory(cat);
                 }}
                 className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border-0 ${
                   isSelected
@@ -557,17 +502,17 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
                     : 'bg-[#1E1E24] text-[#A1A1AA] hover:text-white hover:bg-[#2A2A34]'
                 }`}
               >
-                {cat.label}
+                {cat}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 2. SECTION HEADER (Tương tự Chuyên Trang) */}
+      {/* 2. SECTION HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-[#E6005A]/15 text-[#FF4D8B] ring-1 ring-[#E6005A]/30 flex items-center justify-center shrink-0 shadow-lg shadow-[#E6005A]/15">
+          <div className="w-10 h-10 rounded-2xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center shrink-0">
             <Compass className="w-6 h-6" />
           </div>
           <div>
@@ -578,7 +523,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
               </span>
             </h1>
             <p className="text-xs sm:text-sm text-[#9CA3AF] mt-0.5">
-              Hệ sinh thái mini-apps và công cụ tương tác: Game Arcade, Quản lý tệp, Bản đồ 63 tỉnh thành, Pomodoro, Minecraft...
+              Hệ sinh thái ứng dụng và tiện ích tương tác: V-Games, V-Files, Explore Vietnam, V-Study, Minecraft...
             </p>
           </div>
         </div>
@@ -605,11 +550,10 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         </div>
       </div>
 
-      {/* 3. BẢNG BANNER TRÒN CỦA SPACE 360: MỖI DÒNG 4 ỨNG DỤNG (Banner tròn, có viền, màu gradient và iconography) */}
-      <div className="mb-10 rounded-[32px] border border-white/10 bg-[#14141B]/70 p-4 sm:p-7 shadow-2xl shadow-black/20">
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 max-w-6xl mx-auto">
+      {/* 3. BẢNG BANNER TRÒN CỦA SPACE 360: MỖI DÒNG 4 ỨNG DỤNG */}
+      <div className="py-2 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-9 sm:gap-y-12 gap-x-4 sm:gap-x-8 max-w-5xl mx-auto">
           {filteredApps.map((app) => {
-            const isActive = activeApp === app.id;
             const AppIcon = app.icon;
 
             return (
@@ -621,11 +565,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
               >
                 {/* Circular Banner: tròn, có viền, màu gradient và iconography của ứng dụng */}
                 <div
-                  className={`w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full relative flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-108 group-active:scale-95 ${app.gradientBg} border-2 sm:border-[3px] ${
-                    isActive
-                      ? 'border-white ring-4 ring-[#FF4081]/70 shadow-[0_0_32px_rgba(255,64,129,0.65)] scale-105'
-                      : `${app.borderClass} ${app.glowClass}`
-                  }`}
+                  className={`w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full relative flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-108 group-active:scale-95 ${app.gradientBg} border-2 sm:border-[3px] ${app.borderClass} ${app.glowClass}`}
                 >
                   {/* Subtle glossy top sheen reflection */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 via-transparent to-black/35 pointer-events-none" />
@@ -648,19 +588,18 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
                     </span>
                   )}
 
-                  {/* Active Indicator Pulse Dot */}
-                  {isActive && (
-                    <div className="absolute bottom-2.5 inset-x-0 flex justify-center pointer-events-none z-20">
-                      <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-white shadow-[0_0_8px_white] animate-pulse" />
-                    </div>
-                  )}
+                  {/* Launch indicator on hover */}
+                  <div className="absolute bottom-2.5 inset-x-0 flex justify-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-1 group-hover:translate-y-0 pointer-events-none z-20">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/95 text-zinc-900 shadow-md flex items-center gap-1">
+                      <span>Mở tab</span>
+                      <ArrowRight className="w-2.5 h-2.5" />
+                    </span>
+                  </div>
                 </div>
 
                 {/* Title underneath */}
                 <span
-                  className={`mt-3 sm:mt-4 text-sm sm:text-base font-bold transition-colors text-center tracking-tight ${
-                    isActive ? 'text-[#FF4081]' : 'text-white/90 group-hover:text-[#FF4081]'
-                  }`}
+                  className="mt-3 sm:mt-4 text-sm sm:text-base font-bold transition-colors text-center tracking-tight text-white/90 group-hover:text-[#FF4081]"
                 >
                   {app.name}
                 </span>
@@ -680,105 +619,16 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
             <button
               onClick={() => {
                 setSearchQuery('');
-                setSelectedCategory('all');
+                setSelectedCategory('Tất cả');
               }}
-              className="mt-3 px-4 py-1.5 rounded-full bg-[#E6005A] text-white text-xs font-bold"
+              className="mt-3 px-4 py-1.5 rounded-full bg-[#E6005A] text-white text-xs font-bold cursor-pointer"
             >
               Xem tất cả ứng dụng
             </button>
           </div>
         )}
       </div>
-
-      {/* 4. KHUNG TRẢI NGHIỆM ỨNG DỤNG ĐANG CHỌN (ACTIVE APP EXECUTION ENGINE) */}
-      <div 
-        id="active-app-execution-container" 
-        className={`overflow-hidden shadow-2xl bg-[#18191C] border-0 transition-all ${
-          activeApp === 'v_minecraft' ? 'rounded-none' : 'rounded-3xl'
-        }`}
-      >
-        {/* App Top Toolbar */}
-        <div className="px-6 py-4 bg-[#1E1E24] flex items-center justify-between border-0">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 ${currentApp.gradientBg} border border-white/25 shadow-md flex items-center justify-center text-white ${
-              activeApp === 'v_minecraft' ? 'rounded-none' : 'rounded-2xl'
-            }`}>
-              <currentApp.icon className="w-5 h-5 text-white drop-shadow" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <span>{currentApp.name}</span>
-                <span className="text-[10px] font-bold text-emerald-400 px-2.5 py-0.5 bg-emerald-500/10 rounded-full">
-                  {currentApp.badge}
-                </span>
-              </h3>
-              <p className="text-xs text-[#9CA3AF]">{currentApp.tagline}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                const el = document.getElementById('waves-vapps-view');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="px-3 py-1.5 bg-[#2A2A35] hover:bg-[#3A3A48] text-white text-xs font-semibold rounded-full transition-all cursor-pointer flex items-center gap-1.5"
-              title="Cuộn lên danh sách ứng dụng Space 360"
-            >
-              <ArrowUp className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Danh sách</span>
-            </button>
-
-            {navigate && (
-              <button
-                onClick={() => handleOpenDedicatedTab(activeApp)}
-                className="px-3.5 py-1.5 bg-[#E6005A] hover:bg-[#FF206E] text-white text-xs font-bold rounded-full transition-all cursor-pointer flex items-center gap-1.5 shadow-md"
-                title="Mở toàn màn hình / Tab riêng"
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-                <span>Toàn màn hình</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Dynamic App Renderer */}
-        <div className="p-4 sm:p-6 min-h-[550px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeApp}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="w-full"
-            >
-              {activeApp === 'v_arcade' && <VArcadeTab initialGameId={selectedGameId} />}
-              {activeApp === 'v_xplore' && <VXploreTab />}
-              {activeApp === 'explore_vietnam' && <ExploreVietnamTab />}
-              {activeApp === 'v_box' && <VplayVBoxTab />}
-              {activeApp === 'v_learn' && <VStudyTab />}
-              {activeApp === 'v_calc' && <VCalcTab />}
-              {activeApp === 'v_clock' && <VClockTab />}
-              {activeApp === 'v_phone' && <VPhoneTab />}
-              {activeApp === 'v_browser' && <VBrowserTab />}
-              {activeApp === 'v_calendar' && <VCalendarTab />}
-              {activeApp === 'v_gallery' && <VGalleryTab />}
-              {activeApp === 'v_camera' && <VCameraTab />}
-              {activeApp === 'v_ticket' && <VTicketTab />}
-  {activeApp === 'v_weather' && <VWeatherTab />}
-  {activeApp === 'v_stocks' && <VStocksTab />}
-  {activeApp === 'v_health' && <VHealthTab />}
-  {activeApp === 'v_reminders' && <VRemindersTab />}
-              {activeApp === 'v_notes' && <VNotesView />}
-              {activeApp === 'v_furniture' && <VFurnitureTab />}
-              {activeApp === 'v_minecraft' && <MinecraftContainerEmulator />}
-              {activeApp === 'v_flow' && <VFlowTab navigate={navigate || (() => {})} />}
-              {activeApp === 'v_chat' && <ChatRoomView />}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
     </div>
   );
 };
+
