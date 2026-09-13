@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { 
   Flag, 
   Search, 
@@ -19,7 +20,9 @@ import {
   FileJson,
   Filter,
   Flame,
-  ShieldCheck
+  ShieldCheck,
+  Play,
+  Activity
 } from 'lucide-react';
 import { 
   useFeatureFlags, 
@@ -28,6 +31,7 @@ import {
   FlagBadge, 
   FeatureFlagItem 
 } from '../hooks/useFeatureFlags';
+import { playPopSound, playWinSound } from '../utils/sound';
 
 interface FeatureFlagsProps {
   navigate?: (route: string) => void;
@@ -439,6 +443,64 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
                   <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
                     {item.description}
                   </p>
+
+                  {/* SPECIAL INTERACTIVE MOTION SANDBOX FOR ANIMATION TEST */}
+                  {item.key === 'animation_test' && (
+                    <div className="mt-4 p-4 rounded-2xl bg-[#131218] border border-white/10 space-y-3.5 select-none">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FF267A] to-purple-400 flex items-center gap-1.5 uppercase tracking-wider">
+                          <Sparkles className="w-3.5 h-3.5 text-[#FF267A]" />
+                          <span>Khu Vực Thử Nghiệm Hoạt Ảnh Trực Tiếp</span>
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono">
+                          60 FPS Spring
+                        </span>
+                      </div>
+
+                      {/* Interactive Sandbox Elements */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        {/* 1. Interactive Spring Drag Ball */}
+                        <div className="p-3 rounded-xl bg-[#1A1922] border border-white/5 flex flex-col items-center justify-center min-h-[90px] relative overflow-hidden">
+                          <p className="text-[10px] text-zinc-400 mb-1 font-mono">Kéo hoặc thả quả cầu đàn hồi:</p>
+                          <motion.div
+                            drag
+                            dragConstraints={{ left: -40, right: 40, top: -20, bottom: 20 }}
+                            dragElastic={0.4}
+                            whileHover={{ scale: 1.25 }}
+                            whileTap={{ scale: 0.9 }}
+                            onDragStart={() => playPopSound()}
+                            onDragEnd={() => playWinSound()}
+                            className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#FF267A] to-[#C83DFF] shadow-lg shadow-[#FF267A]/40 flex items-center justify-center cursor-grab active:cursor-grabbing"
+                          >
+                            <Sparkles className="w-4 h-4 text-white" />
+                          </motion.div>
+                        </div>
+
+                        {/* 2. Interactive 3D Hover & Pulse Card */}
+                        <motion.div
+                          whileHover={{ scale: 1.05, rotateZ: 2 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            playPopSound();
+                            showToast('✨ Hiệu ứng nảy đàn hồi (Spring Motion) kích hoạt!');
+                          }}
+                          className="p-3 rounded-xl bg-gradient-to-br from-purple-900/30 to-rose-900/30 border border-[#FF267A]/30 flex flex-col items-center justify-center min-h-[90px] cursor-pointer text-center group"
+                        >
+                          <motion.div
+                            animate={{ scale: [1, 1.15, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="w-7 h-7 rounded-xl bg-[#FF267A]/20 text-[#FF267A] flex items-center justify-center mb-1"
+                          >
+                            <Zap className="w-4 h-4" />
+                          </motion.div>
+                          <p className="text-xs font-bold text-white group-hover:text-[#FF267A] transition-colors">
+                            Nhấp để thử nảy (Bounce)
+                          </p>
+                          <p className="text-[10px] text-zinc-400 font-mono">Tap feedback & Sound</p>
+                        </motion.div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Footer status row */}

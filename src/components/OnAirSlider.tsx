@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Play, Radio, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Radio } from 'lucide-react';
 import { Channel } from '../types';
 
 interface OnAirSliderProps {
@@ -17,7 +17,7 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const offset = direction === 'left' ? -350 : 350;
+      const offset = direction === 'left' ? -360 : 360;
       scrollContainerRef.current.scrollBy({ left: offset, behavior: 'smooth' });
     }
   };
@@ -27,26 +27,24 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
       {/* Header with Title & Slider Controls */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#FF2020] animate-ping" />
-          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
-            Đang phát sóng
+          <span className="w-1.5 h-5 bg-[#FF2020] rounded-full shrink-0" />
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            <span>Đang phát sóng</span>
+            <span className="text-sm font-semibold text-[#8E8B99]">({channels.length})</span>
           </h2>
-          <span className="text-xs text-[#8E8E93] font-medium hidden sm:inline-block">
-            (Chương trình trực tiếp theo thời gian thực)
-          </span>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => scroll('left')}
-            className="w-8 h-8 rounded-full bg-[#222226] hover:bg-[#2F2F36] border border-[#34343C] flex items-center justify-center text-[#A1A1AA] hover:text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-[#222226] hover:bg-[#2F2F36] border border-[#34343C] flex items-center justify-center text-[#A1A1AA] hover:text-white transition-colors cursor-pointer"
             aria-label="Cuộn sang trái"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-8 h-8 rounded-full bg-[#222226] hover:bg-[#2F2F36] border border-[#34343C] flex items-center justify-center text-[#A1A1AA] hover:text-white transition-colors"
+            className="w-8 h-8 rounded-full bg-[#222226] hover:bg-[#2F2F36] border border-[#34343C] flex items-center justify-center text-[#A1A1AA] hover:text-white transition-colors cursor-pointer"
             aria-label="Cuộn sang phải"
           >
             <ChevronRight className="w-4 h-4" />
@@ -54,72 +52,44 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
         </div>
       </div>
 
-      {/* Horizontal Cards Scroll */}
+      {/* Horizontal Cards Scroll - giống các ô kênh trong tab truyền hình (thu nhỏ gọn gàng) */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth"
+        className="flex gap-2 sm:gap-2.5 overflow-x-auto pb-2 no-scrollbar scroll-smooth"
       >
-        {channels.map((ch) => (
-          <div
-            key={ch.id}
-            onClick={() => {
-              onSelectChannel(ch);
-              navigate(`/live-tv?channel=${ch.slug}`);
-            }}
-            className="min-w-[260px] sm:min-w-[290px] rounded-[22px] bg-[#22171E] hover:bg-[#2A1B25] transition-all p-3.5 cursor-pointer group shadow-lg flex flex-col justify-between border-0"
-          >
-            {/* Top row: Channel Logo + Live badge */}
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#170E13] flex items-center justify-center p-1 overflow-hidden border-0">
-                  <img
-                    src={ch.logo}
-                    alt={ch.name}
-                    referrerPolicy="no-referrer"
-                    className="max-w-full max-h-full object-contain channel-logo-img filter drop-shadow"
-                    style={{ imageRendering: '-webkit-optimize-contrast' }}
-                  />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-white group-hover:text-[#FF3366] transition-colors truncate block">
-                    {ch.shortName || ch.name}
-                  </span>
-                  <span className="text-[10px] text-[#A1959C]">{ch.category}</span>
-                </div>
-              </div>
+        {channels.map((ch) => {
+          const isVtv2 = ch.id === 'vtv2' || ch.slug === 'vtv2' || ch.name.toLowerCase() === 'vtv2';
 
-              <span className="px-2 py-0.5 rounded-full bg-[#FF2020]/25 text-[#FF6666] text-[9px] font-extrabold flex items-center gap-1 border-0">
-                <Radio className="w-2.5 h-2.5 animate-pulse" />
-                <span>LIVE</span>
+          return (
+            <button
+              key={ch.id}
+              id={`onair-channel-${ch.id}`}
+              onClick={() => {
+                onSelectChannel(ch);
+                navigate(`/live-tv?channel=${ch.slug}`);
+              }}
+              className="w-24 sm:w-28 h-13 sm:h-15 rounded-xl p-1.5 flex flex-col items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-2 border-transparent hover:border-white/40 active:border-white shrink-0 shadow-md"
+              title={`${ch.name} - ${ch.currentProgram?.title || 'Đang phát sóng'}`}
+            >
+              {/* Channel Logo */}
+              <img
+                src={ch.logo}
+                alt={ch.name}
+                className={`object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none ${
+                  isVtv2
+                    ? 'h-6 sm:h-7 w-auto max-w-[78%]'
+                    : 'h-8 sm:h-9 w-auto max-w-[88%]'
+                }`}
+                referrerPolicy="no-referrer"
+              />
+
+              {/* Subtle Live pulse dot */}
+              <span className="absolute top-1 right-1.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               </span>
-            </div>
-
-            {/* Program Title & Description */}
-            <div className="mb-3">
-              <h4 className="text-sm font-bold text-white group-hover:text-[#C83DFF] transition-colors line-clamp-1">
-                {ch.currentProgram?.title}
-              </h4>
-              <p className="text-xs text-[#9CA3AF] line-clamp-2 mt-1 leading-relaxed">
-                {ch.currentProgram?.description}
-              </p>
-            </div>
-
-            {/* Progress Bar & Time */}
-            <div className="pt-2 border-t border-[#2A2A30]">
-              <div className="flex items-center justify-between text-[10px] text-[#8E8E93] mb-1 font-mono">
-                <span>{ch.currentProgram?.startTime}</span>
-                <span className="text-white font-semibold">{ch.currentProgram?.progress}% đã phát</span>
-                <span>{ch.currentProgram?.endTime}</span>
-              </div>
-              <div className="w-full bg-[#2A2A32] h-1.5 rounded-full overflow-hidden">
-                <div
-                  className="bg-gradient-to-r from-[#FF2020] to-[#C83DFF] h-full rounded-full"
-                  style={{ width: `${ch.currentProgram?.progress || 50}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </section>
   );

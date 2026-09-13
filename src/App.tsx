@@ -59,10 +59,13 @@ import { Channel } from './types';
 import { useSettings } from './hooks/useSettings';
 import { useFavorites } from './hooks/useFavorites';
 import { useFeatureFlags } from './hooks/useFeatureFlags';
+import { motion, AnimatePresence } from 'motion/react';
+import { MotionEffectsLayer } from './components/motion/MotionEffectsLayer';
 
 export default function App() {
   const { settings, updateSetting } = useSettings();
-  const { flags } = useFeatureFlags();
+  const { flags, toggleFlag } = useFeatureFlags();
+  const isAnimationTest = flags.animation_test !== false;
   const isFloatyMode = Boolean(settings.floatyBar);
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
@@ -626,7 +629,14 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen bg-[#1B0912] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative">
+    <div className={`min-h-screen bg-[#1B0912] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
+      {/* Background Ambient Motion Orbs & Floating Controller */}
+      <MotionEffectsLayer
+        isEnabled={isAnimationTest}
+        onToggle={() => toggleFlag('animation_test')}
+        navigate={navigate}
+      />
+
       {/* Sidebar Navigation: Only rendered when Floaty bar is disabled */}
       {!isFloatyMode && (
         <Sidebar
@@ -643,7 +653,7 @@ export default function App() {
       )}
 
       {/* Main App Container */}
-      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 ${
+      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 relative z-10 ${
         isFloatyMode
           ? 'pl-0 pb-28 sm:pb-32'
           : isTopBarMode
@@ -668,13 +678,28 @@ export default function App() {
           </div>
         )}
 
-        {/* Dynamic Page Content with smooth fade */}
-        <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out ${
+        {/* Dynamic Page Content with smooth motion fade & spring transition */}
+        <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out relative z-10 ${
           currentRoute === '/' || currentRoute === '/home' 
             ? 'p-0 max-w-none' 
             : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
         }`}>
-          {renderContent()}
+          {isAnimationTest ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentRoute}
+                initial={{ opacity: 0, y: 12, scale: 0.99 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.99 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full h-full"
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
+          ) : (
+            renderContent()
+          )}
         </main>
       </div>
 

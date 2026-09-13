@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { 
   Tv, 
   Megaphone, 
@@ -12,6 +13,7 @@ import {
   Flag,
   Radio
 } from 'lucide-react';
+import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
 interface BottomDockProps {
   currentRoute: string;
@@ -24,6 +26,9 @@ export const BottomDock: React.FC<BottomDockProps> = ({
   navigate,
   onOpenSearch
 }) => {
+  const { flags } = useFeatureFlags();
+  const isAnimationTest = flags.animation_test !== false;
+
   const isActive = (path: string) => {
     if (path === '/') return currentRoute === '/' || currentRoute === '/home';
     if (path === '/vertical') return currentRoute === '/vertical' || currentRoute === '/shorts' || currentRoute === '/vplay-vertical';
@@ -44,12 +49,19 @@ export const BottomDock: React.FC<BottomDockProps> = ({
 
   return (
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 select-none">
-      <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-[#1E1D24]/95 dark:bg-[#1E1D24]/95 backdrop-blur-xl border border-[#34343E] shadow-2xl">
+      <motion.div 
+        animate={isAnimationTest ? { y: [0, -2, 0] } : undefined}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        className="flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-[#1E1D24]/95 dark:bg-[#1E1D24]/95 backdrop-blur-xl border border-[#34343E] shadow-2xl"
+      >
         {/* Spotlight Search button */}
-        <button
+        <motion.button
           id="dock-spotlight-btn"
           onClick={onOpenSearch}
           title="Spotlight Search (⌘K)"
+          whileHover={isAnimationTest ? { scale: 1.22, y: -6 } : undefined}
+          whileTap={isAnimationTest ? { scale: 0.92 } : undefined}
+          transition={{ type: 'spring', stiffness: 450, damping: 18 }}
           className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 ${
             currentRoute === '/search' || currentRoute === '/spotlight'
               ? 'bg-[#E50914] text-white shadow-lg shadow-[#E50914]/30'
@@ -57,7 +69,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
           }`}
         >
           <Search className="w-5.5 h-5.5" />
-        </button>
+        </motion.button>
 
         <div className="w-[1px] h-6 bg-[#3E3E4A] my-auto mx-1" />
 
@@ -67,11 +79,14 @@ export const BottomDock: React.FC<BottomDockProps> = ({
           const Icon = item.icon;
 
           return (
-            <button
+            <motion.button
               key={item.id}
               id={item.id}
               onClick={() => navigate(item.route)}
               title={item.label}
+              whileHover={isAnimationTest ? { scale: 1.24, y: -6 } : undefined}
+              whileTap={isAnimationTest ? { scale: 0.9 } : undefined}
+              transition={{ type: 'spring', stiffness: 450, damping: 18 }}
               className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 ${
                 active 
                   ? 'bg-[#E50914] text-white shadow-lg shadow-[#E50914]/30' 
@@ -93,10 +108,10 @@ export const BottomDock: React.FC<BottomDockProps> = ({
               ) : Icon ? (
                 <Icon className="w-6 h-6 shrink-0" />
               ) : null}
-            </button>
+            </motion.button>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 };

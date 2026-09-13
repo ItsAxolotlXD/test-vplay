@@ -16,6 +16,15 @@ export interface FeatureFlagItem {
 
 export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
   {
+    id: 'flag_animation_test',
+    key: 'animation_test',
+    name: 'Animation Test',
+    description: 'Thêm thật nhiều animation và motion mượt mà vào toàn bộ ứng dụng: hiệu ứng chuyển trang đàn hồi (Page Transitions), các khối sáng lơ lửng chuyển động nền (Ambient Orbs), tương tác spring phóng to thu nhỏ trên thẻ & nút bấm, macOS dock magnification, và bảng điều khiển Motion Sandbox trực tiếp.',
+    category: 'ui',
+    badge: 'EXPERIMENTAL',
+    defaultValue: true,
+  },
+  {
     id: 'flag_voice_search_integration',
     key: 'voice_search_integration',
     name: 'Voice Search Integration',

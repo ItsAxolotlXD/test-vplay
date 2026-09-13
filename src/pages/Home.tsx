@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { OnAirSlider } from '../components/OnAirSlider';
-import { ChannelCard } from '../components/ChannelCard';
 import { NewsCard } from '../components/NewsCard';
 import { CHANNELS_DATA } from '../data/channels';
 import { NEWS_DATA } from '../data/news';
 import { Channel, NewsArticle } from '../types';
-import { Tv, Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers } from 'lucide-react';
+import { Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers } from 'lucide-react';
 import { PortalsCircularSection } from '../components/PortalsCircularSection';
 
 interface HomeProps {
@@ -20,14 +19,6 @@ export const Home: React.FC<HomeProps> = ({
   onSelectChannel,
   channels
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
-
-  const categories = ['Tất cả', ...Array.from(new Set(channels.map((c) => c.category)))];
-
-  const filteredChannels = selectedCategory === 'Tất cả'
-    ? channels
-    : channels.filter((c) => c.category === selectedCategory);
-
   const featuredArticle = NEWS_DATA[0];
   const otherArticles = NEWS_DATA.slice(1, 4);
 
@@ -40,15 +31,23 @@ export const Home: React.FC<HomeProps> = ({
       />
 
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-12">
-        {/* 2. Chuyên trang banner tròn */}
-        <section className="relative overflow-hidden rounded-[32px] bg-gradient-to-b from-[#1C1A24] via-[#181620] to-[#14131A] p-6 sm:p-10 md:p-12 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
+        {/* 2. Đang phát sóng (On Air Section) - Chuyển lên đầu, trên các chuyên trang */}
+        <OnAirSlider
+          channels={channels}
+          onSelectChannel={onSelectChannel}
+          navigate={navigate}
+        />
+
+        {/* 3. Chuyên trang banner tròn - Dạng scroll ngang giống các ô kênh, bỏ nền */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-[#E6005A]" />
+              <div className="w-8 h-8 rounded-xl bg-[#E6005A]/15 text-[#E6005A] flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-[#E6005A]" />
               </div>
-              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-white">
-                Chuyên trang
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                <span>Chuyên trang</span>
+                <span className="text-xs sm:text-sm font-semibold text-[#8E8B99]">(Vuốt ngang để khám phá)</span>
               </h2>
             </div>
 
@@ -67,10 +66,11 @@ export const Home: React.FC<HomeProps> = ({
               navigate('/search', { portal: portalId });
             }}
             showSectionHeader={false}
+            variant="scroll"
           />
         </section>
 
-        {/* 3. Copilot is coming to Vplay - Featured Banner Thumbnail */}
+        {/* 4. Copilot is coming to Vplay - Featured Banner Thumbnail */}
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-[#1A1A20] via-[#241C2B] to-[#1A1A20] border border-[#3E344A] p-6 sm:p-8 shadow-xl">
           <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#E6005A]/20 to-[#A800FF]/15 blur-3xl pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 sm:gap-8 justify-between">
@@ -141,55 +141,84 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </section>
 
-        {/* 3. Đang phát sóng (On Air Section) */}
-        <OnAirSlider
-          channels={channels}
-          onSelectChannel={onSelectChannel}
-          navigate={navigate}
-        />
-
-        {/* 3. Kênh truyền hình - Đề xuất cho bạn (Channels Grid) */}
+        {/* Placeholder Category 1: khối ngang - cấp 2 */}
         <section className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                <Tv className="w-6 h-6 text-[#FF2020]" />
-                <span>Đề xuất cho bạn</span>
-              </h2>
-              <p className="text-xs text-[#A1959C] mt-0.5">
-                Các kênh truyền hình trực tuyến được tuyển chọn và đề xuất theo sở thích của bạn
-              </p>
-            </div>
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+            khối ngang - cấp 2
+          </h2>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border-0 ${
-                    selectedCategory === cat
-                      ? 'bg-gradient-to-r from-[#FF2020] to-[#E6005A] text-white shadow-md'
-                      : 'bg-[#251821] text-[#A1959C] hover:text-white hover:bg-[#311F2B]'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+          <div className="flex gap-3.5 sm:gap-4 overflow-x-auto pb-3 no-scrollbar scroll-smooth">
+            {[
+              { id: 'block-1', title: 'Spotlight khối chứa khối' },
+              { id: 'block-2', title: 'khối chứa nd 2' },
+              { id: 'block-3', title: 'khối banner' },
+              { id: 'block-4', title: 'khối chứa VOD' },
+              { id: 'block-5', title: 'KHỐI CHỨA NHÓM KÊNH 2' },
+            ].map((item) => (
+              <div
+                key={item.id}
+                className="w-52 sm:w-64 h-28 sm:h-32 shrink-0 rounded-2xl bg-gradient-to-b from-[#1b4698] via-[#163a82] to-[#10275c] border border-[#2753a7]/50 shadow-lg shadow-blue-950/30 flex items-center justify-center p-4 text-center cursor-pointer hover:scale-[1.02] hover:border-blue-400/60 hover:brightness-110 transition-all group"
+              >
+                <span className="text-sm sm:text-base font-bold text-white leading-snug group-hover:text-blue-100">
+                  {item.title}
+                </span>
+              </div>
+            ))}
           </div>
+        </section>
 
-          {/* Channel Cards Grid - Compact and responsive */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {filteredChannels.map((channel) => (
-              <ChannelCard
-                key={channel.id}
-                channel={channel}
-                onSelect={(ch) => {
-                  onSelectChannel(ch);
-                  navigate(`/live-tv?channel=${ch.slug}`);
-                }}
-              />
+        {/* Placeholder Category 2: khối chứa khối 3 */}
+        <section className="space-y-4">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+            khối chứa khối 3
+          </h2>
+
+          <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 no-scrollbar scroll-smooth items-start">
+            {[
+              {
+                id: 'circle-1',
+                innerLines: ['Spotlight', 'khối chứ...'],
+                label: 'Spotlight khối chứa khối',
+              },
+              {
+                id: 'circle-2',
+                innerLines: ['khối chứa', 'nd 2'],
+                label: 'khối chứa nd 2',
+              },
+              {
+                id: 'circle-3',
+                innerLines: ['khối', 'banner'],
+                label: 'khối banner',
+              },
+              {
+                id: 'circle-4',
+                innerLines: ['khối chứa', 'VOD'],
+                label: 'khối chứa VOD',
+              },
+              {
+                id: 'circle-5',
+                innerLines: ['KHỐI', 'CHỨA...'],
+                label: 'KHỐI CHỨA NHÓM KÊNH 2',
+              },
+            ].map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col items-center text-center cursor-pointer group shrink-0 w-32 sm:w-36"
+              >
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-b from-[#1b4698] via-[#163a82] to-[#10275c] border border-[#2753a7]/50 shadow-lg shadow-blue-950/30 flex flex-col items-center justify-center p-3 transition-all duration-200 group-hover:scale-105 group-hover:border-blue-400/60 group-hover:brightness-110">
+                  {item.innerLines.map((line, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs sm:text-sm font-bold text-white leading-tight"
+                    >
+                      {line}
+                    </span>
+                  ))}
+                </div>
+                <span className="mt-2.5 text-xs sm:text-sm font-semibold text-white leading-snug max-w-[130px] group-hover:text-blue-200 transition-colors">
+                  {item.label}
+                </span>
+              </div>
             ))}
           </div>
         </section>

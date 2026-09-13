@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { playPopSound } from '../utils/sound';
-import { VplayPrimaryButton } from './ui/VplayPrimaryButton';
-import { VplaySecondaryButton } from './ui/VplaySecondaryButton';
-import { VplayInputBox } from './ui/VplayInputBox';
-import { VplayTab } from './ui/VplayTab';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   StickyNote,
   Plus,
@@ -14,17 +10,31 @@ import {
   Copy,
   Check,
   Download,
-  Tag,
-  Calendar,
+  RotateCcw,
   Sparkles,
   FileText,
-  RotateCcw,
-  ListFilter,
-  Eye,
-  Folder,
-  HardDrive,
   X,
+  Layers,
+  Calendar,
+  Flame,
+  Zap,
+  Award,
+  BookOpen,
+  BookOpenCheck,
+  Clock,
+  ArrowLeft,
+  CheckCircle2,
+  Tag,
+  Palette,
+  ExternalLink,
+  ChevronRight,
+  Filter,
+  Eye,
+  SlidersHorizontal,
+  Bookmark,
+  Share2
 } from 'lucide-react';
+import { playPopSound, playWinSound } from '../utils/sound';
 
 export interface NoteItem {
   id: string;
@@ -32,50 +42,128 @@ export interface NoteItem {
   content: string;
   category: string;
   isPinned: boolean;
-  colorTag: 'emerald' | 'redstone' | 'lapis' | 'gold' | 'diamond';
+  colorTag: 'rose' | 'emerald' | 'sky' | 'amber' | 'purple';
   createdAt: string;
   updatedAt: string;
+  tags?: string[];
+  readTime?: string;
 }
 
-const COLOR_MAP: Record<NoteItem['colorTag'], { bg: string; border: string; text: string; label: string }> = {
-  emerald: { bg: 'bg-[#28960b]', border: 'border-[#89dc69]', text: 'text-[#89dc69]', label: 'Emerald' },
-  redstone: { bg: 'bg-[#b91c1c]', border: 'border-[#f87171]', text: 'text-[#f87171]', label: 'Redstone' },
-  lapis: { bg: 'bg-[#1d4ed8]', border: 'border-[#60a5fa]', text: 'text-[#60a5fa]', label: 'Lapis' },
-  gold: { bg: 'bg-[#b45309]', border: 'border-[#fbbf24]', text: 'text-[#fbbf24]', label: 'Gold' },
-  diamond: { bg: 'bg-[#0f766e]', border: 'border-[#2dd4bf]', text: 'text-[#2dd4bf]', label: 'Diamond' },
+const COLOR_MAP: Record<
+  NoteItem['colorTag'],
+  {
+    bg: string;
+    border: string;
+    text: string;
+    dot: string;
+    badge: string;
+    label: string;
+    accent: string;
+  }
+> = {
+  amber: {
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/30',
+    text: 'text-amber-400',
+    dot: 'bg-amber-400',
+    badge: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    label: 'Hoàng Kim (Học tập)',
+    accent: 'from-amber-500 to-yellow-500'
+  },
+  rose: {
+    bg: 'bg-rose-500/10',
+    border: 'border-rose-500/30',
+    text: 'text-rose-400',
+    dot: 'bg-[#E6005A]',
+    badge: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+    label: 'Hồng Đỏ (Quan trọng)',
+    accent: 'from-rose-500 to-red-600'
+  },
+  emerald: {
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/30',
+    text: 'text-emerald-400',
+    dot: 'bg-emerald-400',
+    badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+    label: 'Lục Bảo (Khoa học)',
+    accent: 'from-emerald-500 to-teal-500'
+  },
+  sky: {
+    bg: 'bg-sky-500/10',
+    border: 'border-sky-500/30',
+    text: 'text-sky-400',
+    dot: 'bg-sky-400',
+    badge: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
+    label: 'Lam Ngọc (Công nghệ)',
+    accent: 'from-sky-500 to-blue-600'
+  },
+  purple: {
+    bg: 'bg-purple-500/10',
+    border: 'border-purple-500/30',
+    text: 'text-purple-400',
+    dot: 'bg-purple-400',
+    badge: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+    label: 'Thạch Anh (Ý tưởng)',
+    accent: 'from-purple-500 to-indigo-600'
+  }
 };
 
 const DEFAULT_NOTES: NoteItem[] = [
   {
     id: 'note-1',
-    title: '📌 Mẹo xem Vplay TV mượt mà (Ore UI)',
-    content: `1. Sử dụng trình duyệt Chrome/Edge để có hiệu suất tốt nhất.\n2. Bật chế độ Fullscreen (F11 hoặc nút Toàn màn hình) để trải nghiệm giao diện Minecraft Ore UI trọn vẹn.\n3. Nếu gặp lỗi đơ kênh, bạn có thể vào Cài Đặt -> Đổi chất lượng hoặc chọn lại kênh.\n4. Sử dụng phím tắt Mũi tên (Arrow keys) hoặc Bàn phím ảo để di chuyển con trỏ chuột.`,
-    category: 'Vplay Guide',
+    title: 'Công thức Toán THPT Quốc Gia & Mẹo tính nhanh Casio',
+    content: `1. Đạo hàm hàm phân thức bậc 1 / bậc 1: y = (ax+b)/(cx+d) => y' = (ad - bc) / (cx+d)^2.\n2. Cực trị hàm bậc 3: Điều kiện có 2 điểm cực trị khi delta' > 0.\n3. Phương pháp đổi biến số & từng phần trong Tích phân: u.dv = uv - int(vdu).\n4. Mẹo giải nhanh hình không gian Oxyz: Viết phương trình mặt phẳng bằng tích có hướng 2 vecto chỉ phương.`,
+    category: 'Toán Học',
     isPinned: true,
-    colorTag: 'emerald',
-    createdAt: new Date().toLocaleDateString('vi-VN'),
-    updatedAt: new Date().toLocaleDateString('vi-VN'),
+    colorTag: 'amber',
+    createdAt: '12/09/2026',
+    updatedAt: '13/09/2026',
+    tags: ['Toán 12', 'Ôn Thi', 'Casio']
   },
   {
     id: 'note-2',
-    title: '📺 Danh sách link M3U8 mẫu',
-    content: `#EXTM3U\n#EXTINF:-1 group-title="VTV",VTV1 HD\nhttps://vtv1-hd.vtv.vn/index.m3u8\n#EXTINF:-1 group-title="THỂ THAO",VTV6 HD\nhttps://vtv6-hd.vtv.vn/index.m3u8`,
-    category: 'M3U Links',
+    title: 'Tổng hợp từ vựng Tiếng Anh CEFR B2 & Cấu trúc viết luận',
+    content: `• In addition to / Moreover / Furthermore: Hơn nữa, ngoài ra\n• Consequently / As a result / Hence: Kết quả là\n• On the one hand / On the other hand: Một mặt thì / Mặt khác thì\n• Crucial / Vital / Imperative: Cực kỳ quan trọng\n• Substantial / Remarkable: Đáng kể, rõ rệt\n* Chú ý: Tránh dùng từ lặp lại trong phần Conclusion.`,
+    category: 'Tiếng Anh',
     isPinned: true,
-    colorTag: 'diamond',
-    createdAt: new Date().toLocaleDateString('vi-VN'),
-    updatedAt: new Date().toLocaleDateString('vi-VN'),
+    colorTag: 'sky',
+    createdAt: '10/09/2026',
+    updatedAt: '13/09/2026',
+    tags: ['IELTS', 'CEFR B2', 'Writing']
   },
   {
     id: 'note-3',
-    title: '🎮 Thiết kế Ore UI Theme Notes',
-    content: `- Bảng màu chủ đạo: Dark Charcoal (#2a2c2e, #141414)\n- Màu viền Accent: Light Emerald (#89dc69)\n- Hiệu ứng nút bấm: Pixelated inset shadow [2px 2px]\n- Bàn phím ảo & chuột ảo di động hỗ trợ D-Pad`,
-    category: 'Ore UI',
+    title: 'Sơ đồ tư duy Lịch Sử & Địa Lý thi Tốt nghiệp 2026',
+    content: `- Chiến dịch Điện Biên Phủ 1954: 56 ngày đêm khoét núi ngủ hầm mưa dầm cơm vắt.\n- Hiệp định Giơ-ne-vơ 1954 về Đông Dương: Công nhận độc lập chủ quyền của 3 nước.\n- Địa lý: Các vùng kinh tế trọng điểm Bắc Bộ, Trung Bộ và Nam Bộ.\n- Xu hướng chuyển dịch cơ cấu ngành kinh tế: Giảm Nông nghiệp, tăng Dịch vụ và Công nghiệp.`,
+    category: 'Khoa Học Xã Hội',
     isPinned: false,
-    colorTag: 'gold',
-    createdAt: new Date().toLocaleDateString('vi-VN'),
-    updatedAt: new Date().toLocaleDateString('vi-VN'),
+    colorTag: 'rose',
+    createdAt: '08/09/2026',
+    updatedAt: '11/09/2026',
+    tags: ['Lịch Sử', 'Địa Lý', 'Mindmap']
   },
+  {
+    id: 'note-4',
+    title: 'Danh sách luồng phát trực tuyến M3U8 & Tài liệu Vplay',
+    content: `#EXTM3U\n#EXTINF:-1 group-title="VTV",VTV1 HD Tin Tức Thời Sự\nhttps://vtv1-hd.vtv.vn/index.m3u8\n#EXTINF:-1 group-title="V-STUDY",Kênh Bài Giảng Trực Tuyến Quốc Gia\nhttps://edu.vtv.vn/stream/live.m3u8\n#EXTINF:-1 group-title="VOV",VOV3 Music Live Stream\nhttps://live.vov.vn/vov3.m3u8`,
+    category: 'Link M3U8',
+    isPinned: false,
+    colorTag: 'emerald',
+    createdAt: '05/09/2026',
+    updatedAt: '09/09/2026',
+    tags: ['M3U8', 'Vplay', 'Streaming']
+  },
+  {
+    id: 'note-5',
+    title: 'Kế hoạch ôn luyện V-Study Pomodoro & Mục tiêu điểm số',
+    content: `- Mỗi ngày hoàn thành tối thiểu 4 phiên Pomodoro 25 phút.\n- Giải 1 đề Siêu Tổng Hợp 100 câu vào tối thứ 7 hàng tuần.\n- Duy trì chuỗi Streak học liên tục để đạt huy hiệu Thủ Khoa V-Study.\n- Ghi lại các câu sai vào sổ tay này để ôn tập lại vào cuối tuần.`,
+    category: 'Kế Hoạch Học',
+    isPinned: false,
+    colorTag: 'purple',
+    createdAt: '01/09/2026',
+    updatedAt: '05/09/2026',
+    tags: ['Pomodoro', 'Mục Tiêu', 'Streak']
+  }
 ];
 
 const LOCAL_STORAGE_KEY = 'vplay_vnotes_items_v1';
@@ -85,7 +173,8 @@ export const VNotesView: React.FC = () => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {
       console.error('Failed to load notes from localStorage', e);
@@ -93,20 +182,16 @@ export const VNotesView: React.FC = () => {
     return DEFAULT_NOTES;
   });
 
-  const [activeCategory, setActiveCategory] = useState<string>('Tất cả');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(notes[0]?.id || null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [copiedId, setCopiedId] = useState<boolean>(false);
+  // V-Study style active tabs
+  const [activeTab, setActiveTab] = useState<'all' | 'pinned' | 'stuck' | 'create'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const [selectedColorTag, setSelectedColorTag] = useState<string | null>(null);
 
-  // Context Menu state
-  const [contextMenu, setContextMenu] = useState<{
-    x: number;
-    y: number;
-    note: NoteItem;
-  } | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Floating sticky note ids (screen pinned)
+  // Floating screen stuck notes
   const [stuckIds, setStuckIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('vnotes_stuck_ids');
@@ -115,23 +200,15 @@ export const VNotesView: React.FC = () => {
     return [];
   });
 
-  // Toast notification
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // Editor / Composer State
+  const [editingNote, setEditingNote] = useState<NoteItem | null>(null);
+  const [noteTitle, setNoteTitle] = useState<string>('');
+  const [noteContent, setNoteContent] = useState<string>('');
+  const [noteCategory, setNoteCategory] = useState<string>('Toán Học');
+  const [noteColorTag, setNoteColorTag] = useState<NoteItem['colorTag']>('amber');
+  const [noteIsPinned, setNoteIsPinned] = useState<boolean>(false);
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((prev) => (prev === msg ? null : prev));
-    }, 3200);
-  };
-
-  // Form state for current selected/edited note
-  const [editTitle, setEditTitle] = useState<string>('');
-  const [editContent, setEditContent] = useState<string>('');
-  const [editCategory, setEditCategory] = useState<string>('Ghi chú');
-  const [editColorTag, setEditColorTag] = useState<NoteItem['colorTag']>('emerald');
-
-  // Save to LocalStorage
+  // Sync to local storage
   useEffect(() => {
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
@@ -157,738 +234,794 @@ export const VNotesView: React.FC = () => {
     };
   }, []);
 
-  // Click outside to dismiss context menu
-  useEffect(() => {
-    const handleClickOutside = () => setContextMenu(null);
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setContextMenu(null);
-    };
-    if (contextMenu) {
-      window.addEventListener('click', handleClickOutside);
-      window.addEventListener('contextmenu', handleClickOutside);
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      window.removeEventListener('click', handleClickOutside);
-      window.removeEventListener('contextmenu', handleClickOutside);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [contextMenu]);
-
-  // Selected note object
-  const selectedNote = notes.find((n) => n.id === selectedNoteId) || null;
-
-  // Sync edit form with selected note
-  useEffect(() => {
-    if (selectedNote) {
-      setEditTitle(selectedNote.title);
-      setEditContent(selectedNote.content);
-      setEditCategory(selectedNote.category);
-      setEditColorTag(selectedNote.colorTag);
-    }
-  }, [selectedNoteId]);
-
-  const categories = ['Tất cả', ...Array.from(new Set(notes.map((n) => n.category)))];
-
-  const filteredNotes = notes.filter((n) => {
-    const matchCat = activeCategory === 'Tất cả' || n.category === activeCategory;
-    const q = searchQuery.toLowerCase().trim();
-    const matchSearch =
-      !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q) || n.category.toLowerCase().includes(q);
-    return matchCat && matchSearch;
-  });
-
-  // Sort pinned notes first
-  const sortedNotes = [...filteredNotes].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    return 0;
-  });
-
-  const handleCreateNewNote = () => {
-    playPopSound();
-    const newNote: NoteItem = {
-      id: `note-${Date.now()}`,
-      title: 'Ghi chú mới',
-      content: '',
-      category: 'Ghi chú',
-      isPinned: false,
-      colorTag: 'emerald',
-      createdAt: new Date().toLocaleDateString('vi-VN'),
-      updatedAt: new Date().toLocaleDateString('vi-VN'),
-    };
-    setNotes((prev) => [newNote, ...prev]);
-    setSelectedNoteId(newNote.id);
-    setIsEditing(true);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage((prev) => (prev === msg ? null : prev));
+    }, 2800);
   };
 
-  const handleSaveEdit = () => {
-    if (!selectedNoteId) return;
-    playPopSound();
-    setNotes((prev) =>
-      prev.map((n) =>
-        n.id === selectedNoteId
-          ? {
-              ...n,
-              title: editTitle.trim() || 'Ghi chú không tiêu đề',
-              content: editContent,
-              category: editCategory.trim() || 'Ghi chú',
-              colorTag: editColorTag,
-              updatedAt: new Date().toLocaleDateString('vi-VN'),
-            }
-          : n
-      )
-    );
-    setIsEditing(false);
-  };
+  const categories = useMemo(() => {
+    return Array.from(new Set(notes.map((n) => n.category)));
+  }, [notes]);
 
-  const handleDeleteNote = (id: string) => {
-    playPopSound();
-    const updated = notes.filter((n) => n.id !== id);
-    setNotes(updated);
-    if (selectedNoteId === id) {
-      setSelectedNoteId(updated[0]?.id || null);
+  // Filtering
+  const filteredNotes = useMemo(() => {
+    let list = [...notes];
+
+    if (activeTab === 'pinned') {
+      list = list.filter((n) => n.isPinned);
+    } else if (activeTab === 'stuck') {
+      list = list.filter((n) => stuckIds.includes(n.id));
     }
-    showToast('Đã xóa ghi chú!');
+
+    if (selectedCategory !== 'all') {
+      list = list.filter((n) => n.category === selectedCategory);
+    }
+
+    if (selectedColorTag) {
+      list = list.filter((n) => n.colorTag === selectedColorTag);
+    }
+
+    if (searchKeyword.trim()) {
+      const q = searchKeyword.toLowerCase().trim();
+      list = list.filter(
+        (n) =>
+          n.title.toLowerCase().includes(q) ||
+          n.content.toLowerCase().includes(q) ||
+          n.category.toLowerCase().includes(q)
+      );
+    }
+
+    // Sort: pinned first
+    return list.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
+  }, [notes, activeTab, selectedCategory, selectedColorTag, searchKeyword, stuckIds]);
+
+  const pinnedCount = useMemo(() => notes.filter((n) => n.isPinned).length, [notes]);
+
+  // Handle Save (Create or Update)
+  const handleSaveNote = () => {
+    if (!noteTitle.trim() && !noteContent.trim()) {
+      showToast('Vui lòng nhập tiêu đề hoặc nội dung ghi chú!');
+      return;
+    }
+
+    playWinSound();
+
+    if (editingNote) {
+      // Update existing
+      setNotes((prev) =>
+        prev.map((n) =>
+          n.id === editingNote.id
+            ? {
+                ...n,
+                title: noteTitle.trim() || 'Ghi chú không tiêu đề',
+                content: noteContent.trim(),
+                category: noteCategory.trim() || 'Học tập',
+                colorTag: noteColorTag,
+                isPinned: noteIsPinned,
+                updatedAt: new Date().toLocaleDateString('vi-VN')
+              }
+            : n
+        )
+      );
+      showToast('Đã cập nhật ghi chú thành công!');
+    } else {
+      // Create new
+      const created: NoteItem = {
+        id: `note-${Date.now()}`,
+        title: noteTitle.trim() || 'Ghi chú học tập mới',
+        content: noteContent.trim(),
+        category: noteCategory.trim() || 'Học tập',
+        colorTag: noteColorTag,
+        isPinned: noteIsPinned,
+        createdAt: new Date().toLocaleDateString('vi-VN'),
+        updatedAt: new Date().toLocaleDateString('vi-VN')
+      };
+      setNotes((prev) => [created, ...prev]);
+      showToast('Đã thêm ghi chú mới vào V-Notes!');
+    }
+
+    // Reset Form
+    setEditingNote(null);
+    setNoteTitle('');
+    setNoteContent('');
+    setNoteIsPinned(false);
+    setActiveTab('all');
   };
 
-  const handleTogglePin = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  // Open Edit Form
+  const openEditModal = (note: NoteItem) => {
+    playPopSound();
+    setEditingNote(note);
+    setNoteTitle(note.title);
+    setNoteContent(note.content);
+    setNoteCategory(note.category);
+    setNoteColorTag(note.colorTag);
+    setNoteIsPinned(note.isPinned);
+    setActiveTab('create');
+  };
+
+  // Reset Create Form
+  const openCreateForm = () => {
+    playPopSound();
+    setEditingNote(null);
+    setNoteTitle('');
+    setNoteContent('');
+    setNoteCategory(categories[0] || 'Toán Học');
+    setNoteColorTag('amber');
+    setNoteIsPinned(false);
+    setActiveTab('create');
+  };
+
+  // Toggle Pin
+  const handleTogglePin = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     playPopSound();
     setNotes((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isPinned: !n.isPinned } : n))
     );
   };
 
-  const handleToggleStickyNote = (note: NoteItem) => {
+  // Toggle Stuck on Screen
+  const handleToggleStuckOnScreen = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     playPopSound();
-    let updated: string[];
-    if (stuckIds.includes(note.id)) {
-      updated = stuckIds.filter((id) => id !== note.id);
-      showToast(`Đã bỏ ghim Sticky Note "${note.title}" khỏi màn hình!`);
-    } else {
-      updated = [...stuckIds, note.id];
-      showToast(`Đã ghim Sticky Note "${note.title}" lên màn hình!`);
+    setStuckIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      try {
+        localStorage.setItem('vnotes_stuck_ids', JSON.stringify(next));
+        window.dispatchEvent(new Event('vnotes_stuck_updated'));
+      } catch (err) {}
+      showToast(
+        next.includes(id)
+          ? '📌 Đã ghim ghi chú nổi trên màn hình!'
+          : 'Đã gỡ ghi chú khỏi màn hình nổi'
+      );
+      return next;
+    });
+  };
+
+  // Delete note
+  const handleDeleteNote = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    playPopSound();
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+    setStuckIds((prev) => {
+      const next = prev.filter((item) => item !== id);
+      try {
+        localStorage.setItem('vnotes_stuck_ids', JSON.stringify(next));
+        window.dispatchEvent(new Event('vnotes_stuck_updated'));
+      } catch (err) {}
+      return next;
+    });
+    if (editingNote?.id === id) {
+      setEditingNote(null);
+      setActiveTab('all');
     }
-    setStuckIds(updated);
-    localStorage.setItem('vnotes_stuck_ids', JSON.stringify(updated));
-    localStorage.setItem('vnotes_list', JSON.stringify(notes));
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
-    window.dispatchEvent(new Event('vnotes_stuck_updated'));
-    window.dispatchEvent(new Event('storage'));
+    showToast('Đã xóa ghi chú');
   };
 
-  const handleSaveToVXplore = (note: NoteItem) => {
+  // Copy content
+  const handleCopy = (text: string, id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    navigator.clipboard.writeText(text);
     playPopSound();
-    try {
-      const existingSaved = localStorage.getItem('vplay_vxplore_files_v1');
-      let files = existingSaved ? JSON.parse(existingSaved) : [];
-
-      const cleanTitle = note.title.replace(/[/\\?%*:|"<>]/g, '_').trim() || 'Ghi_chu';
-      const fileName = cleanTitle.endsWith('.txt') ? cleanTitle : `${cleanTitle}.txt`;
-      const noteBlob = new Blob([note.content], { type: 'text/plain' });
-
-      const newFileItem = {
-        id: `file-vnote-${Date.now()}`,
-        name: fileName,
-        type: 'text',
-        size: `${(noteBlob.size / 1024).toFixed(1)} KB`,
-        sizeBytes: noteBlob.size,
-        dateModified: new Date().toISOString().replace('T', ' ').slice(0, 16),
-        path: 'C:\\Vplay\\Documents',
-        content: note.content,
-        mimeType: 'text/plain',
-      };
-
-      files = [newFileItem, ...files];
-      localStorage.setItem('vplay_vxplore_files_v1', JSON.stringify(files));
-      window.dispatchEvent(new Event('storage'));
-
-      showToast(`Đã lưu "${fileName}" vào V-Files (C:\\Vplay\\Documents)!`);
-    } catch (e) {
-      console.error(e);
-      showToast('Lỗi khi lưu vào V-Files!');
-    }
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+    showToast('Đã sao chép nội dung vào clipboard!');
   };
 
-  const handleContextMenu = (e: React.MouseEvent, note: NoteItem) => {
-    e.preventDefault();
-    e.stopPropagation();
-    playPopSound();
-
-    const menuWidth = 230;
-    const menuHeight = 250;
-    const x = Math.min(e.clientX, window.innerWidth - menuWidth);
-    const y = Math.min(e.clientY, window.innerHeight - menuHeight);
-
-    setContextMenu({ x, y, note });
-  };
-
-  const handleCopyNote = () => {
-    if (!selectedNote) return;
-    playPopSound();
-    navigator.clipboard.writeText(`${selectedNote.title}\n\n${selectedNote.content}`);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
-  };
-
+  // Export TXT
   const handleExportTxt = () => {
     playPopSound();
-    const dataStr = notes
-      .map((n) => `====================\nTITLE: ${n.title}\nCATEGORY: ${n.category}\nDATE: ${n.createdAt}\n====================\n${n.content}\n\n`)
+    const txtContent = notes
+      .map(
+        (n, idx) =>
+          `=========================================\n[${idx + 1}] ${n.title}\nDanh mục: ${n.category} | Ngày cập nhật: ${n.updatedAt}\n=========================================\n${n.content}\n\n`
+      )
       .join('\n');
-    const blob = new Blob([dataStr], { type: 'text/plain;charset=utf-8' });
+
+    const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Vplay_VNotes_Export_${new Date().toISOString().slice(0, 10)}.txt`;
+    link.download = `VStudy_VNotes_Export_${new Date().toISOString().slice(0, 10)}.txt`;
     link.click();
     URL.revokeObjectURL(url);
+    showToast('Đã tải xuống toàn bộ ghi chú học tập dạng TXT!');
   };
 
+  // Reset defaults
   const handleResetDefaults = () => {
     playPopSound();
-    if (window.confirm('Khôi phục danh sách ghi chú mẫu ban đầu?')) {
+    if (window.confirm('Khôi phục danh sách ghi chú học tập mẫu ban đầu?')) {
       setNotes(DEFAULT_NOTES);
-      setSelectedNoteId(DEFAULT_NOTES[0].id);
+      showToast('Đã khôi phục ghi chú mẫu!');
     }
   };
 
   return (
-    <div className="space-y-4 select-none relative font-jura">
-      {/* ORE UI TOP ACTION HEADER BAR */}
-      <div className="bg-[#2d2f32] border-2 border-[#141414] p-3 sm:p-4 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        {/* Title & Badge */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#28960b] border-2 border-[#141414] flex items-center justify-center text-white shrink-0 shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]">
-            <StickyNote className="w-5 h-5 text-white" />
+    <div className="w-full max-w-7xl mx-auto p-2 sm:p-4 md:p-6 text-white font-sans space-y-6">
+      {/* TOAST NOTIFICATION */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-[#1F1E24]/95 border border-amber-500/40 text-white text-xs font-semibold shadow-2xl flex items-center gap-2 backdrop-blur-md"
+          >
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 1. TOP BANNER HEADER - EXACT V-STUDY HERO BANNER */}
+      <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-rose-500 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-amber-500/20">
+            <StickyNote className="w-6 h-6 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm sm:text-base font-black text-white uppercase tracking-wider font-jura">
-                V-NOTES (SỔ TAY GHI CHÚ)
-              </h2>
-              <span className="bg-[#89dc69] text-[#141414] px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
-                {notes.length} ghi chú
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-base sm:text-xl font-bold text-white tracking-wide">
+                V-Notes • Sổ Tay Học Tập & Ghi Chú
+              </h1>
+              <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">
+                Sổ tay kiến thức & M3U8
               </span>
             </div>
-            <p className="text-[11px] text-zinc-300 font-jura">
-              Click chuột phải vào bất kỳ ghi chú nào để Mở, Sửa, Pin Sticky Note lên màn hình, Xóa hoặc Save to V-Files.
+            <p className="text-xs text-[#9CA3AF] mt-0.5">
+              Hệ thống ghi chép công thức ôn thi, đề cương môn học, từ vựng CEFR và ghim ghi chú nổi trên màn hình Vplay.
             </p>
           </div>
         </div>
 
-        {/* Header Action Buttons */}
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          <VplayPrimaryButton
-            onClick={handleCreateNewNote}
-            className="!py-2 !px-3 text-xs font-bold whitespace-nowrap flex items-center gap-1.5 shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tạo Ghi Chú</span>
-          </VplayPrimaryButton>
-
-          <VplaySecondaryButton
-            onClick={handleExportTxt}
-            fullWidth={false}
-            className="!py-2 !px-3 text-xs font-bold whitespace-nowrap flex items-center gap-1.5 shrink-0"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Xuất TXT</span>
-          </VplaySecondaryButton>
-
-          <VplaySecondaryButton
-            onClick={handleResetDefaults}
-            fullWidth={false}
-            className="!py-2 !px-2.5 text-xs font-bold whitespace-nowrap shrink-0"
-            title="Khôi phục ghi chú mẫu"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </VplaySecondaryButton>
-        </div>
-      </div>
-
-      {/* CATEGORY TABS & SEARCH BAR */}
-      <div className="bg-[#35383b] border-2 border-[#141414] p-3 shadow-md space-y-3">
-        {/* Search input */}
-        <div className="relative flex items-center w-full h-[40px] px-3.5 rounded-full spotlight-bubble-box search-box-capsule border-0 transition-all">
-          <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm kiếm trong V-Notes (tiêu đề, nội dung)..."
-            className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
-              title="Xóa tìm kiếm"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* Horizontal Category Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          <ListFilter className="w-4 h-4 text-[#89dc69] shrink-0 mr-1" />
-          {categories.map((cat) => (
-            <VplayTab
-              key={cat}
-              active={activeCategory === cat}
-              onClick={() => {
-                playPopSound();
-                setActiveCategory(cat);
-              }}
-              className="!py-1 !px-3 text-xs shrink-0"
-            >
-              {cat}
-            </VplayTab>
-          ))}
-        </div>
-      </div>
-
-      {/* MAIN TWO-COLUMN CONTAINER: LEFT NOTE LIST, RIGHT NOTE EDITOR/VIEWER */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LEFT COLUMN: NOTES CARDS LIST (5 cols on lg) */}
-        <div className="lg:col-span-5 space-y-2.5 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar">
-          {sortedNotes.length === 0 ? (
-            <div className="bg-[#2a2c2e] border-2 border-[#141414] p-6 text-center space-y-3">
-              <FileText className="w-8 h-8 text-zinc-500 mx-auto" />
-              <p className="text-xs text-zinc-300 font-bold">Chưa có ghi chú nào trong danh mục này.</p>
-              <VplayPrimaryButton onClick={handleCreateNewNote} className="!py-1.5 !px-3 text-xs max-w-[160px] mx-auto">
-                + Tạo ghi chú mới
-              </VplayPrimaryButton>
+        {/* Global Student Stats Badge (V-Study style) */}
+        <div className="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap">
+          <div className="px-3.5 py-2 bg-[#18171E] border border-[#2D2D38] rounded-xl flex items-center gap-3 shadow-inner">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+              <BookOpen className="w-4 h-4 text-amber-500" />
+              <span>{notes.length} Ghi Chú</span>
             </div>
-          ) : (
-            sortedNotes.map((note) => {
-              const isSelected = selectedNoteId === note.id;
-              const colorConfig = COLOR_MAP[note.colorTag] || COLOR_MAP.emerald;
-              const isStuckOnScreen = stuckIds.includes(note.id);
-
-              return (
-                <div
-                  key={note.id}
-                  onClick={() => {
-                    playPopSound();
-                    setSelectedNoteId(note.id);
-                    setIsEditing(false);
-                  }}
-                  onContextMenu={(e) => handleContextMenu(e, note)}
-                  className={`
-                    group relative border-2 cursor-pointer transition-none p-3 shadow-lg select-none active:translate-y-[1px]
-                    ${
-                      isSelected
-                        ? 'bg-[#28960b] text-white border-white shadow-[inset_2px_2px_0_#89dc69,inset_-2px_-2px_0_#1b5e20]'
-                        : 'bg-[#c6c6c6] text-[#202020] border-[#141414] hover:bg-[#383b3e] hover:text-white hover:border-white shadow-[inset_2px_2px_0_#ffffff,inset_-2px_-2px_0_#898d91]'
-                    }
-                  `}
-                >
-                  {/* Top Bar inside Card */}
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-1.5">
-                      {/* Color Tag Pill */}
-                      <span
-                        className={`w-2.5 h-2.5 border border-black/40 ${colorConfig.bg} shadow-sm shrink-0`}
-                        title={`Color: ${colorConfig.label}`}
-                      />
-                      <span
-                        className={`text-[9px] font-bold font-mono px-1.5 py-0.5 border border-[#141414] ${
-                          isSelected
-                            ? 'bg-black/30 text-white'
-                            : 'bg-[#242424] text-[#89dc69] group-hover:bg-black/40'
-                        }`}
-                      >
-                        {note.category}
-                      </span>
-                      {isStuckOnScreen && (
-                        <span className="text-[9px] font-bold font-mono px-1 py-0.5 bg-purple-900/80 text-purple-200 border border-purple-400/50">
-                          STUCK
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      {/* Pin to top button */}
-                      <button
-                        onClick={(e) => handleTogglePin(note.id, e)}
-                        className={`p-1 rounded hover:bg-black/20 ${note.isPinned ? 'text-amber-300' : 'text-black/40 group-hover:text-white/60'}`}
-                        title={note.isPinned ? 'Bỏ ghim khỏi đầu danh sách' : 'Ghim lên đầu danh sách'}
-                      >
-                        <Pin className="w-3.5 h-3.5 fill-current" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Note Title */}
-                  <h3
-                    className={`font-bold text-xs sm:text-sm truncate font-jura ${
-                      isSelected ? 'text-white' : 'text-[#141414] group-hover:text-white'
-                    }`}
-                  >
-                    {note.title}
-                  </h3>
-
-                  {/* Content Preview */}
-                  <p
-                    className={`text-[11px] line-clamp-2 mt-1 font-jura ${
-                      isSelected ? 'text-white/90' : 'text-[#404040] group-hover:text-zinc-300'
-                    }`}
-                  >
-                    {note.content || '(Ghi chú trống...)'}
-                  </p>
-
-                  {/* Date Footer */}
-                  <div className="mt-2.5 pt-1.5 border-t border-black/10 flex items-center justify-between text-[9px] font-mono opacity-80">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-2.5 h-2.5" />
-                      {note.updatedAt}
-                    </span>
-                    <span className="text-[9px] italic opacity-75">
-                      [Chuột phải để chọn menu]
-                    </span>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        {/* RIGHT COLUMN: NOTE VIEW / EDIT PANEL (7 cols on lg) */}
-        <div className="lg:col-span-7 bg-[#2d2f32] border-2 border-[#141414] p-4 sm:p-5 shadow-2xl flex flex-col justify-between min-h-[480px]">
-          {selectedNote ? (
-            isEditing ? (
-              /* --- EDIT MODE --- */
-              <div className="space-y-4 flex-1 flex flex-col">
-                <div className="flex items-center justify-between border-b border-[#141414] pb-2">
-                  <div className="flex items-center gap-2">
-                    <Edit3 className="w-4 h-4 text-[#89dc69]" />
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-white font-jura">
-                      CHỈNH SỬA GHI CHÚ
-                    </h3>
-                  </div>
-                  <span className="text-[10px] font-mono text-zinc-400">Ore UI Editor</span>
-                </div>
-
-                {/* Title Input */}
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Tiêu đề ghi chú</label>
-                  <VplayInputBox
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    placeholder="Nhập tiêu đề..."
-                  />
-                </div>
-
-                {/* Category & Color Tag Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Danh mục (Category)</label>
-                    <input
-                      type="text"
-                      value={editCategory}
-                      onChange={(e) => setEditCategory(e.target.value)}
-                      placeholder="Ghi chú, M3U Links, Vplay..."
-                      className="w-full h-9 mc-input-box text-xs"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Nhãn màu (Color Tag)</label>
-                    <div className="flex items-center gap-1.5 h-9">
-                      {(Object.keys(COLOR_MAP) as Array<NoteItem['colorTag']>).map((colorKey) => (
-                        <button
-                          key={colorKey}
-                          type="button"
-                          onClick={() => setEditColorTag(colorKey)}
-                          className={`flex-1 h-full border-2 ${COLOR_MAP[colorKey].bg} ${
-                            editColorTag === colorKey ? 'border-white scale-105 shadow-md' : 'border-[#141414] opacity-70 hover:opacity-100'
-                          }`}
-                          title={COLOR_MAP[colorKey].label}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content Textarea */}
-                <div className="space-y-1 flex-1 flex flex-col min-h-[180px]">
-                  <label className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Nội dung chi tiết</label>
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    placeholder="Nhập nội dung ghi chú, liên kết M3U8 hoặc văn bản bất kỳ..."
-                    className="w-full flex-1 min-h-[160px] mc-input-box p-3 font-mono text-xs leading-relaxed resize-y"
-                  />
-                </div>
-
-                {/* Bottom Action Bar for Edit */}
-                <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#141414]">
-                  <span className="text-[10px] font-mono text-zinc-400">
-                    {editContent.length} ký tự • {editContent.split(/\s+/).filter(Boolean).length} từ
-                  </span>
-
-                  <div className="flex items-center gap-2">
-                    <VplaySecondaryButton
-                      onClick={() => setIsEditing(false)}
-                      fullWidth={false}
-                      className="!py-1.5 !px-3 text-xs font-bold"
-                    >
-                      Hủy
-                    </VplaySecondaryButton>
-
-                    <VplayPrimaryButton onClick={handleSaveEdit} className="!py-1.5 !px-4 text-xs font-bold">
-                      Lưu Ghi Chú
-                    </VplayPrimaryButton>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* --- VIEW MODE --- */
-              <div className="space-y-4 flex-1 flex flex-col justify-between">
-                <div>
-                  {/* Top Bar inside View Panel */}
-                  <div className="flex items-start justify-between gap-3 border-b border-[#141414] pb-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className={`w-3 h-3 border border-black ${COLOR_MAP[selectedNote.colorTag].bg}`}
-                        />
-                        <span className="bg-[#141414] text-[#89dc69] text-[10px] font-bold px-2 py-0.5 border border-zinc-700 font-mono">
-                          {selectedNote.category}
-                        </span>
-                        {selectedNote.isPinned && (
-                          <span className="bg-amber-500/20 text-amber-300 border border-amber-500/50 text-[10px] font-bold px-1.5 py-0.5 font-mono">
-                            ★ PINNED
-                          </span>
-                        )}
-                        {stuckIds.includes(selectedNote.id) && (
-                          <span className="bg-purple-900/80 text-purple-200 border border-purple-400/50 text-[10px] font-bold px-1.5 py-0.5 font-mono">
-                            STUCK ON SCREEN
-                          </span>
-                        )}
-                      </div>
-                      <h2 className="text-base sm:text-lg font-black text-white font-jura tracking-wide pt-1">
-                        {selectedNote.title}
-                      </h2>
-                    </div>
-
-                    {/* View Controls */}
-                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                      {/* Pin Sticky Note button */}
-                      <button
-                        onClick={() => handleToggleStickyNote(selectedNote)}
-                        className={`p-2 border-2 border-[#141414] shadow active:translate-y-[1px] ${
-                          stuckIds.includes(selectedNote.id)
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-[#3a3d40] hover:bg-[#4a4d50] text-zinc-200'
-                        }`}
-                        title={stuckIds.includes(selectedNote.id) ? 'Bỏ ghim Sticky Note' : 'Ghim Sticky Note (Màn hình)'}
-                      >
-                        <Pin className="w-4 h-4" />
-                      </button>
-
-                      {/* Save to V-Files button */}
-                      <button
-                        onClick={() => handleSaveToVXplore(selectedNote)}
-                        className="bg-[#0e7490] hover:bg-[#0891b2] text-white p-2 border-2 border-[#141414] shadow active:translate-y-[1px]"
-                        title="Save to V-Files"
-                      >
-                        <Folder className="w-4 h-4" />
-                      </button>
-
-                      <button
-                        onClick={handleCopyNote}
-                        className="bg-[#3a3d40] hover:bg-[#4a4d50] text-zinc-200 hover:text-white p-2 border-2 border-[#141414] shadow active:translate-y-[1px]"
-                        title="Sao chép nội dung"
-                      >
-                        {copiedId ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                      </button>
-
-                      <VplayPrimaryButton
-                        onClick={() => {
-                          playPopSound();
-                          setIsEditing(true);
-                        }}
-                        className="!py-1.5 !px-3 text-xs font-bold flex items-center gap-1"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Sửa</span>
-                      </VplayPrimaryButton>
-
-                      <button
-                        onClick={() => handleDeleteNote(selectedNote.id)}
-                        className="bg-[#991b1b] hover:bg-[#b91c1c] text-white p-2 border-2 border-[#141414] shadow active:translate-y-[1px]"
-                        title="Xóa ghi chú này"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Main Display Content Box */}
-                  <div className="mt-4 bg-[#1f2022] border-2 border-[#141414] p-4 font-mono text-xs text-zinc-200 leading-relaxed whitespace-pre-wrap min-h-[220px] shadow-inner select-text">
-                    {selectedNote.content ? (
-                      selectedNote.content
-                    ) : (
-                      <span className="text-zinc-500 italic">Ghi chú này chưa có nội dung. Bấm Sửa để thêm nội dung.</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Footer Meta Info */}
-                <div className="pt-3 border-t border-[#141414] flex flex-col sm:flex-row items-start sm:items-center justify-between text-[10px] font-mono text-zinc-400 gap-2">
-                  <div className="flex items-center gap-3">
-                    <span>Tạo lúc: {selectedNote.createdAt}</span>
-                    <span>Cập nhật: {selectedNote.updatedAt}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {copiedId && <span className="text-emerald-400 font-bold">✓ Đã chép vào clipboard!</span>}
-                    <span className="bg-[#141414] px-2 py-0.5 border border-zinc-700">Ore UI V-Notes</span>
-                  </div>
-                </div>
-              </div>
-            )
-          ) : (
-            <div className="flex flex-col items-center justify-center flex-1 text-center py-12 space-y-3 text-zinc-400">
-              <StickyNote className="w-12 h-12 text-zinc-600 animate-bounce" />
-              <p className="text-xs font-bold font-jura">Chọn một ghi chú ở danh sách bên trái hoặc tạo ghi chú mới.</p>
-              <VplayPrimaryButton onClick={handleCreateNewNote} className="!py-2 !px-4 text-xs max-w-[180px]">
-                + Tạo Ghi Chú Mới
-              </VplayPrimaryButton>
+            <div className="w-px h-4 bg-[#2D2D38]" />
+            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+              <Pin className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
+              <span>{pinnedCount} Đã Ghim</span>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* CONTEXT MENU */}
-      {contextMenu && (
-        <div
-          style={{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }}
-          className="fixed z-[100000] w-60 bg-[#2d2f32] border-2 border-[#141414] shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-1.5 font-jura select-none text-xs text-white divide-y divide-[#141414] animate-in fade-in zoom-in-95 duration-100"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header title */}
-          <div className="px-2.5 py-1.5 font-mono text-[10px] text-zinc-400 flex items-center justify-between">
-            <span className="truncate max-w-[140px] font-bold text-emerald-400">{contextMenu.note.title}</span>
-            <span className="text-zinc-500">V-Notes</span>
           </div>
 
-          {/* Menu Options */}
-          <div className="py-1 space-y-0.5">
-            {/* 1. Mở Notes */}
-            <button
-              onClick={() => {
-                setSelectedNoteId(contextMenu.note.id);
-                setIsEditing(false);
-                setContextMenu(null);
-                playPopSound();
-              }}
-              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
-            >
-              <Eye className="w-4 h-4 text-emerald-400 group-hover:text-white shrink-0" />
-              <div className="flex flex-col">
-                <span className="font-bold">Mở Notes</span>
-                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">Xem nội dung ghi chú</span>
-              </div>
-            </button>
-
-            {/* 2. Sửa Notes */}
-            <button
-              onClick={() => {
-                setSelectedNoteId(contextMenu.note.id);
-                setIsEditing(true);
-                setContextMenu(null);
-                playPopSound();
-              }}
-              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
-            >
-              <Edit3 className="w-4 h-4 text-amber-400 group-hover:text-white shrink-0" />
-              <div className="flex flex-col">
-                <span className="font-bold">Sửa Notes</span>
-                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">Chỉnh sửa tiêu đề & nội dung</span>
-              </div>
-            </button>
-
-            {/* 3. Pin Notes (Sticky Note) */}
-            <button
-              onClick={() => {
-                const note = contextMenu.note;
-                setContextMenu(null);
-                handleToggleStickyNote(note);
-              }}
-              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
-            >
-              <Pin className={`w-4 h-4 ${stuckIds.includes(contextMenu.note.id) ? 'text-purple-300 fill-purple-300' : 'text-purple-400'} group-hover:text-white shrink-0`} />
-              <div className="flex flex-col">
-                <span className="font-bold">
-                  {stuckIds.includes(contextMenu.note.id) ? 'Bỏ Ghim Sticky Note' : 'Pin Notes (Sticky Note)'}
-                </span>
-                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">
-                  Ghim dạng sticky note nổi trên màn hình
-                </span>
-              </div>
-            </button>
-
-            {/* 4. Save to V-Files */}
-            <button
-              onClick={() => {
-                const note = contextMenu.note;
-                setContextMenu(null);
-                handleSaveToVXplore(note);
-              }}
-              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-[#28960b] hover:text-white transition-none group cursor-pointer"
-            >
-              <Folder className="w-4 h-4 text-cyan-400 group-hover:text-white shrink-0" />
-              <div className="flex flex-col">
-                <span className="font-bold">Save to V-Files</span>
-                <span className="text-[9px] text-zinc-400 group-hover:text-zinc-200">
-                  Lưu file TXT vào C:\Vplay\Documents
-                </span>
-              </div>
-            </button>
-          </div>
-
-          {/* 5. Xóa Notes */}
-          <div className="pt-1">
-            <button
-              onClick={() => {
-                const noteId = contextMenu.note.id;
-                setContextMenu(null);
-                handleDeleteNote(noteId);
-              }}
-              className="w-full text-left px-2.5 py-1.5 flex items-center gap-2 hover:bg-rose-700 hover:text-white text-rose-300 transition-none group cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4 text-rose-400 group-hover:text-white shrink-0" />
-              <div className="flex flex-col">
-                <span className="font-bold">Xóa Notes</span>
-                <span className="text-[9px] text-rose-300/80 group-hover:text-zinc-100">Xóa vĩnh viễn ghi chú</span>
-              </div>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* TOAST NOTIFICATION */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[100001] bg-[#1d1f21] border-2 border-[#89dc69] text-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.8)] flex items-center gap-3 max-w-md animate-in slide-in-from-bottom-5 duration-200 font-jura">
-          <div className="w-8 h-8 bg-[#28960b] border border-[#141414] flex items-center justify-center shrink-0 shadow-[inset_1px_1px_0_#89dc69]">
-            <Check className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white leading-tight">{toastMessage}</p>
-            <p className="text-[10px] text-zinc-400 font-mono mt-0.5">V-Notes Notification</p>
-          </div>
           <button
-            onClick={() => setToastMessage(null)}
-            className="text-zinc-400 hover:text-white p-1"
+            onClick={handleExportTxt}
+            className="px-3 py-2 bg-[#2A2933] hover:bg-[#343340] border border-[#3E3D4D] rounded-xl text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            title="Tải toàn bộ ghi chú về máy"
           >
-            <X className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">Xuất TXT</span>
           </button>
+
+          <button
+            onClick={handleResetDefaults}
+            className="p-2 bg-[#2A2933] hover:bg-[#343340] border border-[#3E3D4D] rounded-xl text-[#9CA3AF] hover:text-white transition-all cursor-pointer"
+            title="Khôi phục mẫu mặc định"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* 2. STATS CARDS ROW (EXACT V-STUDY 4-BOX STATS SYSTEM) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 shadow-md">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          {/* Box 1: Tổng ghi chú */}
+          <div className="px-3.5 py-2 bg-[#18171E] border border-[#2D2D38] rounded-xl flex items-center gap-2.5 flex-1 sm:flex-initial">
+            <div className="w-8 h-8 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg flex items-center justify-center text-xs font-black">
+              VN
+            </div>
+            <div className="text-left">
+              <p className="text-[10px] text-[#9CA3AF] font-bold uppercase tracking-wider">Tổng Sổ Tay</p>
+              <p className="text-xs font-bold text-amber-400 font-mono">{notes.length} Mục</p>
+            </div>
+          </div>
+
+          {/* Box 2: Đang ghim */}
+          <div className="px-3.5 py-2 bg-[#18171E] border border-[#2D2D38] rounded-xl flex items-center gap-2 flex-1 sm:flex-initial">
+            <Pin className="w-4 h-4 text-rose-400 fill-rose-400/30" />
+            <div className="text-left">
+              <p className="text-[10px] text-[#9CA3AF] font-bold uppercase tracking-wider">Ghim Quan Trọng</p>
+              <p className="text-xs font-bold text-white font-mono">{pinnedCount} Bài</p>
+            </div>
+          </div>
+
+          {/* Box 3: Ghim nổi màn hình */}
+          <div className="px-3.5 py-2 bg-[#18171E] border border-[#2D2D38] rounded-xl flex items-center gap-2 flex-1 sm:flex-initial">
+            <Layers className="w-4 h-4 text-purple-400" />
+            <div className="text-left">
+              <p className="text-[10px] text-[#9CA3AF] font-bold uppercase tracking-wider">Ghim Nổi Màn Hình</p>
+              <p className="text-xs font-bold text-purple-300 font-mono">{stuckIds.length} Sticky</p>
+            </div>
+          </div>
+
+          {/* Box 4: Danh mục môn */}
+          <div className="px-3.5 py-2 bg-[#18171E] border border-[#2D2D38] rounded-xl flex items-center gap-2 flex-1 sm:flex-initial">
+            <Tag className="w-4 h-4 text-emerald-400" />
+            <div className="text-left">
+              <p className="text-[10px] text-[#9CA3AF] font-bold uppercase tracking-wider">Chủ Đề & Môn</p>
+              <p className="text-xs font-bold text-emerald-400 font-mono">{categories.length} Nhóm</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button: Tạo ghi chú mới */}
+        <button
+          onClick={openCreateForm}
+          className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-95 text-white font-bold text-xs tracking-wider rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Soạn Ghi Chú Mới</span>
+        </button>
+      </div>
+
+      {/* 3. MODULE MODE SELECTION TABS (V-STUDY PILL BUTTON TABS) */}
+      <div className="flex flex-wrap items-center gap-2 p-2 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl shadow-lg">
+        <button
+          onClick={() => {
+            playPopSound();
+            setActiveTab('all');
+            setEditingNote(null);
+          }}
+          className={`flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl border ${
+            activeTab === 'all'
+              ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+              : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
+          }`}
+        >
+          <BookOpen className="w-4 h-4" />
+          <span>1. Tất Cả Ghi Chú ({notes.length})</span>
+        </button>
+
+        <button
+          onClick={() => {
+            playPopSound();
+            setActiveTab('pinned');
+            setEditingNote(null);
+          }}
+          className={`flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl border ${
+            activeTab === 'pinned'
+              ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+              : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
+          }`}
+        >
+          <Pin className="w-4 h-4 text-amber-300" />
+          <span>2. Đã Ghim Quan Trọng</span>
+          <span className="px-1.5 py-0.5 bg-[#18171E] text-amber-300 text-[10px] rounded-md border border-[#2D2D38]">
+            {pinnedCount}
+          </span>
+        </button>
+
+        <button
+          onClick={() => {
+            playPopSound();
+            setActiveTab('stuck');
+            setEditingNote(null);
+          }}
+          className={`flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl border ${
+            activeTab === 'stuck'
+              ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+              : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
+          }`}
+        >
+          <Layers className="w-4 h-4 text-purple-400" />
+          <span>3. Ghim Nổi Màn Hình (Sticky)</span>
+          <span className="px-1.5 py-0.5 bg-[#18171E] text-purple-300 text-[10px] rounded-md border border-[#2D2D38]">
+            {stuckIds.length}
+          </span>
+        </button>
+
+        <button
+          onClick={openCreateForm}
+          className={`flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl border ${
+            activeTab === 'create'
+              ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+              : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
+          }`}
+        >
+          <Edit3 className="w-4 h-4 text-emerald-400" />
+          <span>{editingNote ? '4. Chỉnh Sửa Ghi Chú' : '4. Soạn Thảo'}</span>
+        </button>
+      </div>
+
+      {/* 4. MAIN CONTENT AREA */}
+      {activeTab === 'create' ? (
+        /* SOẠN THẢO / CHỈNH SỬA GHI CHÚ GIAO DIỆN V-STUDY FORM */
+        <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-5 sm:p-7 shadow-xl space-y-5">
+          <div className="flex items-center justify-between border-b border-[#2D2D38] pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white">
+                <Edit3 className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-white">
+                  {editingNote ? 'Chỉnh Sửa Ghi Chú Sổ Tay' : 'Soạn Ghi Chú Học Tập Mới'}
+                </h2>
+                <p className="text-xs text-[#9CA3AF]">
+                  Hỗ trợ công thức ôn thi, danh sách link M3U8 và đồng bộ sang tiện ích màn hình
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setActiveTab('all');
+                setEditingNote(null);
+              }}
+              className="px-3 py-1.5 rounded-xl bg-[#2A2933] hover:bg-[#343340] border border-[#3E3D4D] text-xs text-[#9CA3AF] hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Quay lại danh sách</span>
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {/* Note Title */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpenCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>Tiêu đề ghi chú</span>
+              </label>
+              <input
+                type="text"
+                value={noteTitle}
+                onChange={(e) => setNoteTitle(e.target.value)}
+                placeholder="Ví dụ: Công thức Toán giải tích 12, Đề cương Sinh học..."
+                className="w-full bg-[#18171E] border border-[#2D2D38] focus:border-amber-500/60 rounded-xl text-white text-sm px-4 py-2.5 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* Note Content */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-amber-400" />
+                <span>Nội dung chi tiết</span>
+              </label>
+              <textarea
+                value={noteContent}
+                onChange={(e) => setNoteContent(e.target.value)}
+                rows={8}
+                placeholder="Nhập ghi chép, công thức, link stream M3U8 hoặc ghi chú ôn tập..."
+                className="w-full bg-[#18171E] border border-[#2D2D38] focus:border-amber-500/60 rounded-xl text-zinc-200 text-xs sm:text-sm p-4 focus:outline-none leading-relaxed custom-scrollbar font-sans"
+              />
+            </div>
+
+            {/* Options Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              {/* Category */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#9CA3AF] flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Danh mục môn / Chủ đề</span>
+                </label>
+                <input
+                  type="text"
+                  value={noteCategory}
+                  onChange={(e) => setNoteCategory(e.target.value)}
+                  placeholder="Ví dụ: Toán Học, Tiếng Anh, M3U8..."
+                  className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl text-white text-xs px-3 py-2 focus:outline-none focus:border-amber-500/60"
+                />
+              </div>
+
+              {/* Color Tag */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#9CA3AF] flex items-center gap-1.5">
+                  <Palette className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Màu sắc nhận diện</span>
+                </label>
+                <div className="flex items-center gap-2 pt-1">
+                  {(['amber', 'rose', 'emerald', 'sky', 'purple'] as NoteItem['colorTag'][]).map(
+                    (tag) => {
+                      const c = COLOR_MAP[tag];
+                      const isSelected = noteColorTag === tag;
+                      return (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => setNoteColorTag(tag)}
+                          className={`w-6 h-6 rounded-lg ${c.dot} transition-all cursor-pointer ${
+                            isSelected
+                              ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-[#1F1E24]'
+                              : 'opacity-70 hover:opacity-100'
+                          }`}
+                          title={c.label}
+                        />
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+
+              {/* Pin Switch */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#9CA3AF] flex items-center gap-1.5">
+                  <Pin className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Ưu tiên ghim</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setNoteIsPinned(!noteIsPinned)}
+                  className={`w-full py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    noteIsPinned
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      : 'bg-[#18171E] text-[#9CA3AF] border-[#2D2D38] hover:text-white'
+                  }`}
+                >
+                  <Pin className={`w-3.5 h-3.5 ${noteIsPinned ? 'fill-amber-300' : ''}`} />
+                  <span>{noteIsPinned ? 'Đã ghim ưu tiên' : 'Chưa ghim'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Save Buttons */}
+            <div className="pt-4 border-t border-[#2D2D38] flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('all');
+                  setEditingNote(null);
+                }}
+                className="px-4 py-2 bg-[#2A2933] hover:bg-[#343340] border border-[#3E3D4D] text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveNote}
+                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-95 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer flex items-center gap-2"
+              >
+                <Check className="w-4 h-4" />
+                <span>{editingNote ? 'Lưu Thay Đổi' : 'Lưu Vào V-Notes'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* DANH SÁCH GHI CHÚ THEO PHONG CÁCH V-STUDY SUBJECTS GRID */
+        <div className="space-y-5">
+          {/* SEARCH & CATEGORY FILTER BAR (EXACT V-STUDY LEVEL SELECTOR) */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-3 shadow-md">
+            {/* Categories scrollable pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+              <button
+                onClick={() => {
+                  playPopSound();
+                  setSelectedCategory('all');
+                  setSelectedColorTag(null);
+                }}
+                className={`px-3.5 py-2 text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-xl border ${
+                  selectedCategory === 'all' && !selectedColorTag
+                    ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+                    : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Tất cả môn</span>
+                <span className="text-[10px] px-1.5 py-0.5 bg-[#18171E] rounded-md font-mono border border-[#2D2D38]">
+                  {notes.length}
+                </span>
+              </button>
+
+              {categories.map((cat) => {
+                const count = notes.filter((n) => n.category === cat).length;
+                const isSelected = selectedCategory === cat && !selectedColorTag;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      playPopSound();
+                      setSelectedCategory(cat);
+                      setSelectedColorTag(null);
+                    }}
+                    className={`px-3.5 py-2 text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer rounded-xl border ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white border-transparent shadow-md'
+                        : 'bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white'
+                    }`}
+                  >
+                    <Tag className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{cat}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-[#18171E] rounded-md font-mono border border-[#2D2D38]">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Keyword Search Input */}
+            <div className="relative min-w-[220px] shrink-0">
+              <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Tìm ghi chú, công thức, M3U8..."
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl text-white placeholder-[#9CA3AF] text-xs pl-8 pr-8 py-2 focus:outline-none focus:border-amber-500/50"
+              />
+              {searchKeyword && (
+                <button
+                  onClick={() => setSearchKeyword('')}
+                  className="p-1 text-[#9CA3AF] hover:text-white absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Section Header with count */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm sm:text-base font-bold text-white tracking-wide uppercase flex items-center gap-2">
+              <BookOpenCheck className="w-4 h-4 text-amber-400" />
+              <span>
+                {activeTab === 'all' && 'Danh Sách Ghi Chú & Tài Liệu Sổ Tay'}
+                {activeTab === 'pinned' && 'Ghi Chú Đã Ghim Quan Trọng'}
+                {activeTab === 'stuck' && 'Ghi Chú Ghim Nổi Trên Màn Hình'}
+              </span>
+            </h2>
+            <span className="text-xs text-[#9CA3AF] font-mono">
+              {filteredNotes.length} ghi chú hiển thị
+            </span>
+          </div>
+
+          {/* GRID OF NOTE CARDS (EXACT V-STUDY SUBJECT CARD LAYOUT) */}
+          {filteredNotes.length === 0 ? (
+            <div className="p-12 text-center bg-[#1F1E24] border border-[#2D2D38] rounded-2xl space-y-3 shadow-lg">
+              <BookOpen className="w-10 h-10 text-[#9CA3AF] mx-auto opacity-50" />
+              <p className="text-white text-sm font-bold">Không tìm thấy ghi chú nào</p>
+              <p className="text-[#9CA3AF] text-xs max-w-sm mx-auto">
+                Không có nội dung nào phù hợp với từ khóa hoặc bộ lọc hiện tại. Hãy tạo ghi chú mới hoặc làm sạch bộ lọc.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchKeyword('');
+                  setSelectedCategory('all');
+                  setSelectedColorTag(null);
+                  setActiveTab('all');
+                }}
+                className="text-xs text-amber-400 hover:underline cursor-pointer font-bold inline-block pt-1"
+              >
+                Xóa tất cả bộ lọc
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filteredNotes.map((note) => {
+                const colorConfig = COLOR_MAP[note.colorTag] || COLOR_MAP.amber;
+                const isStuck = stuckIds.includes(note.id);
+                const isM3U8 =
+                  note.content.includes('#EXTM3U') ||
+                  note.content.includes('.m3u8') ||
+                  note.title.toLowerCase().includes('m3u8');
+
+                return (
+                  <div
+                    key={note.id}
+                    onClick={() => openEditModal(note)}
+                    className="group relative border border-[#2D2D38] bg-[#1F1E24] hover:bg-[#25242C] rounded-2xl p-4 transition-all duration-200 cursor-pointer flex flex-col justify-between min-h-[200px] shadow-lg hover:border-amber-500/50 hover:shadow-amber-500/5"
+                  >
+                    <div className="space-y-2.5">
+                      {/* Card Top Metadata */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs px-2.5 py-1 bg-[#18171E] rounded-xl border border-[#2D2D38] flex items-center gap-1.5 font-bold text-zinc-300">
+                          <span className={`w-2 h-2 rounded-full ${colorConfig.dot}`} />
+                          <span className="truncate max-w-[100px]">{note.category}</span>
+                        </span>
+
+                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          {/* Pin Toggle */}
+                          <button
+                            onClick={(e) => handleTogglePin(note.id, e)}
+                            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                              note.isPinned
+                                ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                : 'bg-[#18171E] text-zinc-500 border-[#2D2D38] hover:text-amber-400'
+                            }`}
+                            title={note.isPinned ? 'Bỏ ghim' : 'Ghim ưu tiên'}
+                          >
+                            <Pin className={`w-3 h-3 ${note.isPinned ? 'fill-amber-400' : ''}`} />
+                          </button>
+
+                          {/* Stuck on Screen Toggle */}
+                          <button
+                            onClick={(e) => handleToggleStuckOnScreen(note.id, e)}
+                            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                              isStuck
+                                ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                                : 'bg-[#18171E] text-zinc-500 border-[#2D2D38] hover:text-purple-400'
+                            }`}
+                            title={isStuck ? 'Gỡ ghim nổi' : 'Ghim nổi trên màn hình'}
+                          >
+                            <Layers className="w-3 h-3" />
+                          </button>
+
+                          {/* Delete */}
+                          <button
+                            onClick={(e) => handleDeleteNote(note.id, e)}
+                            className="p-1.5 rounded-lg bg-[#18171E] border border-[#2D2D38] text-zinc-500 hover:text-rose-400 hover:border-rose-500/30 transition-colors cursor-pointer"
+                            title="Xóa ghi chú"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Card Title & Snippet */}
+                      <div>
+                        <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-2 leading-snug">
+                          {note.title}
+                        </h3>
+                        <p
+                          className={`text-xs mt-1.5 line-clamp-3 leading-relaxed ${
+                            isM3U8
+                              ? 'font-mono text-emerald-400 text-[11px] bg-[#141318] p-1.5 rounded-lg border border-[#2D2D38]'
+                              : 'text-[#9CA3AF]'
+                          }`}
+                        >
+                          {note.content || 'Chưa có nội dung...'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Card Footer (V-Study style) */}
+                    <div className="flex items-center justify-between text-xs font-bold text-[#9CA3AF] transition-all mt-4 pt-2.5 border-t border-[#2D2D38]">
+                      <span className="text-[11px] text-zinc-400 font-mono bg-[#18171E] px-2 py-0.5 rounded-md border border-[#2D2D38]">
+                        {note.updatedAt}
+                      </span>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={(e) => handleCopy(note.content, note.id, e)}
+                          className="p-1 text-zinc-400 hover:text-cyan-400 transition-colors cursor-pointer"
+                          title="Sao chép nội dung"
+                        >
+                          {copiedId === note.id ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+
+                        <div className="flex items-center gap-1 text-white group-hover:text-amber-400">
+                          <span className="text-[11px]">Mở</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* EDUCATIONAL / USAGE GUIDELINES (EXACT V-STUDY FOOTER GUIDE BANNER) */}
+          <div className="p-5 sm:p-6 bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-white/5 space-y-2.5 mt-6 shadow-xl">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse" />
+              <span>Chế độ Đồng Bộ Sổ Tay V-Notes & Sticky Nổi</span>
+            </h4>
+            <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+              Khi bạn ghim nổi ghi chú bằng biểu tượng <strong>Ghim Nổi (Layers)</strong>, ghi chú sẽ tự động xuất hiện dạng thẻ lơ lửng trên màn hình Vplay. Bạn có thể vừa làm bài thi trắc nghiệm trên <strong>V-Study</strong>, vừa xem tivi trực tuyến mà không bị che khuất tài liệu ôn tập.
+            </p>
+          </div>
         </div>
       )}
     </div>
   );
 };
+
+export default VNotesView;
