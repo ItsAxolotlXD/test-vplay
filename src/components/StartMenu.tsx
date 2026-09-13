@@ -860,7 +860,7 @@ export default function StartMenu({
                         group: "Thử nghiệm",
                         logoText: "TEST VIDEO",
                         logoBg: "bg-gradient-to-br from-indigo-500 to-purple-700",
-                        logoImg: "https://static.wikia.nocookie.net/ep-deo/images/6/6a/VTV6_HD.png/revision/latest/scale-to-width-down/180?cb=20260625104230"
+                        logoImg: "https://static.wikia.nocookie.net/ep-deo/images/3/31/Vtv6_front.png/revision/latest?cb=20260913100008"
                       });
                     }
                   }}
