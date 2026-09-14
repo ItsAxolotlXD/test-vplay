@@ -14,6 +14,7 @@ import {
   Radio,
   MessageSquare,
   Smartphone,
+  Music,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -156,12 +157,12 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
       { id: 'floaty-settings', title: 'Cài đặt', route: '/settings', icon: SettingsIcon },
       { id: 'floaty-search', title: 'Tìm kiếm', action: onOpenSearch, icon: Search },
     ],
-    // Trang 2: Space360, News, Truyền hình, Loyalty
+    // Trang 2: Space360, News, Truyền hình, Music
     [
       { id: 'floaty-space360', title: 'Space 360', route: '/space-360', icon: Sparkles },
-      { id: 'floaty-news', title: 'Tin tức & Sự kiện', route: '/news', icon: Newspaper },
+      { id: 'floaty-music', title: 'Kho nhạc TV', route: '/music', icon: Music },
       { id: 'floaty-tv', title: 'Truyền hình trực tuyến', route: '/live-tv', icon: Tv },
-      { id: 'floaty-loyalty', title: 'Điểm thưởng Loyalty', route: '/loyalty', icon: Trophy },
+      { id: 'floaty-news', title: 'Tin tức & Sự kiện', route: '/news', icon: Newspaper },
     ],
     // Trang 3: Danh sách bạn bè, V-Flow, V-Chat, Vertical
     [

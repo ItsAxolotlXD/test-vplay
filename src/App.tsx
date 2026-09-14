@@ -54,6 +54,7 @@ import { SearchTab } from './components/SearchTab';
 import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
 import VplayVertical from './components/VplayVertical';
+import { MusicTab } from './pages/MusicTab';
 import { ArrowLeft } from 'lucide-react';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -397,6 +398,11 @@ export default function App() {
             routeState={routeState}
           />
         );
+
+      case '/music':
+      case '/v-music':
+      case '/audio':
+        return <MusicTab navigate={navigate} />;
 
       case '/copilot':
       case '/copilot-standalone':

@@ -872,39 +872,34 @@ function parseFandomHtml(html: string) {
 }
 
 // API endpoint for fetching and parsing Fandom Logos using MediaWiki Action API (bypasses Cloudflare)
-app.post("/api/fandom-logos", async (req, res) => {
+const handleFandomLogos = async (req: express.Request, res: express.Response) => {
   try {
-    const { url } = req.body;
-    if (!url) {
-      return res.status(400).json({ error: "Vui lòng cung cấp đường link Fandom Logopedia" });
-    }
+    const rawUrl = (req.query.url as string) || req.body?.url;
+    let lang = ((req.query.lang as string) || req.body?.lang || "en").toLowerCase();
+    let pageName = ((req.query.page as string) || req.body?.page || "").trim();
 
-    console.log(`Processing Fandom request: ${url}`);
-    
-    // Parse URL into language and pageName
-    let lang = "en";
-    let pageName = "";
-    try {
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split("/").filter(Boolean);
-      
-      if (pathParts[0] === "vi" && pathParts[1] === "wiki") {
-        lang = "vi";
-        pageName = decodeURIComponent(pathParts[2]);
-      } else if (pathParts[0] === "wiki") {
-        lang = "en";
-        pageName = decodeURIComponent(pathParts[1]);
-      } else {
-        // Fallback: use last segment of path as pageName if not matching exact /wiki/
-        pageName = decodeURIComponent(pathParts[pathParts.length - 1] || "");
+    if (rawUrl) {
+      console.log(`Processing Fandom request from URL: ${rawUrl}`);
+      try {
+        const urlObj = new URL(rawUrl);
+        const pathParts = urlObj.pathname.split("/").filter(Boolean);
+        
+        if (pathParts[0] === "vi" && pathParts[1] === "wiki") {
+          lang = "vi";
+          pageName = decodeURIComponent(pathParts[2]);
+        } else if (pathParts[0] === "wiki") {
+          lang = "en";
+          pageName = decodeURIComponent(pathParts[1]);
+        } else {
+          pageName = decodeURIComponent(pathParts[pathParts.length - 1] || "");
+        }
+      } catch (e) {
+        pageName = rawUrl.trim();
       }
-    } catch (e) {
-      // If not a full URL but just page name, we can guess page name directly
-      pageName = url.trim();
     }
 
     if (!pageName) {
-      return res.status(400).json({ error: "Không tìm thấy tên trang hợp lệ từ liên kết cung cấp." });
+      return res.status(400).json({ error: "Vui lòng cung cấp tên trang hoặc liên kết Fandom Logopedia" });
     }
 
     const apiUrl = lang === "vi" 
@@ -940,8 +935,10 @@ app.post("/api/fandom-logos", async (req, res) => {
     }
 
     res.json({
+      success: true,
       title: pageTitle,
-      sections
+      sections,
+      sectionsCount: sections.length
     });
   } catch (error: any) {
     console.error("Fandom Logos API Error:", error);
@@ -949,6 +946,51 @@ app.post("/api/fandom-logos", async (req, res) => {
       error: "Không thể lấy dữ liệu từ Fandom Logopedia. Vui lòng kiểm tra lại liên kết.",
       details: error.message
     });
+  }
+};
+
+app.get("/api/fandom-logos", handleFandomLogos);
+app.post("/api/fandom-logos", handleFandomLogos);
+
+// Audio proxy endpoint for streaming TV music tracks without Cloudflare hotlinking blocks
+app.get("/api/audio-proxy", async (req, res) => {
+  try {
+    const audioUrl = req.query.url as string;
+    if (!audioUrl) {
+      return res.status(400).json({ error: "Missing audio url" });
+    }
+
+    const range = req.headers.range;
+    const fetchHeaders: Record<string, string> = {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Referer": "https://logos.fandom.com/"
+    };
+    if (range) {
+      fetchHeaders["Range"] = range;
+    }
+
+    const response = await fetch(audioUrl, { headers: fetchHeaders });
+    if (!response.ok && response.status !== 206) {
+      return res.status(response.status).send(`Failed to fetch audio: ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const contentLength = response.headers.get("content-length");
+    const contentRange = response.headers.get("content-range");
+    const acceptRanges = response.headers.get("accept-ranges");
+
+    res.status(response.status);
+    res.setHeader("Content-Type", contentType);
+    if (contentLength) res.setHeader("Content-Length", contentLength);
+    if (contentRange) res.setHeader("Content-Range", contentRange);
+    if (acceptRanges) res.setHeader("Accept-Ranges", acceptRanges);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const arrayBuffer = await response.arrayBuffer();
+    res.send(Buffer.from(arrayBuffer));
+  } catch (error: any) {
+    console.error("Audio Proxy Error:", error);
+    res.status(500).json({ error: "Failed to proxy audio", details: error.message });
   }
 });
 

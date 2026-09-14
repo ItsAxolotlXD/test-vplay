@@ -109,6 +109,11 @@ export interface HeroSlide {
   backgroundImage: string;
   ctaText: string;
   director?: string;
+  cardType?: 'vtv56' | 'waves' | 'vinhlong' | 'copilot' | 'standard';
+  anniversaryText?: string;
+  dates?: string;
+  themeColor?: string;
+  isAd?: boolean;
 }
 
 export interface UserSettings {

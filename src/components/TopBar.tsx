@@ -41,7 +41,8 @@ import {
   Layers,
   ArrowRight,
   StickyNote,
-  Armchair
+  Armchair,
+  Music
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
@@ -255,7 +256,22 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <span className="font-medium tracking-wide">Truyền hình</span>
               </button>
 
-              {/* Item 2: Xem thêm v with Dropdown Menu */}
+              {/* Item 2: Music / Kho nhạc truyền hình */}
+              <button
+                id="topbar-nav-music"
+                onClick={() => navigate('/music')}
+                className={`relative px-4 py-2 rounded-full text-[14.5px] font-medium transition-all flex items-center gap-2 cursor-pointer group ${
+                  currentRoute === '/music' || currentRoute.startsWith('/music')
+                    ? 'text-white bg-white/15 font-bold'
+                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                }`}
+                title="Kho nhạc truyền hình Vplay Music"
+              >
+                <Music className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
+                <span className="font-medium tracking-wide">Music</span>
+              </button>
+
+              {/* Item 3: Xem thêm v with Dropdown Menu */}
               <div
                 className="relative h-full flex items-center"
                 ref={moreMenuDropdownRef}
@@ -341,6 +357,20 @@ export const TopBar: React.FC<TopBarProps> = ({
                         >
                           <Newspaper className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
                           <span>Cổng thông tin</span>
+                        </button>
+
+                        {/* Music - Kho nhạc truyền hình */}
+                        <button
+                          id="more-item-music"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
+                            navigate('/music');
+                          }}
+                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                        >
+                          <Music className="w-5 h-5 shrink-0 text-[#FF4C93] group-hover:scale-105 transition-transform" />
+                          <span>Kho nhạc truyền hình</span>
                         </button>
 
                         {/* 4. Cổng không gian (Space 360) - Dẫn trực tiếp đến tab Space 360 */}

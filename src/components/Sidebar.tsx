@@ -42,7 +42,8 @@ import {
   CloudSun,
   StickyNote,
   Armchair,
-  MessageSquare
+  MessageSquare,
+  Music
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -543,6 +544,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           />
           <span className="truncate">Copilot for Vplay</span>
+        </button>
+
+        {/* Music (Kho nhạc truyền hình) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-music' : 'nav-item-music'}
+          onClick={() => handleNavClick('/music')}
+          title="Kho nhạc truyền hình Vplay Music"
+          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/music')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <Music className="w-5 h-5 shrink-0 text-[#FF4C93]" />
+          <span className="truncate">Music (Nhạc TV)</span>
         </button>
 
         {/* Divider 1 */}

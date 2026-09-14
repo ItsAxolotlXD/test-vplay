@@ -1,9 +1,11 @@
 import React from 'react';
 import { HeroCarousel } from '../components/HeroCarousel';
+import { BannerCardItem } from '../components/BannerCardItem';
 import { OnAirSlider } from '../components/OnAirSlider';
 import { NewsCard } from '../components/NewsCard';
 import { CHANNELS_DATA } from '../data/channels';
 import { NEWS_DATA } from '../data/news';
+import { HERO_SLIDES } from '../data/heroSlides';
 import { Channel, NewsArticle } from '../types';
 import { Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers } from 'lucide-react';
 import { PortalsCircularSection } from '../components/PortalsCircularSection';
@@ -22,20 +24,27 @@ export const Home: React.FC<HomeProps> = ({
   const featuredArticle = NEWS_DATA[0];
   const otherArticles = NEWS_DATA.slice(1, 4);
 
+  // 2 cái AD banner cho lên đầu khối ngang
+  const horizontalBanners = [
+    ...HERO_SLIDES.filter((s) => s.isAd),
+    ...HERO_SLIDES.filter((s) => !s.isAd)
+  ];
+
   return (
-    <div className="space-y-12 pb-16">
-      {/* 1. Big Full Page Hero Banner */}
+    <div className="space-y-6 sm:space-y-8 pb-16">
+      {/* 1. Banner Cards Carousel */}
       <HeroCarousel
         navigate={navigate}
         onSelectChannel={onSelectChannel}
       />
 
-      <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-12">
-        {/* 2. Đang phát sóng (On Air Section) - Chuyển lên đầu, trên các chuyên trang */}
+      <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-10 sm:space-y-12">
+        {/* 2. Đề xuất cho bạn */}
         <OnAirSlider
           channels={channels}
           onSelectChannel={onSelectChannel}
           navigate={navigate}
+          title="Đề xuất cho bạn"
         />
 
         {/* 3. Chuyên trang banner tròn - Dạng scroll ngang giống các ô kênh, bỏ nền */}
@@ -141,27 +150,19 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </section>
 
-        {/* Placeholder Category 1: khối ngang - cấp 2 */}
+        {/* Category: khối ngang - cấp 2 */}
         <section className="space-y-4">
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
             khối ngang - cấp 2
           </h2>
 
-          <div className="flex gap-3.5 sm:gap-4 overflow-x-auto pb-3 no-scrollbar scroll-smooth">
-            {[
-              { id: 'block-1', title: 'Spotlight khối chứa khối' },
-              { id: 'block-2', title: 'khối chứa nd 2' },
-              { id: 'block-3', title: 'khối banner' },
-              { id: 'block-4', title: 'khối chứa VOD' },
-              { id: 'block-5', title: 'KHỐI CHỨA NHÓM KÊNH 2' },
-            ].map((item) => (
+          <div className="flex gap-4 sm:gap-5 overflow-x-auto pb-3 no-scrollbar scroll-smooth">
+            {horizontalBanners.map((banner) => (
               <div
-                key={item.id}
-                className="w-52 sm:w-64 h-28 sm:h-32 shrink-0 rounded-2xl bg-gradient-to-b from-[#1b4698] via-[#163a82] to-[#10275c] border border-[#2753a7]/50 shadow-lg shadow-blue-950/30 flex items-center justify-center p-4 text-center cursor-pointer hover:scale-[1.02] hover:border-blue-400/60 hover:brightness-110 transition-all group"
+                key={banner.id}
+                className="w-[280px] sm:w-[340px] md:w-[380px] aspect-[16/9] shrink-0 select-none cursor-default"
               >
-                <span className="text-sm sm:text-base font-bold text-white leading-snug group-hover:text-blue-100">
-                  {item.title}
-                </span>
+                <BannerCardItem slide={banner} />
               </div>
             ))}
           </div>
