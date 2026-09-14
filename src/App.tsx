@@ -42,6 +42,7 @@ import {
   VWeatherTab,
   VStockTab,
   VHealthTab,
+  VMapsTab,
 } from './components/vapps';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
 import VplayVBoxTab from './components/VplayVBoxTab';
@@ -61,11 +62,13 @@ import { useFavorites } from './hooks/useFavorites';
 import { useFeatureFlags } from './hooks/useFeatureFlags';
 import { motion, AnimatePresence } from 'motion/react';
 import { MotionEffectsLayer } from './components/motion/MotionEffectsLayer';
+import { VBoardOverlay } from './components/vboard/VBoardOverlay';
 
 export default function App() {
   const { settings, updateSetting } = useSettings();
   const { flags, toggleFlag } = useFeatureFlags();
-  const isAnimationTest = flags.animation_test !== false;
+  const isAnimationTest = Boolean(flags.animation_test);
+  const isVBoardEnabled = flags.experimental_vboard !== false;
   const isFloatyMode = Boolean(settings.floatyBar);
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
@@ -422,6 +425,11 @@ export default function App() {
       case '/explore-vietnam':
         return renderSpace360App('Explore Vietnam', <ExploreVietnamTab onBack={() => navigate('/space-360')} />);
 
+      case '/v-maps':
+      case '/space-360-maps':
+      case '/maps':
+        return renderSpace360App('Space 360 V-Maps', <VMapsTab onBack={() => navigate('/space-360')} />);
+
       case '/v-box':
         return renderSpace360App('V-Box', <VplayVBoxTab onBack={() => navigate('/space-360')} />);
 
@@ -636,6 +644,9 @@ export default function App() {
         onToggle={() => toggleFlag('animation_test')}
         navigate={navigate}
       />
+
+      {/* Experimental V-board iOS Virtual Keyboard System */}
+      <VBoardOverlay isEnabled={isVBoardEnabled} />
 
       {/* Sidebar Navigation: Only rendered when Floaty bar is disabled */}
       {!isFloatyMode && (

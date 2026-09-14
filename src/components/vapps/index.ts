@@ -19,3 +19,4 @@ export { VTicketTab } from "./VTicketTab";
 export { VWeatherTab } from "./VWeatherTab";
 export { VStockTab } from "./VStockTab";
 export { VHealthTab } from "./VHealthTab";
+export { VMapsTab } from "./VMapsTab";

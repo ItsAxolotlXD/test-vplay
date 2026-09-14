@@ -630,7 +630,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
                     isSelected
                       ? 'border-[3px] border-white shadow-xl shadow-black/40'
                       : 'border-[3px] border-transparent hover:border-white/30'
@@ -640,23 +640,9 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   <img
                     src={channel.logo}
                     alt={channel.name}
-                    className={`object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none ${
-                      isVtv2
-                        ? 'h-10 sm:h-11 w-auto max-w-[82%]'
-                        : 'h-13 sm:h-15 w-auto max-w-[94%]'
-                    }`}
+                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
                     referrerPolicy="no-referrer"
                   />
-                  {/* Subtle label for duplicate/test channels to distinguish */}
-                  {(channel.name.includes('Front') ||
-                    channel.name.includes('test') ||
-                    channel.name.includes('thử nghiệm') ||
-                    channel.name.includes('Low Latency') ||
-                    channel.name.includes('Cần Thơ')) && (
-                    <span className="text-[10px] text-zinc-400 truncate max-w-[90%] font-medium mt-1">
-                      {channel.name}
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -689,7 +675,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
                     isSelected
                       ? 'border-[3px] border-white shadow-xl shadow-black/40'
                       : 'border-[3px] border-transparent hover:border-white/30'
@@ -699,12 +685,9 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   <img
                     src={channel.logo}
                     alt={channel.name}
-                    className="h-12 sm:h-14 w-auto max-w-[90%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
+                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="text-[10px] text-zinc-400 truncate max-w-[90%] font-medium mt-1">
-                    {channel.name}
-                  </span>
                 </button>
               );
             })}
@@ -737,7 +720,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex flex-col items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
                     isSelected
                       ? 'border-[3px] border-white shadow-xl shadow-black/40'
                       : 'border-[3px] border-transparent hover:border-white/30'
@@ -747,12 +730,9 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   <img
                     src={channel.logo}
                     alt={channel.name}
-                    className="h-11 sm:h-13 w-auto max-w-[90%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
+                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="text-[10px] text-zinc-400 truncate max-w-[90%] font-medium mt-1">
-                    {channel.name}
-                  </span>
                 </button>
               );
             })}

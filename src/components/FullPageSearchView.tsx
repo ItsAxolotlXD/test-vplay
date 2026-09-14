@@ -31,6 +31,7 @@ import {
   BadgeCheck,
   Puzzle,
   Folder,
+  Globe,
 } from "lucide-react";
 import { Channel, Category } from "../data/channels";
 import { NEWS_LIST } from "./NewsView";
@@ -286,6 +287,15 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
       appId: "explore_vietnam",
       color: "from-amber-500/20 to-red-500/20",
       icon: <Compass className="w-5 h-5 text-amber-400" />,
+    },
+    {
+      id: "v_maps",
+      title: "Space 360 V-Maps",
+      description: "Bản đồ không gian 360 độ, khám phá vệ tinh Trái Đất, toàn cảnh di tích và quỹ đạo ISS",
+      badge: "Không Gian",
+      appId: "v_maps",
+      color: "from-cyan-500/20 to-blue-500/20",
+      icon: <Globe className="w-5 h-5 text-cyan-400" />,
     },
     {
       id: "v_learn",

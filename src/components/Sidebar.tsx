@@ -148,6 +148,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           routeState?.appId === 'explore_vietnam')
       );
     }
+    if (appId === 'v_maps') {
+      return (
+        currentRoute === '/v-maps' ||
+        currentRoute === '/space-360-maps' ||
+        currentRoute === '/maps' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'v_maps')
+      );
+    }
     if (appId === 'v_box') {
       return (
         currentRoute === '/v-box' ||
@@ -659,6 +668,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="flex items-center gap-2.5 truncate">
                     <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
                     <span className="truncate">Explore Vietnam</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-maps" : "space360-tab-maps"}
+                  onClick={() => handleNavClick("/v-maps", { appId: "v_maps" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("v_maps")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Globe className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span className="truncate">Space 360 V-Maps</span>
                   </div>
                 </button>
 

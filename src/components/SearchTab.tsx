@@ -32,7 +32,8 @@ import {
   Swords,
   Flame,
   LayoutGrid,
-  MessageSquare
+  MessageSquare,
+  Globe
 } from 'lucide-react';
 import { Channel } from '../data/channels';
 import { NEWS_LIST } from './NewsView';
@@ -153,6 +154,15 @@ export const SearchTab: React.FC<SearchTabProps> = ({
         state: { appId: 'explore_vietnam' },
         icon: <MapPin className="w-4.5 h-4.5 text-[#FF4D8D]" />,
         tags: ['explore vietnam', 'việt nam', 'bản đồ', 'du lịch', '63 tỉnh thành', 'địa danh']
+      },
+      {
+        id: 'sidebar_v_maps',
+        name: 'Space 360 V-Maps',
+        tagline: 'Tab Sidebar • Bản đồ không gian 360°, vệ tinh toàn cầu & địa danh',
+        route: '/v-maps',
+        state: { appId: 'v_maps' },
+        icon: <Globe className="w-4.5 h-4.5 text-cyan-400" />,
+        tags: ['v-maps', 'space 360', 'bản đồ', 'vệ tinh', 'street view', '360', 'toàn cảnh', 'maps']
       },
       {
         id: 'sidebar_vbox',
@@ -334,6 +344,16 @@ export const SearchTab: React.FC<SearchTabProps> = ({
         appId: 'explore_vietnam',
         icon: <MapPin className="w-4 h-4 text-rose-400" />,
         tags: ['Bản Đồ', 'Việt Nam', '63 Tỉnh Thành', 'Du Lịch']
+      },
+      {
+        id: 'v_maps',
+        name: 'Space 360 V-Maps',
+        tagline: 'Bản Đồ Không Gian 360° & Vệ Tinh Trái Đất',
+        category: 'Không gian & Bản đồ',
+        route: '/v-maps',
+        appId: 'v_maps',
+        icon: <Globe className="w-4 h-4 text-cyan-400" />,
+        tags: ['Bản Đồ', 'Space 360', 'V-Maps', 'Vệ Tinh', 'Street View', 'Toàn Cảnh 360']
       },
       {
         id: 'v_learn',

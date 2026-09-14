@@ -35,6 +35,7 @@ export type VAppId =
   | 'v_arcade'
   | 'v_xplore'
   | 'explore_vietnam'
+  | 'v_maps'
   | 'v_box'
   | 'v_learn'
   | 'v_calc'
@@ -109,6 +110,19 @@ export const VAPPS_LIST: VAppDefinition[] = [
     glowClass: 'shadow-[0_10px_30px_rgba(225,29,72,0.35)]',
     icon: MapPin,
     tags: ['63 Tỉnh Thành', 'Ẩm Thực', 'Danh Lam Thắng Cảnh', 'Explore Vietnam'],
+  },
+  {
+    id: 'v_maps',
+    name: 'Space 360 V-Maps',
+    tagline: 'Bản Đồ Không Gian 360° & Vệ Tinh',
+    description: 'Bản đồ không gian 360 độ toàn cảnh, khám phá vệ tinh Trái Đất độ phân giải cao, danh lam thắng cảnh 360° Việt Nam và trạm vũ trụ ISS.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Space 360',
+    gradientBg: 'bg-gradient-to-br from-[#0EA5E9] via-[#2563EB] to-[#1D4ED8]',
+    borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(14,165,233,0.35)]',
+    icon: Globe,
+    tags: ['Space 360', 'V-Maps', 'Bản Đồ Vệ Tinh', 'Toàn Cảnh 360', 'Street View', 'ISS Orbit', 'Bản Đồ Không Gian'],
   },
   {
     id: 'v_box',
@@ -396,6 +410,9 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'explore_vietnam':
         navigate('/explore-vietnam', { appId: 'explore_vietnam' });
+        break;
+      case 'v_maps':
+        navigate('/v-maps', { appId: 'v_maps' });
         break;
       case 'v_box':
         navigate('/v-box', { appId: 'v_box' });

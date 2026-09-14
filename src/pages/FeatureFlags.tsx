@@ -22,7 +22,8 @@ import {
   Flame,
   ShieldCheck,
   Play,
-  Activity
+  Activity,
+  Keyboard
 } from 'lucide-react';
 import { 
   useFeatureFlags, 
@@ -498,6 +499,33 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
                           </p>
                           <p className="text-[10px] text-zinc-400 font-mono">Tap feedback & Sound</p>
                         </motion.div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SPECIAL INTERACTIVE TEST BOX FOR EXPERIMENTAL V-BOARD */}
+                  {item.key === 'experimental_vboard' && (
+                    <div className="mt-4 p-4 rounded-2xl bg-[#131218] border border-white/10 space-y-3 select-none">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center gap-1.5 uppercase tracking-wider">
+                          <Keyboard className="w-3.5 h-3.5 text-cyan-400" />
+                          <span>Thử Nghiệm Bàn Phím V-board Trực Tiếp</span>
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 font-mono">
+                          iOS Dark Keyboard
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-zinc-400 leading-relaxed">
+                        Chạm vào ô bên dưới để mở V-board. Đã tích hợp bộ gõ <strong>Tiếng Việt Telex</strong> (vd: <code className="text-cyan-300">truyeenf</code> ➔ <span className="text-white font-bold">truyền</span>, <code className="text-cyan-300">boongs ddaas</code> ➔ <span className="text-white font-bold">bóng đá</span>). Chạm biểu tượng quả địa cầu <strong>🌐</strong> để chuyển tức thì sang bàn phím thiết bị.
+                      </p>
+
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Chạm để gõ thử Tiếng Việt bằng bàn phím V-board..."
+                          className="w-full px-4 py-2.5 rounded-xl bg-[#1D1C24] border border-cyan-500/30 text-white text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all placeholder:text-zinc-500"
+                        />
                       </div>
                     </div>
                   )}

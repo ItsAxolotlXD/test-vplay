@@ -22,6 +22,15 @@ export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
     description: 'Thêm thật nhiều animation và motion mượt mà vào toàn bộ ứng dụng: hiệu ứng chuyển trang đàn hồi (Page Transitions), các khối sáng lơ lửng chuyển động nền (Ambient Orbs), tương tác spring phóng to thu nhỏ trên thẻ & nút bấm, macOS dock magnification, và bảng điều khiển Motion Sandbox trực tiếp.',
     category: 'ui',
     badge: 'EXPERIMENTAL',
+    defaultValue: false,
+  },
+  {
+    id: 'flag_experimental_vboard',
+    key: 'experimental_vboard',
+    name: 'Experimental V-board',
+    description: 'Bàn phím ảo độc quyền V-board mang phong cách iOS dark mode khi tương tác với thanh tìm kiếm (Search box) và ô nhập văn bản (Input box), vô hiệu hóa bàn phím mặc định của thiết bị (không trigger bàn phím device).',
+    category: 'ui',
+    badge: 'EXPERIMENTAL',
     defaultValue: true,
   },
   {
@@ -47,6 +56,15 @@ export const getStoredFlags = (): Record<string, boolean> => {
       FEATURE_FLAGS_DEFINITIONS.forEach((item) => {
         merged[item.key] = typeof parsed[item.key] === 'boolean' ? parsed[item.key] : item.defaultValue;
       });
+
+      // Migration: Ensure animation_test is OFF by default as requested
+      const appliedMigration = localStorage.getItem('vplay_flags_v2_migration');
+      if (!appliedMigration) {
+        merged['animation_test'] = false;
+        localStorage.setItem('vplay_flags_v2_migration', 'true');
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      }
+
       return merged;
     }
   } catch (err) {

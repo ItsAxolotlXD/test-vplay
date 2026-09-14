@@ -41,6 +41,32 @@ export const playPopSound = () => {
   } catch (err) {}
 };
 
+export const playKeyboardClickSound = (isDelete = false) => {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = isDelete ? 'sine' : 'triangle';
+    const startFreq = isDelete ? 520 : 1350;
+    const endFreq = isDelete ? 260 : 680;
+
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.02);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.022);
+  } catch (err) {}
+};
+
 export const playWinSound = () => {
   try {
     const ctx = getAudioContext();
