@@ -11,19 +11,19 @@ export type Channel = {
 
 export const channels: Channel[] = [
   // VTV
-  { category: "VTV", name: "VTV1", logo: "https://static.wikia.nocookie.net/ftv/images/a/ac/1vv.png/revision/latest/scale-to-width-down/1000?cb=20260604052331&path-prefix=vi", stream: "https://live.fptplay53.net/fnxch2/vtv1hd_abr.smil/chunklist.m3u8" },
+  { category: "VTV", name: "VTV1", logo: "https://static.wikia.nocookie.net/ep-deo/images/f/f9/Image_%2812%29.png/revision/latest?cb=20260914074936", stream: "https://live.fptplay53.net/fnxch2/vtv1hd_abr.smil/chunklist.m3u8" },
   { category: "VTV", name: "VTV2", logo: "https://static.wikia.nocookie.net/ep-deo/images/4/45/Vtv2_front.png/revision/latest/scale-to-width-down/1000?cb=20260913100152", stream: "https://live.fptplay53.net/fnxch2/vtv2hd_abr.smil/chunklist.m3u8" },
   { category: "VTV", name: "VTV3", logo: "https://static.wikia.nocookie.net/ftv/images/3/32/V3.png/revision/latest/scale-to-width-down/1000?cb=20260601093014&path-prefix=vi", stream: "https://live.fptplay53.net/fnxch2/vtv3hd_abr.smil/chunklist.m3u8" },
   { category: "VTV", name: "VTV4", logo: "https://static.wikia.nocookie.net/ftv/images/0/02/Imagei4.png/revision/latest/scale-to-width-down/1000?cb=20260601093135&path-prefix=vi", stream: "https://live.fptplay53.net/fnxch2/vtv4hd_abr.smil/chunklist.m3u8" },
   { category: "VTV", name: "VTV5", logo: "https://static.wikia.nocookie.net/ftv/images/7/79/Imagej42.png/revision/latest/scale-to-width-down/1000?cb=20260601093345&path-prefix=vi", stream: "https://live-a.fptplay53.net/live/media/VTV5HD/live_hls_avc/index.m3u8" },
   { category: "VTV", name: "VTV6", logo: "https://static.wikia.nocookie.net/ep-deo/images/3/31/Vtv6_front.png/revision/latest?cb=20260913100008", stream: "https://toiyeuvietnam.dpdns.org/OnliveTV/vtv6-hd/Free.m3u8" },
   { category: "VTV", name: "VTV7", logo: "https://static.wikia.nocookie.net/ftv/images/4/43/Image7.png/revision/latest/scale-to-width-down/1000?cb=20260601093859&path-prefix=vi", stream: "https://live.fptplay53.net/fnxhd1/vtv7hd_vhls.smil/chunklist_b5000000.m3u8" },
-  { category: "VTV", name: "VTV8", logo: "https://static.wikia.nocookie.net/ftv/images/b/b1/Imagea8.png/revision/latest/scale-to-width-down/1000?cb=20260601094212&path-prefix=vi", stream: "https://live.fptplay53.net/epzhd1/vtv8hd_vhls.smil/chunklist.m3u8" },
-  { category: "VTV", name: "VTV9", logo: "https://static.wikia.nocookie.net/ftv/images/8/8c/Imagei9.png/revision/latest/scale-to-width-down/1000?cb=20260601094610&path-prefix=vi", stream: "https://live.fptplay53.net/fnxhd1/vtv9hd_vhls.smil/chunklist_b5000000.m3u8" },
+  { category: "VTV", name: "VTV8", logo: "https://static.wikia.nocookie.net/logos/images/7/73/Logo_VTV8_01.02.2016.png/revision/latest?cb=20260228014157&path-prefix=uk", stream: "https://live.fptplay53.net/epzhd1/vtv8hd_vhls.smil/chunklist.m3u8" },
+  { category: "VTV", name: "VTV9", logo: "https://static.wikia.nocookie.net/logos/images/7/7b/Logo_VTV9_20.12.2012.png/revision/latest?cb=20260301015846&path-prefix=uk", stream: "https://live.fptplay53.net/fnxhd1/vtv9hd_vhls.smil/chunklist_b5000000.m3u8" },
   { category: "VTV", name: "VTV Cần Thơ", logo: "https://static.wikia.nocookie.net/ftv/images/a/a0/I10.png/revision/latest/scale-to-width-down/1000?cb=20260601094723&path-prefix=vi", stream: "https://live.fptplay53.net/fnxch2/vtvcantho_abr.smil/chunklist_b4200000.m3u8" },
   { category: "VTV", name: "VTV5 Tây Nam Bộ", logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/VTV5_logo_24.png", stream: "https://live.fptplay53.net/fnxhd1/vtv5tnb_vhls.smil/chunklist_b5000000.m3u8" },
   { category: "VTV", name: "VTV5 Tây Nguyên", logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/VTV5_logo_24.png", stream: "https://live.fptplay53.net/fnxhd1/vtv5taynguyen_vhls.smil/chunklist_b5000000.m3u8" },
-  { category: "VTV", name: "Vietnam Today", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d2/VTV_logo_24.png", stream: "https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8" },
+  { category: "VTV", name: "Vietnam Today", logo: "https://static.wikia.nocookie.net/logos/images/f/f2/Logo_Vietnam_Today_07-2025_v2.png/revision/latest?cb=20260228060318&path-prefix=uk", stream: "https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8" },
 
   // VTVcab
   // { category: "VTVcab", name: "ON SPORT +", logo: "https://img.vtvprime.vn/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvT04rU1BPUlQrLnBuZw==.png", stream: "https://freem3u.xyz/api/live/play.m3u8?vid=193" },

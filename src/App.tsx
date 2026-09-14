@@ -646,7 +646,7 @@ export default function App() {
       />
 
       {/* Experimental V-board iOS Virtual Keyboard System */}
-      <VBoardOverlay isEnabled={isVBoardEnabled} />
+      <VBoardOverlay isEnabled={isVBoardEnabled} navigate={navigate} />
 
       {/* Sidebar Navigation: Only rendered when Floaty bar is disabled */}
       {!isFloatyMode && (

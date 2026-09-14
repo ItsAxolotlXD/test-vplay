@@ -38,7 +38,7 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({
         )}
 
         {/* Center Channel Logo */}
-        <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#170E13]/90 flex items-center justify-center p-1.5 overflow-hidden shadow-md group-hover:scale-105 transition-transform duration-300 border-0">
+        <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#170E13]/90 flex items-center justify-center p-1.5 overflow-hidden shadow-md border-0">
           <img
             src={channel.logo}
             alt={channel.name}

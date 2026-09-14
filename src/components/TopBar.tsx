@@ -836,53 +836,57 @@ export const TopBar: React.FC<TopBarProps> = ({
                 ))}
               </div>
 
-              {/* Programs list */}
-              <div className="space-y-2.5">
-                {[
-                  { time: '06:00', title: 'Chào buổi sáng', desc: 'Bản tin tin tức buổi sáng toàn diện', active: false },
-                  { time: '11:30', title: 'Thời sự trưa 11h30', desc: 'Cập nhật tin tức trong nước và quốc tế', active: false },
-                  { time: '13:00', title: 'Phim truyện đặc sắc', desc: 'Tập 24 - Vùng trời hoa lửa', active: false },
-                  { time: '19:00', title: 'Thời sự 19h (Chương trình trọng điểm)', desc: 'Bản tin quốc gia chính luận', active: true },
-                  { time: '20:10', title: 'Giải quyết kiến nghị Doanh nghiệp', desc: 'Chính phủ kiến tạo phát triển', active: false },
-                  { time: '21:30', title: 'Phim truyền hình giờ vàng VTV', desc: 'Tập 18 - Những nẻo đường phù sa', active: false },
-                  { time: '23:00', title: 'Tin tức 24h & Thế giới đêm qua', desc: 'Tổng hợp sự kiện nổi bật trong ngày', active: false }
-                ].map((prog, i) => (
-                  <div
-                    key={i}
-                    className={`p-3 rounded-xl border flex items-center justify-between transition-colors ${
-                      prog.active
-                        ? 'bg-red-600/15 border-red-500/40 text-white'
-                        : 'bg-white/5 border-white/5 hover:border-white/20'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold px-2 py-1 rounded bg-black/30 text-amber-400">
-                        {prog.time}
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-sm">{prog.title}</p>
-                          {prog.active && (
-                            <span className="px-2 py-0.5 text-[9px] font-bold rounded-full bg-red-600 text-white uppercase animate-pulse">
-                              Đang phát
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-400">{prog.desc}</p>
-                      </div>
-                    </div>
+              {/* Programs list 0h -> 23h */}
+              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
+                {Array.from({ length: 24 }, (_, h) => {
+                  const startHour = String(h).padStart(2, '0') + ':00';
+                  const nextH = (h + 1) % 24;
+                  const endHour = nextH === 0 ? '23:59' : String(nextH).padStart(2, '0') + ':00';
+                  const isCurrent = h === new Date().getHours();
 
-                    <button
-                      onClick={() => {
-                        setIsScheduleModalOpen(false);
-                        navigate('/live-tv');
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white shrink-0"
+                  return (
+                    <div
+                      key={h}
+                      id={`topbar-epg-slot-${h}`}
+                      className={`p-3 rounded-xl border flex items-center justify-between transition-colors ${
+                        isCurrent
+                          ? 'bg-red-600/15 border-red-500/40 text-white shadow-md'
+                          : 'bg-white/5 border-white/5 hover:border-white/20'
+                      }`}
                     >
-                      Xem ngay
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex items-center gap-3">
+                        <span className={`font-mono text-xs font-bold px-2 py-1 rounded ${
+                          isCurrent ? 'bg-red-600 text-white' : 'bg-black/30 text-amber-400'
+                        }`}>
+                          {startHour} - {endHour}
+                        </span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-sm">Chưa có lịch phát sóng</p>
+                            {isCurrent && (
+                              <span className="px-2 py-0.5 text-[9px] font-bold rounded-full bg-red-600 text-white uppercase animate-pulse">
+                                Đang phát
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-400">
+                            {isCurrent ? 'Khung giờ hiện tại' : 'Chưa có thông tin phát sóng'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setIsScheduleModalOpen(false);
+                          navigate('/live-tv');
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white shrink-0 cursor-pointer"
+                      >
+                        Xem kênh
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </motion.div>
           </div>

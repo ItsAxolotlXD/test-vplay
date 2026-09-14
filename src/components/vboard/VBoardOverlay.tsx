@@ -7,9 +7,10 @@ import { playPopSound } from '../../utils/sound';
 
 interface VBoardOverlayProps {
   isEnabled: boolean;
+  navigate?: (path: string) => void;
 }
 
-export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled }) => {
+export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled, navigate }) => {
   const [activeInput, setActiveInput] = useState<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isDeviceKeyboardActive, setIsDeviceKeyboardActive] = useState(false);
@@ -60,7 +61,7 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled }) => {
       }
     };
 
-    // When an input receives focus, open V-board (unless in device keyboard mode)
+    // When an input receives focus or click, open V-board (unless in device keyboard mode)
     const handleFocusIn = (e: FocusEvent) => {
       if (!isEnabledRef.current) return;
       const target = e.target as HTMLElement | null;
@@ -76,6 +77,22 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled }) => {
           disableDeviceKeyboard(target);
           setIsOpen(true);
         }
+      }
+    };
+
+    // Explicit click listener for desktop web browsers where focus might already be active
+    const handleInputClick = (e: MouseEvent) => {
+      if (!isEnabledRef.current) return;
+      if (isDeviceKeyboardActiveRef.current) return;
+
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      const inputEl = target.closest('input, textarea');
+      if (inputEl && isTextInput(inputEl)) {
+        setActiveInput(inputEl);
+        disableDeviceKeyboard(inputEl);
+        setIsOpen(true);
       }
     };
 
@@ -107,6 +124,7 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled }) => {
 
     window.addEventListener('pointerdown', handlePointerDown, { capture: true });
     window.addEventListener('focusin', handleFocusIn, { capture: true });
+    window.addEventListener('click', handleInputClick, { capture: true });
     window.addEventListener('click', handleDocumentClick);
     window.addEventListener('keydown', handleKeyDown);
 
@@ -122,6 +140,7 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled }) => {
     return () => {
       window.removeEventListener('pointerdown', handlePointerDown, { capture: true });
       window.removeEventListener('focusin', handleFocusIn, { capture: true });
+      window.removeEventListener('click', handleInputClick, { capture: true });
       window.removeEventListener('click', handleDocumentClick);
       window.removeEventListener('keydown', handleKeyDown);
 
@@ -160,6 +179,47 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled }) => {
     setIsOpen(true);
   };
 
+  // Automatically nudge / scroll the page up when keyboard opens to prevent covering inputs & content
+  useEffect(() => {
+    if (isOpen) {
+      // 1. Add spacious bottom padding to body so the page can scroll past the bottom content
+      const prevPadding = document.body.style.paddingBottom;
+      const prevTransition = document.body.style.transition;
+      document.body.style.transition = 'padding-bottom 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+      document.body.style.paddingBottom = '340px';
+
+      // 2. Smoothly scroll active input or view up
+      const timer = setTimeout(() => {
+        if (activeInput) {
+          const rect = activeInput.getBoundingClientRect();
+          const keyboardHeight = 310;
+          const safeBottom = window.innerHeight - keyboardHeight;
+
+          // If the element is near or below the top of the virtual keyboard
+          if (rect.bottom > safeBottom - 24) {
+            const scrollDelta = (rect.bottom - safeBottom) + 70;
+            window.scrollBy({
+              top: scrollDelta,
+              behavior: 'smooth',
+            });
+            activeInput.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+          }
+        }
+      }, 70);
+
+      return () => {
+        clearTimeout(timer);
+        document.body.style.paddingBottom = prevPadding;
+        document.body.style.transition = prevTransition;
+      };
+    } else {
+      document.body.style.paddingBottom = '';
+    }
+  }, [isOpen, activeInput]);
+
   // Clean up if disabled while open
   useEffect(() => {
     if (!isEnabled && isOpen) {
@@ -180,6 +240,7 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled }) => {
           setIsOpen(false);
         }}
         onSwitchToDeviceKeyboard={handleSwitchToDeviceKeyboard}
+        navigate={navigate}
       />
 
       {/* Floating Re-open V-board Chip when user has switched to device keyboard */}

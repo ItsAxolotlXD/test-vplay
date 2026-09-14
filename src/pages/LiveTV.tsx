@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv } from 'lucide-react';
+import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays } from 'lucide-react';
 import { Channel } from '../types';
+import { ChannelSchedule } from '../components/ChannelSchedule';
 import Hls from 'hls.js';
 
 interface LiveTVProps {
@@ -24,7 +25,7 @@ const VTV_CHANNELS: VtvChannelItem[] = [
   {
     id: 'vtv1',
     name: 'VTV1',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/a/ac/1vv.png/revision/latest/scale-to-width-down/1000?cb=20260604052331&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/f/f9/Image_%2812%29.png/revision/latest?cb=20260914074936',
     streamUrl: 'https://live.fptplay53.net/live/media/vtv1/live247-hls-avc/vtv1-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
   {
@@ -37,19 +38,19 @@ const VTV_CHANNELS: VtvChannelItem[] = [
   {
     id: 'vtv3',
     name: 'VTV3',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/3/32/V3.png/revision/latest/scale-to-width-down/1000?cb=20260601093014&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/5/53/Image_%2814%29.png/revision/latest?cb=20260914083805',
     streamUrl: 'https://live.fptplay53.net/live/media/v3abr/live247-hls-avc/v3abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
   {
     id: 'vtv4',
     name: 'VTV4',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/0/02/Imagei4.png/revision/latest/scale-to-width-down/1000?cb=20260601093135&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/logos/images/2/2c/VTV4_logo_%282026-nay%29.png/revision/latest?cb=20260907125330&path-prefix=vi',
     streamUrl: 'https://live.fptplay53.net/live/media/vtv4/live247-hls-avc/vtv4-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
   {
     id: 'vtv5',
     name: 'VTV5',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/7/79/Imagej42.png/revision/latest/scale-to-width-down/1000?cb=20260601093345&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/logos/images/9/9b/VTV5_logo_%282026-nay%29.png/revision/latest?cb=20260907125407&path-prefix=vi',
     streamUrl: 'https://live.fptplay53.net/live/media/vtv5/live247-hls-avc/vtv5-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
   {
@@ -61,19 +62,19 @@ const VTV_CHANNELS: VtvChannelItem[] = [
   {
     id: 'vtv7',
     name: 'VTV7',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/4/43/Image7.png/revision/latest/scale-to-width-down/1000?cb=20260601093859&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/logos/images/1/14/VTV7_logo_%282016-nay%29_%283%29.png/revision/latest/scale-to-width-down/1000?cb=20260420032353&path-prefix=vi',
     streamUrl: 'https://live.fptplay53.net/live/media/v7abr/live247-hls-avc/v7abr-avc1_5600000=10000-mp4a_140800_vie=20000.m3u8',
   },
   {
     id: 'vtv8',
     name: 'VTV8',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/b/b1/Imagea8.png/revision/latest/scale-to-width-down/1000?cb=20260601094212&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/logos/images/7/73/Logo_VTV8_01.02.2016.png/revision/latest?cb=20260228014157&path-prefix=uk',
     streamUrl: 'https://live.fptplay53.net/fnxsd1/vtv8hd_vhls.smil/chunklist_b2500000.m3u8',
   },
   {
     id: 'vtv9',
     name: 'VTV9',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/8/8c/Imagei9.png/revision/latest/scale-to-width-down/1000?cb=20260601094610&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/logos/images/7/7b/Logo_VTV9_20.12.2012.png/revision/latest?cb=20260301015846&path-prefix=uk',
     streamUrl: 'https://live.fptplay53.net/live/media/v9abr/live247-hls-avc/v9abr-avc1_5600000=10000-mp4a_140800_vie=20000.m3u8',
   },
   {
@@ -85,60 +86,16 @@ const VTV_CHANNELS: VtvChannelItem[] = [
   {
     id: 'vn_today',
     name: 'Vietnam Today',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/7/7f/Vtd.png/revision/latest/scale-to-width-down/1000?cb=20260601094859&path-prefix=vi',
+    logo: 'https://static.wikia.nocookie.net/logos/images/f/f2/Logo_Vietnam_Today_07-2025_v2.png/revision/latest?cb=20260228060318&path-prefix=uk',
     streamUrl: 'https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8',
   },
-  // VTV1 -> VTV9 Front & luồng duplicate / test theo yêu cầu
   {
-    id: 'vtv1_front',
-    name: 'VTV1 Front',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/a/ac/1vv.png/revision/latest/scale-to-width-down/1000?cb=20260604052331&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/live/media/vtv1/live247-hls-avc/vtv1-avc1_5600000=10000-mp4a_131600=20000.m3u8',
+    id: 'vtv_can_tho',
+    name: 'VTV Cần Thơ',
+    logo: 'https://static.wikia.nocookie.net/logos/images/7/79/VTV_C%E1%BA%A7n_Th%C6%A1_logo_%282022-nay%29.png/revision/latest?cb=20221009182058&path-prefix=vi',
+    streamUrl: 'https://live.fptplay53.net/epzsd1/cantho_hls.smil/chunklist_b2500000.m3u8',
   },
-  {
-    id: 'vtv1_test',
-    name: 'VTV1 test luồng',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/a/ac/1vv.png/revision/latest/scale-to-width-down/1000?cb=20260604052331&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/fnxhd1/vtv1hd_vhls.smil/chunklist_b5000000.m3u8',
-  },
-  {
-    id: 'vtv2_front',
-    name: 'VTV2 Front',
-    logo: 'https://static.wikia.nocookie.net/ep-deo/images/4/45/Vtv2_front.png/revision/latest/scale-to-width-down/1000?cb=20260913100152',
-    streamUrl: 'https://live.fptplay53.net/live/media/v2abr/live247-hls-avc/v2abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
-    isVtv2: true,
-  },
-  {
-    id: 'vtv2_test',
-    name: 'VTV2 test luồng',
-    logo: 'https://static.wikia.nocookie.net/ep-deo/images/4/45/Vtv2_front.png/revision/latest/scale-to-width-down/1000?cb=20260913100152',
-    streamUrl: 'https://live.fptplay53.net/live/media/v2abr/live247-hls-avc/v2abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
-    isVtv2: true,
-  },
-  {
-    id: 'vtv3_front',
-    name: 'VTV3 Front',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/3/32/V3.png/revision/latest/scale-to-width-down/1000?cb=20260601093014&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/live/media/v3abr/live247-hls-avc/v3abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
-  },
-  {
-    id: 'vtv4_front',
-    name: 'VTV4 Front',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/0/02/Imagei4.png/revision/latest/scale-to-width-down/1000?cb=20260601093135&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/live/media/vtv4/live247-hls-avc/vtv4-avc1_5600000=10000-mp4a_131600=20000.m3u8',
-  },
-  {
-    id: 'vtv4_test',
-    name: 'VTV4 test luồng',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/0/02/Imagei4.png/revision/latest/scale-to-width-down/1000?cb=20260601093135&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/fnxhd1/vtv4hd_vhls.smil/chunklist_b5000000.m3u8',
-  },
-  {
-    id: 'vtv5_front',
-    name: 'VTV5 Front',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/7/79/Imagej42.png/revision/latest/scale-to-width-down/1000?cb=20260601093345&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/live/media/vtv5/live247-hls-avc/vtv5-avc1_5600000=10000-mp4a_131600=20000.m3u8',
-  },
+  // Kênh duplicate giữ lại theo yêu cầu: VTV6, VTV8 (duplicate), VTV10 (duplicate)
   {
     id: 'vtv6_front',
     name: 'VTV6 Front',
@@ -158,52 +115,22 @@ const VTV_CHANNELS: VtvChannelItem[] = [
     streamUrl: 'https://live.fptplay53.net/live/media/v6abr/live247-hls-avc/v6abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
   {
-    id: 'vtv7_front',
-    name: 'VTV7 Front',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/4/43/Image7.png/revision/latest/scale-to-width-down/1000?cb=20260601093859&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/live/media/v7abr/live247-hls-avc/v7abr-avc1_5600000=10000-mp4a_140800_vie=20000.m3u8',
-  },
-  {
-    id: 'vtv8_front',
-    name: 'VTV8 Front',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/b/b1/Imagea8.png/revision/latest/scale-to-width-down/1000?cb=20260601094212&path-prefix=vi',
+    id: 'vtv8_duplicate',
+    name: 'VTV8 (duplicate)',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/e/e3/Image_%2816%29.png/revision/latest?cb=20260914083804',
     streamUrl: 'https://live.fptplay53.net/fnxsd1/vtv8hd_vhls.smil/chunklist_b2500000.m3u8',
-  },
-  {
-    id: 'vtv8_test',
-    name: 'VTV8 test luồng',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/b/b1/Imagea8.png/revision/latest/scale-to-width-down/1000?cb=20260601094212&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/fnxsd1/vtv8hd_vhls.smil/chunklist_b2500000.m3u8',
-  },
-  {
-    id: 'vtv9_front',
-    name: 'VTV9 Front',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/8/8c/Imagei9.png/revision/latest/scale-to-width-down/1000?cb=20260601094610&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/live/media/v9abr/live247-hls-avc/v9abr-avc1_5600000=10000-mp4a_140800_vie=20000.m3u8',
-  },
-  {
-    id: 'vtv9_test',
-    name: 'VTV9 test luồng',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/8/8c/Imagei9.png/revision/latest/scale-to-width-down/1000?cb=20260601094610&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/fnxhd1/vtv9hd_vhls.smil/chunklist_b5000000.m3u8',
-  },
-  {
-    id: 'vtv_test_hevc',
-    name: 'VTV test HEVC',
-    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
-    streamUrl: 'https://live.fptplay53.net/live/media/vtv1/live247-hls-avc/vtv1-avc1_5600000=10000-mp4a_131600=20000.m3u8',
-  },
-  {
-    id: 'vtv_can_tho',
-    name: 'VTV Cần Thơ',
-    logo: 'https://static.wikia.nocookie.net/logos/images/7/79/VTV_C%E1%BA%A7n_Th%C6%A1_logo_%282022-nay%29.png/revision/latest?cb=20221009182058&path-prefix=vi',
-    streamUrl: 'https://live.fptplay53.net/epzsd1/cantho_hls.smil/chunklist_b2500000.m3u8',
   },
   {
     id: 'vtv10_test',
-    name: 'VTV10 test luồng',
-    logo: 'https://static.wikia.nocookie.net/ftv/images/b/b3/10logo.png/revision/latest?cb=20260613020449&path-prefix=vi',
+    name: 'VTV10 (duplicate)',
+    logo: 'https://static.wikia.nocookie.net/logos/images/4/4c/VTV10_30.03.2026-nay.png/revision/latest?cb=20260330072914&path-prefix=uk',
     streamUrl: 'https://live.fptplay53.net/live/media/v10abr/live247-hls-avc/v10abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
+  },
+  {
+    id: 'vtv_test_hevc1',
+    name: 'VTV test HEVC-1',
+    logo: 'https://static.wikia.nocookie.net/logos/images/b/b5/VTV_go_logo_2015.png/revision/latest?cb=20260317072846&path-prefix=uk',
+    streamUrl: 'https://live.fptplay53.net/live/media/v1abr/live247-hls-avc/v1abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
 ];
 
@@ -347,7 +274,7 @@ const LOCAL_CHANNELS: VtvChannelItem[] = [
   },
 ];
 
-export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel }) => {
+export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel, onOpenCustomStreamModal }) => {
   const [selectedChannel, setSelectedChannel] = useState<VtvChannelItem>(() => {
     if (currentChannel?.id) {
       const all = [...VTV_CHANNELS, ...HTV_CHANNELS, ...LOCAL_CHANNELS];
@@ -361,9 +288,41 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [hasPlaybackError, setHasPlaybackError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isMobileScheduleOpen, setIsMobileScheduleOpen] = useState<boolean>(false);
+  const [playerHeight, setPlayerHeight] = useState<number | undefined>(undefined);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
+
+  // Measure and synchronize video player exact pixel height to desktop schedule sidebar
+  useEffect(() => {
+    const el = playerContainerRef.current;
+    if (!el) return;
+
+    const updateHeight = () => {
+      if (el.clientHeight > 0) {
+        setPlayerHeight(el.clientHeight);
+      }
+    };
+
+    updateHeight();
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.height > 0) {
+          setPlayerHeight(Math.round(entry.contentRect.height));
+        }
+      }
+    });
+    ro.observe(el);
+
+    window.addEventListener('resize', updateHeight);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, []);
 
   // Initialize and load video stream when selectedChannel changes
   useEffect(() => {
@@ -489,31 +448,11 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
   return (
     <div className="min-h-[calc(100vh-140px)] flex flex-col justify-start px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-6xl w-full mx-auto space-y-8">
-        {/* Notice Section: chỉ còn dòng description và nút truy cập official website */}
-        <div className="max-w-2xl mx-auto text-center space-y-4 pt-1 pb-2">
-          <p className="text-sm sm:text-base text-[#A1A1AA] leading-relaxed max-w-xl mx-auto">
-            To watch official TV channels feed provided by Vplay and our community without interruptions, please visit the official Vplay website. This website is only for testing feed and they will not be able to watch at anytime.
-          </p>
-
-          <div>
-            <a
-              id="btn-livetv-official-website"
-              href="https://v0-vplay-preview.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-gradient-to-r from-[#FF0000] to-[#E6007A] text-white font-bold text-sm shadow-lg shadow-red-500/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-            >
-              <span>Check official website</span>
-              <ExternalLink className="w-4 h-4 stroke-[2.5]" />
-            </a>
-          </div>
-        </div>
-
-        {/* Video Player Section with Channel Name Header Above */}
-        <div className="w-full max-w-4xl mx-auto space-y-2.5">
-          {/* Tên kênh trên Video Player */}
+        {/* Video Player & Schedule Section (Side-by-side on desktop, calendar icon on mobile) */}
+        <div className="w-full space-y-3">
+          {/* Channel Info Bar & Mobile Schedule Button */}
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-lg bg-[#2D1A25] border border-white/10 flex items-center justify-center p-1 shrink-0">
                 <img
                   src={selectedChannel.logo}
@@ -522,86 +461,126 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <h1 className="text-lg sm:text-xl font-black text-white tracking-wide">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+                <h1 className="text-lg sm:text-xl font-black text-white tracking-wide truncate">
                   {selectedChannel.name}
                 </h1>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-[#A1A1AA]">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-[#A1A1AA] shrink-0">
                   Live Feed
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs text-[#8E8B99]">
-              <Tv className="w-3.5 h-3.5" />
-              <span>Đang phát trực tiếp</span>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#8E8B99]">
+                <Tv className="w-3.5 h-3.5" />
+                <span>Đang phát trực tiếp</span>
+              </div>
+
+              {/* Mobile Calendar Icon Button ("icon hình quyển lịch") */}
+              <button
+                type="button"
+                onClick={() => setIsMobileScheduleOpen(true)}
+                className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-600/25 to-[#C83DFF]/25 hover:from-red-600/35 hover:to-[#C83DFF]/35 border border-red-500/40 text-red-200 text-xs font-semibold shadow-md active:scale-95 transition-all cursor-pointer"
+                title="Xem lịch phát sóng 24h"
+              >
+                <CalendarDays className="w-4 h-4 text-red-400" />
+                <span className="text-xs font-medium">Lịch phát sóng</span>
+              </button>
             </div>
           </div>
 
-          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/95 shadow-2xl group flex items-center justify-center border border-white/10">
-            {/* Real Video Element */}
-            <video
-              ref={videoRef}
-              className="w-full h-full object-contain bg-black cursor-pointer"
-              onClick={togglePlay}
-              playsInline
-              autoPlay
-              muted={isMuted}
-            />
+          {/* Desktop: Side-by-side grid with height strictly determined by video player */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+            {/* Video Player (8 cols on desktop) */}
+            <div className="lg:col-span-8 flex flex-col">
+              <div
+                ref={playerContainerRef}
+                className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/95 shadow-2xl group flex items-center justify-center border border-white/10"
+              >
+                {/* Real Video Element */}
+                <video
+                  ref={videoRef}
+                  className="w-full h-full object-contain bg-black cursor-pointer"
+                  onClick={togglePlay}
+                  playsInline
+                  autoPlay
+                  muted={isMuted}
+                />
 
-            {/* Simple Playback Error Message */}
-            {hasPlaybackError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/90 p-4 text-center z-20">
-                <span className="text-white text-lg font-medium tracking-wide">
-                  Playback error.
-                </span>
+                {/* Simple Playback Error Message */}
+                {hasPlaybackError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/90 p-4 text-center z-20">
+                    <span className="text-white text-lg font-medium tracking-wide">
+                      Playback error.
+                    </span>
+                  </div>
+                )}
+
+                {/* Loading Indicator */}
+                {isLoading && !hasPlaybackError && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                    <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                  </div>
+                )}
+
+                {/* Player Controls Bar */}
+                {!hasPlaybackError && (
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-3 sm:p-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={togglePlay}
+                        className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
+                        title={isPlaying ? 'Tạm dừng' : 'Phát'}
+                      >
+                        {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                      </button>
+                      <button
+                        onClick={toggleMute}
+                        className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
+                        title={isMuted ? 'Bật tiếng' : 'Tắt tiếng'}
+                      >
+                        {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                      </button>
+                      <span className="text-xs font-semibold text-white/90">
+                        {selectedChannel.name}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={toggleFullscreen}
+                        className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
+                        title="Toàn màn hình"
+                      >
+                        <Maximize2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
-            {/* Loading Indicator */}
-            {isLoading && !hasPlaybackError && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+            {/* Desktop LPS sidebar: Height is strictly locked to video player, scrollable inside */}
+            <div
+              className="hidden lg:block lg:col-span-4 relative min-h-0 overflow-hidden"
+              style={playerHeight ? { height: `${playerHeight}px`, maxHeight: `${playerHeight}px` } : undefined}
+            >
+              <div className="absolute inset-0 h-full w-full overflow-hidden">
+                <ChannelSchedule channel={selectedChannel} variant="sidebar" />
               </div>
-            )}
-
-            {/* Player Controls Bar */}
-            {!hasPlaybackError && (
-              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-3 sm:p-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={togglePlay}
-                    className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
-                    title={isPlaying ? 'Tạm dừng' : 'Phát'}
-                  >
-                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                  </button>
-                  <button
-                    onClick={toggleMute}
-                    className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
-                    title={isMuted ? 'Bật tiếng' : 'Tắt tiếng'}
-                  >
-                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                  </button>
-                  <span className="text-xs font-semibold text-white/90">
-                    {selectedChannel.name}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={toggleFullscreen}
-                    className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
-                    title="Toàn màn hình"
-                  >
-                    <Maximize2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
+
+        {/* Mobile Schedule Drawer (Slide-in from right edge) */}
+        <ChannelSchedule
+          channel={selectedChannel}
+          variant="drawer"
+          isOpen={isMobileScheduleOpen}
+          onClose={() => setIsMobileScheduleOpen(false)}
+        />
 
         {/* Section 1: Kênh VTV (Bao gồm các luồng chính và luồng duplicate/test) */}
         <div className="w-full space-y-4">
@@ -620,32 +599,68 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
           <div className="h-px bg-white/10 w-full mb-4" />
 
           {/* Grid of VTV channels */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 lg:grid-cols-7 gap-3">
             {VTV_CHANNELS.map((channel) => {
               const isSelected = selectedChannel.id === channel.id;
-              const isVtv2 = channel.isVtv2;
+              // Phóng to logo vtv6 low latency và front, vtv6 thử nghiệm quay lại như cũ
+              const isEnlargedVtv6 = channel.id === 'vtv6_front' || channel.id === 'vtv6_low_latency';
 
               return (
                 <button
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-[3px] ${
                     isSelected
-                      ? 'border-[3px] border-white shadow-xl shadow-black/40'
-                      : 'border-[3px] border-transparent hover:border-white/30'
+                      ? 'border-white shadow-xl shadow-black/40'
+                      : 'border-transparent hover:border-white'
                   }`}
                   title={channel.name}
                 >
                   <img
                     src={channel.logo}
                     alt={channel.name}
-                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
+                    className={`${
+                      isEnlargedVtv6
+                        ? 'h-16 sm:h-18 max-w-[95%] max-h-[92%] scale-135'
+                        : 'h-12 sm:h-14 max-w-[88%] max-h-[82%]'
+                    } w-auto object-contain select-none pointer-events-none`}
                     referrerPolicy="no-referrer"
                   />
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* Notice Section: Chuyển xuống bên dưới category kênh VTV */}
+        <div className="max-w-2xl mx-auto text-center space-y-4 pt-2 pb-2">
+          <p className="text-sm sm:text-base text-[#A1A1AA] leading-relaxed max-w-xl mx-auto">
+            To watch official TV channels feed provided by Vplay and our community without interruptions, please visit the official Vplay website. This website is only for testing feed and they will not be able to watch at anytime.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              id="btn-livetv-official-website"
+              href="https://v0-vplay-preview.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-gradient-to-r from-[#FF0000] to-[#E6007A] text-white font-bold text-sm shadow-lg shadow-red-500/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <span>Check official website</span>
+              <ExternalLink className="w-4 h-4 stroke-[2.5]" />
+            </a>
+
+            {onOpenCustomStreamModal && (
+              <button
+                id="btn-livetv-add-custom-link"
+                onClick={onOpenCustomStreamModal}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shadow-lg"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add custom TV link</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -666,7 +681,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
           <div className="h-px bg-white/10 w-full mb-4" />
 
           {/* Grid of HTV channels */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 lg:grid-cols-7 gap-3">
             {HTV_CHANNELS.map((channel) => {
               const isSelected = selectedChannel.id === channel.id;
 
@@ -675,17 +690,17 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-[3px] ${
                     isSelected
-                      ? 'border-[3px] border-white shadow-xl shadow-black/40'
-                      : 'border-[3px] border-transparent hover:border-white/30'
+                      ? 'border-white shadow-xl shadow-black/40'
+                      : 'border-transparent hover:border-white'
                   }`}
                   title={channel.name}
                 >
                   <img
                     src={channel.logo}
                     alt={channel.name}
-                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
+                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none pointer-events-none"
                     referrerPolicy="no-referrer"
                   />
                 </button>
@@ -711,7 +726,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
           <div className="h-px bg-white/10 w-full mb-4" />
 
           {/* Grid of Local channels */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 lg:grid-cols-7 gap-3">
             {LOCAL_CHANNELS.map((channel) => {
               const isSelected = selectedChannel.id === channel.id;
 
@@ -720,17 +735,17 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel 
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-[3px] ${
                     isSelected
-                      ? 'border-[3px] border-white shadow-xl shadow-black/40'
-                      : 'border-[3px] border-transparent hover:border-white/30'
+                      ? 'border-white shadow-xl shadow-black/40'
+                      : 'border-transparent hover:border-white'
                   }`}
                   title={channel.name}
                 >
                   <img
                     src={channel.logo}
                     alt={channel.name}
-                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none"
+                    className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none pointer-events-none"
                     referrerPolicy="no-referrer"
                   />
                 </button>

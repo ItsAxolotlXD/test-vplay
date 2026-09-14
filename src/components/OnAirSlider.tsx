@@ -15,6 +15,14 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Chỉ hiển thị các kênh VTV trong chuyên mục Đang phát sóng
+  const vtvChannels = channels.filter((ch) => {
+    const isCategoryVtv = ch.category === 'Kênh VTV' || ch.category === 'VTV';
+    const isVtvName = ch.name.toUpperCase().startsWith('VTV') && !ch.name.toUpperCase().includes('VTVCAB');
+    const isVtvId = ch.id.toLowerCase().startsWith('vtv') && !ch.id.toLowerCase().includes('vtvcab');
+    return isCategoryVtv || isVtvName || isVtvId;
+  });
+
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const offset = direction === 'left' ? -360 : 360;
@@ -30,7 +38,7 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
           <span className="w-1.5 h-5 bg-[#FF2020] rounded-full shrink-0" />
           <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <span>Đang phát sóng</span>
-            <span className="text-sm font-semibold text-[#8E8B99]">({channels.length})</span>
+            <span className="text-sm font-semibold text-[#8E8B99]">({vtvChannels.length})</span>
           </h2>
         </div>
 
@@ -52,12 +60,12 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
         </div>
       </div>
 
-      {/* Horizontal Cards Scroll - giống các ô kênh trong tab truyền hình (thu nhỏ gọn gàng) */}
+      {/* Horizontal Cards Scroll - chỉ hiển thị các kênh VTV */}
       <div
         ref={scrollContainerRef}
         className="flex gap-2 sm:gap-2.5 overflow-x-auto pb-2 no-scrollbar scroll-smooth"
       >
-        {channels.map((ch) => {
+        {vtvChannels.map((ch) => {
           const isVtv2 = ch.id === 'vtv2' || ch.slug === 'vtv2' || ch.name.toLowerCase() === 'vtv2';
 
           return (
@@ -66,16 +74,16 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
               id={`onair-channel-${ch.id}`}
               onClick={() => {
                 onSelectChannel(ch);
-                navigate(`/live-tv?channel=${ch.slug}`);
+                navigate(`/live-tv?channel=${ch.slug || ch.id}`);
               }}
-              className="w-24 sm:w-28 h-13 sm:h-15 rounded-xl p-1.5 flex flex-col items-center justify-center transition-all cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-2 border-transparent hover:border-white/40 active:border-white shrink-0 shadow-md"
+              className="w-24 sm:w-28 h-13 sm:h-15 rounded-xl p-1.5 flex flex-col items-center justify-center cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-2 border-transparent hover:border-white active:border-white shrink-0 shadow-md"
               title={`${ch.name} - ${ch.currentProgram?.title || 'Đang phát sóng'}`}
             >
               {/* Channel Logo */}
               <img
                 src={ch.logo}
                 alt={ch.name}
-                className={`object-contain select-none transition-transform duration-200 group-hover:scale-105 pointer-events-none ${
+                className={`object-contain select-none pointer-events-none ${
                   isVtv2
                     ? 'h-6 sm:h-7 w-auto max-w-[78%]'
                     : 'h-8 sm:h-9 w-auto max-w-[88%]'
