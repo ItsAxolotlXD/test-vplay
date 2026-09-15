@@ -43,6 +43,7 @@ import {
   VStockTab,
   VHealthTab,
   VMapsTab,
+  CookbookTab,
 } from './components/vapps';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
 import VplayVBoxTab from './components/VplayVBoxTab';
@@ -55,6 +56,7 @@ import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
 import VplayVertical from './components/VplayVertical';
 import { MusicTab } from './pages/MusicTab';
+import { VShopTab } from './pages/VShopTab';
 import { ArrowLeft } from 'lucide-react';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -404,6 +406,11 @@ export default function App() {
       case '/audio':
         return <MusicTab navigate={navigate} />;
 
+      case '/v-shop':
+      case '/shop':
+      case '/vshop':
+        return <VShopTab navigate={navigate} />;
+
       case '/copilot':
       case '/copilot-standalone':
         return (
@@ -422,11 +429,11 @@ export default function App() {
 
       case '/v-arcade':
       case '/v-games':
-        return renderSpace360App('V-Games', <VArcadeTab initialGameId={routeState?.gameId || null} />);
+        return renderSpace360App('Games', <VArcadeTab initialGameId={routeState?.gameId || null} />);
 
       case '/v-files':
       case '/v-xplore':
-        return renderSpace360App('V-Files', <VXploreTab />);
+        return renderSpace360App('Files', <VXploreTab />);
 
       case '/explore-vietnam':
         return renderSpace360App('Explore Vietnam', <ExploreVietnamTab onBack={() => navigate('/space-360')} />);
@@ -434,29 +441,29 @@ export default function App() {
       case '/v-maps':
       case '/space-360-maps':
       case '/maps':
-        return renderSpace360App('Space 360 V-Maps', <VMapsTab onBack={() => navigate('/space-360')} />);
+        return renderSpace360App('Maps', <VMapsTab onBack={() => navigate('/space-360')} />);
 
       case '/v-box':
-        return renderSpace360App('V-Box', <VplayVBoxTab onBack={() => navigate('/space-360')} />);
+        return renderSpace360App('Box', <VplayVBoxTab onBack={() => navigate('/space-360')} />);
 
       case '/v-study':
       case '/v-learn':
-        return renderSpace360App('V-Study', <VStudyTab onBack={() => navigate('/space-360')} />);
+        return renderSpace360App('Study', <VStudyTab onBack={() => navigate('/space-360')} />);
 
       case '/v-calc':
-        return renderSpace360App('V-Calc', <VCalcTab />);
+        return renderSpace360App('Calc', <VCalcTab />);
 
       case '/v-clock':
       case '/clock':
-        return renderSpace360App('V-Clock', <VClockTab />);
+        return renderSpace360App('Clock', <VClockTab />);
 
       case '/v-phone':
       case '/phone':
-        return renderSpace360App('V-Phone', <VPhoneTab />);
+        return renderSpace360App('Phone', <VPhoneTab />);
 
       case '/v-browser':
       case '/browser':
-        return renderSpace360App('V-Browser', <VBrowserTab />);
+        return renderSpace360App('Browser', <VBrowserTab />);
 
       case '/v-calendar':
       case '/calendar':
@@ -464,38 +471,42 @@ export default function App() {
 
       case '/v-gallery':
       case '/gallery':
-        return renderSpace360App('V-Gallery', <VGalleryTab />);
+        return renderSpace360App('Gallery', <VGalleryTab />);
 
       case '/v-camera':
       case '/camera':
-        return renderSpace360App('V-Camera', <VCameraTab />);
+        return renderSpace360App('Camera', <VCameraTab />);
 
       case '/v-ticket':
       case '/ticket':
       case '/dat-ve':
-        return renderSpace360App('V-Ticket', <VTicketTab />);
+        return renderSpace360App('Ticket', <VTicketTab />);
 
       case '/v-weather':
       case '/weather':
       case '/thoi-tiet':
-        return renderSpace360App('V-Weather', <VWeatherTab />);
+        return renderSpace360App('Weather', <VWeatherTab />);
 
       case '/v-reminders':
-        return renderSpace360App('V-Reminders', <VRemindersTab />);
+        return renderSpace360App('Reminders', <VRemindersTab />);
 
       case '/v-notes':
-        return renderSpace360App('V-Notes', <VNotesView />);
+        return renderSpace360App('Notes', <VNotesView />);
 
       case '/v-furniture':
-        return renderSpace360App('V-Furniture', <VFurnitureTab />);
+        return renderSpace360App('Furniture', <VFurnitureTab />);
 
       case '/v-stock':
       case '/stock':
-        return renderSpace360App('V-Stock', <VStockTab />);
+        return renderSpace360App('Stock', <VStockTab />);
 
       case '/v-health':
       case '/health':
-        return renderSpace360App('V-Health', <VHealthTab />);
+        return renderSpace360App('Health', <VHealthTab />);
+
+      case '/cookbook':
+      case '/v-cookbook':
+        return renderSpace360App('Cookbook', <CookbookTab onBack={() => navigate('/space-360')} />);
 
       case '/minecraft':
       case '/minecraft-gui':

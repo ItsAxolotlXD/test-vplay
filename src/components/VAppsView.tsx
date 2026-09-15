@@ -28,6 +28,7 @@ import {
   ArrowRight,
   TrendingUp,
   Activity,
+  UtensilsCrossed,
   LucideIcon
 } from 'lucide-react';
 
@@ -54,7 +55,8 @@ export type VAppId =
   | 'v_flow'
   | 'v_chat'
   | 'v_stock'
-  | 'v_health';
+  | 'v_health'
+  | 'cookbook';
 
 export interface VAppDefinition {
   id: VAppId;
@@ -74,7 +76,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   // Hàng 1 (4 ứng dụng)
   {
     id: 'v_arcade',
-    name: 'V-Games',
+    name: 'Games',
     tagline: 'Vòng Quay & Mini Games',
     description: 'Vòng Quay May Mắn Wheels of Fortune, Cờ Caro XO, Oẳn Tù Tì đối kháng, Nối Từ TV & EN, Đếm Số và Rắn Săn Mồi cổ điển.',
     category: 'Trò chơi (Arcade)',
@@ -83,20 +85,20 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FF5E7E]/50 group-hover:border-[#FF5E7E]',
     glowClass: 'shadow-[0_10px_30px_rgba(255,0,122,0.35)]',
     icon: Gamepad2,
-    tags: ['Wheels of Fortune', 'Vòng Quay May Mắn', 'Caro XO', 'Rắn Săn Mồi', 'V-Games', 'Arcade'],
+    tags: ['Wheels of Fortune', 'Vòng Quay May Mắn', 'Caro XO', 'Rắn Săn Mồi', 'Games', 'Arcade'],
   },
   {
     id: 'v_xplore',
-    name: 'V-Files',
+    name: 'Files',
     tagline: 'Quản Lý Tệp Ore UI',
-    description: 'Quản lý tệp đa năng phong cách Windows Explorer, xem trước media, phát danh sách phát M3U8 và sao lưu dữ liệu đám mây V-Cloud.',
+    description: 'Quản lý tệp đa năng phong cách Windows Explorer, xem trước media, phát danh sách phát M3U8 và sao lưu dữ liệu đám mây Cloud.',
     category: 'Tiện ích & Tệp tin',
     badge: 'Tệp Tin',
     gradientBg: 'bg-gradient-to-br from-[#6A11CB] via-[#4338CA] to-[#2575FC]',
     borderClass: 'border-[#818CF8]/50 group-hover:border-[#818CF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(67,56,202,0.35)]',
     icon: Folder,
-    tags: ['File Manager', 'M3U8 Playlists', 'V-Cloud Backup', 'V-Files', 'Explorer'],
+    tags: ['File Manager', 'M3U8 Playlists', 'Cloud Backup', 'Files', 'Explorer'],
   },
   {
     id: 'explore_vietnam',
@@ -113,7 +115,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   },
   {
     id: 'v_maps',
-    name: 'Space 360 V-Maps',
+    name: 'Maps',
     tagline: 'Bản Đồ Không Gian 360° & Vệ Tinh',
     description: 'Bản đồ không gian 360 độ toàn cảnh, khám phá vệ tinh Trái Đất độ phân giải cao, danh lam thắng cảnh 360° Việt Nam và trạm vũ trụ ISS.',
     category: 'Học tập & Văn hóa',
@@ -122,11 +124,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(14,165,233,0.35)]',
     icon: Globe,
-    tags: ['Space 360', 'V-Maps', 'Bản Đồ Vệ Tinh', 'Toàn Cảnh 360', 'Street View', 'ISS Orbit', 'Bản Đồ Không Gian'],
+    tags: ['Space 360', 'Maps', 'Bản Đồ Vệ Tinh', 'Toàn Cảnh 360', 'Street View', 'ISS Orbit', 'Bản Đồ Không Gian'],
   },
   {
     id: 'v_box',
-    name: 'V-Box',
+    name: 'Box',
     tagline: 'Kho Video & Truyền Hình',
     description: 'Bộ sưu tập video giải trí đặc sắc, các clip phát lại chất lượng cao, luồng phát sóng chọn lọc và tin tức tổng hợp.',
     category: 'Giải trí & Media',
@@ -135,13 +137,13 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FBBF24]/50 group-hover:border-[#FBBF24]',
     glowClass: 'shadow-[0_10px_30px_rgba(245,158,11,0.35)]',
     icon: Tv,
-    tags: ['Video Clip', 'Phát Lại', 'Giải Trí HD', 'V-Box'],
+    tags: ['Video Clip', 'Phát Lại', 'Giải Trí HD', 'Box'],
   },
 
   // Hàng 2 (4 ứng dụng)
   {
     id: 'v_learn',
-    name: 'V-Study',
+    name: 'Study',
     tagline: 'Flashcard & Tập Trung',
     description: 'Công cụ hỗ trợ học tập đắc lực: Đồng hồ đếm ngược Pomodoro tập trung sâu, quản lý bộ thẻ Flashcard và theo dõi tiến độ mục tiêu.',
     category: 'Học tập & Văn hóa',
@@ -150,11 +152,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(2,132,199,0.35)]',
     icon: GraduationCap,
-    tags: ['Pomodoro', 'Flashcards', 'Ghi Nhớ', 'V-Study'],
+    tags: ['Pomodoro', 'Flashcards', 'Ghi Nhớ', 'Study'],
   },
   {
     id: 'v_calc',
-    name: 'V-Calc',
+    name: 'Calc',
     tagline: 'Máy Tính Biểu Thức',
     description: 'Máy tính bỏ túi khoa học hỗ trợ tính toán biểu thức phức tạp, lưu lịch sử phép tính và quy đổi đơn vị đo lường linh hoạt.',
     category: 'Tiện ích & Tệp tin',
@@ -163,11 +165,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#2DD4BF]/50 group-hover:border-[#2DD4BF]',
     glowClass: 'shadow-[0_10px_30px_rgba(13,148,136,0.35)]',
     icon: Calculator,
-    tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi Đơn Vị', 'V-Calc'],
+    tags: ['Khoa Học', 'Biểu Thức', 'Quy Đổi Đơn Vị', 'Calc'],
   },
   {
     id: 'v_clock',
-    name: 'V-Clock',
+    name: 'Clock',
     tagline: 'Báo Thức • Đếm Giờ • Giờ Quốc Tế',
     description: 'Báo thức thông minh đa năng, bấm giờ thể thao từng vòng, hẹn giờ đếm ngược và tra cứu giờ chuẩn quốc tế hơn 30 quốc gia.',
     category: 'Tiện ích & Tệp tin',
@@ -176,11 +178,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(6,182,212,0.35)]',
     icon: Clock,
-    tags: ['V-Clock', 'Đồng Hồ', 'Báo Thức', 'Đếm Giờ', 'Bấm Giờ', 'Giờ Quốc Tế', 'World Clock', 'Timer'],
+    tags: ['Clock', 'Đồng Hồ', 'Báo Thức', 'Đếm Giờ', 'Bấm Giờ', 'Giờ Quốc Tế', 'World Clock', 'Timer'],
   },
   {
     id: 'v_phone',
-    name: 'V-Phone',
+    name: 'Phone',
     tagline: 'Bàn Phím & Danh Bạ',
     description: 'Bàn phím gọi số với hiệu ứng âm thanh DTMF chân thực, danh bạ liên hệ cá nhân và các đầu số cứu hộ khẩn cấp quốc gia 113, 114, 115.',
     category: 'Tiện ích & Tệp tin',
@@ -189,11 +191,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FB7185]/50 group-hover:border-[#FB7185]',
     glowClass: 'shadow-[0_10px_30px_rgba(225,29,72,0.35)]',
     icon: Phone,
-    tags: ['Điện Thoại', 'Bàn Phím', 'Danh Bạ', 'Khẩn Cấp', 'DTMF', 'Hotline', 'V-Phone'],
+    tags: ['Điện Thoại', 'Bàn Phím', 'Danh Bạ', 'Khẩn Cấp', 'DTMF', 'Hotline', 'Phone'],
   },
   {
     id: 'v_browser',
-    name: 'V-Browser',
+    name: 'Browser',
     tagline: 'Duyệt Web & Tin Tức',
     description: 'Trình duyệt web tích hợp đa tab, điểm báo điện tử 24/7, tra cứu bách khoa toàn thư Wikipedia và cổng tin tức truyền hình.',
     category: 'Tiện ích & Tệp tin',
@@ -202,7 +204,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(2,132,199,0.35)]',
     icon: Globe,
-    tags: ['Trình Duyệt', 'Browser', 'Duyệt Web', 'Wikipedia', 'Tin Tức', 'VnExpress', 'VTV', 'V-Browser'],
+    tags: ['Trình Duyệt', 'Browser', 'Duyệt Web', 'Wikipedia', 'Tin Tức', 'VnExpress', 'VTV'],
   },
   {
     id: 'v_calendar',
@@ -219,7 +221,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   },
   {
     id: 'v_gallery',
-    name: 'V-Gallery',
+    name: 'Gallery',
     tagline: 'Kho Ảnh 4K & Album',
     description: 'Bộ sưu tập ảnh danh thắng Việt Nam, hậu trường trường quay truyền hình, trình chiếu slideshow toàn màn hình và lưu trữ ảnh cá nhân.',
     category: 'Giải trí & Media',
@@ -228,11 +230,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#A78BFA]/50 group-hover:border-[#A78BFA]',
     glowClass: 'shadow-[0_10px_30px_rgba(124,58,237,0.35)]',
     icon: ImageIcon,
-    tags: ['Thư Viện', 'Kho Ảnh', 'Album', 'Danh Thắng', 'Gallery', 'Hậu Trường', '4K', 'V-Gallery'],
+    tags: ['Thư Viện', 'Kho Ảnh', 'Album', 'Danh Thắng', 'Gallery', 'Hậu Trường', '4K'],
   },
   {
     id: 'v_camera',
-    name: 'V-Camera',
+    name: 'Camera',
     tagline: 'Chụp Ảnh & Bộ Lọc',
     description: 'Chụp ảnh trực tiếp từ webcam hoặc trường quay ảo, bộ lọc nghệ thuật Vintage, Cyberpunk, TV Scanlines và hẹn giờ tự động.',
     category: 'Giải trí & Media',
@@ -241,11 +243,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#F472B6]/50 group-hover:border-[#F472B6]',
     glowClass: 'shadow-[0_10px_30px_rgba(192,38,211,0.35)]',
     icon: Camera,
-    tags: ['Camera', 'Máy Ảnh', 'Chụp Ảnh', 'Bộ Lọc', 'Webcam', 'Vintage', 'Scanlines', 'V-Camera'],
+    tags: ['Camera', 'Máy Ảnh', 'Chụp Ảnh', 'Bộ Lọc', 'Webcam', 'Vintage', 'Scanlines'],
   },
   {
     id: 'v_ticket',
-    name: 'V-Ticket',
+    name: 'Ticket',
     tagline: 'Vé Phim, Concert & TV',
     description: 'Hệ thống đặt vé xem phim chiếu rạp, đại nhạc hội Liveshow, vé khán giả trường quay VTV và vé tàu du lịch với mã QR điện tử.',
     category: 'Giải trí & Media',
@@ -254,11 +256,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FBBF24]/50 group-hover:border-[#FBBF24]',
     glowClass: 'shadow-[0_10px_30px_rgba(217,119,6,0.35)]',
     icon: Ticket,
-    tags: ['Đặt Vé', 'Vé Xem Phim', 'Concert', 'Liveshow', 'Vé TV Show', 'QR Code', 'Ticket', 'V-Ticket'],
+    tags: ['Đặt Vé', 'Vé Xem Phim', 'Concert', 'Liveshow', 'Vé TV Show', 'QR Code', 'Ticket'],
   },
   {
     id: 'v_weather',
-    name: 'V-Weather',
+    name: 'Weather',
     tagline: 'Dự Báo & Khí Tượng 360',
     description: 'Dự báo thời tiết chi tiết 63 tỉnh thành Việt Nam, nhiệt độ theo giờ, chất lượng không khí AQI, chỉ số UV và dự báo 7 ngày.',
     category: 'Tiện ích & Tệp tin',
@@ -267,11 +269,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(14,165,233,0.35)]',
     icon: CloudSun,
-    tags: ['Thời Tiết', 'Dự Báo', 'Khí Tượng', 'Nhiệt Độ', 'AQI', 'Tia UV', 'Weather', 'V-Weather'],
+    tags: ['Thời Tiết', 'Dự Báo', 'Khí Tượng', 'Nhiệt Độ', 'AQI', 'Tia UV', 'Weather'],
   },
   {
     id: 'v_reminders',
-    name: 'V-Reminders',
+    name: 'Reminders',
     tagline: 'Nhắc Việc & Hẹn Giờ',
     description: 'Lên lịch nhắc nhở đón xem chương trình truyền hình yêu thích, các công việc quan trọng kèm chuông báo âm thanh cảnh báo sống động.',
     category: 'Tiện ích & Tệp tin',
@@ -280,11 +282,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FB923C]/50 group-hover:border-[#FB923C]',
     glowClass: 'shadow-[0_10px_30px_rgba(234,88,12,0.35)]',
     icon: Bell,
-    tags: ['Chuông Báo', 'Lịch Xem TV', 'Task Alert', 'V-Reminders'],
+    tags: ['Chuông Báo', 'Lịch Xem TV', 'Task Alert', 'Reminders'],
   },
   {
     id: 'v_notes',
-    name: 'V-Notes',
+    name: 'Notes',
     tagline: 'Sticky Notes Thông Minh',
     description: 'Soạn thảo văn bản ghi chú với hệ thống dán nhãn màu sắc phong phú, quản lý dạng thẻ Sticky Notes và tìm kiếm thông minh.',
     category: 'Tiện ích & Tệp tin',
@@ -293,13 +295,13 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FDE047]/50 group-hover:border-[#FDE047]',
     glowClass: 'shadow-[0_10px_30px_rgba(234,179,8,0.35)]',
     icon: StickyNote,
-    tags: ['Ghi Chú Nhanh', 'Sticky Notes', 'Đồng Bộ', 'V-Notes'],
+    tags: ['Ghi Chú Nhanh', 'Sticky Notes', 'Đồng Bộ', 'Notes'],
   },
 
   // Hàng 3 (4 ứng dụng)
   {
     id: 'v_furniture',
-    name: 'V-Furniture',
+    name: 'Furniture',
     tagline: 'Bài Trí Phòng Khách TV',
     description: 'Trải nghiệm không gian nội thất phòng xem truyền hình, tùy biến ánh sáng, sofa thư giãn và bài trí rạp hát tại gia.',
     category: 'Tiện ích & Tệp tin',
@@ -308,7 +310,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#A3E635]/50 group-hover:border-[#A3E635]',
     glowClass: 'shadow-[0_10px_30px_rgba(101,163,13,0.35)]',
     icon: Armchair,
-    tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn', 'V-Furniture'],
+    tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn', 'Furniture'],
   },
   {
     id: 'v_minecraft',
@@ -325,7 +327,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
   },
   {
     id: 'v_flow',
-    name: 'V-Flow',
+    name: 'Flow',
     tagline: 'Mạng Xã Hội & Radio Live',
     description: 'Không gian tương tác trực tiếp cộng đồng Vplay, phát thanh radio, chia sẻ cảm nghĩ và dòng thời gian cập nhật liên tục.',
     category: 'Giải trí & Media',
@@ -334,11 +336,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#60A5FA]/50 group-hover:border-[#60A5FA]',
     glowClass: 'shadow-[0_10px_30px_rgba(59,130,246,0.35)]',
     icon: Radio,
-    tags: ['V-Flow', 'Mạng Xã Hội', 'Radio Live', 'Tương Tác'],
+    tags: ['Flow', 'Mạng Xã Hội', 'Radio Live', 'Tương Tác'],
   },
   {
     id: 'v_chat',
-    name: 'V-Chat',
+    name: 'Chat',
     tagline: 'Phòng Chat Trực Tiếp',
     description: 'Phòng trò chuyện trực tuyến, giao lưu kết nối bạn bè xem truyền hình trên toàn quốc với biểu tượng cảm xúc phong phú.',
     category: 'Giải trí & Media',
@@ -347,11 +349,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#F472B6]/50 group-hover:border-[#F472B6]',
     glowClass: 'shadow-[0_10px_30px_rgba(219,39,119,0.35)]',
     icon: MessageSquare,
-    tags: ['V-Chat', 'Phòng Chat', 'Cộng Đồng', 'Kết Nối'],
+    tags: ['Chat', 'Phòng Chat', 'Cộng Đồng', 'Kết Nối'],
   },
   {
     id: 'v_stock',
-    name: 'V-Stock',
+    name: 'Stock',
     tagline: 'Chứng Khoán & Đầu Tư',
     description: 'Bảng giá chứng khoán trực tuyến VN-Index, HNX, UPCoM, biểu đồ kỹ thuật hình nến, phân tích kỹ thuật và quản lý danh mục đầu tư.',
     category: 'Tiện ích & Tệp tin',
@@ -360,11 +362,11 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#34D399]/50 group-hover:border-[#34D399]',
     glowClass: 'shadow-[0_10px_30px_rgba(16,185,129,0.35)]',
     icon: TrendingUp,
-    tags: ['V-Stock', 'Chứng Khoán', 'VN-Index', 'Tài Chính', 'Cổ Phiếu', 'Đầu Tư'],
+    tags: ['Stock', 'Chứng Khoán', 'VN-Index', 'Tài Chính', 'Cổ Phiếu', 'Đầu Tư'],
   },
   {
     id: 'v_health',
-    name: 'V-Health',
+    name: 'Health',
     tagline: 'Sức Khỏe & Thể Chất',
     description: 'Theo dõi chỉ số sức khỏe BMI, huyết áp, nhịp tim, nhắc nhở uống nước, vận động thể chất và thư viện bài tập thể dục tại nhà.',
     category: 'Tiện ích & Tệp tin',
@@ -373,7 +375,20 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#FB7185]/50 group-hover:border-[#FB7185]',
     glowClass: 'shadow-[0_10px_30px_rgba(236,72,153,0.35)]',
     icon: Activity,
-    tags: ['V-Health', 'Sức Khỏe', 'BMI', 'Nhịp Tim', 'Uống Nước', 'Y Tế'],
+    tags: ['Health', 'Sức Khỏe', 'BMI', 'Nhịp Tim', 'Uống Nước', 'Y Tế'],
+  },
+  {
+    id: 'cookbook',
+    name: 'Cookbook',
+    tagline: 'Cẩm Nang Ẩm Thực Ba Miền',
+    description: 'Khám phá công thức nấu ăn 3 miền chuẩn vị, định lượng nguyên liệu chi tiết, mẹo vặt của bếp trưởng và đồng hồ bấm giờ nấu ăn tiện lợi.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Ẩm Thực',
+    gradientBg: 'bg-gradient-to-br from-[#EA580C] via-[#D97706] to-[#B45309]',
+    borderClass: 'border-[#F97316]/50 group-hover:border-[#F97316]',
+    glowClass: 'shadow-[0_10px_30px_rgba(234,88,12,0.35)]',
+    icon: UtensilsCrossed,
+    tags: ['Cookbook', 'Nấu Ăn', 'Ẩm Thực', 'Công Thức', 'Món Ngon', 'Phở Bò', 'Bún Chả', 'Cơm Tấm'],
   },
 ];
 
@@ -470,6 +485,9 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'v_health':
         navigate('/v-health', { appId: 'v_health' });
+        break;
+      case 'cookbook':
+        navigate('/cookbook', { appId: 'cookbook' });
         break;
       default:
         navigate('/space-360');

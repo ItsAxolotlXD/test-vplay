@@ -12,7 +12,8 @@ import {
   Smartphone,
   Flag,
   Radio,
-  Music
+  Music,
+  ShoppingBag
 } from 'lucide-react';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
@@ -40,6 +41,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
     { id: 'dock-home', label: 'Trang chủ', isCustomHome: true, route: '/' },
     { id: 'dock-tv', label: 'Truyền hình', icon: Tv, route: '/live-tv' },
     { id: 'dock-music', label: 'Kho nhạc TV', icon: Music, route: '/music' },
+    { id: 'dock-shop', label: 'Shop', icon: ShoppingBag, route: '/v-shop' },
     { id: 'dock-vertical', label: 'Vplay Vertical', icon: Smartphone, route: '/vertical' },
     { id: 'dock-news', label: 'Tin tức', icon: Megaphone, route: '/news' },
     { id: 'dock-vflow', label: 'Mạng xã hội V-Flow', icon: Radio, route: '/v-flow' },

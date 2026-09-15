@@ -214,11 +214,11 @@ export const LoyaltyPage: React.FC<LoyaltyPageProps> = ({
             </div>
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
-              Trung Tâm <span className="bg-gradient-to-r from-amber-300 via-rose-400 to-purple-400 bg-clip-text text-transparent">Loyalty</span> & Sàn Cược Orbs
+              Trung Tâm <span className="bg-gradient-to-r from-amber-300 via-rose-400 to-purple-400 bg-clip-text text-transparent">Loyalty</span> & Sàn Cược <span className="text-yellow-400">Orbs</span>
             </h1>
 
             <p className="text-sm text-[#D1D5DB] leading-relaxed">
-              Tích lũy điểm V-Points khi xem truyền hình, đổi quà VIP và trải nghiệm sàn cược khoáng vật Orbs 3D trực tiếp với tỷ lệ trả thưởng hấp dẫn.
+              Tích lũy điểm V-Points khi xem truyền hình, đổi quà VIP và trải nghiệm sàn cược khoáng vật <span className="text-yellow-400 font-bold">Orbs</span> 3D trực tiếp với tỷ lệ trả thưởng hấp dẫn.
             </p>
           </div>
 
@@ -246,14 +246,14 @@ export const LoyaltyPage: React.FC<LoyaltyPageProps> = ({
             {/* Orbs Balance Pill */}
             <div className="p-3.5 rounded-2xl bg-gradient-to-br from-purple-950/60 to-purple-900/40 border border-purple-500/30 backdrop-blur-md flex items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300">
-                  <Coins className="w-5 h-5 text-amber-300" />
+                <div className="w-9 h-9 rounded-xl bg-yellow-500/20 border border-yellow-400/40 flex items-center justify-center text-yellow-300">
+                  <Coins className="w-5 h-5 text-yellow-400" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-purple-300/80 block font-medium">Khoáng vật Orbs</span>
-                  <div className="text-base font-extrabold text-white font-mono flex items-baseline gap-1">
+                  <span className="text-[11px] text-yellow-400/90 block font-medium">Khoáng vật <span className="text-yellow-400 font-bold">Orbs</span></span>
+                  <div className="text-base font-extrabold text-yellow-400 font-mono flex items-baseline gap-1">
                     <span>{orbs.toLocaleString()}</span>
-                    <span className="text-[10px] text-purple-300 font-sans">ORBS</span>
+                    <span className="text-[10px] text-yellow-400 font-sans font-bold">ORBS</span>
                   </div>
                 </div>
               </div>

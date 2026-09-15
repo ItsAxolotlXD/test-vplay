@@ -47,6 +47,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { useOrbs } from '../hooks/useOrbs';
+import { VAPPS_LIST } from './VAppsView';
 
 interface TopBarProps {
   currentRoute: string;
@@ -57,14 +59,18 @@ interface TopBarProps {
 }
 
 // Official Vplay Logo component with fallback (compact size)
-const VplayLogo: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
+const VplayLogo: React.FC<{ onClick?: () => void; isActive?: boolean }> = ({ onClick, isActive = false }) => {
   const [imgError, setImgError] = useState(false);
 
   return (
     <button
       id="topbar-vplay-logo"
       onClick={onClick}
-      className="flex items-center gap-2 group cursor-pointer focus:outline-none shrink-0"
+      className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 group cursor-pointer focus:outline-none shrink-0 transition-all ${
+        isActive 
+          ? 'text-white bg-white/15 font-bold shadow-sm' 
+          : 'text-white/90 hover:text-white hover:bg-white/10'
+      }`}
       title="Vplay - Về trang chủ"
     >
       {!imgError ? (
@@ -100,6 +106,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   const { flags } = useFeatureFlags();
 
   const isLightMode = settings.theme === 'light';
+
+  const { orbs, addOrbs } = useOrbs();
+  const [orbsFlyoutOpen, setOrbsFlyoutOpen] = useState(false);
+  const [orbsHover, setOrbsHover] = useState(false);
+  const orbsRef = useRef<HTMLDivElement | null>(null);
 
   // Dropdowns & Modals State
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -149,6 +160,38 @@ export const TopBar: React.FC<TopBarProps> = ({
     }, 250);
   };
 
+  const handleOpenSpace360App = (appId: string) => {
+    setMoreMenuOpen(false);
+    setIsSpaceMenuOpen(false);
+    switch (appId) {
+      case 'v_arcade': navigate('/v-arcade', { appId }); break;
+      case 'v_xplore': navigate('/v-files', { appId }); break;
+      case 'explore_vietnam': navigate('/explore-vietnam', { appId }); break;
+      case 'v_maps': navigate('/v-maps', { appId }); break;
+      case 'v_box': navigate('/v-box', { appId }); break;
+      case 'v_learn': navigate('/v-study', { appId }); break;
+      case 'v_calc': navigate('/v-calc', { appId }); break;
+      case 'v_clock': navigate('/v-clock', { appId }); break;
+      case 'v_phone': navigate('/v-phone', { appId }); break;
+      case 'v_browser': navigate('/v-browser', { appId }); break;
+      case 'v_calendar': navigate('/v-calendar', { appId }); break;
+      case 'v_gallery': navigate('/v-gallery', { appId }); break;
+      case 'v_camera': navigate('/v-camera', { appId }); break;
+      case 'v_ticket': navigate('/v-ticket', { appId }); break;
+      case 'v_weather': navigate('/v-weather', { appId }); break;
+      case 'v_reminders': navigate('/v-reminders', { appId }); break;
+      case 'v_notes': navigate('/v-notes', { appId }); break;
+      case 'v_furniture': navigate('/v-furniture', { appId }); break;
+      case 'v_minecraft': navigate('/minecraft', { appId }); break;
+      case 'v_flow': navigate('/v-flow', { appId }); break;
+      case 'v_chat': navigate('/chat', { appId }); break;
+      case 'v_stock': navigate('/v-stock', { appId }); break;
+      case 'v_health': navigate('/v-health', { appId }); break;
+      case 'cookbook': navigate('/cookbook', { appId }); break;
+      default: navigate('/space-360', { appId }); break;
+    }
+  };
+
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -158,6 +201,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       }
       if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
         setNotificationsOpen(false);
+      }
+      if (orbsRef.current && !orbsRef.current.contains(e.target as Node)) {
+        setOrbsFlyoutOpen(false);
       }
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setUserProfileOpen(false);
@@ -233,11 +279,14 @@ export const TopBar: React.FC<TopBarProps> = ({
             </button>
 
             {/* 1. Official Vplay Logo */}
-            <VplayLogo onClick={() => navigate('/')} />
+            <VplayLogo 
+              onClick={() => navigate('/')} 
+              isActive={currentRoute === '/' || currentRoute === '' || currentRoute === '/home'} 
+            />
 
             {/* 2. Navigation Items:
                 - Truyền Hình
-                - Xem thêm v (với Dropdown Menu có Loyalty bên trong)
+                - App v (với Dropdown Menu có Loyalty bên trong)
             */}
             <nav className="hidden md:flex items-center gap-2 lg:gap-3 h-full text-white">
               
@@ -256,22 +305,22 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <span className="font-medium tracking-wide">Truyền hình</span>
               </button>
 
-              {/* Item 2: Music / Kho nhạc truyền hình */}
+              {/* Item 2: Shop */}
               <button
-                id="topbar-nav-music"
-                onClick={() => navigate('/music')}
+                id="topbar-nav-shop"
+                onClick={() => navigate('/v-shop')}
                 className={`relative px-4 py-2 rounded-full text-[14.5px] font-medium transition-all flex items-center gap-2 cursor-pointer group ${
-                  currentRoute === '/music' || currentRoute.startsWith('/music')
+                  currentRoute === '/v-shop' || currentRoute.startsWith('/v-shop') || currentRoute === '/shop'
                     ? 'text-white bg-white/15 font-bold'
                     : 'text-white/90 hover:text-white hover:bg-white/10'
                 }`}
-                title="Kho nhạc truyền hình Vplay Music"
+                title="Shop Mua sắm tiện ích"
               >
-                <Music className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                <span className="font-medium tracking-wide">Music</span>
+                <ShoppingBag className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
+                <span className="font-medium tracking-wide">Shop</span>
               </button>
 
-              {/* Item 3: Xem thêm v with Dropdown Menu */}
+              {/* Item 3: App v with Dropdown Menu */}
               <div
                 className="relative h-full flex items-center"
                 ref={moreMenuDropdownRef}
@@ -288,7 +337,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   }`}
                   aria-expanded={moreMenuOpen}
                 >
-                  <span className="font-medium tracking-wide">Xem thêm</span>
+                  <span className="font-medium tracking-wide">App</span>
                   <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-white/80 ${
                     moreMenuOpen ? 'rotate-180 text-white' : ''
                   }`} />
@@ -308,7 +357,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         backdropFilter: 'blur(32px)',
                         transformOrigin: 'top left'
                       }}
-                      className="absolute left-0 top-full mt-2 w-[310px] max-h-[238px] overflow-y-auto rounded-2xl p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.3)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-white/5 origin-top-left"
+                      className="absolute left-0 top-full mt-2 w-[320px] max-h-[380px] overflow-y-auto rounded-2xl p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.3)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-white/5 origin-top-left"
                     >
                       <div className="space-y-1 py-0.5 pr-1">
                         
@@ -341,7 +390,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
-                          <LayoutGrid className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
+                          <LayoutGrid className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
                           <span>Cổng nội dung</span>
                         </button>
 
@@ -355,7 +404,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
-                          <Newspaper className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
+                          <Newspaper className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
                           <span>Cổng thông tin</span>
                         </button>
 
@@ -369,11 +418,11 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
-                          <Music className="w-5 h-5 shrink-0 text-[#FF4C93] group-hover:scale-105 transition-transform" />
+                          <Music className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
                           <span>Kho nhạc truyền hình</span>
                         </button>
 
-                        {/* 4. Cổng không gian (Space 360) - Dẫn trực tiếp đến tab Space 360 */}
+                        {/* 4. Cổng không gian - Dẫn trực tiếp đến tab Space 360 */}
                         <button
                           id="more-item-space-360"
                           onClick={() => {
@@ -382,18 +431,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                             navigate('/space-360');
                           }}
                           className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
-                          title="Chuyển đến Cổng không gian (Space 360)"
+                          title="Chuyển đến Cổng không gian"
                         >
                           <div className="flex items-center gap-3.5">
-                            <Compass className="w-5 h-5 shrink-0 text-emerald-400 group-hover:scale-105 transition-transform" />
-                            <span>Cổng không gian</span>
+                            <Compass className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
+                            <span>Cổng không gian (Space 360)</span>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 font-mono font-bold">
-                              Space 360
-                            </span>
-                            <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
-                          </div>
+                          <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
                         </button>
 
                         {/* 5. Cổng kết nối (V-Flow) */}
@@ -406,8 +450,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
-                          <Radio className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                          <span>Cổng kết nối (V-Flow)</span>
+                          <Radio className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
+                          <span>Cổng kết nối (Flow)</span>
                         </button>
 
                         {/* 6. Cổng trò chuyện (V-Chat) */}
@@ -420,8 +464,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
-                          <MessageSquare className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                          <span>Cổng trò chuyện (V-Chat)</span>
+                          <MessageSquare className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
+                          <span>Cổng trò chuyện (Chat)</span>
                         </button>
 
                         {/* Divider */}
@@ -437,7 +481,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
-                          <Ticket className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
+                          <Ticket className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
                           <span>Mã kích hoạt</span>
                         </button>
 
@@ -449,13 +493,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                             setIsSpaceMenuOpen(false);
                             navigate('/loyalty');
                           }}
-                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-amber-300 hover:text-amber-200 hover:bg-white/10 transition-colors cursor-pointer group"
+                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
                           <div className="relative flex items-center justify-center">
-                            <Coins className="w-5 h-5 shrink-0 text-amber-400 group-hover:scale-110 transition-transform" />
-                            <Sparkles className="w-2.5 h-2.5 text-amber-300 absolute -top-1 -right-1" />
+                            <Coins className="w-5 h-5 shrink-0 text-white group-hover:scale-110 transition-transform" />
+                            <Sparkles className="w-2.5 h-2.5 text-white absolute -top-1 -right-1" />
                           </div>
-                          <span className="font-semibold">Loyalty</span>
+                          <span className="font-semibold text-yellow-400">Loyalty & Orbs</span>
                         </button>
 
                         {/* 9. Danh sách bạn bè */}
@@ -468,9 +512,42 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }}
                           className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
                         >
-                          <Users className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
+                          <Users className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
                           <span>Danh sách bạn bè</span>
                         </button>
+
+                        {/* Space 360 Header & All Apps (Monochrome White Icons) */}
+                        <div className="pt-2.5 pb-1 px-3 border-t border-white/10 mt-2 flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-white/50 tracking-wider uppercase">
+                            Ứng dụng Space 360
+                          </span>
+                          <span className="text-[10px] text-white/40 font-mono">
+                            {VAPPS_LIST.length} apps
+                          </span>
+                        </div>
+
+                        {/* Render all Space 360 apps with monochrome white icons */}
+                        <div className="space-y-0.5 pt-0.5">
+                          {VAPPS_LIST.map((app) => {
+                            const AppIcon = app.icon;
+                            return (
+                              <button
+                                key={app.id}
+                                id={`more-space360-app-${app.id}`}
+                                onClick={() => handleOpenSpace360App(app.id)}
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-[13.5px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <AppIcon className="w-4.5 h-4.5 shrink-0 text-white group-hover:scale-105 transition-transform" />
+                                  <span className="truncate">{app.name}</span>
+                                </div>
+                                <span className="text-[10.5px] px-1.5 py-0.5 rounded bg-white/10 text-white/70 font-mono shrink-0 ml-2">
+                                  {app.badge || 'App'}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
 
                       </div>
                     </motion.div>
@@ -502,50 +579,103 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <Search className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
               </button>
 
-              {/* 2. Notification Bell Icon */}
-              <div className="relative" ref={notificationsRef}>
+              {/* 2. Orbs Coin Icon (hiển thị số orbs khi hover & click - monochrome white) */}
+              <div 
+                className="relative" 
+                ref={orbsRef}
+                onMouseEnter={() => setOrbsHover(true)}
+                onMouseLeave={() => setOrbsHover(false)}
+              >
                 <button
-                  id="btn-topbar-notifications"
-                  onClick={() => setNotificationsOpen(!notificationsOpen)}
-                  className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all relative cursor-pointer ${
-                    notificationsOpen
-                      ? 'text-white bg-white/15'
-                      : 'text-white/90 hover:text-white hover:bg-white/10'
+                  id="btn-topbar-orbs-coin"
+                  onClick={() => setOrbsFlyoutOpen(!orbsFlyoutOpen)}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all relative cursor-pointer group ${
+                    orbsFlyoutOpen
+                      ? 'text-white bg-white/20 shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                      : 'text-white hover:text-white hover:bg-white/10'
                   }`}
-                  title="Thông báo phát sóng"
-                  aria-label="Thông báo phát sóng"
+                  title={`Số dư Orbs: ${orbs.toLocaleString()} ORBS`}
+                  aria-label="Số dư Orbs"
                 >
-                  <Bell className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
-                  <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                  <Coins className="w-5 h-5 stroke-[1.6] text-white group-hover:scale-110 transition-transform" />
                 </button>
 
-                {/* Notification Flyout */}
-                {notificationsOpen && (
+                {/* Hover Tooltip - Hiển thị số orbs hiện tại khi hover (text đổi thành màu vàng) */}
+                {orbsHover && !orbsFlyoutOpen && (
+                  <div className="absolute right-0 top-full mt-2 px-3 py-1.5 rounded-xl bg-black/95 border border-white/20 text-white text-xs font-mono font-bold shadow-2xl backdrop-blur-md whitespace-nowrap z-50 pointer-events-none flex items-center gap-1.5 animate-in fade-in zoom-in-95 duration-100">
+                    <Coins className="w-3.5 h-3.5 text-white shrink-0" />
+                    <span className="text-yellow-400 font-mono font-bold">{orbs.toLocaleString()} ORBS</span>
+                  </div>
+                )}
+
+                {/* Click Flyout - Hiển thị chi tiết số orbs và tiện ích đổi khi click (text đổi thành màu vàng) */}
+                {orbsFlyoutOpen && (
                   <div 
-                    className="absolute right-0 mt-2 w-80 rounded-2xl p-3 shadow-2xl z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white animate-in fade-in zoom-in-95 duration-150"
+                    className="absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl p-4 shadow-2xl z-50 bg-[#16121E]/95 backdrop-blur-2xl text-white border border-white/20 animate-in fade-in zoom-in-95 duration-150"
                     style={{ WebkitBackdropFilter: 'blur(32px)', backdropFilter: 'blur(32px)' }}
                   >
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
-                      <span className="text-xs font-bold uppercase tracking-wider text-gray-300">Thông báo phát sóng</span>
-                      <span className="text-[11px] text-red-400 font-medium cursor-pointer hover:underline">Đã đọc tất cả</span>
+                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Coins className="w-5 h-5 text-white" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-yellow-400">Ví Orbs Của Bạn</span>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-400/15 text-yellow-400 font-bold border border-yellow-400/30 font-mono">
+                        10.000đ = 10 ORBS
+                      </span>
                     </div>
+
+                    {/* Balance Highlight */}
+                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/15 text-center space-y-1 mb-3">
+                      <span className="text-[11px] text-yellow-400/80 uppercase tracking-wider block font-medium">Số dư Orbs hiện tại</span>
+                      <div className="text-2xl sm:text-3xl font-black text-yellow-400 font-mono tracking-tight flex items-center justify-center gap-2">
+                        <Coins className="w-6 h-6 text-white shrink-0" />
+                        <span>{orbs.toLocaleString()}</span>
+                        <span className="text-xs font-bold text-yellow-400/80">ORBS</span>
+                      </div>
+                      <span className="text-[11px] text-zinc-400 block font-mono">
+                        Tương đương ~ {new Intl.NumberFormat('vi-VN').format(orbs * 1000)} VND
+                      </span>
+                    </div>
+
+                    {/* Quick actions */}
                     <div className="space-y-1.5">
-                      {notifications.map((n) => (
-                        <div 
-                          key={n.id} 
-                          className={`p-2.5 rounded-xl text-xs transition-colors cursor-pointer ${
-                            n.unread 
-                              ? 'bg-white/10 border border-white/10'
-                              : 'hover:bg-white/5 text-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="font-medium leading-snug">{n.title}</p>
-                            {n.unread && <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 mt-1" />}
-                          </div>
-                          <span className="text-[10px] text-gray-400 mt-1 block">{n.time}</span>
-                        </div>
-                      ))}
+                      <button
+                        onClick={() => {
+                          setOrbsFlyoutOpen(false);
+                          navigate('/v-shop');
+                        }}
+                        className="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2">
+                          <ShoppingBag className="w-4 h-4 text-white" />
+                          <span>Dùng <span className="text-yellow-400">Orbs</span> mua sắm tại Shop</span>
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-zinc-400" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setOrbsFlyoutOpen(false);
+                          navigate('/loyalty');
+                        }}
+                        className="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Gamepad2 className="w-4 h-4 text-white" />
+                          <span>Sàn cược <span className="text-yellow-400">Orbs</span> & Loyalty</span>
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-zinc-400" />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          addOrbs(1000);
+                        }}
+                        className="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-yellow-400 border border-yellow-400/30 flex items-center justify-center gap-2 transition-all cursor-pointer mt-1"
+                      >
+                        <Gift className="w-4 h-4 text-white" />
+                        <span>+ Nhận 1.000 ORBS miễn phí</span>
+                      </button>
                     </div>
                   </div>
                 )}

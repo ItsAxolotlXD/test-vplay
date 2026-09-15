@@ -3,19 +3,21 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { HERO_SLIDES } from '../data/heroSlides';
 import { HeroSlide, Channel } from '../types';
-import { CHANNELS_DATA } from '../data/channels';
 import { BannerCardItem } from './BannerCardItem';
 
 interface HeroCarouselProps {
   navigate?: (route: string) => void;
   onSelectChannel?: (channel: Channel) => void;
+  slides?: HeroSlide[];
+  idPrefix?: string;
 }
 
-export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
+export const HeroCarousel: React.FC<HeroCarouselProps> = ({ slides = HERO_SLIDES, idPrefix = 'hero' }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const totalSlides = HERO_SLIDES.length;
+  const activeSlides = slides && slides.length > 0 ? slides : HERO_SLIDES;
+  const totalSlides = activeSlides.length;
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % totalSlides);
@@ -42,7 +44,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
 
   return (
     <section 
-      id="hero-banner-cards-carousel"
+      id={`${idPrefix}-banner-cards-carousel`}
       className="relative w-full pt-1 sm:pt-3 pb-3 overflow-hidden select-none"
       aria-label="Thẻ banner nổi bật"
     >
@@ -50,7 +52,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
       <div className="relative w-full flex items-center justify-center [perspective:1400px]">
         {/* Navigation Chevrons - Clickable */}
         <button
-          id="btn-banner-prev"
+          id={`btn-${idPrefix}-banner-prev`}
           onClick={prevSlide}
           className="absolute left-2 sm:left-4 md:left-8 lg:left-12 top-1/2 -translate-y-1/2 z-40 p-2 sm:p-2.5 rounded-full bg-black/55 hover:bg-black/85 backdrop-blur-md border border-white/20 text-white/90 hover:text-white transition-all hover:scale-110 active:scale-95 shadow-2xl cursor-pointer"
           aria-label="Thẻ trước"
@@ -59,7 +61,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
         </button>
 
         <button
-          id="btn-banner-next"
+          id={`btn-${idPrefix}-banner-next`}
           onClick={nextSlide}
           className="absolute right-2 sm:right-4 md:right-8 lg:right-12 top-1/2 -translate-y-1/2 z-40 p-2 sm:p-2.5 rounded-full bg-black/55 hover:bg-black/85 backdrop-blur-md border border-white/20 text-white/90 hover:text-white transition-all hover:scale-110 active:scale-95 shadow-2xl cursor-pointer"
           aria-label="Thẻ kế tiếp"
@@ -69,7 +71,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
 
         {/* Carousel Fixed 16:9 Aspect Ratio Frame */}
         <div className="relative w-[90vw] sm:w-[78vw] md:w-[68vw] lg:w-[60vw] max-w-[780px] aspect-[16/9] flex items-center justify-center [transform-style:preserve-3d]">
-          {HERO_SLIDES.map((slide, index) => {
+          {activeSlides.map((slide, index) => {
             // Compute distance from current index with wrap-around
             let diff = (index - currentIndex) % totalSlides;
             if (diff < -Math.floor(totalSlides / 2)) diff += totalSlides;
@@ -86,6 +88,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
             let zIndex = 30;
             let rotateY = 0;
             let brightness = 'brightness(1)';
+            let isOffscreen = false;
 
             if (isCenter) {
               xPosition = '0%';
@@ -119,6 +122,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
               zIndex = 0;
               rotateY = diff > 0 ? -28 : 28;
               brightness = 'brightness(0.4)';
+              isOffscreen = true;
             }
 
             return (
@@ -134,14 +138,15 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
                   filter: brightness
                 }}
                 transition={{
-                  duration: 0.85, // Animation trượt chậm hơn mượt mà
+                  duration: isOffscreen ? 0.2 : 0.85, // Mượt mà giống hệt banner trong Shop
                   ease: [0.25, 1, 0.5, 1]
                 }}
                 className="absolute inset-0 w-full h-full aspect-[16/9] pointer-events-none select-none cursor-default"
                 style={{
                   zIndex,
                   transformStyle: 'preserve-3d',
-                  transformOrigin: 'center center'
+                  transformOrigin: 'center center',
+                  visibility: opacity === 0 && isOffscreen ? 'hidden' : 'visible'
                 }}
               >
                 <BannerCardItem
@@ -156,7 +161,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = () => {
 
       {/* Pagination Indicators matching dots - Clickable */}
       <div className="mt-3 sm:mt-4 flex items-center justify-center gap-1.5 sm:gap-2">
-        {HERO_SLIDES.map((slide, idx) => {
+        {activeSlides.map((slide, idx) => {
           const isActive = idx === currentIndex;
           return (
             <button

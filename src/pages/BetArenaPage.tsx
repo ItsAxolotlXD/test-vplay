@@ -169,15 +169,15 @@ export const BetArenaPage: React.FC<BetArenaPageProps> = ({ navigate }) => {
       {/* 1. HEADER (News style UI) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs text-purple-400 font-bold uppercase tracking-wider mb-1">
-            <Coins className="w-4 h-4 text-purple-400 animate-pulse" />
+          <div className="flex items-center gap-2 text-xs text-yellow-400 font-bold uppercase tracking-wider mb-1">
+            <Coins className="w-4 h-4 text-yellow-400 animate-pulse" />
             <span>SÀN CƯỢC KHOÁNG VẬT • HIGH-ROLLER CASINO</span>
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Sàn Cược Orbs VIP & Đấu Trường Minigame
+            Sàn Cược <span className="text-yellow-400">Orbs</span> VIP & Đấu Trường Minigame
           </h1>
           <p className="text-xs sm:text-sm text-[#9CA3AF] mt-1">
-            Đấu trí cá cược khoáng vật Orbs thời gian thực cùng cộng đồng Vplay! 4 sảnh cược Provably Fair: Bầu Cua Tôm Cá, Lật Xu 3D, Bài Cào 3 Cây và Xúc Xắc Tài Xỉu.
+            Đấu trí cá cược khoáng vật <span className="text-yellow-400 font-bold">Orbs</span> thời gian thực cùng cộng đồng Vplay! 4 sảnh cược Provably Fair: Bầu Cua Tôm Cá, Lật Xu 3D, Bài Cào 3 Cây và Xúc Xắc Tài Xỉu.
           </p>
         </div>
 
@@ -206,9 +206,9 @@ export const BetArenaPage: React.FC<BetArenaPageProps> = ({ navigate }) => {
 
           {/* User Orbs Badge Capsule */}
           <div className="px-3.5 py-1.5 rounded-full bg-[#1E1E22] border border-[#2D2D35] flex items-center gap-2 text-xs">
-            <Coins className="w-3.5 h-3.5 text-purple-400" />
-            <span className="text-zinc-400 font-medium">Orbs:</span>
-            <span className="font-mono font-black text-amber-300">{orbs.toLocaleString()}</span>
+            <Coins className="w-3.5 h-3.5 text-yellow-400" />
+            <span className="text-yellow-400/90 font-medium">Orbs:</span>
+            <span className="font-mono font-black text-yellow-400">{orbs.toLocaleString()}</span>
           </div>
         </div>
       </div>

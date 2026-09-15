@@ -18,6 +18,10 @@ import {
   Tv,
   Radio,
   Share2,
+  ShoppingBag,
+  Coins,
+  BookOpen,
+  Package,
 } from 'lucide-react';
 import { FontFamilyOption } from '../hooks/useSettings';
 
@@ -36,8 +40,8 @@ interface OobeSetupModalProps {
   initialFontFamily?: FontFamilyOption;
 }
 
-// Steps enumeration
-type OobeStep = 1 | 2 | 2.1 | 3 | 4 | 5 | 6 | 7;
+// Steps enumeration with V-Shop and Space360 steps
+type OobeStep = 1 | 2 | 2.1 | 3 | 4 | 5 | 5.1 | 5.2 | 6 | 7;
 
 export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
   isOpen,
@@ -621,6 +625,152 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
               )}
 
               {/* ========================================================
+                  TRANG 5.1: KHÁM PHÁ V-SHOP & TÍCH LŨY ORBS
+                 ======================================================== */}
+              {currentStep === 5.1 && (
+                <motion.div
+                  key="step-5-1"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.25 }}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center"
+                >
+                  {/* Left Graphic: Shopping & Orbs */}
+                  <div className="md:col-span-5 flex items-center justify-center py-4">
+                    <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 flex items-center justify-center">
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#FF4C93]/25 via-[#FFA800]/25 to-[#FF3366]/30 blur-2xl animate-pulse" />
+                      <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-3xl bg-gradient-to-br from-[#201018] via-[#1A121E] to-[#120E15] shadow-2xl border border-[#FF4C93]/30 flex flex-col items-center justify-center p-5 text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#FF4C93] to-[#FF8008] flex items-center justify-center shadow-lg shadow-[#FF4C93]/40 mb-3">
+                          <ShoppingBag className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="flex items-center gap-1 text-yellow-400 font-bold text-sm">
+                          <Coins className="w-4 h-4 text-yellow-400" />
+                          <span>10.000₫ = 10 Orbs</span>
+                        </div>
+                        <span className="text-white/60 text-[11px] mt-1 font-medium">V-Shop Official</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: V-Shop Details */}
+                  <div className="md:col-span-7 flex flex-col justify-center max-w-md w-full mx-auto md:mx-0">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FF4C93]/15 border border-[#FF4C93]/30 text-[#FF4C93] text-xs font-semibold w-fit mb-2">
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>V-Shop • Cửa Hàng Tiện Ích</span>
+                    </div>
+
+                    <h1 className="text-2xl sm:text-3xl font-semibold text-[#1A1A1A] tracking-tight leading-tight font-sans">
+                      Mua sắm tiện lợi & Tích lũy Orbs
+                    </h1>
+
+                    <p className="text-xs sm:text-sm text-[#5C5C5C] mt-2 mb-4 font-normal leading-relaxed font-sans">
+                      Trải nghiệm trung tâm mua sắm V-Shop tích hợp sẵn trên nền tảng Vplay với 3 danh mục tuyển chọn: Thực phẩm, Đồ công nghệ - Điện tử và Đồ gia dụng.
+                    </p>
+
+                    <div className="space-y-2.5 mb-4">
+                      <div className="flex items-start gap-2.5 text-xs text-[#2A2A2A]">
+                        <Package className="w-4 h-4 text-[#FF4C93] shrink-0 mt-0.5" />
+                        <span>Sản phẩm phong phú, cam kết chất lượng và giao hàng tận nơi.</span>
+                      </div>
+                      <div className="flex items-start gap-2.5 text-xs text-[#2A2A2A]">
+                        <Coins className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+                        <span>Quy đổi Orbs thông minh: <strong className="text-yellow-600 font-bold">10.000 VNĐ = 10 ORBS</strong> cộng thưởng và trừ tương ứng khi thanh toán.</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 text-[11px] leading-relaxed">
+                      <strong>Lưu ý:</strong> Bạn vẫn thanh toán tiền mặt hoặc chuyển khoản khi đặt mua/nhận hàng, và số Orbs của bạn vẫn sẽ bị trừ đúng với giá trị tiền thật.
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ========================================================
+                  TRANG 5.2: VŨ TRỤ TIỆN ÍCH SPACE 360
+                 ======================================================== */}
+              {currentStep === 5.2 && (
+                <motion.div
+                  key="step-5-2"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.25 }}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center"
+                >
+                  {/* Left Graphic: Space360 Apps Mosaic */}
+                  <div className="md:col-span-5 flex items-center justify-center py-4">
+                    <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 flex items-center justify-center">
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#00D2FF]/25 via-[#6E2CF4]/30 to-[#E6005A]/25 blur-2xl animate-pulse" />
+                      <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-3xl bg-[#12111A] shadow-2xl border border-white/15 p-4 flex flex-col justify-between">
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold">
+                            📖
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold">
+                            📝
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold">
+                            ⏰
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold">
+                            🌍
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold">
+                            🎮
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white text-xs font-bold">
+                            🧮
+                          </div>
+                        </div>
+                        <div className="text-center pt-2 border-t border-white/10">
+                          <div className="text-xs font-black text-white tracking-wide">SPACE 360</div>
+                          <div className="text-[10px] text-cyan-400 font-semibold">24+ Apps • Cookbook Inside</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Space360 Details */}
+                  <div className="md:col-span-7 flex flex-col justify-center max-w-md w-full mx-auto md:mx-0">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-700 text-xs font-semibold w-fit mb-2">
+                      <BookOpen className="w-3.5 h-3.5 text-cyan-600" />
+                      <span>Space 360 • Cổng Không Gian Đa Tiện Ích</span>
+                    </div>
+
+                    <h1 className="text-2xl sm:text-3xl font-semibold text-[#1A1A1A] tracking-tight leading-tight font-sans">
+                      Không gian làm việc & giải trí 360°
+                    </h1>
+
+                    <p className="text-xs sm:text-sm text-[#5C5C5C] mt-2 mb-4 font-normal leading-relaxed font-sans">
+                      Truy cập nhanh vào hệ sinh thái hơn 24 ứng dụng độc lập ngay trong menu <strong className="text-black font-semibold">App</strong> trên thanh điều hướng với biểu tượng monochrome đồng bộ.
+                    </p>
+
+                    <div className="space-y-2.5">
+                      <div className="flex items-start gap-2.5 text-xs text-[#2A2A2A]">
+                        <div className="w-5 h-5 rounded-full bg-cyan-500/15 text-cyan-700 flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                          ✓
+                        </div>
+                        <span><strong>Cookbook:</strong> Khám phá công thức nấu ăn 3 miền với hướng dẫn chi tiết từng bước.</span>
+                      </div>
+                      <div className="flex items-start gap-2.5 text-xs text-[#2A2A2A]">
+                        <div className="w-5 h-5 rounded-full bg-cyan-500/15 text-cyan-700 flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                          ✓
+                        </div>
+                        <span><strong>Bộ công cụ văn phòng:</strong> Notes, Clock, Calculator, Reminders, Files, Browser, Calendar.</span>
+                      </div>
+                      <div className="flex items-start gap-2.5 text-xs text-[#2A2A2A]">
+                        <div className="w-5 h-5 rounded-full bg-cyan-500/15 text-cyan-700 flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                          ✓
+                        </div>
+                        <span><strong>Khám phá không gian & minigame:</strong> Bản đồ Maps 360°, rương đồ Minecraft và kho Arcade phong phú.</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ========================================================
                   TRANG 6: READ AND ACCEPT OUR TERMS AND CONDITIONS
                  ======================================================== */}
               {currentStep === 6 && (
@@ -744,7 +894,9 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                   type="button"
                   onClick={() => {
                     if (currentStep === 7) setCurrentStep(6);
-                    else if (currentStep === 6) setCurrentStep(5);
+                    else if (currentStep === 6) setCurrentStep(5.2);
+                    else if (currentStep === 5.2) setCurrentStep(5.1);
+                    else if (currentStep === 5.1) setCurrentStep(5);
                     else if (currentStep === 5) setCurrentStep(4);
                     else if (currentStep === 4) setCurrentStep(3);
                     else if (currentStep === 3) setCurrentStep(2);
@@ -821,6 +973,30 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
               {currentStep === 5 && (
                 <button
                   id="btn-oobe-step5-next"
+                  type="button"
+                  onClick={() => setCurrentStep(5.1)}
+                  className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+
+              {currentStep === 5.1 && (
+                <button
+                  id="btn-oobe-step5-1-next"
+                  type="button"
+                  onClick={() => setCurrentStep(5.2)}
+                  className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+
+              {currentStep === 5.2 && (
+                <button
+                  id="btn-oobe-step5-2-next"
                   type="button"
                   onClick={() => setCurrentStep(6)}
                   className="px-8 sm:px-10 py-1.5 sm:py-2 rounded-[4px] bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white text-xs sm:text-sm font-medium shadow-sm transition-all cursor-pointer inline-flex items-center gap-1.5"

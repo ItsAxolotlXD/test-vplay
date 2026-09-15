@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Smartphone,
   Music,
+  ShoppingBag,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -142,13 +143,17 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
     if (route === '/chat') {
       return currentRoute.startsWith('/chat') || currentRoute.startsWith('/discord');
     }
+    if (route === '/v-shop') {
+      return currentRoute.startsWith('/v-shop') || currentRoute.startsWith('/shop');
+    }
     return currentRoute.startsWith(route);
   };
 
-  // 3 pages strictly matching user request:
+  // Pages matching navigation:
   // Trang 1: Trang chủ, Copilot (custom icon), Settings, Search
-  // Trang 2: Space360, News, Truyền hình, Loyalty
+  // Trang 2: Space360, News, Truyền hình, Music
   // Trang 3: Danh sách bạn bè, V-Flow, V-Chat, Vertical
+  // Trang 4: V-Shop Mua sắm
   const pages: FloatyTabItem[][] = [
     // Trang 1: Trang chủ, Copilot, Settings, Search
     [
@@ -170,6 +175,10 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
       { id: 'floaty-vflow', title: 'Mạng xã hội V-Flow', route: '/v-flow', icon: Radio },
       { id: 'floaty-chat', title: 'Phòng Chat V-Chat', route: '/chat', icon: MessageSquare },
       { id: 'floaty-vertical', title: 'Vplay Vertical', route: '/vertical', icon: Smartphone },
+    ],
+    // Trang 4: Shop Mua sắm
+    [
+      { id: 'floaty-shop', title: 'Shop', route: '/v-shop', icon: ShoppingBag },
     ],
   ];
 

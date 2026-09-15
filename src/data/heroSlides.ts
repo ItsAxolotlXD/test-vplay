@@ -26,6 +26,18 @@ export const HERO_SLIDES: HeroSlide[] = [
     isAd: true
   },
   {
+    id: 'banner-ad-datafa',
+    title: 'Nước Dừa Tươi Datafa',
+    description: '',
+    category: 'QUẢNG CÁO',
+    quality: 'HD',
+    badge: 'AD',
+    channelId: 'vtv3',
+    backgroundImage: '/banners/banner_datafa_ad.png',
+    ctaText: 'Xem ngay',
+    isAd: true
+  },
+  {
     id: 'banner-ad-iphone',
     title: 'iPhone Duo',
     description: '',

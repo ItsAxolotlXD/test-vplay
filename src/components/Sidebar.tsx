@@ -43,7 +43,9 @@ import {
   StickyNote,
   Armchair,
   MessageSquare,
-  Music
+  Music,
+  ShoppingBag,
+  UtensilsCrossed
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -384,9 +386,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex items-center gap-2.5 min-w-0">
               {/* Glowing Orb Sphere Avatar */}
               <div className="relative w-8 h-8 rounded-xl bg-purple-950/70 border border-purple-400/40 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-105 transition-transform">
-                <Coins className="w-4 h-4 text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.9)]" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 animate-ping opacity-75" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-300" />
+                <Coins className="w-4 h-4 text-white" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-white/60 animate-ping opacity-75" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-white" />
               </div>
 
               <div className="flex flex-col min-w-0">
@@ -557,8 +559,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
           }`}
         >
-          <Music className="w-5 h-5 shrink-0 text-[#FF4C93]" />
+          <Music className="w-5 h-5 shrink-0 text-white" />
           <span className="truncate">Music (Nhạc TV)</span>
+        </button>
+
+        {/* Shop (Mua sắm tiện ích) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-shop' : 'nav-item-shop'}
+          onClick={() => handleNavClick('/v-shop')}
+          title="Shop Mua sắm tiện ích"
+          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/v-shop') || isActive('/shop')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <ShoppingBag className="w-5 h-5 shrink-0 text-white" />
+          <span className="truncate">Shop</span>
         </button>
 
         {/* Divider 1 */}
@@ -593,7 +610,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           >
             <div className="flex items-center gap-3.5 truncate">
-              <LayoutGrid className="w-5 h-5 shrink-0 text-emerald-400" />
+              <LayoutGrid className="w-5 h-5 shrink-0 text-white" />
               <span className="truncate">Space 360</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -653,7 +670,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Gamepad2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="truncate">V-Games</span>
+                    <span className="truncate">Games</span>
                   </div>
                 </button>
 
@@ -668,7 +685,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Folder className="w-4 h-4 text-purple-400 shrink-0" />
-                    <span className="truncate">V-Files</span>
+                    <span className="truncate">Files</span>
                   </div>
                 </button>
 
@@ -698,7 +715,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Globe className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="truncate">Space 360 V-Maps</span>
+                    <span className="truncate">Maps</span>
                   </div>
                 </button>
 
@@ -713,7 +730,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Clock className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="truncate">V-Clock</span>
+                    <span className="truncate">Clock</span>
                   </div>
                 </button>
 
@@ -728,7 +745,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Phone className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span className="truncate">V-Phone</span>
+                    <span className="truncate">Phone</span>
                   </div>
                 </button>
 
@@ -743,7 +760,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Globe className="w-4 h-4 text-sky-400 shrink-0" />
-                    <span className="truncate">V-Browser</span>
+                    <span className="truncate">Browser</span>
                   </div>
                 </button>
 
@@ -773,7 +790,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <ImageIcon className="w-4 h-4 text-purple-400 shrink-0" />
-                    <span className="truncate">V-Gallery</span>
+                    <span className="truncate">Gallery</span>
                   </div>
                 </button>
 
@@ -788,7 +805,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Camera className="w-4 h-4 text-pink-400 shrink-0" />
-                    <span className="truncate">V-Camera</span>
+                    <span className="truncate">Camera</span>
                   </div>
                 </button>
 
@@ -803,7 +820,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Ticket className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span className="truncate">V-Ticket</span>
+                    <span className="truncate">Ticket</span>
                   </div>
                 </button>
 
@@ -818,7 +835,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <CloudSun className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="truncate">V-Weather</span>
+                    <span className="truncate">Weather</span>
+                  </div>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-cookbook" : "space360-tab-cookbook"}
+                  onClick={() => handleNavClick("/cookbook", { appId: "cookbook" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("cookbook")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <UtensilsCrossed className="w-4 h-4 text-orange-400 shrink-0" />
+                    <span className="truncate">Cookbook</span>
                   </div>
                 </button>
 
@@ -937,7 +969,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <div className="flex items-center gap-3.5 truncate">
-            <Coins className="w-5 h-5 shrink-0 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]" />
+            <Coins className="w-5 h-5 shrink-0 text-white" />
             <span className="truncate">Loyalty</span>
           </div>
           <span className="px-2 py-0.5 text-[9.5px] font-mono font-black bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-400/40 rounded-full">
@@ -1206,6 +1238,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   />
                 </button>
 
+                {/* Music mini */}
+                <button
+                  id="mini-nav-item-music"
+                  onClick={() => handleNavClick('/music')}
+                  title="Music"
+                  className={`w-10 h-10 min-w-[40px] min-h-[40px] shrink-0 rounded-[12px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/music') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Music className="w-4 h-4 text-white shrink-0" />
+                </button>
+
+                {/* Shop mini */}
+                <button
+                  id="mini-nav-item-shop"
+                  onClick={() => handleNavClick('/v-shop')}
+                  title="Shop"
+                  className={`w-10 h-10 min-w-[40px] min-h-[40px] shrink-0 rounded-[12px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/v-shop') || isActive('/shop') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <ShoppingBag className="w-4 h-4 text-white shrink-0" />
+                </button>
+
                 <div className="w-6 border-t border-white/10 my-0.5 shrink-0" />
 
                 {/* 5. Space 360 */}
@@ -1217,7 +1273,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     isActive('/space-360') || isActive('/v-space') || isActive('/v-apps') || isActive('/v-arcade') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <LayoutGrid className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <LayoutGrid className="w-4 h-4 text-white shrink-0" />
                 </button>
 
                 {/* 6. V-Flow */}
@@ -1279,7 +1335,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     isActive('/loyalty') || isActive('/bet-arena') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
-                  <Coins className="w-4 h-4 text-amber-400 shrink-0" />
+                  <Coins className="w-4 h-4 text-white shrink-0" />
                 </button>
 
                 {/* 11. People */}
