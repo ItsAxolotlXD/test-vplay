@@ -1103,7 +1103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="absolute inset-0 backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)]" />
             <div className="absolute inset-0 backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)]" />
             {/* Background tint gradually decreasing opacity from top to bottom */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1B0912]/98 via-[#1B0912]/70 to-[#1B0912]/20" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#181818]/98 via-[#181818]/70 to-[#181818]/20" />
           </div>
           {!effectiveCollapsed ? (
             renderSidebarBody(false)
@@ -1400,7 +1400,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="absolute inset-0 backdrop-blur-[12px] [mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_80%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_80%)]" />
                 <div className="absolute inset-0 backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_95%)]" />
                 <div className="absolute inset-0 backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_100%)]" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#1B0912]/98 via-[#1B0912]/70 to-[#1B0912]/20" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#181818]/98 via-[#181818]/70 to-[#181818]/20" />
               </div>
               {renderSidebarBody(true)}
             </motion.div>

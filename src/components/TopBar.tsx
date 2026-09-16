@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Menu, 
   Search, 
@@ -42,7 +42,8 @@ import {
   ArrowRight,
   StickyNote,
   Armchair,
-  Music
+  Music,
+  Settings
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
@@ -128,6 +129,11 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   // Dynamic Scroll State for Progressive Blur elevation
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Danh sách ứng dụng Space 360 sắp xếp theo A - Z
+  const sortedSpace360Apps = useMemo(() => {
+    return [...VAPPS_LIST].sort((a, b) => a.name.localeCompare(b.name, 'vi', { sensitivity: 'base' }));
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -259,8 +265,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                 ? 'bg-gradient-to-b from-white/70 via-white/45 to-white/20' 
                 : 'bg-gradient-to-b from-white/50 via-white/30 to-white/10'
               : isScrolled
-                ? 'bg-gradient-to-b from-[#1B0912]/75 via-[#1B0912]/50 to-[#1B0912]/25'
-                : 'bg-gradient-to-b from-[#1B0912]/55 via-[#1B0912]/35 to-[#1B0912]/15'
+                ? 'bg-gradient-to-b from-[#181818]/75 via-[#181818]/50 to-[#181818]/25'
+                : 'bg-gradient-to-b from-[#181818]/55 via-[#181818]/35 to-[#181818]/15'
           }`} />
         </div>
         <div className="w-full max-w-[1780px] mx-auto px-4 md:px-6 lg:px-8 h-16 md:h-[68px] flex items-center justify-between gap-3 md:gap-4">
@@ -294,30 +300,36 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 id="topbar-nav-live-tv"
                 onClick={() => navigate('/live-tv')}
-                className={`relative px-4 py-2 rounded-full text-[14.5px] font-medium transition-all flex items-center gap-2 cursor-pointer group ${
+                className={`relative px-4 py-2 rounded-full text-[14.5px] transition-all flex items-center gap-2 cursor-pointer group ${
                   isLiveTVActive
-                    ? 'text-white bg-white/15 font-bold'
-                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                    ? 'bg-white text-black font-bold shadow-md'
+                    : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
                 }`}
                 title="Truyền hình Vplay"
               >
-                <Tv className="w-5 h-5 shrink-0 text-white/90 group-hover:scale-105 transition-transform" />
-                <span className="font-medium tracking-wide">Truyền hình</span>
+                <Tv className={`w-5 h-5 shrink-0 transition-transform ${
+                  isLiveTVActive ? 'text-black' : 'text-white/90 group-hover:scale-105'
+                }`} />
+                <span className="tracking-wide">Truyền hình</span>
               </button>
 
               {/* Item 2: Shop */}
               <button
                 id="topbar-nav-shop"
                 onClick={() => navigate('/v-shop')}
-                className={`relative px-4 py-2 rounded-full text-[14.5px] font-medium transition-all flex items-center gap-2 cursor-pointer group ${
+                className={`relative px-4 py-2 rounded-full text-[14.5px] transition-all flex items-center gap-2 cursor-pointer group ${
                   currentRoute === '/v-shop' || currentRoute.startsWith('/v-shop') || currentRoute === '/shop'
-                    ? 'text-white bg-white/15 font-bold'
-                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                    ? 'bg-white text-black font-bold shadow-md'
+                    : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
                 }`}
                 title="Shop Mua sắm tiện ích"
               >
-                <ShoppingBag className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
-                <span className="font-medium tracking-wide">Shop</span>
+                <ShoppingBag className={`w-5 h-5 shrink-0 transition-transform ${
+                  currentRoute === '/v-shop' || currentRoute.startsWith('/v-shop') || currentRoute === '/shop'
+                    ? 'text-black'
+                    : 'text-white group-hover:scale-105'
+                }`} />
+                <span className="tracking-wide">Shop</span>
               </button>
 
               {/* Item 3: App v with Dropdown Menu */}
@@ -330,17 +342,31 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <button
                   id="topbar-nav-more"
                   onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                  className={`relative px-4 py-2 rounded-full text-[14.5px] font-medium transition-all flex items-center gap-1.5 cursor-pointer group ${
-                    moreMenuOpen
-                      ? 'text-white bg-white/15 font-bold'
-                      : 'text-white/90 hover:text-white hover:bg-white/10'
+                  className={`relative px-4 py-2 rounded-full text-[14.5px] transition-all flex items-center gap-1.5 cursor-pointer group ${
+                    moreMenuOpen || [
+                      '/v-arcade', '/v-files', '/explore-vietnam', '/v-maps', '/v-box',
+                      '/v-study', '/v-calc', '/v-clock', '/v-phone', '/v-browser',
+                      '/v-calendar', '/v-gallery', '/v-camera', '/v-ticket', '/v-weather',
+                      '/v-reminders', '/v-notes', '/v-furniture', '/minecraft', '/v-flow',
+                      '/chat', '/v-stock', '/v-health', '/cookbook', '/space-360', '/loyalty', '/copilot'
+                    ].some(path => currentRoute === path || currentRoute.startsWith(path))
+                      ? 'bg-white text-black font-bold shadow-md'
+                      : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
                   }`}
                   aria-expanded={moreMenuOpen}
                 >
-                  <span className="font-medium tracking-wide">App</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-white/80 ${
-                    moreMenuOpen ? 'rotate-180 text-white' : ''
-                  }`} />
+                  <span className="tracking-wide">App</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+                    moreMenuOpen || [
+                      '/v-arcade', '/v-files', '/explore-vietnam', '/v-maps', '/v-box',
+                      '/v-study', '/v-calc', '/v-clock', '/v-phone', '/v-browser',
+                      '/v-calendar', '/v-gallery', '/v-camera', '/v-ticket', '/v-weather',
+                      '/v-reminders', '/v-notes', '/v-furniture', '/minecraft', '/v-flow',
+                      '/chat', '/v-stock', '/v-health', '/cookbook', '/space-360', '/loyalty', '/copilot'
+                    ].some(path => currentRoute === path || currentRoute.startsWith(path))
+                      ? 'text-black'
+                      : 'text-white/80'
+                  } ${moreMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* "XEM THÊM" DROPDOWN MENU WITH ANIMATION EXPANDING FROM TOP-LEFT (MAX 5 ITEMS VISIBLE, SCROLLBAR, BORDERLESS) */}
@@ -357,7 +383,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         backdropFilter: 'blur(32px)',
                         transformOrigin: 'top left'
                       }}
-                      className="absolute left-0 top-full mt-2 w-[320px] max-h-[380px] overflow-y-auto rounded-2xl p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.3)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-white/5 origin-top-left"
+                      className="absolute left-0 top-full mt-2 w-[320px] max-h-[380px] overflow-y-auto rounded-2xl p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-50 bg-[#181818]/95 backdrop-blur-2xl text-white [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.3)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-white/5 origin-top-left"
                     >
                       <div className="space-y-1 py-0.5 pr-1">
                         
@@ -440,38 +466,27 @@ export const TopBar: React.FC<TopBarProps> = ({
                           <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
                         </button>
 
-                        {/* 5. Cổng kết nối (V-Flow) */}
-                        <button
-                          id="more-item-vflow"
-                          onClick={() => {
-                            setMoreMenuOpen(false);
-                            setIsSpaceMenuOpen(false);
-                            navigate('/v-flow');
-                          }}
-                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
-                        >
-                          <Radio className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
-                          <span>Cổng kết nối (Flow)</span>
-                        </button>
-
-                        {/* 6. Cổng trò chuyện (V-Chat) */}
-                        <button
-                          id="more-item-vchat"
-                          onClick={() => {
-                            setMoreMenuOpen(false);
-                            setIsSpaceMenuOpen(false);
-                            navigate('/chat');
-                          }}
-                          className="w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
-                        >
-                          <MessageSquare className="w-5 h-5 shrink-0 text-white group-hover:scale-105 transition-transform" />
-                          <span>Cổng trò chuyện (Chat)</span>
-                        </button>
-
                         {/* Divider */}
                         <div className="my-1.5 h-[1px] bg-white/10" />
 
-                        {/* 7. Mã kích hoạt */}
+                        {/* Cài đặt hệ thống */}
+                        <button
+                          id="more-item-settings"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
+                            navigate('/settings');
+                          }}
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <Settings className="w-5 h-5 shrink-0 text-red-500 group-hover:scale-105 transition-transform" />
+                            <span className="font-semibold">Cài đặt hệ thống</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+
+                        {/* 5. Mã kích hoạt */}
                         <button
                           id="more-item-activation-code"
                           onClick={() => {
@@ -516,19 +531,19 @@ export const TopBar: React.FC<TopBarProps> = ({
                           <span>Danh sách bạn bè</span>
                         </button>
 
-                        {/* Space 360 Header & All Apps (Monochrome White Icons) */}
+                        {/* Space 360 Header & All Apps (Monochrome White Icons, Sorted A-Z) */}
                         <div className="pt-2.5 pb-1 px-3 border-t border-white/10 mt-2 flex items-center justify-between">
                           <span className="text-[11px] font-bold text-white/50 tracking-wider uppercase">
-                            Ứng dụng Space 360
+                            Ứng dụng Space 360 (A - Z)
                           </span>
                           <span className="text-[10px] text-white/40 font-mono">
-                            {VAPPS_LIST.length} apps
+                            {sortedSpace360Apps.length} apps
                           </span>
                         </div>
 
-                        {/* Render all Space 360 apps with monochrome white icons */}
+                        {/* Render all Space 360 apps with monochrome white icons sorted A to Z */}
                         <div className="space-y-0.5 pt-0.5">
-                          {VAPPS_LIST.map((app) => {
+                          {sortedSpace360Apps.map((app) => {
                             const AppIcon = app.icon;
                             return (
                               <button
@@ -697,9 +712,24 @@ export const TopBar: React.FC<TopBarProps> = ({
                 />
                 <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#E6005A] animate-pulse" />
               </button>
+
+              {/* 4. Settings Icon Button */}
+              <button
+                id="btn-topbar-settings"
+                onClick={() => navigate('/settings')}
+                className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all cursor-pointer ${
+                  currentRoute === '/settings' || currentRoute.startsWith('/settings')
+                    ? 'text-white bg-white/20 shadow-[0_0_12px_rgba(255,255,255,0.2)]'
+                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                }`}
+                title="Cài đặt hệ thống"
+                aria-label="Cài đặt hệ thống"
+              >
+                <Settings className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
+              </button>
             </div>
 
-            {/* 4. User Profile Icon (Fully rounded, no border) */}
+            {/* 5. User Profile Icon (Fully rounded, no border) */}
             <div className="relative" ref={profileRef}>
               <button
                 id="btn-topbar-user-profile"
@@ -714,7 +744,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               {/* User Account Flyout */}
               {userProfileOpen && (
                 <div 
-                  className="absolute right-0 mt-2 w-72 rounded-2xl p-3.5 shadow-2xl z-50 bg-[#1B0912]/95 backdrop-blur-2xl text-white animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute right-0 mt-2 w-72 rounded-2xl p-3.5 shadow-2xl z-50 bg-[#181818]/95 backdrop-blur-2xl text-white animate-in fade-in zoom-in-95 duration-150"
                   style={{ WebkitBackdropFilter: 'blur(32px)', backdropFilter: 'blur(32px)' }}
                 >
                   <div className="flex items-center gap-3 pb-3 mb-3 border-b border-white/10">
@@ -750,7 +780,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setUserProfileOpen(false);
                         setIsActivationModalOpen(true);
                       }}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 transition-colors text-left cursor-pointer"
                     >
                       <Ticket className="w-4 h-4 text-blue-400" />
                       <span>Nhập mã kích hoạt VIP</span>
@@ -761,21 +791,22 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setUserProfileOpen(false);
                         navigate('/favorites');
                       }}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 transition-colors text-left cursor-pointer"
                     >
                       <Heart className="w-4 h-4 text-rose-400" />
                       <span>Kênh & Video yêu thích</span>
                     </button>
 
                     <button
+                      id="topbar-profile-item-settings"
                       onClick={() => {
                         setUserProfileOpen(false);
                         navigate('/settings');
                       }}
-                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/10 transition-colors text-left group cursor-pointer"
                     >
-                      <CreditCard className="w-4 h-4 text-purple-400" />
-                      <span>Cài đặt & Tài khoản</span>
+                      <Settings className="w-4 h-4 text-red-500 group-hover:rotate-45 transition-transform" />
+                      <span>Cài đặt hệ thống & Tài khoản</span>
                     </button>
                   </div>
                 </div>

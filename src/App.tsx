@@ -279,6 +279,15 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [channels]);
 
+  // Global event listener to open Settings from any widget or copilot
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      navigate('/settings');
+    };
+    window.addEventListener('vplay:open_settings', handleOpenSettings);
+    return () => window.removeEventListener('vplay:open_settings', handleOpenSettings);
+  }, []);
+
   // Handle playing a custom single channel
   const handlePlayCustomChannel = (newChannel: Channel) => {
     setChannels((prev) => {
@@ -335,7 +344,13 @@ export default function App() {
       </div>
     );
 
-    switch (currentRoute) {
+    const cleanRoute = currentRoute.split('?')[0].replace(/\/$/, '') || '/';
+
+    if (cleanRoute === '/settings' || cleanRoute.startsWith('/settings')) {
+      return <Settings navigate={navigate} />;
+    }
+
+    switch (cleanRoute) {
       case '/':
       case '/home':
         return (
@@ -654,7 +669,7 @@ export default function App() {
 
 
   return (
-    <div className={`min-h-screen bg-[#1B0912] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
+    <div className={`min-h-screen bg-[#181818] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
       {/* Background Ambient Motion Orbs & Floating Controller */}
       <MotionEffectsLayer
         isEnabled={isAnimationTest}

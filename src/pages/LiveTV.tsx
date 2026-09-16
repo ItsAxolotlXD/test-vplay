@@ -453,7 +453,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
           {/* Channel Info Bar & Mobile Schedule Button */}
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-[#2D1A25] border border-white/10 flex items-center justify-center p-1 shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#353535] border border-white/10 flex items-center justify-center p-1 shrink-0">
                 <img
                   src={selectedChannel.logo}
                   alt={selectedChannel.name}
@@ -610,7 +610,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-[3px] ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
                     isSelected
                       ? 'border-white shadow-xl shadow-black/40'
                       : 'border-transparent hover:border-white'
@@ -690,7 +690,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-[3px] ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
                     isSelected
                       ? 'border-white shadow-xl shadow-black/40'
                       : 'border-transparent hover:border-white'
@@ -735,7 +735,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#2D1A25]/90 hover:bg-[#3A2231] relative group border-[3px] ${
+                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
                     isSelected
                       ? 'border-white shadow-xl shadow-black/40'
                       : 'border-transparent hover:border-white'

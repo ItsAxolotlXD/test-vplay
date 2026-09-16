@@ -16,7 +16,6 @@ import {
   Calculator,
   Bell,
   StickyNote,
-  Armchair,
   Box,
   Crown,
   Users,
@@ -72,7 +71,6 @@ const getSpace360Route = (appId: string) => {
     case 'v_weather': return '/v-weather';
     case 'v_reminders': return '/v-reminders';
     case 'v_notes': return '/v-notes';
-    case 'v_furniture': return '/v-furniture';
     case 'v_minecraft': return '/minecraft';
     case 'v_flow': return '/v-flow';
     case 'v_chat': return '/chat';
@@ -283,15 +281,6 @@ export const SearchTab: React.FC<SearchTabProps> = ({
         state: { appId: 'v_notes' },
         icon: <StickyNote className="w-4.5 h-4.5 text-[#FF4D8D]" />,
         tags: ['notes', 'ghi chú', 'sổ tay', 'lưu trữ nhanh']
-      },
-      {
-        id: 'sidebar_vfurniture',
-        name: 'Nội Thất & Decor 3D (Furniture)',
-        tagline: 'Tab Sidebar • Bố trí sắp xếp nội thất phòng và không gian sống 3D',
-        route: '/v-furniture',
-        state: { appId: 'v_furniture' },
-        icon: <Armchair className="w-4.5 h-4.5 text-[#FF4D8D]" />,
-        tags: ['furniture', 'nội thất', 'decor', '3d', 'phòng ốc', 'thiết kế']
       },
       {
         id: 'sidebar_minecraft',

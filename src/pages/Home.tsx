@@ -38,6 +38,16 @@ export const Home: React.FC<HomeProps> = ({
         onSelectChannel={onSelectChannel}
       />
 
+      {/* Aesthetic Welcome Tagline */}
+      <div id="home-welcome-tagline" className="w-full flex items-center justify-center -mt-2 sm:-mt-1 mb-1 sm:mb-2 px-4 select-none">
+        <p className="text-sm sm:text-base md:text-lg tracking-wide text-zinc-300/90 font-light">
+          Welcome to{' '}
+          <span className="font-['Playfair_Display',serif] italic font-medium text-[#FFA6D2] tracking-normal text-base sm:text-lg md:text-xl drop-shadow-[0_0_14px_rgba(255,166,210,0.45)]">
+            the everything app.
+          </span>
+        </p>
+      </div>
+
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-10 sm:space-y-12">
         {/* 2. Đề xuất cho bạn */}
         <OnAirSlider

@@ -32,6 +32,7 @@ export const SHOP_HERO_SLIDES: HeroSlide[] = [
     channelId: '',
     backgroundImage: '/banners/shop/banner_shop_0.webp',
     ctaText: 'Mua ngay',
+    themeColor: '#EC4899', // Hot deal vibrant pink glow
     isAd: false
   },
   {
@@ -44,6 +45,7 @@ export const SHOP_HERO_SLIDES: HeroSlide[] = [
     channelId: '',
     backgroundImage: '/banners/shop/banner_shop_1.webp',
     ctaText: 'Khám phá',
+    themeColor: '#3B82F6', // Tech neon blue glow
     isAd: false
   },
   {
@@ -56,6 +58,7 @@ export const SHOP_HERO_SLIDES: HeroSlide[] = [
     channelId: '',
     backgroundImage: '/banners/shop/banner_shop_2.webp',
     ctaText: 'Xem thêm',
+    themeColor: '#10B981', // Fresh green / emerald glow
     isAd: false
   }
 ];

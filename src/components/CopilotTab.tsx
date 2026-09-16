@@ -1041,6 +1041,10 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                                       <div className="flex items-center gap-1.5 shrink-0">
                                         <button
                                           type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleItemClick(item);
+                                          }}
                                           className="px-2.5 py-1 rounded-lg bg-[#E50914]/10 hover:bg-[#E50914] text-[#E50914] hover:text-white text-[11px] font-bold transition-colors flex items-center gap-1 cursor-pointer"
                                         >
                                           <span>Mở</span>

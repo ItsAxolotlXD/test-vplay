@@ -46,14 +46,14 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
         <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={() => scroll('left')}
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#20141D] hover:bg-[#2E1D2A] border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#353535] hover:bg-[#424242] border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
             aria-label="Cuộn sang trái"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#20141D] hover:bg-[#2E1D2A] border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#353535] hover:bg-[#424242] border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors cursor-pointer"
             aria-label="Cuộn sang phải"
           >
             <ChevronRight className="w-4 h-4" />
@@ -77,7 +77,7 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
                 onSelectChannel(ch);
                 navigate(`/live-tv?channel=${ch.slug || ch.id}`);
               }}
-              className="w-24 sm:w-28 h-13 sm:h-15 rounded-xl sm:rounded-2xl p-2 flex flex-col items-center justify-center cursor-pointer bg-[#20141D]/90 hover:bg-[#2C1C28] relative group border border-white/10 hover:border-white/30 active:border-white shrink-0 shadow-md transition-all"
+              className="w-24 sm:w-28 h-13 sm:h-15 rounded-xl sm:rounded-2xl p-2 flex flex-col items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border border-white/10 hover:border-white/30 active:border-white shrink-0 shadow-md transition-all"
               title={`${ch.name} - ${ch.currentProgram?.title || 'Đang phát sóng'}`}
             >
               {/* Channel Logo */}

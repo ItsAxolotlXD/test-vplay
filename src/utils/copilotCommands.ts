@@ -838,7 +838,7 @@ Cú pháp:
     if (isLight) {
       return {
         handled: true,
-        replyText: `✨ **Vplay** hiện tại hoạt động độc quyền ở chế độ **Dark Mode (#1B0912)** để mang lại trải nghiệm xem truyền hình điện ảnh và bảo vệ mắt tối ưu nhất!`,
+        replyText: `✨ **Vplay** hiện tại hoạt động độc quyền ở chế độ **Dark Mode (#181818)** để mang lại trải nghiệm xem truyền hình điện ảnh và bảo vệ mắt tối ưu nhất!`,
         action: {
           type: "theme",
           payload: "dark"
@@ -848,7 +848,7 @@ Cú pháp:
 
     return {
       handled: true,
-      replyText: `✨ **Vplay** đang ở chế độ **Dark Mode (#1B0912)** hoàn hảo cho trải nghiệm truyền hình.`,
+      replyText: `✨ **Vplay** đang ở chế độ **Dark Mode (#181818)** hoàn hảo cho trải nghiệm truyền hình.`,
       action: {
         type: "theme",
         payload: "dark"

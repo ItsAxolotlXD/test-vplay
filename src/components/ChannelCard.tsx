@@ -21,14 +21,14 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({
     <div
       id={`channel-card-${channel.id}`}
       onClick={() => onSelect(channel)}
-      className={`group relative rounded-[20px] bg-[#22171E] transition-all duration-300 overflow-hidden cursor-pointer hover:scale-[1.02] shadow-md border-0 ${
+      className={`group relative rounded-[20px] bg-[#353535] transition-all duration-300 overflow-hidden cursor-pointer hover:scale-[1.02] shadow-md border-0 ${
         isActive
-          ? 'bg-[#2D1B26] shadow-lg shadow-red-900/20'
-          : 'hover:bg-[#281A22]'
+          ? 'bg-[#404040] shadow-lg shadow-black/40 ring-2 ring-white/20'
+          : 'hover:bg-[#404040]'
       }`}
     >
       {/* Top Banner / Logo Area */}
-      <div className="relative h-24 sm:h-26 bg-gradient-to-b from-[#2A1D25] to-[#22171E] flex items-center justify-center p-3 overflow-hidden border-0">
+      <div className="relative h-24 sm:h-26 bg-[#353535] flex items-center justify-center p-3 overflow-hidden border-0">
         {channel.bannerImage && (
           <img
             src={channel.bannerImage}
@@ -38,7 +38,7 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({
         )}
 
         {/* Center Channel Logo */}
-        <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#170E13]/90 flex items-center justify-center p-1.5 overflow-hidden shadow-md border-0">
+        <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#242424] flex items-center justify-center p-1.5 overflow-hidden shadow-md border-0">
           <img
             src={channel.logo}
             alt={channel.name}
@@ -102,7 +102,7 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({
         </div>
 
         {/* Current Program on Air */}
-        <div className="mt-2 p-2 rounded-xl bg-[#170E13]/70 border-0">
+        <div className="mt-2 p-2 rounded-xl bg-[#242424] border-0">
           <div className="flex items-center justify-between text-[10px] text-[#A1A1AA] mb-1">
             <span className="font-semibold text-white truncate max-w-[130px]">
               {channel.currentProgram?.title || 'Chương trình trực tiếp'}
@@ -113,7 +113,7 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-[#2A1D25] h-1 rounded-full overflow-hidden border-0">
+          <div className="w-full bg-[#454545] h-1 rounded-full overflow-hidden border-0">
             <div
               className="bg-gradient-to-r from-[#FF2020] to-[#E6005A] h-full rounded-full"
               style={{ width: `${channel.currentProgram?.progress || 50}%` }}

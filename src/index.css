@@ -8,9 +8,9 @@
     --solid-red: #E6005A;
     --accent-red: #FF267A;
     --dark-red: #B30046;
-    --dark-bg: #1B0912;
-    --sidebar-bg: #22171E;
-    --card-bg: #22171E;
+    --dark-bg: #181818;
+    --sidebar-bg: #202020;
+    --card-bg: #222222;
     --waves-font-scale: 1;
     --waves-font-family: 'Alata', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
@@ -21,11 +21,11 @@
 
   html {
     font-size: calc(16px * var(--waves-font-scale, 1));
-    background-color: #1B0912;
+    background-color: #181818;
   }
 
   body {
-    background-color: #1B0912;
+    background-color: #181818;
     color: #F3F4F6;
     overflow-x: clip;
     font-family: var(--waves-font-family, 'Alata', system-ui, -apple-system, sans-serif) !important;

@@ -241,7 +241,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     <span>Chế độ giao diện Dark Mode</span>
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Ứng dụng Vplay hoạt động ở chế độ nền tối chuyên biệt (#1B0912) tối ưu thị giác cho trải nghiệm truyền hình.
+                    Ứng dụng Vplay hoạt động ở chế độ nền tối chuyên biệt (#181818) tối ưu thị giác cho trải nghiệm truyền hình.
                   </div>
                 </div>
 

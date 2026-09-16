@@ -19,7 +19,6 @@ import {
   Ticket,
   CloudSun,
   StickyNote,
-  Armchair,
   Box,
   Radio,
   MessageSquare,
@@ -50,7 +49,6 @@ export type VAppId =
   | 'v_weather'
   | 'v_reminders'
   | 'v_notes'
-  | 'v_furniture'
   | 'v_minecraft'
   | 'v_flow'
   | 'v_chat'
@@ -300,19 +298,6 @@ export const VAPPS_LIST: VAppDefinition[] = [
 
   // Hàng 3 (4 ứng dụng)
   {
-    id: 'v_furniture',
-    name: 'Furniture',
-    tagline: 'Bài Trí Phòng Khách TV',
-    description: 'Trải nghiệm không gian nội thất phòng xem truyền hình, tùy biến ánh sáng, sofa thư giãn và bài trí rạp hát tại gia.',
-    category: 'Tiện ích & Tệp tin',
-    badge: '3D Room',
-    gradientBg: 'bg-gradient-to-br from-[#65A30D] via-[#16A34A] to-[#15803D]',
-    borderClass: 'border-[#A3E635]/50 group-hover:border-[#A3E635]',
-    glowClass: 'shadow-[0_10px_30px_rgba(101,163,13,0.35)]',
-    icon: Armchair,
-    tags: ['Không Gian 3D', 'Phòng Khách TV', 'Thư Giãn', 'Furniture'],
-  },
-  {
     id: 'v_minecraft',
     name: 'Minecraft',
     tagline: 'Mô Phỏng Rương Đồ Pixel Art',
@@ -467,9 +452,6 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'v_notes':
         navigate('/v-notes', { appId: 'v_notes' });
-        break;
-      case 'v_furniture':
-        navigate('/v-furniture', { appId: 'v_furniture' });
         break;
       case 'v_minecraft':
         navigate('/minecraft', { appId: 'v_minecraft' });
