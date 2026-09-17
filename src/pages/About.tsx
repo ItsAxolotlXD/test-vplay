@@ -67,6 +67,33 @@ export const About: React.FC = () => {
         </p>
       </div>
 
+      {/* Application Info Category */}
+      <div className="p-6 sm:p-7 rounded-[28px] bg-[#1E1E22] border border-[#2D2D35] space-y-4 shadow-xl">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-white/5">
+          <Code2 className="w-5 h-5 text-[#FF2020]" />
+          <h3 className="text-base sm:text-lg font-bold text-white tracking-wide">
+            Thông tin ứng dụng
+          </h3>
+        </div>
+
+        <div className="divide-y divide-white/10 text-sm">
+          <div className="flex items-center justify-between py-3.5">
+            <span className="text-[#9CA3AF] font-medium">Software Update</span>
+            <span className="text-white font-semibold font-mono tracking-wide">Vplay 26.9.0</span>
+          </div>
+
+          <div className="flex items-center justify-between py-3.5">
+            <span className="text-[#9CA3AF] font-medium">Build Number</span>
+            <span className="text-white font-semibold font-mono tracking-wide">26A3667c</span>
+          </div>
+
+          <div className="flex items-center justify-between py-3.5">
+            <span className="text-[#9CA3AF] font-medium">Branch</span>
+            <span className="text-white font-semibold font-mono tracking-wide">Dev Test</span>
+          </div>
+        </div>
+      </div>
+
       {/* Community Connect */}
       <div className="text-center p-8 rounded-[30px] bg-[#1E1E22] border border-[#2D2D35] space-y-4">
         <h3 className="text-xl font-bold text-white">Tham gia cùng Waves Community</h3>

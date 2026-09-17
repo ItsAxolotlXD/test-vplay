@@ -22,6 +22,8 @@ import {
   Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { HeroCarousel } from '../HeroCarousel';
+import { HeroSlide } from '../../types';
 
 export interface GalleryItem {
   id: string;
@@ -88,6 +90,48 @@ const CURATED_GALLERY: GalleryItem[] = [
     date: '28/08/2026',
     resolution: '2560 x 1440 (2K)',
     description: 'Tác phẩm đồ họa kỹ thuật số thể hiện dòng chảy kết nối tương lai.',
+  },
+];
+
+export const GALLERY_HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 'gallery-banner-0',
+    title: 'Triển Lãm Nhiếp Ảnh & Hậu Trường Truyền Hình',
+    description: '',
+    category: 'V-GALLERY',
+    quality: '4K',
+    badge: 'FEATURED',
+    channelId: '',
+    backgroundImage: 'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=1600&q=85',
+    ctaText: 'Khám phá',
+    themeColor: '#F59E0B',
+    isAd: false,
+  },
+  {
+    id: 'gallery-banner-1',
+    title: 'Vẻ Đẹp Non Nước & Danh Thắng Việt Nam',
+    description: '',
+    category: 'DI SẢN',
+    quality: '4K',
+    badge: 'NATURE',
+    channelId: '',
+    backgroundImage: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1600&q=85',
+    ctaText: 'Xem bộ sưu tập',
+    themeColor: '#10B981',
+    isAd: false,
+  },
+  {
+    id: 'gallery-banner-2',
+    title: 'Công Nghệ Phát Sóng & Xe Lưu Động OB Van',
+    description: '',
+    category: 'KỸ THUẬT',
+    quality: 'HD',
+    badge: 'BROADCAST',
+    channelId: '',
+    backgroundImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1600&q=85',
+    ctaText: 'Chiêm ngưỡng',
+    themeColor: '#3B82F6',
+    isAd: false,
   },
 ];
 
@@ -216,6 +260,11 @@ export const VGalleryTab: React.FC = () => {
 
   return (
     <div id="v-gallery-app" className="w-full text-white">
+      {/* 1. Carousel Banner trượt giống ở Home và Shop */}
+      <div className="mb-6 sm:mb-8 -mx-4 sm:-mx-6 md:-mx-8">
+        <HeroCarousel slides={GALLERY_HERO_SLIDES} idPrefix="gallery" />
+      </div>
+
       {/* Header Banner - V-Flow style */}
       <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-4 sm:p-5 mb-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">

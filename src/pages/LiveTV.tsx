@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays } from 'lucide-react';
 import { Channel } from '../types';
 import { ChannelSchedule } from '../components/ChannelSchedule';
+import { useTabSearch } from '../context/TabSearchContext';
 import Hls from 'hls.js';
 
 interface LiveTVProps {
@@ -275,6 +276,7 @@ const LOCAL_CHANNELS: VtvChannelItem[] = [
 ];
 
 export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel, onOpenCustomStreamModal }) => {
+  const { searchQuery } = useTabSearch();
   const [selectedChannel, setSelectedChannel] = useState<VtvChannelItem>(() => {
     if (currentChannel?.id) {
       const all = [...VTV_CHANNELS, ...HTV_CHANNELS, ...LOCAL_CHANNELS];
@@ -599,38 +601,56 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
           <div className="h-px bg-white/10 w-full mb-4" />
 
           {/* Grid of VTV channels */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 lg:grid-cols-7 gap-3">
-            {VTV_CHANNELS.map((channel) => {
-              const isSelected = selectedChannel.id === channel.id;
-              // Phóng to logo vtv6 low latency và front, vtv6 thử nghiệm quay lại như cũ
-              const isEnlargedVtv6 = channel.id === 'vtv6_front' || channel.id === 'vtv6_low_latency';
+          {(() => {
+            const filteredVtv = VTV_CHANNELS.filter((ch) =>
+              !searchQuery.trim() || ch.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+            );
 
+            if (filteredVtv.length === 0) {
               return (
-                <button
-                  key={channel.id}
-                  id={`channel-btn-${channel.id}`}
-                  onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
-                    isSelected
-                      ? 'border-white shadow-xl shadow-black/40'
-                      : 'border-transparent hover:border-white'
-                  }`}
-                  title={channel.name}
-                >
-                  <img
-                    src={channel.logo}
-                    alt={channel.name}
-                    className={`${
-                      isEnlargedVtv6
-                        ? 'h-16 sm:h-18 max-w-[95%] max-h-[92%] scale-135'
-                        : 'h-12 sm:h-14 max-w-[88%] max-h-[82%]'
-                    } w-auto object-contain select-none pointer-events-none`}
-                    referrerPolicy="no-referrer"
-                  />
-                </button>
+                <div className="py-8 text-center bg-white/5 rounded-2xl border border-white/10">
+                  <p className="text-zinc-400 text-sm">
+                    Không tìm thấy kênh nào khớp với từ khóa &quot;{searchQuery}&quot;
+                  </p>
+                </div>
               );
-            })}
-          </div>
+            }
+
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 lg:grid-cols-7 gap-3">
+                {filteredVtv.map((channel) => {
+                  const isSelected = selectedChannel.id === channel.id;
+                  // Phóng to logo vtv6 low latency và front, vtv6 thử nghiệm quay lại như cũ
+                  const isEnlargedVtv6 = channel.id === 'vtv6_front' || channel.id === 'vtv6_low_latency';
+
+                  return (
+                    <button
+                      key={channel.id}
+                      id={`channel-btn-${channel.id}`}
+                      onClick={() => handleSelectChannel(channel)}
+                      className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
+                        isSelected
+                          ? 'border-white shadow-xl shadow-black/40'
+                          : 'border-transparent hover:border-white'
+                      }`}
+                      title={channel.name}
+                    >
+                      <img
+                        src={channel.logo}
+                        alt={channel.name}
+                        className={`${
+                          isEnlargedVtv6
+                            ? 'h-16 sm:h-18 max-w-[95%] max-h-[92%] scale-135'
+                            : 'h-12 sm:h-14 max-w-[88%] max-h-[82%]'
+                        } w-auto object-contain select-none pointer-events-none`}
+                        referrerPolicy="no-referrer"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Notice Section: Chuyển xuống bên dưới category kênh VTV */}

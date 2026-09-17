@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTabSearch } from '../context/TabSearchContext';
 import { playPopSound } from '../utils/sound';
 import {
   Compass,
@@ -389,7 +390,7 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
   navigate,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery } = useTabSearch();
 
   const categories = [
     'Tất cả',

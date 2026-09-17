@@ -1,25 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Sparkles, 
-  Flame, 
-  Zap, 
-  Sliders, 
-  X, 
-  ChevronUp, 
-  ChevronDown, 
-  Check, 
-  RefreshCw, 
-  Settings2, 
-  Eye, 
-  Activity,
-  Play
-} from 'lucide-react';
-import { playPopSound, playWinSound } from '../../utils/sound';
+import { playWinSound } from '../../utils/sound';
 
 interface MotionEffectsLayerProps {
   isEnabled: boolean;
-  onToggle: () => void;
+  onToggle?: () => void;
   navigate?: (route: string) => void;
 }
 
@@ -34,14 +19,10 @@ interface Particle {
 }
 
 export const MotionEffectsLayer: React.FC<MotionEffectsLayerProps> = ({
-  isEnabled,
-  onToggle,
-  navigate
+  isEnabled
 }) => {
-  const [isHudExpanded, setIsHudExpanded] = useState(false);
-  const [motionIntensity, setMotionIntensity] = useState<'smooth' | 'bouncy' | 'extreme'>('bouncy');
+  const [motionIntensity] = useState<'smooth' | 'bouncy' | 'extreme'>('bouncy');
   const [particles, setParticles] = useState<Particle[]>([]);
-  const [burstCount, setBurstCount] = useState(0);
 
   // Trigger floating particle burst
   const triggerParticleBurst = (originX?: number, originY?: number) => {
@@ -66,7 +47,6 @@ export const MotionEffectsLayer: React.FC<MotionEffectsLayerProps> = ({
     });
 
     setParticles((prev) => [...prev.slice(-30), ...newParticles]);
-    setBurstCount((prev) => prev + 1);
 
     // Auto cleanup particles after 1.5s
     setTimeout(() => {
@@ -221,169 +201,6 @@ export const MotionEffectsLayer: React.FC<MotionEffectsLayerProps> = ({
           ))}
         </div>
       )}
-
-      {/* 3. FLOATING INTERACTIVE HUD FOR "ANIMATION TEST" */}
-      <div 
-        id="motion-hud-panel"
-        className="fixed bottom-6 left-6 z-40 select-none font-sans"
-      >
-        <AnimatePresence>
-          {isHudExpanded ? (
-            /* EXPANDED MOTION CONTROLLER SANDBOX */
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.92 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.92 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-              className="w-80 bg-[#1A1922]/95 border border-[#3E3D4D] rounded-3xl p-4 shadow-2xl backdrop-blur-2xl text-white space-y-3.5"
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-[#2D2D38] pb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#FF267A] to-purple-600 flex items-center justify-center shadow-md">
-                    <Sparkles className="w-4 h-4 text-white animate-spin-slow" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-                      <span>Animation Test</span>
-                      <span className="px-1.5 py-0.2 rounded-md bg-[#FF267A]/20 text-[#FF267A] border border-[#FF267A]/30 text-[9px] font-black uppercase">
-                        BETA
-                      </span>
-                    </h4>
-                    <p className="text-[10px] text-zinc-400">Điều khiển hoạt ảnh toàn hệ thống</p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setIsHudExpanded(false)}
-                  className="p-1 text-zinc-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-                  title="Thu gọn bảng điều khiển"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Toggle Switch */}
-              <div className="flex items-center justify-between p-2.5 rounded-2xl bg-[#131218] border border-[#2D2D38]">
-                <div className="flex items-center gap-2">
-                  <Activity className={`w-4 h-4 ${isEnabled ? 'text-emerald-400 animate-pulse' : 'text-zinc-500'}`} />
-                  <div>
-                    <p className="text-xs font-bold text-white">
-                      Trạng thái Motion
-                    </p>
-                    <p className="text-[10px] text-zinc-400">
-                      {isEnabled ? 'Đang bật mọi hoạt ảnh & orbs' : 'Đã tạm tắt animation'}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    playPopSound();
-                    onToggle();
-                  }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${
-                    isEnabled
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
-                      : 'bg-[#2A2933] text-zinc-400 hover:text-white border border-[#3E3D4D]'
-                  }`}
-                >
-                  {isEnabled ? (
-                    <>
-                      <Check className="w-3.5 h-3.5" />
-                      <span>BẬT</span>
-                    </>
-                  ) : (
-                    <span>TẮT</span>
-                  )}
-                </button>
-              </div>
-
-              {/* Intensity Preset Modes */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1">
-                  <Sliders className="w-3 h-3 text-purple-400" />
-                  <span>Độ đàn hồi & Năng lượng</span>
-                </label>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {(['smooth', 'bouncy', 'extreme'] as const).map((mode) => {
-                    const isSel = motionIntensity === mode;
-                    const labels = {
-                      smooth: 'Êm dịu',
-                      bouncy: 'Đàn hồi',
-                      extreme: 'Cực đại',
-                    };
-                    return (
-                      <button
-                        key={mode}
-                        onClick={() => {
-                          playPopSound();
-                          setMotionIntensity(mode);
-                        }}
-                        className={`py-1.5 px-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer border ${
-                          isSel
-                            ? 'bg-[#E6005A] text-white border-transparent shadow-md shadow-[#E6005A]/30'
-                            : 'bg-[#18171E] border-[#2D2D38] text-zinc-400 hover:text-white'
-                        }`}
-                      >
-                        {labels[mode]}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Interactive Test Action: Particle Burst */}
-              <div className="pt-1 flex items-center gap-2">
-                <button
-                  onClick={() => triggerParticleBurst()}
-                  className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-[#FF267A] to-purple-600 hover:opacity-90 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-[#FF267A]/20"
-                >
-                  <Sparkles className="w-3.5 h-3.5 animate-spin" />
-                  <span>Bắn Pháo Hoa ({burstCount})</span>
-                </button>
-
-                {navigate && (
-                  <button
-                    onClick={() => {
-                      playPopSound();
-                      navigate('/feature-flags');
-                    }}
-                    className="p-2 rounded-xl bg-[#2A2933] hover:bg-[#343340] border border-[#3E3D4D] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                    title="Mở cài đặt Feature Flags"
-                  >
-                    <Settings2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          ) : (
-            /* COLLAPSED FLOATING PILL BUTTON */
-            <motion.button
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                playPopSound();
-                setIsHudExpanded(true);
-              }}
-              className={`group flex items-center gap-2 px-3.5 py-2 rounded-full border shadow-xl backdrop-blur-xl transition-all cursor-pointer ${
-                isEnabled
-                  ? 'bg-[#1F1E24]/90 border-[#FF267A]/40 text-white shadow-[#FF267A]/10 hover:border-[#FF267A]'
-                  : 'bg-[#1F1E24]/80 border-zinc-700 text-zinc-400 hover:text-white'
-              }`}
-            >
-              <div className={`w-2 h-2 rounded-full ${isEnabled ? 'bg-[#FF267A] animate-ping' : 'bg-zinc-500'}`} />
-              <Sparkles className={`w-3.5 h-3.5 ${isEnabled ? 'text-[#FF267A] animate-spin-slow' : 'text-zinc-500'}`} />
-              <span className="text-xs font-bold tracking-wide">
-                Animation Test: {isEnabled ? 'BẬT' : 'TẮT'}
-              </span>
-              <ChevronUp className="w-3 h-3 text-zinc-400 group-hover:text-white transition-colors" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </div>
     </>
   );
 };

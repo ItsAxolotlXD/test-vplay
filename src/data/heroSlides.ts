@@ -2,6 +2,20 @@ import { HeroSlide } from '../types';
 
 export const HERO_SLIDES: HeroSlide[] = [
   {
+    id: 'banner-prototype-test-build',
+    title: 'You are using a prototype test build of Vplay',
+    subtitle: 'Everything you see here may change or may remove in future builds',
+    description: 'Everything you see here may change or may remove in future builds',
+    category: 'PROTOTYPE',
+    quality: 'DEV TEST',
+    badge: 'PREVIEW',
+    channelId: '',
+    backgroundImage: '',
+    ctaText: 'Tìm hiểu thêm',
+    themeColor: '#71717A', // Metallic Zinc / Titanium Grey glow
+    isAd: false
+  },
+  {
     id: 'banner-baomoi-vtv',
     title: 'Báo Mới & Truyền hình Việt Nam',
     description: '',

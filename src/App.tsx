@@ -57,6 +57,8 @@ import { ChatRoomView } from './components/chat/ChatRoomView';
 import VplayVertical from './components/VplayVertical';
 import { MusicTab } from './pages/MusicTab';
 import { VShopTab } from './pages/VShopTab';
+import { TabSearchProvider } from './context/TabSearchContext';
+import { FloatingTabSearchBar } from './components/FloatingTabSearchBar';
 import { ArrowLeft } from 'lucide-react';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -668,149 +670,161 @@ export default function App() {
   }
 
 
+  const isDedicatedSearchRoute = 
+    currentRoute === '/search' || 
+    currentRoute === '/spotlight' || 
+    currentRoute === '/copilot' || 
+    currentRoute === '/copilot-standalone';
+  const isFloatingSearchVisible = isTopBarMode && !isFloatyMode && !isDedicatedSearchRoute;
+
   return (
-    <div className={`min-h-screen bg-[#181818] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
-      {/* Background Ambient Motion Orbs & Floating Controller */}
-      <MotionEffectsLayer
-        isEnabled={isAnimationTest}
-        onToggle={() => toggleFlag('animation_test')}
-        navigate={navigate}
-      />
-
-      {/* Experimental V-board iOS Virtual Keyboard System */}
-      <VBoardOverlay isEnabled={isVBoardEnabled} navigate={navigate} />
-
-      {/* Sidebar Navigation: Only rendered when Floaty bar is disabled */}
-      {!isFloatyMode && (
-        <Sidebar
-          currentRoute={currentRoute}
-          routeState={routeState}
+    <TabSearchProvider currentRoute={currentRoute}>
+      <div className={`min-h-screen bg-[#181818] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
+        {/* Background Ambient Motion Orbs & Floating Controller */}
+        <MotionEffectsLayer
+          isEnabled={isAnimationTest}
+          onToggle={() => toggleFlag('animation_test')}
           navigate={navigate}
-          onOpenSearch={handleOpenSearch}
-          onSelectChannel={setCurrentChannel}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={toggleSidebarCollapse}
-          isMobileOpen={isMobileSidebarOpen}
-          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
-      )}
 
-      {/* Main App Container */}
-      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 relative z-10 ${
-        isFloatyMode
-          ? 'pl-0 pb-28 sm:pb-32'
-          : isTopBarMode
-            ? 'pl-0'
-            : !settings.dockToSidebar 
-              ? 'md:pl-0 pb-20' 
-              : isEffectiveCollapsed 
-                ? 'md:pl-[80px]' 
-                : 'md:pl-[290px]'
-      }`}>
-        {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar.
-            When Floaty bar is active, topbar is completely replaced by Floaty bar. */}
+        {/* Experimental V-board iOS Virtual Keyboard System */}
+        <VBoardOverlay isEnabled={isVBoardEnabled} navigate={navigate} />
+
+        {/* Sidebar Navigation: Only rendered when Floaty bar is disabled */}
         {!isFloatyMode && (
-          <div className={`sticky top-0 z-50 w-full shrink-0 ${!isTopBarMode ? 'md:hidden' : ''}`}>
-            <TopBar
-              currentRoute={currentRoute}
-              navigate={navigate}
-              onOpenSearch={handleOpenSearch}
-              onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
-              onOpenCopilotWindow={() => toggleCopilotFloating(true)}
-            />
-          </div>
+          <Sidebar
+            currentRoute={currentRoute}
+            routeState={routeState}
+            navigate={navigate}
+            onOpenSearch={handleOpenSearch}
+            onSelectChannel={setCurrentChannel}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={toggleSidebarCollapse}
+            isMobileOpen={isMobileSidebarOpen}
+            onCloseMobile={() => setIsMobileSidebarOpen(false)}
+          />
         )}
 
-        {/* Dynamic Page Content with smooth motion fade & spring transition */}
-        <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out relative z-10 ${
-          currentRoute === '/' || currentRoute === '/home' 
-            ? 'p-0 max-w-none' 
-            : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
+        {/* Main App Container */}
+        <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 relative z-10 ${
+          isFloatyMode
+            ? 'pl-0 pb-28 sm:pb-32'
+            : isTopBarMode
+              ? 'pl-0 pb-24 sm:pb-28'
+              : !settings.dockToSidebar 
+                ? 'md:pl-0 pb-20' 
+                : isEffectiveCollapsed 
+                  ? 'md:pl-[80px]' 
+                  : 'md:pl-[290px]'
         }`}>
-          {isAnimationTest ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentRoute}
-                initial={{ opacity: 0, y: 12, scale: 0.99 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.99 }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full h-full"
-              >
-                {renderContent()}
-              </motion.div>
-            </AnimatePresence>
-          ) : (
-            renderContent()
+          {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar.
+              When Floaty bar is active, topbar is completely replaced by Floaty bar. */}
+          {!isFloatyMode && (
+            <div className={`sticky top-0 z-50 w-full shrink-0 ${!isTopBarMode ? 'md:hidden' : ''}`}>
+              <TopBar
+                currentRoute={currentRoute}
+                navigate={navigate}
+                onOpenSearch={handleOpenSearch}
+                onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
+                onOpenCopilotWindow={() => toggleCopilotFloating(true)}
+              />
+            </div>
           )}
-        </main>
-      </div>
 
-      {/* Floaty Bar Navigation: Active when floatyBar setting is enabled */}
-      {isFloatyMode && (
-        <FloatyBar
-          currentRoute={currentRoute}
-          navigate={navigate}
-          onOpenSearch={handleOpenSearch}
+          {/* Dynamic Page Content with smooth motion fade & spring transition */}
+          <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out relative z-10 ${
+            currentRoute === '/' || currentRoute === '/home' 
+              ? 'p-0 max-w-none' 
+              : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
+          }`}>
+            {isAnimationTest ? (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentRoute}
+                  initial={{ opacity: 0, y: 12, scale: 0.99 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.99 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full h-full"
+                >
+                  {renderContent()}
+                </motion.div>
+              </AnimatePresence>
+            ) : (
+              renderContent()
+            )}
+          </main>
+        </div>
+
+        {/* Floaty Bar Navigation: Active when floatyBar setting is enabled */}
+        {isFloatyMode && (
+          <FloatyBar
+            currentRoute={currentRoute}
+            navigate={navigate}
+            onOpenSearch={handleOpenSearch}
+          />
+        )}
+
+        {/* Bottom Dock Navigation (When dockToSidebar is false and not in floaty mode) */}
+        {!settings.dockToSidebar && !isFloatyMode && (
+          <BottomDock
+            currentRoute={currentRoute}
+            navigate={navigate}
+            onOpenSearch={handleOpenSearch}
+          />
+        )}
+
+        {/* Floating in-tab Search Bar (Active when Top Bar navigation is enabled) */}
+        <FloatingTabSearchBar isVisible={isFloatingSearchVisible} />
+
+        <CustomStreamModal
+          isOpen={isCustomStreamModalOpen}
+          onClose={() => setIsCustomStreamModalOpen(false)}
+          onPlayCustomChannel={handlePlayCustomChannel}
+          onImportPlaylist={handleImportPlaylist}
         />
-      )}
 
-      {/* Bottom Dock Navigation (When dockToSidebar is false and not in floaty mode) */}
-      {!settings.dockToSidebar && !isFloatyMode && (
-        <BottomDock
-          currentRoute={currentRoute}
-          navigate={navigate}
-          onOpenSearch={handleOpenSearch}
+        {/* Initial Startup / Replay Splash Screen */}
+        {showSplashScreen && (
+          <SplashScreen
+            onFinish={() => {
+              setShowSplashScreen(false);
+            }}
+          />
+        )}
+
+        {/* Windows 11 Style OOBE First-Time Setup Modal */}
+        <OobeSetupModal
+          isOpen={isOobeOpen && !showSplashScreen}
+          onClose={() => setIsOobeOpen(false)}
+          onComplete={handleCompleteOobe}
+          initialName={settings.userName}
+          initialNavStyle={settings.floatyBar ? 'floaty' : settings.navigationMode === 'sidebar' ? 'sidebar' : 'topbar'}
+          initialFontFamily={settings.fontFamily}
         />
-      )}
 
-      <CustomStreamModal
-        isOpen={isCustomStreamModalOpen}
-        onClose={() => setIsCustomStreamModalOpen(false)}
-        onPlayCustomChannel={handlePlayCustomChannel}
-        onImportPlaylist={handleImportPlaylist}
-      />
+        {/* Startup / Refresh Welcome Modal */}
+        <WelcomeModal
+          isOpen={isWelcomeModalOpen}
+          onClose={() => setIsWelcomeModalOpen(false)}
+        />
 
-      {/* Initial Startup / Replay Splash Screen */}
-      {showSplashScreen && (
-        <SplashScreen
-          onFinish={() => {
-            setShowSplashScreen(false);
+        {/* Detached Movable Copilot Window */}
+        <CopilotFloatingWindow
+          isOpen={isCopilotFloating}
+          onClose={() => toggleCopilotFloating(false)}
+          onDockBack={() => {
+            toggleCopilotFloating(false);
+            navigate('/copilot');
           }}
+          onSelectChannel={(ch) => {
+            setCurrentChannel(ch);
+            navigate(`/live-tv?channel=${ch.slug}`);
+          }}
+          channels={channels}
+          navigate={navigate}
         />
-      )}
-
-      {/* Windows 11 Style OOBE First-Time Setup Modal */}
-      <OobeSetupModal
-        isOpen={isOobeOpen && !showSplashScreen}
-        onClose={() => setIsOobeOpen(false)}
-        onComplete={handleCompleteOobe}
-        initialName={settings.userName}
-        initialNavStyle={settings.floatyBar ? 'floaty' : settings.navigationMode === 'sidebar' ? 'sidebar' : 'topbar'}
-        initialFontFamily={settings.fontFamily}
-      />
-
-      {/* Startup / Refresh Welcome Modal */}
-      <WelcomeModal
-        isOpen={isWelcomeModalOpen}
-        onClose={() => setIsWelcomeModalOpen(false)}
-      />
-
-      {/* Detached Movable Copilot Window */}
-      <CopilotFloatingWindow
-        isOpen={isCopilotFloating}
-        onClose={() => toggleCopilotFloating(false)}
-        onDockBack={() => {
-          toggleCopilotFloating(false);
-          navigate('/copilot');
-        }}
-        onSelectChannel={(ch) => {
-          setCurrentChannel(ch);
-          navigate(`/live-tv?channel=${ch.slug}`);
-        }}
-        channels={channels}
-        navigate={navigate}
-      />
-    </div>
+      </div>
+    </TabSearchProvider>
   );
 }

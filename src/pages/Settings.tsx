@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { useTabSearch } from '../context/TabSearchContext';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -31,7 +32,7 @@ interface SettingsProps {
 export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const { settings, updateSetting } = useSettings();
   const { flags, setFlag } = useFeatureFlags();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery } = useTabSearch();
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
 

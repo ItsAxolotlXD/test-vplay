@@ -23,6 +23,7 @@ import {
 } from '../data/vShopData';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { useOrbs } from '../hooks/useOrbs';
+import { useTabSearch } from '../context/TabSearchContext';
 
 interface VShopTabProps {
   navigate: (route: string, state?: any) => void;
@@ -35,7 +36,7 @@ interface CartItem {
 
 export const VShopTab: React.FC<VShopTabProps> = ({ navigate }) => {
   const { orbs, spendOrbs, addOrbs } = useOrbs();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery } = useTabSearch();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {

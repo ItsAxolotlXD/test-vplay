@@ -7,8 +7,9 @@ import { CHANNELS_DATA } from '../data/channels';
 import { NEWS_DATA } from '../data/news';
 import { HERO_SLIDES } from '../data/heroSlides';
 import { Channel, NewsArticle } from '../types';
-import { Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers } from 'lucide-react';
+import { Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers, Search } from 'lucide-react';
 import { PortalsCircularSection } from '../components/PortalsCircularSection';
+import { useTabSearch } from '../context/TabSearchContext';
 
 interface HomeProps {
   navigate: (route: string, state?: any) => void;
@@ -21,8 +22,16 @@ export const Home: React.FC<HomeProps> = ({
   onSelectChannel,
   channels
 }) => {
+  const { searchQuery } = useTabSearch();
   const featuredArticle = NEWS_DATA[0];
   const otherArticles = NEWS_DATA.slice(1, 4);
+
+  // Filter channels when searching in Home tab
+  const searchResults = channels.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+      c.category.toLowerCase().includes(searchQuery.toLowerCase().trim())
+  );
 
   // 2 cái AD banner cho lên đầu khối ngang
   const horizontalBanners = [
@@ -32,6 +41,51 @@ export const Home: React.FC<HomeProps> = ({
 
   return (
     <div className="space-y-6 sm:space-y-8 pb-16">
+      {/* Tab Search Filter Results Banner when querying on Home */}
+      {searchQuery.trim() && (
+        <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto pt-2">
+          <div className="p-4 rounded-2xl bg-[#1c1c1e]/90 border border-white/15 backdrop-blur-xl shadow-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-white font-semibold text-sm">
+                <Search className="w-4 h-4 text-[#8E8E93]" />
+                <span>Kênh khớp với &quot;{searchQuery}&quot;</span>
+              </div>
+              <span className="text-xs text-zinc-400 font-medium">{searchResults.length} kết quả</span>
+            </div>
+
+            {searchResults.length === 0 ? (
+              <p className="text-xs text-zinc-400 py-2">
+                Không tìm thấy kênh nào trên Trang chủ phù hợp với từ khóa này.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 pt-1">
+                {searchResults.map((ch) => (
+                  <button
+                    key={ch.id}
+                    onClick={() => {
+                      onSelectChannel(ch);
+                      navigate(`/live-tv?channel=${ch.slug}`);
+                    }}
+                    className="p-3 bg-white/5 hover:bg-white/10 active:scale-98 border border-white/10 hover:border-white/20 rounded-xl flex items-center gap-3 transition-all cursor-pointer text-left"
+                  >
+                    <img
+                      src={ch.logo}
+                      alt={ch.name}
+                      className="w-8 h-8 object-contain shrink-0"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold text-white truncate">{ch.name}</p>
+                      <p className="text-[10px] text-zinc-400 truncate">{ch.category}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* 1. Banner Cards Carousel */}
       <HeroCarousel
         navigate={navigate}

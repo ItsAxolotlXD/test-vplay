@@ -61,6 +61,10 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
   };
 
   const handleSlideClick = (slide: HeroSlide) => {
+    if (slide.id === 'banner-prototype-test-build' && navigate) {
+      navigate('/about');
+      return;
+    }
     if (slide.channelId && onSelectChannel) {
       const matchedChannel = CHANNELS_DATA.find((c) => c.id === slide.channelId);
       if (matchedChannel) {
@@ -105,13 +109,22 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
             transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
             className="absolute inset-0 w-full h-full"
           >
-            <img
-              src={currentSlide.backgroundImage}
-              alt=""
-              aria-hidden="true"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover blur-[60px] filter brightness-[0.55] saturate-[1.6] transform"
-            />
+            {currentSlide.backgroundImage ? (
+              <img
+                src={currentSlide.backgroundImage}
+                alt=""
+                aria-hidden="true"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover blur-[60px] filter brightness-[0.55] saturate-[1.6] transform"
+              />
+            ) : (
+              <div 
+                className="w-full h-full blur-[60px] transform"
+                style={{
+                  background: 'radial-gradient(ellipse at center, rgba(82, 82, 91, 0.4) 0%, rgba(24, 24, 27, 0.8) 100%)'
+                }}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
 

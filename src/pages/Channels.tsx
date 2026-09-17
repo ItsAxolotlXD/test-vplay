@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Channel } from '../types';
 import { ChannelCard } from '../components/ChannelCard';
 import { Tag, Search, Radio, Filter, Tv, CheckCircle2, Sparkles, Satellite, X } from 'lucide-react';
+import { useTabSearch } from '../context/TabSearchContext';
 
 interface ChannelsProps {
   channels: Channel[];
@@ -17,7 +18,7 @@ export const Channels: React.FC<ChannelsProps> = ({
   onOpenCustomStreamModal
 }) => {
   const [selectedGroup, setSelectedGroup] = useState<string>('Tất cả');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const { searchQuery, setSearchQuery } = useTabSearch();
 
   const groups = ['Tất cả', 'VTV', 'HTV', 'VTC', 'Địa phương', 'Chuyên biệt', 'Quốc tế'];
 

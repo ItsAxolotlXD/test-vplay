@@ -3,6 +3,7 @@ import { NEWS_DATA } from '../data/news';
 import { NewsCard } from '../components/NewsCard';
 import { NewsArticle } from '../types';
 import { Newspaper, Search, Filter, Sparkles, TrendingUp, X } from 'lucide-react';
+import { useTabSearch } from '../context/TabSearchContext';
 
 interface NewsProps {
   navigate: (route: string) => void;
@@ -10,7 +11,7 @@ interface NewsProps {
 
 export const News: React.FC<NewsProps> = ({ navigate }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery } = useTabSearch();
 
   const categories = [
     'Tất cả',
