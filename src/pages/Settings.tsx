@@ -59,10 +59,59 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
     setTimeout(() => setOobeResetTriggered(false), 2000);
   };
 
-  const matchesSearch = (text: string) => {
-    if (!searchQuery.trim()) return true;
-    return text.toLowerCase().includes(searchQuery.toLowerCase().trim());
+  const normalizeSearch = (s: string) =>
+    (s || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'd')
+      .trim();
+
+  const normalizedQuery = normalizeSearch(searchQuery);
+
+  const matchesSearch = (...terms: string[]) => {
+    if (!normalizedQuery) return true;
+    return terms.some((term) => {
+      const normalizedTerm = normalizeSearch(term);
+      return (
+        normalizedTerm.includes(normalizedQuery) ||
+        normalizedQuery.includes(normalizedTerm)
+      );
+    });
   };
+
+  const isSection1Visible = matchesSearch(
+    'Giao diện', 'Chế độ giao diện', 'Floaty bar', 'Floaty', 'Navigation bar',
+    'floating', 'floats', 'Sáng', 'Tối', 'Theme', 'Thanh điều hướng',
+    'Sidebar', 'Top bar', 'topbar', 'Bố cục', 'Dock sang Sidebar', 'Dock',
+    'Phông chữ', 'Font', 'Integer', 'Alata', 'Google Sans', 'Montserrat',
+    'Cỡ chữ ứng dụng', 'Cỡ chữ', 'Cài đặt', 'Settings', 'UI', 'Display',
+    'Appearance', 'Splash Screen', 'Reload App', 'Màn hình khởi động', 'Tải lại', 'Refresh'
+  );
+
+  const isSection2Visible = matchesSearch(
+    'Trợ năng', 'Tự động trượt hình Banner', 'Tự động ẩn Sidebar',
+    'Accessibility', 'Banner', 'Carousel', 'Sidebar', 'Auto slide', 'Auto hide'
+  );
+
+  const isSection3Visible = matchesSearch(
+    'Copilot', 'Trợ lý ảo', 'Tên người dùng', 'Username', 'User', 'Tên',
+    'Hồ sơ', 'Profile', 'Merge Spotlight', 'Hợp nhất', 'Slash', 'Lệnh',
+    'AI', 'Chatbot', 'Trợ lý', 'OOBE', 'Setup', 'Thiết lập lần đầu'
+  );
+
+  const isSection4Visible = matchesSearch(
+    'Tìm kiếm', 'Danh mục', 'Tin tức', 'Truyền hình', 'Toolbox', 'Cài đặt',
+    'Search', 'Kênh', 'Quick links', 'Lối tắt', 'Chuyên mục'
+  );
+
+  const isFeatureFlagsVisible = matchesSearch(
+    'Feature Flags', 'Cờ tính năng', 'Thử nghiệm', 'Experimental',
+    'AI Copilot', 'Gỡ lỗi', 'Labs', 'Flags'
+  );
+
+  const hasAnyResults = !normalizedQuery || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none">
@@ -112,7 +161,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
         </div>
 
         {/* Feature Flags Quick Entry Card */}
-        {(matchesSearch('Feature Flags') || matchesSearch('Cờ tính năng') || matchesSearch('Thử nghiệm') || matchesSearch('Experimental')) && (
+        {isFeatureFlagsVisible && (
           <div 
             onClick={() => navigate ? navigate('/feature-flags') : window.location.assign('/feature-flags')}
             className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-r from-cyan-950/40 via-[#1E1D24] to-[#1E1D24] border border-cyan-500/30 hover:border-cyan-500/60 shadow-lg flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
@@ -143,28 +192,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       </div>
 
       {/* 2. Section 1: Giao diện */}
-      {(matchesSearch('Giao diện') ||
-        matchesSearch('Chế độ giao diện') ||
-        matchesSearch('Floaty bar') ||
-        matchesSearch('Floaty') ||
-        matchesSearch('Navigation bar') ||
-        matchesSearch('Navigation bar that floats on your screen') ||
-        matchesSearch('floats') ||
-        matchesSearch('Sáng') ||
-        matchesSearch('Tối') ||
-        matchesSearch('Theme') ||
-        matchesSearch('Thanh điều hướng') ||
-        matchesSearch('Sidebar') ||
-        matchesSearch('Top bar') ||
-        matchesSearch('Bố cục') ||
-        matchesSearch('Dock sang Sidebar') ||
-        matchesSearch('Phông chữ') ||
-        matchesSearch('Font') ||
-        matchesSearch('Integer') ||
-        matchesSearch('Alata') ||
-        matchesSearch('Google Sans') ||
-        matchesSearch('Montserrat') ||
-        matchesSearch('Cỡ chữ ứng dụng')) && (
+      {isSection1Visible && (
         <section 
           id="settings-section-interface"
           className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
@@ -619,9 +647,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       )}
 
       {/* 3. Section 2: Trợ năng */}
-      {(matchesSearch('Trợ năng') ||
-        matchesSearch('Tự động trượt hình Banner') ||
-        matchesSearch('Tự động ẩn Sidebar')) && (
+      {isSection2Visible && (
         <section 
           id="settings-section-accessibility"
           className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
@@ -708,18 +734,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       )}
 
       {/* 4. Section 3: Copilot for Vplay */}
-      {(matchesSearch('Copilot') ||
-        matchesSearch('Trợ lý ảo') ||
-        matchesSearch('Tên người dùng') ||
-        matchesSearch('Username') ||
-        matchesSearch('User') ||
-        matchesSearch('Tên') ||
-        matchesSearch('Hồ sơ') ||
-        matchesSearch('Profile') ||
-        matchesSearch('Merge Spotlight') ||
-        matchesSearch('Hợp nhất') ||
-        matchesSearch('Slash') ||
-        matchesSearch('Lệnh')) && (
+      {isSection3Visible && (
         <section 
           id="settings-section-copilot"
           className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
@@ -911,12 +926,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       )}
 
       {/* 5. Section 4: Tìm kiếm */}
-      {(matchesSearch('Tìm kiếm') ||
-        matchesSearch('Danh mục') ||
-        matchesSearch('Tin tức') ||
-        matchesSearch('Truyền hình') ||
-        matchesSearch('Toolbox') ||
-        matchesSearch('Cài đặt')) && (
+      {isSection4Visible && (
         <section 
           id="settings-section-search"
           className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
@@ -1112,6 +1122,28 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
             )}
           </div>
         </section>
+      )}
+
+      {/* Empty State when no settings match query */}
+      {!hasAnyResults && (
+        <div className="py-12 px-6 text-center rounded-[28px] bg-[#1E1D22] border border-white/10 space-y-3 shadow-xl">
+          <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto text-zinc-400">
+            <Search className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-white">
+            Không tìm thấy cài đặt nào
+          </h3>
+          <p className="text-xs text-[#9CA3AF] max-w-sm mx-auto leading-relaxed">
+            Không tìm thấy cài đặt khớp với từ khóa &quot;{searchQuery}&quot;. Thử tìm kiếm với từ khóa như giao diện, sidebar, font, trợ năng, copilot...
+          </p>
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors cursor-pointer"
+          >
+            Xóa tìm kiếm
+          </button>
+        </div>
       )}
     </div>
   );

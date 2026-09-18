@@ -12,27 +12,94 @@ interface TabSearchContextType {
 const TabSearchContext = createContext<TabSearchContextType | undefined>(undefined);
 
 const ROUTE_PLACEHOLDERS: Record<string, string> = {
-  '/': 'Tìm kiếm kênh & chuyên mục...',
-  '/home': 'Tìm kiếm kênh & chuyên mục...',
-  '/live-tv': 'Tìm kiếm kênh VTV, HTV, VTC...',
-  '/news': 'Tìm kiếm bài viết, phóng sự...',
-  '/v-shop': 'Tìm kiếm sản phẩm, thiết bị...',
-  '/shop': 'Tìm kiếm sản phẩm, thiết bị...',
-  '/v-flow': 'Tìm bài viết, tài khoản...',
-  '/flow': 'Tìm bài viết, tài khoản...',
-  '/music': 'Tìm bài hát, đài phát thanh...',
-  '/settings': 'Tìm kiếm cài đặt...',
-  '/about': 'Tìm thông tin phiên bản...',
-  '/space-360': 'Tìm kiếm ứng dụng 360...',
-  '/v-apps': 'Tìm kiếm ứng dụng 360...',
-  '/v-games': 'Tìm kiếm trò chơi arcade...',
-  '/v-arcade': 'Tìm kiếm trò chơi arcade...',
-  '/v-files': 'Tìm tài liệu, tập tin...',
-  '/v-books': 'Tìm kiếm sách, tài liệu...',
-  '/favorites': 'Tìm trong mục yêu thích...',
-  '/channels': 'Tìm kiếm danh sách kênh...',
-  '/vertical': 'Tìm kênh dọc...',
-  '/shorts': 'Tìm kênh dọc...',
+  // Primary core tabs requested
+  '/': 'Search Home',
+  '/home': 'Search Home',
+  '/live-tv': 'Search TV channels',
+  '/channels': 'Search TV channels',
+  '/news': 'Search news articles',
+  '/v-shop': 'Search products',
+  '/shop': 'Search products',
+  '/vshop': 'Search products',
+  '/music': 'Search music and tracks',
+  '/v-music': 'Search music and tracks',
+  '/audio': 'Search music and tracks',
+  '/settings': 'Search settings and features',
+
+  // Specific tabs with clear English names
+  '/cookbook': 'Search Cookbook',
+  '/v-cookbook': 'Search Cookbook',
+  '/minecraft': 'Search Minecraft',
+  '/mc-container': 'Search Minecraft',
+  '/minecraft-container': 'Search Minecraft',
+  '/minecraft-gui': 'Search Minecraft',
+  '/space-360': 'Search Space 360',
+  '/v-space': 'Search Space 360',
+  '/v-apps': 'Search Space 360',
+  '/v-arcade': 'Search Arcade',
+  '/v-games': 'Search Games',
+  '/v-files': 'Search Files',
+  '/v-xplore': 'Search Files',
+  '/explore-vietnam': 'Search Explore Vietnam',
+  '/v-maps': 'Search Maps',
+  '/maps': 'Search Maps',
+  '/space-360-maps': 'Search Maps',
+  '/v-box': 'Search Box',
+  '/v-study': 'Search Study',
+  '/v-learn': 'Search Study',
+  '/v-calc': 'Search Calc',
+  '/v-clock': 'Search Clock',
+  '/clock': 'Search Clock',
+  '/v-phone': 'Search Phone',
+  '/phone': 'Search Phone',
+  '/v-browser': 'Search Browser',
+  '/browser': 'Search Browser',
+  '/v-calendar': 'Search Calendar',
+  '/calendar': 'Search Calendar',
+  '/v-gallery': 'Search Gallery',
+  '/gallery': 'Search Gallery',
+  '/v-camera': 'Search Camera',
+  '/camera': 'Search Camera',
+  '/v-ticket': 'Search Ticket',
+  '/ticket': 'Search Ticket',
+  '/v-weather': 'Search Weather',
+  '/weather': 'Search Weather',
+  '/v-reminders': 'Search Reminders',
+  '/v-notes': 'Search Notes',
+  '/v-furniture': 'Search Furniture',
+  '/v-stock': 'Search Stock',
+  '/stock': 'Search Stock',
+  '/v-health': 'Search Health',
+  '/health': 'Search Health',
+  '/v-flow': 'Search V-Flow',
+  '/vflow': 'Search V-Flow',
+  '/flow': 'Search V-Flow',
+  '/chat': 'Search Chat',
+  '/chat-room': 'Search Chat',
+  '/favorites': 'Search Favorites',
+  '/friends': 'Search Friends',
+  '/people': 'Search Friends',
+  '/loyalty': 'Search Loyalty',
+  '/arena': 'Search Arena',
+  '/toolbox': 'Search Toolbox',
+  '/about': 'Search About',
+  '/feature-flags': 'Search Feature Flags',
+  '/flags': 'Search Feature Flags',
+  '/vertical': 'Search Vertical TV',
+  '/shorts': 'Search Vertical TV',
+};
+
+const getDynamicTabPlaceholder = (route: string): string => {
+  const clean = route.split('?')[0].replace(/^\//, '').replace(/\/$/, '');
+  if (!clean) return 'Search Home';
+
+  const formatted = clean
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
+  return `Search ${formatted || 'Tab'}`;
 };
 
 interface TabSearchProviderProps {
@@ -54,12 +121,12 @@ export const TabSearchProvider: React.FC<TabSearchProviderProps> = ({ children, 
     if (customPlaceholder) return customPlaceholder;
     
     // Exact or prefix match
-    const cleanRoute = currentRoute.split('?')[0];
+    const cleanRoute = currentRoute.split('?')[0].replace(/\/$/, '') || '/';
     if (ROUTE_PLACEHOLDERS[cleanRoute]) {
       return ROUTE_PLACEHOLDERS[cleanRoute];
     }
 
-    return 'Search';
+    return getDynamicTabPlaceholder(cleanRoute);
   }, [customPlaceholder, currentRoute]);
 
   const clearSearch = () => {
