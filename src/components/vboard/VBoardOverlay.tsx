@@ -179,6 +179,65 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled, navigat
     setIsOpen(true);
   };
 
+  // Broadcast V-board state to components (e.g. FloatingTabSearchBar)
+  useEffect(() => {
+    if (isOpen) {
+      const broadcastHeight = () => {
+        const el = document.getElementById('vboard-keyboard-container');
+        const height = el ? el.getBoundingClientRect().height : 320;
+        window.dispatchEvent(
+          new CustomEvent('vplay:vboard_state', {
+            detail: { isOpen: true, height: height > 100 ? height : 320 },
+          })
+        );
+      };
+
+      broadcastHeight();
+      const timer = setTimeout(broadcastHeight, 60);
+
+      // ResizeObserver in case emoji drawer or Copilot bar expands
+      let ro: ResizeObserver | null = null;
+      const el = document.getElementById('vboard-keyboard-container');
+      if (el && typeof ResizeObserver !== 'undefined') {
+        ro = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            const h = entry.contentRect.height;
+            if (h > 100) {
+              window.dispatchEvent(
+                new CustomEvent('vplay:vboard_state', {
+                  detail: { isOpen: true, height: h },
+                })
+              );
+            }
+          }
+        });
+        ro.observe(el);
+      }
+
+      return () => {
+        clearTimeout(timer);
+        if (ro) ro.disconnect();
+      };
+    } else {
+      window.dispatchEvent(
+        new CustomEvent('vplay:vboard_state', {
+          detail: { isOpen: false, height: 0 },
+        })
+      );
+    }
+  }, [isOpen]);
+
+  // Clean up if unmounted or disabled
+  useEffect(() => {
+    return () => {
+      window.dispatchEvent(
+        new CustomEvent('vplay:vboard_state', {
+          detail: { isOpen: false, height: 0 },
+        })
+      );
+    };
+  }, []);
+
   // Automatically nudge / scroll the page up when keyboard opens to prevent covering inputs & content
   useEffect(() => {
     if (isOpen) {

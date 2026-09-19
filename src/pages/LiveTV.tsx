@@ -628,7 +628,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                       key={channel.id}
                       id={`channel-btn-${channel.id}`}
                       onClick={() => handleSelectChannel(channel)}
-                      className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
+                      className={`channel-card h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
                         isSelected
                           ? 'border-white shadow-xl shadow-black/40'
                           : 'border-transparent hover:border-white'
@@ -710,7 +710,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
+                  className={`channel-card h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
                     isSelected
                       ? 'border-white shadow-xl shadow-black/40'
                       : 'border-transparent hover:border-white'
@@ -755,7 +755,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                   key={channel.id}
                   id={`channel-btn-${channel.id}`}
                   onClick={() => handleSelectChannel(channel)}
-                  className={`h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
+                  className={`channel-card h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
                     isSelected
                       ? 'border-white shadow-xl shadow-black/40'
                       : 'border-transparent hover:border-white'

@@ -41,6 +41,33 @@ export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
     category: 'features',
     badge: 'BETA',
     defaultValue: true,
+  },
+  {
+    id: 'flag_status_bar',
+    key: 'status_bar',
+    name: 'Vertical Status Bar (Dọc bên phải)',
+    description: 'Hiển thị thanh trạng thái và Dynamic Island đặt dọc ở góc trên bên phải màn hình: Camera/Island, Đồng hồ 9:41, Vòng cung Pin & Wi-Fi & chấm sóng, Nút quay lại (<).',
+    category: 'ui',
+    badge: 'STABLE',
+    defaultValue: true,
+  },
+  {
+    id: 'flag_dynamic_island',
+    key: 'dynamic_island',
+    name: 'Dynamic Island',
+    description: 'Kích hoạt camera punch-hole và khả năng mở rộng tương tác cho Dynamic Island khi chạm vào ở góc trên bên phải.',
+    category: 'ui',
+    badge: 'STABLE',
+    defaultValue: true,
+  },
+  {
+    id: 'flag_shiny_outline',
+    key: 'shiny_outline',
+    name: 'Shiny Outline',
+    description: 'Viền sáng bóng 2 cạnh trên dưới phản chiếu kính mờ (Specular rim highlights) cho toàn bộ elements trong ứng dụng (ô kênh, menus, buttons, toggles, nền danh mục, khối thẻ, banner, search boxes, input boxes...).',
+    category: 'ui',
+    badge: 'STABLE',
+    defaultValue: true,
   }
 ];
 
@@ -62,6 +89,23 @@ export const getStoredFlags = (): Record<string, boolean> => {
       if (!appliedMigration) {
         merged['animation_test'] = false;
         localStorage.setItem('vplay_flags_v2_migration', 'true');
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      }
+
+      // Migration v3: Enable vertical status_bar & dynamic_island by default
+      const appliedMigrationV3 = localStorage.getItem('vplay_flags_v3_vertical_status');
+      if (!appliedMigrationV3) {
+        merged['status_bar'] = true;
+        merged['dynamic_island'] = true;
+        localStorage.setItem('vplay_flags_v3_vertical_status', 'true');
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      }
+
+      // Migration v4: Enforce status_bar is DEFAULT ON
+      const appliedMigrationV4 = localStorage.getItem('vplay_flags_v4_status_bar_default');
+      if (!appliedMigrationV4) {
+        merged['status_bar'] = true;
+        localStorage.setItem('vplay_flags_v4_status_bar_default', 'true');
         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
       }
 
@@ -111,6 +155,17 @@ export const useFeatureFlags = () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newFlags));
       // Dispatch custom event for immediate same-window listeners
       window.dispatchEvent(new CustomEvent('vplay:flags_updated', { detail: newFlags }));
+
+      // Sync with system settings if shiny_outline is modified
+      if (typeof newFlags['shiny_outline'] === 'boolean') {
+        const rawSettings = localStorage.getItem('waves_system_settings');
+        const settingsObj = rawSettings ? JSON.parse(rawSettings) : {};
+        if (settingsObj.shinyOutline !== newFlags['shiny_outline']) {
+          settingsObj.shinyOutline = newFlags['shiny_outline'];
+          localStorage.setItem('waves_system_settings', JSON.stringify(settingsObj));
+          window.dispatchEvent(new Event('waves_settings_change'));
+        }
+      }
     } catch (err) {
       console.error('Failed to save feature flags to localStorage:', err);
     }

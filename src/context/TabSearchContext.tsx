@@ -7,6 +7,9 @@ interface TabSearchContextType {
   placeholder: string;
   setCustomPlaceholder: (placeholder: string | null) => void;
   currentRoute: string;
+  isSearchExpanded: boolean;
+  setIsSearchExpanded: (expanded: boolean) => void;
+  toggleSearchExpanded: () => void;
 }
 
 const TabSearchContext = createContext<TabSearchContextType | undefined>(undefined);
@@ -110,11 +113,13 @@ interface TabSearchProviderProps {
 export const TabSearchProvider: React.FC<TabSearchProviderProps> = ({ children, currentRoute }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [customPlaceholder, setCustomPlaceholder] = useState<string | null>(null);
+  const [isSearchExpanded, setIsSearchExpanded] = useState<boolean>(false);
 
   // Clear search query whenever route changes so search belongs to each tab
   useEffect(() => {
     setSearchQuery('');
     setCustomPlaceholder(null);
+    setIsSearchExpanded(false);
   }, [currentRoute]);
 
   const placeholder = useMemo(() => {
@@ -133,6 +138,10 @@ export const TabSearchProvider: React.FC<TabSearchProviderProps> = ({ children, 
     setSearchQuery('');
   };
 
+  const toggleSearchExpanded = () => {
+    setIsSearchExpanded((prev) => !prev);
+  };
+
   return (
     <TabSearchContext.Provider
       value={{
@@ -142,6 +151,9 @@ export const TabSearchProvider: React.FC<TabSearchProviderProps> = ({ children, 
         placeholder,
         setCustomPlaceholder,
         currentRoute,
+        isSearchExpanded,
+        setIsSearchExpanded,
+        toggleSearchExpanded,
       }}
     >
       {children}
@@ -160,6 +172,9 @@ export const useTabSearch = (): TabSearchContextType => {
       placeholder: 'Search',
       setCustomPlaceholder: () => {},
       currentRoute: '/',
+      isSearchExpanded: false,
+      setIsSearchExpanded: () => {},
+      toggleSearchExpanded: () => {},
     };
   }
   return context;

@@ -41,7 +41,7 @@ export const playPopSound = () => {
   } catch (err) {}
 };
 
-export const playKeyboardClickSound = (isDelete = false) => {
+export const playKeyboardClickSound = (isDelete = false, skin: string = 'default') => {
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
@@ -49,21 +49,53 @@ export const playKeyboardClickSound = (isDelete = false) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
-    osc.type = isDelete ? 'sine' : 'triangle';
-    const startFreq = isDelete ? 520 : 1350;
-    const endFreq = isDelete ? 260 : 680;
+    if (skin === 'physical') {
+      // Deep mechanical switch "thock"
+      osc.type = isDelete ? 'sine' : 'sawtooth';
+      const startFreq = isDelete ? 420 : 860;
+      const endFreq = isDelete ? 180 : 210;
+      osc.frequency.setValueAtTime(startFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.035);
 
-    osc.frequency.setValueAtTime(startFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.02);
+      gain.gain.setValueAtTime(0.24, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
 
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.038);
+    } else if (skin === 'butterfly') {
+      // Ultra-short crisp MacBook chiclet clack
+      osc.type = 'triangle';
+      const startFreq = isDelete ? 750 : 1850;
+      const endFreq = isDelete ? 350 : 920;
+      osc.frequency.setValueAtTime(startFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.014);
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.014);
 
-    osc.start(now);
-    osc.stop(now + 0.022);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.016);
+    } else {
+      osc.type = isDelete ? 'sine' : 'triangle';
+      const startFreq = isDelete ? 520 : 1350;
+      const endFreq = isDelete ? 260 : 680;
+
+      osc.frequency.setValueAtTime(startFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.02);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.022);
+    }
   } catch (err) {}
 };
 

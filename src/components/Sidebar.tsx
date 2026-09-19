@@ -82,6 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { settings } = useSettings();
   const { flags } = useFeatureFlags();
+  const isStatusBar = Boolean(flags.status_bar);
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
     : true;
@@ -1091,7 +1092,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           id="waves-desktop-sidebar"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className={`hidden md:flex flex-col h-screen border-r border-white/5 select-none shrink-0 fixed top-0 left-0 z-40 overflow-hidden transition-all duration-300 ease-in-out ${
+          className={`hidden md:flex flex-col border-r border-white/5 select-none shrink-0 fixed top-0 h-screen left-0 z-40 overflow-hidden transition-all duration-300 ease-in-out ${
             effectiveCollapsed ? 'w-[80px]' : 'w-[290px]'
           }`}
         >

@@ -59,10 +59,12 @@ import { MusicTab } from './pages/MusicTab';
 import { VShopTab } from './pages/VShopTab';
 import { TabSearchProvider } from './context/TabSearchContext';
 import { FloatingTabSearchBar } from './components/FloatingTabSearchBar';
+import { InspectElementsOverlay } from './components/InspectElementsOverlay';
+import { StatusBar } from './components/StatusBar';
 import { ArrowLeft } from 'lucide-react';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
-import { useSettings } from './hooks/useSettings';
+import { useSettings, WALLPAPER_PRESETS } from './hooks/useSettings';
 import { useFavorites } from './hooks/useFavorites';
 import { useFeatureFlags } from './hooks/useFeatureFlags';
 import { motion, AnimatePresence } from 'motion/react';
@@ -71,9 +73,16 @@ import { VBoardOverlay } from './components/vboard/VBoardOverlay';
 
 export default function App() {
   const { settings, updateSetting } = useSettings();
+  const currentWallpaperPreset = WALLPAPER_PRESETS.find(w => w.id === settings.appBackground);
+  const customWallpaperUrl = currentWallpaperPreset 
+    ? currentWallpaperPreset.url 
+    : (settings.appBackground && settings.appBackground !== 'default' ? settings.appBackground : '');
+  const hasCustomWallpaper = Boolean(customWallpaperUrl);
   const { flags, toggleFlag } = useFeatureFlags();
   const isAnimationTest = Boolean(flags.animation_test);
   const isVBoardEnabled = flags.experimental_vboard !== false;
+  const isStatusBar = Boolean(flags.status_bar);
+  const isDynamicIsland = Boolean(flags.status_bar && flags.dynamic_island);
   const isFloatyMode = Boolean(settings.floatyBar);
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
@@ -675,11 +684,63 @@ export default function App() {
     currentRoute === '/spotlight' || 
     currentRoute === '/copilot' || 
     currentRoute === '/copilot-standalone';
-  const isFloatingSearchVisible = isTopBarMode && !isFloatyMode && !isDedicatedSearchRoute;
+  const isFloatingSearchVisible = (isStatusBar || (isTopBarMode && !isFloatyMode)) && !isDedicatedSearchRoute;
 
   return (
     <TabSearchProvider currentRoute={currentRoute}>
-      <div className={`min-h-screen bg-[#181818] text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
+      <div className={`min-h-screen ${hasCustomWallpaper ? 'has-custom-wallpaper bg-transparent' : 'bg-[#181818]'} text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative transition-colors duration-500 ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
+        {/* Custom App Wallpaper Layer (Liquid Glass interactive background) */}
+        {hasCustomWallpaper && (
+          <div
+            id="vplay-wallpaper-backdrop"
+            className="fixed inset-0 -z-50 pointer-events-none bg-cover bg-center bg-no-repeat transition-all duration-700 ease-in-out"
+            style={{
+              backgroundImage: `url("${customWallpaperUrl}")`,
+              backgroundAttachment: 'fixed',
+            }}
+          >
+            {/* Soft dark overlay for perfect text contrast while highlighting Liquid Glass blurs */}
+            <div className="absolute inset-0 bg-black/25 backdrop-brightness-95 pointer-events-none" />
+          </div>
+        )}
+
+        {/* Vertical Right Status Bar & Dynamic Island (Feature Flag: status_bar & dynamic_island) */}
+        {isStatusBar && (
+          <StatusBar 
+            isDynamicIsland={isDynamicIsland}
+            navigate={navigate}
+            channels={channels}
+            currentChannel={currentChannel}
+            onSelectChannel={(ch) => {
+              setCurrentChannel(ch);
+              navigate(`/live-tv?channel=${ch.slug}`);
+            }}
+            onBack={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                navigate('/');
+              }
+            }}
+          />
+        )}
+
+        {/* Pre-release product watermark in bottom-left corner when status bar is active */}
+        {isStatusBar && (
+          <div
+            id="screen-prerelease-watermark-left"
+            className="fixed bottom-3 left-4 sm:bottom-4 sm:left-6 z-40 text-left pointer-events-none select-none space-y-0.5"
+            style={{ fontFamily: "'Inter', 'Integer', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
+          >
+            <p className="text-[11px] sm:text-xs font-medium tracking-tight text-zinc-300/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
+              Vplay v26.10_devb (26A3667c) - Pre-release build product
+            </p>
+            <p className="text-[10px] sm:text-[11px] font-normal text-zinc-400/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
+              Anything you've seen here are not finished and may change in future builds
+            </p>
+          </div>
+        )}
+
         {/* Background Ambient Motion Orbs & Floating Controller */}
         <MotionEffectsLayer
           isEnabled={isAnimationTest}
@@ -776,6 +837,12 @@ export default function App() {
 
         {/* Floating in-tab Search Bar (Active when Top Bar navigation is enabled) */}
         <FloatingTabSearchBar isVisible={isFloatingSearchVisible} />
+
+        {/* In-App DOM & Elements Inspector */}
+        <InspectElementsOverlay
+          enabled={Boolean(settings.inspectElements)}
+          onDisable={() => updateSetting('inspectElements', false)}
+        />
 
         <CustomStreamModal
           isOpen={isCustomStreamModalOpen}

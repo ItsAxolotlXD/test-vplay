@@ -58,14 +58,15 @@ export const Channels: React.FC<ChannelsProps> = ({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-[28px] bg-[#1E1E22] border border-[#2D2D35] flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="block-card p-4 rounded-[28px] bg-[#1E1E22] border border-[#2D2D35] flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Groups */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
           {groups.map((grp) => (
             <button
               key={grp}
+              id={`channels-category-${grp}`}
               onClick={() => setSelectedGroup(grp)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`category-pill px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedGroup === grp
                   ? 'bg-[#DF37EE] text-white shadow-md'
                   : 'bg-[#141416] text-[#A1A1AA] hover:text-white border border-[#2D2D35]'

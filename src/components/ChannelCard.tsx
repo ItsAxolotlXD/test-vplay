@@ -21,14 +21,14 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({
     <div
       id={`channel-card-${channel.id}`}
       onClick={() => onSelect(channel)}
-      className={`group relative rounded-[20px] bg-[#353535] transition-all duration-300 overflow-hidden cursor-pointer hover:scale-[1.02] shadow-md border-0 ${
+      className={`channel-card group relative rounded-[20px] bg-[#353535] transition-all duration-300 overflow-hidden cursor-pointer hover:scale-[1.02] shadow-md border-0 ${
         isActive
           ? 'bg-[#404040] shadow-lg shadow-black/40 ring-2 ring-white/20'
           : 'hover:bg-[#404040]'
       }`}
     >
       {/* Top Banner / Logo Area */}
-      <div className="relative h-24 sm:h-26 bg-[#353535] flex items-center justify-center p-3 overflow-hidden border-0">
+      <div className="channel-card-banner relative h-24 sm:h-26 bg-[#353535] flex items-center justify-center p-3 overflow-hidden border-0">
         {channel.bannerImage && (
           <img
             src={channel.bannerImage}
@@ -38,7 +38,7 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({
         )}
 
         {/* Center Channel Logo */}
-        <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#242424] flex items-center justify-center p-1.5 overflow-hidden shadow-md border-0">
+        <div className="channel-logo-box relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#242424] flex items-center justify-center p-1.5 overflow-hidden shadow-md border-0">
           <img
             src={channel.logo}
             alt={channel.name}

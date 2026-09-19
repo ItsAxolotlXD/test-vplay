@@ -75,7 +75,7 @@ export const News: React.FC<NewsProps> = ({ navigate }) => {
       {featured && selectedCategory === 'Tất cả' && !searchQuery && (
         <div
           onClick={() => navigate(`/news/${featured.slug}`)}
-          className="relative rounded-[30px] overflow-hidden bg-[#1E1E22] border border-[#2D2D35] hover:border-[#E50914]/60 cursor-pointer group shadow-2xl transition-all"
+          className="block-card relative rounded-[30px] overflow-hidden bg-[#1E1E22] border border-[#2D2D35] hover:border-[#E50914]/60 cursor-pointer group shadow-2xl transition-all"
         >
           <div className="grid grid-cols-1 md:grid-cols-12 min-h-[360px]">
             {/* Image */}
@@ -127,8 +127,9 @@ export const News: React.FC<NewsProps> = ({ navigate }) => {
         {categories.map((cat) => (
           <button
             key={cat}
+            id={`news-category-${cat}`}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`category-pill px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               selectedCategory === cat
                 ? 'bg-gradient-purple-active text-white shadow-md glow-purple-sm'
                 : 'bg-[#1E1E22] text-[#A1A1AA] hover:text-white border border-[#32323A]'

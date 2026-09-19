@@ -44,7 +44,7 @@ export const BannerCardItem: React.FC<BannerCardItemProps> = ({
   return (
     <div 
       onClick={onClick}
-      className={`w-full h-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#181818] select-none transition-all duration-700 cursor-pointer ${
+      className={`banner-card w-full h-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#181818] select-none transition-all duration-700 cursor-pointer ${
         isActive 
           ? 'ring-1' 
           : 'shadow-xl ring-1 ring-white/10 hover:ring-white/20'

@@ -154,3 +154,408 @@
   animation: spin-slow 8s linear infinite;
 }
 
+/* ==========================================================================
+   CUSTOM WALLPAPER: LIQUID GLASS (50% OPACITY + 50% BACKDROP BLUR)
+   Khi người dùng cài đặt hình nền (Duo Light, Duo Dark, hoặc bất kỳ wallpaper nào),
+   toàn bộ các element, danh mục, ô kênh, khối, và section tự động chuyển sang
+   dạng backdrop blur (blur 50% ~ 20px, background opacity 50%).
+   ========================================================================== */
+
+/* 1. Reset nền gốc khi có Custom Wallpaper để hình nền hiển thị mượt mà */
+html.has-custom-wallpaper,
+body.has-custom-wallpaper {
+  background-color: transparent !important;
+}
+
+/* 2. Ô KÊNH (Channel cards, On-Air slider items, Channel tiles) */
+.has-custom-wallpaper .channel-card,
+.has-custom-wallpaper [id^="channel-card-"],
+.has-custom-wallpaper [id^="onair-channel-"],
+.has-custom-wallpaper .channel-card-banner,
+.has-custom-wallpaper .channel-logo-box {
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+.has-custom-wallpaper .channel-card,
+.has-custom-wallpaper [id^="channel-card-"],
+.has-custom-wallpaper [id^="onair-channel-"] {
+  background-color: rgba(28, 27, 34, 0.50) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.28) !important;
+}
+
+.has-custom-wallpaper .channel-card:hover,
+.has-custom-wallpaper [id^="channel-card-"]:hover {
+  background-color: rgba(45, 42, 55, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+.has-custom-wallpaper .channel-card-banner {
+  background-color: rgba(18, 17, 24, 0.45) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.has-custom-wallpaper .channel-logo-box {
+  background-color: rgba(12, 12, 16, 0.50) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+/* 3. DANH MỤC (Categories, filter pills, category tabs) */
+.has-custom-wallpaper .category-pill,
+.has-custom-wallpaper .category-chip,
+.has-custom-wallpaper [id*="category-"],
+.has-custom-wallpaper [id^="channels-category-"],
+.has-custom-wallpaper [id^="news-category-"] {
+  -webkit-backdrop-filter: blur(18px) saturate(170%) !important;
+  backdrop-filter: blur(18px) saturate(170%) !important;
+}
+
+/* Trạng thái chưa chọn */
+.has-custom-wallpaper .category-pill,
+.has-custom-wallpaper .category-chip,
+.has-custom-wallpaper [id^="channels-category-"],
+.has-custom-wallpaper [id^="news-category-"] {
+  background-color: rgba(22, 21, 28, 0.50) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+.has-custom-wallpaper .category-pill:hover,
+.has-custom-wallpaper [id*="category-"]:hover {
+  background-color: rgba(42, 40, 52, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+}
+
+/* Trạng thái danh mục đang chọn (Active category pill) */
+.has-custom-wallpaper .category-pill.active,
+.has-custom-wallpaper .category-pill[class*="bg-[#DF37EE]"],
+.has-custom-wallpaper .category-pill[class*="bg-gradient-purple-active"],
+.has-custom-wallpaper [id*="category-"].active {
+  background-color: rgba(223, 55, 238, 0.50) !important;
+  background-image: none !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: 0 0 24px rgba(223, 55, 238, 0.4) !important;
+}
+
+/* 4. SECTION & DANH MỤC (Tất cả các danh mục trong Cài đặt, Cờ tính năng, Trang chủ)
+   Xóa nền các cài đặt, chỉ để nền backdrop blur cho danh mục */
+.settings-category-section,
+[id^="settings-section-"] {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.25) !important;
+}
+
+.has-custom-wallpaper section,
+.has-custom-wallpaper .settings-category-section,
+.has-custom-wallpaper [id^="settings-section-"],
+.has-custom-wallpaper [id^="feature-flags-section-"],
+.has-custom-wallpaper [id^="home-section-"] {
+  background-color: rgba(20, 19, 26, 0.35) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
+  backdrop-filter: blur(32px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.35) !important;
+}
+
+/* TOÀN BỘ CÁC THẺ / MỤC ĐỔI HẾT SANG BACKDROP BLUR (NẾU CHỌN WALLPAPER) */
+.has-custom-wallpaper .settings-item-card,
+.has-custom-wallpaper .settings-category-section .settings-item-card,
+.has-custom-wallpaper [id^="settings-section-"] .settings-item-card,
+.has-custom-wallpaper [id^="feature-flags-section-"] .settings-item-card,
+.has-custom-wallpaper [id^="settings-card-"],
+.has-custom-wallpaper [id^="setting-vboard-skin-"],
+.has-custom-wallpaper [id^="setting-font-"],
+.has-custom-wallpaper [id^="wallpaper-preset-"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
+  backdrop-filter: blur(20px) saturate(170%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.has-custom-wallpaper .settings-item-card:hover,
+.has-custom-wallpaper .settings-category-section .settings-item-card:hover,
+.has-custom-wallpaper [id^="settings-section-"] .settings-item-card:hover,
+.has-custom-wallpaper [id^="feature-flags-section-"] .settings-item-card:hover,
+.has-custom-wallpaper [id^="settings-card-"]:hover,
+.has-custom-wallpaper [id^="setting-vboard-skin-"]:hover,
+.has-custom-wallpaper [id^="setting-font-"]:hover,
+.has-custom-wallpaper [id^="wallpaper-preset-"]:hover {
+  background-color: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* 5. KHỐI (Blocks, cards con, news cards, banner items, quick entry cards, search bars) */
+.has-custom-wallpaper .block-card,
+.has-custom-wallpaper [id^="flag-card-"],
+.has-custom-wallpaper .news-card,
+.has-custom-wallpaper [id^="news-card-"],
+.has-custom-wallpaper .banner-card,
+.has-custom-wallpaper [id^="banner-card-"],
+.has-custom-wallpaper .portal-card-scroll,
+.has-custom-wallpaper .spotlight-bubble-box,
+.has-custom-wallpaper .search-box-capsule {
+  background-color: rgba(30, 29, 38, 0.50) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
+  backdrop-filter: blur(20px) saturate(170%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22) !important;
+}
+
+.has-custom-wallpaper [id^="settings-card-"]:hover,
+.has-custom-wallpaper [id^="flag-card-"]:hover,
+.has-custom-wallpaper .news-card:hover {
+  background-color: rgba(45, 43, 56, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* 6. TOÀN BỘ CÁC ELEMENT HỆ THỐNG (Sidebar, Mobile Drawer, Dialogs, V-Board, Floaty Bar) */
+.has-custom-wallpaper #waves-desktop-sidebar,
+.has-custom-wallpaper #waves-mobile-sidebar,
+.has-custom-wallpaper aside {
+  background-color: rgba(18, 17, 24, 0.50) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
+  backdrop-filter: blur(26px) saturate(180%) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.has-custom-wallpaper #floaty-bar-container,
+.has-custom-wallpaper .floaty-bar-container {
+  background-color: rgba(255, 255, 255, 0.50) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.has-custom-wallpaper #vboard-keyboard-container,
+.has-custom-wallpaper .vboard-panel {
+  background-color: rgba(20, 20, 26, 0.50) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.has-custom-wallpaper [role="dialog"],
+.has-custom-wallpaper .modal-box,
+.has-custom-wallpaper .discord-modal-box {
+  background-color: rgba(22, 21, 28, 0.50) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 7. TOÀN DIỆN CÁC LỚP NỀN TỐI (Tự động chuyển các class màu nền cố định thành 50% opacity & 50% blur) */
+.has-custom-wallpaper .bg-\[\#1E1D22\],
+.has-custom-wallpaper .bg-\[\#28272E\],
+.has-custom-wallpaper .bg-\[\#1E1E22\],
+.has-custom-wallpaper .bg-\[\#353535\],
+.has-custom-wallpaper .bg-\[\#1A1A20\],
+.has-custom-wallpaper .bg-\[\#241C2B\],
+.has-custom-wallpaper .bg-\[\#141416\],
+.has-custom-wallpaper .bg-\[\#1E1D24\],
+.has-custom-wallpaper .bg-\[\#202020\],
+.has-custom-wallpaper .bg-\[\#222222\],
+.has-custom-wallpaper .bg-\[\#2F2F36\],
+.has-custom-wallpaper .bg-\[\#25252C\],
+.has-custom-wallpaper .bg-\[\#282830\],
+.has-custom-wallpaper .bg-\[\#17171B\],
+.has-custom-wallpaper .bg-\[\#121217\],
+.has-custom-wallpaper .bg-\[\#1D1C24\],
+.has-custom-wallpaper .bg-\[\#121216\],
+.has-custom-wallpaper .bg-\[\#32313A\],
+.has-custom-wallpaper .bg-\[\#1F1E24\] {
+  background-color: rgba(28, 27, 34, 0.50) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(175%) !important;
+  backdrop-filter: blur(20px) saturate(175%) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ==========================================================================
+   SHINY OUTLINE: 2-EDGE TOP & BOTTOM SPECULAR RIM HIGHLIGHT
+   Viền 2 cạnh trên dưới của các nút status bar vào toàn bộ elements trong app:
+   - Ô kênh (channel tiles, channel cards, onair items, logo boxes)
+   - Menus (start menu, dropdowns, contextual popups, modal cards, navigation menus)
+   - Buttons (buttons, pill buttons, tabs, interactive controls)
+   - Toggles (switch switches, toggle controls)
+   - Nền danh mục (category sections, category pills/chips, filter bars)
+   - Các khối (cards, content blocks, news cards, flag cards, settings cards)
+   - Banner (hero banner, banner cards, promo sliders)
+   - Search boxes (floating search pill, spotlight bubble, search bars)
+   - Input boxes (text inputs, search inputs, textareas)
+   ========================================================================== */
+
+/* 1. Ẩn viền specular trên StatusBar khi tắt cài đặt "Shiny outline" */
+html:not(.has-shiny-outline) .shiny-rim-svg,
+body:not(.has-shiny-outline) .shiny-rim-svg {
+  display: none !important;
+}
+
+/* 2. Đảm bảo position context cho các container khi Shiny outline được bật */
+.has-shiny-outline :is(
+  .shiny-outline,
+  .channel-card,
+  [id^="channel-card-"],
+  [id^="onair-channel-"],
+  .channel-card-banner,
+  .channel-logo-box,
+  .category-pill,
+  .category-chip,
+  [id*="category-"],
+  [id^="channels-category-"],
+  [id^="news-category-"],
+  .settings-category-section,
+  [id^="settings-section-"],
+  [id^="feature-flags-section-"],
+  [id^="home-section-"],
+  .settings-item-card,
+  [id^="settings-card-"],
+  [id^="flag-card-"],
+  .news-card,
+  [id^="news-card-"],
+  .banner-card,
+  [id^="banner-card-"],
+  .block-card,
+  [role="switch"],
+  .spotlight-bubble-box,
+  .search-box-capsule,
+  [role="dialog"],
+  .modal-box,
+  .start-menu-panel,
+  [id^="vapp-card-"]
+) {
+  position: relative;
+}
+
+/* Cho các nút không có vị trí absolute hoặc fixed */
+.has-shiny-outline button:not(.no-shiny):not([class*="absolute"]):not([class*="fixed"]) {
+  position: relative;
+}
+
+/* 3. LỚP VIỀN PHẢN CHIẾU 2 CẠNH TRÊN DƯỚI (SPECULAR RIM HIGHLIGHT) */
+.has-shiny-outline :is(
+  .shiny-outline,
+  .channel-card,
+  [id^="channel-card-"],
+  [id^="onair-channel-"],
+  .channel-card-banner,
+  .channel-logo-box,
+  .category-pill,
+  .category-chip,
+  [id*="category-"],
+  [id^="channels-category-"],
+  [id^="news-category-"],
+  .settings-category-section,
+  [id^="settings-section-"],
+  [id^="feature-flags-section-"],
+  [id^="home-section-"],
+  .settings-item-card,
+  [id^="settings-card-"],
+  [id^="flag-card-"],
+  .news-card,
+  [id^="news-card-"],
+  .banner-card,
+  [id^="banner-card-"],
+  .block-card,
+  [role="switch"],
+  .spotlight-bubble-box,
+  .search-box-capsule,
+  [role="dialog"],
+  .modal-box,
+  .start-menu-panel,
+  [id^="vapp-card-"],
+  button:not(.no-shiny):not([class*="no-shiny"]):not([class*="p-0"]):not([class*="w-0"]):not([class*="h-0"])
+)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1.2px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.45) 22%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.45) 78%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: 12;
+  transition: opacity 0.25s ease, background 0.25s ease, filter 0.25s ease;
+}
+
+/* 4. HIỆU ỨNG HOVER PHẢN CHIẾU TĂNG ĐỘ SÁNG BÓNG */
+.has-shiny-outline :is(
+  button:not(.no-shiny):not([class*="no-shiny"]),
+  .channel-card,
+  [id^="channel-card-"],
+  .banner-card,
+  .category-pill,
+  .settings-item-card,
+  .block-card,
+  .news-card
+):hover::after {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.65) 20%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.65) 80%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+
+/* 5. INPUT BOXES & TEXTAREAS (Viền sáng trên và dưới trực tiếp trên ô nhập liệu) */
+.has-shiny-outline input[type="text"]:not([class*="no-shiny"]):not([class*="bg-transparent"]),
+.has-shiny-outline input[type="search"]:not([class*="no-shiny"]):not([class*="bg-transparent"]),
+.has-shiny-outline input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="range"]):not([type="hidden"]):not([class*="no-shiny"]):not([class*="bg-transparent"]),
+.has-shiny-outline textarea:not([class*="no-shiny"]) {
+  border-top: 1.2px solid transparent !important;
+  border-bottom: 1.2px solid transparent !important;
+  border-left: 0px solid transparent !important;
+  border-right: 0px solid transparent !important;
+  background-image: 
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 22%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 255, 255, 0.45) 78%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 22%, rgba(255, 255, 255, 0.95) 50%, rgba(255, 255, 255, 0.45) 78%, transparent 100%);
+  background-position: top center, bottom center;
+  background-size: 100% 1.2px, 100% 1.2px;
+  background-repeat: no-repeat;
+}
+
+/* Tránh đường viền kép khi input nằm bên trong container capsule đã có viền bo tròn */
+.has-shiny-outline :is(.spotlight-bubble-box, .search-box-capsule) input {
+  background-image: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+/* 6. NÚT GẠT TOGGLE (Switch knob & pill highlight) */
+.has-shiny-outline [role="switch"] span[class*="rounded-full bg-white"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+

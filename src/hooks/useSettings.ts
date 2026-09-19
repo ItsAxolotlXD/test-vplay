@@ -2,14 +2,76 @@ import { useState, useEffect } from 'react';
 
 export type FontFamilyOption = 'integer' | 'alata' | 'google-sans' | 'montserrat';
 
+export type VBoardSkin = 'default' | 'ios' | 'google' | 'butterfly' | 'physical';
+
+export interface VBoardSkinOption {
+  id: VBoardSkin;
+  name: string;
+  description: string;
+  badge: string;
+  previewBg: string;
+  previewKeyBg: string;
+  previewTextColor: string;
+}
+
+export const VBOARD_SKIN_OPTIONS: VBoardSkinOption[] = [
+  {
+    id: 'default',
+    name: 'Default V-Board',
+    description: 'Giao diện V-board kính tối mờ thanh lịch với hiệu ứng Liquid Glass',
+    badge: 'Mặc định',
+    previewBg: '#1E1D24',
+    previewKeyBg: '#525257',
+    previewTextColor: '#FFFFFF',
+  },
+  {
+    id: 'ios',
+    name: 'iOS (hình 1)',
+    description: 'Mô phỏng chuẩn bàn phím iOS với phím trắng bo góc, bóng đổ mềm và nền xám thanh lịch',
+    badge: 'Apple iOS',
+    previewBg: '#D0D3D9',
+    previewKeyBg: '#FFFFFF',
+    previewTextColor: '#000000',
+  },
+  {
+    id: 'google',
+    name: 'Google (hình 2)',
+    description: 'Mô phỏng Gboard với thanh tiện ích, số phụ góc trên và nút Enter xanh nổi bật',
+    badge: 'Gboard',
+    previewBg: '#ECEFF4',
+    previewKeyBg: '#FFFFFF',
+    previewTextColor: '#1F1F1F',
+  },
+  {
+    id: 'butterfly',
+    name: 'Butterfly keyboard (mô phỏng giống bàn phím trên Macbook)',
+    description: 'Mô phỏng bàn phím MacBook với các phím chiclet đen mờ, hành trình phím siêu mỏng và đèn nền',
+    badge: 'MacBook',
+    previewBg: '#202125',
+    previewKeyBg: '#121215',
+    previewTextColor: '#FFFFFF',
+  },
+  {
+    id: 'physical',
+    name: 'Physical keyboard (mô phỏng giống bàn phím thực tế, các keys dạng 3D)',
+    description: 'Mô phỏng bàn phím thực tế với các phím 3D nổi khối, độ sâu xúc giác và hiệu ứng ấn phím vật lý',
+    badge: '3D Mechanical',
+    previewBg: '#18191E',
+    previewKeyBg: '#2D2F36',
+    previewTextColor: '#FFFFFF',
+  },
+];
+
 export interface SystemSettings {
   userName: string;
   theme: 'light' | 'dark';
   dockToSidebar: boolean;
   navigationMode: 'sidebar' | 'topbar';
   floatyBar: boolean;
+  vboardSkin: VBoardSkin;
   fontFamily: FontFamilyOption;
   fontScale: number; // 0: 85%, 1: 100%, 2: 115%, 3: 130%
+  appBackground: string; // 'default' | 'duo-light' | 'duo-dark' | string url
   autoScrollBanner: boolean;
   autoHideSidebar: boolean;
   mergeSpotlightToCopilot: boolean;
@@ -20,6 +82,8 @@ export interface SystemSettings {
   searchChannelNumber: boolean;
   searchToolbox: boolean;
   searchSettings: boolean;
+  inspectElements: boolean;
+  shinyOutline: boolean;
 }
 
 export const DEFAULT_SETTINGS: SystemSettings = {
@@ -28,8 +92,10 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   dockToSidebar: true,
   navigationMode: 'topbar',
   floatyBar: false,
+  vboardSkin: 'default',
   fontFamily: 'alata',
   fontScale: 1,
+  appBackground: 'default',
   autoScrollBanner: true,
   autoHideSidebar: false,
   mergeSpotlightToCopilot: false,
@@ -40,7 +106,45 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   searchChannelNumber: true,
   searchToolbox: true,
   searchSettings: true,
+  inspectElements: false,
+  shinyOutline: true,
 };
+
+export interface WallpaperOption {
+  id: string;
+  name: string;
+  url: string;
+  previewUrl: string;
+  subtext: string;
+  type: 'solid' | 'image';
+}
+
+export const WALLPAPER_PRESETS: WallpaperOption[] = [
+  {
+    id: 'default',
+    name: 'Mặc định (Solid Dark)',
+    url: '',
+    previewUrl: '',
+    subtext: 'Màu nền tối #181818 tiêu chuẩn',
+    type: 'solid',
+  },
+  {
+    id: 'duo-light',
+    name: 'Duo Light',
+    url: 'https://www.iclarified.com/files/ios/iClarified-iPhone-Duo-Wallpaper/iClarified-iPhone-Duo-Wallpaper-Inner-Light.jpg',
+    previewUrl: 'https://www.iclarified.com/files/ios/iClarified-iPhone-Duo-Wallpaper/iClarified-iPhone-Duo-Wallpaper-Inner-Light.jpg',
+    subtext: 'Hình nền Duo Light phong cách iOS rực rỡ và tươi sáng',
+    type: 'image',
+  },
+  {
+    id: 'duo-dark',
+    name: 'Duo Dark',
+    url: 'https://www.iclarified.com/files/ios/iClarified-iPhone-Duo-Wallpaper/iClarified-iPhone-Duo-Wallpaper-Inner-Dark.jpg',
+    previewUrl: 'https://www.iclarified.com/files/ios/iClarified-iPhone-Duo-Wallpaper/iClarified-iPhone-Duo-Wallpaper-Inner-Dark.jpg',
+    subtext: 'Hình nền Duo Dark sang trọng với các vệt màu neon sâu thẳm',
+    type: 'image',
+  },
+];
 
 export interface FontFamilyItem {
   id: FontFamilyOption;
@@ -117,12 +221,31 @@ export const getStoredSettings = (): SystemSettings => {
         // If it was previous integer default, migrate to Alata
         font = parsed.fontFamily === 'integer' ? 'alata' : parsed.fontFamily;
       }
+      // Check shinyOutline with feature flag fallback
+      let isShiny = true;
+      if (typeof parsed.shinyOutline === 'boolean') {
+        isShiny = parsed.shinyOutline;
+      } else {
+        try {
+          const rawFlags = localStorage.getItem('vplay_feature_flags');
+          if (rawFlags) {
+            const parsedFlags = JSON.parse(rawFlags);
+            if (typeof parsedFlags.shiny_outline === 'boolean') {
+              isShiny = parsedFlags.shiny_outline;
+            }
+          }
+        } catch {}
+      }
+
       return { 
         ...base, 
         ...parsed,
+        shinyOutline: isShiny,
         fontFamily: font,
         navigationMode: navMode,
+        appBackground: parsed.appBackground || 'default',
         floatyBar: typeof parsed.floatyBar === 'boolean' ? parsed.floatyBar : false,
+        vboardSkin: ['default', 'ios', 'google', 'butterfly', 'physical'].includes(parsed.vboardSkin) ? parsed.vboardSkin : 'default',
         userName: parsed.userName || legacyUser || 'User',
         theme: 'dark'
       };
@@ -137,7 +260,7 @@ export const getStoredSettings = (): SystemSettings => {
   return DEFAULT_SETTINGS;
 };
 
-// Apply side-effects (theme class, font-scale property, font-family)
+// Apply side-effects (theme class, font-scale property, font-family, background wallpaper)
 export const applySystemSettings = (settings: SystemSettings) => {
   if (typeof document === 'undefined') return;
 
@@ -153,6 +276,37 @@ export const applySystemSettings = (settings: SystemSettings) => {
   const selectedFont = FONT_FAMILY_CONFIG.find(f => f.id === settings.fontFamily) || FONT_FAMILY_CONFIG[0];
   document.documentElement.style.setProperty('--waves-font-family', selectedFont.cssFamily);
   document.body.style.fontFamily = selectedFont.cssFamily;
+
+  // Apply background wallpaper
+  const bgPreset = WALLPAPER_PRESETS.find(w => w.id === settings.appBackground);
+  const bgUrl = bgPreset ? bgPreset.url : (settings.appBackground && settings.appBackground !== 'default' ? settings.appBackground : '');
+
+  if (bgUrl) {
+    document.documentElement.classList.add('has-custom-wallpaper');
+    document.body.classList.add('has-custom-wallpaper');
+    document.documentElement.style.setProperty('--waves-custom-bg', `url("${bgUrl}")`);
+    document.body.style.backgroundImage = `url("${bgUrl}")`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundAttachment = 'fixed';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+  } else {
+    document.documentElement.classList.remove('has-custom-wallpaper');
+    document.body.classList.remove('has-custom-wallpaper');
+    document.documentElement.style.setProperty('--waves-custom-bg', 'none');
+    document.body.style.backgroundImage = 'none';
+    document.body.style.backgroundColor = '#181818';
+  }
+
+  // Apply Shiny outline (Specular 2-edge top & bottom rim highlight)
+  const isShinyActive = settings.shinyOutline !== false;
+  if (isShinyActive) {
+    document.documentElement.classList.add('has-shiny-outline');
+    document.body.classList.add('has-shiny-outline');
+  } else {
+    document.documentElement.classList.remove('has-shiny-outline');
+    document.body.classList.remove('has-shiny-outline');
+  }
 };
 
 export const useSettings = () => {
@@ -197,6 +351,15 @@ export const useSettings = () => {
             const flagsObj = rawFlags ? JSON.parse(rawFlags) : {};
             flagsObj.top_bar = (value === 'topbar');
             localStorage.setItem('waves_feature_flags', JSON.stringify(flagsObj));
+            window.dispatchEvent(new CustomEvent('vplay:flags_updated', { detail: flagsObj }));
+          } catch {}
+        }
+        if (key === 'shinyOutline') {
+          try {
+            const rawFlags = localStorage.getItem('vplay_feature_flags');
+            const flagsObj = rawFlags ? JSON.parse(rawFlags) : {};
+            flagsObj.shiny_outline = Boolean(value);
+            localStorage.setItem('vplay_feature_flags', JSON.stringify(flagsObj));
             window.dispatchEvent(new CustomEvent('vplay:flags_updated', { detail: flagsObj }));
           } catch {}
         }

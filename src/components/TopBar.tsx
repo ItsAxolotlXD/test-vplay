@@ -105,6 +105,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 }) => {
   const { settings } = useSettings();
   const { flags } = useFeatureFlags();
+  const isStatusBar = Boolean(flags.status_bar);
 
   const isLightMode = settings.theme === 'light';
 
@@ -269,7 +270,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 : 'bg-gradient-to-b from-[#181818]/55 via-[#181818]/35 to-[#181818]/15'
           }`} />
         </div>
-        <div className="w-full max-w-[1780px] mx-auto px-4 md:px-6 lg:px-8 h-16 md:h-[68px] flex items-center justify-between gap-3 md:gap-4">
+        <div className={`w-full max-w-[1780px] mx-auto px-4 md:px-6 lg:px-8 ${isStatusBar ? 'pr-16 sm:pr-20 md:pr-24' : ''} h-16 md:h-[68px] flex items-center justify-between gap-3 md:gap-4`}>
           
           {/* LEFT & CENTER NAV GROUP */}
           <div className="flex items-center gap-5 lg:gap-8 h-full">
@@ -583,16 +584,18 @@ export const TopBar: React.FC<TopBarProps> = ({
             
             {/* Search, Notification, Copilot compact icon group */}
             <div className="flex items-center gap-1 sm:gap-1.5">
-              {/* 1. Search Icon */}
-              <button
-                id="btn-topbar-search"
-                onClick={onOpenSearch}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-                title="Tìm kiếm chương trình (⌘K / Ctrl+K)"
-                aria-label="Tìm kiếm"
-              >
-                <Search className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
-              </button>
+              {/* 1. Search Icon - Hidden when status bar right is active */}
+              {!isStatusBar && (
+                <button
+                  id="btn-topbar-search"
+                  onClick={onOpenSearch}
+                  className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                  title="Tìm kiếm chương trình (⌘K / Ctrl+K)"
+                  aria-label="Tìm kiếm"
+                >
+                  <Search className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
+                </button>
+              )}
 
               {/* 2. Orbs Coin Icon (hiển thị số orbs khi hover & click - monochrome white) */}
               <div 
@@ -696,7 +699,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 )}
               </div>
 
-              {/* 3. Copilot AI Icon */}
+              {/* 3. Copilot AI Icon - Always on TopBar */}
               <button
                 id="btn-topbar-copilot"
                 onClick={() => navigate('/copilot')}

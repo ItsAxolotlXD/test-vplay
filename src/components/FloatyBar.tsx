@@ -255,8 +255,21 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
   return (
     <div
       id="floaty-bar-container"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 select-none pointer-events-auto"
+      className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 select-none pointer-events-auto flex flex-col items-center gap-1.5"
     >
+      {/* Pre-release build product watermark lines */}
+      <div 
+        id="floaty-bar-prerelease-watermark"
+        className="text-center pointer-events-none select-none px-2 space-y-0.5"
+      >
+        <p className="text-[11px] sm:text-xs font-medium tracking-tight text-zinc-400/90 dark:text-zinc-400/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight">
+          Vplay v26.10_devb (26A3667c) - Pre-release build product
+        </p>
+        <p className="text-[10px] sm:text-[11px] font-normal text-zinc-400/75 dark:text-zinc-400/75 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight">
+          Anything you've seen here are not finished and may change in future builds
+        </p>
+      </div>
+
       <div className="relative flex flex-col items-center">
         {/* Main Pill Bar with reduced backdrop blur opacity and no indicator */}
         <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-full bg-[#121118]/25 backdrop-blur-md border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.25)]">

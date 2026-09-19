@@ -15,7 +15,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
   return (
     <div
       onClick={() => onClick(article)}
-      className="group rounded-[28px] bg-[#1E1E22] border border-[#2D2D35] hover:border-[#E50914]/60 hover:bg-[#25252C] transition-all overflow-hidden flex flex-col justify-between cursor-pointer shadow-lg hover:scale-[1.01]"
+      className="news-card group rounded-[28px] bg-[#1E1E22] border border-[#2D2D35] hover:border-[#E50914]/60 hover:bg-[#25252C] transition-all overflow-hidden flex flex-col justify-between cursor-pointer shadow-lg hover:scale-[1.01]"
     >
       {/* Cover Image */}
       <div className="relative h-44 sm:h-48 overflow-hidden">

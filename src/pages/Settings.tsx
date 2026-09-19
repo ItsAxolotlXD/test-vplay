@@ -19,9 +19,10 @@ import {
   PanelLeft,
   PanelTop,
   Compass,
-  Monitor
+  Monitor,
+  Keyboard as KeyboardIcon
 } from 'lucide-react';
-import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG } from '../hooks/useSettings';
+import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, WALLPAPER_PRESETS, VBOARD_SKIN_OPTIONS, VBoardSkin } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useTabSearch } from '../context/TabSearchContext';
 
@@ -87,12 +88,15 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
     'Sidebar', 'Top bar', 'topbar', 'Bố cục', 'Dock sang Sidebar', 'Dock',
     'Phông chữ', 'Font', 'Integer', 'Alata', 'Google Sans', 'Montserrat',
     'Cỡ chữ ứng dụng', 'Cỡ chữ', 'Cài đặt', 'Settings', 'UI', 'Display',
-    'Appearance', 'Splash Screen', 'Reload App', 'Màn hình khởi động', 'Tải lại', 'Refresh'
+    'Appearance', 'Splash Screen', 'Reload App', 'Màn hình khởi động', 'Tải lại', 'Refresh',
+    'Change your background', 'Background', 'Hình nền', 'Wallpaper', 'Liquid Glass', 'Duo Light', 'Duo Dark',
+    'Shiny outline', 'Shiny', 'Outline', 'Viền', 'Viền sáng bóng', 'Specular', 'Rim'
   );
 
   const isSection2Visible = matchesSearch(
     'Trợ năng', 'Tự động trượt hình Banner', 'Tự động ẩn Sidebar',
-    'Accessibility', 'Banner', 'Carousel', 'Sidebar', 'Auto slide', 'Auto hide'
+    'Accessibility', 'Banner', 'Carousel', 'Sidebar', 'Auto slide', 'Auto hide',
+    'Inspect elements', 'Inspect web này', 'Kiểm tra phần tử', 'DevTools', 'DOM', 'Elements', 'Soi phần tử'
   );
 
   const isSection3Visible = matchesSearch(
@@ -195,7 +199,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection1Visible && (
         <section 
           id="settings-section-interface"
-          className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
         >
           {/* Section Header without background container on icon */}
           <div className="flex items-start gap-3">
@@ -221,7 +225,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-floaty-bar"
-                className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors border border-cyan-500/20 shadow-md"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-cyan-500/20 hover:border-cyan-500/40 hover:bg-white/[0.03]"
               >
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
@@ -261,9 +265,160 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               </div>
             )}
 
+            {/* Card: Shiny outline */}
+            {(matchesSearch('Shiny outline') ||
+              matchesSearch('Shiny') ||
+              matchesSearch('Outline') ||
+              matchesSearch('Viền') ||
+              matchesSearch('Viền sáng bóng') ||
+              matchesSearch('Specular') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-shiny-outline"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-white/10 hover:border-white/25 hover:bg-white/[0.03]"
+              >
+                <div className="space-y-1">
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <Sparkles className="w-4.5 h-4.5 text-amber-300" />
+                    <span>Shiny outline</span>
+                    {settings.shinyOutline !== false && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white/90 border border-white/20">
+                        ĐANG BẬT
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] leading-normal">
+                    Viền 2 cạnh trên dưới phản chiếu kính mờ cho toàn bộ giao diện
+                  </div>
+                  <div className="text-[11px] text-gray-400 leading-relaxed">
+                    Thêm viền phản chiếu ánh sáng trắng (Specular top & bottom rim highlight) ở 2 cạnh trên và dưới của các nút status bar vào toàn bộ elements trong ứng dụng (ô kênh, menus, buttons, toggles, nền danh mục, các khối thẻ, banner, search boxes và input boxes).
+                  </div>
+                </div>
+
+                {/* Toggle Switch */}
+                <button
+                  id="toggle-shiny-outline"
+                  type="button"
+                  role="switch"
+                  aria-checked={settings.shinyOutline !== false}
+                  onClick={() => updateSetting('shinyOutline', settings.shinyOutline === false ? true : false)}
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
+                    settings.shinyOutline !== false ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  }`}
+                >
+                  <span
+                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.shinyOutline !== false ? 'translate-x-5.5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
+            {/* Card: Change your background */}
+            {(matchesSearch('Change your background') ||
+              matchesSearch('Background') ||
+              matchesSearch('Hình nền') ||
+              matchesSearch('Wallpaper') ||
+              matchesSearch('Liquid Glass') ||
+              matchesSearch('Duo Light') ||
+              matchesSearch('Duo Dark') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-change-background"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-3.5 transition-colors border border-purple-500/20 hover:border-purple-500/40 hover:bg-white/[0.03]"
+              >
+                <div>
+                  <div className="font-semibold text-white text-sm flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4.5 h-4.5 text-purple-400" />
+                      <span>Change your background</span>
+                    </div>
+                    {settings.appBackground && settings.appBackground !== 'default' && (
+                      <button
+                        type="button"
+                        onClick={() => updateSetting('appBackground', 'default')}
+                        className="text-[11px] text-zinc-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                      >
+                        Khôi phục nền mặc định
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-xs text-purple-300 font-medium mt-1">
+                    Changing your background to see how Liquid Glass on Vplay reacts!
+                  </div>
+                  <div className="text-[11px] text-[#9CA3AF] mt-1 leading-relaxed">
+                    Người dùng chọn một mẫu nền cho sẵn và app background sẽ đổi theo hình đó thay vì là solid color mặc định. Các thành phần kính mờ Liquid Glass (Top bar, Sidebar, Floating Search Bar, V-board) sẽ phản chiếu và khúc xạ màu sắc chân thực.
+                  </div>
+                </div>
+
+                {/* Wallpaper Previews Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  {WALLPAPER_PRESETS.map((wp) => {
+                    const isSelected = settings.appBackground === wp.id || (!settings.appBackground && wp.id === 'default');
+                    return (
+                      <button
+                        key={wp.id}
+                        id={`wallpaper-preset-${wp.id}`}
+                        type="button"
+                        onClick={() => updateSetting('appBackground', wp.id)}
+                        className={`relative flex flex-col p-2.5 rounded-2xl border text-left transition-all group cursor-pointer ${
+                          isSelected 
+                            ? 'bg-purple-950/30 border-purple-500 ring-2 ring-purple-500/40 shadow-lg' 
+                            : 'bg-[#1E1D24] border-white/5 hover:border-white/20 hover:bg-[#23222B]'
+                        }`}
+                      >
+                        {/* Visual Preview Box */}
+                        <div className="w-full h-24 rounded-xl overflow-hidden relative border border-white/10 mb-2.5 bg-[#121216] flex items-center justify-center">
+                          {wp.type === 'image' ? (
+                            <img
+                              src={wp.previewUrl}
+                              alt={wp.name}
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-[#181818] flex flex-col items-center justify-center gap-1 text-zinc-400">
+                              <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center">
+                                <Moon className="w-4 h-4 text-zinc-300" />
+                              </div>
+                              <span className="text-[10px] font-mono text-zinc-400">Solid #181818</span>
+                            </div>
+                          )}
+
+                          {/* Selected Badge */}
+                          {isSelected && (
+                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-md">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </div>
+                          )}
+
+                          {/* Liquid Glass reaction preview badge */}
+                          <div className="absolute bottom-1.5 inset-x-2 py-0.5 px-2 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-between text-[9px] text-white pointer-events-none">
+                            <span className="truncate">Liquid Glass</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                          </div>
+                        </div>
+
+                        {/* Name and description */}
+                        <div className="space-y-0.5">
+                          <div className="font-bold text-white text-xs flex items-center justify-between">
+                            <span>{wp.name}</span>
+                          </div>
+                          <p className="text-[10px] text-zinc-400 line-clamp-2 leading-tight">
+                            {wp.subtext}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Card 0: Chế độ giao diện (Dark Mode mặc định) */}
             {(matchesSearch('Chế độ giao diện') || matchesSearch('Giao diện') || matchesSearch('Theme') || matchesSearch('Dark')) && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <Moon className="w-4 h-4 text-[#FF3366]" />
@@ -287,7 +442,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               matchesSearch('Top bar') ||
               matchesSearch('Bố cục') ||
               matchesSearch('Giao diện')) && (
-              <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-3.5 transition-colors">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3.5 transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
@@ -391,7 +546,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* Card 2: Dock sang Sidebar (No Border) */}
             {matchesSearch('Dock sang Sidebar') && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Dock sang Sidebar
@@ -431,7 +586,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-font-family"
-                className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-3.5 transition-colors"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3.5 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -511,9 +666,150 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               </div>
             )}
 
+            {/* Card: Giao diện bàn phím ảo V-board */}
+            {(matchesSearch('bàn phím') ||
+              matchesSearch('keyboard') ||
+              matchesSearch('vboard') ||
+              matchesSearch('v-keyboard') ||
+              matchesSearch('skin') ||
+              matchesSearch('iOS') ||
+              matchesSearch('Google') ||
+              matchesSearch('Macbook') ||
+              matchesSearch('Butterfly') ||
+              matchesSearch('Physical') ||
+              matchesSearch('3D') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-vboard-skin"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-4 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <KeyboardIcon className="w-4.5 h-4.5 text-cyan-400" />
+                      <span>Giao diện bàn phím ảo (V-Board Skins)</span>
+                    </div>
+                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                      Tùy chọn phong cách hiển thị cho bàn phím ảo V-board. Mỗi giao diện được mô phỏng chuẩn xác từ bố cục, phím bấm đến âm thanh tương tác.
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shrink-0">
+                    {VBOARD_SKIN_OPTIONS.find(s => s.id === (settings.vboardSkin || 'default'))?.name.split(' ')[0] || 'Default'}
+                  </span>
+                </div>
+
+                {/* Skin Options Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+                  {VBOARD_SKIN_OPTIONS.map((skinOption) => {
+                    const isSelected = (settings.vboardSkin || 'default') === skinOption.id;
+                    return (
+                      <button
+                        key={skinOption.id}
+                        id={`setting-vboard-skin-${skinOption.id}`}
+                        type="button"
+                        onClick={() => updateSetting('vboardSkin', skinOption.id)}
+                        className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                          isSelected
+                            ? 'bg-[#1E1D24] border-cyan-400 shadow-[0_0_18px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400'
+                            : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
+                        }`}
+                      >
+                        {/* Header: Title + Checkbox */}
+                        <div className="flex items-start justify-between gap-2 w-full">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`text-sm font-semibold transition-colors ${
+                                isSelected ? 'text-white' : 'text-gray-200 group-hover:text-white'
+                              }`}>
+                                {skinOption.name}
+                              </span>
+                              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-md bg-white/10 text-gray-300 border border-white/10">
+                                {skinOption.badge}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-[#9CA3AF] mt-1.5 leading-snug">
+                              {skinOption.description}
+                            </p>
+                          </div>
+
+                          <div 
+                            className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 ${
+                              isSelected
+                                ? 'bg-cyan-500 border-cyan-500 text-black shadow-sm'
+                                : 'border-[#4B4B58] bg-[#141419] text-transparent group-hover:border-[#71717A]'
+                            }`}
+                            aria-checked={isSelected}
+                            role="checkbox"
+                          >
+                            <Check className={`w-3.5 h-3.5 stroke-[3] transition-transform ${isSelected ? 'scale-100' : 'scale-50 opacity-0'}`} />
+                          </div>
+                        </div>
+
+                        {/* Visual Keycap Preview Widget */}
+                        <div 
+                          className="w-full mt-3 p-2 rounded-xl border border-white/10 flex items-center justify-center gap-1.5 overflow-hidden"
+                          style={{ backgroundColor: skinOption.previewBg }}
+                        >
+                          {['Q', 'W', 'E', 'R', 'T'].map((char, i) => {
+                            if (skinOption.id === 'ios') {
+                              return (
+                                <div 
+                                  key={char} 
+                                  className="w-7 h-8 bg-white text-black text-[13px] font-normal rounded-[4px] shadow-[0_1px_0_rgba(0,0,0,0.35)] flex items-center justify-center"
+                                >
+                                  {char.toLowerCase()}
+                                </div>
+                              );
+                            } else if (skinOption.id === 'google') {
+                              return (
+                                <div 
+                                  key={char} 
+                                  className="w-7 h-8 bg-white text-[#1F1F1F] text-[12px] font-normal rounded-[6px] shadow-[0_1px_2px_rgba(0,0,0,0.12)] relative flex items-center justify-center"
+                                >
+                                  <span>{char.toLowerCase()}</span>
+                                  <span className="absolute top-0.5 right-1 text-[7px] text-zinc-500 font-medium">{i + 1}</span>
+                                </div>
+                              );
+                            } else if (skinOption.id === 'butterfly') {
+                              return (
+                                <div 
+                                  key={char} 
+                                  className="w-7 h-8 bg-[#121215] text-white/95 text-[12px] font-light rounded-[3px] border border-black shadow-[0_1px_1px_rgba(0,0,0,0.8)] flex items-center justify-center"
+                                >
+                                  {char}
+                                </div>
+                              );
+                            } else if (skinOption.id === 'physical') {
+                              return (
+                                <div 
+                                  key={char} 
+                                  className="w-7 h-7 bg-gradient-to-b from-[#383B46] to-[#272932] text-white text-[12px] font-bold rounded-[5px] shadow-[0_3px_0_#121317,0_4px_3px_rgba(0,0,0,0.6)] flex items-center justify-center"
+                                >
+                                  {char}
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div 
+                                  key={char} 
+                                  className="w-7 h-8 bg-[#525257]/90 text-white text-[12px] font-normal rounded-[5px] shadow-[0_1px_0_rgba(0,0,0,0.5)] border-t border-white/10 flex items-center justify-center"
+                                >
+                                  {char}
+                                </div>
+                              );
+                            }
+                          })}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Card 2: Cỡ chữ ứng dụng (Liquid Glass Pill Slider Style) */}
             {matchesSearch('Cỡ chữ ứng dụng') && (
-              <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-4">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-4">
                 {/* Header Row */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -529,7 +825,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
                 {/* Liquid Glass Capsule Slider Container */}
                 <div className="pt-1">
-                  <div className="group relative w-full h-16 rounded-[24px] bg-[#1E1D24] dark:bg-[#1E1D24] border border-[#34343E]/60 flex items-center px-6 transition-all settings-slider-capsule">
+                  <div className="group relative w-full h-16 rounded-[24px] bg-white/[0.04] border border-white/10 flex items-center px-6 transition-all settings-slider-capsule">
                     {/* Track Background */}
                     <div className="relative w-full h-2 rounded-full bg-[#383842] dark:bg-[#383842] overflow-visible">
                       {/* Active Red Track */}
@@ -587,7 +883,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* Card 4: Màn hình khởi động (Splash Screen) */}
             {(matchesSearch('Splash Screen') || matchesSearch('Màn hình khởi động')) && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <span>Màn hình khởi động (Splash Screen)</span>
@@ -615,7 +911,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* Card 5: Tải lại ứng dụng (Reload App) */}
             {(matchesSearch('Reload App') || matchesSearch('Tải lại') || matchesSearch('Làm mới') || matchesSearch('Reload')) && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <RotateCw className="w-4 h-4 text-cyan-400 shrink-0" />
@@ -650,7 +946,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection2Visible && (
         <section 
           id="settings-section-accessibility"
-          className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
         >
           {/* Section Header without background container on icon */}
           <div className="flex items-start gap-3">
@@ -668,7 +964,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
           <div className="space-y-3 pt-1">
             {/* Card 1: Tự động trượt hình Banner (No Border) */}
             {matchesSearch('Tự động trượt hình Banner') && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Tự động trượt hình Banner
@@ -700,7 +996,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* Card 2: Tự động ẩn Sidebar (No Border) */}
             {matchesSearch('Tự động ẩn Sidebar') && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Tự động ẩn Sidebar
@@ -729,6 +1025,50 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                 </button>
               </div>
             )}
+
+            {/* Card 3: Inspect Elements (Inspect web này) */}
+            {(matchesSearch('Inspect elements', 'Inspect web này', 'Kiểm tra phần tử', 'DevTools', 'DOM', 'Elements', 'Soi phần tử')) && (
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3 transition-colors">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <span>Inspect Elements (Inspect web này)</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#007AFF]/20 text-[#007AFF] border border-[#007AFF]/30">
+                        DevTools
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                      Bật công cụ soi phần tử DOM, tra cứu mã nguồn HTML, xem thuộc tính CSS và mở bảng điều khiển DevTools trực tiếp trên web
+                    </div>
+                  </div>
+
+                  {/* Toggle Switch */}
+                  <button
+                    id="toggle-inspect-elements"
+                    type="button"
+                    role="switch"
+                    aria-checked={settings.inspectElements}
+                    onClick={() => updateSetting('inspectElements', !settings.inspectElements)}
+                    className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
+                      settings.inspectElements ? 'bg-[#007AFF]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                    }`}
+                  >
+                    <span
+                      className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                        settings.inspectElements ? 'translate-x-5.5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {settings.inspectElements && (
+                  <div className="pt-2 border-t border-white/5 text-xs text-[#34C759] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#34C759] animate-pulse" />
+                    <span>Đã kích hoạt: Nút công cụ nổi &quot;Soi phần tử&quot; &amp; DevTools đã sẵn sàng ở góc màn hình.</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -737,7 +1077,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection3Visible && (
         <section 
           id="settings-section-copilot"
-          className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
         >
           {/* Section Header with Monochrome Red Icon matching interface, accessibility & search */}
           <div className="flex items-start gap-3">
@@ -755,7 +1095,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
           <div className="space-y-3 pt-1">
             {/* Card 0: Tên người dùng (User Name) */}
             {(matchesSearch('Tên người dùng') || matchesSearch('Username') || matchesSearch('User') || matchesSearch('Tên') || matchesSearch('Hồ sơ') || matchesSearch('Profile') || matchesSearch('Copilot')) && (
-              <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] space-y-3.5 transition-colors">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3.5 transition-colors">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
@@ -832,7 +1172,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* Card 0.5: Reset OOBE Setup Screen */}
             {(matchesSearch('OOBE') || matchesSearch('Reset OOBE') || matchesSearch('Thiết lập lần đầu') || matchesSearch('Setup') || matchesSearch('Windows') || matchesSearch("Who's going to use Vplay") || matchesSearch('Khởi động')) && (
-              <div className="p-4 sm:p-5 rounded-[20px] bg-[#28272E] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <Monitor className="w-4 h-4 text-[#0078D4]" />
@@ -860,7 +1200,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* Card 1: Merge Spotlight Search to Copilot */}
             {(matchesSearch('Merge Spotlight Search to Copilot') || matchesSearch('Hợp nhất') || matchesSearch('Spotlight') || matchesSearch('Copilot') || matchesSearch('Tìm kiếm')) && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Merge Spotlight Search to Copilot
@@ -892,7 +1232,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* Card 2: Gợi ý lệnh thông minh Slash Commands */}
             {(matchesSearch('Gợi ý lệnh') || matchesSearch('Slash') || matchesSearch('Copilot') || matchesSearch('Lệnh')) && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Gợi ý lệnh Slash Commands
@@ -929,7 +1269,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection4Visible && (
         <section 
           id="settings-section-search"
-          className="p-5 sm:p-6 rounded-[28px] bg-[#1E1D22] shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
         >
           {/* Section Header without background container on icon */}
           <div className="flex items-start gap-3">
@@ -950,7 +1290,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
             {matchesSearch('Danh mục') && (
               <div 
                 onClick={() => updateSetting('searchCategories', !settings.searchCategories)}
-                className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 cursor-pointer hover:bg-[#313038] transition-colors"
+                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
               >
                 <div>
                   <div className="font-semibold text-white text-sm">
@@ -977,7 +1317,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
             {matchesSearch('Tin tức') && (
               <div 
                 onClick={() => updateSetting('searchNews', !settings.searchNews)}
-                className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 cursor-pointer hover:bg-[#313038] transition-colors"
+                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
               >
                 <div>
                   <div className="font-semibold text-white text-sm">
@@ -1002,7 +1342,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
             {/* 3. Truyền hình & Tìm kênh theo số hiệu */}
             {(matchesSearch('Truyền hình') || matchesSearch('Tìm kênh theo số hiệu kênh')) && (
-              <div className="p-4 rounded-[20px] bg-[#28272E] space-y-4">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-4">
                 {/* 3.1 Truyền hình */}
                 {matchesSearch('Truyền hình') && (
                   <div 
@@ -1071,7 +1411,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
             {matchesSearch('Toolbox') && (
               <div 
                 onClick={() => updateSetting('searchToolbox', !settings.searchToolbox)}
-                className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 cursor-pointer hover:bg-[#313038] transition-colors"
+                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
               >
                 <div>
                   <div className="font-semibold text-white text-sm">
@@ -1098,7 +1438,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
             {matchesSearch('Cài đặt') && (
               <div 
                 onClick={() => updateSetting('searchSettings', !settings.searchSettings)}
-                className="p-4 rounded-[20px] bg-[#28272E] flex items-center justify-between gap-4 cursor-pointer hover:bg-[#313038] transition-colors"
+                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
               >
                 <div>
                   <div className="font-semibold text-white text-sm">
