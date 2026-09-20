@@ -660,9 +660,9 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
             </div>
 
             {/* Giant Glass Search Input */}
-            <div className="relative w-full">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-                <Search className="w-5 h-5 text-cyan-400" />
+            <div className="relative w-full rounded-full spotlight-bubble-box search-box-capsule float-search-style border-0">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-10">
+                <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
               </div>
               <input
                 ref={inputRef}
@@ -681,7 +681,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
                   }
                 }}
                 placeholder="Nhập tên kênh (VTV1, HBO...), số kênh (#001), trò chơi (Caro, Rắn...), V-Cloud hay từ khóa..."
-                className="w-full pl-12 pr-28 py-3.5 sm:py-4 rounded-2xl bg-white/[0.07] border border-white/15 text-sm sm:text-base font-semibold text-white placeholder:text-white/40 shadow-[inset_0_1.5px_0_rgba(255,255,255,0.15)] focus:outline-none focus:bg-white/[0.12] focus:border-cyan-400/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.25)] transition-all"
+                className="w-full pl-12 pr-28 py-3.5 sm:py-4 rounded-full bg-transparent border-0 text-sm sm:text-base font-semibold text-white placeholder:text-white/60 focus:outline-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-all"
               />
 
               {/* Action buttons inside input */}

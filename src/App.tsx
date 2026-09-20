@@ -51,6 +51,8 @@ import VStudyTab from './components/VStudyTab';
 import { VNotesView } from './components/VNotesView';
 import { VPremiumView } from './components/VPremiumView';
 import { MinecraftContainerEmulator } from './components/minecraft/MinecraftContainerEmulator';
+import { SpatialDesignVisualizer } from './components/tools/SpatialDesignVisualizer';
+import { LogoSwitcherVisualizer } from './components/tools/LogoSwitcherVisualizer';
 import { SearchTab } from './components/SearchTab';
 import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
@@ -540,6 +542,21 @@ export default function App() {
       case '/mc-container':
       case '/minecraft-chest':
         return renderSpace360App('Minecraft', <MinecraftContainerEmulator />);
+
+      case '/spatial-design':
+      case '/spatial-design-visualizer':
+      case '/spatial-visualizer':
+        return renderSpace360App(
+          'Spatial Design Visualizer',
+          <SpatialDesignVisualizer onBack={() => navigate('/space-360')} navigate={navigate} />
+        );
+
+      case '/logo-switcher':
+      case '/logo-switcher-visualizer':
+        return renderSpace360App(
+          'Logo Switcher Visualizer',
+          <LogoSwitcherVisualizer onBack={() => navigate('/space-360')} navigate={navigate} />
+        );
 
       case '/v-space':
       case '/v-apps':

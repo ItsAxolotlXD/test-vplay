@@ -29,6 +29,7 @@ import {
   TrendingUp,
   Activity,
   UtensilsCrossed,
+  RotateCw,
   LucideIcon
 } from 'lucide-react';
 
@@ -55,7 +56,9 @@ export type VAppId =
   | 'v_chat'
   | 'v_stock'
   | 'v_health'
-  | 'cookbook';
+  | 'cookbook'
+  | 'spatial_visualizer'
+  | 'logo_switcher';
 
 export interface VAppDefinition {
   id: VAppId;
@@ -376,6 +379,32 @@ export const VAPPS_LIST: VAppDefinition[] = [
     icon: UtensilsCrossed,
     tags: ['Cookbook', 'Nấu Ăn', 'Ẩm Thực', 'Công Thức', 'Món Ngon', 'Phở Bò', 'Bún Chả', 'Cơm Tấm'],
   },
+  {
+    id: 'spatial_visualizer',
+    name: 'Spatial Design Visualizer',
+    tagline: 'Mô Phỏng Kính Không Gian 30px',
+    description: 'Mô phỏng hình vuông kính không gian bo góc tròn 30px, tùy chỉnh thanh trượt độ trong suốt, độ mờ blur, độ nổi và độ dày viền.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Spatial UI',
+    gradientBg: 'bg-gradient-to-br from-[#0284C7] via-[#2563EB] to-[#4F46E5]',
+    borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(37,99,235,0.35)]',
+    icon: Box,
+    tags: ['Spatial Design', 'Liquid Glass', 'Corner 30px', 'Blur', 'Transparency', 'Elevation', 'Border'],
+  },
+  {
+    id: 'logo_switcher',
+    name: 'Logo Switcher Visualizer',
+    tagline: 'Chuyển Đổi Logo On-Air Truyền Hình',
+    description: 'Mô phỏng chuyển đổi logo truyền hình với preset Default VTV1, Merged, LIVE 2025; hỗ trợ import custom và các hiệu ứng chuyển thẳng, Cross dissolve, Fade 1/2/3.',
+    category: 'Giải trí & Media',
+    badge: 'Broadcast',
+    gradientBg: 'bg-gradient-to-br from-[#DC2626] via-[#E11D48] to-[#7C3AED]',
+    borderClass: 'border-[#F43F5E]/50 group-hover:border-[#F43F5E]',
+    glowClass: 'shadow-[0_10px_30px_rgba(225,29,72,0.35)]',
+    icon: RotateCw,
+    tags: ['Logo Switcher', 'Broadcast Logo', 'Cross Dissolve', 'Fade 1', 'Fade 2', 'Fade 3', 'VTV Logo'],
+  },
 ];
 
 interface VAppsViewProps {
@@ -472,6 +501,12 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
       case 'cookbook':
         navigate('/cookbook', { appId: 'cookbook' });
         break;
+      case 'spatial_visualizer':
+        navigate('/spatial-design', { appId: 'spatial_visualizer' });
+        break;
+      case 'logo_switcher':
+        navigate('/logo-switcher', { appId: 'logo_switcher' });
+        break;
       default:
         navigate('/space-360');
     }
@@ -547,19 +582,19 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         </div>
 
         {/* Search capsule input */}
-        <div className="relative w-full sm:w-72 h-[42px] flex items-center px-4 rounded-full bg-[#16151D] text-xs transition-all border-0 shadow-inner shrink-0">
-          <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
+        <div className="relative w-full sm:w-80 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0 shadow-lg shrink-0">
+          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm ứng dụng Space 360..."
-            className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
+            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+              className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
               title="Xóa tìm kiếm"
             >
               <X className="w-3.5 h-3.5" />

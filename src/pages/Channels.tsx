@@ -78,19 +78,19 @@ export const Channels: React.FC<ChannelsProps> = ({
         </div>
 
         {/* Search */}
-        <div className="relative w-full md:w-72 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule text-xs transition-all border-0">
-          <Search className="w-4 h-4 text-[#8E8E93] shrink-0 mr-2.5" />
+        <div className="relative w-full md:w-80 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
+          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm kiếm kênh truyền hình..."
-            className="w-full bg-transparent text-xs text-white placeholder-[#8E8E93] focus:outline-none font-medium truncate"
+            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="p-1 text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+              className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
               title="Xóa tìm kiếm"
             >
               <X className="w-3.5 h-3.5" />

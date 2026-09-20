@@ -154,18 +154,10 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
 
         {/* Search Bar Capsule with Spotlight Search Styling */}
         <div className="pt-2">
-          <div className="w-full h-[46px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box text-sm transition-all">
+          <div className="w-full h-[46px] sm:h-[48px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-sm transition-all border-0">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-[18px] h-[18px] min-w-[18px] min-h-[18px] max-w-[18px] max-h-[18px] flex items-center justify-center shrink-0">
-                <img
-                  src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest?cb=20260717131751"
-                  alt="Search"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full aspect-square object-contain brightness-0 invert opacity-75 topbar-search-icon"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                />
+              <div className="w-[20px] h-[20px] min-w-[20px] min-h-[20px] flex items-center justify-center shrink-0">
+                <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
               </div>
               <input
                 id="feature-flags-search-input"
@@ -173,13 +165,13 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm cờ tính năng..."
-                className="w-full bg-transparent text-white placeholder-[#8E8E93] text-sm focus:outline-none font-medium truncate"
+                className="w-full bg-transparent text-white placeholder-white/60 text-sm focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
               />
             </div>
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="p-1 rounded-full text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+                className="p-1 rounded-full text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
                 title="Xóa tìm kiếm"
               >
                 <X className="w-4 h-4" />
@@ -191,10 +183,10 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
         {/* Settings Quick Entry Card */}
         <div 
           onClick={() => navigate ? navigate('/settings') : window.location.assign('/settings')}
-          className="settings-item-card p-4 sm:p-5 rounded-[22px] bg-transparent border border-purple-500/30 hover:border-purple-500/60 shadow-lg flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
+          className="settings-item-card p-4 sm:p-5 rounded-[22px] bg-transparent border-0 shadow-lg flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-purple-500/15 border-0 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Palette className="w-5 h-5 text-purple-400" />
             </div>
             <div>
@@ -312,7 +304,7 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
             <div 
               key={item.id}
               id={`flag-card-${item.key}`}
-              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3.5 transition-colors shadow-md"
+              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border-0 space-y-3.5 transition-colors shadow-md"
             >
               {/* Card Header with Name, Badge and Switch */}
               <div className="flex items-start justify-between gap-4">
@@ -469,7 +461,7 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
             {uiFlags.length > 0 && (
               <section 
                 id="feature-flags-section-ui"
-                className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-[#1E1D22]/70 backdrop-blur-md border border-white/10 shadow-xl space-y-4"
+                className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-[#1E1D22]/70 backdrop-blur-md border-0 shadow-xl space-y-4"
               >
                 <div className="flex items-start gap-3">
                   <Layers className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
@@ -493,7 +485,7 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
             {featureFlags.length > 0 && (
               <section 
                 id="feature-flags-section-features"
-                className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-[#1E1D22]/70 backdrop-blur-md border border-white/10 shadow-xl space-y-4"
+                className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-[#1E1D22]/70 backdrop-blur-md border-0 shadow-xl space-y-4"
               >
                 <div className="flex items-start gap-3">
                   <Zap className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
@@ -517,7 +509,7 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
             {otherFlags.length > 0 && (
               <section 
                 id="feature-flags-section-other"
-                className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-[#1E1D22]/70 backdrop-blur-md border border-white/10 shadow-xl space-y-4"
+                className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-[#1E1D22]/70 backdrop-blur-md border-0 shadow-xl space-y-4"
               >
                 <div className="flex items-start gap-3">
                   <Flag className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />

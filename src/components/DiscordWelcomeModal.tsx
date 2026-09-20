@@ -78,7 +78,7 @@ export const DiscordWelcomeModal: React.FC<DiscordWelcomeModalProps> = ({
                 type="button"
                 id="btn-discord-join"
                 onClick={handleJoin}
-                className="w-full py-4 px-6 rounded-full font-bold text-white bg-[#E6005A] hover:bg-[#FF267A] active:scale-[0.98] transition-all text-base sm:text-[17px] cursor-pointer flex items-center justify-center shadow-md tracking-tight text-center"
+                className="btn-colored w-full py-4 px-6 rounded-full font-bold text-white bg-[#388BFD] hover:bg-[#2575FC] active:scale-[0.98] transition-all text-base sm:text-[17px] cursor-pointer flex items-center justify-center shadow-md tracking-tight text-center"
               >
                 Tham gia
               </button>

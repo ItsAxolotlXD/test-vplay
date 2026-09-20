@@ -130,18 +130,10 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
         {/* Search Bar Capsule with Spotlight Search Styling */}
         <div className="pt-2">
-          <div className="w-full h-[46px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box text-sm transition-all">
+          <div className="w-full h-[46px] sm:h-[48px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-sm transition-all border-0">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-[18px] h-[18px] min-w-[18px] min-h-[18px] max-w-[18px] max-h-[18px] flex items-center justify-center shrink-0">
-                <img
-                  src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest?cb=20260717131751"
-                  alt="Search"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full aspect-square object-contain brightness-0 invert opacity-75 topbar-search-icon"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                />
+              <div className="w-[20px] h-[20px] min-w-[20px] min-h-[20px] flex items-center justify-center shrink-0">
+                <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
               </div>
               <input
                 id="settings-search-input"
@@ -149,13 +141,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm cài đặt..."
-                className="w-full bg-transparent text-white placeholder-[#8E8E93] text-sm focus:outline-none font-medium truncate"
+                className="w-full bg-transparent text-white placeholder-white/60 text-sm focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
               />
             </div>
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="p-1 rounded-full text-[#8E8E93] hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+                className="p-1 rounded-full text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
                 title="Xóa tìm kiếm"
               >
                 <X className="w-4 h-4" />
@@ -168,10 +160,10 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
         {isFeatureFlagsVisible && (
           <div 
             onClick={() => navigate ? navigate('/feature-flags') : window.location.assign('/feature-flags')}
-            className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-r from-cyan-950/40 via-[#1E1D24] to-[#1E1D24] border border-cyan-500/30 hover:border-cyan-500/60 shadow-lg flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
+            className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-r from-cyan-950/40 via-[#1E1D24] to-[#1E1D24] border-0 shadow-lg flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
           >
             <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-2xl bg-cyan-500/15 border-0 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                 <Flag className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
@@ -179,7 +171,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                   <span className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">
                     Feature Flags
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border-0">
                     EXPERIMENTAL
                   </span>
                 </div>
@@ -199,7 +191,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection1Visible && (
         <section 
           id="settings-section-interface"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header without background container on icon */}
           <div className="flex items-start gap-3">
@@ -946,7 +938,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection2Visible && (
         <section 
           id="settings-section-accessibility"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header without background container on icon */}
           <div className="flex items-start gap-3">
@@ -1077,7 +1069,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection3Visible && (
         <section 
           id="settings-section-copilot"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header with Monochrome Red Icon matching interface, accessibility & search */}
           <div className="flex items-start gap-3">
@@ -1269,7 +1261,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
       {isSection4Visible && (
         <section 
           id="settings-section-search"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/10 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header without background container on icon */}
           <div className="flex items-start gap-3">

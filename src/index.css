@@ -4,10 +4,13 @@
 
 @layer base {
   :root {
-    --primary-red: #E6005A;
-    --solid-red: #E6005A;
-    --accent-red: #FF267A;
-    --dark-red: #B30046;
+    --primary-red: #388BFD;
+    --solid-red: #388BFD;
+    --accent-red: #58A6FF;
+    --dark-red: #1F6FEB;
+    --button-colored: #388BFD;
+    --button-colored-hover: #2575FC;
+    --button-colored-active: #1A64DE;
     --dark-bg: #181818;
     --sidebar-bg: #202020;
     --card-bg: #222222;
@@ -242,13 +245,13 @@ body.has-custom-wallpaper {
 }
 
 /* 4. SECTION & DANH MỤC (Tất cả các danh mục trong Cài đặt, Cờ tính năng, Trang chủ)
-   Xóa nền các cài đặt, chỉ để nền backdrop blur cho danh mục */
+   Bỏ border khỏi danh mục cài đặt và các cài đặt */
 .settings-category-section,
 [id^="settings-section-"] {
   background-color: rgba(255, 255, 255, 0.02) !important;
   -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
   backdrop-filter: blur(28px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border: none !important;
   box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.25) !important;
 }
 
@@ -260,11 +263,13 @@ body.has-custom-wallpaper {
   background-color: rgba(20, 19, 26, 0.35) !important;
   -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
   backdrop-filter: blur(32px) saturate(190%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border: none !important;
   box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.35) !important;
 }
 
-/* TOÀN BỘ CÁC THẺ / MỤC ĐỔI HẾT SANG BACKDROP BLUR (NẾU CHỌN WALLPAPER) */
+/* BỎ BORDER KHỎI CÁC CÀI ĐẶT VÀ DANH MỤC CÀI ĐẶT */
+.settings-item-card,
+[id^="settings-card-"],
 .has-custom-wallpaper .settings-item-card,
 .has-custom-wallpaper .settings-category-section .settings-item-card,
 .has-custom-wallpaper [id^="settings-section-"] .settings-item-card,
@@ -276,10 +281,12 @@ body.has-custom-wallpaper {
   background-color: rgba(255, 255, 255, 0.05) !important;
   -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
   backdrop-filter: blur(20px) saturate(170%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border: none !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
+.settings-item-card:hover,
+[id^="settings-card-"]:hover,
 .has-custom-wallpaper .settings-item-card:hover,
 .has-custom-wallpaper .settings-category-section .settings-item-card:hover,
 .has-custom-wallpaper [id^="settings-section-"] .settings-item-card:hover,
@@ -289,24 +296,128 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper [id^="setting-font-"]:hover,
 .has-custom-wallpaper [id^="wallpaper-preset-"]:hover {
   background-color: rgba(255, 255, 255, 0.09) !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
+  border: none !important;
 }
 
-/* 5. KHỐI (Blocks, cards con, news cards, banner items, quick entry cards, search bars) */
+/* BỎ BORDER KHỎI LOGO WEB VÀ CÁC MỤC TRÊN TOP BAR (TRỪ HAMBURGER MENU) */
+#topbar-vplay-logo,
+#vplay-topbar-header button:not(#btn-topbar-mobile-menu),
+#vplay-topbar-header a,
+#vplay-topbar-header nav button {
+  border: none !important;
+  outline: none !important;
+}
+
+/* 5. KHỐI (Blocks, cards con, news cards, banner items, quick entry cards) */
 .has-custom-wallpaper .block-card,
 .has-custom-wallpaper [id^="flag-card-"],
 .has-custom-wallpaper .news-card,
 .has-custom-wallpaper [id^="news-card-"],
 .has-custom-wallpaper .banner-card,
 .has-custom-wallpaper [id^="banner-card-"],
-.has-custom-wallpaper .portal-card-scroll,
-.has-custom-wallpaper .spotlight-bubble-box,
-.has-custom-wallpaper .search-box-capsule {
+.has-custom-wallpaper .portal-card-scroll {
   background-color: rgba(30, 29, 38, 0.50) !important;
   -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
   backdrop-filter: blur(20px) saturate(170%) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22) !important;
+}
+
+/* STYLE THANH TÌM KIẾM TOÀN BỘ APP GIỐNG THANH FLOAT SEARCH (LIQUID GLASS PILL) */
+.spotlight-bubble-box,
+.search-box-capsule,
+.float-search-style {
+  position: relative !important;
+  border-radius: 9999px !important;
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  box-shadow: 0 16px 36px 0 rgba(0, 0, 0, 0.35) !important;
+  border: none !important;
+  overflow: hidden !important;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  transition: all 0.3s ease !important;
+}
+
+.has-custom-wallpaper .spotlight-bubble-box,
+.has-custom-wallpaper .search-box-capsule,
+.has-custom-wallpaper .float-search-style {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  border: none !important;
+}
+
+.spotlight-bubble-box:focus-within,
+.search-box-capsule:focus-within,
+.float-search-style:focus-within {
+  background-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 20px 44px 0 rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Lớp viền phản chiếu Specular rim highlight với horizontal fade như Float search */
+.spotlight-bubble-box::before,
+.search-box-capsule::before,
+.float-search-style::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 9999px !important;
+  padding: 1.4px !important;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 18%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.6) 82%,
+    rgba(255, 255, 255, 0) 100%
+  ) !important;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask-composite: exclude !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+/* Search input typography inside float search styled containers */
+.spotlight-bubble-box input,
+.search-box-capsule input,
+.float-search-style input {
+  position: relative !important;
+  z-index: 11 !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.spotlight-bubble-box input::placeholder,
+.search-box-capsule input::placeholder,
+.float-search-style input::placeholder {
+  color: rgba(255, 255, 255, 0.60) !important;
+  font-weight: 600 !important;
+}
+
+/* Monochrome White Search Icon matching float search */
+.spotlight-bubble-box svg,
+.search-box-capsule svg,
+.float-search-style svg {
+  position: relative !important;
+  z-index: 11 !important;
+  color: #ffffff !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6)) !important;
+}
+
+.spotlight-bubble-box button,
+.search-box-capsule button,
+.float-search-style button {
+  position: relative !important;
+  z-index: 12 !important;
+  color: #ffffff !important;
 }
 
 .has-custom-wallpaper [id^="settings-card-"]:hover,
@@ -411,12 +522,8 @@ body:not(.has-shiny-outline) .shiny-rim-svg {
   [id*="category-"],
   [id^="channels-category-"],
   [id^="news-category-"],
-  .settings-category-section,
-  [id^="settings-section-"],
   [id^="feature-flags-section-"],
   [id^="home-section-"],
-  .settings-item-card,
-  [id^="settings-card-"],
   [id^="flag-card-"],
   .news-card,
   [id^="news-card-"],
@@ -439,6 +546,65 @@ body:not(.has-shiny-outline) .shiny-rim-svg {
   position: relative;
 }
 
+/* BỎ HOÀN TOÀN BORDER VÀ SPECULAR SHINY OUTLINE KHỎI CÀI ĐẶT VÀ DANH MỤC CÀI ĐẶT */
+.settings-category-section,
+[id^="settings-section-"],
+.settings-item-card,
+[id^="settings-card-"],
+[id^="feature-flags-section-"],
+[id^="flag-card-"],
+.has-custom-wallpaper .settings-category-section,
+.has-custom-wallpaper [id^="settings-section-"],
+.has-custom-wallpaper .settings-item-card,
+.has-custom-wallpaper [id^="settings-card-"] {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+.settings-category-section::after,
+[id^="settings-section-"]::after,
+.settings-item-card::after,
+[id^="settings-card-"]::after,
+[id^="feature-flags-section-"]::after,
+[id^="flag-card-"]::after,
+.has-shiny-outline .settings-category-section::after,
+.has-shiny-outline [id^="settings-section-"]::after,
+.has-shiny-outline .settings-item-card::after,
+.has-shiny-outline [id^="settings-card-"]::after,
+.has-shiny-outline [id^="feature-flags-section-"]::after,
+.has-shiny-outline [id^="flag-card-"]::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* BỎ BORDER VÀ SPECULAR SHINY OUTLINE KHỎI LOGO WEB VÀ CÁC MỤC TRÊN TOP BAR (TRỪ HAMBURGER MENU) */
+#topbar-vplay-logo,
+#vplay-topbar-header button:not(#btn-topbar-mobile-menu),
+#vplay-topbar-header a,
+#vplay-topbar-header nav button,
+#vplay-topbar-header [role="button"] {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+#topbar-vplay-logo::after,
+#vplay-topbar-header button:not(#btn-topbar-mobile-menu)::after,
+#vplay-topbar-header a::after,
+#vplay-topbar-header nav button::after,
+#vplay-topbar-header [role="button"]::after,
+.has-shiny-outline #topbar-vplay-logo::after,
+.has-shiny-outline #vplay-topbar-header button:not(#btn-topbar-mobile-menu)::after,
+.has-shiny-outline #vplay-topbar-header a::after,
+.has-shiny-outline #vplay-topbar-header nav button::after,
+.has-shiny-outline #vplay-topbar-header [role="button"]::after {
+  display: none !important;
+  content: none !important;
+}
+
 /* 3. LỚP VIỀN PHẢN CHIẾU 2 CẠNH TRÊN DƯỚI (SPECULAR RIM HIGHLIGHT) */
 .has-shiny-outline :is(
   .shiny-outline,
@@ -452,12 +618,8 @@ body:not(.has-shiny-outline) .shiny-rim-svg {
   [id*="category-"],
   [id^="channels-category-"],
   [id^="news-category-"],
-  .settings-category-section,
-  [id^="settings-section-"],
   [id^="feature-flags-section-"],
   [id^="home-section-"],
-  .settings-item-card,
-  [id^="settings-card-"],
   [id^="flag-card-"],
   .news-card,
   [id^="news-card-"],
@@ -471,7 +633,7 @@ body:not(.has-shiny-outline) .shiny-rim-svg {
   .modal-box,
   .start-menu-panel,
   [id^="vapp-card-"],
-  button:not(.no-shiny):not([class*="no-shiny"]):not([class*="p-0"]):not([class*="w-0"]):not([class*="h-0"])
+  button:not(#btn-topbar-mobile-menu):not(#vplay-topbar-header button):not(.no-shiny):not([class*="no-shiny"]):not([class*="p-0"]):not([class*="w-0"]):not([class*="h-0"])
 )::after {
   content: "";
   position: absolute;
@@ -558,4 +720,147 @@ body:not(.has-shiny-outline) .shiny-rim-svg {
   mask-composite: exclude;
   pointer-events: none;
 }
+
+/* ==========================================================================
+   7. TOÀN BỘ BUTTON COLORED (ĐỔI SANG MÀU HÌNH & VIỀN GIỐNG Ô KÊNH)
+   Màu xanh iOS/Apple Blue (#388BFD / #2575FC), viền 1px solid rgba(255, 255, 255, 0.22)
+   giống hệt các ô kênh + specular highlight phản chiếu.
+   ========================================================================== */
+.btn-colored,
+button.btn-colored,
+.button-colored,
+#btn-welcome-close,
+#btn-discord-join,
+#btn-reboot-app,
+#btn-enter-password,
+#btn-flags-reload-app,
+#btn-settings-reload-app,
+#btn-settings-replay-splash,
+#btn-save-username,
+#btn-shop-checkout,
+#btn-claim-daily-loyalty,
+#btn-home-banner-ask-copilot,
+#btn-home-banner-open-standalone,
+#btn-custom-stream-play,
+#btn-install-app-banner,
+[id^="btn-shop-buy-"],
+[id^="btn-redeem-"],
+[id^="btn-oobe-step"],
+#btn-oobe-signin,
+#btn-oobe-step6-accept,
+#btn-oobe-step7-finish,
+button[class*="bg-[#E6005A]"],
+button[class*="bg-[#FF2020]"],
+button[class*="bg-[#FF007A]"],
+button[class*="bg-[#E50914]"],
+button[class*="from-[#FF2020]"],
+button[class*="from-[#E6005A]"],
+button[class*="from-[#FF007A]"] {
+  background-color: #388BFD !important;
+  background-image: none !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.5), 0 4px 14px rgba(56, 139, 253, 0.35) !important;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-colored:hover,
+button.btn-colored:hover,
+.button-colored:hover,
+#btn-welcome-close:hover,
+#btn-discord-join:hover,
+#btn-reboot-app:hover,
+#btn-enter-password:hover,
+#btn-flags-reload-app:hover,
+#btn-settings-reload-app:hover,
+#btn-settings-replay-splash:hover,
+#btn-save-username:hover,
+#btn-shop-checkout:hover,
+#btn-claim-daily-loyalty:hover,
+#btn-home-banner-ask-copilot:hover,
+#btn-home-banner-open-standalone:hover,
+#btn-custom-stream-play:hover,
+#btn-install-app-banner:hover,
+[id^="btn-shop-buy-"]:hover,
+[id^="btn-redeem-"]:hover,
+[id^="btn-oobe-step"]:hover,
+#btn-oobe-signin:hover,
+#btn-oobe-step6-accept:hover,
+#btn-oobe-step7-finish:hover,
+button[class*="bg-[#E6005A]"]:hover,
+button[class*="bg-[#FF2020]"]:hover,
+button[class*="bg-[#FF007A]"]:hover,
+button[class*="bg-[#E50914]"]:hover,
+button[class*="from-[#FF2020]"]:hover,
+button[class*="from-[#E6005A]"]:hover,
+button[class*="from-[#FF007A]"]:hover {
+  background-color: #2575FC !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.7), 0 6px 22px rgba(56, 139, 253, 0.55) !important;
+  filter: brightness(1.06);
+}
+
+.btn-colored:active,
+button.btn-colored:active,
+.button-colored:active,
+#btn-welcome-close:active,
+#btn-discord-join:active,
+#btn-reboot-app:active,
+#btn-enter-password:active,
+#btn-flags-reload-app:active,
+#btn-settings-reload-app:active,
+#btn-settings-replay-splash:active,
+#btn-save-username:active,
+#btn-shop-checkout:active,
+#btn-claim-daily-loyalty:active,
+#btn-custom-stream-play:active,
+[id^="btn-shop-buy-"]:active,
+[id^="btn-redeem-"]:active,
+[id^="btn-oobe-step"]:active,
+#btn-oobe-signin:active,
+#btn-oobe-step6-accept:active,
+#btn-oobe-step7-finish:active,
+button[class*="bg-[#E6005A]"]:active,
+button[class*="bg-[#FF2020]"]:active,
+button[class*="bg-[#FF007A]"]:active,
+button[class*="bg-[#E50914]"]:active,
+button[class*="from-[#FF2020]"]:active,
+button[class*="from-[#E6005A]"]:active,
+button[class*="from-[#FF007A]"]:active {
+  background-color: #1A64DE !important;
+  transform: scale(0.98) !important;
+}
+
+/* Đảm bảo viền bóng Specular Rim Highlight hoạt động hoàn hảo trên các button colored giống hệt channel-card */
+.has-shiny-outline :is(
+  .btn-colored,
+  button.btn-colored,
+  .button-colored,
+  #btn-welcome-close,
+  #btn-discord-join,
+  #btn-reboot-app,
+  #btn-enter-password
+)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1.2px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 22%,
+    rgba(255, 255, 255, 0.98) 50%,
+    rgba(255, 255, 255, 0.55) 78%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: 12;
+  transition: opacity 0.25s ease, background 0.25s ease, filter 0.25s ease;
+}
+
 

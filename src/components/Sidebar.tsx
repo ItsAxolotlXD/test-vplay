@@ -605,7 +605,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isActive("/v-reminders") ||
               isActive("/v-notes") ||
               isActive("/v-furniture") ||
-              isActive("/minecraft")
+              isActive("/minecraft") ||
+              isActive("/spatial-design") ||
+              isActive("/logo-switcher")
                 ? "bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20"
                 : "text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]"
             }`}
@@ -616,7 +618,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="px-2 py-0.5 text-[9px] font-mono font-bold bg-white/10 rounded-full">
-                17 Apps
+                19 Apps
               </span>
               <div
                 onClick={(e) => {
@@ -870,6 +872,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                   <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-bold bg-emerald-500/20 text-emerald-300 rounded-md">
                     MC
+                  </span>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-spatial-design" : "space360-tab-spatial-design"}
+                  onClick={() => handleNavClick("/spatial-design", { appId: "spatial_visualizer" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isActive("/spatial-design")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Box className="w-4 h-4 text-sky-400 shrink-0" />
+                    <span className="truncate">Spatial Design Visualizer</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-bold bg-sky-500/20 text-sky-300 rounded-md">
+                    30px
+                  </span>
+                </button>
+
+                <button
+                  id={isMobile ? "mobile-space360-tab-logo-switcher" : "space360-tab-logo-switcher"}
+                  onClick={() => handleNavClick("/logo-switcher", { appId: "logo_switcher" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isActive("/logo-switcher")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <RotateCw className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span className="truncate">Logo Switcher Visualizer</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 text-[8.5px] font-mono font-bold bg-rose-500/20 text-rose-300 rounded-md">
+                    LIVE
                   </span>
                 </button>
               </motion.div>

@@ -37,6 +37,7 @@ import {
   Box,
   GraduationCap,
   Calculator,
+  RotateCw,
   FileText,
   Layers,
   ArrowRight,
@@ -195,6 +196,8 @@ export const TopBar: React.FC<TopBarProps> = ({
       case 'v_stock': navigate('/v-stock', { appId }); break;
       case 'v_health': navigate('/v-health', { appId }); break;
       case 'cookbook': navigate('/cookbook', { appId }); break;
+      case 'spatial_visualizer': navigate('/spatial-design', { appId }); break;
+      case 'logo_switcher': navigate('/logo-switcher', { appId }); break;
       default: navigate('/space-360', { appId }); break;
     }
   };
@@ -465,6 +468,46 @@ export const TopBar: React.FC<TopBarProps> = ({
                             <span>Cổng không gian (Space 360)</span>
                           </div>
                           <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+
+                        {/* Spatial Design Visualizer */}
+                        <button
+                          id="more-item-spatial-visualizer"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
+                            navigate('/spatial-design');
+                          }}
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                          title="Spatial Design Visualizer"
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <Box className="w-5 h-5 shrink-0 text-sky-400 group-hover:scale-105 transition-transform" />
+                            <span>Spatial Design Visualizer</span>
+                          </div>
+                          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-400/30 rounded-md">
+                            UI
+                          </span>
+                        </button>
+
+                        {/* Logo Switcher Visualizer */}
+                        <button
+                          id="more-item-logo-switcher"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
+                            navigate('/logo-switcher');
+                          }}
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                          title="Logo Switcher Visualizer"
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <RotateCw className="w-5 h-5 shrink-0 text-rose-400 group-hover:scale-105 transition-transform" />
+                            <span>Logo Switcher Visualizer</span>
+                          </div>
+                          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-400/30 rounded-md">
+                            TV
+                          </span>
                         </button>
 
                         {/* Divider */}

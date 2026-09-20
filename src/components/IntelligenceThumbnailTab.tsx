@@ -89,14 +89,14 @@ export default function IntelligenceThumbnailTab({
 
       {/* Control Area (Search) without language selection (ko lang) */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-between">
-        <div className="relative flex-1">
-          <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 object-contain" referrerPolicy="no-referrer" alt="Search" />
+        <div className="relative flex-1 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
+          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm kiếm kênh trong kho dữ liệu V-Intelligence..."
-            className="w-full bg-zinc-950 border border-white/10 focus:border-purple-500/50 pl-10 pr-4 py-2 text-xs text-white placeholder-white/30 focus:outline-none transition-all rounded-none"
+            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
           />
         </div>
         <div className="flex items-center gap-2 bg-zinc-900 border border-white/5 px-3 py-2 text-[10px] text-white/50 uppercase tracking-wider shrink-0">

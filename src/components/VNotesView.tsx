@@ -843,19 +843,20 @@ export const VNotesView: React.FC = () => {
             </div>
 
             {/* Keyword Search Input */}
-            <div className="relative min-w-[220px] shrink-0">
-              <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative w-full sm:w-72 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0 shrink-0">
+              <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
               <input
                 type="text"
                 placeholder="Tìm ghi chú, công thức, M3U8..."
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                className="w-full bg-[#18171E] border border-[#2D2D38] rounded-xl text-white placeholder-[#9CA3AF] text-xs pl-8 pr-8 py-2 focus:outline-none focus:border-amber-500/50"
+                className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
               />
               {searchKeyword && (
                 <button
                   onClick={() => setSearchKeyword('')}
-                  className="p-1 text-[#9CA3AF] hover:text-white absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                  className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                  title="Xóa tìm kiếm"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

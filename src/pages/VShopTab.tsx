@@ -261,19 +261,19 @@ export const VShopTab: React.FC<VShopTabProps> = ({ navigate }) => {
             </div>
 
             {/* Search Input */}
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+            <div className="relative w-full sm:w-72 h-[42px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
+              <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-8 py-2 rounded-full bg-[#12121A] border border-[#2B2B38] focus:border-[#E6005A] text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors"
+                className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                  className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

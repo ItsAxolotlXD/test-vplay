@@ -104,7 +104,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
                 type="button"
                 id="btn-welcome-close"
                 onClick={onClose}
-                className="w-full py-3.5 px-6 rounded-full font-bold text-white bg-[#E6005A] hover:bg-[#FF267A] active:scale-[0.98] transition-all text-base sm:text-[16px] cursor-pointer flex items-center justify-center shadow-lg shadow-[#E6005A]/25 tracking-tight text-center"
+                className="btn-colored w-full py-3.5 px-6 rounded-full font-bold text-white bg-[#388BFD] hover:bg-[#2575FC] active:scale-[0.98] transition-all text-base sm:text-[16px] cursor-pointer flex items-center justify-center shadow-lg tracking-tight text-center"
               >
                 Close
               </button>

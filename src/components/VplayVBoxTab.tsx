@@ -354,19 +354,20 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
         {/* Search & Filter pills */}
         <div className="flex items-center gap-2">
-          <div className="relative flex-1 sm:w-72">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative flex-1 sm:w-80 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
+            <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
             <input
               type="text"
               placeholder="Tìm kiếm theo mã, tiêu đề..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-8 py-2 rounded-xl bg-[#18171E] border border-[#2D2D38] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/60"
+              className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+                title="Xóa tìm kiếm"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

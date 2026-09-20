@@ -16,7 +16,8 @@ import {
   Disc3, 
   ListMusic,
   SkipForward,
-  SkipBack
+  SkipBack,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TV_MUSIC_TRACKS, TvMusicTrack, getAudioProxyUrl } from '../data/tvMusicData';
@@ -370,15 +371,24 @@ export const MusicTab: React.FC<MusicTabProps> = ({ navigate }) => {
 
       {/* Search Bar (bỏ phân loại) */}
       <div className="flex items-center justify-between gap-4">
-        <div className="relative w-full max-w-md">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <div className="relative w-full max-w-md h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
+          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
           <input
             type="text"
             placeholder="Tìm kiếm bài nhạc..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-white placeholder-zinc-400 focus:outline-none focus:border-[#E6005A] transition-colors"
+            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+              title="Xóa tìm kiếm"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
         <div className="text-xs text-zinc-400 shrink-0 font-medium">
           Hiển thị <span className="text-white font-bold">{filteredTracks.length}</span> bài

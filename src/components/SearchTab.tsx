@@ -876,8 +876,8 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       {/* Top Search Bar Container */}
       <div className="w-full max-w-2xl relative">
         {/* THE SINGLE SEARCH BAR AT TOP */}
-        <div className="relative flex items-center w-full h-14 sm:h-15 rounded-2xl bg-[#1C1B23] border border-transparent focus-within:border-zinc-500 transition-all px-4 shadow-lg">
-          <Search className="w-5 h-5 text-gray-400 stroke-[1.4] shrink-0 mr-3 pointer-events-none" strokeWidth={1.4} />
+        <div className="relative flex items-center w-full h-14 sm:h-15 rounded-full spotlight-bubble-box search-box-capsule float-search-style transition-all px-5 shadow-lg border-0">
+          <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-3 pointer-events-none" />
 
           <input
             ref={inputRef}
@@ -902,7 +902,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                 ? 'Tìm ứng dụng Space 360 (Cookbook, Notes, Clock, Maps...)'
                 : 'Find and search (Kênh TV, V-Shop, Kho Nhạc, Loyalty, Space 360...)'
             }
-            className="flex-1 bg-transparent text-white text-base placeholder-[#8A8A93] focus:outline-none font-medium truncate"
+            className="flex-1 bg-transparent text-white text-base placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
           />
 
           {/* Clear Button */}
@@ -912,7 +912,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
                 setQuery('');
                 inputRef.current?.focus();
               }}
-              className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors mr-1 cursor-pointer"
+              className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors mr-1 cursor-pointer"
               title="Xóa tìm kiếm (Esc)"
             >
               <X className="w-4 h-4" />
