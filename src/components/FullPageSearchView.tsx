@@ -32,6 +32,7 @@ import {
   Puzzle,
   Folder,
   Globe,
+  RotateCcw,
 } from "lucide-react";
 import { Channel, Category } from "../data/channels";
 import { NEWS_LIST } from "./NewsView";
@@ -578,7 +579,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-start overflow-hidden select-none font-sans">
-        {/* Deep frosted liquid glass backdrop with subtle ambient light orbs */}
+        {/* Deep frosted spatial glass backdrop with subtle ambient light orbs */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -590,7 +591,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
           }}
           className="absolute inset-0 bg-[#07090e]/85 backdrop-blur-[28px] cursor-pointer"
         >
-          {/* Ambient Liquid Glass Glowing Lights */}
+          {/* Ambient Spatial Glass Glowing Lights */}
           <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/12 rounded-full blur-[120px] pointer-events-none animate-pulse duration-10000" />
           <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-500/12 rounded-full blur-[140px] pointer-events-none" />
           <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -616,7 +617,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
                   <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
                     Tìm kiếm Toàn Trang
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-wider">
-                      Liquid Glass
+                      Spatial Glass
                     </span>
                   </h2>
                   <p className="text-xs text-white/50 hidden sm:block">
@@ -705,7 +706,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
                   <button
                     type="button"
                     onClick={handleVoiceSearch}
-                    className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                    className={`p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
                       isListening
                         ? "bg-rose-500 text-white animate-pulse shadow-[0_0_12px_rgba(244,63,94,0.6)]"
                         : "bg-white/10 hover:bg-white/20 text-cyan-400 hover:text-cyan-300"
@@ -722,7 +723,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
               </div>
             </div>
 
-            {/* Category Filter Pills (Liquid Glass Style) */}
+            {/* Category Filter Pills (Spatial Glass Style) */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 text-xs">
               {[
                 { id: "all" as FilterTab, label: "Tất cả", count: results.totalCount },
@@ -1139,7 +1140,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
 
                             <button
                               type="button"
-                              className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shrink-0 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                              className="px-3 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-all shrink-0 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
                             >
                               <span>Mở</span>
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -1196,7 +1197,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
 
                             <button
                               type="button"
-                              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all shrink-0 flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
+                              className="px-3 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all shrink-0 flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
                             >
                               <span>Xem</span>
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -1413,7 +1414,7 @@ export const FullPageSearchView: React.FC<FullPageSearchViewProps> = ({
             <div className="flex items-center gap-2 text-[11px] text-white/40">
               <span>Waves Spotlight Full Page Engine</span>
               <span>•</span>
-              <span>Glassmorphism / Liquid Glass</span>
+              <span>Glassmorphism / Spatial Glass</span>
             </div>
           </div>
         </motion.div>

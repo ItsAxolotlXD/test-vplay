@@ -32,22 +32,22 @@ export interface PresetLogo {
 
 export const PRESET_LOGOS: PresetLogo[] = [
   {
-    id: 'default',
-    name: 'Default (VTV1)',
-    category: 'VTV Presets',
-    url: 'https://static.wikia.nocookie.net/logos/images/1/11/VTV1_2019%2C_2020_v%C3%A0_2022-2026.png/revision/latest/scale-to-width-down/1000?cb=20250110114239&path-prefix=vi'
+    id: 'screenbug-01',
+    name: 'Screenbug 01',
+    category: 'Screenbug Presets',
+    url: 'https://static.wikia.nocookie.net/ep-deo/images/e/e7/Screenbug01.png/revision/latest/scale-to-width-down/1000?cb=20260921074043'
   },
   {
-    id: 'merged',
-    name: 'Merged (VTV 2025-2026)',
-    category: 'VTV Presets',
-    url: 'https://static.wikia.nocookie.net/logos/images/4/48/VTV_logo_2025%2C_2026.png/revision/latest?cb=20250604141539&path-prefix=vi'
+    id: 'screenbug-2',
+    name: 'Screenbug 2',
+    category: 'Screenbug Presets',
+    url: 'https://static.wikia.nocookie.net/ep-deo/images/5/5b/Screenbug2.png/revision/latest/scale-to-width-down/1000?cb=20260921073357'
   },
   {
-    id: 'live',
-    name: 'LIVE (VTV Trực Tiếp 2025)',
-    category: 'VTV Presets',
-    url: 'https://static.wikia.nocookie.net/logos/images/6/65/VTV_logo_tr%E1%BB%B1c_ti%E1%BA%BFp_2025.png/revision/latest/scale-to-width-down/1000?cb=20250906021257&path-prefix=vi'
+    id: 'screenbug-3',
+    name: 'Screenbug 3',
+    category: 'Screenbug Presets',
+    url: 'https://static.wikia.nocookie.net/ep-deo/images/1/18/Screenbug3.png/revision/latest/scale-to-width-down/1000?cb=20260921073559'
   },
   {
     id: 'vplay',
@@ -97,6 +97,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
   const autoLoopTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Corner Position for On-Air Bug Simulation
+  const [isFitToFrame, setIsFitToFrame] = useState<boolean>(true); // Auto-fit screenbug to simulated broadcast frame
   const [position, setPosition] = useState<'top-right' | 'top-left' | 'bottom-right' | 'center'>('top-right');
   const [zoomLevel, setZoomLevel] = useState<number>(100); // 100%, 150%, 200%, 300%
   const [bgStyle, setBgStyle] = useState<'studio' | 'news' | 'dark' | 'checkerboard'>('studio');
@@ -308,7 +309,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
           {onBack && (
             <button
               onClick={onBack}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/15 text-white transition-colors cursor-pointer"
+              className="p-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white transition-colors cursor-pointer"
               title="Quay lại"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -320,12 +321,12 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                 <Tv className="w-6 h-6 text-[#388BFD]" />
                 Logo Switcher Visualizer
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#388BFD]/20 text-[#388BFD] border border-[#388BFD]/40">
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[#388BFD]/20 text-[#388BFD] border border-[#388BFD]/40">
                 On-Air Engine
               </span>
             </div>
             <p className="text-xs sm:text-sm text-zinc-400 mt-0.5">
-              Mô phỏng chuyển tiếp logo kênh truyền hình chuyên nghiệp (Chuyển thẳng, Cross dissolve, Fade 1/2/3)
+              Mô phỏng chuyển tiếp logo & screenbug kênh truyền hình phát sóng (Chuyển thẳng, Cross dissolve, Fade 1/2/3)
             </p>
           </div>
         </div>
@@ -334,7 +335,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsAutoLoop(!isAutoLoop)}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
               isAutoLoop 
                 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' 
                 : 'bg-white/10 hover:bg-white/15 text-white'
@@ -345,7 +346,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
           </button>
           <button
             onClick={handleSwap}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors cursor-pointer"
             title="Đảo chiều Logo A và Logo B"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -354,7 +355,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
           <button
             onClick={() => triggerSwitch()}
             disabled={isTransitioning}
-            className="btn-colored flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
+            className="btn-colored flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shadow-md disabled:opacity-50"
           >
             <RotateCw className={`w-4 h-4 ${isTransitioning ? 'animate-spin' : ''}`} />
             <span>Kích hoạt chuyển đổi</span>
@@ -369,31 +370,56 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
         <div className="lg:col-span-7 flex flex-col gap-4">
           
           {/* Stage Header Info & Options */}
-          <div className="flex items-center justify-between text-xs text-zinc-400">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-white flex items-center gap-1">
                 <Monitor className="w-3.5 h-3.5 text-[#388BFD]" />
                 Màn hình phát sóng mô phỏng (16:9)
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">
-                LIVE
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">
+                LIVE ON-AIR
               </span>
             </div>
 
-            {/* Position Picker */}
-            <div className="flex items-center gap-1">
-              <span className="text-[11px]">Vị trí:</span>
-              {(['top-right', 'top-left', 'bottom-right', 'center'] as const).map((pos) => (
+            {/* Screenbug Fit / Corner Mode Switcher */}
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center bg-white/5 p-0.5 rounded-full border border-white/10">
                 <button
-                  key={pos}
-                  onClick={() => setPosition(pos)}
-                  className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer ${
-                    position === pos ? 'bg-[#388BFD] text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-zinc-400'
+                  onClick={() => setIsFitToFrame(true)}
+                  className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                    isFitToFrame ? 'bg-[#388BFD] text-white shadow-sm' : 'text-zinc-400 hover:text-white'
                   }`}
+                  title="Tự động fit vừa với khung màn hình phát sóng mô phỏng"
                 >
-                  {pos === 'top-right' ? 'Góc Phải' : pos === 'top-left' ? 'Góc Trái' : pos === 'bottom-right' ? 'Dưới' : 'Giữa'}
+                  Fit vừa khung TV (Screenbug)
                 </button>
-              ))}
+                <button
+                  onClick={() => setIsFitToFrame(false)}
+                  className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                    !isFitToFrame ? 'bg-[#388BFD] text-white shadow-sm' : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Hiển thị dạng logo góc thu nhỏ"
+                >
+                  Góc màn hình
+                </button>
+              </div>
+
+              {/* Position Picker if in Corner Mode */}
+              {!isFitToFrame && (
+                <div className="flex items-center gap-1 pl-1">
+                  {(['top-right', 'top-left', 'bottom-right', 'center'] as const).map((pos) => (
+                    <button
+                      key={pos}
+                      onClick={() => setPosition(pos)}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors cursor-pointer ${
+                        position === pos ? 'bg-[#388BFD] text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-zinc-400'
+                      }`}
+                    >
+                      {pos === 'top-right' ? 'Phải' : pos === 'top-left' ? 'Trái' : pos === 'bottom-right' ? 'Dưới' : 'Giữa'}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -423,13 +449,13 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
               <>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(56,139,253,0.15),transparent_60%)]" />
                 {/* Simulated studio news ticker */}
-                <div className="absolute inset-x-0 bottom-0 h-10 bg-black/70 backdrop-blur-md border-t border-white/10 flex items-center px-4 justify-between">
+                <div className="absolute inset-x-0 bottom-0 h-10 bg-black/70 backdrop-blur-md border-t border-white/10 flex items-center px-4 justify-between z-10">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[10px] uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded-full bg-red-600 text-white font-black text-[10px] uppercase tracking-wider">
                       THỜI SỰ
                     </span>
                     <span className="text-[11px] text-white/80 font-medium truncate max-w-[280px] sm:max-w-md">
-                      Bản tin truyền hình mô phỏng Logo On-Air Switcher Vplay 2026
+                      Bản tin truyền hình mô phỏng Screenbug On-Air Switcher Vplay 2026
                     </span>
                   </div>
                   <span className="text-[10px] font-mono text-white/50">19:00:00</span>
@@ -437,24 +463,14 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
               </>
             )}
 
-            {/* ON-AIR LOGO OVERLAY CONTAINER */}
-            <div 
-              className={`absolute ${getPositionClasses()} pointer-events-none select-none z-20 flex items-center justify-center`}
-              style={{
-                transform: position === 'center' ? 'translate(-50%, -50%)' : 'none'
-              }}
-            >
-              <div 
-                className="relative flex items-center justify-center"
-                style={{
-                  width: `${(100 * zoomLevel) / 100}px`,
-                  height: `${(50 * zoomLevel) / 100}px`
-                }}
-              >
-                {/* LOGO A */}
+            {/* ON-AIR LOGO / SCREENBUG OVERLAY CONTAINER */}
+            {isFitToFrame ? (
+              /* SCREENBUG TỰ FIT VỪA VỚI KHUNG MÀN HÌNH PHÁT SÓNG MÔ PHỎNG */
+              <div className="absolute inset-0 w-full h-full pointer-events-none select-none z-20 flex items-center justify-center overflow-hidden">
+                {/* SCREENBUG A */}
                 <img
                   src={logoA}
-                  alt="Logo A"
+                  alt="Screenbug A"
                   referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                   style={{
@@ -463,10 +479,10 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                   }}
                 />
 
-                {/* LOGO B */}
+                {/* SCREENBUG B */}
                 <img
                   src={logoB}
-                  alt="Logo B"
+                  alt="Screenbug B"
                   referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                   style={{
@@ -475,10 +491,50 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                   }}
                 />
               </div>
-            </div>
+            ) : (
+              /* CORNER / CUSTOM POSITION LOGO OVERLAY */
+              <div 
+                className={`absolute ${getPositionClasses()} pointer-events-none select-none z-20 flex items-center justify-center`}
+                style={{
+                  transform: position === 'center' ? 'translate(-50%, -50%)' : 'none'
+                }}
+              >
+                <div 
+                  className="relative flex items-center justify-center"
+                  style={{
+                    width: `${(100 * zoomLevel) / 100}px`,
+                    height: `${(50 * zoomLevel) / 100}px`
+                  }}
+                >
+                  {/* LOGO A */}
+                  <img
+                    src={logoA}
+                    alt="Logo A"
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                    style={{
+                      opacity: opacityA,
+                      transition: animationMode === 'direct' ? 'none' : `opacity ${fadeDuration}s ease-in-out`
+                    }}
+                  />
 
-            {/* Center Visual Helper info when in center mode */}
-            {position === 'center' && (
+                  {/* LOGO B */}
+                  <img
+                    src={logoB}
+                    alt="Logo B"
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                    style={{
+                      opacity: opacityB,
+                      transition: animationMode === 'direct' ? 'none' : `opacity ${fadeDuration}s ease-in-out`
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Helper pill when in corner center mode */}
+            {!isFitToFrame && position === 'center' && (
               <div className="absolute bottom-14 px-3 py-1 rounded-full bg-black/60 text-[11px] text-zinc-300 backdrop-blur-md">
                 Chế độ xem phóng to chính giữa
               </div>
@@ -486,7 +542,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
           </div>
 
           {/* Status Bar & Timeline Indicator */}
-          <div className="p-3.5 rounded-2xl bg-[#141418] border border-white/10 flex items-center justify-between text-xs">
+          <div className="p-3.5 rounded-full bg-[#141418] border border-white/10 flex items-center justify-between text-xs px-5">
             <div className="flex items-center gap-2.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#388BFD] animate-ping" />
               <span className="text-zinc-300 font-medium">Trạng thái:</span>
@@ -512,7 +568,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                 <button
                   key={bg.id}
                   onClick={() => setBgStyle(bg.id as any)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] transition-colors cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-[11px] transition-colors cursor-pointer ${
                     bgStyle === bg.id ? 'bg-[#388BFD] text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-zinc-400'
                   }`}
                 >
@@ -604,7 +660,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                   <button
                     key={val}
                     onClick={() => setFadeDuration(val)}
-                    className={`py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    className={`py-1.5 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
                       fadeDuration === val
                         ? 'bg-[#388BFD] text-white font-bold'
                         : 'bg-white/5 hover:bg-white/10 text-zinc-300'
@@ -623,7 +679,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                 step="0.1"
                 value={fadeDuration}
                 onChange={(e) => setFadeDuration(Number(e.target.value))}
-                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#388BFD]"
+                className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#388BFD]"
               />
             </div>
 
@@ -633,7 +689,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                 <span className="font-semibold text-white">Nguồn Logo A:</span>
                 <button
                   onClick={() => fileInputRefA.current?.click()}
-                  className="text-[11px] text-[#388BFD] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-[11px] text-[#388BFD] flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Upload className="w-3 h-3" />
                   Tải ảnh từ máy
@@ -645,8 +701,13 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                 {PRESET_LOGOS.map((p) => (
                   <button
                     key={p.id}
-                    onClick={() => setLogoA(p.url)}
-                    className={`p-2 rounded-xl border flex items-center gap-2 text-xs transition-all cursor-pointer ${
+                    onClick={() => {
+                      setLogoA(p.url);
+                      if (p.id.startsWith('screenbug')) {
+                        setIsFitToFrame(true);
+                      }
+                    }}
+                    className={`p-2 rounded-full border flex items-center gap-2 text-xs transition-all cursor-pointer px-3 ${
                       logoA === p.url
                         ? 'border-[#388BFD] bg-[#388BFD]/15 text-white font-bold'
                         : 'border-white/5 bg-white/5 hover:bg-white/10 text-zinc-300'
@@ -656,7 +717,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                       src={p.url} 
                       alt={p.name} 
                       referrerPolicy="no-referrer" 
-                      className="w-7 h-5 object-contain bg-black/40 rounded p-0.5" 
+                      className="w-7 h-5 object-contain bg-black/40 rounded-full p-0.5" 
                     />
                     <span className="truncate">{p.name}</span>
                   </button>
@@ -670,11 +731,11 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                   placeholder="Hoặc dán URL Logo A..."
                   value={customUrlA}
                   onChange={(e) => setCustomUrlA(e.target.value)}
-                  className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#388BFD]"
+                  className="flex-1 bg-black/40 border border-white/10 rounded-full px-3.5 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#388BFD]"
                 />
                 <button
                   onClick={() => customUrlA && setLogoA(customUrlA)}
-                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold cursor-pointer"
+                  className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs font-semibold cursor-pointer"
                 >
                   Áp dụng
                 </button>
@@ -687,7 +748,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                 <span className="font-semibold text-white">Nguồn Logo B:</span>
                 <button
                   onClick={() => fileInputRefB.current?.click()}
-                  className="text-[11px] text-[#388BFD] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-[11px] text-[#388BFD] flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Upload className="w-3 h-3" />
                   Tải ảnh từ máy
@@ -699,8 +760,13 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                 {PRESET_LOGOS.map((p) => (
                   <button
                     key={p.id}
-                    onClick={() => setLogoB(p.url)}
-                    className={`p-2 rounded-xl border flex items-center gap-2 text-xs transition-all cursor-pointer ${
+                    onClick={() => {
+                      setLogoB(p.url);
+                      if (p.id.startsWith('screenbug')) {
+                        setIsFitToFrame(true);
+                      }
+                    }}
+                    className={`p-2 rounded-full border flex items-center gap-2 text-xs transition-all cursor-pointer px-3 ${
                       logoB === p.url
                         ? 'border-[#388BFD] bg-[#388BFD]/15 text-white font-bold'
                         : 'border-white/5 bg-white/5 hover:bg-white/10 text-zinc-300'
@@ -710,7 +776,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                       src={p.url} 
                       alt={p.name} 
                       referrerPolicy="no-referrer" 
-                      className="w-7 h-5 object-contain bg-black/40 rounded p-0.5" 
+                      className="w-7 h-5 object-contain bg-black/40 rounded-full p-0.5" 
                     />
                     <span className="truncate">{p.name}</span>
                   </button>
@@ -724,11 +790,11 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                   placeholder="Hoặc dán URL Logo B..."
                   value={customUrlB}
                   onChange={(e) => setCustomUrlB(e.target.value)}
-                  className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#388BFD]"
+                  className="flex-1 bg-black/40 border border-white/10 rounded-full px-3.5 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#388BFD]"
                 />
                 <button
                   onClick={() => customUrlB && setLogoB(customUrlB)}
-                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold cursor-pointer"
+                  className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs font-semibold cursor-pointer"
                 >
                   Áp dụng
                 </button>
@@ -746,7 +812,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                   <button
                     key={z}
                     onClick={() => setZoomLevel(z)}
-                    className={`py-1 rounded-lg text-xs font-medium cursor-pointer ${
+                    className={`py-1 rounded-full text-xs font-medium cursor-pointer ${
                       zoomLevel === z ? 'bg-[#388BFD] text-white font-bold' : 'bg-white/5 hover:bg-white/10 text-zinc-400'
                     }`}
                   >

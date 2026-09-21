@@ -543,7 +543,7 @@ export const LocalStorageBar: React.FC<LocalStorageBarProps> = ({
               type="button"
               onClick={handleCleanTemporaryCache}
               title="Dọn dẹp bộ nhớ đệm tạm thời"
-              className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
+              className="px-2.5 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span className="hidden sm:inline">Dọn đệm</span>
@@ -554,7 +554,7 @@ export const LocalStorageBar: React.FC<LocalStorageBarProps> = ({
               type="button"
               onClick={handleExportBackup}
               title="Sao lưu toàn bộ Local Storage thành file JSON"
-              className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
+              className="px-2.5 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
             >
               <Download className="w-3.5 h-3.5 text-sky-300" />
               <span className="hidden md:inline">Sao lưu</span>
@@ -565,7 +565,7 @@ export const LocalStorageBar: React.FC<LocalStorageBarProps> = ({
               type="button"
               onClick={handleTriggerRestore}
               title="Khôi phục dữ liệu từ file JSON"
-              className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
+              className="px-2.5 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-sm"
             >
               <Upload className="w-3.5 h-3.5 text-emerald-300" />
               <span className="hidden md:inline">Khôi phục</span>
@@ -968,7 +968,7 @@ export const LocalStorageBar: React.FC<LocalStorageBarProps> = ({
                 <button
                   type="button"
                   onClick={handleConfirmClear}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-lg shadow-rose-900/40 transition-colors"
+                  className="px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-lg shadow-rose-900/40 transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Xác nhận xóa</span>

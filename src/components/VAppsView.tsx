@@ -390,7 +390,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
     borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
     glowClass: 'shadow-[0_10px_30px_rgba(37,99,235,0.35)]',
     icon: Box,
-    tags: ['Spatial Design', 'Liquid Glass', 'Corner 30px', 'Blur', 'Transparency', 'Elevation', 'Border'],
+    tags: ['Spatial Design', 'Spatial Glass', 'Corner 30px', 'Blur', 'Transparency', 'Elevation', 'Border'],
   },
   {
     id: 'logo_switcher',

@@ -196,7 +196,7 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
                 </span>
               </div>
               <p className="text-xs text-[#9CA3AF] mt-0.5">
-                Quay lại cài đặt giao diện, hình nền Liquid Glass, phông chữ và trợ năng
+                Quay lại cài đặt giao diện, hình nền Spatial Glass, phông chữ và trợ năng
               </p>
             </div>
           </div>

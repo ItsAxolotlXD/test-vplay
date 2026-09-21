@@ -35,7 +35,7 @@ export default function IntelligenceThumbnailTab({
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold uppercase tracking-wider transition-all cursor-default text-neutral-300 hover:text-white rounded-none"
+          className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold uppercase tracking-wider transition-all cursor-default text-neutral-300 hover:text-white rounded-full"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Trở về Trang chủ</span>

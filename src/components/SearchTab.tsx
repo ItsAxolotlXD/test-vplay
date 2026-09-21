@@ -923,7 +923,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
           {showVoiceSearch && (
             <button
               onClick={handleVoiceSearch}
-              className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+              className={`p-2 rounded-full transition-all cursor-pointer flex items-center justify-center ${
                 isListening
                   ? 'bg-[#E6005A] text-white animate-pulse shadow-md shadow-[#E6005A]/50'
                   : 'text-zinc-400 hover:text-white hover:bg-white/10'

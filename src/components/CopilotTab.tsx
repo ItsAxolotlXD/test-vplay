@@ -524,7 +524,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
           <button
             id="btn-create-new-chat"
             onClick={handleCreateNewChat}
-            className="px-3.5 py-1.5 bg-[#E50914] hover:bg-[#C20710] text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 rounded-xl shadow-md shadow-[#E50914]/25 active:scale-95"
+            className="px-3.5 py-1.5 bg-[#E50914] hover:bg-[#C20710] text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 rounded-full shadow-md shadow-[#E50914]/25 active:scale-95"
             title="Tạo cuộc trò chuyện mới"
           >
             <Plus className="w-3.5 h-3.5 text-white" />
@@ -556,7 +556,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
             <button
               id="btn-detach-copilot"
               onClick={onDetachWindow}
-              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-200 border border-slate-200 dark:border-white/10 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 rounded-xl active:scale-95"
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-200 border border-slate-200 dark:border-white/10 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 rounded-full active:scale-95"
               title="Tách Copilot thành cửa sổ nổi có thể di chuyển"
             >
               <AppWindow className="w-3.5 h-3.5 text-[#E50914]" />
@@ -684,7 +684,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
               <div className="p-2.5 border-b border-slate-200 dark:border-white/10">
                 <button
                   onClick={handleCreateNewChat}
-                  className="w-full py-2 px-3 bg-[#E50914]/10 hover:bg-[#E50914] text-[#E50914] hover:text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2 px-3 bg-[#E50914]/10 hover:bg-[#E50914] text-[#E50914] hover:text-white rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>+ Tạo đoạn chat mới</span>
@@ -772,7 +772,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
               </div>
               <button
                 onClick={onDetachWindow}
-                className="px-2.5 py-1 bg-white dark:bg-[#E50914] hover:bg-slate-100 dark:hover:bg-[#C20710] text-[#E50914] dark:text-white border border-red-200 dark:border-transparent rounded-lg text-[11px] font-bold cursor-pointer transition-all shadow-xs"
+                className="px-2.5 py-1 bg-white dark:bg-[#E50914] hover:bg-slate-100 dark:hover:bg-[#C20710] text-[#E50914] dark:text-white border border-red-200 dark:border-transparent rounded-full text-[11px] font-bold cursor-pointer transition-all shadow-xs"
               >
                 Thu hồi vào Tab
               </button>

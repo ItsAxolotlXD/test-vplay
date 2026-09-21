@@ -384,7 +384,7 @@ export const CopilotFloatingWindow: React.FC<CopilotFloatingWindowProps> = ({
             <div className="flex items-center gap-1">
               <button
                 onClick={handleCreateNewChat}
-                className="p-1 text-slate-500 hover:text-[#E50914] rounded-lg transition-colors cursor-pointer"
+                className="p-1 text-slate-500 hover:text-[#E50914] rounded-full transition-colors cursor-pointer"
                 title="Tạo cuộc trò chuyện mới"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -392,7 +392,7 @@ export const CopilotFloatingWindow: React.FC<CopilotFloatingWindowProps> = ({
 
               <button
                 onClick={onDockBack}
-                className="p-1 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-lg transition-colors cursor-pointer"
+                className="p-1 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-full transition-colors cursor-pointer"
                 title="Thu về dạng Tab"
               >
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -408,7 +408,7 @@ export const CopilotFloatingWindow: React.FC<CopilotFloatingWindowProps> = ({
 
               <button
                 onClick={onClose}
-                className="p-1 text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 rounded-lg transition-colors cursor-pointer"
+                className="p-1 text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 rounded-full transition-colors cursor-pointer"
                 title="Đóng cửa sổ"
               >
                 <X className="w-3.5 h-3.5" />

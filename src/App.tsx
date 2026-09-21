@@ -53,6 +53,7 @@ import { VPremiumView } from './components/VPremiumView';
 import { MinecraftContainerEmulator } from './components/minecraft/MinecraftContainerEmulator';
 import { SpatialDesignVisualizer } from './components/tools/SpatialDesignVisualizer';
 import { LogoSwitcherVisualizer } from './components/tools/LogoSwitcherVisualizer';
+import { WheelOfFortuneTool } from './components/tools/WheelOfFortuneTool';
 import { SearchTab } from './components/SearchTab';
 import { VFlowTab } from './components/vflow/VFlowTab';
 import { ChatRoomView } from './components/chat/ChatRoomView';
@@ -558,6 +559,15 @@ export default function App() {
           <LogoSwitcherVisualizer onBack={() => navigate('/space-360')} navigate={navigate} />
         );
 
+      case '/wheel-of-fortune':
+      case '/wheels-of-fortune':
+      case '/wheel-tool':
+      case '/v-wheel':
+        return renderSpace360App(
+          'Wheels of Fortune',
+          <WheelOfFortuneTool onBack={() => navigate('/toolbox')} navigate={navigate} />
+        );
+
       case '/v-space':
       case '/v-apps':
       case '/space-360':
@@ -706,7 +716,7 @@ export default function App() {
   return (
     <TabSearchProvider currentRoute={currentRoute}>
       <div className={`min-h-screen ${hasCustomWallpaper ? 'has-custom-wallpaper bg-transparent' : 'bg-[#181818]'} text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative transition-colors duration-500 ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
-        {/* Custom App Wallpaper Layer (Liquid Glass interactive background) */}
+        {/* Custom App Wallpaper Layer (Spatial Glass interactive background) */}
         {hasCustomWallpaper && (
           <div
             id="vplay-wallpaper-backdrop"
@@ -716,7 +726,7 @@ export default function App() {
               backgroundAttachment: 'fixed',
             }}
           >
-            {/* Soft dark overlay for perfect text contrast while highlighting Liquid Glass blurs */}
+            {/* Soft dark overlay for perfect text contrast while highlighting Spatial Glass blurs */}
             <div className="absolute inset-0 bg-black/25 backdrop-brightness-95 pointer-events-none" />
           </div>
         )}

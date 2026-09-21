@@ -163,7 +163,7 @@ export default function NotificationsTab({
         <div className="flex items-center gap-3.5">
           <button
             onClick={onBack}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition-all cursor-pointer"
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition-all cursor-pointer"
             title="Quay lại"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -193,7 +193,7 @@ export default function NotificationsTab({
           <button
             onClick={onMarkAllRead}
             disabled={unreadCount === 0}
-            className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-zinc-200 hover:text-white transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="px-3 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-zinc-200 hover:text-white transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
             title="Đánh dấu tất cả là đã đọc"
           >
             <CheckCheck className="w-4 h-4 text-emerald-400" />
@@ -202,7 +202,7 @@ export default function NotificationsTab({
           <button
             onClick={onClearAll}
             disabled={notifications.length === 0}
-            className="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-xs font-semibold text-rose-300 hover:text-rose-200 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="px-3 py-2 rounded-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-xs font-semibold text-rose-300 hover:text-rose-200 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
             title="Xóa tất cả thông báo"
           >
             <Trash2 className="w-4 h-4 text-rose-400" />

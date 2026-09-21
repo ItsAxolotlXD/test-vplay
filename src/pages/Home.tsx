@@ -52,14 +52,16 @@ export const Home: React.FC<HomeProps> = ({
         onSelectChannel={onSelectChannel}
       />
 
-      {/* Aesthetic Welcome Tagline */}
-      <div id="home-welcome-tagline" className="w-full flex items-center justify-center -mt-2 sm:-mt-1 mb-1 sm:mb-2 px-4 select-none">
-        <p className="text-sm sm:text-base md:text-lg tracking-wide text-zinc-300/90 font-light">
-          Welcome to{' '}
-          <span className="font-['Playfair_Display',serif] italic font-medium text-[#FFA6D2] tracking-normal text-base sm:text-lg md:text-xl drop-shadow-[0_0_14px_rgba(255,166,210,0.45)]">
-            the everything app.
+      {/* Aesthetic Headline: Introducing Spatial Glass (Balanced size, glow, pink-white gradient) */}
+      <div id="home-welcome-tagline" className="w-full flex flex-col items-center justify-center my-6 sm:my-8 px-4 text-center select-none">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight font-['Integer','Inter',sans-serif] leading-tight flex flex-wrap items-center justify-center gap-x-3 gap-y-1 drop-shadow-[0_0_24px_rgba(244,114,182,0.4)]">
+          <span className="text-white drop-shadow-[0_0_16px_rgba(255,255,255,0.4)]">
+            Introducing
           </span>
-        </p>
+          <span className="bg-gradient-to-r from-pink-400 via-rose-300 to-white bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(244,114,182,0.6)]">
+            Spatial Glass
+          </span>
+        </h2>
       </div>
 
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-10 sm:space-y-12">

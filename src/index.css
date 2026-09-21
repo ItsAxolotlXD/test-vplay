@@ -15,11 +15,11 @@
     --sidebar-bg: #202020;
     --card-bg: #222222;
     --waves-font-scale: 1;
-    --waves-font-family: 'Alata', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --waves-font-family: 'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   *, *::before, *::after {
-    font-family: var(--waves-font-family, 'Alata', system-ui, -apple-system, sans-serif) !important;
+    font-family: var(--waves-font-family, 'Integer', 'Inter', system-ui, -apple-system, sans-serif) !important;
   }
 
   html {
@@ -31,7 +31,31 @@
     background-color: #181818;
     color: #F3F4F6;
     overflow-x: clip;
-    font-family: var(--waves-font-family, 'Alata', system-ui, -apple-system, sans-serif) !important;
+    font-family: var(--waves-font-family, 'Integer', 'Inter', system-ui, -apple-system, sans-serif) !important;
+  }
+
+  /* Font Integer Bold đối với các heading/title/header/big text/main text */
+  h1, h2, h3, h4, h5, h6,
+  .heading-text,
+  .title-text,
+  .header-text,
+  .big-text,
+  .main-text,
+  header h1, header h2, header h3,
+  [class*="font-bold"],
+  [class*="font-extrabold"],
+  [class*="font-black"],
+  [class*="text-xl"],
+  [class*="text-2xl"],
+  [class*="text-3xl"],
+  [class*="text-4xl"],
+  [class*="text-5xl"],
+  [class*="text-6xl"],
+  [class*="text-7xl"],
+  [class*="text-8xl"],
+  [class*="text-9xl"] {
+    font-family: 'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-weight: 700 !important;
   }
 }
 
@@ -323,34 +347,45 @@ body.has-custom-wallpaper {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22) !important;
 }
 
-/* STYLE THANH TÌM KIẾM TOÀN BỘ APP GIỐNG THANH FLOAT SEARCH (LIQUID GLASS PILL) */
+/* STYLE THANH TÌM KIẾM TOÀN BỘ APP GIỐNG THANH FLOAT SEARCH (SPATIAL GLASS PILL) */
 .spotlight-bubble-box,
 .search-box-capsule,
-.float-search-style {
+.float-search-style,
+.search-bar,
+.search-container,
+div:has(> input[placeholder*="Tìm"]),
+div:has(> input[placeholder*="search" i]),
+div:has(> input[type="search"]),
+form:has(> input[placeholder*="Tìm"]),
+form:has(> input[placeholder*="search" i]) {
   position: relative !important;
   border-radius: 9999px !important;
   background-color: rgba(255, 255, 255, 0.25) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
   backdrop-filter: blur(24px) saturate(180%) !important;
   box-shadow: 0 16px 36px 0 rgba(0, 0, 0, 0.35) !important;
-  border: none !important;
+  border: 0 none transparent !important;
   overflow: hidden !important;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   transition: all 0.3s ease !important;
 }
 
 .has-custom-wallpaper .spotlight-bubble-box,
 .has-custom-wallpaper .search-box-capsule,
-.has-custom-wallpaper .float-search-style {
+.has-custom-wallpaper .float-search-style,
+.has-custom-wallpaper div:has(> input[placeholder*="Tìm"]),
+.has-custom-wallpaper div:has(> input[placeholder*="search" i]) {
   background-color: rgba(255, 255, 255, 0.22) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
   backdrop-filter: blur(24px) saturate(180%) !important;
-  border: none !important;
+  border: 0 none transparent !important;
 }
 
 .spotlight-bubble-box:focus-within,
 .search-box-capsule:focus-within,
-.float-search-style:focus-within {
+.float-search-style:focus-within,
+div:has(> input[placeholder*="Tìm"]):focus-within,
+div:has(> input[placeholder*="search" i]):focus-within {
   background-color: rgba(255, 255, 255, 0.32) !important;
   box-shadow: 0 20px 44px 0 rgba(0, 0, 0, 0.45) !important;
 }
@@ -358,7 +393,9 @@ body.has-custom-wallpaper {
 /* Lớp viền phản chiếu Specular rim highlight với horizontal fade như Float search */
 .spotlight-bubble-box::before,
 .search-box-capsule::before,
-.float-search-style::before {
+.float-search-style::before,
+div:has(> input[placeholder*="Tìm"])::before,
+div:has(> input[placeholder*="search" i])::before {
   content: "" !important;
   position: absolute !important;
   inset: 0 !important;
@@ -382,22 +419,26 @@ body.has-custom-wallpaper {
 /* Search input typography inside float search styled containers */
 .spotlight-bubble-box input,
 .search-box-capsule input,
-.float-search-style input {
+.float-search-style input,
+div:has(> input[placeholder*="Tìm"]) input,
+div:has(> input[placeholder*="search" i]) input {
   position: relative !important;
   z-index: 11 !important;
   background-color: transparent !important;
   color: #ffffff !important;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
-  border: none !important;
+  border: 0 none transparent !important;
   outline: none !important;
 }
 
 .spotlight-bubble-box input::placeholder,
 .search-box-capsule input::placeholder,
-.float-search-style input::placeholder {
+.float-search-style input::placeholder,
+div:has(> input[placeholder*="Tìm"]) input::placeholder,
+div:has(> input[placeholder*="search" i]) input::placeholder {
   color: rgba(255, 255, 255, 0.60) !important;
   font-weight: 600 !important;
 }
@@ -405,7 +446,9 @@ body.has-custom-wallpaper {
 /* Monochrome White Search Icon matching float search */
 .spotlight-bubble-box svg,
 .search-box-capsule svg,
-.float-search-style svg {
+.float-search-style svg,
+div:has(> input[placeholder*="Tìm"]) svg,
+div:has(> input[placeholder*="search" i]) svg {
   position: relative !important;
   z-index: 11 !important;
   color: #ffffff !important;
@@ -414,10 +457,83 @@ body.has-custom-wallpaper {
 
 .spotlight-bubble-box button,
 .search-box-capsule button,
-.float-search-style button {
+.float-search-style button,
+div:has(> input[placeholder*="Tìm"]) button,
+div:has(> input[placeholder*="search" i]) button {
   position: relative !important;
   z-index: 12 !important;
   color: #ffffff !important;
+}
+
+/* =========================================================================
+   BỎ BORDER KHỎI CÀI ĐẶT, DANH MỤC CÀI ĐẶT, LOGO WEB & TOP BAR (TRỪ HAMBURGER MENU)
+   ========================================================================= */
+
+/* 1. Bỏ border khỏi các cài đặt và danh mục cài đặt */
+.settings-category-section,
+[id^="settings-section-"],
+.settings-item-card,
+[id^="settings-card-"],
+.settings-slider-capsule,
+#settings-card-change-background,
+#settings-category-nav,
+.settings-item-card button,
+.settings-item-card div {
+  border-width: 0 !important;
+  border-color: transparent !important;
+}
+
+.settings-item-card,
+[id^="settings-card-"],
+.settings-category-section,
+[id^="settings-section-"] {
+  border: 0 none transparent !important;
+  box-shadow: none !important;
+}
+
+.settings-item-card::before,
+.settings-item-card::after,
+.settings-category-section::before,
+.settings-category-section::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* 2. Bỏ border khỏi logo web và các mục trên top bar (trừ hamburger menu) */
+#topbar-vplay-logo,
+.vplay-logo-btn,
+#topbar-nav-live-tv,
+#topbar-nav-shop,
+#topbar-nav-more,
+#btn-topbar-search,
+#btn-topbar-orbs-coin,
+#btn-topbar-copilot,
+#btn-topbar-settings,
+#btn-topbar-user-profile,
+#vplay-topbar-header nav button,
+#vplay-topbar-header nav a,
+#vplay-topbar-header button:not(#btn-topbar-mobile-menu):not(.hamburger-menu-btn):not([aria-label*="Mở danh mục"]) {
+  border: 0 none transparent !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#topbar-vplay-logo::before,
+#topbar-vplay-logo::after,
+#btn-topbar-search::before,
+#btn-topbar-search::after,
+#btn-topbar-orbs-coin::before,
+#btn-topbar-orbs-coin::after,
+#btn-topbar-copilot::before,
+#btn-topbar-copilot::after,
+#btn-topbar-settings::before,
+#btn-topbar-settings::after,
+#btn-topbar-user-profile::before,
+#btn-topbar-user-profile::after {
+  display: none !important;
+  content: none !important;
 }
 
 .has-custom-wallpaper [id^="settings-card-"]:hover,
@@ -861,6 +977,25 @@ button[class*="from-[#FF007A]"]:active {
   mask-composite: exclude;
   z-index: 12;
   transition: opacity 0.25s ease, background 0.25s ease, filter 0.25s ease;
+}
+
+/* TOÀN BỘ CÁC NÚT ĐỔI THÀNH DẠNG PILL (ROUNDED-FULL) - SPATIAL GLASS SPEC */
+button,
+.btn,
+.btn-colored,
+button.btn-colored,
+.button-colored,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  border-radius: 9999px !important;
+}
+
+button::before,
+button::after,
+.btn::before,
+.btn::after {
+  border-radius: 9999px !important;
 }
 
 

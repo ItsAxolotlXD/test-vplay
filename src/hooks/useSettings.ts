@@ -18,7 +18,7 @@ export const VBOARD_SKIN_OPTIONS: VBoardSkinOption[] = [
   {
     id: 'default',
     name: 'Default V-Board',
-    description: 'Giao diện V-board kính tối mờ thanh lịch với hiệu ứng Liquid Glass',
+    description: 'Giao diện V-board kính tối mờ thanh lịch với hiệu ứng Spatial Glass',
     badge: 'Mặc định',
     previewBg: '#1E1D24',
     previewKeyBg: '#525257',
@@ -93,7 +93,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   navigationMode: 'topbar',
   floatyBar: false,
   vboardSkin: 'default',
-  fontFamily: 'alata',
+  fontFamily: 'integer',
   fontScale: 1,
   appBackground: 'default',
   autoScrollBanner: true,
@@ -156,17 +156,17 @@ export interface FontFamilyItem {
 
 export const FONT_FAMILY_CONFIG: FontFamilyItem[] = [
   {
+    id: 'integer',
+    name: 'Integer',
+    subtext: 'Phông chữ hiện đại, hình khối sắc nét chuẩn giao diện số (Integer Bold / Inter)',
+    cssFamily: "'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    badge: 'Mặc định',
+  },
+  {
     id: 'alata',
     name: 'Alata',
     subtext: 'Phông chữ phong cách hình học độc đáo, dứt khoát và ấn tượng',
     cssFamily: "'Alata', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    badge: 'Mặc định',
-  },
-  {
-    id: 'integer',
-    name: 'Integer',
-    subtext: 'Phông chữ hiện đại, hình khối sắc nét chuẩn giao diện số (Inter / Integer)',
-    cssFamily: "'Inter', 'Integer', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
   {
     id: 'google-sans',
@@ -216,10 +216,9 @@ export const getStoredSettings = (): SystemSettings => {
     if (saved) {
       const parsed = JSON.parse(saved);
       const navMode = parsed.navigationMode || (parsed.dockToSidebar === false ? 'sidebar' : fallbackNavMode);
-      let font: FontFamilyOption = 'alata';
+      let font: FontFamilyOption = 'integer';
       if (parsed.fontFamily && ['alata', 'integer', 'google-sans', 'montserrat'].includes(parsed.fontFamily)) {
-        // If it was previous integer default, migrate to Alata
-        font = parsed.fontFamily === 'integer' ? 'alata' : parsed.fontFamily;
+        font = parsed.fontFamily;
       }
       // Check shinyOutline with feature flag fallback
       let isShiny = true;

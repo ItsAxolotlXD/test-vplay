@@ -102,7 +102,7 @@ export default function FandomLogosTab({ onBack }: FandomLogosTabProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-all cursor-pointer active:scale-95"
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-all cursor-pointer active:scale-95"
             title="Quay lại"
           >
             <ArrowLeft className="w-5 h-5" />

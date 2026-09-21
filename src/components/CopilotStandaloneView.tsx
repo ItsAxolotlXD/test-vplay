@@ -881,7 +881,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
         <div className="flex flex-col items-center gap-5 w-full">
           <button
             onClick={handleNewChat}
-            className="group relative flex items-center justify-center w-10 h-10 rounded-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer"
+            className="group relative flex items-center justify-center w-10 h-10 rounded-full hover:scale-110 active:scale-95 transition-all cursor-pointer"
             title="Cuộc trò chuyện mới (New Chat)"
           >
             <img
@@ -1158,7 +1158,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                     />
                     <button
                       onClick={handleSaveName}
-                      className="px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-lg"
+                      className="px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded-full"
                     >
                       Lưu
                     </button>
@@ -2026,7 +2026,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                 <div className="space-y-2">
                   <button
                     onClick={handleNewChat}
-                    className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-md cursor-pointer hover:bg-indigo-700"
+                    className="w-full flex items-center justify-center gap-2 p-2.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-md cursor-pointer hover:bg-indigo-700"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Cuộc trò chuyện mới</span>
@@ -2104,7 +2104,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                   <button
                     onClick={handleGenerateImageFromStudio}
                     disabled={!imagePrompt.trim() || isGeneratingImage}
-                    className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+                    className="w-full py-2.5 rounded-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
                   >
                     {isGeneratingImage ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                     <span>{isGeneratingImage ? "Đang render ảnh..." : "Bắt đầu vẽ ảnh AI"}</span>
@@ -2148,7 +2148,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                     />
                     <button
                       onClick={addTask}
-                      className="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold"
+                      className="px-3 py-2 bg-emerald-600 text-white rounded-full text-xs font-bold"
                     >
                       Thêm
                     </button>
@@ -2234,7 +2234,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                       />
                       <button
                         onClick={handleSaveName}
-                        className="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold"
+                        className="px-3 py-1.5 bg-indigo-600 text-white rounded-full text-xs font-bold"
                       >
                         Lưu
                       </button>
@@ -2387,7 +2387,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
             <div className="pt-3 border-t border-zinc-200 dark:border-white/10 text-center">
               <button
                 onClick={onOptOut}
-                className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5 rotate-180" />
                 <span>Opt out / Quay lại Vplay</span>

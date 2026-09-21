@@ -859,7 +859,7 @@ const TicTacToeGame: React.FC<{
         )}
       </div>
 
-      {/* Grid Board (Liquid Glass) */}
+      {/* Grid Board (Spatial Glass) */}
       <div className="grid grid-cols-3 gap-3 p-4 rounded-3xl bg-white/[0.06] backdrop-blur-[20px] border border-white/15 shadow-xl mb-5">
         {board.map((cell, idx) => (
           <button
@@ -1323,7 +1323,7 @@ const CountingGame: React.FC<{
 
   return (
     <div className="flex flex-col items-center w-full max-w-md">
-      {/* Big Counter Display (Liquid Glass) */}
+      {/* Big Counter Display (Spatial Glass) */}
       <div className="w-full mb-5 p-7 rounded-3xl bg-white/[0.06] backdrop-blur-[20px] border border-white/15 shadow-xl flex flex-col items-center justify-center relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
 
@@ -1465,7 +1465,7 @@ const SnakeGame: React.FC<{
 
   return (
     <div className="flex flex-col items-center w-full max-w-md select-none">
-      {/* Snake Canvas Grid (Liquid Glass) */}
+      {/* Snake Canvas Grid (Spatial Glass) */}
       <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/20 shadow-2xl grid grid-cols-15 grid-rows-15 p-1 mb-4 overflow-hidden">
         {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, idx) => {
           const x = idx % GRID_SIZE;

@@ -89,7 +89,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
     'Phông chữ', 'Font', 'Integer', 'Alata', 'Google Sans', 'Montserrat',
     'Cỡ chữ ứng dụng', 'Cỡ chữ', 'Cài đặt', 'Settings', 'UI', 'Display',
     'Appearance', 'Splash Screen', 'Reload App', 'Màn hình khởi động', 'Tải lại', 'Refresh',
-    'Change your background', 'Background', 'Hình nền', 'Wallpaper', 'Liquid Glass', 'Duo Light', 'Duo Dark',
+    'Change your background', 'Background', 'Hình nền', 'Wallpaper', 'Spatial Glass', 'Duo Light', 'Duo Dark',
     'Shiny outline', 'Shiny', 'Outline', 'Viền', 'Viền sáng bóng', 'Specular', 'Rim'
   );
 
@@ -312,13 +312,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               matchesSearch('Background') ||
               matchesSearch('Hình nền') ||
               matchesSearch('Wallpaper') ||
-              matchesSearch('Liquid Glass') ||
+              matchesSearch('Spatial Glass') ||
               matchesSearch('Duo Light') ||
               matchesSearch('Duo Dark') ||
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-change-background"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-3.5 transition-colors border border-purple-500/20 hover:border-purple-500/40 hover:bg-white/[0.03]"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-3.5 transition-colors border-0 hover:bg-white/[0.03]"
               >
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center justify-between">
@@ -337,10 +337,10 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     )}
                   </div>
                   <div className="text-xs text-purple-300 font-medium mt-1">
-                    Changing your background to see how Liquid Glass on Vplay reacts!
+                    Changing your background to see how Spatial Glass on Vplay reacts!
                   </div>
                   <div className="text-[11px] text-[#9CA3AF] mt-1 leading-relaxed">
-                    Người dùng chọn một mẫu nền cho sẵn và app background sẽ đổi theo hình đó thay vì là solid color mặc định. Các thành phần kính mờ Liquid Glass (Top bar, Sidebar, Floating Search Bar, V-board) sẽ phản chiếu và khúc xạ màu sắc chân thực.
+                    Người dùng chọn một mẫu nền cho sẵn và app background sẽ đổi theo hình đó thay vì là solid color mặc định. Các thành phần kính mờ Spatial Glass (Top bar, Sidebar, Floating Search Bar, V-board) sẽ phản chiếu và khúc xạ màu sắc chân thực.
                   </div>
                 </div>
 
@@ -385,9 +385,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                             </div>
                           )}
 
-                          {/* Liquid Glass reaction preview badge */}
-                          <div className="absolute bottom-1.5 inset-x-2 py-0.5 px-2 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-between text-[9px] text-white pointer-events-none">
-                            <span className="truncate">Liquid Glass</span>
+                          {/* Spatial Glass reaction preview badge */}
+                          <div className="absolute bottom-1.5 inset-x-2 py-0.5 px-2 rounded-full bg-black/40 backdrop-blur-md border-0 flex items-center justify-between text-[9px] text-white pointer-events-none">
+                            <span className="truncate">Spatial Glass</span>
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
                           </div>
                         </div>
@@ -799,9 +799,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               </div>
             )}
 
-            {/* Card 2: Cỡ chữ ứng dụng (Liquid Glass Pill Slider Style) */}
+            {/* Card 2: Cỡ chữ ứng dụng (Spatial Glass Pill Slider Style) */}
             {matchesSearch('Cỡ chữ ứng dụng') && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-4">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border-0 hover:bg-white/[0.03] space-y-4">
                 {/* Header Row */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -810,14 +810,14 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                       Cỡ chữ ứng dụng
                     </span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/90 border border-white/10">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/90 border-0">
                     Phông chữ: {FONT_FAMILY_CONFIG.find(f => f.id === settings.fontFamily)?.name || 'Integer'}
                   </span>
                 </div>
 
-                {/* Liquid Glass Capsule Slider Container */}
+                {/* Spatial Glass Capsule Slider Container */}
                 <div className="pt-1">
-                  <div className="group relative w-full h-16 rounded-[24px] bg-white/[0.04] border border-white/10 flex items-center px-6 transition-all settings-slider-capsule">
+                  <div className="group relative w-full h-16 rounded-[24px] bg-white/[0.04] border-0 flex items-center px-6 transition-all settings-slider-capsule">
                     {/* Track Background */}
                     <div className="relative w-full h-2 rounded-full bg-[#383842] dark:bg-[#383842] overflow-visible">
                       {/* Active Red Track */}

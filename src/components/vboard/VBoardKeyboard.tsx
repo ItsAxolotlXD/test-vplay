@@ -384,7 +384,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
         </motion.div>
       );
     } else {
-      // Default: Default V-Board (Kính tối Liquid Glass)
+      // Default: Default V-Board (Kính tối Spatial Glass)
       buttonClasses = isKeyActive
         ? 'bg-[#7D7D83] scale-90 shadow-[inset_0_2px_6px_rgba(0,0,0,0.5),0_0_12px_rgba(255,255,255,0.4)] ring-1 ring-white/60 brightness-125 text-white'
         : 'bg-[#525257]/80 hover:bg-[#66666B] active:bg-[#7D7D83] active:scale-90 text-white shadow-[0_1.5px_0_rgba(0,0,0,0.55)] border-t border-white/10';

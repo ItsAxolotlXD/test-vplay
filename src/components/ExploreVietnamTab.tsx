@@ -70,7 +70,7 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
           {onBack && (
             <button
               onClick={onBack}
-              className="p-2 rounded-xl bg-[#2A2933] hover:bg-[#34333F] text-zinc-300 border border-[#3E3D4D] transition-all cursor-pointer"
+              className="p-2 rounded-full bg-[#2A2933] hover:bg-[#34333F] text-zinc-300 border border-[#3E3D4D] transition-all cursor-pointer"
               title="Quay lại"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -107,14 +107,14 @@ export default function ExploreVietnamTab({ onBack }: ExploreVietnamTabProps) {
           <button
             onClick={handleZoomOut}
             disabled={scale <= 0.5}
-            className="p-2 rounded-xl bg-[#18171E] hover:bg-[#262530] text-zinc-200 hover:text-white disabled:opacity-40 border border-[#2D2D38] transition-all cursor-pointer"
+            className="p-2 rounded-full bg-[#18171E] hover:bg-[#262530] text-zinc-200 hover:text-white disabled:opacity-40 border border-[#2D2D38] transition-all cursor-pointer"
             title="Thu nhỏ"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
           <button
             onClick={handleReset}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
+            className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Đặt lại ({Math.round(scale * 100)}%)</span>

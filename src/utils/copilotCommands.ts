@@ -79,6 +79,14 @@ export const TOOLBOX_DATA = [
     badge: "Minecraft Tool",
     route: "/toolbox",
     routeState: { tab: "mc-container" }
+  },
+  {
+    id: "tool-wheel-fortune",
+    title: "Wheels of Fortune (Vòng Quay May Mắn)",
+    subtitle: "Tự tạo vòng quay, thiết lập danh sách mục thưởng và tùy chỉnh thời gian quay từ 1s đến 30s",
+    badge: "Interactive Tool",
+    route: "/toolbox",
+    routeState: { tab: "wheel-fortune" }
   }
 ];
 

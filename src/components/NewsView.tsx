@@ -91,7 +91,7 @@ export const WAVES_ANNIVERSARY_IMAGES: string[] = [
   "https://static.wikia.nocookie.net/ep-deo/images/b/b0/Weves.png/revision/latest?cb=20260826065128"
 ];
 
-// Interactive Liquid Glass Carousel shown ONLY inside Article Detail view
+// Interactive Spatial Glass Carousel shown ONLY inside Article Detail view
 export const ImageGallerySlider: React.FC<{
   images: string[];
   className?: string;
@@ -1231,7 +1231,7 @@ export const NewsView: React.FC<NewsViewProps> = ({
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="w-full mx-auto font-sans space-y-6"
           >
-            {/* Top Hub Banner - Liquid Glass styling */}
+            {/* Top Hub Banner - Spatial Glass styling */}
             <div className="bg-white/[0.09] backdrop-blur-[24px] saturate-[180%] rounded-[20px] p-5 sm:p-7 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] border border-white/15 flex flex-col gap-3 relative overflow-hidden">
               {/* Specular highlight rim */}
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
@@ -1304,7 +1304,7 @@ export const NewsView: React.FC<NewsViewProps> = ({
               )}
             </div>
 
-            {/* News Articles Vertical Stack - Pure Liquid Glass, Entire Card Clickable, No Buttons / Tags / Author */}
+            {/* News Articles Vertical Stack - Pure Spatial Glass, Entire Card Clickable, No Buttons / Tags / Author */}
             <div className="flex flex-col gap-4">
               {filteredNews.map((item) => (
                 <div

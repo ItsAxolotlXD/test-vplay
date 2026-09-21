@@ -46,7 +46,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         <button
           onClick={handleBack}
           aria-label="Back"
-          className="p-1 hover:bg-[#cecece] active:bg-[#bebebe] active:translate-y-[1px] btn-press-effect text-[#141414] cursor-pointer rounded-none flex items-center justify-center"
+          className="p-1 hover:bg-[#cecece] active:bg-[#bebebe] active:translate-y-[1px] btn-press-effect text-[#141414] cursor-pointer rounded-full flex items-center justify-center"
           title="Quay lại"
         >
           <img

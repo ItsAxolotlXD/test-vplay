@@ -195,14 +195,14 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
       const saved = localStorage.getItem(STORAGE_DURATION_KEY);
       if (saved) {
         const num = parseFloat(saved);
-        if (num >= 2 && num <= 30) return num;
+        if (num >= 1 && num <= 60) return num;
       }
     } catch {}
     return 6;
   });
 
   const handleSetDuration = (sec: number) => {
-    const clamped = Math.max(2, Math.min(30, sec));
+    const clamped = Math.max(1, Math.min(60, Number(sec) || 5));
     setSpinDuration(clamped);
     try {
       localStorage.setItem(STORAGE_DURATION_KEY, clamped.toString());
@@ -662,7 +662,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
 
   return (
     <div className="w-full text-white font-sans select-none animate-fade-in">
-      {/* 1. Header Bar: Title, Preset Picker, Tabs (Liquid Glass) */}
+      {/* 1. Header Bar: Title, Preset Picker, Tabs (Spatial Glass) */}
       <div className="w-full bg-white/[0.09] backdrop-blur-[24px] saturate-[180%] rounded-[20px] p-5 sm:p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] border border-white/15 mb-5 relative overflow-hidden flex flex-wrap items-center justify-between gap-4">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
 
@@ -685,7 +685,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
           </div>
         </div>
 
-        {/* Action Tabs: Vòng Quay / Chỉnh Sửa / Mẫu Có Sẵn */}
+        {/* Action Tabs: Vòng Quay / Chỉnh Sửa / Mẫu Có Sẵn / Tự Tạo Mới */}
         <div className="flex items-center gap-2 bg-black/20 p-1.5 rounded-full border border-white/10 z-10 flex-wrap">
           <button
             onClick={() => {
@@ -731,13 +731,25 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
             <List className="w-3.5 h-3.5" />
             <span>Mẫu Vòng Quay ({presets.length})</span>
           </button>
+
+          <button
+            onClick={() => {
+              setShowNewWheelModal(true);
+              if (soundEnabled) playPopSound();
+            }}
+            className="px-4 py-2 rounded-full text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 transition-all cursor-pointer shadow-sm active:scale-95 flex items-center gap-1.5"
+            title="Tạo vòng quay mới theo ý muốn"
+          >
+            <Plus className="w-3.5 h-3.5 text-amber-400" />
+            <span>+ Tự Tạo Vòng Quay</span>
+          </button>
         </div>
       </div>
 
       {/* 2. Main Tab Content */}
       {activeTab === "wheel" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* Left Column: The Wheel Stage (Liquid Glass) */}
+          {/* Left Column: The Wheel Stage (Spatial Glass) */}
           <div className="lg:col-span-7 flex flex-col items-center justify-center p-6 bg-white/[0.06] backdrop-blur-[24px] saturate-[180%] rounded-[24px] border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_1px_0_rgba(255,255,255,0.25)] relative min-h-[460px] overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
 
@@ -838,17 +850,31 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
                   <Clock className="w-4 h-4 text-amber-400" />
                   <span>Thời Gian Vòng Quay</span>
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
-                  {spinDuration} Giây
-                </span>
+                {/* Direct Number Input */}
+                <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-full border border-emerald-400/40">
+                  <input
+                    type="number"
+                    min={1}
+                    max={60}
+                    step={0.5}
+                    value={spinDuration}
+                    disabled={isSpinning}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      if (!isNaN(val)) handleSetDuration(val);
+                    }}
+                    className="w-12 bg-transparent text-right font-mono font-bold text-xs text-emerald-300 focus:outline-none"
+                  />
+                  <span className="text-[11px] font-bold text-emerald-400">Giây</span>
+                </div>
               </div>
 
               {/* Slider Duration */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <input
                   type="range"
-                  min={2}
-                  max={20}
+                  min={1}
+                  max={30}
                   step={0.5}
                   value={spinDuration}
                   disabled={isSpinning}
@@ -856,20 +882,22 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
                   className="w-full accent-amber-500 cursor-pointer h-2 bg-white/10 rounded-lg"
                 />
                 <div className="flex justify-between text-[10px] font-mono text-white/60">
-                  <span>2s (Nhanh)</span>
-                  <span>10s (Hồi hộp)</span>
-                  <span>20s (Kịch tính)</span>
+                  <span>1s (Chớp nhoáng)</span>
+                  <span>5s (Chuẩn)</span>
+                  <span>15s (Kịch tính)</span>
+                  <span>30s (Cực lâu)</span>
                 </div>
               </div>
 
               {/* Quick Duration Buttons */}
-              <div className="grid grid-cols-5 gap-1.5 mt-3">
+              <div className="grid grid-cols-6 gap-1.5 mt-3">
                 {[
+                  { sec: 1, label: "1s" },
                   { sec: 3, label: "3s" },
                   { sec: 5, label: "5s" },
                   { sec: 8, label: "8s" },
                   { sec: 12, label: "12s" },
-                  { sec: 16, label: "16s" }
+                  { sec: 20, label: "20s" }
                 ].map((item) => (
                   <button
                     key={item.sec}
@@ -892,7 +920,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
               <button
                 onClick={handleShuffleItems}
                 disabled={isSpinning}
-                className="flex-1 px-3 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold uppercase flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] transition-all active:scale-95"
+                className="flex-1 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold uppercase flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] transition-all active:scale-95"
                 title="Xáo trộn vị trí các ô thưởng"
               >
                 <Shuffle className="w-3.5 h-3.5 text-cyan-400" />
@@ -902,7 +930,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
               <button
                 onClick={handleRandomizeColors}
                 disabled={isSpinning}
-                className="flex-1 px-3 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold uppercase flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] transition-all active:scale-95"
+                className="flex-1 px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold uppercase flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px] transition-all active:scale-95"
                 title="Đổi màu sắc ngẫu nhiên"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
@@ -985,7 +1013,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
         </div>
       )}
 
-      {/* 3. Tab: Chỉnh Sửa & Thêm Ô (Edit Wheel - Liquid Glass) */}
+      {/* 3. Tab: Chỉnh Sửa & Thêm Ô (Edit Wheel - Spatial Glass) */}
       {activeTab === "edit" && (
         <div className="p-6 rounded-[24px] bg-white/[0.08] backdrop-blur-[24px] border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] space-y-6 relative overflow-hidden">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
@@ -1164,7 +1192,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
         </div>
       )}
 
-      {/* 4. Tab: Mẫu Có Sẵn & Tạo Vòng Quay Mới (Presets - Liquid Glass) */}
+      {/* 4. Tab: Mẫu Có Sẵn & Tạo Vòng Quay Mới (Presets - Spatial Glass) */}
       {activeTab === "presets" && (
         <div className="p-6 rounded-[24px] bg-white/[0.08] backdrop-blur-[24px] border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] space-y-6 relative overflow-hidden">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
@@ -1265,7 +1293,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
         </div>
       )}
 
-      {/* 5. Tab: Nhập Dán Danh Sách Hàng Loạt (Bulk Text - Liquid Glass) */}
+      {/* 5. Tab: Nhập Dán Danh Sách Hàng Loạt (Bulk Text - Spatial Glass) */}
       {activeTab === "bulk" && (
         <div className="p-6 rounded-[24px] bg-white/[0.08] backdrop-blur-[24px] border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] space-y-4 relative overflow-hidden">
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
@@ -1308,7 +1336,7 @@ export const WheelOfFortuneGame: React.FC<WheelOfFortuneGameProps> = ({
         </div>
       )}
 
-      {/* 6. Modal: Tạo Vòng Quay Mới (Liquid Glass) */}
+      {/* 6. Modal: Tạo Vòng Quay Mới (Spatial Glass) */}
       {showNewWheelModal && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 backdrop-blur-md">
           <div className="w-full max-w-md bg-white/[0.12] backdrop-blur-[24px] border border-white/20 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] p-6 space-y-4 relative overflow-hidden">

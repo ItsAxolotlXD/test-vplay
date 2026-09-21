@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays } from 'lucide-react';
+import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays, Ratio } from 'lucide-react';
 import { Channel } from '../types';
 import { ChannelSchedule } from '../components/ChannelSchedule';
+import { ChannelAdOverlay } from '../components/ChannelAdOverlay';
 import { useTabSearch } from '../context/TabSearchContext';
 import Hls from 'hls.js';
 
@@ -292,10 +293,53 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMobileScheduleOpen, setIsMobileScheduleOpen] = useState<boolean>(false);
   const [playerHeight, setPlayerHeight] = useState<number | undefined>(undefined);
+  const [isAdOpen, setIsAdOpen] = useState<boolean>(false);
+  const [aspectRatio, setAspectRatio] = useState<'16:9' | '4:3'>(() => {
+    try {
+      const saved = localStorage.getItem('vplay_tv_aspect_ratio');
+      if (saved === '4:3' || saved === '16:9') return saved;
+    } catch {}
+    return '16:9';
+  });
+  const [aspectRatioToast, setAspectRatioToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleAspectRatioChange = (ratio: '16:9' | '4:3') => {
+    setAspectRatio(ratio);
+    try {
+      localStorage.setItem('vplay_tv_aspect_ratio', ratio);
+    } catch {}
+    setAspectRatioToast(`Tỷ lệ luồng: ${ratio} (${ratio === '16:9' ? '16:9 Màn rộng' : '4:3 Squish'})`);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setAspectRatioToast(null);
+    }, 2000);
+  };
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const prevChannelIdRef = useRef<string | null>(null);
+
+  // Trigger 5-second advertisement on entering any channel (every 5 channels watched)
+  useEffect(() => {
+    if (prevChannelIdRef.current === selectedChannel.id) return;
+    prevChannelIdRef.current = selectedChannel.id;
+
+    try {
+      const stored = parseInt(sessionStorage.getItem('vplay_tv_channel_view_count') || '0', 10);
+      const nextCount = stored + 1;
+      sessionStorage.setItem('vplay_tv_channel_view_count', nextCount.toString());
+
+      // Every 5 channels (5th, 10th, 15th, etc.), show 5s ad
+      if (nextCount % 5 === 0) {
+        setIsAdOpen(true);
+        if (videoRef.current) {
+          videoRef.current.pause();
+        }
+      }
+    } catch {}
+  }, [selectedChannel.id]);
 
   // Measure and synchronize video player exact pixel height to desktop schedule sidebar
   useEffect(() => {
@@ -433,12 +477,14 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
   };
 
   const toggleFullscreen = () => {
-    const video = videoRef.current;
-    if (!video) return;
+    const target = playerContainerRef.current || videoRef.current;
+    if (!target) return;
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
     } else {
-      video.requestFullscreen().catch(() => {});
+      target.requestFullscreen().catch(() => {
+        videoRef.current?.requestFullscreen().catch(() => {});
+      });
     }
   };
 
@@ -480,11 +526,41 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                 <span>Đang phát trực tiếp</span>
               </div>
 
+              {/* Aspect Ratio Switcher (16:9 vs 4:3 Squish) */}
+              <div className="flex items-center bg-white/10 p-0.5 rounded-full border border-white/15 text-xs shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => handleAspectRatioChange('16:9')}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    aspectRatio === '16:9'
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Tỷ lệ 16:9 (Màn ảnh rộng, squish luồng vừa 16:9)"
+                >
+                  <Ratio className="w-3.5 h-3.5" />
+                  <span>16:9</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAspectRatioChange('4:3')}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    aspectRatio === '4:3'
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Tỷ lệ 4:3 (Truyền thống, squish luồng kênh lại cho vừa 4:3)"
+                >
+                  <Ratio className="w-3.5 h-3.5" />
+                  <span>4:3</span>
+                </button>
+              </div>
+
               {/* Mobile Calendar Icon Button ("icon hình quyển lịch") */}
               <button
                 type="button"
                 onClick={() => setIsMobileScheduleOpen(true)}
-                className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-red-600/25 to-[#C83DFF]/25 hover:from-red-600/35 hover:to-[#C83DFF]/35 border border-red-500/40 text-red-200 text-xs font-semibold shadow-md active:scale-95 transition-all cursor-pointer"
+                className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-red-600/25 to-[#C83DFF]/25 hover:from-red-600/35 hover:to-[#C83DFF]/35 border border-red-500/40 text-red-200 text-xs font-semibold shadow-md active:scale-95 transition-all cursor-pointer"
                 title="Xem lịch phát sóng 24h"
               >
                 <CalendarDays className="w-4 h-4 text-red-400" />
@@ -499,16 +575,47 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
             <div className="lg:col-span-8 flex flex-col">
               <div
                 ref={playerContainerRef}
-                className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/95 shadow-2xl group flex items-center justify-center border border-white/10"
+                className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl group flex items-center justify-center border border-white/10"
               >
-                {/* Real Video Element */}
+                {/* Real Video Element with 16:9 / 4:3 Squish support */}
                 <video
                   ref={videoRef}
-                  className="w-full h-full object-contain bg-black cursor-pointer"
+                  className={`h-full transition-all duration-300 bg-black cursor-pointer ${
+                    aspectRatio === '16:9'
+                      ? 'w-full object-fill block'
+                      : 'w-auto aspect-[4/3] object-fill mx-auto block'
+                  }`}
+                  style={{
+                    objectFit: 'fill',
+                    aspectRatio: aspectRatio === '4:3' ? '4 / 3' : '16 / 9',
+                    width: aspectRatio === '4:3' ? 'auto' : '100%',
+                    height: '100%',
+                    maxWidth: '100%',
+                  }}
                   onClick={togglePlay}
                   playsInline
                   autoPlay
                   muted={isMuted}
+                />
+
+                {/* On-screen Toast Notification for Aspect Ratio */}
+                {aspectRatioToast && (
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/85 border border-white/20 backdrop-blur-md text-white font-mono text-xs font-bold flex items-center gap-2 z-20 pointer-events-none shadow-2xl animate-fade-in">
+                    <Ratio className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+                    <span>{aspectRatioToast}</span>
+                  </div>
+                )}
+
+                {/* 5-Second Channel Interstitial Ad Overlay (Every 5 Channels) */}
+                <ChannelAdOverlay
+                  isOpen={isAdOpen}
+                  channelName={selectedChannel.name}
+                  onAdComplete={() => {
+                    setIsAdOpen(false);
+                    if (videoRef.current) {
+                      videoRef.current.play().catch(() => {});
+                    }
+                  }}
                 />
 
                 {/* Simple Playback Error Message */}
@@ -533,14 +640,14 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                     <div className="flex items-center gap-3">
                       <button
                         onClick={togglePlay}
-                        className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
                         title={isPlaying ? 'Tạm dừng' : 'Phát'}
                       >
                         {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                       </button>
                       <button
                         onClick={toggleMute}
-                        className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
                         title={isMuted ? 'Bật tiếng' : 'Tắt tiếng'}
                       >
                         {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -551,9 +658,20 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                     </div>
 
                     <div className="flex items-center gap-2">
+                      {/* Aspect Ratio Quick Toggle Pill in Overlay Controls */}
+                      <button
+                        type="button"
+                        onClick={() => handleAspectRatioChange(aspectRatio === '16:9' ? '4:3' : '16:9')}
+                        className="px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-white/10"
+                        title={`Tỷ lệ hiện tại: ${aspectRatio}. Bấm để chuyển sang ${aspectRatio === '16:9' ? '4:3' : '16:9'} (squish luồng)`}
+                      >
+                        <Ratio className="w-3.5 h-3.5 text-red-400" />
+                        <span>{aspectRatio}</span>
+                      </button>
+
                       <button
                         onClick={toggleFullscreen}
-                        className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
                         title="Toàn màn hình"
                       >
                         <Maximize2 className="w-4 h-4" />

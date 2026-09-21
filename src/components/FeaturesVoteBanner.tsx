@@ -687,7 +687,7 @@ export const FeaturesVoteBanner: React.FC<FeaturesVoteBannerProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-fuchsia-600/30 cursor-pointer"
+                    className="px-5 py-2.5 rounded-full bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-fuchsia-600/30 cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
                     <span>Gửi Đề Xuất</span>

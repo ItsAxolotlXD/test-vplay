@@ -15,12 +15,14 @@ import {
   Sparkles, 
   Sliders,
   Maximize2,
-  Tv
+  Tv,
+  RotateCcw
 } from 'lucide-react';
 import { parseM3UPlaylist, exportToM3U, SAMPLE_M3U_TEMPLATE } from '../utils/m3uParser';
 import { Channel } from '../types';
 import { CHANNELS_DATA } from '../data/channels';
 import { MinecraftContainerEmulator } from '../components/minecraft/MinecraftContainerEmulator';
+import { WheelOfFortuneGame } from '../components/vapps/WheelOfFortuneGame';
 
 interface ToolboxProps {
   initialTab?: string;
@@ -37,7 +39,13 @@ export const Toolbox: React.FC<ToolboxProps> = ({
 
   // Sync tab when initialTab prop changes
   useEffect(() => {
-    if (initialTab) setActiveTab(initialTab);
+    if (initialTab) {
+      if (initialTab === 'wheels-of-fortune' || initialTab === 'wheel-of-fortune' || initialTab === 'wheel') {
+        setActiveTab('wheel-fortune');
+      } else {
+        setActiveTab(initialTab);
+      }
+    }
   }, [initialTab]);
 
   // Tab 1: Aspect Ratio & Safe Area state
@@ -233,7 +241,7 @@ export const Toolbox: React.FC<ToolboxProps> = ({
 
         <button
           onClick={() => setActiveTab('mc-container')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-none text-xs font-bold whitespace-nowrap transition-all ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
             activeTab === 'mc-container'
               ? 'bg-gradient-purple-active text-white shadow-md glow-purple-sm'
               : 'bg-[#1E1E22] text-[#A1A1AA] hover:text-white border border-[#2E2E36]'
@@ -241,6 +249,18 @@ export const Toolbox: React.FC<ToolboxProps> = ({
         >
           <Box className="w-4 h-4 text-emerald-400" />
           <span>Emulate Minecraft Container GUI</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('wheel-fortune')}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+            activeTab === 'wheel-fortune'
+              ? 'bg-gradient-purple-active text-white shadow-md glow-purple-sm'
+              : 'bg-[#1E1E22] text-[#A1A1AA] hover:text-white border border-[#2E2E36]'
+          }`}
+        >
+          <RotateCcw className="w-4 h-4 text-amber-400" />
+          <span>Wheels of Fortune (Vòng Quay)</span>
         </button>
       </div>
 
@@ -686,8 +706,15 @@ export const Toolbox: React.FC<ToolboxProps> = ({
 
       {/* TAB 6: Emulate Minecraft Container GUI */}
       {activeTab === 'mc-container' && (
-        <div className="p-4 sm:p-6 md:p-8 rounded-none bg-[#1E1E22] border border-[#2E2E36] shadow-xl">
+        <div className="p-4 sm:p-6 md:p-8 rounded-[30px] bg-[#1E1E22] border border-[#2E2E36] shadow-xl">
           <MinecraftContainerEmulator />
+        </div>
+      )}
+
+      {/* TAB 7: Wheels of Fortune Tool (Tự tạo vòng quay, tự set thời gian quay) */}
+      {activeTab === 'wheel-fortune' && (
+        <div className="rounded-[30px] overflow-hidden bg-[#1E1E22] border border-[#2E2E36] shadow-xl p-4 sm:p-6">
+          <WheelOfFortuneGame />
         </div>
       )}
     </div>

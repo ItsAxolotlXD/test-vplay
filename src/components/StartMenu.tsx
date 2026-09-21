@@ -560,7 +560,7 @@ export default function StartMenu({
                     </div>
                     <button 
                       onClick={handleClearFavorites}
-                      className="bg-rose-600/20 hover:bg-rose-600 hover:text-white text-rose-300 border border-rose-500/30 px-3 py-1 rounded-md transition-all font-semibold cursor-pointer shrink-0"
+                      className="bg-rose-600/20 hover:bg-rose-600 hover:text-white text-rose-300 border border-rose-500/30 px-3 py-1 rounded-full transition-all font-semibold cursor-pointer shrink-0"
                     >
                       Xóa dữ liệu
                     </button>
@@ -574,7 +574,7 @@ export default function StartMenu({
                     </div>
                     <button 
                       onClick={handleClearCustomChannels}
-                      className="bg-rose-600/20 hover:bg-rose-600 hover:text-white text-rose-300 border border-rose-500/30 px-3 py-1 rounded-md transition-all font-semibold cursor-pointer shrink-0"
+                      className="bg-rose-600/20 hover:bg-rose-600 hover:text-white text-rose-300 border border-rose-500/30 px-3 py-1 rounded-full transition-all font-semibold cursor-pointer shrink-0"
                     >
                       Xóa luồng
                     </button>
@@ -588,7 +588,7 @@ export default function StartMenu({
                     </div>
                     <button 
                       onClick={handleResetSettings}
-                      className="bg-amber-600/20 hover:bg-amber-600 hover:text-white text-amber-300 border border-amber-500/30 px-3 py-1 rounded-md transition-all font-semibold cursor-pointer shrink-0"
+                      className="bg-amber-600/20 hover:bg-amber-600 hover:text-white text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full transition-all font-semibold cursor-pointer shrink-0"
                     >
                       Đặt lại mặc định
                     </button>
@@ -725,7 +725,7 @@ export default function StartMenu({
                   </span>
                   <button
                     onClick={handleRefreshChannelSuggestions}
-                    className="p-1 rounded-md hover:bg-white/10 text-white/50 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                    className="p-1 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
                     title="Làm mới gợi ý"
                   >
                     <RotateCw className="w-3.5 h-3.5" />

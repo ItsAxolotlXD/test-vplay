@@ -284,7 +284,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                 <button
                   type="button"
                   style={{ borderRadius: "0px" }}
-                  className="ore-btn-white px-5 py-2 text-xs font-semibold rounded-none cursor-pointer"
+                  className="ore-btn-white px-5 py-2 text-xs font-semibold rounded-full cursor-pointer"
                 >
                   Manage
                 </button>
@@ -299,7 +299,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                 <button
                   type="button"
                   style={{ borderRadius: "0px" }}
-                  className="ore-btn-white px-5 py-2 text-xs font-semibold rounded-none cursor-pointer"
+                  className="ore-btn-white px-5 py-2 text-xs font-semibold rounded-full cursor-pointer"
                 >
                   View
                 </button>
@@ -314,7 +314,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                 <button
                   type="button"
                   style={{ borderRadius: "0px" }}
-                  className="ore-btn-white px-5 py-2 text-xs font-semibold rounded-none cursor-pointer"
+                  className="ore-btn-white px-5 py-2 text-xs font-semibold rounded-full cursor-pointer"
                 >
                   Sign Out
                 </button>
@@ -443,7 +443,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
                   type="button"
                   onClick={handleCleanStorage}
                   style={{ borderRadius: "0px" }}
-                  className="ore-btn-white px-4 py-2 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer rounded-none"
+                  className="ore-btn-white px-4 py-2 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer rounded-full"
                 >
                   <Trash2 className="w-3.5 h-3.5 text-black shrink-0" />
                   <span>Dọn dẹp ổ cứng</span>

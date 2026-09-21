@@ -282,7 +282,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             <button
               id="btn-topbar-mobile-menu"
               onClick={onOpenMobileMenu}
-              className="w-9 h-9 flex md:hidden items-center justify-center rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="w-9 h-9 flex md:hidden items-center justify-center rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Mở danh mục điều hướng"
             >
               <Menu className="w-5 h-5" />
@@ -944,7 +944,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold text-sm hover:brightness-110 transition-all shadow-md shadow-red-600/30"
+                    className="flex-1 py-2.5 rounded-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold text-sm hover:brightness-110 transition-all shadow-md shadow-red-600/30"
                   >
                     Kích hoạt ngay
                   </button>
@@ -1175,7 +1175,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <h4 className="font-bold text-sm mt-1">{prod.name}</h4>
                       <p className="text-amber-400 font-bold text-sm mt-0.5">{prod.price}</p>
                     </div>
-                    <button className="mt-3 w-full py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors">
+                    <button className="mt-3 w-full py-2 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors">
                       Đặt mua
                     </button>
                   </div>
@@ -1232,7 +1232,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <p className="text-[10px] text-gray-400">Cần 1.000 V-Points</p>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs">
+                  <button className="px-3 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs">
                     Đổi quà
                   </button>
                 </div>
@@ -1245,7 +1245,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <p className="text-[10px] text-gray-400">Cần 500 V-Points</p>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-xs">
+                  <button className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium text-xs">
                     Đổi quà
                   </button>
                 </div>

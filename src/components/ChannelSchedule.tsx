@@ -106,7 +106,7 @@ export const ChannelSchedule: React.FC<ChannelScheduleProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 active:scale-90 text-white/70 hover:text-white transition-all cursor-pointer shrink-0"
+            className="p-1.5 rounded-full bg-white/5 hover:bg-white/15 active:scale-90 text-white/70 hover:text-white transition-all cursor-pointer shrink-0"
             title="Đóng lịch phát sóng"
           >
             <X className="w-4 h-4" />

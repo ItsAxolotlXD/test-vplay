@@ -36,6 +36,8 @@ const ROUTE_PLACEHOLDERS: Record<string, string> = {
   '/mc-container': 'Search Minecraft',
   '/minecraft-container': 'Search Minecraft',
   '/minecraft-gui': 'Search Minecraft',
+  '/wheel-of-fortune': 'Search Wheels of Fortune',
+  '/wheels-of-fortune': 'Search Wheels of Fortune',
   '/space-360': 'Search Space 360',
   '/v-space': 'Search Space 360',
   '/v-apps': 'Search Space 360',

@@ -30,7 +30,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   const [batteryLevel, setBatteryLevel] = useState(95);
   const [isCharging, setIsCharging] = useState(false);
   const [showStatusTooltip, setShowStatusTooltip] = useState(false);
-  const [recentChannels, setRecentChannels] = useState<Channel[]>([]);
   const islandRef = useRef<HTMLDivElement>(null);
 
   // Update real-time clock and date
@@ -68,70 +67,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       }).catch(() => {});
     }
   }, []);
-
-  // Track and load 4 recent channels
-  useEffect(() => {
-    const allChannels = (channels && channels.length > 0) ? channels : CHANNELS_DATA;
-    try {
-      const savedIds = JSON.parse(localStorage.getItem('vplay_recent_channel_ids') || '[]');
-      let resolved: Channel[] = [];
-      if (Array.isArray(savedIds) && savedIds.length > 0) {
-        resolved = savedIds
-          .map((id: string) => allChannels.find((c) => c.id === id || c.slug === id))
-          .filter(Boolean) as Channel[];
-      }
-      // Top fallback channels: VTV1, VTV3, VTV6, ON TRENDING
-      const defaults = ['vtv1', 'vtv3', 'vtv6', 'on_trending'];
-      for (const defId of defaults) {
-        if (resolved.length >= 4) break;
-        const ch = allChannels.find((c) => c.id === defId || c.slug === defId);
-        if (ch && !resolved.some((r) => r.id === ch.id)) {
-          resolved.push(ch);
-        }
-      }
-      for (const ch of allChannels) {
-        if (resolved.length >= 4) break;
-        if (!resolved.some((r) => r.id === ch.id)) {
-          resolved.push(ch);
-        }
-      }
-      setRecentChannels(resolved.slice(0, 4));
-    } catch {
-      setRecentChannels(allChannels.slice(0, 4));
-    }
-  }, [channels]);
-
-  // When active channel changes, prepend to recent channels
-  useEffect(() => {
-    if (!currentChannel?.id) return;
-    try {
-      const savedIds: string[] = JSON.parse(localStorage.getItem('vplay_recent_channel_ids') || '[]');
-      const nextIds = [currentChannel.id, ...savedIds.filter((id) => id !== currentChannel.id)].slice(0, 10);
-      localStorage.setItem('vplay_recent_channel_ids', JSON.stringify(nextIds));
-
-      const allChannels = (channels && channels.length > 0) ? channels : CHANNELS_DATA;
-      const resolved = nextIds
-        .map((id) => allChannels.find((c) => c.id === id || c.slug === id))
-        .filter(Boolean) as Channel[];
-
-      for (const ch of allChannels) {
-        if (resolved.length >= 4) break;
-        if (!resolved.some((r) => r.id === ch.id)) {
-          resolved.push(ch);
-        }
-      }
-      setRecentChannels(resolved.slice(0, 4));
-    } catch {}
-  }, [currentChannel, channels]);
-
-  const handleSelectRecentChannel = (ch: Channel) => {
-    if (onSelectChannel) {
-      onSelectChannel(ch);
-    }
-    if (navigate) {
-      navigate(`/live-tv?channel=${ch.slug}`);
-    }
-  };
 
   // Close expanded Dynamic Island when clicking outside
   useEffect(() => {
@@ -192,22 +127,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           style={{
             maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0) 65%)',
             WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0) 65%)',
-          }}
-        />
-        {/* Step 4: Vertical top gradient vignette for top items */}
-        <div 
-          className="absolute top-0 right-0 w-full h-[360px] bg-gradient-to-b from-black/30 via-black/10 to-transparent pointer-events-none"
-          style={{
-            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0) 100%)',
-          }}
-        />
-        {/* Step 5: Vertical bottom gradient vignette for foot buttons */}
-        <div 
-          className="absolute bottom-0 right-0 w-full h-[260px] bg-gradient-to-t from-black/35 via-black/10 to-transparent pointer-events-none"
-          style={{
-            maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0) 100%)',
           }}
         />
       </div>

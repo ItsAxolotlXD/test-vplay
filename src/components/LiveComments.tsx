@@ -462,7 +462,7 @@ export default function LiveComments({ channel, isMaterialDesignActive = false }
 
                   <button
                     onClick={handleSendSuperChat}
-                    className="w-full py-2 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-black font-extrabold text-[10.5px] rounded-xl transition-all shadow-md active:scale-98"
+                    className="w-full py-2 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-black font-extrabold text-[10.5px] rounded-full transition-all shadow-md active:scale-98"
                   >
                     Gửi Super Chat (100 Xu)
                   </button>
@@ -554,7 +554,7 @@ export default function LiveComments({ channel, isMaterialDesignActive = false }
           />
           <button
             type="submit"
-            className="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg cursor-default transition-all hover:scale-105 shrink-0"
+            className="p-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg cursor-default transition-all hover:scale-105 shrink-0"
           >
             <Send className="w-3.5 h-3.5" />
           </button>
