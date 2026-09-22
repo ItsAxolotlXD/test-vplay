@@ -12,7 +12,12 @@ import {
   Palette,
   Image as ImageIcon,
   Tv,
-  Box
+  Box,
+  Trees,
+  Mountain,
+  Sun,
+  CloudSun,
+  Compass
 } from 'lucide-react';
 
 interface SpatialDesignVisualizerProps {
@@ -20,11 +25,72 @@ interface SpatialDesignVisualizerProps {
   navigate?: (route: string) => void;
 }
 
-// Preset themes for background testing
-const BACKGROUND_PRESETS = [
+export interface BackgroundPreset {
+  id: string;
+  name: string;
+  category: 'nature' | 'abstract';
+  locationTag: string;
+  imageUrl?: string;
+  bgClass?: string;
+  extraDecor?: React.ReactNode;
+}
+
+// Preset themes for background testing - Defaults to scenic landscape & nature
+const BACKGROUND_PRESETS: BackgroundPreset[] = [
+  {
+    id: 'yosemite-valley',
+    name: 'Hồ & Núi đá Alpine',
+    category: 'nature',
+    locationTag: 'Yosemite Valley • Dãy Alps',
+    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'misty-forest',
+    name: 'Rừng sương mù nhiệt đới',
+    category: 'nature',
+    locationTag: 'Rừng nguyên sinh • Sương mai',
+    imageUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'sunset-alps',
+    name: 'Hoàng hôn đỉnh núi tuyết',
+    category: 'nature',
+    locationTag: 'Hoàng hôn ráng chiều • Đỉnh tuyết',
+    imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'aurora-fjord',
+    name: 'Cực quang Bắc Cực',
+    category: 'nature',
+    locationTag: 'Cực quang đêm • Vịnh Na Uy',
+    imageUrl: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'misty-lake',
+    name: 'Hồ nước & Rừng thông',
+    category: 'nature',
+    locationTag: 'Hồ sương mờ • Rừng thông',
+    imageUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'tropical-coast',
+    name: 'Bờ biển nhiệt đới',
+    category: 'nature',
+    locationTag: 'Biển xanh ngọc • Hàng dừa',
+    imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80',
+  },
+  {
+    id: 'autumn-forest',
+    name: 'Rừng thu lá phong',
+    category: 'nature',
+    locationTag: 'Mùa thu vàng • Rừng lá đỏ',
+    imageUrl: 'https://images.unsplash.com/photo-1477414348463-c0eb7f1359b6?auto=format&fit=crop&w=1920&q=80',
+  },
   {
     id: 'mesh-color',
     name: 'Mesh Gradient',
+    category: 'abstract',
+    locationTag: 'Hiệu ứng Gradient',
     bgClass: 'bg-gradient-to-tr from-[#6b21a8] via-[#1e1b4b] to-[#0f766e]',
     extraDecor: (
       <>
@@ -37,6 +103,8 @@ const BACKGROUND_PRESETS = [
   {
     id: 'vplay-studio',
     name: 'Vplay Studio',
+    category: 'abstract',
+    locationTag: 'Phòng thu tối',
     bgClass: 'bg-[#121216]',
     extraDecor: (
       <>
@@ -46,47 +114,6 @@ const BACKGROUND_PRESETS = [
           VPLAY BROADCAST
         </div>
       </>
-    )
-  },
-  {
-    id: 'tokyo-neon',
-    name: 'Neon Cyber',
-    bgClass: 'bg-gradient-to-b from-[#180828] via-[#0b0c1e] to-[#020208]',
-    extraDecor: (
-      <>
-        <div className="absolute top-10 right-16 w-56 h-56 rounded-full bg-fuchsia-600/30 blur-3xl" />
-        <div className="absolute bottom-10 left-16 w-64 h-64 rounded-full bg-blue-600/30 blur-3xl" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-fuchsia-950/40 to-transparent" />
-      </>
-    )
-  },
-  {
-    id: 'channel-matrix',
-    name: 'TV Grid Simulation',
-    bgClass: 'bg-[#18181b]',
-    extraDecor: (
-      <div className="absolute inset-0 grid grid-cols-4 gap-3 p-4 opacity-35 pointer-events-none scale-95">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="h-24 rounded-2xl bg-zinc-800/80 border border-white/10 flex flex-col justify-end p-2.5">
-            <span className="text-[10px] text-white/50 font-bold">KÊNH VTV {i} HD</span>
-          </div>
-        ))}
-      </div>
-    )
-  },
-  {
-    id: 'checkerboard',
-    name: 'Alpha Checkerboard',
-    bgClass: 'bg-[#222]',
-    extraDecor: (
-      <div 
-        className="absolute inset-0 opacity-20 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%)',
-          backgroundSize: '20px 20px',
-          backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
-        }}
-      />
     )
   }
 ];
@@ -120,13 +147,18 @@ export const SpatialDesignVisualizer: React.FC<SpatialDesignVisualizerProps> = (
   const [specularBrightness, setSpecularBrightness] = useState<number>(85); // 0% - 100%
   const [saturation, setSaturation] = useState<number>(180); // 100% - 250%
   const [selectedTint, setSelectedTint] = useState<string>('dark');
-  const [selectedBg, setSelectedBg] = useState<string>('mesh-color');
+  const [selectedBg, setSelectedBg] = useState<string>('yosemite-valley');
+  const [sceneDimming, setSceneDimming] = useState<number>(20); // 0% - 70%
+  const [customBgUrl, setCustomBgUrl] = useState<string>('');
+  const [showCustomInput, setShowCustomInput] = useState<boolean>(false);
   const [squareSize, setSquareSize] = useState<number>(280); // 280px x 280px
   const [showContent, setShowContent] = useState<'card' | 'button' | 'blank'>('card');
   const [copied, setCopied] = useState<boolean>(false);
 
   // Active tint RGB
   const currentTint = TINT_PRESETS.find(t => t.id === selectedTint) || TINT_PRESETS[0];
+  const activeBgPreset = BACKGROUND_PRESETS.find(b => b.id === selectedBg) || BACKGROUND_PRESETS[0];
+  const effectiveImageUrl = selectedBg === 'custom' && customBgUrl ? customBgUrl : activeBgPreset.imageUrl;
 
   // Calculate CSS styles
   const alpha = transparency / 100;
@@ -180,11 +212,25 @@ export const SpatialDesignVisualizer: React.FC<SpatialDesignVisualizerProps> = (
     setSpecularBrightness(85);
     setSaturation(180);
     setSelectedTint('dark');
+    setSelectedBg('yosemite-valley');
+    setSceneDimming(20);
     setSquareSize(280);
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-6 select-none space-y-6">
+    <div className="relative w-full max-w-7xl mx-auto px-4 py-6 select-none space-y-6">
+      {/* Subtle ambient nature atmosphere behind the whole stage */}
+      {effectiveImageUrl && (
+        <div 
+          className="fixed inset-0 opacity-15 blur-3xl pointer-events-none -z-10 scale-110 overflow-hidden"
+          style={{
+            backgroundImage: `url(${effectiveImageUrl})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover'
+          }}
+        />
+      )}
+
       {/* Top Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div className="flex items-center gap-3">
@@ -206,9 +252,13 @@ export const SpatialDesignVisualizer: React.FC<SpatialDesignVisualizerProps> = (
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#388BFD]/20 text-[#388BFD] border border-[#388BFD]/40">
                 Corner 30px
               </span>
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <Trees className="w-3 h-3" />
+                Nền thiên nhiên
+              </span>
             </div>
             <p className="text-xs sm:text-sm text-zinc-400 mt-0.5">
-              Mô phỏng hình vuông kính không gian (Spatial Glass), góc bo 30px với độ trong suốt, mờ, nổi và viền tùy chỉnh
+              Mô phỏng hình vuông kính không gian (Spatial Glass) góc bo 30px trên nền phong cảnh thiên nhiên hùng vĩ
             </p>
           </div>
         </div>
@@ -238,38 +288,117 @@ export const SpatialDesignVisualizer: React.FC<SpatialDesignVisualizerProps> = (
         {/* 1. VISUALIZER STAGE (COL 7) */}
         <div className="lg:col-span-7 flex flex-col gap-4">
           
-          {/* Background Selector Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
-            <span className="text-zinc-400 font-medium shrink-0 flex items-center gap-1">
-              <ImageIcon className="w-3.5 h-3.5" />
-              Nền hậu cảnh:
-            </span>
-            {BACKGROUND_PRESETS.map((bg) => (
+          {/* Nature Landscape & Background Selector */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-zinc-300 font-semibold flex items-center gap-1.5">
+                <Mountain className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Nền phong cảnh, thiên nhiên ({BACKGROUND_PRESETS.filter(b => b.category === 'nature').length} cảnh):</span>
+              </span>
               <button
-                key={bg.id}
-                onClick={() => setSelectedBg(bg.id)}
-                className={`px-3 py-1.5 rounded-xl font-medium transition-all cursor-pointer shrink-0 ${
-                  selectedBg === bg.id
-                    ? 'bg-white text-black font-bold shadow-md'
-                    : 'bg-white/5 text-zinc-300 hover:bg-white/10'
-                }`}
+                type="button"
+                onClick={() => setShowCustomInput(prev => !prev)}
+                className="text-[11px] text-[#388BFD] hover:underline font-medium flex items-center gap-1 cursor-pointer"
               >
-                {bg.name}
+                <span>{showCustomInput ? 'Đóng ô link' : '+ Thêm URL phong cảnh'}</span>
               </button>
-            ))}
+            </div>
+
+            {/* Custom URL Input if opened */}
+            {showCustomInput && (
+              <div className="flex items-center gap-2 p-2 rounded-2xl bg-[#141418] border border-white/15 shadow-md">
+                <input
+                  type="text"
+                  value={customBgUrl}
+                  onChange={(e) => setCustomBgUrl(e.target.value)}
+                  placeholder="Dán URL ảnh phong cảnh, thiên nhiên (https://...)..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-[#388BFD]"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (customBgUrl.trim()) setSelectedBg('custom');
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-[#388BFD] text-white text-xs font-bold hover:bg-[#388BFD]/80 cursor-pointer shrink-0"
+                >
+                  Áp dụng
+                </button>
+              </div>
+            )}
+
+            {/* Horizontal Scrollable Thumbnails */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1.5 [scrollbar-width:thin] no-scrollbar text-xs">
+              {BACKGROUND_PRESETS.map((bg) => {
+                const isSelected = selectedBg === bg.id;
+                return (
+                  <button
+                    key={bg.id}
+                    type="button"
+                    onClick={() => setSelectedBg(bg.id)}
+                    className={`group relative flex items-center gap-2 px-2.5 py-1.5 rounded-2xl border transition-all cursor-pointer shrink-0 ${
+                      isSelected
+                        ? 'bg-white/15 border-white/50 ring-2 ring-emerald-400/60 shadow-lg text-white font-bold'
+                        : 'bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 hover:border-white/20'
+                    }`}
+                    title={bg.locationTag}
+                  >
+                    {bg.imageUrl ? (
+                      <img
+                        src={bg.imageUrl}
+                        alt={bg.name}
+                        referrerPolicy="no-referrer"
+                        className="w-6 h-6 rounded-lg object-cover border border-white/20 shrink-0"
+                      />
+                    ) : (
+                      <span className="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 to-teal-500 border border-white/20 shrink-0" />
+                    )}
+                    <span className="truncate max-w-[140px] text-[11px]">{bg.name}</span>
+                    {bg.category === 'nature' && (
+                      <Trees className="w-3 h-3 text-emerald-400 shrink-0 opacity-70 group-hover:opacity-100" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Interactive Canvas */}
+          {/* Interactive Canvas Stage */}
           <div 
-            className={`relative min-h-[440px] sm:min-h-[500px] w-full rounded-3xl overflow-hidden border border-white/10 flex items-center justify-center p-6 shadow-2xl transition-all ${
-              BACKGROUND_PRESETS.find(b => b.id === selectedBg)?.bgClass || 'bg-[#18181e]'
-            }`}
+            className="relative min-h-[460px] sm:min-h-[520px] w-full rounded-3xl overflow-hidden border border-white/15 flex items-center justify-center p-6 shadow-2xl transition-all"
+            style={{ backgroundColor: '#101014' }}
           >
-            {/* Background elements */}
-            {BACKGROUND_PRESETS.find(b => b.id === selectedBg)?.extraDecor}
+            {/* Nature Landscape & Background Photo Layer */}
+            {effectiveImageUrl ? (
+              <div className="absolute inset-0 select-none overflow-hidden">
+                <img
+                  src={effectiveImageUrl}
+                  alt={activeBgPreset.name}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 hover:scale-105"
+                />
+                {/* Scene Dimming & Natural Lighting Overlay */}
+                <div 
+                  className="absolute inset-0 pointer-events-none transition-colors duration-300"
+                  style={{ backgroundColor: `rgba(0, 0, 0, ${sceneDimming / 100})` }}
+                />
+              </div>
+            ) : (
+              <>
+                <div className={`absolute inset-0 ${activeBgPreset.bgClass || 'bg-[#18181e]'}`} />
+                {activeBgPreset.extraDecor}
+              </>
+            )}
+
+            {/* Location & Nature Badge (Top-Left) */}
+            <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-xs text-white/90 z-20 shadow-md">
+              <Trees className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="font-semibold text-[11px] truncate max-w-[240px]">
+                {selectedBg === 'custom' ? 'Ảnh thiên nhiên tự chọn' : activeBgPreset.locationTag}
+              </span>
+            </div>
 
             {/* Specular Rim Indicator Overlay on Hover */}
-            <div className="relative group cursor-pointer" style={{ width: `${squareSize}px`, height: `${squareSize}px` }}>
+            <div className="relative group cursor-pointer z-10" style={{ width: `${squareSize}px`, height: `${squareSize}px` }}>
               
               {/* THE SPATIAL SQUARE WITH CORNER 30PX */}
               <div 
@@ -334,12 +463,12 @@ export const SpatialDesignVisualizer: React.FC<SpatialDesignVisualizerProps> = (
             </div>
 
             {/* Corner Info Badge */}
-            <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-[11px] text-zinc-300 font-mono">
+            <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-[11px] text-zinc-300 font-mono z-20">
               Corner: <span className="text-white font-bold">30px</span> | Size: <span className="text-white font-bold">{squareSize}x{squareSize}px</span>
             </div>
 
             {/* Content Switcher floating pills */}
-            <div className="absolute top-3 right-3 flex items-center gap-1.5 p-1 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 text-xs">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 p-1 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 text-xs z-20">
               <button
                 onClick={() => setShowContent('card')}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-colors cursor-pointer ${
@@ -397,6 +526,30 @@ export const SpatialDesignVisualizer: React.FC<SpatialDesignVisualizerProps> = (
           </div>
 
           <div className="space-y-5">
+            
+            {/* 0. Ánh sáng tự nhiên (Scene Lighting) */}
+            <div className="space-y-2 pb-3 border-b border-white/10">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-white flex items-center gap-1.5">
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  Ánh sáng tự nhiên (Scene Lighting)
+                </span>
+                <span className="font-mono text-[#388BFD] font-bold">{100 - sceneDimming}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="70"
+                value={sceneDimming}
+                onChange={(e) => setSceneDimming(Number(e.target.value))}
+                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#388BFD]"
+              />
+              <div className="flex justify-between text-[10px] text-zinc-500">
+                <span>Ban ngày rực rỡ (100%)</span>
+                <span>Chiều tà (80%)</span>
+                <span>Hoàng hôn / Tối (30%)</span>
+              </div>
+            </div>
             
             {/* 1. Độ trong suốt (Transparency) */}
             <div className="space-y-2">
