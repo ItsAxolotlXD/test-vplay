@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Smile, 
@@ -18,7 +18,10 @@ import {
   CornerDownLeft,
   ArrowLeftRight,
   Languages,
-  Sparkles
+  Sparkles,
+  ClipboardList,
+  Copy,
+  Trash2
 } from 'lucide-react';
 import { playKeyboardClickSound, playPopSound, playWinSound } from '../../utils/sound';
 import { 
@@ -27,33 +30,26 @@ import {
   triggerSearchOrSubmit 
 } from './vboardUtils';
 import { useSettings, VBOARD_SKIN_OPTIONS, VBoardSkin } from '../../hooks/useSettings';
+import { EMOJI_GROUPS, getEmojiName, searchEmojis } from './emojiData';
 
-// Custom Monochrome White Copilot Icon
-export const CopilotMonochromeIcon: React.FC<{ className?: string }> = ({
-  className = 'w-5 h-5 text-white',
+// Custom Copilot Icon matching the TopBar Copilot icon
+export const CopilotTopBarIcon: React.FC<{ className?: string }> = ({
+  className = 'w-5 h-5',
 }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-  >
-    {/* Left ribbon loop */}
-    <path
-      d="M7 13.5C7 10 9.8 7 13.3 7H17.5C19.4 7 21 8.6 21 10.5V12C21 15.6 18.2 18.5 14.7 18.5H10.5C8.6 18.5 7 16.9 7 15V13.5Z"
-      fill="currentColor"
-      fillOpacity="0.95"
-    />
-    {/* Right ribbon loop */}
-    <path
-      d="M17 10.5C17 14 14.2 17 10.7 17H6.5C4.6 17 3 15.4 3 13.5V12C3 8.4 5.8 5.5 9.3 5.5H13.5C15.4 5.5 17 7.1 17 9V10.5Z"
-      fill="currentColor"
-      fillOpacity="0.55"
-    />
-    {/* Central AI node/sparkle */}
-    <circle cx="12" cy="12" r="1.3" fill="currentColor" fillOpacity="0.95" />
-  </svg>
+  <img
+    src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
+    alt="Copilot"
+    referrerPolicy="no-referrer"
+    className={`${className} object-contain shrink-0`}
+    onError={(e) => {
+      // Fallback if SVG fails to load
+      e.currentTarget.style.display = 'none';
+    }}
+  />
 );
+
+// Backward-compatible alias for any callers
+export const CopilotMonochromeIcon = CopilotTopBarIcon;
 
 interface VBoardKeyboardProps {
   targetInput: HTMLInputElement | HTMLTextAreaElement | null;
@@ -63,7 +59,7 @@ interface VBoardKeyboardProps {
   navigate?: (path: string) => void;
 }
 
-type KeyboardMode = 'alpha' | 'numeric' | 'symbol';
+type KeyboardMode = 'alpha' | 'numeric' | 'symbol' | 'emoji' | 'clipboard';
 
 const POPULAR_EMOJIS = [
   '🔥', '⭐', '✨', '❤️', '👍', '🍿', '🎮', '🎬', 
@@ -85,7 +81,92 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
   const [isShift, setIsShift] = useState(false);
   const [isCapsLock, setIsCapsLock] = useState(false);
   const [isVietnamese, setIsVietnamese] = useState(true); // Tiếng Việt Telex default ON
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [activeEmojiGroupId, setActiveEmojiGroupId] = useState<string>('smileys');
+  const [emojiSearchQuery, setEmojiSearchQuery] = useState<string>('');
+  const [hoveredEmoji, setHoveredEmoji] = useState<string | null>(null);
+  const emojiScrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Clipboard state (persisted in localStorage)
+  const [clipboardItems, setClipboardItems] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('vplay_vboard_clipboard');
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return ['Vplay TV', 'Không gian Space 360', 'https://vplay.vn', 'Chào bạn! Chúc bạn xem phim vui vẻ 🎉'];
+  });
+
+  const saveClipboard = (items: string[]) => {
+    setClipboardItems(items);
+    try {
+      localStorage.setItem('vplay_vboard_clipboard', JSON.stringify(items));
+    } catch {}
+  };
+
+  const handleCopyFromInput = () => {
+    if (!targetInput || !targetInput.value.trim()) return;
+    playClick(false);
+    const text = targetInput.value.trim();
+    const newItems = [text, ...clipboardItems.filter((item) => item !== text)].slice(0, 25);
+    saveClipboard(newItems);
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(text);
+      }
+    } catch {}
+  };
+
+  const handlePasteFromSystem = async () => {
+    playClick(false);
+    try {
+      if (navigator?.clipboard?.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          const trimmed = text.trim();
+          const newItems = [trimmed, ...clipboardItems.filter((item) => item !== trimmed)].slice(0, 25);
+          saveClipboard(newItems);
+          if (targetInput) {
+            insertTextIntoElement(targetInput, trimmed, false);
+          }
+        }
+      }
+    } catch {}
+  };
+
+  const handleDeleteClip = (idx: number) => {
+    playClick(true);
+    const newItems = clipboardItems.filter((_, i) => i !== idx);
+    saveClipboard(newItems);
+  };
+
+  const handleClearAllClips = () => {
+    playClick(true);
+    saveClipboard([]);
+  };
+
+  const handlePasteClip = (clip: string) => {
+    if (!targetInput) return;
+    playClick(false);
+    insertTextIntoElement(targetInput, clip, false);
+  };
+
+  // Horizontal mouse-wheel scroll listener for Emoji board
+  useEffect(() => {
+    const container = emojiScrollContainerRef.current;
+    if (!container) return;
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY * 1.5;
+      }
+    };
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [mode, activeEmojiGroupId]);
+
+  const displayedEmojis = useMemo(() => {
+    return searchEmojis(emojiSearchQuery, activeEmojiGroupId);
+  }, [emojiSearchQuery, activeEmojiGroupId]);
+
   const [showCopilotBar, setShowCopilotBar] = useState(false);
   const [showSkinPicker, setShowSkinPicker] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -103,7 +184,8 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
       setMode('alpha');
       setIsShift(false);
       setIsCapsLock(false);
-      setShowEmojiPicker(false);
+      setEmojiSearchQuery('');
+      setHoveredEmoji(null);
       setShowCopilotBar(false);
       setShowSkinPicker(false);
       setPressedKey(null);
@@ -386,8 +468,8 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
     } else {
       // Default: Default V-Board (Kính tối Spatial Glass)
       buttonClasses = isKeyActive
-        ? 'bg-[#7D7D83] scale-90 shadow-[inset_0_2px_6px_rgba(0,0,0,0.5),0_0_12px_rgba(255,255,255,0.4)] ring-1 ring-white/60 brightness-125 text-white'
-        : 'bg-[#525257]/80 hover:bg-[#66666B] active:bg-[#7D7D83] active:scale-90 text-white shadow-[0_1.5px_0_rgba(0,0,0,0.55)] border-t border-white/10';
+        ? 'bg-[#7D7D83] scale-90 shadow-[inset_0_2px_6px_rgba(0,0,0,0.5),0_0_12px_rgba(255,255,255,0.4)] brightness-125 text-white'
+        : 'bg-[#525257]/80 hover:bg-[#66666B] active:bg-[#7D7D83] active:scale-90 text-white shadow-[0_1.5px_0_rgba(0,0,0,0.55)]';
 
       balloonContent = (
         <motion.div
@@ -397,10 +479,10 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
           transition={{ type: 'spring', damping: 22, stiffness: 500 }}
           className="absolute left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center"
         >
-          <div className="w-[clamp(42px,5.5vw,56px)] h-[clamp(48px,6.5vw,66px)] min-w-[42px] px-2 bg-[#2D2D32] border border-cyan-400/40 text-white rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.85),0_0_12px_rgba(34,211,238,0.3)] flex items-center justify-center font-bold text-[clamp(20px,2.6vw,30px)] tracking-normal">
+          <div className="w-[clamp(42px,5.5vw,56px)] h-[clamp(48px,6.5vw,66px)] min-w-[42px] px-2 bg-[#2D2D32] text-white rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.85),0_0_12px_rgba(34,211,238,0.3)] flex items-center justify-center font-bold text-[clamp(20px,2.6vw,30px)] tracking-normal">
             {displayChar}
           </div>
-          <div className="w-2.5 h-2.5 bg-[#2D2D32] border-r border-b border-cyan-400/40 rotate-45 -mt-1.5 shadow-sm" />
+          <div className="w-2.5 h-2.5 bg-[#2D2D32] rotate-45 -mt-1.5 shadow-sm" />
         </motion.div>
       );
     }
@@ -529,11 +611,11 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
         : 'bg-[#D3E3FD] hover:bg-[#C2D8FC] text-[#001D35] shadow-[0_1px_2px_rgba(0,0,0,0.1)] active:bg-[#B4D2FA]';
     } else if (currentSkin === 'butterfly') {
       shiftClasses = isShiftActive
-        ? 'bg-[#1A1A1E] text-white border border-white/30 shadow-none'
-        : 'bg-[#121215] hover:bg-[#1A1A1E] text-white/90 border border-black/80 shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
+        ? 'bg-[#1A1A1E] text-white shadow-none'
+        : 'bg-[#121215] hover:bg-[#1A1A1E] text-white/90 shadow-[0_1px_2px_rgba(0,0,0,0.85)]';
       backspaceClasses = isBackspaceActive
         ? 'bg-[#0A0A0C] text-white translate-y-[1px] shadow-none'
-        : 'bg-[#121215] hover:bg-[#1A1A1E] text-white/90 border border-black/80 shadow-[0_1px_2px_rgba(0,0,0,0.85)] active:translate-y-[1px]';
+        : 'bg-[#121215] hover:bg-[#1A1A1E] text-white/90 shadow-[0_1px_2px_rgba(0,0,0,0.85)] active:translate-y-[1px]';
     } else if (currentSkin === 'physical') {
       shiftClasses = isShiftActive
         ? 'translate-y-[4px] shadow-[0_1px_0_#101116,0_2px_2px_rgba(0,0,0,0.5)] bg-[#1A1C23] text-orange-400 font-bold'
@@ -544,10 +626,10 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
     } else {
       shiftClasses = isShiftActive
         ? 'bg-white text-black font-bold scale-95 shadow-[0_0_12px_rgba(255,255,255,0.7)]'
-        : 'bg-[#3C3C41]/90 hover:bg-[#48484E] text-white shadow-[0_1.5px_0_rgba(0,0,0,0.55)] border-t border-white/10';
+        : 'bg-[#3C3C41]/90 hover:bg-[#48484E] text-white shadow-[0_1.5px_0_rgba(0,0,0,0.55)]';
       backspaceClasses = isBackspaceActive
-        ? 'bg-[#505057] scale-90 ring-1 ring-white/50 text-amber-300'
-        : 'bg-[#3C3C41]/90 hover:bg-[#48484E] text-white shadow-[0_1.5px_0_rgba(0,0,0,0.55)] border-t border-white/10 active:bg-[#505057] active:scale-90';
+        ? 'bg-[#505057] scale-90 text-amber-300'
+        : 'bg-[#3C3C41]/90 hover:bg-[#48484E] text-white shadow-[0_1.5px_0_rgba(0,0,0,0.55)] active:bg-[#505057] active:scale-90';
     }
 
     const keyRounding = 
@@ -622,18 +704,18 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
   const isSearchActive = pressedKey === 'enter';
   const isCopilotActive = pressedKey === 'copilot';
 
-  // Keyboard container styling based on current skin
+  // Keyboard container styling based on current skin (borderless)
   let containerClasses = '';
   if (currentSkin === 'ios') {
-    containerClasses = 'bg-[#D0D3D9] text-black border-t border-[#B8BCC4] shadow-2xl';
+    containerClasses = 'bg-[#D0D3D9] text-black shadow-2xl border-none';
   } else if (currentSkin === 'google') {
-    containerClasses = 'bg-[#ECEFF4] text-[#1F1F1F] border-t border-[#DCE2EA] shadow-2xl';
+    containerClasses = 'bg-[#ECEFF4] text-[#1F1F1F] shadow-2xl border-none';
   } else if (currentSkin === 'butterfly') {
-    containerClasses = 'bg-[#202125] text-white border-t-2 border-white/15 shadow-2xl';
+    containerClasses = 'bg-[#202125] text-white shadow-2xl border-none';
   } else if (currentSkin === 'physical') {
-    containerClasses = 'bg-[#16171D] text-white border-t-2 border-[#2C2E38] shadow-[0_-8px_35px_rgba(0,0,0,0.9)]';
+    containerClasses = 'bg-[#16171D] text-white shadow-[0_-8px_35px_rgba(0,0,0,0.9)] border-none';
   } else {
-    containerClasses = 'bg-[#161618]/95 backdrop-blur-2xl text-white border-t border-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.85)]';
+    containerClasses = 'bg-[#161618]/95 backdrop-blur-2xl text-white shadow-[0_25px_70px_rgba(0,0,0,0.85)] border-none';
   }
 
   return (
@@ -650,10 +732,10 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
             WebkitBackdropFilter: 'blur(36px)',
             backdropFilter: 'blur(36px)',
           }}
-          className={`fixed z-[100000] select-none transition-all duration-300 ${
+          className={`fixed z-[100000] select-none transition-all duration-300 border-none ${
             isCompact
-              ? 'bottom-0 right-0 w-full sm:w-[540px] md:w-[620px] rounded-tl-2xl sm:rounded-tl-3xl border-t border-l border-b-0 border-r-0 shadow-2xl'
-              : 'bottom-0 left-0 right-0 w-full rounded-t-2xl sm:rounded-t-3xl border-t border-x-0 border-b-0 shadow-2xl'
+              ? 'bottom-0 right-0 w-full sm:w-[540px] md:w-[620px] rounded-tl-2xl sm:rounded-tl-3xl shadow-2xl'
+              : 'bottom-0 left-0 right-0 w-full rounded-t-2xl sm:rounded-t-3xl shadow-2xl'
           } ${containerClasses}`}
         >
           {/* Quick Skin Picker Drawer Tray */}
@@ -663,14 +745,14 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className={`overflow-hidden border-b transition-colors ${
-                  currentSkin === 'ios' ? 'border-black/15 bg-[#C5C8CE]' :
-                  currentSkin === 'google' ? 'border-slate-300 bg-[#DEE5EF]' :
-                  'border-white/10 bg-[#1A1A1E]'
+                className={`overflow-hidden transition-colors ${
+                  currentSkin === 'ios' ? 'bg-[#C5C8CE]' :
+                  currentSkin === 'google' ? 'bg-[#DEE5EF]' :
+                  'bg-[#1A1A1E]'
                 }`}
               >
                 <div className="p-3 w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
-                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
+                  <div className="flex items-center justify-between pb-2 mb-2 border-none">
                     <div className="flex items-center gap-2">
                       <Palette className="w-4 h-4 text-cyan-400" />
                       <span className="text-xs font-bold uppercase tracking-wider">
@@ -697,10 +779,10 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                             playClick(false);
                             updateSetting('vboardSkin', skinOpt.id);
                           }}
-                          className={`p-2 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between relative group ${
+                          className={`p-2 rounded-xl text-left transition-all cursor-pointer flex flex-col justify-between relative group ${
                             isSelected
-                              ? 'bg-cyan-500/20 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.3)] ring-1 ring-cyan-400'
-                              : 'bg-black/25 border-white/10 hover:border-white/20'
+                              ? 'bg-cyan-500/20 shadow-[0_0_12px_rgba(34,211,238,0.3)]'
+                              : 'bg-black/25'
                           }`}
                         >
                           <div className="flex items-start justify-between gap-1 w-full">
@@ -717,7 +799,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
 
                           {/* Mini key preview */}
                           <div 
-                            className="mt-2 w-full h-6 rounded-md flex items-center justify-center gap-1 border border-white/10"
+                            className="mt-2 w-full h-6 rounded-md flex items-center justify-center gap-1"
                             style={{ backgroundColor: skinOpt.previewBg }}
                           >
                             <div 
@@ -738,38 +820,6 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Quick Emoji Picker Drawer */}
-          <AnimatePresence>
-            {showEmojiPicker && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className={`overflow-hidden border-b ${
-                  currentSkin === 'ios' ? 'border-black/15 bg-[#D8DBE0]' :
-                  currentSkin === 'google' ? 'border-slate-300 bg-[#E2E8F0]' :
-                  'border-white/10 bg-[#1A1A1E]'
-                }`}
-              >
-                <div className="p-2.5 flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
-                  {POPULAR_EMOJIS.map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onPointerDown={(e) => {
-                        e.preventDefault();
-                        handleKeyPress(emoji);
-                      }}
-                      className="w-10 h-10 shrink-0 text-xl flex items-center justify-center rounded-xl bg-black/10 hover:bg-black/20 active:scale-90 transition-all cursor-pointer"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Quick Copilot AI Assistant Suggestions Drawer */}
           <AnimatePresence>
             {showCopilotBar && (
@@ -777,12 +827,12 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden border-b border-white/10 bg-[#1A1A1E]/95 backdrop-blur-xl"
+                className="overflow-hidden bg-[#1A1A1E]/95 backdrop-blur-xl border-none"
               >
                 <div className="p-2.5 px-4 flex items-center justify-between gap-3 w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
                   <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-0.5">
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 text-white text-xs font-semibold shrink-0">
-                      <CopilotMonochromeIcon className="w-4 h-4 text-white" />
+                      <CopilotTopBarIcon className="w-4.5 h-4.5" />
                       <span>Copilot</span>
                     </div>
 
@@ -794,7 +844,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                           insertTextIntoElement(targetInput, 'Hỏi Copilot: ', isVietnamese);
                         }
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-medium border border-white/5 shrink-0 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-medium shrink-0 transition-colors cursor-pointer border-none"
                     >
                       ✨ Hỏi Copilot
                     </button>
@@ -807,7 +857,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                           insertTextIntoElement(targetInput, 'Gợi ý phim hot hôm nay ', isVietnamese);
                         }
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-medium border border-white/5 shrink-0 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-medium shrink-0 transition-colors cursor-pointer border-none"
                     >
                       🎬 Gợi ý phim hot
                     </button>
@@ -820,7 +870,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                           insertTextIntoElement(targetInput, 'Lịch phát sóng VTV ', isVietnamese);
                         }
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-medium border border-white/5 shrink-0 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-medium shrink-0 transition-colors cursor-pointer border-none"
                     >
                       📺 Lịch phát sóng VTV
                     </button>
@@ -838,7 +888,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                         window.dispatchEvent(new CustomEvent('vplay:navigate', { detail: '/copilot' }));
                       }
                     }}
-                    className="px-3 py-1 rounded-lg bg-gradient-to-r from-red-600/30 to-[#C83DFF]/30 hover:from-red-600/50 hover:to-[#C83DFF]/50 border border-white/15 text-white text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1 rounded-lg bg-gradient-to-r from-red-600/30 to-[#C83DFF]/30 hover:from-red-600/50 hover:to-[#C83DFF]/50 text-white text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1 border-none"
                   >
                     <span>Mở Copilot</span>
                     <span>→</span>
@@ -850,33 +900,50 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
 
           {/* 1. TOP HEADER TOOLBAR */}
           {currentSkin === 'google' ? (
-            /* Google Gboard Toolbar - Exact recreation of Image 2 */
-            <div className="h-11 px-3 sm:px-5 border-b border-slate-300/80 flex items-center justify-between text-[#3C4043] w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
+            /* Google Gboard Toolbar */
+            <div className="h-11 px-3 sm:px-5 border-none flex items-center justify-between text-[#3C4043] w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                {/* Vibrant blue circular 4-dots/menu button (opens skin picker & quick tools) */}
+                {/* Vibrant blue circular 4-dots/menu button (opens skin picker) */}
                 <button
                   type="button"
                   onClick={() => {
                     playClick(false);
                     setShowSkinPicker(!showSkinPicker);
                   }}
-                  className="w-8 h-8 rounded-full bg-[#38B6FF] hover:bg-[#28A6EF] text-white flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all"
+                  className="w-8 h-8 rounded-full bg-[#38B6FF] hover:bg-[#28A6EF] text-white flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all border-none"
                   title="Tùy chọn Skin & Tiện ích Gboard"
                 >
                   <LayoutGrid className="w-4 h-4 stroke-[2.4]" />
                 </button>
 
-                {/* Smiley emoji icon */}
+                {/* Smiley emoji icon -> Switches directly to Emoji Board */}
                 <button
                   type="button"
                   onClick={() => {
                     playClick(false);
-                    setShowEmojiPicker(!showEmojiPicker);
+                    setMode(mode === 'emoji' ? 'alpha' : 'emoji');
                   }}
-                  className="p-1.5 rounded-full hover:bg-black/5 text-[#3C4043] cursor-pointer transition-colors"
-                  title="Biểu tượng cảm xúc"
+                  className={`p-1.5 rounded-full hover:bg-black/5 cursor-pointer transition-colors ${
+                    mode === 'emoji' ? 'bg-black/10 text-[#FF267A]' : 'text-[#3C4043]'
+                  }`}
+                  title="Biểu tượng cảm xúc (Emoji Board)"
                 >
                   <Smile className="w-5 h-5 stroke-[1.8]" />
+                </button>
+
+                {/* Clipboard button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick(false);
+                    setMode(mode === 'clipboard' ? 'alpha' : 'clipboard');
+                  }}
+                  className={`p-1.5 rounded-full hover:bg-black/5 cursor-pointer transition-colors ${
+                    mode === 'clipboard' ? 'bg-black/10 text-amber-500 font-bold' : 'text-[#3C4043]'
+                  }`}
+                  title="Bộ nhớ tạm (Clipboard)"
+                >
+                  <ClipboardList className="w-5 h-5 stroke-[1.8]" />
                 </button>
 
                 {/* Resize / compact icon */}
@@ -915,7 +982,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                   className="p-1.5 rounded-full hover:bg-black/5 text-[#3C4043] cursor-pointer transition-colors"
                   title="Gợi ý Copilot"
                 >
-                  <Sparkles className="w-4.5 h-4.5 stroke-[1.8]" />
+                  <CopilotTopBarIcon className="w-4.5 h-4.5" />
                 </button>
 
                 {/* Translate / Languages icon */}
@@ -971,27 +1038,39 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
             </div>
           ) : (
             /* Standard / iOS / Butterfly / Physical Top Toolbar */
-            <div className={`h-10 px-4 sm:px-6 border-b flex items-center justify-between w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto ${
-              currentSkin === 'ios' ? 'border-black/10 text-black/80' : 'border-white/10 text-white/80'
+            <div className={`h-10 px-4 sm:px-6 border-none flex items-center justify-between w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto ${
+              currentSkin === 'ios' ? 'text-black/80' : 'text-white/80'
             }`}>
               <div className="flex items-center h-full w-full max-w-sm sm:max-w-md mx-auto justify-around">
-                {/* Left: Smiley face */}
+                {/* Smiley face -> Opens Emoji Board in place of keyboard */}
                 <button
                   type="button"
                   onClick={() => {
                     playClick(false);
-                    setShowEmojiPicker(!showEmojiPicker);
+                    setMode(mode === 'emoji' ? 'alpha' : 'emoji');
                   }}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer border-none ${
                     currentSkin === 'ios' ? 'hover:bg-black/10' : 'hover:bg-white/10 hover:text-white'
-                  } ${showEmojiPicker ? 'text-[#FF267A]' : ''}`}
-                  title="Biểu tượng cảm xúc (Emojis)"
+                  } ${mode === 'emoji' ? 'text-[#FF267A] bg-black/10 dark:bg-white/15' : ''}`}
+                  title="Biểu tượng cảm xúc (Emoji Board)"
                 >
                   <Smile className="w-5 h-5 stroke-[1.8]" />
                 </button>
 
-                {/* Subtle Divider */}
-                <div className={`w-[1px] h-4 ${currentSkin === 'ios' ? 'bg-black/15' : 'bg-white/15'}`} />
+                {/* Clipboard Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClick(false);
+                    setMode(mode === 'clipboard' ? 'alpha' : 'clipboard');
+                  }}
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer border-none ${
+                    currentSkin === 'ios' ? 'hover:bg-black/10' : 'hover:bg-white/10 hover:text-white'
+                  } ${mode === 'clipboard' ? 'text-amber-400 bg-black/10 dark:bg-white/15' : ''}`}
+                  title="Bộ nhớ tạm (Clipboard)"
+                >
+                  <ClipboardList className="w-5 h-5 stroke-[1.8]" />
+                </button>
 
                 {/* Center: Window / LayoutGrid icon */}
                 <button
@@ -1000,16 +1079,13 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                     playClick(false);
                     setIsCompact(!isCompact);
                   }}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer border-none ${
                     currentSkin === 'ios' ? 'hover:bg-black/10 text-black/80' : 'hover:bg-white/10 text-white/80 hover:text-white'
                   }`}
                   title={isCompact ? 'Mở rộng bàn phím đầy đủ' : 'Thu gọn bàn phím'}
                 >
                   <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
                 </button>
-
-                {/* Subtle Divider */}
-                <div className={`w-[1px] h-4 ${currentSkin === 'ios' ? 'bg-black/15' : 'bg-white/15'}`} />
 
                 {/* Skin Selector Button */}
                 <button
@@ -1018,16 +1094,13 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                     playClick(false);
                     setShowSkinPicker(!showSkinPicker);
                   }}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 border-none ${
                     currentSkin === 'ios' ? 'hover:bg-black/10 text-black/80' : 'hover:bg-white/10 text-white/80 hover:text-white'
                   }`}
                   title="Đổi giao diện bàn phím (Skins)"
                 >
                   <Palette className="w-4.5 h-4.5 stroke-[1.8] text-cyan-400" />
                 </button>
-
-                {/* Subtle Divider */}
-                <div className={`w-[1px] h-4 ${currentSkin === 'ios' ? 'bg-black/15' : 'bg-white/15'}`} />
 
                 {/* Right: Globe icon -> Switches directly to device keyboard */}
                 <button
@@ -1036,7 +1109,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                     playClick(false);
                     onSwitchToDeviceKeyboard();
                   }}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 border-none ${
                     currentSkin === 'ios' ? 'hover:bg-black/10 text-black/80' : 'hover:bg-white/10 text-white/80 hover:text-white'
                   }`}
                   title="Chuyển sang bàn phím thiết bị (Device keyboard)"
@@ -1054,10 +1127,10 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
                     playClick(false);
                     setIsVietnamese(!isVietnamese);
                   }}
-                  className={`px-2 py-0.5 text-[11px] font-bold rounded-md transition-all cursor-pointer border ${
+                  className={`px-2 py-0.5 text-[11px] font-bold rounded-md transition-all cursor-pointer border-none ${
                     currentSkin === 'ios'
-                      ? (isVietnamese ? 'bg-black/15 text-black border-black/20' : 'bg-transparent text-black/50 border-black/10')
-                      : (isVietnamese ? 'bg-blue-600/30 text-blue-400 border-blue-500/40 hover:bg-blue-600/40' : 'bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10')
+                      ? (isVietnamese ? 'bg-black/15 text-black' : 'bg-transparent text-black/50')
+                      : (isVietnamese ? 'bg-blue-600/30 text-blue-400 hover:bg-blue-600/40' : 'bg-white/5 text-zinc-400 hover:bg-white/10')
                   }`}
                   title="Bật/Tắt gõ tiếng Việt Telex"
                 >
@@ -1092,8 +1165,295 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
             </div>
           )}
 
-          {/* 2. MAIN KEYBOARD KEYS MATRIX */}
-          <div className="p-1.5 sm:p-2.5 md:p-3.5 lg:p-4 w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto space-y-[clamp(5px,0.9vh,10px)]">
+          {/* 2. KEYBOARD BODY: EMOJI BOARD / CLIPBOARD / STANDARD KEYS MATRIX */}
+          {mode === 'emoji' ? (
+            /* Full Emoji Board View (Replaces main keyboard, scroll horizontal, with search bar and tooltips) */
+            <div className="p-2 sm:p-3 w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto flex flex-col gap-2 min-h-[220px] sm:min-h-[260px]">
+              {/* Emoji Header: Search Bar + Tooltip Hover Indicator + ABC / Backspace Buttons */}
+              <div className="flex items-center justify-between gap-2 px-1">
+                {/* Search Bar */}
+                <div className={`relative flex items-center flex-1 max-w-sm rounded-xl px-2.5 py-1.5 transition-all ${
+                  currentSkin === 'ios' || currentSkin === 'google'
+                    ? 'bg-black/5 hover:bg-black/10 text-zinc-900 ring-1 ring-black/10'
+                    : 'bg-white/10 hover:bg-white/15 text-white ring-1 ring-white/10'
+                }`}>
+                  <Search className={`w-4 h-4 shrink-0 mr-2 ${
+                    currentSkin === 'ios' || currentSkin === 'google' ? 'text-zinc-500' : 'text-zinc-400'
+                  }`} />
+                  <input
+                    type="text"
+                    value={emojiSearchQuery}
+                    onChange={(e) => setEmojiSearchQuery(e.target.value)}
+                    placeholder="Tìm emoji (cười, tim, cờ, sao...)..."
+                    className="w-full bg-transparent text-xs sm:text-sm focus:outline-none placeholder:text-zinc-400 font-medium"
+                  />
+                  {emojiSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setEmojiSearchQuery('')}
+                      className="p-0.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-zinc-400 hover:text-zinc-600 dark:hover:text-white transition-colors cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Hover Tooltip / Preview Pill */}
+                {hoveredEmoji ? (
+                  <div className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium shrink-0 animate-in fade-in duration-100 ${
+                    currentSkin === 'ios' || currentSkin === 'google'
+                      ? 'bg-black/10 text-zinc-800 ring-1 ring-black/10'
+                      : 'bg-white/15 text-white ring-1 ring-white/20'
+                  }`}>
+                    <span className="text-base leading-none">{hoveredEmoji}</span>
+                    <span className="truncate max-w-[150px] font-semibold text-[11px]">{getEmojiName(hoveredEmoji)}</span>
+                  </div>
+                ) : (
+                  <div className={`hidden sm:flex items-center gap-1 text-[11px] font-medium shrink-0 ${
+                    currentSkin === 'ios' || currentSkin === 'google' ? 'text-zinc-500' : 'text-zinc-400'
+                  }`}>
+                    <span>{displayedEmojis.length} emoji</span>
+                  </div>
+                )}
+
+                {/* Right controls: ABC key & Backspace */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick(false);
+                      setMode('alpha');
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none active:scale-95 ${
+                      currentSkin === 'ios' || currentSkin === 'google'
+                        ? 'bg-black/10 hover:bg-black/15 text-zinc-800'
+                        : 'bg-white/10 hover:bg-white/20 text-white'
+                    }`}
+                    title="Trở về bàn phím chữ (ABC)"
+                  >
+                    ABC
+                  </button>
+
+                  <button
+                    type="button"
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      handleBackspaceStart();
+                    }}
+                    onPointerUp={handleBackspaceEnd}
+                    onPointerLeave={handleBackspaceEnd}
+                    className={`p-2 rounded-lg transition-all cursor-pointer select-none active:scale-90 ${
+                      currentSkin === 'ios' || currentSkin === 'google'
+                        ? 'bg-black/10 hover:bg-black/15 text-zinc-800'
+                        : 'bg-white/10 hover:bg-white/20 text-white'
+                    }`}
+                    title="Xóa ký tự (Backspace)"
+                  >
+                    <Delete className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Horizontal Scrolling Emojis Container */}
+              <div
+                ref={emojiScrollContainerRef}
+                className="overflow-x-auto overflow-y-hidden [scrollbar-width:thin] px-1 py-1.5 flex-1 min-h-[140px] sm:min-h-[170px]"
+              >
+                {displayedEmojis.length > 0 ? (
+                  <div className="grid grid-rows-4 sm:grid-rows-4 grid-flow-col auto-cols-max gap-1.5 sm:gap-2 items-center">
+                    {displayedEmojis.map((emoji, idx) => (
+                      <button
+                        key={`${emoji}-${idx}`}
+                        type="button"
+                        onMouseEnter={() => setHoveredEmoji(emoji)}
+                        onMouseLeave={() => setHoveredEmoji(null)}
+                        onPointerDown={(e) => {
+                          e.preventDefault();
+                          handleKeyPress(emoji);
+                        }}
+                        className={`w-10 h-10 sm:w-11 sm:h-11 text-2xl flex items-center justify-center rounded-xl transition-all cursor-pointer active:scale-85 select-none ${
+                          currentSkin === 'ios' || currentSkin === 'google'
+                            ? 'hover:bg-black/10 active:bg-black/20'
+                            : 'hover:bg-white/15 active:bg-white/25'
+                        }`}
+                        title={getEmojiName(emoji)}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-6 px-4">
+                    <span className="text-3xl mb-1.5">🔍</span>
+                    <p className={`text-xs sm:text-sm font-medium ${
+                      currentSkin === 'ios' || currentSkin === 'google' ? 'text-zinc-600' : 'text-zinc-400'
+                    }`}>
+                      Không tìm thấy emoji nào cho "{emojiSearchQuery}"
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Bottom Emoji Category Tabs (9 Groups) */}
+              <div className={`flex items-center gap-1 px-1 py-1 border-t overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0 ${
+                currentSkin === 'ios' || currentSkin === 'google'
+                  ? 'border-black/10'
+                  : 'border-white/10'
+              }`}>
+                {EMOJI_GROUPS.map((group) => {
+                  const isActive = !emojiSearchQuery && group.id === activeEmojiGroupId;
+                  return (
+                    <button
+                      key={group.id}
+                      type="button"
+                      onClick={() => {
+                        playClick(false);
+                        setEmojiSearchQuery('');
+                        setActiveEmojiGroupId(group.id);
+                        if (emojiScrollContainerRef.current) {
+                          emojiScrollContainerRef.current.scrollLeft = 0;
+                        }
+                      }}
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer ${
+                        isActive
+                          ? currentSkin === 'ios' || currentSkin === 'google'
+                            ? 'bg-white text-zinc-900 shadow-xs font-bold ring-1 ring-black/10'
+                            : 'bg-white/20 text-white font-bold shadow-xs'
+                          : currentSkin === 'ios' || currentSkin === 'google'
+                            ? 'text-zinc-600 hover:bg-black/10'
+                            : 'text-zinc-400 hover:bg-white/10 hover:text-zinc-200'
+                      }`}
+                      title={group.label}
+                    >
+                      <span className="text-base leading-none">{group.icon}</span>
+                      <span className="hidden md:inline">{group.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : mode === 'clipboard' ? (
+            /* Clipboard View (Replaces main keyboard) */
+            <div className="p-2 sm:p-3 w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto flex flex-col gap-2 min-h-[220px] sm:min-h-[260px]">
+              {/* Header */}
+              <div className="flex items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-2">
+                  <ClipboardList className="w-4.5 h-4.5 text-amber-500" />
+                  <span className={`text-xs sm:text-sm font-semibold ${
+                    currentSkin === 'ios' || currentSkin === 'google' ? 'text-zinc-900' : 'text-white'
+                  }`}>
+                    Bộ nhớ tạm ({clipboardItems.length})
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleCopyFromInput}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-all cursor-pointer ${
+                      currentSkin === 'ios' || currentSkin === 'google'
+                        ? 'bg-black/10 hover:bg-black/15 text-zinc-800'
+                        : 'bg-white/10 hover:bg-white/20 text-white'
+                    }`}
+                    title="Sao chép nội dung từ ô nhập hiện tại"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Sao chép từ ô</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handlePasteFromSystem}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-all cursor-pointer ${
+                      currentSkin === 'ios' || currentSkin === 'google'
+                        ? 'bg-black/10 hover:bg-black/15 text-zinc-800'
+                        : 'bg-white/10 hover:bg-white/20 text-white'
+                    }`}
+                    title="Dán nội dung từ clipboard hệ thống"
+                  >
+                    <span>Dán từ hệ thống</span>
+                  </button>
+
+                  {clipboardItems.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearAllClips}
+                      className="px-2 py-1 rounded-lg text-xs font-medium text-rose-400 hover:bg-rose-500/15 transition-all cursor-pointer flex items-center gap-1"
+                      title="Xóa toàn bộ bộ nhớ tạm"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Xóa hết</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick(false);
+                      setMode('alpha');
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      currentSkin === 'ios' || currentSkin === 'google'
+                        ? 'bg-black/15 hover:bg-black/20 text-zinc-900'
+                        : 'bg-white/15 hover:bg-white/25 text-white'
+                    }`}
+                    title="Trở về bàn phím chữ (ABC)"
+                  >
+                    ABC
+                  </button>
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div className="overflow-y-auto max-h-[170px] sm:max-h-[200px] [scrollbar-width:thin] px-1 py-1 flex-1">
+                {clipboardItems.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                    {clipboardItems.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className={`group relative p-2.5 rounded-xl border transition-all flex items-start justify-between gap-2 cursor-pointer ${
+                          currentSkin === 'ios' || currentSkin === 'google'
+                            ? 'bg-white hover:bg-zinc-50 border-black/10 text-zinc-900 shadow-xs'
+                            : 'bg-white/5 hover:bg-white/10 border-white/10 text-zinc-200 shadow-xs'
+                        }`}
+                        onClick={() => handlePasteClip(item)}
+                        title="Nhấp để chèn văn bản này vào ô nhập"
+                      >
+                        <p className="text-xs line-clamp-2 select-none flex-1 break-words font-medium">
+                          {item}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClip(idx);
+                          }}
+                          className="p-1 rounded-md text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors opacity-70 group-hover:opacity-100"
+                          title="Xóa mục này"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-8">
+                    <ClipboardList className="w-8 h-8 text-zinc-400 mb-1.5 stroke-[1.5]" />
+                    <p className={`text-xs sm:text-sm font-medium ${
+                      currentSkin === 'ios' || currentSkin === 'google' ? 'text-zinc-600' : 'text-zinc-400'
+                    }`}>
+                      Chưa có nội dung sao chép nào trong bộ nhớ tạm.
+                    </p>
+                    <p className="text-[11px] text-zinc-500 mt-1">
+                      Sao chép văn bản hoặc nhấn "Dán từ hệ thống" để lưu vào đây.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* 2. MAIN KEYBOARD KEYS MATRIX */
+            <div className="p-1.5 sm:p-2.5 md:p-3.5 lg:p-4 w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto space-y-[clamp(5px,0.9vh,10px)]">
             {/* Row 1 */}
             <div className="flex items-center gap-[clamp(4px,0.7vw,10px)] w-full">
               {renderRow1()}
@@ -1500,6 +1860,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
               </div>
             )}
           </div>
+        )}
 
           {/* 3. BOTTOM FOOTER (Globe icon + Home indicator bar + Microphone) */}
           <div className="pb-2.5 sm:pb-3 pt-1 px-4 sm:px-8 flex items-center justify-between w-full max-w-[100vw] sm:max-w-4xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
@@ -1508,17 +1869,21 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
               type="button"
               onClick={() => {
                 playClick(false);
-                onSwitchToDeviceKeyboard();
+                if (currentSkin === 'ios' || mode === 'emoji') {
+                  setMode(mode === 'emoji' ? 'alpha' : 'emoji');
+                } else {
+                  onSwitchToDeviceKeyboard();
+                }
               }}
               className={`w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-all cursor-pointer ${
                 currentSkin === 'ios' ? 'text-black/75 hover:bg-black/10' :
                 currentSkin === 'google' ? 'text-[#3C4043] hover:bg-black/5' :
                 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
-              title="Chuyển sang bàn phím thiết bị (Device keyboard)"
+              title={currentSkin === 'ios' || mode === 'emoji' ? 'Biểu tượng cảm xúc (Emoji)' : 'Chuyển sang bàn phím thiết bị (Device keyboard)'}
             >
-              {currentSkin === 'ios' ? (
-                <Smile className="w-6 h-6 stroke-[1.6]" />
+              {currentSkin === 'ios' || mode === 'emoji' ? (
+                <Smile className={`w-6 h-6 stroke-[1.6] ${mode === 'emoji' ? 'text-[#FF267A]' : ''}`} />
               ) : (
                 <Globe className="w-6 h-6 stroke-[1.5]" />
               )}

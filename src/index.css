@@ -979,23 +979,141 @@ button[class*="from-[#FF007A]"]:active {
   transition: opacity 0.25s ease, background 0.25s ease, filter 0.25s ease;
 }
 
-/* TOÀN BỘ CÁC NÚT ĐỔI THÀNH DẠNG PILL (ROUNDED-FULL) - SPATIAL GLASS SPEC */
-button,
-.btn,
+/* BỎ HOÀN TOÀN HIỆU ỨNG VIỀN KHỎI KEYBOARD (V-BOARD) */
+#vboard-keyboard-container,
+#vboard-keyboard-container *,
+#vboard-keyboard-container *::before,
+#vboard-keyboard-container *::after,
+#vboard-floating-trigger,
+#vboard-floating-trigger *,
+#vboard-floating-trigger *::before,
+#vboard-floating-trigger *::after {
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-color: transparent !important;
+}
+
+/* QUY TẮC BO GÓC NÚT BẤM THEO YÊU CẦU: */
+/* CÁC NÚT TO KHÔNG BO TRÒN DẠNG PILL (CHỈ CÁC NÚT NHỎ MỚI BO) MÀ DẠNG RADIUS CORNER 30PX */
+
+/* 1. Mặc định các nút bấm chuẩn và các nút to: bo góc dạng radius corner 30px */
+button:not(.vplay-app-item-btn):not(.vplay-circle-btn),
+.btn:not(.vplay-app-item-btn),
 .btn-colored,
 button.btn-colored,
 .button-colored,
+.btn-large,
+.btn-lg,
+.btn-hero,
+.btn-primary,
+.btn-secondary,
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
+  border-radius: 30px !important;
+}
+
+button:not(.vplay-app-item-btn):not(.vplay-circle-btn)::before,
+button:not(.vplay-app-item-btn):not(.vplay-circle-btn)::after,
+.btn:not(.vplay-app-item-btn)::before,
+.btn:not(.vplay-app-item-btn)::after,
+.btn-colored::before,
+.btn-colored::after {
+  border-radius: 30px !important;
+}
+
+/* Miễn trừ cho các icon ứng dụng Space 360 - bỏ viền radius corner 30px bên ngoài */
+button.vplay-app-item-btn,
+.vplay-app-item-btn {
+  border-radius: 0 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+}
+
+/* Các nút to (large buttons với chiều cao hoặc padding lớn): radius 30px */
+button.btn-lg,
+button[class*="py-2.5"],
+button[class*="py-3"],
+button[class*="py-3.5"],
+button[class*="py-4"],
+button[class*="h-10"],
+button[class*="h-11"],
+button[class*="h-12"],
+button[class*="h-14"],
+button[class*="h-16"],
+button[class*="px-5"],
+button[class*="px-6"],
+button[class*="px-7"],
+button[class*="px-8"],
+button[class*="text-base"],
+button[class*="text-lg"],
+button.rounded-\[30px\] {
+  border-radius: 30px !important;
+}
+
+/* 2. CHỈ CÁC NÚT NHỎ MỚI BO DẠNG PILL (ROUNDED-FULL / 9999px) */
+button.btn-sm,
+button.btn-compact,
+button.btn-pill,
+button.btn-chip,
+button[class*="rounded-full"][class*="text-xs"],
+button[class*="rounded-full"][class*="text-\[10px\]"],
+button[class*="rounded-full"][class*="text-\[11px\]"],
+button[class*="rounded-full"][class*="py-0.5"],
+button[class*="rounded-full"][class*="py-1"],
+button[class*="rounded-full"][class*="py-1.5"],
+button[class*="rounded-full"][class*="h-5"],
+button[class*="rounded-full"][class*="h-6"],
+button[class*="rounded-full"][class*="h-7"],
+button[class*="rounded-full"][class*="h-8"],
+button[class*="rounded-full"][class*="w-5"],
+button[class*="rounded-full"][class*="w-6"],
+button[class*="rounded-full"][class*="w-7"],
+button[class*="rounded-full"][class*="w-8"],
+button[class*="rounded-full"][class*="w-9"],
+button[class*="rounded-full"][class*="p-1"],
+button[class*="rounded-full"][class*="p-1.5"],
+button[class*="rounded-full"][class*="p-2"],
+button[class*="rounded-full"][class*="px-2"],
+button[class*="rounded-full"][class*="px-2.5"],
+button[class*="rounded-full"][class*="px-3"] {
   border-radius: 9999px !important;
 }
 
-button::before,
-button::after,
-.btn::before,
-.btn::after {
+button.btn-sm::before,
+button.btn-sm::after,
+button.btn-compact::before,
+button.btn-compact::after,
+button.btn-pill::before,
+button.btn-pill::after {
   border-radius: 9999px !important;
 }
+
+/* 3. Miễn trừ cho phím bàn phím ảo V-Board (giữ phom dáng keycap chuẩn, không bị áp đặt 30px hay pill) */
+#vboard-keyboard-container button,
+#vboard-keyboard-container button::before,
+#vboard-keyboard-container button::after {
+  border-radius: 6px !important;
+}
+#vboard-keyboard-container button[class*="rounded-\[8px\]"] {
+  border-radius: 8px !important;
+}
+#vboard-keyboard-container button[class*="rounded-\[5px\]"] {
+  border-radius: 5px !important;
+}
+#vboard-keyboard-container button[class*="rounded-\[7px\]"] {
+  border-radius: 7px !important;
+}
+#vboard-keyboard-container button[class*="rounded-\[22px\]"] {
+  border-radius: 18px !important;
+}
+
 
 

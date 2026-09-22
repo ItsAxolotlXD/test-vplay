@@ -68,8 +68,8 @@ export const VplaySecondaryButton: React.FC<VplaySecondaryButtonProps> = ({
 
   const isSmall = size === 'sm' || size === 'compact';
   const sizeClasses = isSmall
-    ? 'text-xs font-bold py-1 px-3 h-8'
-    : 'text-sm sm:text-base font-semibold py-3 px-6 h-12';
+    ? 'text-xs font-bold py-1 px-3 h-8 rounded-full'
+    : 'text-sm sm:text-base font-semibold py-3 px-6 h-12 rounded-[30px]';
 
   return (
     <button
@@ -82,7 +82,7 @@ export const VplaySecondaryButton: React.FC<VplaySecondaryButtonProps> = ({
       className={`
         relative select-none font-montserrat
         flex items-center justify-center active:translate-y-[2px] btn-press-effect
-        border-2 border-[#181818] rounded-none cursor-pointer transition-none
+        border-2 border-[#181818] cursor-pointer transition-none
         ${sizeClasses}
         ${bgClass} ${shadowClass} ${transformClass}
         ${fullWidth ? 'w-full' : ''}

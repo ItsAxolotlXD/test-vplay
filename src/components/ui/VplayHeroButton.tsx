@@ -68,8 +68,8 @@ export const VplayHeroButton: React.FC<VplayHeroButtonProps> = ({
 
   const isSmall = size === 'sm' || size === 'compact';
   const sizeClasses = isSmall
-    ? 'text-xs font-bold py-1.5 px-4 h-9'
-    : 'text-sm sm:text-base font-extrabold py-3 px-6 h-12';
+    ? 'text-xs font-bold py-1.5 px-4 h-9 rounded-full'
+    : 'text-sm sm:text-base font-extrabold py-3 px-6 h-12 rounded-[30px]';
 
   return (
     <button
@@ -82,7 +82,7 @@ export const VplayHeroButton: React.FC<VplayHeroButtonProps> = ({
       className={`
         relative select-none font-montserrat uppercase tracking-wider
         flex items-center justify-center active:translate-y-[2px] btn-press-effect
-        border-2 border-[#181818] rounded-none cursor-pointer transition-colors duration-75
+        border-2 border-[#181818] cursor-pointer transition-colors duration-75
         ${sizeClasses}
         ${bgClass} ${shadowClass} ${transformClass}
         ${fullWidth ? 'w-full' : ''}

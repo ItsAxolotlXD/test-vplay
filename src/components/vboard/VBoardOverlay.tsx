@@ -195,14 +195,16 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled, navigat
       broadcastHeight();
       const timer = setTimeout(broadcastHeight, 60);
 
-      // ResizeObserver in case emoji drawer or Copilot bar expands
+      // ResizeObserver in case Copilot bar expands
       let ro: ResizeObserver | null = null;
+      let lastHeight = 0;
       const el = document.getElementById('vboard-keyboard-container');
       if (el && typeof ResizeObserver !== 'undefined') {
         ro = new ResizeObserver((entries) => {
           for (const entry of entries) {
-            const h = entry.contentRect.height;
-            if (h > 100) {
+            const h = Math.round(entry.contentRect.height);
+            if (Math.abs(h - lastHeight) > 4 && h > 100) {
+              lastHeight = h;
               window.dispatchEvent(
                 new CustomEvent('vplay:vboard_state', {
                   detail: { isOpen: true, height: h },
@@ -313,7 +315,7 @@ export const VBoardOverlay: React.FC<VBoardOverlayProps> = ({ isEnabled, navigat
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSwitchBackToVBoard}
-            className="fixed bottom-5 right-5 z-[99999] px-3.5 py-2.5 rounded-full bg-[#1C1C20]/95 border border-cyan-500/50 text-white shadow-[0_8px_30px_rgba(0,0,0,0.7)] backdrop-blur-xl flex items-center gap-2.5 cursor-pointer select-none group"
+            className="fixed bottom-5 right-5 z-[99999] px-3.5 py-2.5 rounded-full bg-[#1C1C20]/95 text-white shadow-[0_8px_30px_rgba(0,0,0,0.7)] backdrop-blur-xl flex items-center gap-2.5 cursor-pointer select-none group border-none"
             title="Đang dùng bàn phím thiết bị. Nhấp vào đây để quay lại bàn phím V-board"
           >
             <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] animate-pulse" />

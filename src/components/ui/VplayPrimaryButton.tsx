@@ -85,7 +85,7 @@ export const VplayPrimaryButton: React.FC<VplayPrimaryButtonProps> = ({
       className={`
         relative select-none font-montserrat text-sm sm:text-base font-bold
         py-2.5 px-6 h-11 flex items-center justify-center active:translate-y-[2px] btn-press-effect
-        border-2 border-[#181818] rounded-none cursor-pointer transition-none
+        border-2 border-[#181818] rounded-[30px] cursor-pointer transition-none
         ${bgClass} ${shadowClass} ${transformClass}
         ${fullWidth ? 'w-full' : ''}
         ${className}

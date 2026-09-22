@@ -9,6 +9,7 @@ import { HERO_SLIDES } from '../data/heroSlides';
 import { Channel, NewsArticle } from '../types';
 import { Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers, Search } from 'lucide-react';
 import { PortalsCircularSection } from '../components/PortalsCircularSection';
+import { VplayAppsHomeGrid } from '../components/VplayAppsHomeGrid';
 import { useTabSearch } from '../context/TabSearchContext';
 import { HomeSpotlightSearch } from '../components/HomeSpotlightSearch';
 
@@ -73,7 +74,10 @@ export const Home: React.FC<HomeProps> = ({
           title="Đề xuất cho bạn"
         />
 
-        {/* 3. Chuyên trang banner tròn - Dạng scroll ngang giống các ô kênh, bỏ nền */}
+        {/* 3. Vplay Apps (Grid 4 apps/dòng phong cách visionOS / iOS) */}
+        <VplayAppsHomeGrid navigate={navigate} />
+
+        {/* 4. Chuyên trang banner tròn - Dạng scroll ngang giống các ô kênh, bỏ nền */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -153,7 +157,7 @@ export const Home: React.FC<HomeProps> = ({
                 <button
                   id="btn-home-banner-ask-copilot"
                   onClick={() => navigate('/copilot')}
-                  className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-[#E6005A] via-[#FF1E6B] to-[#D0008F] hover:from-[#FF1E6B] hover:to-[#E6005A] text-white text-sm font-bold shadow-[0_4px_20px_rgba(230,0,90,0.4)] hover:shadow-[0_6px_25px_rgba(230,0,90,0.6)] transition-all cursor-pointer group"
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-[30px] bg-gradient-to-r from-[#E6005A] via-[#FF1E6B] to-[#D0008F] hover:from-[#FF1E6B] hover:to-[#E6005A] text-white text-sm font-bold shadow-[0_4px_20px_rgba(230,0,90,0.4)] hover:shadow-[0_6px_25px_rgba(230,0,90,0.6)] transition-all cursor-pointer group"
                 >
                   <img
                     src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
@@ -167,7 +171,7 @@ export const Home: React.FC<HomeProps> = ({
                 <button
                   id="btn-home-banner-open-standalone"
                   onClick={() => navigate('/copilot-standalone')}
-                  className="px-5 py-3 rounded-full bg-[#2A2A33] hover:bg-[#34343F] text-zinc-200 text-sm font-semibold border border-white/10 transition-colors cursor-pointer"
+                  className="px-5 py-3 rounded-[30px] bg-[#2A2A33] hover:bg-[#34343F] text-zinc-200 text-sm font-semibold border border-white/10 transition-colors cursor-pointer"
                 >
                   Giao diện độc lập
                 </button>
@@ -194,63 +198,7 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </section>
 
-        {/* Placeholder Category 2: khối chứa khối 3 */}
-        <section className="space-y-4">
-          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
-            khối chứa khối 3
-          </h2>
-
-          <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 no-scrollbar scroll-smooth items-start">
-            {[
-              {
-                id: 'circle-1',
-                innerLines: ['Spotlight', 'khối chứ...'],
-                label: 'Spotlight khối chứa khối',
-              },
-              {
-                id: 'circle-2',
-                innerLines: ['khối chứa', 'nd 2'],
-                label: 'khối chứa nd 2',
-              },
-              {
-                id: 'circle-3',
-                innerLines: ['khối', 'banner'],
-                label: 'khối banner',
-              },
-              {
-                id: 'circle-4',
-                innerLines: ['khối chứa', 'VOD'],
-                label: 'khối chứa VOD',
-              },
-              {
-                id: 'circle-5',
-                innerLines: ['KHỐI', 'CHỨA...'],
-                label: 'KHỐI CHỨA NHÓM KÊNH 2',
-              },
-            ].map((item) => (
-              <div
-                key={item.id}
-                className="flex flex-col items-center text-center cursor-pointer group shrink-0 w-32 sm:w-36"
-              >
-                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-b from-[#1b4698] via-[#163a82] to-[#10275c] border border-[#2753a7]/50 shadow-lg shadow-blue-950/30 flex flex-col items-center justify-center p-3 transition-all duration-200 group-hover:scale-105 group-hover:border-blue-400/60 group-hover:brightness-110">
-                  {item.innerLines.map((line, idx) => (
-                    <span
-                      key={idx}
-                      className="text-xs sm:text-sm font-bold text-white leading-tight"
-                    >
-                      {line}
-                    </span>
-                  ))}
-                </div>
-                <span className="mt-2.5 text-xs sm:text-sm font-semibold text-white leading-snug max-w-[130px] group-hover:text-blue-200 transition-colors">
-                  {item.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 4. Tin tức mới (Latest TV & Broadcast News) */}
+        {/* 6. Tin tức mới (Latest TV & Broadcast News) */}
         <section className="space-y-5">
           <div className="flex items-center justify-between">
             <div>

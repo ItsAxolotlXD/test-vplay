@@ -727,7 +727,7 @@ export default function App() {
             }}
           >
             {/* Soft dark overlay for perfect text contrast while highlighting Spatial Glass blurs */}
-            <div className="absolute inset-0 bg-black/25 backdrop-brightness-95 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/30 pointer-events-none" />
           </div>
         )}
 
@@ -881,6 +881,7 @@ export default function App() {
         {/* Initial Startup / Replay Splash Screen */}
         {showSplashScreen && (
           <SplashScreen
+            duration={2000}
             onFinish={() => {
               setShowSplashScreen(false);
             }}

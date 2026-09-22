@@ -4,6 +4,7 @@ import { Search, Wifi, ChevronLeft, Sparkles, X, BatteryCharging, Radio } from '
 import { useTabSearch } from '../context/TabSearchContext';
 import { Channel } from '../types';
 import { CHANNELS_DATA } from '../data/channels';
+import { playPopSound } from '../utils/sound';
 
 interface StatusBarProps {
   isDynamicIsland?: boolean;
@@ -383,6 +384,125 @@ export const StatusBar: React.FC<StatusBarProps> = ({
 
             <ChevronLeft className="w-5 h-5 stroke-[2.4] group-hover:-translate-x-0.5 transition-transform text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
           </motion.button>
+        </div>
+
+        {/* 2. DOCK PILL (PINNED 4 SPACE 360 APPS: Phone, Browser, TV, Study) */}
+        <div 
+          id="status-bar-dock-pill"
+          className="pointer-events-auto my-auto flex flex-col items-center p-1.5 rounded-full bg-black/45 backdrop-blur-2xl border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.6)] gap-2.5 select-none"
+          title="Space 360 Dock (Phone • Browser • TV • Study)"
+        >
+          {/* Pinned App 1: Phone */}
+          <div className="relative group flex items-center justify-center">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                playPopSound();
+                if (navigate) navigate('/v-phone');
+              }}
+              title="Mở Phone"
+              aria-label="Phone"
+              className="vplay-circle-btn w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full relative flex items-center justify-center border border-white/20 hover:border-white/50 shadow-md bg-gradient-to-b from-[#34D399] via-[#22C55E] to-[#15803D] cursor-pointer overflow-hidden"
+            >
+              <svg className="w-4 h-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+            </motion.button>
+            <div className="absolute right-full mr-2 px-2 py-1 rounded-lg bg-zinc-900/95 text-white text-[11px] font-semibold whitespace-nowrap border border-white/15 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">
+              Phone
+            </div>
+          </div>
+
+          {/* Pinned App 2: Browser (Sao Thổ) */}
+          <div className="relative group flex items-center justify-center">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                playPopSound();
+                if (navigate) navigate('/v-browser');
+              }}
+              title="Mở Browser"
+              aria-label="Browser"
+              className="vplay-circle-btn w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full relative flex items-center justify-center border border-white/20 hover:border-white/50 shadow-md bg-gradient-to-b from-[#A855F7] via-[#7C3AED] to-[#4C1D95] cursor-pointer overflow-hidden"
+            >
+              <svg className="w-[85%] h-[85%] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" viewBox="0 0 100 100" fill="none">
+                <defs>
+                  <radialGradient id="dock-saturn-body" cx="38%" cy="32%" r="65%">
+                    <stop offset="0%" stopColor="#FEF08A" />
+                    <stop offset="40%" stopColor="#F59E0B" />
+                    <stop offset="100%" stopColor="#B45309" />
+                  </radialGradient>
+                  <linearGradient id="dock-saturn-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FEF3C7" />
+                    <stop offset="50%" stopColor="#F59E0B" />
+                    <stop offset="100%" stopColor="#FEF3C7" />
+                  </linearGradient>
+                </defs>
+                <g transform="rotate(-25 50 50)">
+                  <ellipse cx="50" cy="50" rx="44" ry="12" fill="none" stroke="url(#dock-saturn-ring)" strokeWidth="6" opacity="0.6" />
+                </g>
+                <circle cx="50" cy="50" r="22" fill="url(#dock-saturn-body)" />
+                <g transform="rotate(-25 50 50)">
+                  <path d="M 6 50 A 44 12 0 0 0 94 50" fill="none" stroke="url(#dock-saturn-ring)" strokeWidth="6" />
+                </g>
+              </svg>
+            </motion.button>
+            <div className="absolute right-full mr-2 px-2 py-1 rounded-lg bg-zinc-900/95 text-white text-[11px] font-semibold whitespace-nowrap border border-white/15 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">
+              Browser
+            </div>
+          </div>
+
+          {/* Pinned App 3: TV */}
+          <div className="relative group flex items-center justify-center">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                playPopSound();
+                if (navigate) navigate('/v-box');
+              }}
+              title="Mở TV"
+              aria-label="TV"
+              className="vplay-circle-btn w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full relative flex items-center justify-center border border-white/20 hover:border-white/50 shadow-md bg-gradient-to-b from-[#27272A] via-[#18181B] to-[#09090B] cursor-pointer overflow-hidden"
+            >
+              <svg className="w-4 h-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="15" x="2" y="5" rx="2" fill="#E11D48" stroke="none" />
+                <polyline points="17 2 12 7 7 2" stroke="white" strokeWidth="1.8" />
+              </svg>
+            </motion.button>
+            <div className="absolute right-full mr-2 px-2 py-1 rounded-lg bg-zinc-900/95 text-white text-[11px] font-semibold whitespace-nowrap border border-white/15 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">
+              TV
+            </div>
+          </div>
+
+          {/* Pinned App 4: Study */}
+          <div className="relative group flex items-center justify-center">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                playPopSound();
+                if (navigate) navigate('/v-study');
+              }}
+              title="Mở Study"
+              aria-label="Study"
+              className="vplay-circle-btn w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full relative flex items-center justify-center border border-white/20 hover:border-white/50 shadow-md bg-gradient-to-b from-[#EF4444] via-[#DC2626] to-[#991B1B] cursor-pointer overflow-hidden"
+            >
+              <svg className="w-4 h-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+              </svg>
+            </motion.button>
+            <div className="absolute right-full mr-2 px-2 py-1 rounded-lg bg-zinc-900/95 text-white text-[11px] font-semibold whitespace-nowrap border border-white/15 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">
+              Study
+            </div>
+          </div>
         </div>
 
         {/* 3. BOTTOM FOOT CLUSTER ("Dưới tít cùng chân status bar - Search Button Only") */}

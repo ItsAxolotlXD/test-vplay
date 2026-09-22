@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays, Ratio } from 'lucide-react';
+import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays, Ratio, LayoutGrid } from 'lucide-react';
 import { Channel } from '../types';
 import { ChannelSchedule } from '../components/ChannelSchedule';
 import { ChannelAdOverlay } from '../components/ChannelAdOverlay';
+import { MultiviewPlayer } from '../components/MultiviewPlayer';
 import { useTabSearch } from '../context/TabSearchContext';
 import Hls from 'hls.js';
 
@@ -276,7 +277,7 @@ const LOCAL_CHANNELS: VtvChannelItem[] = [
   },
 ];
 
-export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel, onOpenCustomStreamModal }) => {
+export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel, channels, onOpenCustomStreamModal }) => {
   const { searchQuery } = useTabSearch();
   const [selectedChannel, setSelectedChannel] = useState<VtvChannelItem>(() => {
     if (currentChannel?.id) {
@@ -303,6 +304,40 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
   });
   const [aspectRatioToast, setAspectRatioToast] = useState<string | null>(null);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Multiview Mode State (2 - 15 channels concurrent in one frame)
+  const [isMultiview, setIsMultiview] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('vplay_tv_multiview_active') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleMultiview = (active: boolean) => {
+    setIsMultiview(active);
+    try {
+      localStorage.setItem('vplay_tv_multiview_active', active ? 'true' : 'false');
+    } catch {}
+  };
+
+  // Aggregated channel list for multiview and search
+  const allChannelsList = useMemo<VtvChannelItem[]>(() => {
+    const list: VtvChannelItem[] = [...VTV_CHANNELS, ...HTV_CHANNELS, ...LOCAL_CHANNELS];
+    if (channels && channels.length > 0) {
+      channels.forEach((ch) => {
+        if (!list.some((existing) => existing.id === ch.id)) {
+          list.push({
+            id: ch.id,
+            name: ch.name,
+            logo: ch.logo || '',
+            streamUrl: ch.streamUrl || '',
+          });
+        }
+      });
+    }
+    return list;
+  }, [channels]);
 
   const handleAspectRatioChange = (ratio: '16:9' | '4:3') => {
     setAspectRatio(ratio);
@@ -520,10 +555,40 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 shrink-0">
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap justify-end">
               <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#8E8B99]">
                 <Tv className="w-3.5 h-3.5" />
-                <span>Đang phát trực tiếp</span>
+                <span>{isMultiview ? 'Multiview Đa Kênh' : 'Đang phát trực tiếp'}</span>
+              </div>
+
+              {/* Multiview Mode Toggle (Single vs Multiview 2-15 channels) */}
+              <div className="flex items-center bg-white/10 p-0.5 rounded-full border border-white/15 text-xs shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => handleToggleMultiview(false)}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    !isMultiview
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Xem 1 kênh chuẩn có lịch phát sóng"
+                >
+                  <Tv className="w-3.5 h-3.5" />
+                  <span>1 Kênh</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleMultiview(true)}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isMultiview
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Bật chế độ Multiview (xem đồng thời từ 2 đến 15 kênh trong 1 khung)"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Multiview (2-15)</span>
+                </button>
               </div>
 
               {/* Aspect Ratio Switcher (16:9 vs 4:3 Squish) */}
@@ -569,129 +634,162 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
             </div>
           </div>
 
-          {/* Desktop: Side-by-side grid with height strictly determined by video player */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
-            {/* Video Player (8 cols on desktop) */}
-            <div className="lg:col-span-8 flex flex-col">
-              <div
-                ref={playerContainerRef}
-                className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl group flex items-center justify-center border border-white/10"
-              >
-                {/* Real Video Element with 16:9 / 4:3 Squish support */}
-                <video
-                  ref={videoRef}
-                  className={`h-full transition-all duration-300 bg-black cursor-pointer ${
-                    aspectRatio === '16:9'
-                      ? 'w-full object-fill block'
-                      : 'w-auto aspect-[4/3] object-fill mx-auto block'
-                  }`}
-                  style={{
-                    objectFit: 'fill',
-                    aspectRatio: aspectRatio === '4:3' ? '4 / 3' : '16 / 9',
-                    width: aspectRatio === '4:3' ? 'auto' : '100%',
-                    height: '100%',
-                    maxWidth: '100%',
-                  }}
-                  onClick={togglePlay}
-                  playsInline
-                  autoPlay
-                  muted={isMuted}
-                />
+          {/* Player View: Multiview (2-15 channels) vs Single View Player */}
+          {isMultiview ? (
+            <div className="w-full">
+              <MultiviewPlayer
+                allChannels={allChannelsList}
+                currentChannel={selectedChannel}
+                aspectRatio={aspectRatio}
+                onSelectSingleChannel={(channel) => {
+                  const full = allChannelsList.find((c) => c.id === channel.id) || {
+                    id: channel.id,
+                    name: channel.name,
+                    logo: channel.logo,
+                    streamUrl: channel.streamUrl,
+                  };
+                  handleSelectChannel(full);
+                  handleToggleMultiview(false);
+                }}
+                onExitMultiview={() => handleToggleMultiview(false)}
+              />
+            </div>
+          ) : (
+            /* Desktop: Side-by-side grid with height strictly determined by video player */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+              {/* Video Player (8 cols on desktop) */}
+              <div className="lg:col-span-8 flex flex-col">
+                <div
+                  ref={playerContainerRef}
+                  className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl group flex items-center justify-center border border-white/10"
+                >
+                  {/* Real Video Element with 16:9 / 4:3 Squish support */}
+                  <video
+                    ref={videoRef}
+                    className={`h-full transition-all duration-300 bg-black cursor-pointer ${
+                      aspectRatio === '16:9'
+                        ? 'w-full object-fill block'
+                        : 'w-auto aspect-[4/3] object-fill mx-auto block'
+                    }`}
+                    style={{
+                      objectFit: 'fill',
+                      aspectRatio: aspectRatio === '4:3' ? '4 / 3' : '16 / 9',
+                      width: aspectRatio === '4:3' ? 'auto' : '100%',
+                      height: '100%',
+                      maxWidth: '100%',
+                    }}
+                    onClick={togglePlay}
+                    playsInline
+                    autoPlay
+                    muted={isMuted}
+                  />
 
-                {/* On-screen Toast Notification for Aspect Ratio */}
-                {aspectRatioToast && (
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/85 border border-white/20 backdrop-blur-md text-white font-mono text-xs font-bold flex items-center gap-2 z-20 pointer-events-none shadow-2xl animate-fade-in">
-                    <Ratio className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-                    <span>{aspectRatioToast}</span>
-                  </div>
-                )}
+                  {/* On-screen Toast Notification for Aspect Ratio */}
+                  {aspectRatioToast && (
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/85 border border-white/20 backdrop-blur-md text-white font-mono text-xs font-bold flex items-center gap-2 z-20 pointer-events-none shadow-2xl animate-fade-in">
+                      <Ratio className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+                      <span>{aspectRatioToast}</span>
+                    </div>
+                  )}
 
-                {/* 5-Second Channel Interstitial Ad Overlay (Every 5 Channels) */}
-                <ChannelAdOverlay
-                  isOpen={isAdOpen}
-                  channelName={selectedChannel.name}
-                  onAdComplete={() => {
-                    setIsAdOpen(false);
-                    if (videoRef.current) {
-                      videoRef.current.play().catch(() => {});
-                    }
-                  }}
-                />
+                  {/* 5-Second Channel Interstitial Ad Overlay (Every 5 Channels) */}
+                  <ChannelAdOverlay
+                    isOpen={isAdOpen}
+                    channelName={selectedChannel.name}
+                    onAdComplete={() => {
+                      setIsAdOpen(false);
+                      if (videoRef.current) {
+                        videoRef.current.play().catch(() => {});
+                      }
+                    }}
+                  />
 
-                {/* Simple Playback Error Message */}
-                {hasPlaybackError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/90 p-4 text-center z-20">
-                    <span className="text-white text-lg font-medium tracking-wide">
-                      Playback error.
-                    </span>
-                  </div>
-                )}
-
-                {/* Loading Indicator */}
-                {isLoading && !hasPlaybackError && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                    <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                  </div>
-                )}
-
-                {/* Player Controls Bar */}
-                {!hasPlaybackError && (
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-3 sm:p-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={togglePlay}
-                        className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
-                        title={isPlaying ? 'Tạm dừng' : 'Phát'}
-                      >
-                        {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                      </button>
-                      <button
-                        onClick={toggleMute}
-                        className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
-                        title={isMuted ? 'Bật tiếng' : 'Tắt tiếng'}
-                      >
-                        {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                      </button>
-                      <span className="text-xs font-semibold text-white/90">
-                        {selectedChannel.name}
+                  {/* Simple Playback Error Message */}
+                  {hasPlaybackError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/90 p-4 text-center z-20">
+                      <span className="text-white text-lg font-medium tracking-wide">
+                        Playback error.
                       </span>
                     </div>
+                  )}
 
-                    <div className="flex items-center gap-2">
-                      {/* Aspect Ratio Quick Toggle Pill in Overlay Controls */}
-                      <button
-                        type="button"
-                        onClick={() => handleAspectRatioChange(aspectRatio === '16:9' ? '4:3' : '16:9')}
-                        className="px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-white/10"
-                        title={`Tỷ lệ hiện tại: ${aspectRatio}. Bấm để chuyển sang ${aspectRatio === '16:9' ? '4:3' : '16:9'} (squish luồng)`}
-                      >
-                        <Ratio className="w-3.5 h-3.5 text-red-400" />
-                        <span>{aspectRatio}</span>
-                      </button>
-
-                      <button
-                        onClick={toggleFullscreen}
-                        className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
-                        title="Toàn màn hình"
-                      >
-                        <Maximize2 className="w-4 h-4" />
-                      </button>
+                  {/* Loading Indicator */}
+                  {isLoading && !hasPlaybackError && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                      <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />
                     </div>
-                  </div>
-                )}
-              </div>
-            </div>
+                  )}
 
-            {/* Desktop LPS sidebar: Height is strictly locked to video player, scrollable inside */}
-            <div
-              className="hidden lg:block lg:col-span-4 relative min-h-0 overflow-hidden"
-              style={playerHeight ? { height: `${playerHeight}px`, maxHeight: `${playerHeight}px` } : undefined}
-            >
-              <div className="absolute inset-0 h-full w-full overflow-hidden">
-                <ChannelSchedule channel={selectedChannel} variant="sidebar" />
+                  {/* Player Controls Bar */}
+                  {!hasPlaybackError && (
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-3 sm:p-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={togglePlay}
+                          className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
+                          title={isPlaying ? 'Tạm dừng' : 'Phát'}
+                        >
+                          {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                        </button>
+                        <button
+                          onClick={toggleMute}
+                          className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
+                          title={isMuted ? 'Bật tiếng' : 'Tắt tiếng'}
+                        >
+                          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                        </button>
+                        <span className="text-xs font-semibold text-white/90">
+                          {selectedChannel.name}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Quick switch to Multiview */}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleMultiview(true)}
+                          className="px-2.5 py-1 rounded-full bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer border border-purple-500/30"
+                          title="Chuyển sang xem Multiview (2-15 kênh)"
+                        >
+                          <LayoutGrid className="w-3.5 h-3.5 text-purple-300" />
+                          <span className="hidden sm:inline">Multiview</span>
+                        </button>
+
+                        {/* Aspect Ratio Quick Toggle Pill in Overlay Controls */}
+                        <button
+                          type="button"
+                          onClick={() => handleAspectRatioChange(aspectRatio === '16:9' ? '4:3' : '16:9')}
+                          className="px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-white/10"
+                          title={`Tỷ lệ hiện tại: ${aspectRatio}. Bấm để chuyển sang ${aspectRatio === '16:9' ? '4:3' : '16:9'} (squish luồng)`}
+                        >
+                          <Ratio className="w-3.5 h-3.5 text-red-400" />
+                          <span>{aspectRatio}</span>
+                        </button>
+
+                        <button
+                          onClick={toggleFullscreen}
+                          className="p-1.5 rounded-full text-white hover:bg-white/20 transition-colors cursor-pointer"
+                          title="Toàn màn hình"
+                        >
+                          <Maximize2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Desktop LPS sidebar: Height is strictly locked to video player, scrollable inside */}
+              <div
+                className="hidden lg:block lg:col-span-4 relative min-h-0 overflow-hidden"
+                style={playerHeight ? { height: `${playerHeight}px`, maxHeight: `${playerHeight}px` } : undefined}
+              >
+                <div className="absolute inset-0 h-full w-full overflow-hidden">
+                  <ChannelSchedule channel={selectedChannel} variant="sidebar" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Mobile Schedule Drawer (Slide-in from right edge) */}
@@ -783,7 +881,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
               href="https://v0-vplay-preview.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full bg-gradient-to-r from-[#FF0000] to-[#E6007A] text-white font-bold text-sm shadow-lg shadow-red-500/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-[30px] bg-gradient-to-r from-[#FF0000] to-[#E6007A] text-white font-bold text-sm shadow-lg shadow-red-500/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <span>Check official website</span>
               <ExternalLink className="w-4 h-4 stroke-[2.5]" />
@@ -793,7 +891,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
               <button
                 id="btn-livetv-add-custom-link"
                 onClick={onOpenCustomStreamModal}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shadow-lg"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-[30px] bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shadow-lg"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add custom TV link</span>
