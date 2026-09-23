@@ -35,15 +35,15 @@ import { Channel } from "../data/channels";
 const SIMULATED_COMMENTS: Record<string, string[]> = {
   vtv: [
     "Thời sự trực tiếp xem căng đét!",
-    "Chất lượng luồng Vplay mượt ghê",
+    "Chất lượng luồng VNRT Online mượt ghê",
     "Có ai đang xem giống mình không? 👋",
     "Đường truyền căng đét, không giật lag tí nào luôn",
     "VTV chiếu tin tức nhanh nhất rồi",
-    "Vplay đúng là app đỉnh của chóp 💯",
+    "VNRT Online đúng là app đỉnh của chóp 💯",
     "Kênh này xem thời sự chuẩn nét căng",
     "Chào cả nhà yêu nước nha!",
     "Xem trên điện thoại tỉ lệ dọc tiện thật sự",
-    "Cảm ơn đội ngũ Vplay đã chia sẻ luồng mượt thế này"
+    "Cảm ơn đội ngũ VNRT Online đã chia sẻ luồng mượt thế này"
   ],
   sports: [
     "Hay quá! Sút căng vcl!!! 🔥",
@@ -71,29 +71,29 @@ const SIMULATED_COMMENTS: Record<string, string[]> = {
   general: [
     "Chào buổi tối cả nhà nha!",
     "Kênh này xem chill phết",
-    "Vplay nhiều kênh xịn thế nhở",
+    "VNRT Online nhiều kênh xịn thế nhở",
     "Âm thanh hình ảnh đồng bộ tốt ghê",
     "Đang rảnh rỗi lướt shorts gặp ngay truyền hình live",
     "TikTok gọi bằng cụ nhé, lướt Shorts xem tivi cực đã",
     "Tính năng này sáng tạo ghê á!",
     "Vừa lướt vừa xem tin tức, tiện cả đôi đường",
-    "10 điểm không có nhưng cho Vplay",
+    "10 điểm không có nhưng cho VNRT Online",
     "Thích giao diện màu tím ấm cúng này ghê"
   ]
 };
 
 const VIRTUAL_USERNAMES = [
-  "tuấn_anh_vtv", "mai_lan_99", "hoang_hai_phong", "vplay_vip_user", 
+  "tuấn_anh_vtv", "mai_lan_99", "hoang_hai_phong", "vnrt_vip_user", 
   "thanh_hang_hn", "minh_quan_korea", "linh_chi_cute", "long_vu_sport", 
   "phuong_thao_vlog", "duy_khanh_bouncy", "ngoc_huyen_vtv3", "cuong_dolce",
-  "tram_anh_fashion", "tiến_dat_tech", "quỳnh_anh_vplay", "khanh_vy_official",
+  "tram_anh_fashion", "tiến_dat_tech", "quỳnh_anh_vnrt", "khanh_vy_official",
   "quang_huy_93", "minh_thu_bds", "binh_minh_chill", "khanh_an_vtv1",
   "anh_tuan_live", "thuy_tien_sg", "quoc_bao_92", "lan_huong_vtv2",
-  "tien_dung_sport", "ngoc_anh_vtv6", "phuc_vinh_vplay", "diem_my_daily",
+  "tien_dung_sport", "ngoc_anh_vtv6", "phuc_vinh_vnrt", "diem_my_daily",
   "vtv_go_fan", "the_anh_28", "beat_vn_member", "schannel_fan_cung",
   "vinh_xo_review", "duy_tham_tech", "tan_one_piece", "linh_ka_official",
   "son_tung_mtp_fan", "den_vau_chill", "suboi_rapviet", "justatee_fan",
-  "viet_anh_94", "huong_giang_vplay", "trung_quan_idol", "my_tam_fanpage",
+  "viet_anh_94", "huong_giang_vnrt", "trung_quan_idol", "my_tam_fanpage",
   "jack_5m", "kicm_producer", "viruss_reaction", "pewpew_tiem_banh",
   "mixigaming_fan", "tiencookie_hit", "bichphuong_chill", "den_vau_rap"
 ];
@@ -324,7 +324,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
       } else {
         const commentReplies = [
           `@${nick} cảm ơn bạn đã quan tâm theo dõi luồng trực tiếp nha! ❤️`,
-          `Chào @${nick}, chúc bạn xem truyền hình vui vẻ trên Vplay nhé!`,
+          `Chào @${nick}, chúc bạn xem truyền hình vui vẻ trên VNRT Online nhé!`,
           `Chuẩn luôn @${nick} ơi, nhớ thả tim ủng hộ stream nhé!`,
           `Cảm ơn @${nick} đã tương tác cực sung! Kênh luôn phát Full HD 1080p mượt mà. 🔥`
         ];
@@ -464,7 +464,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
       if (randType === 'gift') {
         const giftList = [
           { name: "Hộp Quà Kim Cương 💎", detail: "gửi tặng kênh" },
-          { name: "Siêu Xe Vplay 🏎️", detail: "gửi tặng kênh" },
+          { name: "Siêu Xe VNRT Online 🏎️", detail: "gửi tặng kênh" },
           { name: "Bảo Ngọc Vương Miện 👑", detail: "gửi tặng kênh" },
           { name: "Tim Khổng Lồ 💖", detail: "gửi tặng kênh" },
           { name: "Tên Lửa Vũ Trụ 🚀", detail: "gửi tặng kênh" }
@@ -496,7 +496,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
         const superChats = [
           { amt: "50.000đ", msg: "Kênh nét căng đét! 😍" },
           { amt: "100.000đ", msg: "Đường truyền mượt quá ad ơi!" },
-          { amt: "20.000đ", msg: "Chào cả nhà yêu Vplay nha!" },
+          { amt: "20.000đ", msg: "Chào cả nhà yêu VNRT Online nha!" },
           { amt: "200.000đ", msg: "Tặng ad ly cà phê sáng ☕" }
         ];
         const sc = superChats[Math.floor(Math.random() * superChats.length)];
@@ -855,7 +855,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
       const core = key.substring(10, key.length - 5);
       if (core === "VietnamWildLive") return "Vietnam Wild Live";
       if (core === "VTV6Test") return "VTV6 Test Stream";
-      if (core.startsWith("VTVgo")) return "Vplay " + core.substring(5);
+      if (core.startsWith("VTVgo")) return "VNRT Online " + core.substring(5);
       return core.replace(/([A-Z])/g, ' $1').trim();
     }
     return key;
@@ -880,7 +880,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
           </div>
           <div>
             <h2 className="text-sm font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 uppercase">
-              Vplay Vertical Live
+              VNRT Online Vertical Live
             </h2>
             <p className="text-[10px] text-white/40 font-semibold uppercase">PORTRAIT TELEVISION MODE</p>
           </div>
@@ -1082,7 +1082,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="px-2 py-0.5 rounded-full bg-red-600 text-[9px] font-black tracking-widest text-white flex items-center gap-1 shadow-md uppercase">
                     <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                    VPLAY VERTICAL
+                    VNRT ONLINE VERTICAL
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-emerald-500/30 text-[9px] font-mono font-bold text-emerald-400 animate-pulse">
                     Viewer: {liveViewersCount.toLocaleString()}
@@ -1437,7 +1437,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
                 
                 {/* Channel full name */}
                 <h3 className="text-[13px] font-black text-white mt-1 uppercase tracking-wider">
-                  {currentChannel ? translateName(currentChannel.name) : "Vplay Television Stream"}
+                  {currentChannel ? translateName(currentChannel.name) : "VNRT Online Television Stream"}
                 </h3>
               </div>
 
@@ -1686,7 +1686,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
               <div className="px-5 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-1.5">
                   <Gift className="w-4 h-4 text-pink-400" />
-                  <span className="text-xs font-black tracking-wide text-white uppercase">Cửa Hàng Quà Tặng Vplay</span>
+                  <span className="text-xs font-black tracking-wide text-white uppercase">Cửa Hàng Quà Tặng VNRT Online</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] bg-yellow-400/10 text-yellow-400 font-black px-2 py-0.5 rounded-full border border-yellow-400/20">
@@ -1708,7 +1708,7 @@ export default function VplayVertical({ channels = [], onBack, isMaterialDesignA
                   { name: "Ly Trà Sữa 🧋", price: 500, icon: "🧋", desc: "Năng lượng cày livestream" },
                   { name: "Hộp Quà Kim Cương 💎", price: 1000, icon: "💎", desc: "Đẳng cấp VIP member" },
                   { name: "Bảo Ngọc Vương Miện 👑", price: 10000, icon: "👑", desc: "Vinh danh bá chủ phòng live" },
-                  { name: "Siêu Xe Vplay 🏎️", price: 100000, icon: "🏎️", desc: "Siêu xịn siêu sang chảnh" },
+                  { name: "Siêu Xe VNRT Online 🏎️", price: 100000, icon: "🏎️", desc: "Siêu xịn siêu sang chảnh" },
                   { name: "Tên Lửa Vũ Trụ 🚀", price: 1000000, icon: "🚀", desc: "Món quà vũ trụ tối thượng" }
                 ].map((g) => {
                   const displayPriceStr = g.price === 1000000 ? "1.000.000" : g.price.toLocaleString();

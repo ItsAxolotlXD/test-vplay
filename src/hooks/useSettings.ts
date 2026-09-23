@@ -84,6 +84,8 @@ export interface SystemSettings {
   searchSettings: boolean;
   inspectElements: boolean;
   shinyOutline: boolean;
+  spatialGlassBlur: number; // 0 to 50px
+  spatialGlassOpacity: number; // 5 to 100 percent
 }
 
 export const DEFAULT_SETTINGS: SystemSettings = {
@@ -108,6 +110,8 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   searchSettings: true,
   inspectElements: false,
   shinyOutline: true,
+  spatialGlassBlur: 20,
+  spatialGlassOpacity: 65,
 };
 
 export interface WallpaperOption {
@@ -236,12 +240,21 @@ export const getStoredSettings = (): SystemSettings => {
         } catch {}
       }
 
+      const glassBlur = typeof parsed.spatialGlassBlur === 'number' && !isNaN(parsed.spatialGlassBlur)
+        ? Math.max(0, Math.min(50, parsed.spatialGlassBlur))
+        : 20;
+      const glassOpacity = typeof parsed.spatialGlassOpacity === 'number' && !isNaN(parsed.spatialGlassOpacity)
+        ? Math.max(5, Math.min(100, parsed.spatialGlassOpacity))
+        : 65;
+
       return { 
         ...base, 
         ...parsed,
         shinyOutline: isShiny,
         fontFamily: font,
         navigationMode: navMode,
+        spatialGlassBlur: glassBlur,
+        spatialGlassOpacity: glassOpacity,
         appBackground: parsed.appBackground || 'default',
         floatyBar: typeof parsed.floatyBar === 'boolean' ? parsed.floatyBar : false,
         vboardSkin: ['default', 'ios', 'google', 'butterfly', 'physical'].includes(parsed.vboardSkin) ? parsed.vboardSkin : 'default',
@@ -296,6 +309,21 @@ export const applySystemSettings = (settings: SystemSettings) => {
     document.body.style.backgroundImage = 'none';
     document.body.style.backgroundColor = '#181818';
   }
+
+  // Apply Spatial Glass blur & opacity CSS variables
+  const glassBlur = typeof settings.spatialGlassBlur === 'number' && !isNaN(settings.spatialGlassBlur)
+    ? Math.max(0, Math.min(50, settings.spatialGlassBlur))
+    : 20;
+  const glassOpacity = typeof settings.spatialGlassOpacity === 'number' && !isNaN(settings.spatialGlassOpacity)
+    ? Math.max(5, Math.min(100, settings.spatialGlassOpacity))
+    : 65;
+  const opacityFraction = (glassOpacity / 100).toFixed(2);
+
+  document.documentElement.style.setProperty('--spatial-glass-blur', `${glassBlur}px`);
+  document.documentElement.style.setProperty('--spatial-glass-opacity', opacityFraction);
+  document.documentElement.style.setProperty('--spatial-glass-bg', `rgba(28, 27, 36, ${opacityFraction})`);
+  document.documentElement.style.setProperty('--spatial-glass-card-bg', `rgba(255, 255, 255, ${(glassOpacity * 0.0012).toFixed(3)})`);
+  document.documentElement.style.setProperty('--spatial-glass-border', `rgba(255, 255, 255, ${(glassOpacity * 0.0025).toFixed(3)})`);
 
   // Apply Shiny outline (Specular 2-edge top & bottom rim highlight)
   const isShinyActive = settings.shinyOutline !== false;

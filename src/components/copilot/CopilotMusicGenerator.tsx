@@ -78,7 +78,7 @@ export const CopilotMusicGenerator: React.FC<CopilotMusicGeneratorProps> = ({ on
   // Presets
   const presets = [
     { label: "☕ Lofi Hà Nội Mưa", genre: "lofi", mood: "relaxed", bpm: 82, prompt: "Giai điệu Lofi ấm áp trong buổi chiều mưa Hà Nội bên tách cà phê trứng" },
-    { label: "⚡ Cyberpunk 2026", genre: "edm", mood: "energetic", bpm: 128, prompt: "Nhạc điện tử Cyberpunk Synthwave bùng nổ năng lượng tương lai Vplay" },
+    { label: "⚡ Cyberpunk 2026", genre: "edm", mood: "energetic", bpm: 128, prompt: "Nhạc điện tử Cyberpunk Synthwave bùng nổ năng lượng tương lai VNRT Online" },
     { label: "🎸 Acoustic Tình Ca", genre: "pop", mood: "romantic", bpm: 95, prompt: "Khúc tình ca acoustic lãng mạn mộc mạc với tiếng đàn guitar nhẹ nhàng" },
     { label: "🏖️ Chillhop Hoàng Hôn", genre: "chillhop", mood: "chill", bpm: 90, prompt: "Chillhop thư giãn ngắm hoàng hôn buông trên bãi biển êm đềm" },
     { label: "🎋 Dân Gian Đương Đại", genre: "traditional", mood: "epic", bpm: 86, prompt: "Hòa tấu sáo trúc và đàn tranh ngũ cung phong cách EDM hiện đại" }
@@ -347,7 +347,7 @@ export const CopilotMusicGenerator: React.FC<CopilotMusicGeneratorProps> = ({ on
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-black/30 backdrop-blur-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Music className="w-3.5 h-3.5 text-pink-300" />
-                Vplay Copilot Audio Studio
+                VNRT Online Copilot Audio Studio
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-pink-500/30 text-[11px] font-semibold">
                 Web Audio Synthesizer

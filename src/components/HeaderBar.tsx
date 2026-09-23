@@ -35,7 +35,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
     if (uppercase === 'HOME') return t('header.home', 'HOME');
     if (uppercase === 'TRỰC TIẾP' || uppercase === 'LIVE TV') return t('header.live', 'TRỰC TIẾP');
     if (uppercase === 'SETTINGS' || uppercase === 'CÀI ĐẶT') return t('header.settings', 'CÀI ĐẶT');
-    if (uppercase === 'SEARCH' || uppercase === 'TÌM KIẾM') return t('search.title', 'VPLAY CHANNELS');
+    if (uppercase === 'SEARCH' || uppercase === 'TÌM KIẾM') return t('search.title', 'VNRT ONLINE CHANNELS');
     return title;
   };
 

@@ -27,7 +27,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
   const [pgCheck, setPgCheck] = useState(true);
   const [pgDropdown, setPgDropdown] = useState('vtv1');
   const [pgSlider, setPgSlider] = useState(5);
-  const [pgInput, setPgInput] = useState('Vplay TV Streaming');
+  const [pgInput, setPgInput] = useState('VNRT Online TV Streaming');
   const [pgSwitch, setPgSwitch] = useState(true);
   const [pgSelectedTab, setPgSelectedTab] = useState(0);
 
@@ -41,7 +41,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
             {t('home.tab.DesignPreview.name', 'WELCOME TO A DESIGN PREVIEW')}
           </h2>
           <p className="text-xs text-gray-300 max-w-2xl font-normal leading-relaxed">
-            {t('home.tab.DesignPreview.desc', 'Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Ore UI. Chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi.')}
+            {t('home.tab.DesignPreview.desc', 'Bạn đang được trải nghiệm hệ thống giao diện mới của VNRT Online, lấy cảm hứng từ Minecraft Ore UI. Chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi.')}
           </p>
         </div>
         <VplaySecondaryButton
@@ -50,7 +50,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
           onClick={() => {
             playPopSound();
             if (onOpenFeedback) onOpenFeedback();
-            else alert('Cảm ơn bạn đã đóng góp ý kiến về giao diện Vplay Ore UI!');
+            else alert('Cảm ơn bạn đã đóng góp ý kiến về giao diện VNRT Online Ore UI!');
           }}
           className="flex-shrink-0"
         >
@@ -65,7 +65,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 bg-[#418a28] animate-pulse border border-[#141414]" />
             <h1 className="text-xl sm:text-2xl font-extrabold text-[#51a233] tracking-tight">
-              VPLAY ORE UI
+              VNRT ONLINE ORE UI
             </h1>
           </div>
           <p className="text-gray-400 text-xs sm:text-sm mt-2 font-montserrat">
@@ -316,7 +316,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
             Interactive Component Playground
           </h2>
           <p className="text-xs text-gray-300">
-            Hover, click, and interact with the custom pixel Vplay design system components below:
+            Hover, click, and interact with the custom pixel VNRT Online design system components below:
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -368,7 +368,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
                     { value: 'vtv1', label: 'VTV1 HD - Thời sự' },
                     { value: 'vtv3', label: 'VTV3 HD - Giải trí' },
                     { value: 'htv7', label: 'HTV7 HD - Phim truyện' },
-                    { value: 'vplay_sports', label: 'Vplay Sports Live' },
+                    { value: 'vplay_sports', label: 'VNRT Online Sports Live' },
                   ]}
                 />
               </div>
@@ -376,7 +376,7 @@ export const DesignSystemViewer: React.FC<DesignSystemViewerProps> = ({ onOpenFe
               <div className="bg-[#1f2123] p-4 border border-[#383a3d]">
                 <h3 className="text-xs text-gray-400 mb-3">06. Slider</h3>
                 <VplaySlider
-                  label="Âm lượng TV Vplay"
+                  label="Âm lượng TV VNRT Online"
                   value={pgSlider}
                   min={0}
                   max={10}

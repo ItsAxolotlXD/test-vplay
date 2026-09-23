@@ -872,7 +872,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
         {/* Notice Section: Chuyển xuống bên dưới category kênh VTV */}
         <div className="max-w-2xl mx-auto text-center space-y-4 pt-2 pb-2">
           <p className="text-sm sm:text-base text-[#A1A1AA] leading-relaxed max-w-xl mx-auto">
-            To watch official TV channels feed provided by Vplay and our community without interruptions, please visit the official Vplay website. This website is only for testing feed and they will not be able to watch at anytime.
+            To watch official TV channels feed provided by VNRT Online and our community without interruptions, please visit the official VNRT Online website. This website is only for testing feed and they will not be able to watch at anytime.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3">

@@ -242,7 +242,7 @@ export const ChannelPlayer = React.memo(function ChannelPlayer({
     };
   }, [channel?.url, channel?.streamUrl, channel?.id]);
 
-  // Web Audio API for 1kHz beep on channel 155 ("vplay_live") and Vplay Event Feed ("vietnam-wild-live")
+  // Web Audio API for 1kHz beep on channel 155 ("vplay_live") and VNRT Online Event Feed ("vietnam-wild-live")
   useEffect(() => {
     const isTestSignalChannel = channel.id === "vplay_live" || channel.id === "vietnam-wild-live";
     if (!isTestSignalChannel) {

@@ -293,21 +293,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Brand Logo */}
           <div 
             onClick={() => handleNavClick('/')} 
-            className="cursor-pointer flex items-center justify-center p-0 hover:opacity-85 transition-opacity"
-            title="Vplay"
+            className="cursor-pointer flex items-center gap-2.5 p-0 hover:opacity-85 transition-opacity"
+            title="VNRT Online"
           >
-            {!logoError ? (
-              <img 
-                src="https://static.wikia.nocookie.net/ep-deo/images/f/f8/Vpla.png/revision/latest/scale-to-width-down/1000?cb=20260829062528" 
-                alt="Vplay Logo" 
-                referrerPolicy="no-referrer"
-                className="h-8 max-w-[125px] w-auto object-contain shrink-0 filter drop-shadow"
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
-                onError={() => setLogoError(true)}
-              />
-            ) : (
-              <span className="text-white font-black text-2xl tracking-tighter">V</span>
-            )}
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E6005A] via-[#FF2020] to-[#FF8C00] flex items-center justify-center shadow-md shadow-red-600/30 border border-white/20 shrink-0">
+              <Tv className="w-4.5 h-4.5 text-white drop-shadow-sm" />
+            </div>
+            <div className="flex flex-col text-left leading-none select-none">
+              <span className="text-lg font-black tracking-tight text-white">
+                VNRT <span className="text-[#388BFD]">Online</span>
+              </span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 mt-0.5">
+                Media Hub 2026
+              </span>
+            </div>
           </div>
 
           {/* Real-time Clock display */}
@@ -527,11 +526,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="truncate">Cổng thông tin</span>
         </button>
 
-        {/* 4. Copilot for Vplay */}
+        {/* 4. Copilot for VNRT Online */}
         <button
           id={isMobile ? 'mobile-nav-item-copilot' : 'nav-item-copilot'}
           onClick={() => handleNavClick('/copilot')}
-          title="Copilot for Vplay"
+          title="Copilot for VNRT Online"
           className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
             isActive('/copilot')
               ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
@@ -540,21 +539,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <img
             src="https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/microsoft-copilot.svg"
-            alt="Copilot for Vplay"
+            alt="Copilot for VNRT Online"
             referrerPolicy="no-referrer"
             className="w-5 h-5 object-contain shrink-0"
             onError={(e) => {
               (e.target as HTMLImageElement).src = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/microsoft-copilot.svg";
             }}
           />
-          <span className="truncate">Copilot for Vplay</span>
+          <span className="truncate">Copilot for VNRT Online</span>
         </button>
 
         {/* Music (Kho nhạc truyền hình) */}
         <button
           id={isMobile ? 'mobile-nav-item-music' : 'nav-item-music'}
           onClick={() => handleNavClick('/music')}
-          title="Kho nhạc truyền hình Vplay Music"
+          title="Kho nhạc truyền hình VNRT Online Music"
           className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
             isActive('/music')
               ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
@@ -1173,19 +1172,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div 
                 onClick={() => handleNavClick('/')} 
                 className="cursor-pointer flex items-center justify-center p-0 hover:opacity-80 transition-opacity"
-                title="Vplay"
+                title="VNRT Online"
               >
-                {!logoError ? (
-                  <img 
-                    src="https://static.wikia.nocookie.net/ep-deo/images/4/4b/Vplay_no_wordmark.png/revision/latest/scale-to-width-down/1000?cb=20260829062616" 
-                    alt="Vplay Logo" 
-                    referrerPolicy="no-referrer"
-                    className="w-8 h-8 object-contain shrink-0"
-                    onError={() => setLogoError(true)}
-                  />
-                ) : (
-                  <span className="text-white dark:text-white light:text-[#111827] font-black text-xl tracking-tighter">V</span>
-                )}
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E6005A] via-[#FF2020] to-[#FF8C00] flex items-center justify-center shadow-md shadow-red-600/30 border border-white/20 shrink-0">
+                  <Tv className="w-4.5 h-4.5 text-white" />
+                </div>
               </div>
 
               {/* Expand sidebar button */}
@@ -1282,7 +1273,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   id="mini-nav-item-copilot"
                   onClick={() => handleNavClick('/copilot')}
-                  title="Copilot for Vplay"
+                  title="Copilot for VNRT Online"
                   className={`w-10 h-10 min-w-[40px] min-h-[40px] shrink-0 rounded-[12px] flex items-center justify-center p-0 transition-all cursor-pointer ${
                     isActive('/copilot') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}

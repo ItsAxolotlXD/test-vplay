@@ -37,13 +37,13 @@ export interface Note {
 const DEFAULT_NOTES: Note[] = [
   {
     id: "note-1",
-    title: "Kế hoạch phát triển Vplay System 2026",
+    title: "Kế hoạch phát triển VNRT Online System 2026",
     content: "<b>Nhiệm vụ trọng tâm:</b><br/>• Tích hợp hệ thống <u>V-Office</u> (Pages, Numbers, Keynotes).<br/>• Nâng cấp giao diện <i>Ore UI Design System</i> đồng bộ.<br/>• Tối ưu hóa hiệu năng phát trực tuyến V-Play & Vertical.",
     category: "Công việc",
     isPinned: true,
     color: "#cc1827",
     updatedAt: "2026-07-24 09:30",
-    tags: ["Vplay", "Roadmap", "OreUI"]
+    tags: ["VNRT Online", "Roadmap", "OreUI"]
   },
   {
     id: "note-2",

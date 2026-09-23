@@ -136,11 +136,11 @@ const REWARD_ITEMS: RewardItem[] = [
   },
   {
     id: 'voucher_shop_50k',
-    title: 'Voucher Vplay Shop 50.000đ',
+    title: 'Voucher VNRT Online Shop 50.000đ',
     costPoints: 500,
     costType: 'V-Points',
     badge: 'MUA SẮM',
-    description: 'Áp dụng giảm trực tiếp khi mua sắm vật phẩm, merchandise và đồ chơi Minecraft trên shop Vplay.',
+    description: 'Áp dụng giảm trực tiếp khi mua sắm vật phẩm, merchandise và đồ chơi Minecraft trên shop VNRT Online.',
     icon: <ShoppingBag className="w-6 h-6 text-purple-400" />,
   },
   {
@@ -196,7 +196,7 @@ export const LoyaltyPage: React.FC<LoyaltyPageProps> = ({
   return (
     <div id="waves-loyalty-page" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-7">
       
-      {/* 1. HERO HEADER: Vplay Loyalty & Sàn Cược Orbs */}
+      {/* 1. HERO HEADER: VNRT Online Loyalty & Sàn Cược Orbs */}
       <div className="relative overflow-hidden rounded-[30px] bg-gradient-to-br from-[#241220] via-[#1B0E1E] to-[#120814] border border-[#3E243B] p-6 sm:p-8 md:p-10 shadow-2xl">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-[#E6005A]/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 -mb-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -206,7 +206,7 @@ export const LoyaltyPage: React.FC<LoyaltyPageProps> = ({
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Vplay Loyalty & Sàn Cược Orbs VIP</span>
+                <span>VNRT Online Loyalty & Sàn Cược Orbs VIP</span>
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 PROVABLY FAIR

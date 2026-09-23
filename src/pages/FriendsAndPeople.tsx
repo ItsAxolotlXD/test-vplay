@@ -171,7 +171,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
       {
         id: 'msg_1',
         sender: 'them',
-        text: `Chào bạn! Mình là ${user.name} (${user.tag}). Rất vui được gặp bạn trên Vplay! ✨`,
+        text: `Chào bạn! Mình là ${user.name} (${user.tag}). Rất vui được gặp bạn trên VNRT Online! ✨`,
         time: 'Vừa xong'
       }
     ]);
@@ -194,7 +194,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
     // Simulate smart auto reply
     setTimeout(() => {
       playWinSound();
-      let reply = 'Hay quá! Chúng mình cùng hẹn xem phim hoặc đấu minigame trên Vplay nhé!';
+      let reply = 'Hay quá! Chúng mình cùng hẹn xem phim hoặc đấu minigame trên VNRT Online nhé!';
       if (sentText.toLowerCase().includes('orbs') || sentText.toLowerCase().includes('cược')) {
         reply = 'Ồ bạn cũng thích săn Orbs à? Vào Copilot gõ /cược hoặc bấm tab Sàn cược Orbs để chơi Bầu Cua hoặc Lật Xu nha! 💎';
       } else if (sentText.toLowerCase().includes('vtv') || sentText.toLowerCase().includes('phim')) {
@@ -242,7 +242,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
     navigator.clipboard.writeText(`${CURRENT_USER.name} ${CURRENT_USER.tag}`);
     setCopiedTag(true);
     playPopSound();
-    showToast('📋 Đã sao chép Vplay Tag của bạn vào bộ nhớ tạm!');
+    showToast('📋 Đã sao chép VNRT Online Tag của bạn vào bộ nhớ tạm!');
     setTimeout(() => setCopiedTag(false), 2000);
   };
 
@@ -274,18 +274,18 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-xs font-bold font-mono">
               <Users className="w-3.5 h-3.5 text-purple-400" />
-              <span>VPLAY COMMUNITY • FRIENDS & PEOPLE</span>
+              <span>VNRT ONLINE COMMUNITY • FRIENDS & PEOPLE</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
-              <span>Bạn bè & Người dùng Vplay</span>
+              <span>Bạn bè & Người dùng VNRT Online</span>
               <span className="text-sm font-mono font-bold px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 {totalUsersCount} Cư dân
               </span>
             </h1>
 
             <p className="text-sm sm:text-base text-zinc-400 max-w-2xl leading-relaxed">
-              Khám phá cộng đồng Vplay Media Hub, kết nối bạn bè, cùng xem truyền hình trực tuyến, thách đấu minigame và trao đổi khoáng vật Orbs!
+              Khám phá cộng đồng VNRT Online Media Hub, kết nối bạn bè, cùng xem truyền hình trực tuyến, thách đấu minigame và trao đổi khoáng vật Orbs!
             </p>
 
             {/* Live Stats Counters */}
@@ -345,7 +345,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
 
             <button
               onClick={handleCopyMyTag}
-              title="Sao chép Vplay Tag để bạn bè kết bạn"
+              title="Sao chép VNRT Online Tag để bạn bè kết bạn"
               className="p-2.5 rounded-xl bg-[#2A2933] hover:bg-purple-600/30 text-zinc-300 hover:text-white border border-[#3E3D4A] hover:border-purple-400/50 transition-all cursor-pointer shrink-0"
             >
               {copiedTag ? <CheckCheck className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -533,7 +533,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <Trophy className="w-5 h-5 text-amber-400" />
-              <span>Bảng Xếp Hạng Đại Gia Khoáng Vật Orbs Vplay</span>
+              <span>Bảng Xếp Hạng Đại Gia Khoáng Vật Orbs VNRT Online</span>
             </h2>
             <span className="text-xs text-zinc-400 font-mono">Top 10 Cư Dân</span>
           </div>
@@ -640,7 +640,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
               <Compass className="w-12 h-12 mx-auto text-zinc-600 opacity-70" />
               <p className="text-base font-bold text-white">Không tìm thấy người dùng phù hợp</p>
               <p className="text-xs text-zinc-400 max-w-md mx-auto">
-                Thử thay đổi từ khóa tìm kiếm hoặc bấm vào bộ lọc "Tất cả" để xem toàn bộ 100+ cư dân Vplay.
+                Thử thay đổi từ khóa tìm kiếm hoặc bấm vào bộ lọc "Tất cả" để xem toàn bộ 100+ cư dân VNRT Online.
               </p>
               <button
                 onClick={() => {
@@ -988,7 +988,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
 
               {/* User Bio */}
               <div className="p-3.5 rounded-xl bg-[#24232C] border border-[#34343E] text-xs text-zinc-300 leading-relaxed italic">
-                "{selectedUser.bio || 'Thành viên cộng đồng Vplay Media Hub.'}"
+                "{selectedUser.bio || 'Thành viên cộng đồng VNRT Online Media Hub.'}"
               </div>
 
               {/* Live Activity & Favorite Channel */}
@@ -1264,7 +1264,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
               <div className="flex items-center justify-between">
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
                   <UserPlus className="w-5 h-5 text-purple-400" />
-                  <span>Kết bạn mới trên Vplay</span>
+                  <span>Kết bạn mới trên VNRT Online</span>
                 </h2>
                 <button
                   onClick={() => setIsAddFriendModalOpen(false)}
@@ -1275,7 +1275,7 @@ export const FriendsAndPeople: React.FC<FriendsAndPeopleProps> = ({
               </div>
 
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Nhập chính xác Vplay Tag (ví dụ: <code className="bg-black/40 px-1.5 py-0.5 rounded text-purple-300 font-mono">#1024</code>) hoặc tên người dùng bạn muốn kết nối.
+                Nhập chính xác VNRT Online Tag (ví dụ: <code className="bg-black/40 px-1.5 py-0.5 rounded text-purple-300 font-mono">#1024</code>) hoặc tên người dùng bạn muốn kết nối.
               </p>
 
               <div>

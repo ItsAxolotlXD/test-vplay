@@ -92,7 +92,7 @@ export const VBoardKeyboard: React.FC<VBoardKeyboardProps> = ({
       const stored = localStorage.getItem('vplay_vboard_clipboard');
       if (stored) return JSON.parse(stored);
     } catch {}
-    return ['Vplay TV', 'Không gian Space 360', 'https://vplay.vn', 'Chào bạn! Chúc bạn xem phim vui vẻ 🎉'];
+    return ['VNRT Online TV', 'Không gian Space 360', 'https://vnrt.online', 'Chào bạn! Chúc bạn xem phim vui vẻ 🎉'];
   });
 
   const saveClipboard = (items: string[]) => {

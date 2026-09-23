@@ -66,7 +66,7 @@ const getSpace360Route = (appId: string) => {
 
 const SYSTEM_LINKS = [
   { id: 'nav-settings', name: 'Cài đặt hệ thống', route: '/settings', desc: 'Tùy chỉnh giao diện, thanh điều hướng, cỡ chữ, trợ năng', category: 'Cài đặt', icon: Settings },
-  { id: 'nav-feature-flags', name: 'Cờ tính năng (Feature Flags)', route: '/feature-flags', desc: 'Trung tâm thử nghiệm tính năng Vplay Experimental Labs', category: 'Cài đặt', icon: Flag },
+  { id: 'nav-feature-flags', name: 'Cờ tính năng (Feature Flags)', route: '/feature-flags', desc: 'Trung tâm thử nghiệm tính năng VNRT Online Experimental Labs', category: 'Cài đặt', icon: Flag },
   { id: 'nav-v-flow', name: 'V-Flow', route: '/v-flow', desc: 'Mạng xã hội tin tức & chia sẻ khoảnh khắc', category: 'Khám phá', icon: Share2 },
   { id: 'nav-space-360', name: 'Space 360', route: '/space-360', desc: 'Kho ứng dụng hệ điều hành 360 độ & tiện ích', category: 'Khám phá', icon: Layers },
   { id: 'nav-v-shop', name: 'V-Shop', route: '/v-shop', desc: 'Cửa hàng chính hãng quà tặng, công nghệ & đặc sản', category: 'Mua sắm', icon: ShoppingBag },
@@ -325,7 +325,7 @@ export const HomeSpotlightSearch: React.FC<HomeSpotlightSearchProps> = ({
               Không tìm thấy kết quả Spotlight nào
             </h3>
             <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
-              Không tìm thấy mục nào trên toàn bộ Vplay khớp với &quot;{query}&quot;. Thử tìm kiếm theo tên kênh, game, tiện ích, tin tức hoặc cài đặt.
+              Không tìm thấy mục nào trên toàn bộ VNRT Online khớp với &quot;{query}&quot;. Thử tìm kiếm theo tên kênh, game, tiện ích, tin tức hoặc cài đặt.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
               {['VTV3', 'Games', 'Maps', 'Thời tiết', 'Cài đặt', 'Nhạc hiệu'].map((kw) => (

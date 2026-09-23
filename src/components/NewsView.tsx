@@ -507,11 +507,11 @@ export const NEWS_LIST: NewsItem[] = [
   },
   {
     id: 'merger-announcement',
-    title: 'Tạm biệt Vplay - Chào mừng bạn đến với Waves Community!',
+    title: 'Tạm biệt VNRT Online - Chào mừng bạn đến với Waves Community!',
     date: '20/09/2026',
     thumbnail: 'https://static.wikia.nocookie.net/ep-deo/images/2/26/Background.png/revision/latest?cb=20260825071832',
-    excerpt: 'Kể từ 20/09/2026, nền tảng xem truyền hình quen thuộc của bạn sẽ bước sang một hành trình hoàn toàn mới. Vplay được hợp nhất để trở thành Waves Community.',
-    fullContent: 'Kể từ ngày 20/09/2026, nền tảng xem truyền hình quen thuộc của bạn sẽ bước sang một hành trình hoàn toàn mới. Vplay được hợp nhất để trở thành Waves Community. Ngoài việc cung cấp cho người dùng một hệ thống xem truyền hình đa dạng thể loại các kênh thì trang web mới sau sáp nhập sẽ tập trung thêm cả vào việc cập nhật những tin tức, thông báo mới của server Waves trong Discord. Toàn bộ tính năng đã được tối ưu hóa giao diện cinematic, độ trễ phát sóng cực thấp và tích hợp cộng đồng Discord.',
+    excerpt: 'Kể từ 20/09/2026, nền tảng xem truyền hình quen thuộc của bạn sẽ bước sang một hành trình hoàn toàn mới. VNRT Online được hợp nhất để trở thành Waves Community.',
+    fullContent: 'Kể từ ngày 20/09/2026, nền tảng xem truyền hình quen thuộc của bạn sẽ bước sang một hành trình hoàn toàn mới. VNRT Online được hợp nhất để trở thành Waves Community. Ngoài việc cung cấp cho người dùng một hệ thống xem truyền hình đa dạng thể loại các kênh thì trang web mới sau sáp nhập sẽ tập trung thêm cả vào việc cập nhật những tin tức, thông báo mới của server Waves trong Discord. Toàn bộ tính năng đã được tối ưu hóa giao diện cinematic, độ trễ phát sóng cực thấp và tích hợp cộng đồng Discord.',
     actionText: 'Tham gia Server Discord Waves',
     actionLink: 'https://discord.gg/waves',
     actionType: 'discord'

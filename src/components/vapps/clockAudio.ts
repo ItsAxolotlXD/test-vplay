@@ -24,7 +24,7 @@ export interface AlarmTonePreset {
 export const ALARM_TONE_PRESETS: AlarmTonePreset[] = [
   {
     id: 'chime',
-    name: 'Giai Điệu Vplay (Melody Chime)',
+    name: 'Giai Điệu VNRT Online (Melody Chime)',
     description: 'Hợp âm chuông trong trẻo, du dương khởi đầu ngày mới',
     tag: 'Mặc định'
   },

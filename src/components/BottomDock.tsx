@@ -42,7 +42,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
     { id: 'dock-tv', label: 'Truyền hình', icon: Tv, route: '/live-tv' },
     { id: 'dock-music', label: 'Kho nhạc TV', icon: Music, route: '/music' },
     { id: 'dock-shop', label: 'Shop', icon: ShoppingBag, route: '/v-shop' },
-    { id: 'dock-vertical', label: 'Vplay Vertical', icon: Smartphone, route: '/vertical' },
+    { id: 'dock-vertical', label: 'VNRT Online Vertical', icon: Smartphone, route: '/vertical' },
     { id: 'dock-news', label: 'Tin tức', icon: Megaphone, route: '/news' },
     { id: 'dock-vflow', label: 'Mạng xã hội V-Flow', icon: Radio, route: '/v-flow' },
     { id: 'dock-friends', label: 'Bạn bè & Người dùng', icon: Users, route: '/friends' },

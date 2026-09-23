@@ -79,7 +79,7 @@ export const About: React.FC = () => {
         <div className="divide-y divide-white/10 text-sm">
           <div className="flex items-center justify-between py-3.5">
             <span className="text-[#9CA3AF] font-medium">Software Update</span>
-            <span className="text-white font-semibold font-mono tracking-wide">Vplay 26.9.0</span>
+            <span className="text-white font-semibold font-mono tracking-wide">VNRT Online 26.9.0</span>
           </div>
 
           <div className="flex items-center justify-between py-3.5">

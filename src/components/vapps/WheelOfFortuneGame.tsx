@@ -84,7 +84,7 @@ const DEFAULT_PRESETS: WheelPreset[] = [
   {
     id: "orbs_rewards",
     title: "Phần Thưởng Orbs VIP 💎",
-    description: "Vòng quay trúng thưởng tích lũy tiền thưởng Orbs Vplay!",
+    description: "Vòng quay trúng thưởng tích lũy tiền thưởng Orbs VNRT Online!",
     category: "rewards",
     items: [
       { id: "1", label: "+100 Orbs 💎", color: "#3B82F6" },

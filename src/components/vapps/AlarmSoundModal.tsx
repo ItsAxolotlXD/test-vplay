@@ -443,7 +443,7 @@ export const AlarmSoundModal: React.FC<AlarmSoundModalProps> = ({
             <span className="font-bold text-cyan-300">
               {customSounds.find((s) => s.id === selectedToneId)?.name ||
                 ALARM_TONE_PRESETS.find((p) => p.id === selectedToneId)?.name ||
-                'Giai Điệu Vplay (Melody Chime)'}
+                'Giai Điệu VNRT Online (Melody Chime)'}
             </span>
           </div>
 

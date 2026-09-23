@@ -86,7 +86,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               id="welcome-modal-title"
               className="text-xl sm:text-[24px] font-bold text-white tracking-tight mb-2.5 font-sans leading-tight"
             >
-              Welcome to Vplay 26.9 - Developer Beta 3
+              Welcome to VNRT Online 26.9 - Developer Beta 3
             </h1>
 
             {/* Description */}

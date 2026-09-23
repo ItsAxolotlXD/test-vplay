@@ -864,7 +864,7 @@ export const CopilotBetArena: React.FC<CopilotBetArenaProps> = ({
                         {c.suit}
                       </span>
                     ) : (
-                      <span className="text-xs text-purple-400">🎴 Vplay</span>
+                      <span className="text-xs text-purple-400">🎴 VNRT Online</span>
                     )}
                   </div>
                 ))}

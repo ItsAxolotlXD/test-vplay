@@ -318,7 +318,7 @@ export const VAPPS_LIST: VAppDefinition[] = [
     id: 'v_flow',
     name: 'Flow',
     tagline: 'Mạng Xã Hội & Radio Live',
-    description: 'Không gian tương tác trực tiếp cộng đồng Vplay, phát thanh radio, chia sẻ cảm nghĩ và dòng thời gian cập nhật liên tục.',
+    description: 'Không gian tương tác trực tiếp cộng đồng VNRT Online, phát thanh radio, chia sẻ cảm nghĩ và dòng thời gian cập nhật liên tục.',
     category: 'Giải trí & Media',
     badge: 'Kết Nối',
     gradientBg: 'bg-gradient-to-br from-[#3B82F6] via-[#1D4ED8] to-[#4338CA]',

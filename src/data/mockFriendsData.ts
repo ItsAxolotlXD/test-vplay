@@ -29,7 +29,7 @@ const USER_BADGES = [
   { name: 'Chiến thần Minigame', color: 'from-purple-500 to-indigo-600 border-purple-400/50 text-purple-200' },
   { name: 'Thần đồng VStudy', color: 'from-cyan-500 to-blue-600 border-cyan-400/50 text-cyan-200' },
   { name: 'Mọt Phim HD', color: 'from-rose-500 to-pink-600 border-rose-400/50 text-rose-200' },
-  { name: 'Nhà phát triển Vplay', color: 'from-emerald-500 to-teal-600 border-emerald-400/50 text-emerald-200' },
+  { name: 'Nhà phát triển VNRT Online', color: 'from-emerald-500 to-teal-600 border-emerald-400/50 text-emerald-200' },
   { name: 'Tay cược Huyền thoại', color: 'from-fuchsia-500 to-purple-700 border-fuchsia-400/50 text-fuchsia-200' },
   { name: 'Cư dân thân thiện', color: 'from-blue-500 to-indigo-500 border-blue-400/50 text-blue-200' }
 ];
@@ -38,10 +38,10 @@ const USER_BIOS = [
   "Đam mê xem truyền hình trực tuyến độ nét cao & thi đấu VStudy!",
   "Thợ săn Orbs cấp vũ trụ • Sẵn sàng giao lưu PvP Caro & Bầu cua",
   "Yêu thích các chương trình thời sự VTV1 & VTV3 giải trí cuối tuần",
-  "Ore UI Minecraft fan chính hiệu • Thích tùy biến giao diện Vplay",
+  "Ore UI Minecraft fan chính hiệu • Thích tùy biến giao diện VNRT Online",
   "Luôn online trải nghiệm phim chiếu rạp và nghe VOV Music thư giãn",
   "Xin chào! Kết bạn để cùng xem phim và chia sẻ phòng live TV nhé!",
-  "Thành viên tích cực của cộng đồng Vplay Media Hub Việt Nam."
+  "Thành viên tích cực của cộng đồng VNRT Online Media Hub Việt Nam."
 ];
 
 // 100 Unique Everyday Vietnamese Names (No celebrities or football players)
@@ -72,12 +72,12 @@ const ACTIVITIES_JOINABLE = [
   "Đang xem VTV3 HD", "Đang xem VTV1 HD", "Đang xem THVL1 4K", "Đang xem HTV7 HD",
   "Đang xem VTV6 - Thể Thao", "Đang xem K+ SPORT 1", "Đang phát kênh tùy chỉnh (M3U8)",
   "Playing in Creative Mode", "Playing in Survival Mode", "Playing Minecraft Launcher",
-  "Đang nghe VOV1 - Thời Sự", "Đang xem Phim Chiếu Rạp Vplay", "Đang thi đấu VStudy Quiz"
+  "Đang nghe VOV1 - Thời Sự", "Đang xem Phim Chiếu Rạp VNRT Online", "Đang thi đấu VStudy Quiz"
 ];
 
 const ACTIVITIES_ONLINE = [
-  "Đang ở Trang chủ Vplay", "In the Menus", "Đang lướt VFlow Shorts", "Đang nghe VOV3 Music",
-  "Đang đọc tin tức Vplay", "Đang xem danh sách kênh HD", "Đang thiết lập Cài đặt Vplay",
+  "Đang ở Trang chủ VNRT Online", "In the Menus", "Đang lướt VFlow Shorts", "Đang nghe VOV3 Music",
+  "Đang đọc tin tức VNRT Online", "Đang xem danh sách kênh HD", "Đang thiết lập Cài đặt VNRT Online",
   "Online - Sẵn sàng trò chuyện", "Đang trải nghiệm Ore UI Minecraft"
 ];
 
@@ -88,7 +88,7 @@ const ACTIVITIES_OFFLINE = [
 
 export const CURRENT_USER: VplayUser = {
   id: "user_you",
-  name: "Nguyễn Văn Vplay",
+  name: "Nguyễn Văn VNRT Online",
   tag: "#0001",
   avatar: "https://mc-heads.net/avatar/Steve/64",
   status: "online",
@@ -97,9 +97,9 @@ export const CURRENT_USER: VplayUser = {
   mutualFriends: 100,
   level: 42,
   orbs: 15400,
-  badge: "Nhà phát triển Vplay",
+  badge: "Nhà phát triển VNRT Online",
   badgeColor: "from-emerald-500 to-teal-600 border-emerald-400/50 text-emerald-200",
-  bio: "Tài khoản của bạn trên Vplay Platform • Luôn sẵn sàng hỗ trợ và giao lưu!",
+  bio: "Tài khoản của bạn trên VNRT Online Platform • Luôn sẵn sàng hỗ trợ và giao lưu!",
   favoriteChannel: "VTV3 HD",
   joinDate: "01/01/2026"
 };
@@ -169,7 +169,7 @@ export const MOCK_FRIEND_REQUESTS: FriendRequest[] = [
       orbs: 4500,
       badge: "Cư dân VIP Kim Cương",
       badgeColor: "from-amber-400 to-amber-600 border-amber-400/50 text-amber-200",
-      bio: "Rất vui được làm quen với mọi người trên hệ sinh thái Vplay!",
+      bio: "Rất vui được làm quen với mọi người trên hệ sinh thái VNRT Online!",
       favoriteChannel: "VTV3 HD",
       joinDate: "15/05/2026"
     },

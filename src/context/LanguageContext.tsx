@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 export const DEFAULT_VPLAY_LANG = `# ========================================================
-# VPLAY LANGUAGE FILE (vplay.lang)
-# File cấu hình ngôn ngữ toàn bộ ứng dụng Vplay (Ore UI)
+# VNRT ONLINE LANGUAGE FILE (vnrt_online.lang)
+# File cấu hình ngôn ngữ toàn bộ ứng dụng VNRT Online (Ore UI)
 # Định dạng: key=value
 # Chỉnh sửa nội dung dưới đây để thay đổi văn bản trong app
 # ========================================================
@@ -26,26 +26,26 @@ sidebar.channels=Danh sách kênh
 sidebar.vnotes=Sổ tay V-Notes
 sidebar.exploreVietnam=Khám phá Việt Nam
 sidebar.fandomLogos=Fandom & Đội bóng
-sidebar.aiThumbnail=Vplay Intelligence
+sidebar.aiThumbnail=VNRT Online Intelligence
 sidebar.oreSettings=Cài đặt giao diện Ore UI
 sidebar.search=Tìm kiếm kênh
-sidebar.copilot=Vplay Copilot
+sidebar.copilot=VNRT Online Copilot
 sidebar.vstudy=Vstudy
 sidebar.vflow=Vflow
 sidebar.verified=Verified Users
 sidebar.notifications=Thông báo
-sidebar.vbox=Vplay VBox
-sidebar.vertical=Vplay Vertical
-sidebar.debugMode=Debug Mode (vplay.lang)
+sidebar.vbox=VNRT Online VBox
+sidebar.vertical=VNRT Online Vertical
+sidebar.debugMode=Debug Mode (vnrt_online.lang)
 
 # --- START MENU ---
-startMenu.title=VPLAY MENU
+startMenu.title=VNRT ONLINE MENU
 startMenu.mainTabs=Danh mục chính
-startMenu.vplayApps=Vplay Suite Apps
+startMenu.vplayApps=VNRT Online Suite Apps
 
 # --- HOME TAB & BANNER SLIDER ---
 home.tab.DesignPreview.name=WELCOME TO A DESIGN PREVIEW
-home.tab.DesignPreview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Ore UI, chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi. Ore UI hứa hẹn sẽ đem đến cho bạn một trải nghiệm Vplay đẹp mắt, trực quan và mượt mà nhất.
+home.tab.DesignPreview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của VNRT Online, lấy cảm hứng từ Minecraft Ore UI, chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi. Ore UI hứa hẹn sẽ đem đến cho bạn một trải nghiệm VNRT Online đẹp mắt, trực quan và mượt mà nhất.
 home.banner.exploreOreUI=KHÁM PHÁ ORE UI
 home.banner.giveFeedback=Give Feedback
 home.banner.vtv6Title=Vì một Việt Nam khỏe mạnh
@@ -54,7 +54,7 @@ home.banner.watchNow=Watch now
 home.banner.learnMore=Learn more
 
 # --- LIVE TV & CHANNEL PLAYER ---
-livetv.title=TRỰC TIẾP VPLAY TV
+livetv.title=TRỰC TIẾP VNRT ONLINE TV
 livetv.nowPlaying=Đang phát
 livetv.liveBadge=LIVE
 livetv.fullscreen=Toàn màn hình
@@ -69,15 +69,15 @@ livetv.quality=Chất lượng video
 livetv.autoQuality=Tự động (1080p)
 
 # --- SEARCH CHANNELS VIEW ---
-search.title=VPLAY CHANNELS
-search.description=Chia sẻ ứng dụng hoặc xuất danh sách toàn bộ kênh Vplay dưới dạng .m3u8.
+search.title=VNRT ONLINE CHANNELS
+search.description=Chia sẻ ứng dụng hoặc xuất danh sách toàn bộ kênh VNRT Online dưới dạng .m3u8.
 search.share=SHARE
 search.shared=ĐÃ CHIA SẺ!
 search.export=EXPORT CHANNELS (.M3U8)
 search.exported=ĐÃ TẢI FILE M3U8!
 search.copy=COPY LINK
 search.copied=ĐÃ COPY LINK!
-search.debugMode=DEBUG MODE (VPLAY.LANG)
+search.debugMode=DEBUG MODE (VNRT ONLINE.LANG)
 search.input.label=Find channels by name or category
 search.input.placeholder=Search for channels
 search.recommended=Recommended channels
@@ -102,8 +102,8 @@ settings.lockPanorama.desc=Khóa nền không gian đứng yên thay vì quay.
 settings.panoramaSpeed=Panorama scroll speed
 settings.panoramaSpeed.desc=Tùy chỉnh độ quay nền không gian nhanh hay chậm.
 settings.section.account=TÀI KHOẢN & THÔNG BÁO
-settings.signIn=Sign in with Vplay account
-settings.signIn.desc=Experience all the best things of Vplay with an official account.
+settings.signIn=Sign in with VNRT Online account
+settings.signIn.desc=Experience all the best things of VNRT Online with an official account.
 settings.signInBtn=Sign in
 settings.username=Tên người dùng
 settings.notifications=Thông báo sự kiện thể thao trực tiếp
@@ -129,11 +129,11 @@ slider.speed=Tốc độ quay Panorama
 
 # --- ORE UI DESIGN SYSTEM VIEWER ---
 design.preview.title=WELCOME TO A DESIGN PREVIEW
-design.preview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Ore UI. Chúng tôi rất muốn nghe ý kiến của bạn.
+design.preview.desc=Bạn đang được trải nghiệm hệ thống giao diện mới của VNRT Online, lấy cảm hứng từ Minecraft Ore UI. Chúng tôi rất muốn nghe ý kiến của bạn.
 
 # --- FOOTER & MISC ---
-app.footer=Vplay TV © 2026 - Ore UI Minecraft Edition
-app.debugAlert=Vplay Debug Mode is Active!
+app.footer=VNRT Online TV © 2026 - Ore UI Minecraft Edition
+app.debugAlert=VNRT Online Debug Mode is Active!
 `;
 
 interface LanguageContextType {

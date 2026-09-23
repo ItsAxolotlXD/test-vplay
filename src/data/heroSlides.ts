@@ -3,7 +3,7 @@ import { HeroSlide } from '../types';
 export const HERO_SLIDES: HeroSlide[] = [
   {
     id: 'banner-prototype-test-build',
-    title: 'You are using a prototype test build of Vplay',
+    title: 'You are using a prototype test build of VNRT Online',
     subtitle: 'Everything you see here may change or may remove in future builds',
     description: 'Everything you see here may change or may remove in future builds',
     category: 'PROTOTYPE',

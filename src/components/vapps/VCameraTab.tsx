@@ -437,7 +437,7 @@ export const VCameraTab: React.FC = () => {
                 <div className="flex items-center justify-between text-[11px] font-mono font-bold text-white/70 drop-shadow">
                   <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg">
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                    <span>VPLAY 4K 60FPS</span>
+                    <span>VNRT ONLINE 4K 60FPS</span>
                   </div>
                   <div className="bg-black/40 px-2.5 py-1 rounded-lg">
                     <span>{aspectRatio} • {activeFilter.toUpperCase()}</span>

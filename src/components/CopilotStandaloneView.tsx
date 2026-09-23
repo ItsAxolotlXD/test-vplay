@@ -405,7 +405,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
   const [isTemporaryChat, setIsTemporaryChat] = useState(false);
 
   // Smart Mode selector
-  const [selectedSmartMode, setSelectedSmartMode] = useState<"Smart" | "Creative" | "Precise" | "Vplay Master">("Smart");
+  const [selectedSmartMode, setSelectedSmartMode] = useState<"Smart" | "Creative" | "Precise" | "VNRT Online Master">("Smart");
   const [isSmartMenuOpen, setIsSmartMenuOpen] = useState(false);
 
   // Plus menu open state
@@ -1039,7 +1039,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                   ? "text-zinc-400 hover:text-white hover:bg-white/10"
                   : "text-zinc-600 hover:text-slate-900 hover:bg-[#EFEAE2]/60"
               }`}
-              title="Ứng dụng Vplay & Công cụ mở rộng"
+              title="Ứng dụng VNRT Online & Công cụ mở rộng"
             >
               <LayoutGrid className="w-5 h-5 stroke-[1.8]" />
             </button>
@@ -1117,7 +1117,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            {/* CRITICAL: OPT OUT BUTTON (Returns to Vplay) */}
+            {/* CRITICAL: OPT OUT BUTTON (Returns to VNRT Online) */}
             <button
               id="btn-copilot-opt-out"
               onClick={onOptOut}
@@ -1126,7 +1126,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                   ? "bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border-rose-500/40"
                   : "bg-white/90 hover:bg-white text-rose-600 hover:text-rose-700 border-[#E8E0D5] hover:border-rose-200"
               }`}
-              title="Quay lại giao diện Vplay thông thường"
+              title="Quay lại giao diện VNRT Online thông thường"
             >
               <LogOut className="w-4 h-4 rotate-180 text-rose-500" />
               <span>Opt out</span>
@@ -1234,7 +1234,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                           }`}
                         >
                           <div className="px-2 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            🚀 Space 360 & Tiện ích Vplay
+                            🚀 Space 360 & Tiện ích VNRT Online
                           </div>
 
                           <button
@@ -1331,7 +1331,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                             }`}
                           >
                             <Tv className="w-4 h-4 text-rose-500" />
-                            <span>Lịch phát sóng Vplay TV</span>
+                            <span>Lịch phát sóng VNRT Online TV</span>
                           </button>
 
                           <button
@@ -1379,7 +1379,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                               { key: "Smart", desc: "Thông minh và cân bằng", icon: Sparkles },
                               { key: "Creative", desc: "Sáng tạo, phong phú", icon: Flame },
                               { key: "Precise", desc: "Chính xác, code & dữ liệu", icon: CheckSquare },
-                              { key: "Vplay Master", desc: "Điều khiển TV & Vplay", icon: Tv }
+                              { key: "VNRT Online Master", desc: "Điều khiển TV & VNRT Online", icon: Tv }
                             ].map((item) => (
                               <button
                                 key={item.key}
@@ -2003,11 +2003,11 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                 <span className="capitalize">
                   {activeDrawer === "history" && "Lịch sử trò chuyện"}
                   {activeDrawer === "drafts" && "Soạn thảo & Bản nháp"}
-                  {activeDrawer === "pages" && "Tài liệu & Vplay Docs"}
+                  {activeDrawer === "pages" && "Tài liệu & VNRT Online Docs"}
                   {activeDrawer === "tasks" && "Nhiệm vụ AI (Tasks)"}
                   {activeDrawer === "explore" && "Khám phá Prompt"}
                   {activeDrawer === "image" && "AI Image Generator"}
-                  {activeDrawer === "apps" && "Tiện ích Vplay"}
+                  {activeDrawer === "apps" && "Tiện ích VNRT Online"}
                   {activeDrawer === "user" && "Cài đặt & Tài khoản"}
                 </span>
               </h3>
@@ -2390,7 +2390,7 @@ export const CopilotStandaloneView: React.FC<CopilotStandaloneViewProps> = ({
                 className="w-full py-2 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5 rotate-180" />
-                <span>Opt out / Quay lại Vplay</span>
+                <span>Opt out / Quay lại VNRT Online</span>
               </button>
             </div>
           </motion.div>

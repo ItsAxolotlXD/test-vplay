@@ -141,7 +141,7 @@ export const ChannelAdOverlay: React.FC<ChannelAdOverlayProps> = ({
         <div className="px-6 sm:px-10 py-4 max-w-2xl z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-semibold mb-3 border border-white/15">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>Đối tác chính thức Vplay</span>
+            <span>Đối tác chính thức VNRT Online</span>
           </div>
 
           <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight leading-snug drop-shadow-md">

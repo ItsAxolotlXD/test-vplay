@@ -34,7 +34,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="flex items-center gap-3">
             <div className="w-3.5 h-3.5 bg-[#418a28] border border-[#141414]" />
             <h2 className="text-lg font-bold text-[#89dc69] uppercase tracking-wide">
-              CÀI ĐẶT TRUYỀN HÌNH VPLAY
+              CÀI ĐẶT TRUYỀN HÌNH VNRT ONLINE
             </h2>
           </div>
           <button

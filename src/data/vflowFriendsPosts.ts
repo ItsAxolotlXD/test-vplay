@@ -28,7 +28,7 @@ interface PostTemplate {
 const TEMPLATES: PostTemplate[] = [
   {
     content: 'Đang cùng hội bạn cày gameshow cuối tuần trên VTV3 HD! Âm thanh sống động và hình ảnh 1080p mượt mà ghê.',
-    hashtags: ['#VTV3', '#GiaiTriCuoiTuan', '#VplayLive', '#TVShow'],
+    hashtags: ['#VTV3', '#GiaiTriCuoiTuan', '#VNRTLive', '#TVShow'],
     feeling: 'đang xem VTV3 HD 📺',
     channel: { id: 'vtv3', name: 'VTV3 HD - Giải trí & Thể thao', slug: 'vtv3', category: 'Giải trí' }
   },
@@ -62,7 +62,7 @@ const TEMPLATES: PostTemplate[] = [
     hasImage: true
   },
   {
-    content: 'Trận cầu Ngoại Hạng Anh tối nay trên K+ SPORT 1 quá kịch tính! Anh em Vplay đang cổ vũ đội nào?',
+    content: 'Trận cầu Ngoại Hạng Anh tối nay trên K+ SPORT 1 quá kịch tính! Anh em VNRT Online đang cổ vũ đội nào?',
     hashtags: ['#KPlusSport', '#NgoaiHangAnh', '#BongDa', '#CuoiTuan'],
     feeling: 'đang hò hét cổ vũ ⚽',
     channel: { id: 'kplus-sport1', name: 'K+ SPORT 1 HD', slug: 'kplus-sport1', category: 'Thể thao' },
@@ -94,14 +94,14 @@ const TEMPLATES: PostTemplate[] = [
     feeling: 'hứng khởi tột cùng 🦀'
   },
   {
-    content: 'Nghe VOV3 Âm Nhạc qua hệ thống âm thanh của Vplay chất âm rất trong trẻo. Thư giãn cuối ngày cực kỳ hợp lý.',
+    content: 'Nghe VOV3 Âm Nhạc qua hệ thống âm thanh của VNRT Online chất âm rất trong trẻo. Thư giãn cuối ngày cực kỳ hợp lý.',
     hashtags: ['#VOV3', '#AmNhac', '#AcousticChill', '#ThuGian'],
     feeling: 'đang nghe nhạc 🎧',
     channel: { id: 'vov3', name: 'VOV3 - Âm nhạc & Thông tin Giải trí', slug: 'vov3', category: 'Radio' }
   },
   {
-    content: 'Mạng xã hội V-Flow ra mắt hay quá, giao diện hiện đại kết nối cả 100 anh em trong danh sách Friends. Chúc cộng đồng Vplay ngày càng lớn mạnh!',
-    hashtags: ['#VFlow', '#FriendsAndPeople', '#VplayCommunity', '#KetNoi'],
+    content: 'Mạng xã hội V-Flow ra mắt hay quá, giao diện hiện đại kết nối cả 100 anh em trong danh sách Friends. Chúc cộng đồng VNRT Online ngày càng lớn mạnh!',
+    hashtags: ['#VFlow', '#FriendsAndPeople', '#VNRTCommunity', '#KetNoi'],
     feeling: 'cảm thấy tự hào 💖'
   },
   {
@@ -147,7 +147,7 @@ export const generateAllFriendsPosts = (): VFlowPost[] => {
     timestamp: 'Vừa xong',
     createdAt: baseTime - 2 * 60 * 1000,
     content: '👋 Chào mừng toàn bộ 100 anh em trong danh sách Friends & People đến với V-Flow! Mọi người tha hồ đăng bài, chia sẻ kênh TV yêu thích, khoe khoảnh khắc Minecraft và giao lưu nhé.',
-    hashtags: ['#Vplay', '#VFlow', '#FriendsAndPeople', '#Welcome'],
+    hashtags: ['#VNRT Online', '#VFlow', '#FriendsAndPeople', '#Welcome'],
     feeling: 'cảm thấy hào hứng 🚀',
     imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1000&auto=format&fit=crop&q=80',
     likes: 89,
@@ -276,7 +276,7 @@ export const generateFriendsStories = (): VFlowStory[] => {
       isVerified: true,
       hasUnread: false,
       storyImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
-      caption: 'Đang online trên Vplay & V-Flow 🌟',
+      caption: 'Đang online trên VNRT Online & V-Flow 🌟',
       time: 'Vừa xong'
     }
   ];

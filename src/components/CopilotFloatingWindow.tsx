@@ -375,7 +375,7 @@ export const CopilotFloatingWindow: React.FC<CopilotFloatingWindowProps> = ({
                   alt="Copilot"
                 />
                 <span className="font-bold text-xs tracking-tight text-slate-800 dark:text-white truncate max-w-[140px]">
-                  Copilot for Vplay
+                  Copilot for VNRT Online
                 </span>
               </div>
             </div>
@@ -540,7 +540,7 @@ export const CopilotFloatingWindow: React.FC<CopilotFloatingWindowProps> = ({
                 {isVIntelLoading && (
                   <div className="flex items-center gap-2 text-xs text-[#E50914] p-2 bg-[#F1F5F9] dark:bg-[#1E1D24] border border-slate-200/80 dark:border-[#34343E] rounded-lg animate-pulse">
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Copilot for Vplay đang xử lý...</span>
+                    <span>Copilot for VNRT Online đang xử lý...</span>
                   </div>
                 )}
                 <div ref={scrollRef} />

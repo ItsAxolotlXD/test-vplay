@@ -24,7 +24,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose })
       setIsSubmitted(false);
       setFeedbackText('');
       onClose();
-      alert('Cảm ơn bạn đã gửi đóng góp ý kiến cho đội ngũ Vplay!');
+      alert('Cảm ơn bạn đã gửi đóng góp ý kiến cho đội ngũ VNRT Online!');
     }, 600);
   };
 

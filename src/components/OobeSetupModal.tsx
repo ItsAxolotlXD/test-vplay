@@ -162,7 +162,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
           <div className="flex-1 flex flex-col justify-center my-auto">
             <AnimatePresence mode="wait">
               {/* ========================================================
-                  TRANG 1: WELCOME TO VPLAY
+                  TRANG 1: WELCOME TO VNRT ONLINE
                  ======================================================== */}
               {currentStep === 1 && (
                 <motion.div
@@ -173,7 +173,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                   transition={{ duration: 0.25 }}
                   className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center"
                 >
-                  {/* Left Column Graphic: Vplay Sphere Logo & Media Glow */}
+                  {/* Left Column Graphic: VNRT Online Sphere Logo & Media Glow */}
                   <div className="md:col-span-5 flex items-center justify-center py-4">
                     <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 flex items-center justify-center">
                       <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#E6005A]/20 via-[#0078D4]/20 to-[#6E2CF4]/25 blur-2xl animate-pulse" />
@@ -181,7 +181,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#E6005A] via-[#FF3366] to-[#FF8008] flex items-center justify-center shadow-lg shadow-[#E6005A]/40 mb-3">
                           <span className="text-white text-3xl font-black italic tracking-tighter">V</span>
                         </div>
-                        <span className="text-white font-black text-xl tracking-wider">VPLAY</span>
+                        <span className="text-white font-black text-xl tracking-wider">VNRT ONLINE</span>
                         <span className="text-white/60 text-[11px] mt-0.5 font-medium">Digital Hub</span>
                       </div>
                     </div>
@@ -190,13 +190,13 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                   {/* Right Column: Welcome Description */}
                   <div className="md:col-span-7 flex flex-col justify-center max-w-md w-full mx-auto md:mx-0">
                     <span className="text-xs font-semibold text-[#0067C0] uppercase tracking-wider mb-1">
-                      Welcome to Vplay
+                      Welcome to VNRT Online
                     </span>
                     <h1 className="text-2xl sm:text-3xl md:text-[34px] font-semibold text-[#1A1A1A] tracking-tight leading-tight font-sans">
                       Khám phá thế giới giải trí thông minh
                     </h1>
                     <p className="text-xs sm:text-sm text-[#5C5C5C] mt-3 mb-6 font-normal leading-relaxed font-sans">
-                      Vplay là nền tảng giải trí và truyền hình đa phương tiện thế hệ mới. Trải nghiệm hàng chục kênh truyền hình trực tiếp chất lượng cao, vũ trụ không gian 360°, mạng xã hội V-Flow và trợ lý thông minh Copilot AI được tích hợp liền mạch.
+                      VNRT Online là nền tảng giải trí và truyền hình đa phương tiện thế hệ mới. Trải nghiệm hàng chục kênh truyền hình trực tiếp chất lượng cao, vũ trụ không gian 360°, mạng xã hội V-Flow và trợ lý thông minh Copilot AI được tích hợp liền mạch.
                     </p>
 
                     <div className="space-y-2.5">
@@ -224,7 +224,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
               )}
 
               {/* ========================================================
-                  TRANG 2: WHO'S GOING TO USE VPLAY?
+                  TRANG 2: WHO'S GOING TO USE VNRT ONLINE?
                  ======================================================== */}
               {currentStep === 2 && (
                 <motion.div
@@ -253,7 +253,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                   {/* Right Column: Name Input + Sign In Option */}
                   <div className="md:col-span-7 flex flex-col justify-center max-w-md w-full mx-auto md:mx-0">
                     <h1 className="text-2xl sm:text-3xl md:text-[32px] font-semibold text-[#1A1A1A] tracking-normal leading-tight font-sans">
-                      Who&apos;s going to use Vplay?
+                      Who&apos;s going to use VNRT Online?
                     </h1>
 
                     <p className="text-xs sm:text-sm text-[#5C5C5C] mt-2 mb-6 sm:mb-8 font-normal leading-relaxed font-sans">
@@ -282,7 +282,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                         />
                       </div>
 
-                      {/* Sign in to Vplay Account link / button */}
+                      {/* Sign in to VNRT Online Account link / button */}
                       <div className="pt-2">
                         <button
                           id="btn-oobe-signin"
@@ -291,7 +291,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                           className="inline-flex items-center gap-1.5 text-xs text-[#0067C0] hover:text-[#005FB8] hover:underline font-medium cursor-pointer transition-colors"
                         >
                           <User className="w-3.5 h-3.5" />
-                          <span>Sign in to Vplay Account</span>
+                          <span>Sign in to VNRT Online Account</span>
                         </button>
                       </div>
                     </div>
@@ -351,7 +351,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
               )}
 
               {/* ========================================================
-                  TRANG 3: HOW DO YOU WANT TO USE VPLAY? (NAVIGATION STYLE)
+                  TRANG 3: HOW DO YOU WANT TO USE VNRT ONLINE? (NAVIGATION STYLE)
                  ======================================================== */}
               {currentStep === 3 && (
                 <motion.div
@@ -363,7 +363,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                   className="flex flex-col max-w-2xl mx-auto w-full"
                 >
                   <h1 className="text-2xl sm:text-3xl font-semibold text-[#1A1A1A] tracking-normal leading-tight font-sans text-center mb-1">
-                    How do you want to use Vplay?
+                    How do you want to use VNRT Online?
                   </h1>
                   <p className="text-xs sm:text-sm text-[#5C5C5C] text-center mb-6 font-normal font-sans">
                     Choose your preferred navigation style. You can customize this anytime in Settings.
@@ -472,14 +472,14 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-bold text-[#1A1A1A]">Alata</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#0067C0]/10 text-[#0067C0]">
-                          Mặc định Vplay
+                          Mặc định VNRT Online
                         </span>
                       </div>
                       <p className="text-xs text-[#5C5C5C] mt-1 font-sans">
                         Hình học độc đáo, dứt khoát và phong cách điện ảnh
                       </p>
                       <div className="mt-3 p-2 rounded bg-black/3 text-xs text-[#2A2A2A] font-['Alata']">
-                        Vplay 26.9 - Trải nghiệm truyền hình tương lai
+                        VNRT Online 26.9 - Trải nghiệm truyền hình tương lai
                       </div>
                     </button>
 
@@ -503,7 +503,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                         Chuẩn giao diện ứng dụng số, hiển thị chi tiết rõ ràng
                       </p>
                       <div className="mt-3 p-2 rounded bg-black/3 text-xs text-[#2A2A2A] font-['Inter']">
-                        Vplay 26.9 - Trải nghiệm truyền hình tương lai
+                        VNRT Online 26.9 - Trải nghiệm truyền hình tương lai
                       </div>
                     </button>
 
@@ -527,7 +527,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                         Đường nét mềm mại, thân thiện phong cách Google Material
                       </p>
                       <div className="mt-3 p-2 rounded bg-black/3 text-xs text-[#2A2A2A] font-['Google_Sans']">
-                        Vplay 26.9 - Trải nghiệm truyền hình tương lai
+                        VNRT Online 26.9 - Trải nghiệm truyền hình tương lai
                       </div>
                     </button>
 
@@ -551,7 +551,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                         Cân đối, thanh lịch, độ nét cao cho các tựa đề nổi bật
                       </p>
                       <div className="mt-3 p-2 rounded bg-black/3 text-xs text-[#2A2A2A] font-['Montserrat']">
-                        Vplay 26.9 - Trải nghiệm truyền hình tương lai
+                        VNRT Online 26.9 - Trải nghiệm truyền hình tương lai
                       </div>
                     </button>
                   </div>
@@ -559,7 +559,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
               )}
 
               {/* ========================================================
-                  TRANG 5: NEW! - COPILOT IS NOW ON VPLAY!
+                  TRANG 5: NEW! - COPILOT IS NOW ON VNRT ONLINE!
                  ======================================================== */}
               {currentStep === 5 && (
                 <motion.div
@@ -593,7 +593,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                     </div>
 
                     <h1 className="text-2xl sm:text-3xl font-semibold text-[#1A1A1A] tracking-normal leading-tight font-sans">
-                      New! - Copilot is now on Vplay!
+                      New! - Copilot is now on VNRT Online!
                     </h1>
 
                     <p className="text-xs sm:text-sm text-[#5C5C5C] mt-2 mb-6 font-normal leading-relaxed font-sans">
@@ -665,7 +665,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                     </h1>
 
                     <p className="text-xs sm:text-sm text-[#5C5C5C] mt-2 mb-4 font-normal leading-relaxed font-sans">
-                      Trải nghiệm trung tâm mua sắm V-Shop tích hợp sẵn trên nền tảng Vplay với 3 danh mục tuyển chọn: Thực phẩm, Đồ công nghệ - Điện tử và Đồ gia dụng.
+                      Trải nghiệm trung tâm mua sắm V-Shop tích hợp sẵn trên nền tảng VNRT Online với 3 danh mục tuyển chọn: Thực phẩm, Đồ công nghệ - Điện tử và Đồ gia dụng.
                     </p>
 
                     <div className="space-y-2.5 mb-4">
@@ -790,19 +790,19 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                   </div>
 
                   <p className="text-xs sm:text-sm text-[#5C5C5C] text-center mb-4 font-normal font-sans">
-                    Vui lòng đọc và chấp nhận các điều khoản dịch vụ và chính sách sử dụng nền tảng Vplay.
+                    Vui lòng đọc và chấp nhận các điều khoản dịch vụ và chính sách sử dụng nền tảng VNRT Online.
                   </p>
 
                   {/* Scrollable Terms Box */}
                   <div className="max-h-52 sm:max-h-56 bg-white border border-[#CCCCCC] rounded-lg p-4 text-xs text-[#333333] leading-relaxed overflow-y-auto space-y-3 font-sans shadow-inner">
                     <div>
-                      <strong className="text-black font-semibold">1. Điều khoản sử dụng chung:</strong> Vplay cung cấp các tiện ích phát trực tuyến truyền hình, nội dung giải trí và công cụ trí tuệ nhân tạo. Bằng việc truy cập hoặc sử dụng ứng dụng, bạn đồng ý tuân thủ các quy định hiện hành về quyền sở hữu trí tuệ và an toàn số.
+                      <strong className="text-black font-semibold">1. Điều khoản sử dụng chung:</strong> VNRT Online cung cấp các tiện ích phát trực tuyến truyền hình, nội dung giải trí và công cụ trí tuệ nhân tạo. Bằng việc truy cập hoặc sử dụng ứng dụng, bạn đồng ý tuân thủ các quy định hiện hành về quyền sở hữu trí tuệ và an toàn số.
                     </div>
                     <div>
                       <strong className="text-black font-semibold">2. Quyền riêng tư & Lưu trữ cục bộ:</strong> Tất cả các cấu hình cá nhân hóa (tên người dùng, phông chữ, chế độ điều hướng) được lưu trữ an toàn trong trình duyệt của bạn (Local Storage) và không bị thu thập nhằm mục đích thương mại trái phép.
                     </div>
                     <div>
-                      <strong className="text-black font-semibold">3. Bản quyền nội dung đa phương tiện:</strong> Các kênh truyền hình, luồng video HLS và đài phát thanh thuộc bản quyền hợp pháp của các đài truyền hình và nhà phát hành nội dung tương ứng. Vplay đóng vai trò cổng hiển thị và trình phát số.
+                      <strong className="text-black font-semibold">3. Bản quyền nội dung đa phương tiện:</strong> Các kênh truyền hình, luồng video HLS và đài phát thanh thuộc bản quyền hợp pháp của các đài truyền hình và nhà phát hành nội dung tương ứng. VNRT Online đóng vai trò cổng hiển thị và trình phát số.
                     </div>
                     <div>
                       <strong className="text-black font-semibold">4. Dịch vụ AI & Trợ lý Copilot:</strong> Nội dung do Copilot AI tạo ra mang tính chất hỗ trợ và tham khảo. Người dùng cam kết không sử dụng AI cho các mục đích vi phạm pháp luật hoặc phát tán thông tin sai lệch.
@@ -817,13 +817,13 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                       onChange={(e) => setTermsAccepted(e.target.checked)}
                       className="w-4 h-4 text-[#0067C0] rounded border-gray-300 focus:ring-[#0067C0] cursor-pointer accent-[#0067C0]"
                     />
-                    <span>Tôi đã đọc và đồng ý với Điều khoản dịch vụ & Chính sách của Vplay</span>
+                    <span>Tôi đã đọc và đồng ý với Điều khoản dịch vụ & Chính sách của VNRT Online</span>
                   </label>
                 </motion.div>
               )}
 
               {/* ========================================================
-                  TRANG 7: YOU'RE GOOD TO GO - WELCOME TO VPLAY!
+                  TRANG 7: YOU'RE GOOD TO GO - WELCOME TO VNRT ONLINE!
                  ======================================================== */}
               {currentStep === 7 && (
                 <motion.div
@@ -839,7 +839,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                   </div>
 
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1A1A1A] tracking-tight leading-tight font-sans">
-                    You&apos;re good to go - Welcome to Vplay!
+                    You&apos;re good to go - Welcome to VNRT Online!
                   </h1>
 
                   <p className="text-xs sm:text-sm text-[#5C5C5C] mt-2 mb-6 font-normal font-sans max-w-md">
@@ -878,7 +878,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
               {currentStep === 1 ? (
                 <div className="flex items-center gap-2 text-xs text-[#707070]">
                   <Sparkles className="w-3.5 h-3.5 text-[#0067C0]" />
-                  <span className="hidden sm:inline font-sans">Vplay Experience Setup</span>
+                  <span className="hidden sm:inline font-sans">VNRT Online Experience Setup</span>
                 </div>
               ) : currentStep === 2.1 ? (
                 <button

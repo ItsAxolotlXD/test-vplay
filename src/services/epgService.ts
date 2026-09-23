@@ -1,5 +1,5 @@
 /**
- * EPG Service for Vplay 3
+ * EPG Service for VNRT Online 3
  * Provides mock program schedules for TV channels.
  */
 

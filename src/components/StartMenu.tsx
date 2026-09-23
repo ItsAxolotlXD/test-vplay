@@ -315,7 +315,7 @@ export default function StartMenu({
       {showDebugScreen && (
         <div className="fixed top-4 left-4 z-[200] bg-black/95 backdrop-blur-2xl border border-white/20 p-4 rounded-none font-mono text-[11px] leading-relaxed text-white text-left space-y-1.5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] w-[360px] sm:w-[420px] max-h-[80vh] overflow-y-auto select-text pointer-events-auto custom-scrollbar border-l-4 border-l-indigo-500">
           <div className="flex items-center justify-between border-b border-white/10 pb-1.5 text-white sticky top-0 bg-black/90 backdrop-blur-sm z-10">
-            <span className="font-bold flex items-center gap-1"><Terminal className="w-3.5 h-3.5 text-indigo-400" /> VPLAY DEBUG SCREEN (F3 Mode)</span>
+            <span className="font-bold flex items-center gap-1"><Terminal className="w-3.5 h-3.5 text-indigo-400" /> VNRT ONLINE DEBUG SCREEN (F3 Mode)</span>
             <button 
               onClick={() => setShowDebugScreen(false)}
               className="text-white/60 hover:text-white px-1.5 py-0.5 hover:bg-white/10 rounded-none text-xs transition-colors"
@@ -422,14 +422,14 @@ export default function StartMenu({
         <div 
           onClick={() => {
             setIsSleeping(false);
-            showToast("Đang kích hoạt lại màn hình Vplay...");
+            showToast("Đang kích hoạt lại màn hình VNRT Online...");
           }}
           className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center cursor-pointer select-none"
         >
           <div className="text-center space-y-4 animate-pulse">
             <Moon className="w-12 h-12 text-white/20 mx-auto" />
             <p className="text-neutral-500 text-xs tracking-widest uppercase font-mono">Display is in Sleep mode</p>
-            <p className="text-neutral-600 text-[11px] font-sans">Nhấp bất kỳ đâu để đánh thức Vplay</p>
+            <p className="text-neutral-600 text-[11px] font-sans">Nhấp bất kỳ đâu để đánh thức VNRT Online</p>
           </div>
         </div>
       )}
@@ -454,7 +454,7 @@ export default function StartMenu({
               <div className="space-y-2">
                 <div className="flex justify-between py-1 border-b border-white/5">
                   <span className="text-neutral-500 font-medium">Phiên bản Hệ thống</span>
-                  <span className="font-mono text-white">Vplay Smart OS (v3.12-dock)</span>
+                  <span className="font-mono text-white">VNRT Online Smart OS (v3.12-dock)</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-white/5">
                   <span className="text-neutral-500 font-medium">Framework Engine</span>
@@ -501,7 +501,7 @@ export default function StartMenu({
             <div className="px-4 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-emerald-400" />
-                <span className="font-bold text-sm text-neutral-200">Quản lý Dung lượng Bộ nhớ Vplay</span>
+                <span className="font-bold text-sm text-neutral-200">Quản lý Dung lượng Bộ nhớ VNRT Online</span>
               </div>
               <button 
                 onClick={() => setShowStorageModal(false)}
@@ -632,7 +632,7 @@ export default function StartMenu({
               <div className="flex items-center gap-2 z-10">
                 <img 
                   src="https://static.wikia.nocookie.net/ftv/images/a/ab/Imagexvxvz.png/revision/latest/scale-to-width-down/1000?cb=20260429082350&path-prefix=vi" 
-                  alt="Vplay OS"
+                  alt="VNRT Online OS"
                   referrerPolicy="no-referrer"
                   className="h-5 w-auto object-contain brightness-110 saturate-[1.1]"
                 />
@@ -642,7 +642,7 @@ export default function StartMenu({
                     if (onOpenSearch) onOpenSearch();
                   }}
                   className="p-1 rounded-md hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
-                  title="Tìm kiếm & Tiện ích Vplay"
+                  title="Tìm kiếm & Tiện ích VNRT Online"
                 >
                   <img src="https://static.wikia.nocookie.net/ep-deo/images/a/a4/MagnifyingGlass.png/revision/latest?cb=20260730091531" className="w-4 h-4 object-contain" referrerPolicy="no-referrer" alt="Search" />
                 </button>
@@ -802,7 +802,7 @@ export default function StartMenu({
                     className={`flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all text-center cursor-pointer ${activeTab === "shorts" ? "bg-indigo-600 border-indigo-400 text-white shadow-lg" : "bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white"}`}
                   >
                     <Flame className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                    <span>Vplay Vertical</span>
+                    <span>VNRT Online Vertical</span>
                   </button>
 
                   <button
@@ -945,7 +945,7 @@ export default function StartMenu({
                 >
                   <Sparkles className="w-5 h-5 text-pink-400 mb-1" />
                   <span className="text-[11px] font-bold text-white/90">Splash Screen</span>
-                  <span className="text-[9px] text-pink-400/70 mt-0.5">Khởi động Vplay</span>
+                  <span className="text-[9px] text-pink-400/70 mt-0.5">Khởi động VNRT Online</span>
                 </button>
 
                 {/* Tile: Bảng gỡ lỗi F3 */}
@@ -1000,7 +1000,7 @@ export default function StartMenu({
                   <span className="text-[9px] text-white/40 mt-0.5">Nhúng video YouTube</span>
                 </button>
 
-                {/* Tile: Wheel of Vplay */}
+                {/* Tile: Wheel of VNRT Online */}
                 <button
                   onClick={() => {
                     onClose();
@@ -1009,7 +1009,7 @@ export default function StartMenu({
                   className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 text-center transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                 >
                   <HelpCircle className="w-5 h-5 text-pink-400 mb-1" />
-                  <span className="text-[11px] font-bold text-white/90">Wheel of Vplay</span>
+                  <span className="text-[11px] font-bold text-white/90">Wheel of VNRT Online</span>
                   <span className="text-[9px] text-white/40 mt-0.5">Vòng quay may mắn</span>
                 </button>
 
@@ -1077,7 +1077,7 @@ export default function StartMenu({
                   <User className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-white leading-tight">Thành viên Vplay</span>
+                  <span className="text-[11px] font-bold text-white leading-tight">Thành viên VNRT Online</span>
                   <span className="text-[9px] text-indigo-300/80 font-semibold uppercase tracking-wider">
                     Quyền: {userRole === "admin" ? "ADMINISTRATOR" : "STANDARD USER"}
                   </span>
@@ -1086,13 +1086,13 @@ export default function StartMenu({
 
               {/* Power Actions */}
               <div className="flex items-center gap-2">
-                {/* About Vplay */}
+                {/* About VNRT Online */}
                 <button
                   onClick={() => {
                     setShowAboutModal(true);
                     onClose();
                   }}
-                  title="Thông tin Vplay"
+                  title="Thông tin VNRT Online"
                   className="w-7.5 h-7.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-neutral-300 hover:text-white flex items-center justify-center transition-all cursor-pointer shrink-0"
                 >
                   <Info className="w-3.5 h-3.5" />

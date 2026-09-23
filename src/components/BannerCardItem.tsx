@@ -82,7 +82,7 @@ export const BannerCardItem: React.FC<BannerCardItemProps> = ({
 
           {/* Main Headline */}
           <h2 className="relative z-10 text-white font-extrabold text-sm sm:text-base md:text-xl lg:text-2xl tracking-tight leading-snug max-w-xl">
-            {slide.title || 'You are using a prototype test build of Vplay'}
+            {slide.title || 'You are using a prototype test build of VNRT Online'}
           </h2>
 
           {/* Subtitle Warning / Disclaimer */}

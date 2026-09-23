@@ -100,12 +100,12 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
     const questionsTemplates = [
       "Làm sao để đăng ký gói tài khoản gia đình Family Plan?",
-      "Vplay có hỗ trợ truyền hình ảnh AirPlay và Chromecast không?",
+      "VNRT Online có hỗ trợ truyền hình ảnh AirPlay và Chromecast không?",
       "Khi nào sẽ có bản cập nhật giao diện V-Flow tiếp theo?",
-      "Làm cách nào để đổi mật khẩu tài khoản Vplay ID?",
+      "Làm cách nào để đổi mật khẩu tài khoản VNRT Online ID?",
       "Có thể xem đồng thời trên bao nhiêu thiết bị cùng lúc?",
-      "Chính sách bảo mật dữ liệu người dùng của Vplay quy định ra sao?",
-      "Vplay có kế hoạch hỗ trợ hệ điều hành Tizen OS trên Samsung TV không?",
+      "Chính sách bảo mật dữ liệu người dùng của VNRT Online quy định ra sao?",
+      "VNRT Online có kế hoạch hỗ trợ hệ điều hành Tizen OS trên Samsung TV không?",
       "Làm thế nào để báo cáo nội dung vi phạm bản quyền trên nền tảng?",
       "Gói cước VIP có được miễn phí toàn bộ phim rạp chiếu mới không?"
     ];
@@ -142,7 +142,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
 
       let description = "";
       if (type === "Question") {
-        description = "Tôi muốn tìm hiểu kỹ hơn về tính năng này để sử dụng hiệu quả trên TV gia đình. Nhờ đội ngũ hỗ trợ kỹ thuật Vplay giải đáp chi tiết.";
+        description = "Tôi muốn tìm hiểu kỹ hơn về tính năng này để sử dụng hiệu quả trên TV gia đình. Nhờ đội ngũ hỗ trợ kỹ thuật VNRT Online giải đáp chi tiết.";
       } else if (type === "Suggestion") {
         description = "Đề xuất này sẽ giúp trải nghiệm người dùng tiện lợi và thân thiện hơn rất nhiều nếu được cập nhật vào phiên bản sắp tới.";
       } else {
@@ -155,7 +155,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
         const respText = type === "Question" 
           ? "Cảm ơn bạn đã gửi câu hỏi! Tính năng này đã sẵn sàng và bạn có thể kích hoạt trong phần Cài đặt > Tùy chọn hệ thống nhé."
           : type === "Suggestion"
-          ? "Ý kiến đóng góp rất giá trị! Đội ngũ phát triển Vplay đã đưa mục này vào lộ trình nâng cấp quý tới."
+          ? "Ý kiến đóng góp rất giá trị! Đội ngũ phát triển VNRT Online đã đưa mục này vào lộ trình nâng cấp quý tới."
           : "Chào bạn, đội ngũ kỹ thuật đã tái hiện được lỗi này và đang gấp rút phát hành bản cập nhật sửa lỗi trong 48h tới.";
         
         response = {
@@ -299,7 +299,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
               </h1>
             </div>
             <p className="text-xs text-[#9CA3AF] mt-0.5">
-              Đóng góp ý kiến, phản hồi lỗi và bình chọn tính năng cùng cộng đồng Vplay
+              Đóng góp ý kiến, phản hồi lỗi và bình chọn tính năng cùng cộng đồng VNRT Online
             </p>
           </div>
         </div>
@@ -512,7 +512,7 @@ export default function VplayVBoxTab({ onBack }: VplayVBoxTabProps) {
             <div className="p-4 border-b border-[#2D2D38] flex items-center justify-between">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Box className="w-4 h-4 text-amber-400" />
-                Gửi Ý Kiến Đóng Góp Vplay
+                Gửi Ý Kiến Đóng Góp VNRT Online
               </h3>
               <button
                 onClick={() => setShowCreateModal(false)}

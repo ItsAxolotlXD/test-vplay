@@ -48,7 +48,7 @@ const DEFAULT_BOOKMARKS = [
   { name: 'Dân Trí', url: 'https://dantri.com.vn', icon: '⚡', category: 'Tin tức' },
   { name: 'VTV Go Trực Tuyến', url: 'https://vtvgo.vn', icon: '🔴', category: 'Truyền hình' },
   { name: 'Zing MP3', url: 'https://zingmp3.vn', icon: '🎵', category: 'Âm nhạc' },
-  { name: 'Cổng Vplay 360', url: 'https://vplay.vn', icon: '✨', category: 'Hệ sinh thái' },
+  { name: 'Cổng VNRT Online 360', url: 'https://vnrt.online', icon: '✨', category: 'Hệ sinh thái' },
 ];
 
 const CURATED_NEWS: WebArticle[] = [
@@ -96,11 +96,11 @@ const CURATED_NEWS: WebArticle[] = [
 
 export const VBrowserTab: React.FC = () => {
   const [tabs, setTabs] = useState<BrowserTab[]>([
-    { id: 'tab-1', title: 'Vplay Portal - Trang Chủ', url: 'https://vplay.vn', favicon: '🌐' },
+    { id: 'tab-1', title: 'VNRT Online Portal - Trang Chủ', url: 'https://vnrt.online', favicon: '🌐' },
     { id: 'tab-2', title: 'Wikipedia Tiếng Việt', url: 'https://vi.wikipedia.org', favicon: '📚' },
   ]);
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
-  const [inputUrl, setInputUrl] = useState<string>('https://vplay.vn');
+  const [inputUrl, setInputUrl] = useState<string>('https://vnrt.online');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [readingArticle, setReadingArticle] = useState<WebArticle | null>(null);
   const [searchFilter, setSearchFilter] = useState<string>('');
@@ -148,12 +148,12 @@ export const VBrowserTab: React.FC = () => {
     const newTab: BrowserTab = {
       id: newId,
       title: 'Tab Mới',
-      url: 'https://vplay.vn',
+      url: 'https://vnrt.online',
       favicon: '✨',
     };
     setTabs((prev) => [...prev, newTab]);
     setActiveTabId(newId);
-    setInputUrl('https://vplay.vn');
+    setInputUrl('https://vnrt.online');
     setReadingArticle(null);
   };
 
@@ -245,7 +245,7 @@ export const VBrowserTab: React.FC = () => {
         <div className="bg-[#1F1E24] border-b border-[#2D2D38] p-2.5 sm:p-3 flex items-center gap-2">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => handleNavigate('https://vplay.vn')}
+              onClick={() => handleNavigate('https://vnrt.online')}
               className="p-2 rounded-xl text-[#9CA3AF] hover:text-white hover:bg-[#2A2933] transition-colors cursor-pointer"
               title="Quay lại"
             >
@@ -259,9 +259,9 @@ export const VBrowserTab: React.FC = () => {
               <RotateCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-400' : ''}`} />
             </button>
             <button
-              onClick={() => handleNavigate('https://vplay.vn', 'Vplay Portal')}
+              onClick={() => handleNavigate('https://vnrt.online', 'VNRT Online Portal')}
               className="p-2 rounded-xl text-[#9CA3AF] hover:text-white hover:bg-[#2A2933] transition-colors cursor-pointer"
-              title="Về trang chủ Vplay"
+              title="Về trang chủ VNRT Online"
             >
               <Home className="w-4 h-4" />
             </button>
@@ -421,7 +421,7 @@ export const VBrowserTab: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                /* Default Vplay Web Portal */
+                /* Default VNRT Online Web Portal */
                 <div className="space-y-6">
                   {/* Search Hero */}
                   <div className="bg-gradient-to-r from-sky-950/60 via-indigo-950/50 to-slate-900 border border-sky-500/25 rounded-3xl p-6 sm:p-8 text-center max-w-2xl mx-auto shadow-xl">

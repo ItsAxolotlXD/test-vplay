@@ -16,6 +16,9 @@
     --card-bg: #222222;
     --waves-font-scale: 1;
     --waves-font-family: 'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --spatial-glass-blur: 20px;
+    --spatial-glass-opacity: 0.65;
+    --spatial-glass-bg: rgba(28, 27, 36, 0.65);
   }
 
   *, *::before, *::after {
@@ -200,32 +203,32 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper [id^="onair-channel-"],
 .has-custom-wallpaper .channel-card-banner,
 .has-custom-wallpaper .channel-logo-box {
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 20px)) saturate(180%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 20px)) saturate(180%) !important;
 }
 
 .has-custom-wallpaper .channel-card,
 .has-custom-wallpaper [id^="channel-card-"],
 .has-custom-wallpaper [id^="onair-channel-"] {
-  background-color: rgba(28, 27, 34, 0.50) !important;
+  background-color: rgba(28, 27, 34, var(--spatial-glass-opacity, 0.50)) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.28) !important;
 }
 
 .has-custom-wallpaper .channel-card:hover,
 .has-custom-wallpaper [id^="channel-card-"]:hover {
-  background-color: rgba(45, 42, 55, 0.55) !important;
+  background-color: rgba(45, 42, 55, calc(var(--spatial-glass-opacity, 0.55) * 1.1)) !important;
   border-color: rgba(255, 255, 255, 0.3) !important;
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4) !important;
 }
 
 .has-custom-wallpaper .channel-card-banner {
-  background-color: rgba(18, 17, 24, 0.45) !important;
+  background-color: rgba(18, 17, 24, calc(var(--spatial-glass-opacity, 0.45) * 0.9)) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .has-custom-wallpaper .channel-logo-box {
-  background-color: rgba(12, 12, 16, 0.50) !important;
+  background-color: rgba(12, 12, 16, var(--spatial-glass-opacity, 0.50)) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
 }
 
@@ -235,8 +238,8 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper [id*="category-"],
 .has-custom-wallpaper [id^="channels-category-"],
 .has-custom-wallpaper [id^="news-category-"] {
-  -webkit-backdrop-filter: blur(18px) saturate(170%) !important;
-  backdrop-filter: blur(18px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 18px)) saturate(170%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 18px)) saturate(170%) !important;
 }
 
 /* Trạng thái chưa chọn */
@@ -244,7 +247,7 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper .category-chip,
 .has-custom-wallpaper [id^="channels-category-"],
 .has-custom-wallpaper [id^="news-category-"] {
-  background-color: rgba(22, 21, 28, 0.50) !important;
+  background-color: rgba(22, 21, 28, var(--spatial-glass-opacity, 0.50)) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
 }
@@ -273,8 +276,8 @@ body.has-custom-wallpaper {
 .settings-category-section,
 [id^="settings-section-"] {
   background-color: rgba(255, 255, 255, 0.02) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 28px)) saturate(180%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 28px)) saturate(180%) !important;
   border: none !important;
   box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.25) !important;
 }
@@ -284,9 +287,9 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper [id^="settings-section-"],
 .has-custom-wallpaper [id^="feature-flags-section-"],
 .has-custom-wallpaper [id^="home-section-"] {
-  background-color: rgba(20, 19, 26, 0.35) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
-  backdrop-filter: blur(32px) saturate(190%) !important;
+  background-color: rgba(20, 19, 26, calc(var(--spatial-glass-opacity, 0.65) * 0.65)) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 32px)) saturate(190%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 32px)) saturate(190%) !important;
   border: none !important;
   box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.35) !important;
 }
@@ -302,9 +305,9 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper [id^="setting-vboard-skin-"],
 .has-custom-wallpaper [id^="setting-font-"],
 .has-custom-wallpaper [id^="wallpaper-preset-"] {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
-  backdrop-filter: blur(20px) saturate(170%) !important;
+  background-color: rgba(255, 255, 255, calc(var(--spatial-glass-opacity, 0.65) * 0.09)) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 20px)) saturate(170%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 20px)) saturate(170%) !important;
   border: none !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
@@ -340,9 +343,9 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper .banner-card,
 .has-custom-wallpaper [id^="banner-card-"],
 .has-custom-wallpaper .portal-card-scroll {
-  background-color: rgba(30, 29, 38, 0.50) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(170%) !important;
-  backdrop-filter: blur(20px) saturate(170%) !important;
+  background-color: rgba(30, 29, 38, var(--spatial-glass-opacity, 0.50)) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 20px)) saturate(170%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 20px)) saturate(170%) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22) !important;
 }
@@ -360,9 +363,9 @@ form:has(> input[placeholder*="Tìm"]),
 form:has(> input[placeholder*="search" i]) {
   position: relative !important;
   border-radius: 9999px !important;
-  background-color: rgba(255, 255, 255, 0.25) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
+  background-color: rgba(255, 255, 255, calc(var(--spatial-glass-opacity, 0.65) * 0.38)) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
   box-shadow: 0 16px 36px 0 rgba(0, 0, 0, 0.35) !important;
   border: 0 none transparent !important;
   overflow: hidden !important;
@@ -375,9 +378,9 @@ form:has(> input[placeholder*="search" i]) {
 .has-custom-wallpaper .float-search-style,
 .has-custom-wallpaper div:has(> input[placeholder*="Tìm"]),
 .has-custom-wallpaper div:has(> input[placeholder*="search" i]) {
-  background-color: rgba(255, 255, 255, 0.22) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
+  background-color: rgba(255, 255, 255, calc(var(--spatial-glass-opacity, 0.65) * 0.34)) !important;
+  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
+  backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
   border: 0 none transparent !important;
 }
 

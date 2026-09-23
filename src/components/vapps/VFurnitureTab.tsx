@@ -511,7 +511,7 @@ export const VFurnitureTab: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-[#9CA3AF] mt-0.5">
-              Trang trí nhà cửa & thiết bị điện gia dụng Vplay - Thanh toán 100% bằng Khoáng vật Orbs
+              Trang trí nhà cửa & thiết bị điện gia dụng VNRT Online - Thanh toán 100% bằng Khoáng vật Orbs
             </p>
           </div>
         </div>
@@ -873,7 +873,7 @@ export const VFurnitureTab: React.FC = () => {
                     <span className="text-amber-400 font-bold">{cartTotalOre.toLocaleString()} ORBS</span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-emerald-400">
-                    <span>Phí giao hàng Vplay Express:</span>
+                    <span>Phí giao hàng VNRT Online Express:</span>
                     <span className="font-semibold">MIỄN PHÍ (0 ORBS)</span>
                   </div>
                   <div className="border-t border-[#2D2D38] pt-3 flex items-center justify-between">
@@ -911,7 +911,7 @@ export const VFurnitureTab: React.FC = () => {
                   KHO ĐỒ GIA DỤNG ĐÃ SỞ HỮU ({purchases.length} món)
                 </h2>
               </div>
-              <span className="text-xs text-[#9CA3AF]">Tự động đồng bộ với Vplay Local Store</span>
+              <span className="text-xs text-[#9CA3AF]">Tự động đồng bộ với VNRT Online Local Store</span>
             </div>
 
             {purchases.length === 0 ? (
@@ -967,7 +967,7 @@ export const VFurnitureTab: React.FC = () => {
                         <button
                           onClick={() => {
                             playPopSound();
-                            showToast(`🏠 "${item.product.name}" đã được bố trí trong căn hộ Vplay của bạn!`);
+                            showToast(`🏠 "${item.product.name}" đã được bố trí trong căn hộ VNRT Online của bạn!`);
                           }}
                           className="bg-[#2A2933] hover:bg-[#32303D] text-white px-2.5 py-1 text-[11px] font-semibold rounded-lg border border-[#3E3D4D] cursor-pointer"
                         >
@@ -1097,7 +1097,7 @@ export const VFurnitureTab: React.FC = () => {
       <div className="bg-[#1F1E24] border border-[#2D2D38] rounded-2xl p-3 px-4 text-xs text-[#9CA3AF] flex items-center justify-between">
         <span className="flex items-center gap-1.5">
           <Truck className="w-4 h-4 text-emerald-400" />
-          <span>Vplay Express Delivery • Giao hàng tận nhà 24/7</span>
+          <span>VNRT Online Express Delivery • Giao hàng tận nhà 24/7</span>
         </span>
         <span className="text-slate-500 text-[11px]">V-Furniture Engine</span>
       </div>

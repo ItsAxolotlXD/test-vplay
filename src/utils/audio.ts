@@ -1,4 +1,4 @@
-// Web Audio API Sound Synthesizer for Vplay System & V-Apps
+// Web Audio API Sound Synthesizer for VNRT Online System & V-Apps
 
 export type SoundEffectType = 
   | "correct" 

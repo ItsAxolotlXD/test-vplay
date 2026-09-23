@@ -1306,8 +1306,8 @@ const CountingGame: React.FC<{
     setTimeout(() => {
       const npcNext = nextCount + 1;
       setCurrentCount(npcNext);
-      setLastCounter("NPC Vplay");
-      setFeedback(`NPC Vplay vừa đếm tiếp số: ${npcNext}!`);
+      setLastCounter("NPC VNRT Online");
+      setFeedback(`NPC VNRT Online vừa đếm tiếp số: ${npcNext}!`);
       if (npcNext > highestChain) {
         setHighestChain(npcNext);
       }

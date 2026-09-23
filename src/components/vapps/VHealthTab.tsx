@@ -310,7 +310,7 @@ export const VHealthTab: React.FC = () => {
               </div>
             </div>
             <div className="pt-2 text-[10px] text-[#9CA3AF] border-t border-[#2D2D38]">
-              Đo tự động qua cảm biến thể chất Vplay
+              Đo tự động qua cảm biến thể chất VNRT Online
             </div>
           </div>
 

@@ -24,7 +24,7 @@ export type ShopCategory = typeof SHOP_CATEGORIES[number];
 export const SHOP_HERO_SLIDES: HeroSlide[] = [
   {
     id: 'shop-banner-0',
-    title: 'Vplay Shop - Ưu Đãi Mua Sắm',
+    title: 'VNRT Online Shop - Ưu Đãi Mua Sắm',
     description: '',
     category: 'V-SHOPPING',
     quality: 'HD',

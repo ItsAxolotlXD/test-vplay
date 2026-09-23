@@ -24,7 +24,7 @@ interface VplayUser {
   name: string;
   username: string;
   userId: string;
-  role: "VIP User" | "Moderator" | "Vplay Member";
+  role: "VIP User" | "Moderator" | "VNRT Online Member";
   joinedDate: string;
   avatarColor: string;
   reputation: number;
@@ -39,7 +39,7 @@ interface VplayUsersTabProps {
 
 export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: VplayUsersTabProps) {
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
-  const [roleFilter, setRoleFilter] = useState<"All" | "VIP User" | "Moderator" | "Vplay Member">("All");
+  const [roleFilter, setRoleFilter] = useState<"All" | "VIP User" | "Moderator" | "VNRT Online Member">("All");
   const [statusFilter, setStatusFilter] = useState<"All" | "Online" | "Offline" | "Idle">("All");
   const [sortBy, setSortBy] = useState<"id_asc" | "id_desc" | "name_asc" | "name_desc" | "joined_newest" | "joined_oldest">("id_asc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,11 +77,11 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
         .toLowerCase()
         .replace(/\s+/g, "");
       
-      const username = `${normalizedName}_vplay${i}`;
+      const username = `${normalizedName}_vnrt${i}`;
       const randomSixDigits = String((123456 + i * 7654321) % 900000 + 100000);
       const userId = `V${randomSixDigits}`;
       
-      const role = i % 25 === 0 ? "VIP User" : i % 100 === 0 ? "Moderator" : "Vplay Member";
+      const role = i % 25 === 0 ? "VIP User" : i % 100 === 0 ? "Moderator" : "VNRT Online Member";
       const month = String((i % 12) + 1).padStart(2, "0");
       const day = String((i % 28) + 1).padStart(2, "0");
       const joinedDate = `2024-${month}-${day}`;
@@ -195,9 +195,9 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
             <div className="text-left">
               <h1 className="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
                 <Users className="w-5 h-5 text-red-500" />
-                Tra cứu Thành viên Vplay
+                Tra cứu Thành viên VNRT Online
               </h1>
-              <p className="text-xs text-zinc-400 font-medium">Tìm kiếm và quản lý thông tin tài khoản người dùng của hệ sinh thái Vplay</p>
+              <p className="text-xs text-zinc-400 font-medium">Tìm kiếm và quản lý thông tin tài khoản người dùng của hệ sinh thái VNRT Online</p>
             </div>
           </div>
 
@@ -257,7 +257,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                   { value: "All", label: "Tất cả" },
                   { value: "VIP User", label: "VIP User" },
                   { value: "Moderator", label: "Moderator" },
-                  { value: "Vplay Member", label: "Vplay Member" }
+                  { value: "VNRT Online Member", label: "VNRT Online Member" }
                 ].map((item) => (
                   <button
                     key={item.value}
@@ -584,7 +584,7 @@ export default function VplayUsersTab({ onBack, initialSearchQuery = "" }: Vplay
                   Đóng cửa sổ
                 </button>
                 <a
-                  href={`mailto:${selectedUser.username}@vplay.vn`}
+                  href={`mailto:${selectedUser.username}@vnrt.online`}
                   className="flex-1 py-2.5 bg-[#208b3a] hover:bg-[#2dc653] border-b-2 border-[#125322] active:border-b-0 text-white text-xs font-bold uppercase tracking-wider rounded-none transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-md"
                 >
                   <Mail className="w-3.5 h-3.5 text-white" />

@@ -83,7 +83,7 @@ export const DataDrivenUiModal: React.FC<DataDrivenUiModalProps> = ({ isOpen, on
               <h2 className="text-sm font-extrabold text-[#55b331] uppercase tracking-wider flex items-center gap-2">
                 Data-Driven UI (DDUI) Inspector
               </h2>
-              <div className="text-[10px] text-zinc-400 font-mono">Vplay Minecraft Bedrock Edition Schema</div>
+              <div className="text-[10px] text-zinc-400 font-mono">VNRT Online Minecraft Bedrock Edition Schema</div>
             </div>
           </div>
           <button

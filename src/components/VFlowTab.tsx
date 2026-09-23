@@ -68,9 +68,9 @@ export interface VFlowPost {
 
 export function generate100Posts(): VFlowPost[] {
   const AUTHORS = [
-    { author: "Vplay Sports 1 HD", handle: "@vplay_sports", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "VNRT Online Sports 1 HD", handle: "@vplay_sports", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
     { author: "Minh Tuấn Cinema", handle: "@minhtuan_movie", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
-    { author: "Vplay Official", handle: "@vplay_official", avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "VNRT Online Official", handle: "@vplay_official", avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
     { author: "Phương Thảo VTV", handle: "@thao_vtv", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
     { author: "Đức Hùng Tech", handle: "@hung_tech_4k", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
     { author: "Khánh Linh Travel", handle: "@linh_explore", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
@@ -78,7 +78,7 @@ export function generate100Posts(): VFlowPost[] {
     { author: "Mai Anh Style", handle: "@maianh_fashion", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
     { author: "Gia Huy Football", handle: "@huy_premier", avatar: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
     { author: "Thanh Trúc Review", handle: "@truc_review", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
-    { author: "Quốc Bảo Vplay", handle: "@bao_vbox", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
+    { author: "Quốc Bảo VNRT Online", handle: "@bao_vbox", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
     { author: "Thu Hà Foodie", handle: "@ha_food", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
     { author: "Văn Sang Otaku", handle: "@sang_anime", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified" as const },
     { author: "Mỹ Linh Music", handle: "@mylinh_sing", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80", isVerified: true, verifiedType: "verified_plus" as const },
@@ -101,25 +101,25 @@ export function generate100Posts(): VFlowPost[] {
   ];
 
   const POST_TEMPLATES = [
-    { tag: "BóngĐá", text: "🔥 Siêu kinh điển Ngoại Hạng Anh trực tiếp trên Vplay Sports 1 HD! Trận đấu kịch tính đến phút cuối cùng.", hasImg: true },
+    { tag: "BóngĐá", text: "🔥 Siêu kinh điển Ngoại Hạng Anh trực tiếp trên VNRT Online Sports 1 HD! Trận đấu kịch tính đến phút cuối cùng.", hasImg: true },
     { tag: "PhimẢnh", text: "Vừa trải nghiệm bộ phim chiếu rạp mới nhất trên V-Box. Chất lượng âm thanh Dolby Atmos quá đỉnh!", hasImg: true },
     { tag: "VplayUpdate", text: "✨ Mạng Xã Hội V-Flow chào đón bài viết thứ 100! Hãy nâng cấp Verified để nhận trọn bộ quà tặng độc quyền.", hasImg: true },
-    { tag: "CongNghe", text: "Bàn về công nghệ Smart TV 8K mới ra mắt. Tốc độ truyền tải dữ liệu Cloud Vplay chạy mượt không chút giật lag.", hasImg: true },
+    { tag: "CongNghe", text: "Bàn về công nghệ Smart TV 8K mới ra mắt. Tốc độ truyền tải dữ liệu Cloud VNRT Online chạy mượt không chút giật lag.", hasImg: true },
     { tag: "DuLich", text: "Chuyến du lịch Sapa mùa này quá tuyệt vời! Không khí trong lành và cảnh đẹp núi rừng trùng điệp.", hasImg: true },
     { tag: "AmThuc", text: "Cuối tuần đi thưởng thức món Phở Bò Hà Nội chuẩn vị gia truyền. Bát phở nóng hổi đậm đà hương vị.", hasImg: true },
-    { tag: "AmNhac", text: "Concert Âm Nhạc Trực Tiếp trên kênh Vplay Music HD hoành tráng không ngờ! Dàn âm thanh đỉnh cao.", hasImg: true },
-    { tag: "GameMobile", text: "Trận chung kết giải đấu Esports Vplay hôm nay vô cùng gay cấn. Đội tuyển vô địch thi đấu xuất sắc!", hasImg: true },
-    { tag: "Showbiz", text: "Cập nhật thảm đỏ sự kiện điện ảnh tối nay. Các nghệ sĩ xuất hiện lộng lẫy trên truyền hình Vplay.", hasImg: true },
+    { tag: "AmNhac", text: "Concert Âm Nhạc Trực Tiếp trên kênh VNRT Online Music HD hoành tráng không ngờ! Dàn âm thanh đỉnh cao.", hasImg: true },
+    { tag: "GameMobile", text: "Trận chung kết giải đấu Esports VNRT Online hôm nay vô cùng gay cấn. Đội tuyển vô địch thi đấu xuất sắc!", hasImg: true },
+    { tag: "Showbiz", text: "Cập nhật thảm đỏ sự kiện điện ảnh tối nay. Các nghệ sĩ xuất hiện lộng lẫy trên truyền hình VNRT Online.", hasImg: true },
     { tag: "VStudy", text: "Hôm nay mình vừa ôn luyện xong bộ đề thi thử THPT Quốc Gia trên V-Study. Rất chi tiết và bổ ích!", hasImg: false },
     { tag: "BóngĐá", text: "Cập nhật kết quả Cúp C1 Châu Âu: Trận đấu nghẹt thở với cú đúp phút 89. Anh em thấy thế nào?", hasImg: false },
-    { tag: "PhimẢnh", text: "Top 5 bộ phim hành động bom tấn đáng xem nhất cuối tuần này trên Vplay Cinema HD.", hasImg: true },
-    { tag: "CongNghe", text: "So sánh tốc độ băng thông 1Gbps trên server VIP Vplay và server thường. Khác biệt rõ rệt!", hasImg: false },
+    { tag: "PhimẢnh", text: "Top 5 bộ phim hành động bom tấn đáng xem nhất cuối tuần này trên VNRT Online Cinema HD.", hasImg: true },
+    { tag: "CongNghe", text: "So sánh tốc độ băng thông 1Gbps trên server VIP VNRT Online và server thường. Khác biệt rõ rệt!", hasImg: false },
     { tag: "DuLich", text: "Khám phá bãi biển Phú Quốc rực rỡ nắng vàng. Địa điểm không thể bỏ qua mùa hè này.", hasImg: true },
     { tag: "AmThuc", text: "Quán bún bò Huế cực ngon tại trung tâm thành phố, topping đầy đặn giá cực hạt dẻ.", hasImg: true },
     { tag: "AmNhac", text: "Bài hát mới vừa cán mốc 10 triệu lượt nghe trên kênh V-Flow Audio. Giai điệu bắt tai gây nghiện!", hasImg: false },
     { tag: "GameMobile", text: "Cần tìm đồng đội leo rank Cao Thủ tối nay! Anh em nào online inbox vào team luôn nhé.", hasImg: false },
-    { tag: "VplayUpdate", text: "Thông báo nâng cấp Server Cloud Storage lên 2 TB cho tất cả hội viên VIP Vplay!", hasImg: true },
-    { tag: "Showbiz", text: "Bài phỏng vấn độc quyền độc lạ cùng đạo diễn nổi tiếng Việt Nam trên kênh Vplay Talkshow.", hasImg: false },
+    { tag: "VplayUpdate", text: "Thông báo nâng cấp Server Cloud Storage lên 2 TB cho tất cả hội viên VIP VNRT Online!", hasImg: true },
+    { tag: "Showbiz", text: "Bài phỏng vấn độc quyền độc lạ cùng đạo diễn nổi tiếng Việt Nam trên kênh VNRT Online Talkshow.", hasImg: false },
     { tag: "VStudy", text: "Bí quyết đạt điểm 9+ môn Toán trong kỳ thi sắp tới. Cùng tham khảo tài liệu V-Study nhé!", hasImg: false }
   ];
 
@@ -257,7 +257,7 @@ export default function VFlowTab({
 
     const newPost: VFlowPost = {
       id: "post-" + Date.now(),
-      author: verifiedSub.plan === "verified_plus" ? "Vplay Royal VIP" : "Vplay Verified Member",
+      author: verifiedSub.plan === "verified_plus" ? "VNRT Online Royal VIP" : "VNRT Online Verified Member",
       handle: "@user_verified",
       avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       isVerified: true,
@@ -485,7 +485,7 @@ export default function VFlowTab({
                     rows={2}
                     value={newPostText}
                     onChange={(e) => setNewPostText(e.target.value)}
-                    placeholder="Bạn đang nghĩ gì về các kênh truyền hình & bộ phim Vplay hôm nay?"
+                    placeholder="Bạn đang nghĩ gì về các kênh truyền hình & bộ phim VNRT Online hôm nay?"
                     className="w-full bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none resize-none"
                   />
 

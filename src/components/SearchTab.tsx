@@ -122,7 +122,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_copilot',
-        name: 'Copilot for Vplay',
+        name: 'Copilot for VNRT Online',
         tagline: 'Tab Sidebar • Trợ lý AI thông minh giải đáp câu hỏi và gợi ý phim, kênh',
         route: '/copilot',
         icon: <Sparkles className="w-4.5 h-4.5 text-[#FF4D8D]" />,
@@ -179,7 +179,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       {
         id: 'sidebar_vflow',
         name: 'Mạng Xã Hội Flow (Social)',
-        tagline: 'Tab Sidebar • Mạng xã hội Vplay, chia sẻ khoảnh khắc, bài viết & story',
+        tagline: 'Tab Sidebar • Mạng xã hội VNRT Online, chia sẻ khoảnh khắc, bài viết & story',
         route: '/v-flow',
         icon: <Waves className="w-4.5 h-4.5 text-[#FF4D8D]" />,
         tags: ['flow', 'v-flow', 'mạng xã hội', 'social', 'cộng đồng', 'bài viết', 'story', 'post']
@@ -292,7 +292,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_premium',
-        name: 'Vplay VIP Premium',
+        name: 'VNRT Online VIP Premium',
         tagline: 'Tab Sidebar • Quyền lợi thành viên VIP, xem không quảng cáo, mở khóa tính năng',
         route: '/v-premium',
         icon: <Crown className="w-4.5 h-4.5 text-[#FF4D8D]" />,
@@ -340,8 +340,8 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       },
       {
         id: 'sidebar_about',
-        name: 'Giới Thiệu Vplay (About)',
-        tagline: 'Tab Sidebar • Thông tin phiên bản, bản quyền và đội ngũ sáng lập Vplay',
+        name: 'Giới Thiệu VNRT Online (About)',
+        tagline: 'Tab Sidebar • Thông tin phiên bản, bản quyền và đội ngũ sáng lập VNRT Online',
         route: '/about',
         icon: <Info className="w-4.5 h-4.5 text-[#FF4D8D]" />,
         tags: ['about', 'giới thiệu', 'thông tin', 'phiên bản', 'vplay info', 'liên hệ']
@@ -385,7 +385,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       {
         id: 'loyalty_daily',
         title: 'Điểm Danh Hằng Ngày (+50 Orbs & +50 V-Points)',
-        subtitle: 'Nhận 50 Orbs vàng miễn phí mỗi ngày vào ví Vplay',
+        subtitle: 'Nhận 50 Orbs vàng miễn phí mỗi ngày vào ví VNRT Online',
         route: '/loyalty',
         icon: <Sparkles className="w-4.5 h-4.5 text-yellow-400" />,
         tags: ['điểm danh', 'orbs', 'daily', 'v-points', 'thưởng', 'miễn phí']
@@ -759,7 +759,7 @@ export const SearchTab: React.FC<SearchTabProps> = ({
         list.push({
           type: 'news',
           title: n.title,
-          subtitle: 'Tin tức & Thời sự Vplay',
+          subtitle: 'Tin tức & Thời sự VNRT Online',
           icon: <Megaphone className="w-4.5 h-4.5 text-amber-400" />,
           badgeText: 'Tin tức',
           badgeStyle: 'bg-amber-500/20 text-amber-300 border-amber-500/40',

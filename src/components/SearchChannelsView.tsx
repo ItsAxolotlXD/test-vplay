@@ -63,8 +63,8 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
     playPopSound();
     if (navigator.share) {
       navigator.share({
-        title: 'Vplay TV Channels',
-        text: 'Xem truyền hình trực tuyến Vplay HD!',
+        title: 'VNRT Online TV Channels',
+        text: 'Xem truyền hình trực tuyến VNRT Online HD!',
         url: window.location.href,
       }).catch(() => {});
     } else {
@@ -85,7 +85,7 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.setAttribute('download', 'Vplay_channels.m3u8');
+    a.setAttribute('download', 'VNRT_Online_channels.m3u8');
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -103,10 +103,10 @@ export const SearchChannelsView: React.FC<SearchChannelsViewProps> = ({
         <div className="md:col-span-4 bg-[#3c3f42] border-2 border-[#141414] p-4 flex flex-col justify-start shadow-xl space-y-4">
           <div className="border-b border-[#2d3033] pb-2">
             <h3 className="font-black text-sm uppercase text-[#89dc69] tracking-wide">
-              {t('search.title', 'VPLAY CHANNELS')}
+              {t('search.title', 'VNRT ONLINE CHANNELS')}
             </h3>
             <p className="text-[11px] text-gray-300 mt-1">
-              {t('search.description', `Chia sẻ ứng dụng hoặc xuất danh sách toàn bộ ${channels.length} kênh Vplay dưới dạng .m3u8.`)}
+              {t('search.description', `Chia sẻ ứng dụng hoặc xuất danh sách toàn bộ ${channels.length} kênh VNRT Online dưới dạng .m3u8.`)}
             </p>
           </div>
 

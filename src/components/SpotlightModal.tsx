@@ -98,7 +98,7 @@ export const SpotlightModal: React.FC<SpotlightModalProps> = ({
               id="spotlight-modal-description"
               className="text-sm sm:text-[15px] text-slate-600 dark:text-[#A1A1AA] leading-relaxed mb-7 font-normal"
             >
-              Spotlight Search is merging with <strong className="font-bold text-slate-900 dark:text-white">Copilot for Vplay</strong> for a better and smarter searching experience. Try Copilot for Vplay now!
+              Spotlight Search is merging with <strong className="font-bold text-slate-900 dark:text-white">Copilot for VNRT Online</strong> for a better and smarter searching experience. Try Copilot for VNRT Online now!
             </p>
 
             {/* Action Buttons */}

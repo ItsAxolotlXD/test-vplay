@@ -660,7 +660,7 @@ export const CookbookTab: React.FC<CookbookTabProps> = ({ onBack }) => {
               <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-500/30 space-y-1.5">
                 <div className="flex items-center gap-2 text-amber-300 text-xs font-bold">
                   <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>Bí quyết vàng từ Bếp Trưởng Vplay:</span>
+                  <span>Bí quyết vàng từ Bếp Trưởng VNRT Online:</span>
                 </div>
                 <p className="text-xs text-zinc-300 leading-relaxed italic">
                   &ldquo;{selectedRecipe.chefTip}&rdquo;

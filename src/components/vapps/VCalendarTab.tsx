@@ -61,7 +61,7 @@ const DEFAULT_EVENTS: CalendarEvent[] = [
     time: '20:00',
     category: 'TV Show',
     color: 'bg-rose-500',
-    note: 'Kênh VTV1 & luồng Vplay Web HD',
+    note: 'Kênh VTV1 & luồng VNRT Online Web HD',
   },
   {
     id: 'evt-2',

@@ -101,8 +101,8 @@ const BACKGROUND_PRESETS: BackgroundPreset[] = [
     )
   },
   {
-    id: 'vplay-studio',
-    name: 'Vplay Studio',
+    id: 'vnrt-studio',
+    name: 'VNRT Online Studio',
     category: 'abstract',
     locationTag: 'Phòng thu tối',
     bgClass: 'bg-[#121216]',
@@ -111,7 +111,7 @@ const BACKGROUND_PRESETS: BackgroundPreset[] = [
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(56,139,253,0.25),transparent_70%)]" />
         <div className="absolute inset-0 opacity-15 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
         <div className="absolute bottom-8 left-8 text-white/20 text-4xl font-black select-none pointer-events-none tracking-widest uppercase">
-          VPLAY BROADCAST
+          VNRT ONLINE BROADCAST
         </div>
       </>
     )
@@ -428,7 +428,7 @@ export const SpatialDesignVisualizer: React.FC<SpatialDesignVisualizerProps> = (
                       <Sparkles className="w-6 h-6 text-[#388BFD]" />
                     </div>
                     <div>
-                      <div className="font-bold text-sm sm:text-base tracking-tight drop-shadow-md">
+                      <div className="font-extrabold text-sm sm:text-base tracking-tight bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] bg-clip-text text-transparent drop-shadow-md">
                         Spatial Glass
                       </div>
                       <div className="text-[11px] text-white/70 font-mono mt-0.5">

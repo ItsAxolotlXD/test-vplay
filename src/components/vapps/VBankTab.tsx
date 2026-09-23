@@ -79,11 +79,11 @@ export const VBankTab: React.FC = () => {
   }, []);
 
   // Transfer Form State
-  const [recipientBank, setRecipientBank] = useState("V-Bank (Nội bộ Vplay)");
+  const [recipientBank, setRecipientBank] = useState("V-Bank (Nội bộ VNRT Online)");
   const [recipientAccount, setRecipientAccount] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
-  const [transferMessage, setTransferMessage] = useState("Vplay Chuyển tiền");
+  const [transferMessage, setTransferMessage] = useState("VNRT Online Chuyển tiền");
   const [isVerifyingRecipient, setIsVerifyingRecipient] = useState(false);
   const [showOreConfirmDialog, setShowOreConfirmDialog] = useState(false);
   const [transferSuccess, setTransferSuccess] = useState(false);
@@ -97,7 +97,7 @@ export const VBankTab: React.FC = () => {
     {
       id: "tx-100",
       type: "convert",
-      title: "Quy đổi 500 Điểm V-Learn ➔ 50 V-Pearls (Ngọc Vplay)",
+      title: "Quy đổi 500 Điểm V-Learn ➔ 50 V-Pearls (Ngọc VNRT Online)",
       amount: 50,
       date: "2026-07-24 10:15",
       status: "success"
@@ -105,7 +105,7 @@ export const VBankTab: React.FC = () => {
     {
       id: "tx-101",
       type: "income",
-      title: "Nhận tiền thưởng Vplay Verified VIP Partner",
+      title: "Nhận tiền thưởng VNRT Online Verified VIP Partner",
       amount: 15000000,
       date: "2026-07-24 08:20",
       status: "success"
@@ -113,7 +113,7 @@ export const VBankTab: React.FC = () => {
     {
       id: "tx-102",
       type: "expense",
-      title: "Gia hạn gói Vplay Premium Cloud VIP (1 Năm)",
+      title: "Gia hạn gói VNRT Online Premium Cloud VIP (1 Năm)",
       amount: 2400000,
       date: "2026-07-23 14:10",
       status: "success"
@@ -236,7 +236,7 @@ export const VBankTab: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              Hệ thống tài chính kỹ thuật số tích hợp quy đổi điểm học tập V-Learn thành V-Pearls (Ngọc Vplay).
+              Hệ thống tài chính kỹ thuật số tích hợp quy đổi điểm học tập V-Learn thành V-Pearls (Ngọc VNRT Online).
             </p>
           </div>
         </div>
@@ -353,7 +353,7 @@ export const VBankTab: React.FC = () => {
               <div className="flex items-end justify-between z-10 border-t border-white/10 pt-3">
                 <div>
                   <div className="text-[9px] text-zinc-400 uppercase font-semibold">Chủ tài khoản</div>
-                  <div className="text-xs font-bold uppercase text-amber-200">HOANG VAN VPLAY</div>
+                  <div className="text-xs font-bold uppercase text-amber-200">HOANG VAN VNRT ONLINE</div>
                 </div>
                 <div className="text-right">
                   <div className="text-[9px] text-zinc-400 uppercase font-semibold">Hạn thẻ</div>
@@ -368,7 +368,7 @@ export const VBankTab: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Gem className="w-5 h-5 text-cyan-400 fill-cyan-400 animate-bounce" />
                   <span className="text-xs font-black uppercase text-cyan-300 tracking-wider">
-                    V-Pearls (Ngọc Vplay)
+                    V-Pearls (Ngọc VNRT Online)
                   </span>
                 </div>
                 <div className="text-2xl font-black font-mono text-cyan-200">
@@ -519,7 +519,7 @@ export const VBankTab: React.FC = () => {
                 Quy Đổi Điểm Học Tập V-Learn ➔ V-Pearls
               </h2>
               <p className="text-xs text-zinc-400">
-                Đổi thành tích học tập từ ứng dụng V-Learn lấy Ngọc Vplay (V-Pearls) sử dụng cho toàn hệ thống Vplay Verified.
+                Đổi thành tích học tập từ ứng dụng V-Learn lấy Ngọc VNRT Online (V-Pearls) sử dụng cho toàn hệ thống VNRT Online Verified.
               </p>
             </div>
           </div>
@@ -618,7 +618,7 @@ export const VBankTab: React.FC = () => {
                 onChange={(e) => setRecipientBank(e.target.value)}
                 className="w-full bg-zinc-900 border border-white/10 rounded-2xl px-4 py-3 text-xs text-white focus:outline-none focus:border-amber-500 cursor-pointer"
               >
-                <option value="V-Bank (Nội bộ Vplay)">V-Bank (Nội bộ Vplay - Miễn phí)</option>
+                <option value="V-Bank (Nội bộ VNRT Online)">V-Bank (Nội bộ VNRT Online - Miễn phí)</option>
                 <option value="Vietcombank">Vietcombank</option>
                 <option value="MB Bank">MB Bank</option>
                 <option value="Techcombank">Techcombank</option>
@@ -766,13 +766,13 @@ export const VBankTab: React.FC = () => {
           </h3>
           <div className="p-6 bg-white rounded-2xl inline-block mb-4 shadow-xl">
             <img
-              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VPLAY_VBANK_888899996868"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VNRT_VBANK_888899996868"
               alt="V-Bank QR Code"
               className="w-48 h-48 mx-auto"
             />
           </div>
           <div className="text-xs font-mono font-bold text-amber-400">
-            STK: 8888 9999 6868 - VPLAY
+            STK: 8888 9999 6868 - VNRT ONLINE
           </div>
           <p className="text-[11px] text-zinc-400 mt-2">
             Sử dụng ứng dụng V-Bank hoặc ngân hàng bất kỳ để quét mã nhận tiền tự động.

@@ -144,14 +144,14 @@ const DEFAULT_NOTES: NoteItem[] = [
   },
   {
     id: 'note-4',
-    title: 'Danh sách luồng phát trực tuyến M3U8 & Tài liệu Vplay',
+    title: 'Danh sách luồng phát trực tuyến M3U8 & Tài liệu VNRT Online',
     content: `#EXTM3U\n#EXTINF:-1 group-title="VTV",VTV1 HD Tin Tức Thời Sự\nhttps://vtv1-hd.vtv.vn/index.m3u8\n#EXTINF:-1 group-title="V-STUDY",Kênh Bài Giảng Trực Tuyến Quốc Gia\nhttps://edu.vtv.vn/stream/live.m3u8\n#EXTINF:-1 group-title="VOV",VOV3 Music Live Stream\nhttps://live.vov.vn/vov3.m3u8`,
     category: 'Link M3U8',
     isPinned: false,
     colorTag: 'emerald',
     createdAt: '05/09/2026',
     updatedAt: '09/09/2026',
-    tags: ['M3U8', 'Vplay', 'Streaming']
+    tags: ['M3U8', 'VNRT Online', 'Streaming']
   },
   {
     id: 'note-5',
@@ -478,7 +478,7 @@ export const VNotesView: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-[#9CA3AF] mt-0.5">
-              Hệ thống ghi chép công thức ôn thi, đề cương môn học, từ vựng CEFR và ghim ghi chú nổi trên màn hình Vplay.
+              Hệ thống ghi chép công thức ôn thi, đề cương môn học, từ vựng CEFR và ghim ghi chú nổi trên màn hình VNRT Online.
             </p>
           </div>
         </div>
@@ -1016,7 +1016,7 @@ export const VNotesView: React.FC = () => {
               <span>Chế độ Đồng Bộ Sổ Tay V-Notes & Sticky Nổi</span>
             </h4>
             <p className="text-xs text-zinc-400 leading-relaxed font-sans">
-              Khi bạn ghim nổi ghi chú bằng biểu tượng <strong>Ghim Nổi (Layers)</strong>, ghi chú sẽ tự động xuất hiện dạng thẻ lơ lửng trên màn hình Vplay. Bạn có thể vừa làm bài thi trắc nghiệm trên <strong>V-Study</strong>, vừa xem tivi trực tuyến mà không bị che khuất tài liệu ôn tập.
+              Khi bạn ghim nổi ghi chú bằng biểu tượng <strong>Ghim Nổi (Layers)</strong>, ghi chú sẽ tự động xuất hiện dạng thẻ lơ lửng trên màn hình VNRT Online. Bạn có thể vừa làm bài thi trắc nghiệm trên <strong>V-Study</strong>, vừa xem tivi trực tuyến mà không bị che khuất tài liệu ôn tập.
             </p>
           </div>
         </div>

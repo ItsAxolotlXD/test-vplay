@@ -20,7 +20,9 @@ import {
   PanelTop,
   Compass,
   Monitor,
-  Keyboard as KeyboardIcon
+  Keyboard as KeyboardIcon,
+  Sliders,
+  Droplets
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, WALLPAPER_PRESETS, VBOARD_SKIN_OPTIONS, VBoardSkin } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -36,6 +38,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const { searchQuery, setSearchQuery } = useTabSearch();
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
+
+  const spatialBlur = typeof settings.spatialGlassBlur === 'number' && !isNaN(settings.spatialGlassBlur)
+    ? settings.spatialGlassBlur
+    : 20;
+  const spatialOpacity = typeof settings.spatialGlassOpacity === 'number' && !isNaN(settings.spatialGlassOpacity)
+    ? settings.spatialGlassOpacity
+    : 65;
 
   useEffect(() => {
     setInputUserName(settings.userName || 'User');
@@ -82,6 +91,12 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
     });
   };
 
+  const isSpatialGlassVisible = matchesSearch(
+    'Spatial Glass', 'Kính', 'Glass', 'Độ mờ', 'Độ trong', 'Blur', 'Opacity',
+    'Transparency', 'Thành phần', 'Kính không gian', 'Hậu cảnh', 'Trong suốt',
+    'Liquid UI', 'Slider', 'Thanh trượt'
+  );
+
   const isSection1Visible = matchesSearch(
     'Giao diện', 'Chế độ giao diện', 'Floaty bar', 'Floaty', 'Navigation bar',
     'floating', 'floats', 'Sáng', 'Tối', 'Theme', 'Thanh điều hướng',
@@ -115,7 +130,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
     'AI Copilot', 'Gỡ lỗi', 'Labs', 'Flags'
   );
 
-  const hasAnyResults = !normalizedQuery || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible;
+  const hasAnyResults = !normalizedQuery || isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none">
@@ -186,6 +201,259 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
           </div>
         )}
       </div>
+
+      {/* 0. Section Spatial Glass: Tùy chỉnh độ mờ (Blur) & độ trong (Opacity) - Đặt trên đầu */}
+      {isSpatialGlassVisible && (
+        <section 
+          id="settings-section-spatial-glass"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-5"
+        >
+          {/* Section Header */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#FBBF24] via-[#F97316] to-[#E6007A] flex items-center justify-center shrink-0 shadow-lg shadow-orange-500/20 mt-0.5">
+                <Sparkles className="w-4.5 h-4.5 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-white leading-tight">
+                    Spatial Glass
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-[#FBBF24]/20 to-[#E6007A]/20 text-amber-300 border border-amber-500/30">
+                    LIQUID UI
+                  </span>
+                </div>
+                <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
+                  Tùy chỉnh độ mờ (blur) và độ trong suốt (opacity) cho các thành phần kính không gian trên VNRT Online
+                </p>
+              </div>
+            </div>
+
+            {/* Reset to defaults button */}
+            {(spatialBlur !== 20 || spatialOpacity !== 65) && (
+              <button
+                type="button"
+                id="btn-reset-spatial-glass"
+                onClick={() => {
+                  updateSetting('spatialGlassBlur', 20);
+                  updateSetting('spatialGlassOpacity', 65);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-semibold transition-all cursor-pointer shrink-0"
+                title="Khôi phục mặc định (20px / 65%)"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Mặc định</span>
+              </button>
+            )}
+          </div>
+
+          {/* Interactive Live Glass Preview Banner */}
+          <div className="relative w-full h-32 sm:h-36 rounded-[22px] overflow-hidden border border-white/10 shadow-inner flex items-center justify-center p-4">
+            {/* Colorful vibrant background mimicking wallpapers/content */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 20% 30%, #FBBF24 0%, transparent 40%), radial-gradient(circle at 80% 40%, #E6007A 0%, transparent 45%), radial-gradient(circle at 50% 80%, #388BFD 0%, transparent 50%), linear-gradient(135deg, #111827 0%, #1e1b4b 50%, #0f172a 100%)'
+              }}
+            >
+              {/* Grid texture for depth */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:16px_16px]" />
+            </div>
+
+            {/* Live Spatial Glass Card Element inside preview */}
+            <div 
+              className="relative z-10 w-full max-w-sm rounded-[18px] p-3.5 sm:p-4 text-center transition-all duration-100 flex items-center justify-between gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.36)] border border-white/25"
+              style={{
+                backdropFilter: `blur(${spatialBlur}px) saturate(175%)`,
+                WebkitBackdropFilter: `blur(${spatialBlur}px) saturate(175%)`,
+                backgroundColor: `rgba(28, 27, 36, ${spatialOpacity / 100})`,
+              }}
+            >
+              <div className="flex items-center gap-3 text-left min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center shrink-0 shadow">
+                  <Sparkles className="w-4.5 h-4.5 text-amber-300" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-extrabold text-xs sm:text-sm text-white tracking-tight truncate drop-shadow">
+                    Kính xem trước (Live Preview)
+                  </div>
+                  <div className="text-[11px] text-white/80 font-mono">
+                    Blur: {spatialBlur}px • Opacity: {spatialOpacity}%
+                  </div>
+                </div>
+              </div>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/20 shrink-0">
+                Active
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Preset Chips */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+            <span className="text-[11px] font-semibold text-zinc-400 shrink-0 mr-1">
+              Mẫu sẵn:
+            </span>
+            {[
+              { label: 'Mặc định', blur: 20, opacity: 65 },
+              { label: 'Kính siêu trong', blur: 12, opacity: 30 },
+              { label: 'Mờ sương đục', blur: 32, opacity: 80 },
+              { label: 'Tối mờ sâu', blur: 40, opacity: 85 },
+              { label: 'Màu phẳng (Solid)', blur: 0, opacity: 95 },
+            ].map((preset) => {
+              const isActive = spatialBlur === preset.blur && spatialOpacity === preset.opacity;
+              return (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => {
+                    updateSetting('spatialGlassBlur', preset.blur);
+                    updateSetting('spatialGlassOpacity', preset.opacity);
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] text-white font-bold shadow-md shadow-orange-500/20' 
+                      : 'bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="space-y-4 pt-1">
+            {/* Slider 1: Độ mờ (Blur) */}
+            <div 
+              id="settings-card-spatial-blur"
+              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border-0 hover:bg-white/[0.03] space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Sliders className="w-4.5 h-4.5 text-amber-400" />
+                  <div>
+                    <span className="font-semibold text-white text-sm block">
+                      Độ mờ hậu cảnh (Blur)
+                    </span>
+                    <span className="text-[11px] text-[#9CA3AF]">
+                      Hiệu ứng nhòe mờ làm nổi bật chi tiết sau các lớp kính
+                    </span>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  {spatialBlur}px
+                </span>
+              </div>
+
+              {/* Slider Capsule */}
+              <div className="pt-1">
+                <div className="group relative w-full h-14 sm:h-16 rounded-[24px] bg-white/[0.04] border-0 flex items-center px-6 transition-all settings-slider-capsule">
+                  <div className="relative w-full h-2 rounded-full bg-[#383842] overflow-visible">
+                    {/* Active Gradient Track */}
+                    <div 
+                      className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] transition-all duration-75 ease-out shadow-[0_0_12px_rgba(249,115,22,0.5)]"
+                      style={{ width: `${(spatialBlur / 50) * 100}%` }}
+                    />
+                    
+                    {/* Handle Thumb */}
+                    <div 
+                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-6 rounded-full bg-white shadow-[0_2px_12px_rgba(0,0,0,0.5)] transition-all duration-75 ease-out pointer-events-none flex items-center justify-center group-hover:scale-125"
+                      style={{ left: `${(spatialBlur / 50) * 100}%` }}
+                    >
+                      <div className="w-4 h-1 rounded-full bg-orange-400" />
+                    </div>
+                  </div>
+
+                  {/* Native Range Input */}
+                  <input
+                    id="slider-spatial-glass-blur"
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="1"
+                    value={spatialBlur}
+                    onChange={(e) => updateSetting('spatialGlassBlur', parseInt(e.target.value, 10))}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    aria-label="Độ mờ Spatial Glass (Blur)"
+                  />
+                </div>
+
+                {/* Markers */}
+                <div className="flex items-center justify-between text-[11px] pt-2 px-2 text-zinc-400 font-mono">
+                  <span>0px (Rõ nét)</span>
+                  <span>20px (Chuẩn)</span>
+                  <span>35px (Mờ sâu)</span>
+                  <span>50px (Tối đa)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Slider 2: Độ trong suốt (Opacity) */}
+            <div 
+              id="settings-card-spatial-opacity"
+              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border-0 hover:bg-white/[0.03] space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Droplets className="w-4.5 h-4.5 text-pink-400" />
+                  <div>
+                    <span className="font-semibold text-white text-sm block">
+                      Độ trong suốt / Đậm màu (Opacity)
+                    </span>
+                    <span className="text-[11px] text-[#9CA3AF]">
+                      Tỷ lệ phủ màu bề mặt kính từ gần như trong suốt đến tối màu đậm
+                    </span>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-pink-400/20 text-pink-300 border border-pink-400/30">
+                  {spatialOpacity}%
+                </span>
+              </div>
+
+              {/* Slider Capsule */}
+              <div className="pt-1">
+                <div className="group relative w-full h-14 sm:h-16 rounded-[24px] bg-white/[0.04] border-0 flex items-center px-6 transition-all settings-slider-capsule">
+                  <div className="relative w-full h-2 rounded-full bg-[#383842] overflow-visible">
+                    {/* Active Gradient Track */}
+                    <div 
+                      className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] transition-all duration-75 ease-out shadow-[0_0_12px_rgba(230,0,122,0.5)]"
+                      style={{ width: `${((spatialOpacity - 5) / 95) * 100}%` }}
+                    />
+                    
+                    {/* Handle Thumb */}
+                    <div 
+                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-6 rounded-full bg-white shadow-[0_2px_12px_rgba(0,0,0,0.5)] transition-all duration-75 ease-out pointer-events-none flex items-center justify-center group-hover:scale-125"
+                      style={{ left: `${((spatialOpacity - 5) / 95) * 100}%` }}
+                    >
+                      <div className="w-4 h-1 rounded-full bg-pink-500" />
+                    </div>
+                  </div>
+
+                  {/* Native Range Input */}
+                  <input
+                    id="slider-spatial-glass-opacity"
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="1"
+                    value={spatialOpacity}
+                    onChange={(e) => updateSetting('spatialGlassOpacity', parseInt(e.target.value, 10))}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    aria-label="Độ trong suốt Spatial Glass (Opacity)"
+                  />
+                </div>
+
+                {/* Markers */}
+                <div className="flex items-center justify-between text-[11px] pt-2 px-2 text-zinc-400 font-mono">
+                  <span>5% (Siêu trong)</span>
+                  <span>40% (Thoáng)</span>
+                  <span>65% (Chuẩn)</span>
+                  <span>100% (Đậm kín)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 2. Section 1: Giao diện */}
       {isSection1Visible && (
@@ -337,7 +605,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     )}
                   </div>
                   <div className="text-xs text-purple-300 font-medium mt-1">
-                    Changing your background to see how Spatial Glass on Vplay reacts!
+                    Changing your background to see how Spatial Glass on VNRT Online reacts!
                   </div>
                   <div className="text-[11px] text-[#9CA3AF] mt-1 leading-relaxed">
                     Người dùng chọn một mẫu nền cho sẵn và app background sẽ đổi theo hình đó thay vì là solid color mặc định. Các thành phần kính mờ Spatial Glass (Top bar, Sidebar, Floating Search Bar, V-board) sẽ phản chiếu và khúc xạ màu sắc chân thực.
@@ -417,7 +685,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     <span>Chế độ giao diện Dark Mode</span>
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Ứng dụng Vplay hoạt động ở chế độ nền tối chuyên biệt (#181818) tối ưu thị giác cho trải nghiệm truyền hình.
+                    Ứng dụng VNRT Online hoạt động ở chế độ nền tối chuyên biệt (#181818) tối ưu thị giác cho trải nghiệm truyền hình.
                   </div>
                 </div>
 
@@ -529,7 +797,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     </div>
 
                     <p className="text-xs text-[#9CA3AF] mt-3 leading-relaxed">
-                      Thanh điều hướng ngang hiện đại phong cách truyền hình với logo Vplay, danh mục Truyền Hình và menu Xem thêm.
+                      Thanh điều hướng ngang hiện đại phong cách truyền hình với logo VNRT Online, danh mục Truyền Hình và menu Xem thêm.
                     </p>
                   </button>
                 </div>
@@ -648,7 +916,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                             className="text-xs text-white/70 mt-2 px-2 py-1 rounded-lg bg-black/20 border border-white/5 truncate tracking-wide"
                             style={{ fontFamily: font.cssFamily }}
                           >
-                            Vplay: Truyền hình trực tuyến 2026
+                            VNRT Online: Truyền hình trực tuyến 2026
                           </div>
                         </div>
                       </button>
@@ -880,7 +1148,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <span>Màn hình khởi động (Splash Screen)</span>
                     <span className="px-2 py-0.5 text-[10px] font-bold bg-[#E6005A]/20 text-[#E6005A] rounded-full">
-                      Vplay OS
+                      VNRT Online OS
                     </span>
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
@@ -1065,7 +1333,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
         </section>
       )}
 
-      {/* 4. Section 3: Copilot for Vplay */}
+      {/* 4. Section 3: Copilot for VNRT Online */}
       {isSection3Visible && (
         <section 
           id="settings-section-copilot"
@@ -1076,7 +1344,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
             <Bot className="w-5 h-5 text-[#E50914] dark:text-[#E50914] shrink-0 mt-0.5" />
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
-                Copilot for Vplay
+                Copilot for VNRT Online
               </h2>
               <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
                 Quản lý tên người dùng, trợ lý trí tuệ nhân tạo, tính năng hợp nhất tìm kiếm và gợi ý lệnh
@@ -1163,7 +1431,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
             )}
 
             {/* Card 0.5: Reset OOBE Setup Screen */}
-            {(matchesSearch('OOBE') || matchesSearch('Reset OOBE') || matchesSearch('Thiết lập lần đầu') || matchesSearch('Setup') || matchesSearch('Windows') || matchesSearch("Who's going to use Vplay") || matchesSearch('Khởi động')) && (
+            {(matchesSearch('OOBE') || matchesSearch('Reset OOBE') || matchesSearch('Thiết lập lần đầu') || matchesSearch('Setup') || matchesSearch('Windows') || matchesSearch("Who's going to use VNRT Online") || matchesSearch('Khởi động')) && (
               <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
@@ -1174,7 +1442,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     </span>
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Trải nghiệm lại màn hình chào mừng và thiết lập &ldquo;Who&apos;s going to use Vplay?&rdquo; phong cách Windows Out-of-Box Experience
+                    Trải nghiệm lại màn hình chào mừng và thiết lập &ldquo;Who&apos;s going to use VNRT Online?&rdquo; phong cách Windows Out-of-Box Experience
                   </div>
                 </div>
 
@@ -1198,7 +1466,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     Merge Spotlight Search to Copilot
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hợp nhất tìm kiếm nhanh Spotlight Search vào trợ lý Copilot for Vplay để có trải nghiệm tìm kiếm thông minh hơn
+                    Hợp nhất tìm kiếm nhanh Spotlight Search vào trợ lý Copilot for VNRT Online để có trải nghiệm tìm kiếm thông minh hơn
                   </div>
                 </div>
 

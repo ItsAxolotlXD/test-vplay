@@ -50,9 +50,9 @@ export const PRESET_LOGOS: PresetLogo[] = [
     url: 'https://static.wikia.nocookie.net/ep-deo/images/1/18/Screenbug3.png/revision/latest/scale-to-width-down/1000?cb=20260921073559'
   },
   {
-    id: 'vplay',
-    name: 'Vplay Logo',
-    category: 'Vplay Presets',
+    id: 'vnrt-online',
+    name: 'VNRT Online Logo',
+    category: 'VNRT Online Presets',
     url: 'https://static.wikia.nocookie.net/ep-deo/images/f/f8/Vpla.png/revision/latest/scale-to-width-down/1000?cb=20260829062528'
   }
 ];
@@ -455,7 +455,7 @@ export const LogoSwitcherVisualizer: React.FC<LogoSwitcherVisualizerProps> = ({
                       THỜI SỰ
                     </span>
                     <span className="text-[11px] text-white/80 font-medium truncate max-w-[280px] sm:max-w-md">
-                      Bản tin truyền hình mô phỏng Screenbug On-Air Switcher Vplay 2026
+                      Bản tin truyền hình mô phỏng Screenbug On-Air Switcher VNRT Online 2026
                     </span>
                   </div>
                   <span className="text-[10px] font-mono text-white/50">19:00:00</span>

@@ -54,7 +54,7 @@ export const TOOLBOX_DATA = [
   {
     id: "tool-plugin-store",
     title: "Cửa hàng Tiện ích (Plugin Store)",
-    subtitle: "Cài đặt các tiện ích mở rộng và addon tính năng cho Vplay",
+    subtitle: "Cài đặt các tiện ích mở rộng và addon tính năng cho VNRT Online",
     badge: "Tiện ích",
     route: "/settings"
   },
@@ -287,7 +287,7 @@ export const SETTINGS_DATA = [
   },
   {
     id: "set-copilot",
-    title: "Cài đặt Copilot for Vplay",
+    title: "Cài đặt Copilot for VNRT Online",
     subtitle: "Quản lý hợp nhất tìm kiếm Spotlight và gợi ý lệnh Slash Commands",
     badge: "Copilot",
     route: "/settings"
@@ -326,7 +326,7 @@ export const HELP_DATA = [
   },
   {
     id: "help-copilot",
-    title: "Hướng dẫn sử dụng Copilot for Vplay",
+    title: "Hướng dẫn sử dụng Copilot for VNRT Online",
     subtitle: "Cách dùng lệnh /search <từ khóa> filter <loại>, /mode, /navigation, /subscribe",
     badge: "Copilot",
     route: "/copilot"
@@ -344,7 +344,7 @@ export const HELP_DATA = [
 export const ABOUT_DATA = [
   {
     id: "about-vplay",
-    title: "Vplay Television & Media Platform",
+    title: "VNRT Online Television & Media Platform",
     subtitle: "Nền tảng truyền hình trực tuyến thế hệ mới, tích hợp AI Copilot & Space 360",
     badge: "Phiên bản 2026.8",
     route: "/about"
@@ -365,7 +365,7 @@ export const ABOUT_DATA = [
   },
   {
     id: "about-team",
-    title: "Đội ngũ phát triển Vplay Team",
+    title: "Đội ngũ phát triển VNRT Online Team",
     subtitle: "Sản phẩm được thiết kế và hoàn thiện bởi các kỹ sư công nghệ truyền hình",
     badge: "Tác giả",
     route: "/about"
@@ -430,7 +430,7 @@ export const processCopilotCommand = (
     if (!rawArgs) {
       return {
         handled: true,
-        replyText: `🔍 **Spotlight Search trong Copilot for Vplay**
+        replyText: `🔍 **Spotlight Search trong Copilot for VNRT Online**
 Cú pháp tìm kiếm:
 - \`/search <từ khóa>\` : Tìm kiếm trên tất cả danh mục
 - \`/search <từ khóa> filter <loại>\` : Lọc chính xác theo danh mục
@@ -444,7 +444,7 @@ Cú pháp tìm kiếm:
 - \`favorites\` : Kênh yêu thích
 - \`toolbox\` : Công cụ & Tiện ích kỹ thuật
 - \`help\` : Hướng dẫn sử dụng & Phím tắt
-- \`about\` : Thông tin về ứng dụng Vplay
+- \`about\` : Thông tin về ứng dụng VNRT Online
 - \`settings\` : Cài đặt hệ thống
 
 *Ví dụ:* \`/search vtv3 filter tv\`, \`/search bóng đá filter news\`, \`/search caro filter space360\`, \`/search chào bạn filter copilot\``
@@ -744,15 +744,15 @@ Cú pháp tìm kiếm:
       });
     }
 
-    // 9. About Vplay
+    // 9. About VNRT Online
     if (isFilterMatch("about") && matchedAbout.length > 0) {
       searchCategoryResults.push({
-        category: "Thông tin về Vplay",
+        category: "Thông tin về VNRT Online",
         icon: "Info",
         items: matchedAbout.map((a) => ({
           id: a.id,
           category: 'about' as const,
-          categoryLabel: 'Vplay',
+          categoryLabel: 'VNRT Online',
           title: a.title,
           subtitle: a.subtitle,
           badge: a.badge,
@@ -846,7 +846,7 @@ Cú pháp:
     if (isLight) {
       return {
         handled: true,
-        replyText: `✨ **Vplay** hiện tại hoạt động độc quyền ở chế độ **Dark Mode (#181818)** để mang lại trải nghiệm xem truyền hình điện ảnh và bảo vệ mắt tối ưu nhất!`,
+        replyText: `✨ **VNRT Online** hiện tại hoạt động độc quyền ở chế độ **Dark Mode (#181818)** để mang lại trải nghiệm xem truyền hình điện ảnh và bảo vệ mắt tối ưu nhất!`,
         action: {
           type: "theme",
           payload: "dark"
@@ -856,7 +856,7 @@ Cú pháp:
 
     return {
       handled: true,
-      replyText: `✨ **Vplay** đang ở chế độ **Dark Mode (#181818)** hoàn hảo cho trải nghiệm truyền hình.`,
+      replyText: `✨ **VNRT Online** đang ở chế độ **Dark Mode (#181818)** hoàn hảo cho trải nghiệm truyền hình.`,
       action: {
         type: "theme",
         payload: "dark"
@@ -893,7 +893,7 @@ Cú pháp:
 
     return {
       handled: true,
-      replyText: `🧭 **Copilot for Vplay** đã chuyển thanh điều hướng sang: **${
+      replyText: `🧭 **Copilot for VNRT Online** đã chuyển thanh điều hướng sang: **${
         dockToSidebar ? "Thanh Sidebar (Cạnh bên)" : "Thanh Dock (Phía dưới)"
       }**!`,
       action: {
@@ -1058,15 +1058,15 @@ Cú pháp:
   ) {
     return {
       handled: true,
-      replyText: `👥 **CỘNG ĐỒNG VPLAY • BẠN BÈ & NGƯỜI DÙNG**
-Đang mở trang danh sách **101+ Cư dân Vplay**.
+      replyText: `👥 **CỘNG ĐỒNG VNRT ONLINE • BẠN BÈ & NGƯỜI DÙNG**
+Đang mở trang danh sách **101+ Cư dân VNRT Online**.
 
 ✨ **Các tính năng trên tab Friends and People:**
 - 🟢 Theo dõi trạng thái Online / Offline / Đang xem TV thời gian thực
 - 📺 Bấm **Cùng xem** để xem chung kênh truyền hình đang phát
 - 💬 Nhắn tin trực tiếp (DM) & trao đổi minigame
 - 💎 **Tặng khoáng vật Orbs** cho bạn bè
-- 🏆 **Bảng xếp hạng đại gia Orbs** toàn hệ thống Vplay
+- 🏆 **Bảng xếp hạng đại gia Orbs** toàn hệ thống VNRT Online
 
 Đang chuyển hướng bạn sang giao diện Bạn bè & Người dùng...`,
       action: {
@@ -1080,13 +1080,13 @@ Cú pháp:
   if (command === "/help" || command === "/commands") {
     return {
       handled: true,
-      replyText: `🤖 **Danh sách lệnh điều khiển của Copilot for Vplay:**
+      replyText: `🤖 **Danh sách lệnh điều khiển của Copilot for VNRT Online:**
 - \`/cược\` : Mở sới cược Orbs PvP (Bầu cua, Lật xu, Đánh bài, Xúc xắc)
 - \`/cược baucua 1000\` : Vào ngay sới Bầu Cua mức cược 1.000 Orbs
 - \`/cược latxu 500\` : Chơi Lật Xu Sấp / Ngửa
 - \`/cược danhbai 2000\` : Đánh Bài Cào 3 Cây đấu PvP người chơi
 - \`/cược xucxac 5000\` : Lắc Xúc Xắc Tài Xỉu
-- \`/friends\` hoặc \`/people\` : Xem danh sách Bạn bè & Người dùng Vplay (100+ cư dân)
+- \`/friends\` hoặc \`/people\` : Xem danh sách Bạn bè & Người dùng VNRT Online (100+ cư dân)
 - \`/standalone\` : Mở Copilot dưới dạng ứng dụng độc lập toàn màn hình
 - \`/space360\` hoặc \`/vapps\` : Khám phá kho ứng dụng & trò chơi Space 360
 - \`/caro\` / \`/arcade\` : Chơi ngay 5 trò chơi Ore UI (Caro XO, Rắn săn mồi, Nối từ...)

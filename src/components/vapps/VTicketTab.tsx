@@ -157,10 +157,10 @@ export const VTicketTab: React.FC = () => {
   };
 
   const handleApplyDiscount = () => {
-    if (discountCode.trim().toUpperCase() === 'VPLAY360') {
+    if (discountCode.trim().toUpperCase() === 'VNRT360') {
       setIsDiscountApplied(true);
     } else {
-      alert('Mã giảm giá không hợp lệ. Hãy thử dùng mã: VPLAY360');
+      alert('Mã giảm giá không hợp lệ. Hãy thử dùng mã: VNRT360');
     }
   };
 
@@ -176,7 +176,7 @@ export const VTicketTab: React.FC = () => {
       dateTime: `${selectedEvent.date} lúc ${selectedEvent.time}`,
       seats: [...selectedSeats],
       totalPrice: calculateTotal(),
-      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VPLAY-TICKET-${Date.now()}`,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VNRT-TICKET-${Date.now()}`,
       bookedAt: new Date().toLocaleDateString('vi-VN'),
     };
 
@@ -453,7 +453,7 @@ export const VTicketTab: React.FC = () => {
 
                       {/* Coupon input */}
                       <div className="pt-2">
-                        <label className="block text-slate-400 font-bold mb-1">Mã Ưu Đãi (Thử: VPLAY360)</label>
+                        <label className="block text-slate-400 font-bold mb-1">Mã Ưu Đãi (Thử: VNRT360)</label>
                         <div className="flex items-center gap-2">
                           <input
                             type="text"

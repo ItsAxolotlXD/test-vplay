@@ -205,12 +205,12 @@ export default function VerifiedTab({
           <div>
             <div className="flex items-center gap-2">
               <span className="bg-[#a855f7] text-white px-2 py-0.5 text-[10px] font-bold font-mono border border-[#141414]">
-                VPLAY OFFICIAL VIP
+                VNRT ONLINE OFFICIAL VIP
               </span>
               <BadgeCheck className="w-5 h-5 text-purple-400 shrink-0" />
             </div>
             <h1 className="text-lg sm:text-2xl font-black uppercase text-white font-jura tracking-wider mt-0.5">
-              VPLAY VERIFIED MEMBERSHIP
+              VNRT ONLINE VERIFIED MEMBERSHIP
             </h1>
             <p className="text-xs text-zinc-300 font-jura mt-0.5">
               Gói dịch vụ đặc quyền cao cấp với huy hiệu Tích Tím chính chủ và nhiều ưu đãi VIP
@@ -257,7 +257,7 @@ export default function VerifiedTab({
                     VP
                   </div>
                   <span className="font-extrabold text-xs tracking-wider uppercase text-purple-300 font-jura">
-                    VPLAY VIP PURPLE PASS
+                    VNRT ONLINE VIP PURPLE PASS
                   </span>
                 </div>
                 {verifiedSub.plan === "verified_plus" ? (
@@ -294,7 +294,7 @@ export default function VerifiedTab({
                 <div>
                   <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-widest">Chủ Thẻ VIP</div>
                   <div className="text-sm font-extrabold text-white flex items-center gap-1.5 mt-0.5 font-jura">
-                    <span>Vplay Member</span>
+                    <span>VNRT Online Member</span>
                     {verifiedSub.plan !== "none" && (
                       <BadgeCheck className="w-4 h-4 text-purple-400 inline shrink-0" />
                     )}
@@ -320,7 +320,7 @@ export default function VerifiedTab({
             <div className="space-y-2">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#1e2022] border border-[#141414] text-purple-300 text-xs font-bold font-mono">
                 <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                <span>Thế Hệ Tài Khoản VIP Đỉnh Cao Vplay</span>
+                <span>Thế Hệ Tài Khoản VIP Đỉnh Cao VNRT Online</span>
               </div>
 
               <h2 className="text-base sm:text-xl font-black text-white leading-snug uppercase font-jura">
@@ -328,7 +328,7 @@ export default function VerifiedTab({
               </h2>
 
               <p className="text-xs text-zinc-300 leading-relaxed font-jura">
-                Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến Vplay. Tự do sở hữu huy hiệu tích tím uy tín, thưởng thức V-Play Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày Orbs mỗi ngày!
+                Trở thành hội viên chính chủ của hệ sinh thái truyền hình trực tuyến VNRT Online. Tự do sở hữu huy hiệu tích tím uy tín, thưởng thức V-Play Server 4K tốc độ cao không giật lag và nhân đôi tốc độ cày Orbs mỗi ngày!
               </p>
             </div>
 
@@ -621,7 +621,7 @@ export default function VerifiedTab({
         {activeTabSection === "comparison" && (
           <div className="bg-[#2d2f32] border-4 border-[#141414] p-4 sm:p-5 shadow-[inset_2px_2px_0_#5a5d61,inset_-2px_-2px_0_#1e2022] space-y-4">
             <h3 className="text-base font-extrabold text-white text-center uppercase font-jura">
-              So Sánh Chi Tiết Quyền Lợi Hội Viên Vplay
+              So Sánh Chi Tiết Quyền Lợi Hội Viên VNRT Online
             </h3>
 
             <div className="overflow-x-auto">
@@ -691,7 +691,7 @@ export default function VerifiedTab({
                 Tích Lũy Khoáng Vật Orbs Rất Đơn Giản
               </h3>
               <p className="text-xs text-zinc-300 mt-1 font-jura">
-                Không cần nạp tiền thật! Chỉ cần thưởng thức truyền hình và video ngắn trên Vplay để cày Orbs
+                Không cần nạp tiền thật! Chỉ cần thưởng thức truyền hình và video ngắn trên VNRT Online để cày Orbs
               </p>
             </div>
 
@@ -1095,7 +1095,7 @@ export default function VerifiedTab({
               </span>
               <h3 className="text-lg font-black text-white uppercase mt-2">Đăng Ký Verified Thành Công!</h3>
               <p className="text-xs text-zinc-300 mt-1">
-                Tài khoản Vplay của bạn đã được nâng cấp chính thức lên gói{" "}
+                Tài khoản VNRT Online của bạn đã được nâng cấp chính thức lên gói{" "}
                 <strong className="text-purple-300">
                   {PLAN_NAMES[successModal]}
                 </strong>

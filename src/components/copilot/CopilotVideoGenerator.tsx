@@ -100,7 +100,7 @@ export const CopilotVideoGenerator: React.FC<CopilotVideoGeneratorProps> = ({ on
   ];
 
   const presets = [
-    "Trailer giới thiệu kênh Vplay 2026 với đồ họa không gian ba chiều rực rỡ",
+    "Trailer giới thiệu kênh VNRT Online 2026 với đồ họa không gian ba chiều rực rỡ",
     "Phim ngắn cảnh Hà Nội về đêm dưới mưa với ánh đèn lồng phố cổ lung linh",
     "Hành trình tàu thám hiểm không gian Việt Nam tiến vào quỹ đạo sao Hỏa",
     "Intro chương trình Tin tức VTV bản tin đặc biệt phong cách tương lai"
@@ -304,7 +304,7 @@ export const CopilotVideoGenerator: React.FC<CopilotVideoGeneratorProps> = ({ on
       ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
       ctx.font = "bold 11px monospace";
       ctx.textAlign = "left";
-      ctx.fillText(`VPLAY COPILOT VIDEO ENGINE • 60 FPS • SCENE ${currentSceneIndex + 1}/${currentProject.scenes.length}`, 16, letterboxHeight - 8);
+      ctx.fillText(`VNRT ONLINE COPILOT VIDEO ENGINE • 60 FPS • SCENE ${currentSceneIndex + 1}/${currentProject.scenes.length}`, 16, letterboxHeight - 8);
 
       animFrameRef.current = requestAnimationFrame(render);
     };
@@ -405,7 +405,7 @@ export const CopilotVideoGenerator: React.FC<CopilotVideoGeneratorProps> = ({ on
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-black/30 backdrop-blur-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Video className="w-3.5 h-3.5 text-sky-300" />
-                Vplay Copilot Cinema Studio
+                VNRT Online Copilot Cinema Studio
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-sky-500/30 text-[11px] font-semibold">
                 Multi-Scene Storyboard & Motion

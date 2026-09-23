@@ -111,7 +111,7 @@ export const ChatVoiceStage: React.FC<ChatVoiceStageProps> = ({
                 Tham gia {channel.name}
               </h3>
               <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                Đàm thoại trực tiếp với các thành viên trong cộng đồng Vplay. Hỗ trợ mic, tai nghe và chia sẻ màn hình mô phỏng chất lượng cao.
+                Đàm thoại trực tiếp với các thành viên trong cộng đồng VNRT Online. Hỗ trợ mic, tai nghe và chia sẻ màn hình mô phỏng chất lượng cao.
               </p>
             </div>
 

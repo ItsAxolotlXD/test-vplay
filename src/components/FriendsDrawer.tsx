@@ -570,11 +570,11 @@ export const FriendsDrawer: React.FC<FriendsDrawerProps> = ({
               </div>
               <div className="flex justify-between text-zinc-400">
                 <span>Trạng thái kết nối:</span>
-                <span className="text-emerald-400 font-bold">Bạn bè Vplay</span>
+                <span className="text-emerald-400 font-bold">Bạn bè VNRT Online</span>
               </div>
               <div className="flex justify-between text-zinc-400">
                 <span>Hệ sinh thái:</span>
-                <span className="text-zinc-200">Vplay HD Player</span>
+                <span className="text-zinc-200">VNRT Online HD Player</span>
               </div>
             </div>
 

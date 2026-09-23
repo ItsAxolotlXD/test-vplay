@@ -8,10 +8,10 @@ const COMMENT_TEMPLATES: Record<string, string[]> = {
     "Thời sự trực tiếp xem mượt quá!",
     "Bản tin hôm nay nhiều thông tin hữu ích ghê",
     "Kênh VTV nét căng đét",
-    "Sóng Vplay xem ổn định dã man",
+    "Sóng VNRT Online xem ổn định dã man",
     "Thời sự 19h chuẩn bị chiếu rồi anh em",
     "Chào mọi người đang xem truyền hình nhé!",
-    "App Vplay đỉnh thật sự, tiện lợi vô cùng",
+    "App VNRT Online đỉnh thật sự, tiện lợi vô cùng",
     "Vừa ăn cơm vừa xem thời sự là chuẩn bài",
     "Có ai đang hóng bản tin dự báo thời tiết không?",
     "Chúc cả nhà buổi tối vui vẻ!"
@@ -26,7 +26,7 @@ const COMMENT_TEMPLATES: Record<string, string[]> = {
     "Hôm nay ai bình luận trận này thế mọi người?",
     "Trọng tài bắt hơi bị công tâm đấy nha",
     "Kèo này ai thắng đây anh em?",
-    "Vplay trực tiếp bóng đá xịn ghê"
+    "VNRT Online trực tiếp bóng đá xịn ghê"
   ],
   movies: [
     "Phim hay quá! Có ai biết lịch chiếu lại không?",
@@ -48,7 +48,7 @@ const COMMENT_TEMPLATES: Record<string, string[]> = {
     "Thiết kế giao diện đẹp và hiện đại quá",
     "10 điểm cho chất lượng âm thanh và hình ảnh",
     "Xem tivi miễn phí thế này tiện lợi ghê",
-    "Vplay là số 1 nha cả nhà",
+    "VNRT Online là số 1 nha cả nhà",
     "Chúc mọi người một ngày làm việc học tập vui vẻ!"
   ]
 };
@@ -73,7 +73,7 @@ const AVAILABLE_GIFTS = [
   { name: "Ly Trà Sữa 🧋", price: 500, icon: "🧋", desc: "Năng lượng cày livestream" },
   { name: "Hộp Quà Kim Cương 💎", price: 1000, icon: "💎", desc: "Đẳng cấp VIP member" },
   { name: "Bảo Ngọc Vương Miện 👑", price: 10000, icon: "👑", desc: "Vinh danh bá chủ phòng live" },
-  { name: "Siêu Xe Vplay 🏎️", price: 100000, icon: "🏎️", desc: "Siêu xịn siêu sang chảnh" },
+  { name: "Siêu Xe VNRT Online 🏎️", price: 100000, icon: "🏎️", desc: "Siêu xịn siêu sang chảnh" },
   { name: "Tên Lửa Vũ Trụ 🚀", price: 1000000, icon: "🚀", desc: "Món quà vũ trụ tối thượng" }
 ];
 
@@ -206,9 +206,9 @@ export default function LiveComments({ channel, isMaterialDesignActive = false }
         const scAmount = [100, 200, 500, 1000][Math.floor(Math.random() * 4)];
         const scMessages = [
           "Live mượt quá admin ơi!",
-          "Vplay số 1 luôn nha 💯",
+          "VNRT Online số 1 luôn nha 💯",
           "Kênh này xem đá bóng sướng cực",
-          "Cảm ơn Vplay đã phát sóng nha!",
+          "Cảm ơn VNRT Online đã phát sóng nha!",
           "Thời sự trực tiếp sắc nét"
         ];
         incoming = {

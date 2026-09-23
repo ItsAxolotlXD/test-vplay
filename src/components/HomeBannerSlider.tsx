@@ -41,7 +41,7 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({
           {currentSlide + 1} / {totalSlides}
         </div>
 
-        {/* ARROW NAVIGATION BUTTONS USING VPLAY SECONDARY BUTTON */}
+        {/* ARROW NAVIGATION BUTTONS USING VNRT ONLINE SECONDARY BUTTON */}
         <div className="flex items-center gap-2">
           <VplaySecondaryButton
             fullWidth={false}
@@ -95,7 +95,7 @@ export const HomeBannerSlider: React.FC<HomeBannerSliderProps> = ({
                   {t('home.tab.DesignPreview.name', 'WELCOME TO A DESIGN PREVIEW')}
                 </h1>
                 <p className="text-xs sm:text-sm text-gray-200 leading-relaxed text-center sm:text-left drop-shadow">
-                  {t('home.tab.DesignPreview.desc', 'Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay, lấy cảm hứng từ Minecraft Ore UI, chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi. Ore UI hứa hẹn sẽ đem đến cho bạn một trải nghiệm Vplay đẹp mắt, trực quan và mượt mà nhất.')}
+                  {t('home.tab.DesignPreview.desc', 'Bạn đang được trải nghiệm hệ thống giao diện mới của VNRT Online, lấy cảm hứng từ Minecraft Ore UI, chúng tôi rất muốn nghe ý kiến của bạn. Hãy nhớ rằng là web nói chung và giao diện nói riêng vẫn đang trong quá trình phát triển, vì vậy một số tính năng có thể bị thiếu hoặc bạn sẽ gặp phải khá nhiều lỗi. Ore UI hứa hẹn sẽ đem đến cho bạn một trải nghiệm VNRT Online đẹp mắt, trực quan và mượt mà nhất.')}
                 </p>
               </div>
 

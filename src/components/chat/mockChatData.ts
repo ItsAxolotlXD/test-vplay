@@ -6,7 +6,7 @@ export const CHAT_CHANNELS: ChatChannel[] = [
     id: 'general',
     name: 'thảo-luận-chung',
     type: 'text',
-    topic: 'Kênh trò chuyện tự do, chia sẻ mọi chủ đề về Vplay, giải trí và công nghệ.',
+    topic: 'Kênh trò chuyện tự do, chia sẻ mọi chủ đề về VNRT Online, giải trí và công nghệ.',
     category: 'text',
     unreadCount: 0
   },
@@ -30,7 +30,7 @@ export const CHAT_CHANNELS: ChatChannel[] = [
     id: 'announcements',
     name: 'thông-báo-sự-kiện',
     type: 'text',
-    topic: 'Kênh tin tức chính thức cập nhật tính năng mới từ Đội ngũ Vplay.',
+    topic: 'Kênh tin tức chính thức cập nhật tính năng mới từ Đội ngũ VNRT Online.',
     category: 'text',
     isLocked: true,
     unreadCount: 1
@@ -78,21 +78,21 @@ export const CHAT_CHANNELS: ChatChannel[] = [
 export const INITIAL_MEMBERS: Member[] = [
   {
     id: 'mem_admin_1',
-    name: 'Vplay Admin',
+    name: 'VNRT Online Admin',
     tag: '#0001',
     avatar: 'https://mc-heads.net/avatar/Notch/64',
     role: 'owner',
     roleName: 'Chủ Phòng',
     roleColor: '#E6005A',
     status: 'online',
-    activity: 'Quản trị hệ thống Vplay Hub',
+    activity: 'Quản trị hệ thống VNRT Online Hub',
     customStatus: '⚡ Luôn lắng nghe ý kiến cộng đồng'
   },
   {
     id: 'mem_bot_copilot',
     name: 'Copilot AI Bot',
     tag: '#BOT',
-    avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vplay-bot&backgroundColor=1e1b24',
+    avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vnrt-bot&backgroundColor=1e1b24',
     role: 'bot',
     roleName: 'BOT HỖ TRỢ',
     roleColor: '#06B6D4',
@@ -118,7 +118,7 @@ export const INITIAL_MEMBERS: Member[] = [
     tag: '#2048',
     avatar: 'https://mc-heads.net/avatar/Alex/64',
     role: 'vip',
-    roleName: 'Vplay VIP Diamond',
+    roleName: 'VNRT Online VIP Diamond',
     roleColor: '#F59E0B',
     status: 'online',
     activity: 'Chơi Sàn cược Orbs',
@@ -178,14 +178,14 @@ export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
       channelId: 'general',
       author: {
         id: 'mem_admin_1',
-        name: 'Vplay Admin',
+        name: 'VNRT Online Admin',
         tag: '#0001',
         avatar: 'https://mc-heads.net/avatar/Notch/64',
         role: 'owner',
         roleColor: '#E6005A',
         roleName: 'Chủ Phòng'
       },
-      content: 'Chào mừng tất cả các bạn đến với **Phòng Chat Vplay**! 🎉 Hệ thống được thiết kế theo phong cách Discord với đầy đủ các kênh thảo luận văn bản và kênh thoại trực tiếp.',
+      content: 'Chào mừng tất cả các bạn đến với **Phòng Chat VNRT Online**! 🎉 Hệ thống được thiết kế theo phong cách Discord với đầy đủ các kênh thảo luận văn bản và kênh thoại trực tiếp.',
       timestamp: 'Hôm nay lúc 10:00',
       reactions: [
         { emoji: '🎉', count: 12, users: ['user_you', 'mem_mod_1', 'mem_vip_1'] },
@@ -221,7 +221,7 @@ export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
         avatar: 'https://mc-heads.net/avatar/Alex/64',
         role: 'vip',
         roleColor: '#F59E0B',
-        roleName: 'Vplay VIP Diamond'
+        roleName: 'VNRT Online VIP Diamond'
       },
       content: 'Tối nay ai qua phòng thoại xem VTV3 cùng mình không? Có phim mới hay lắm á!',
       timestamp: 'Hôm nay lúc 10:15',
@@ -236,7 +236,7 @@ export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
         id: 'mem_bot_copilot',
         name: 'Copilot AI Bot',
         tag: '#BOT',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vplay-bot&backgroundColor=1e1b24',
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vnrt-bot&backgroundColor=1e1b24',
         role: 'bot',
         roleColor: '#06B6D4',
         roleName: 'BOT HỖ TRỢ'
@@ -274,7 +274,7 @@ export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
         avatar: 'https://mc-heads.net/avatar/Alex/64',
         role: 'vip',
         roleColor: '#F59E0B',
-        roleName: 'Vplay VIP Diamond'
+        roleName: 'VNRT Online VIP Diamond'
       },
       content: 'Chất lượng stream 1080p 60fps mượt không giật lag tí nào luôn.',
       timestamp: 'Hôm qua lúc 20:45'
@@ -306,14 +306,14 @@ export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
       channelId: 'announcements',
       author: {
         id: 'mem_admin_1',
-        name: 'Vplay Admin',
+        name: 'VNRT Online Admin',
         tag: '#0001',
         avatar: 'https://mc-heads.net/avatar/Notch/64',
         role: 'owner',
         roleColor: '#E6005A',
         roleName: 'Chủ Phòng'
       },
-      content: '📢 **THÔNG BÁO CHÍNH THỨC:**\n\n1. Ra mắt tính năng **Phòng Chat Discord** tích hợp đầy đủ phân kênh Văn bản & Kênh thoại chất lượng cao.\n2. Cho phép người dùng bật/tắt mic, tai nghe, chia sẻ màn hình mô phỏng và trò chuyện thời gian thực.\n3. Hỗ trợ hệ thống bot Copilot và lệnh slash tương tác.\n\nCảm ơn các bạn đã đồng hành cùng Vplay!',
+      content: '📢 **THÔNG BÁO CHÍNH THỨC:**\n\n1. Ra mắt tính năng **Phòng Chat Discord** tích hợp đầy đủ phân kênh Văn bản & Kênh thoại chất lượng cao.\n2. Cho phép người dùng bật/tắt mic, tai nghe, chia sẻ màn hình mô phỏng và trò chuyện thời gian thực.\n3. Hỗ trợ hệ thống bot Copilot và lệnh slash tương tác.\n\nCảm ơn các bạn đã đồng hành cùng VNRT Online!',
       timestamp: 'Hôm nay lúc 08:00',
       reactions: [
         { emoji: '🚀', count: 18, users: ['user_you', 'mem_mod_1'] },
@@ -329,7 +329,7 @@ export const INITIAL_MESSAGES: Record<string, ChatMessage[]> = {
         id: 'mem_bot_copilot',
         name: 'Copilot AI Bot',
         tag: '#BOT',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vplay-bot&backgroundColor=1e1b24',
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vnrt-bot&backgroundColor=1e1b24',
         role: 'bot',
         roleColor: '#06B6D4',
         roleName: 'BOT HỖ TRỢ'
@@ -358,7 +358,7 @@ export const INITIAL_VOICE_PARTICIPANTS: Record<string, VoiceParticipant[]> = {
       name: 'Trần Mai Anh',
       tag: '#2048',
       avatar: 'https://mc-heads.net/avatar/Alex/64',
-      role: 'Vplay VIP',
+      role: 'VNRT Online VIP',
       isMuted: false,
       isDeafened: false,
       isSpeaking: false,

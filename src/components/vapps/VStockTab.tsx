@@ -772,7 +772,7 @@ export const VStockTab: React.FC = () => {
               {
                 title: 'VN-Index bứt phá hơn 14 điểm nhờ nhóm cổ phiếu công nghệ và bất động sản',
                 time: '15 phút trước',
-                source: 'Vplay Finance',
+                source: 'VNRT Online Finance',
                 desc: 'Khối ngoại quay lại mua ròng hơn 450 tỷ đồng, tâm điểm tập trung tại FPT, VIC và HPG.'
               },
               {

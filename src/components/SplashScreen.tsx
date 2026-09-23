@@ -136,7 +136,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 className="relative text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 selection:bg-sky-200"
               >
                 Welcome to{' '}
-                <span className="bg-gradient-to-r from-slate-900 via-sky-800 to-indigo-900 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] bg-clip-text text-transparent">
                   Spatial Glass
                 </span>
               </motion.h1>

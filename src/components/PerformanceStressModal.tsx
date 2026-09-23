@@ -186,7 +186,7 @@ export const PerformanceStressModal: React.FC<PerformanceStressModalProps> = ({
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-[#55b331] animate-ping" />
             <h2 className="font-extrabold text-sm sm:text-base tracking-wider text-amber-300 uppercase">
-              VPLAY STRESS PERFORMANCE BENCHMARK
+              VNRT ONLINE STRESS PERFORMANCE BENCHMARK
             </h2>
           </div>
           <span className="font-mono text-xs font-bold text-emerald-400">{progress}%</span>

@@ -140,7 +140,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
       setPurchasedStorageMB(prev => prev + addAmount);
     }
 
-    const msg = `Thành công! Đã trừ ${priceVP.toLocaleString()} V-pearls và cộng +${addAmount.toLocaleString()} MB Storage Vplay!`;
+    const msg = `Thành công! Đã trừ ${priceVP.toLocaleString()} V-pearls và cộng +${addAmount.toLocaleString()} MB Storage VNRT Online!`;
     setBuySuccessMessage(msg);
 
     setTimeout(() => {
@@ -425,7 +425,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
               <p className="text-xs text-gray-200 leading-normal">
-                Clear cached application resources or purchase additional storage capacity for Vplay.
+                Clear cached application resources or purchase additional storage capacity for VNRT Online.
               </p>
 
               <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -458,7 +458,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
           <div className="bg-[#4a4d50] border-2 border-[#141414] rounded-none shadow-xl overflow-hidden">
             <div className="px-4 py-3 bg-[#3f4245] flex items-center gap-2">
               <ShoppingBag className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span className="font-mono font-bold text-xs uppercase tracking-wider text-white">VPLAY PLUGIN STORE</span>
+              <span className="font-mono font-bold text-xs uppercase tracking-wider text-white">VNRT ONLINE PLUGIN STORE</span>
             </div>
 
             <div>
@@ -650,7 +650,7 @@ export const OreSettingsTab: React.FC<OreSettingsTabProps> = ({
 
                 <h3 className="text-base sm:text-lg font-bold text-white tracking-wide text-center font-mono uppercase flex items-center gap-2">
                   <ShoppingBag className="w-5 h-5 text-emerald-400" />
-                  <span>Mua Storage Vplay (V-Pearls)</span>
+                  <span>Mua Storage VNRT Online (V-Pearls)</span>
                 </h3>
 
                 <button

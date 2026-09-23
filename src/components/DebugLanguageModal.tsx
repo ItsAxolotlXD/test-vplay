@@ -41,15 +41,15 @@ export const DebugLanguageModal: React.FC = () => {
   const handleSave = () => {
     playPopSound();
     setLangRawContent(editedText);
-    showStatus('Đã lưu và áp dụng vplay.lang cho toàn bộ ứng dụng!', 'success');
+    showStatus('Đã lưu và áp dụng vnrt_online.lang cho toàn bộ ứng dụng!', 'success');
   };
 
   const handleReset = () => {
     playPopSound();
-    if (window.confirm('Bạn có chắc chắn muốn khôi phục file vplay.lang về mặc định không?')) {
+    if (window.confirm('Bạn có chắc chắn muốn khôi phục file vnrt_online.lang về mặc định không?')) {
       resetToDefaultLang();
       setEditedText(DEFAULT_VPLAY_LANG);
-      showStatus('Đã khôi phục file vplay.lang về mặc định!', 'info');
+      showStatus('Đã khôi phục file vnrt_online.lang về mặc định!', 'info');
     }
   };
 
@@ -59,12 +59,12 @@ export const DebugLanguageModal: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'vplay.lang';
+    a.download = 'vnrt_online.lang';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showStatus('Đã xuất file vplay.lang thành công!', 'success');
+    showStatus('Đã xuất file vnrt_online.lang thành công!', 'success');
   };
 
   const handleImportClick = () => {
@@ -167,10 +167,10 @@ export const DebugLanguageModal: React.FC = () => {
             </div>
             <div>
               <h2 className="font-black text-sm uppercase tracking-wide text-white drop-shadow">
-                DEBUG MODE — FILE LANGUAGE EDITOR (<span className="text-white underline">vplay.lang</span>)
+                DEBUG MODE — FILE LANGUAGE EDITOR (<span className="text-white underline">vnrt_online.lang</span>)
               </h2>
               <p className="text-[10px] text-white/90 font-medium">
-                Chỉnh sửa ngôn ngữ & văn bản thời gian thực toàn bộ ứng dụng Vplay
+                Chỉnh sửa ngôn ngữ & văn bản thời gian thực toàn bộ ứng dụng VNRT Online
               </p>
             </div>
           </div>
@@ -202,7 +202,7 @@ export const DebugLanguageModal: React.FC = () => {
               }`}
             >
               <FileCode className="w-3.5 h-3.5 text-white" />
-              Raw Editor (vplay.lang)
+              Raw Editor (vnrt_online.lang)
             </button>
 
             <button
@@ -253,7 +253,7 @@ export const DebugLanguageModal: React.FC = () => {
           {activeTab === 'raw' && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-[11px] text-white font-mono bg-[#141517] px-3 py-1.5 border border-[#2b2d30]">
-                <span>FILE: <strong className="text-white underline">vplay.lang</strong></span>
+                <span>FILE: <strong className="text-white underline">vnrt_online.lang</strong></span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleCopy}
@@ -268,7 +268,7 @@ export const DebugLanguageModal: React.FC = () => {
               <textarea
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
-                placeholder="Nhập nội dung vplay.lang (key=value)..."
+                placeholder="Nhập nội dung vnrt_online.lang (key=value)..."
                 rows={16}
                 spellCheck={false}
                 className="w-full bg-[#121315] text-white font-mono text-xs p-3 border-2 border-[#141414] focus:outline-none focus:border-white leading-relaxed shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] resize-y"
@@ -368,7 +368,7 @@ export const DebugLanguageModal: React.FC = () => {
           {/* LIVE DEMO PREVIEW BOX */}
           <div className="bg-[#292b2e] border-2 border-[#141414] p-3 space-y-1.5">
             <div className="text-[10px] font-black uppercase text-white flex items-center justify-between">
-              <span className="text-white">LIVE PREVIEW — CÁC PHẦN TỬ ĐANG ÁP DỤNG vplay.lang</span>
+              <span className="text-white">LIVE PREVIEW — CÁC PHẦN TỬ ĐANG ÁP DỤNG vnrt_online.lang</span>
               <span className="text-white/80">cập nhật tức thì</span>
             </div>
             <div className="bg-[#18191b] p-2.5 border border-[#141414] space-y-2">
@@ -381,7 +381,7 @@ export const DebugLanguageModal: React.FC = () => {
               <div>
                 <span className="text-[10px] text-white/80 font-mono block">home.tab.DesignPreview.desc:</span>
                 <p className="text-xs text-white leading-snug">
-                  {t('home.tab.DesignPreview.desc', 'Bạn đang được trải nghiệm hệ thống giao diện mới của Vplay...')}
+                  {t('home.tab.DesignPreview.desc', 'Bạn đang được trải nghiệm hệ thống giao diện mới của VNRT Online...')}
                 </p>
               </div>
             </div>
@@ -405,7 +405,7 @@ export const DebugLanguageModal: React.FC = () => {
               className="bg-[#7b2cbf] hover:bg-[#8f39df] text-white font-black text-xs uppercase border-2 border-[#141414] py-2 px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_0_#141414] active:translate-y-[1px] btn-press-effect cursor-pointer flex items-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
-              TẢI VPLAY.LANG
+              TẢI VNRT ONLINE.LANG
             </button>
 
             <button

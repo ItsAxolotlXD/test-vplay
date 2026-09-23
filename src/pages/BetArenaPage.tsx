@@ -177,7 +177,7 @@ export const BetArenaPage: React.FC<BetArenaPageProps> = ({ navigate }) => {
             Sàn Cược <span className="text-yellow-400">Orbs</span> VIP & Đấu Trường Minigame
           </h1>
           <p className="text-xs sm:text-sm text-[#9CA3AF] mt-1">
-            Đấu trí cá cược khoáng vật <span className="text-yellow-400 font-bold">Orbs</span> thời gian thực cùng cộng đồng Vplay! 4 sảnh cược Provably Fair: Bầu Cua Tôm Cá, Lật Xu 3D, Bài Cào 3 Cây và Xúc Xắc Tài Xỉu.
+            Đấu trí cá cược khoáng vật <span className="text-yellow-400 font-bold">Orbs</span> thời gian thực cùng cộng đồng VNRT Online! 4 sảnh cược Provably Fair: Bầu Cua Tôm Cá, Lật Xu 3D, Bài Cào 3 Cây và Xúc Xắc Tài Xỉu.
           </p>
         </div>
 
@@ -446,7 +446,7 @@ export const BetArenaPage: React.FC<BetArenaPageProps> = ({ navigate }) => {
             <Users className="w-5 h-5 text-cyan-300" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] text-zinc-400 uppercase font-bold block">Cộng đồng Vplay</span>
+            <span className="text-[10px] text-zinc-400 uppercase font-bold block">Cộng đồng VNRT Online</span>
             <span className="text-xs sm:text-sm font-black text-cyan-300 font-mono truncate">200+ Người Đang Chơi</span>
           </div>
         </div>

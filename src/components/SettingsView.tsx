@@ -107,7 +107,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       qualityOption: '1080p',
       subtitles: true,
       autoPlay: true,
-      searchQuery: 'Vplay Member',
+      searchQuery: 'VNRT Online Member',
       notifications: true,
       preferredCategory: 'all',
       themeMode: 'dark',
@@ -209,7 +209,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           onClick={() => {
             playPopSound();
             if (onOpenFeedback) onOpenFeedback();
-            else alert('Cảm ơn bạn đã đóng góp ý kiến về giao diện Vplay!');
+            else alert('Cảm ơn bạn đã đóng góp ý kiến về giao diện VNRT Online!');
           }}
           className="flex-shrink-0"
         >
@@ -293,7 +293,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* SUBHEADING: TÀI KHOẢN & THÔNG BÁO */}
       {(matchesSearch('Tên người dùng') ||
-        matchesSearch('Sign in with Vplay account') ||
+        matchesSearch('Sign in with VNRT Online account') ||
         matchesSearch('Thông báo sự kiện thể thao trực tiếp') ||
         matchesSearch('TÀI KHOẢN & THÔNG BÁO')) && (
         <div>
@@ -303,15 +303,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </h3>
           </div>
 
-          {/* Sign in with Vplay account */}
-          {matchesSearch('Sign in with Vplay account', 'Experience all the best things of Vplay with an official account.') && (
+          {/* Sign in with VNRT Online account */}
+          {matchesSearch('Sign in with VNRT Online account', 'Experience all the best things of VNRT Online with an official account.') && (
             <div className="px-3 sm:px-4 py-3 hover:bg-[#56595c] transition-colors flex flex-col gap-2.5">
               <div>
                 <div className="font-bold text-xs text-white">
-                  Sign in with Vplay account
+                  Sign in with VNRT Online account
                 </div>
                 <div className="text-[10px] text-gray-200 font-normal">
-                  Experience all the best things of Vplay with an official account.
+                  Experience all the best things of VNRT Online with an official account.
                 </div>
               </div>
               <div className="w-full">
@@ -336,7 +336,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <div>
                 <div className="font-bold text-xs text-white">Tên người dùng (Gamertag / User)</div>
                 <div className="text-[10px] text-gray-200 font-normal">
-                  Tên danh xưng hiển thị trên thiết bị đầu thu Vplay
+                  Tên danh xưng hiển thị trên thiết bị đầu thu VNRT Online
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -375,7 +375,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         matchesSearch('Design components') ||
         matchesSearch('Performance test') ||
         matchesSearch('Debug mode') ||
-        matchesSearch('vplay.lang') ||
+        matchesSearch('vnrt_online.lang') ||
         matchesSearch('Reset settings to default') ||
         matchesSearch('TÙY CHỌN NHÀ PHÁT TRIỂN')) && (
         <div>
@@ -385,17 +385,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </h3>
           </div>
 
-          {/* Item 1: Debug Mode (vplay.lang) */}
-          {(matchesSearch('Debug Mode', 'File language editor vplay.lang') ||
-            matchesSearch('Debug Mode (vplay.lang)') ||
-            matchesSearch('vplay.lang')) && (
+          {/* Item 1: Debug Mode (vnrt_online.lang) */}
+          {(matchesSearch('Debug Mode', 'File language editor vnrt_online.lang') ||
+            matchesSearch('Debug Mode (vnrt_online.lang)') ||
+            matchesSearch('vnrt_online.lang')) && (
             <div className="px-3 sm:px-4 py-3 hover:bg-[#56595c] transition-colors flex flex-col gap-2.5">
               <div>
                 <div className="font-bold text-xs text-white">
-                  Debug Mode (vplay.lang)
+                  Debug Mode (vnrt_online.lang)
                 </div>
                 <div className="text-[10px] text-gray-200 font-normal">
-                  Chỉnh sửa & áp dụng file ngôn ngữ vplay.lang thời gian thực toàn bộ ứng dụng.
+                  Chỉnh sửa & áp dụng file ngôn ngữ vnrt_online.lang thời gian thực toàn bộ ứng dụng.
                 </div>
               </div>
               <div className="w-full">
@@ -560,13 +560,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           )}
 
           {/* Item 6: Ore UI design components */}
-          {(matchesSearch('Ore UI design components', 'Hệ thống ngôn ngữ thiết kế giao diện của Vplay.') ||
+          {(matchesSearch('Ore UI design components', 'Hệ thống ngôn ngữ thiết kế giao diện của VNRT Online.') ||
             matchesSearch('Design components')) && (
             <div className="px-3 sm:px-4 py-3 hover:bg-[#56595c] transition-colors flex flex-col gap-2.5">
               <div>
                 <div className="font-bold text-xs text-white">Ore UI design components</div>
                 <div className="text-[10px] text-gray-200 font-normal">
-                  Hệ thống ngôn ngữ thiết kế giao diện Ore UI của Vplay.
+                  Hệ thống ngôn ngữ thiết kế giao diện Ore UI của VNRT Online.
                 </div>
               </div>
               <div className="w-full">
@@ -642,10 +642,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="bg-[#0e0e0e] border-2 border-[#141414] p-[2px] mb-4">
               <div className="border border-white/90 p-4 sm:p-5 text-white font-sans text-xs sm:text-sm leading-relaxed space-y-3 font-normal">
                 <p>
-                  Tính năng Đăng nhập tài khoản Vplay & Đồng bộ hóa dữ liệu hiện đang trong quá trình phát triển và hoàn thiện.
+                  Tính năng Đăng nhập tài khoản VNRT Online & Đồng bộ hóa dữ liệu hiện đang trong quá trình phát triển và hoàn thiện.
                 </p>
                 <p>
-                  Hãy quay lại trong các bản cập nhật tiếp theo để trải nghiệm đầy đủ các tiện ích tuyệt vời nhất từ Vplay!
+                  Hãy quay lại trong các bản cập nhật tiếp theo để trải nghiệm đầy đủ các tiện ích tuyệt vời nhất từ VNRT Online!
                 </p>
               </div>
             </div>

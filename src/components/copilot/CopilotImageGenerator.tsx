@@ -172,7 +172,7 @@ export const CopilotImageGenerator: React.FC<CopilotImageGeneratorProps> = ({ on
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-black/30 backdrop-blur-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <ImageIcon className="w-3.5 h-3.5 text-pink-300" />
-                Vplay Copilot Vision Studio
+                VNRT Online Copilot Vision Studio
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-pink-500/30 text-[11px] font-semibold">
                 Photorealistic & Neural Art

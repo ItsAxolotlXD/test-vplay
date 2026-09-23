@@ -44,7 +44,7 @@ export interface FileItem {
   size: string; // e.g. "4.2 MB"
   sizeBytes: number;
   dateModified: string;
-  path: string; // e.g. "C:\\Vplay\\Documents"
+  path: string; // e.g. "C:\\VNRT Online\\Documents"
   isCloud?: boolean;
   content?: string; // Text or preview URL
   mimeType?: string;
@@ -58,7 +58,7 @@ const INITIAL_FILES: FileItem[] = [
     size: '4 Items',
     sizeBytes: 0,
     dateModified: '2026-08-05 14:20',
-    path: 'C:\\Vplay\\Playlists',
+    path: 'C:\\VNRT Online\\Playlists',
   },
   {
     id: 'f-2',
@@ -67,7 +67,7 @@ const INITIAL_FILES: FileItem[] = [
     size: '1.2 KB',
     sizeBytes: 1200,
     dateModified: '2026-08-06 09:15',
-    path: 'C:\\Vplay\\Playlists',
+    path: 'C:\\VNRT Online\\Playlists',
     content: 'https://vtv1-live.vtv.vn/manifest.m3u8',
   },
   {
@@ -77,7 +77,7 @@ const INITIAL_FILES: FileItem[] = [
     size: '420 MB',
     sizeBytes: 440401920,
     dateModified: '2026-08-04 18:30',
-    path: 'C:\\Vplay\\Videos',
+    path: 'C:\\VNRT Online\\Videos',
     isCloud: true,
   },
   {
@@ -87,17 +87,17 @@ const INITIAL_FILES: FileItem[] = [
     size: '18 KB',
     sizeBytes: 18432,
     dateModified: '2026-08-06 08:00',
-    path: 'C:\\Vplay\\Documents',
+    path: 'C:\\VNRT Online\\Documents',
     content: 'Danh sách từ vựng CEFR B2 cho kì thi V-Learn:\n1. Sustainable - Bền vững\n2. Optimization - Tối ưu hóa\n3. Systemic - Có hệ thống\n4. Infrastructure - Hạ tầng\n5. Resilience - Khả năng phục hồi',
   },
   {
     id: 'f-5',
-    name: 'Vplay_Banner_Wallpaper_OreUI.png',
+    name: 'VNRT_Online_Banner_Wallpaper_OreUI.png',
     type: 'image',
     size: '2.8 MB',
     sizeBytes: 2936012,
     dateModified: '2026-08-03 11:45',
-    path: 'C:\\Vplay\\Pictures',
+    path: 'C:\\VNRT Online\\Pictures',
     content: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
   },
   {
@@ -107,16 +107,16 @@ const INITIAL_FILES: FileItem[] = [
     size: '8.4 MB',
     sizeBytes: 8808038,
     dateModified: '2026-08-02 20:10',
-    path: 'C:\\Vplay\\Music',
+    path: 'C:\\VNRT Online\\Music',
   },
   {
     id: 'f-7',
-    name: 'vplay_config_settings.json',
+    name: 'vnrt_online_config_settings.json',
     type: 'code',
     size: '3.4 KB',
     sizeBytes: 3481,
     dateModified: '2026-08-06 10:00',
-    path: 'C:\\Vplay\\Documents',
+    path: 'C:\\VNRT Online\\Documents',
     content: '{\n  "version": "2.5.0",\n  "theme": "Ore UI Dark",\n  "playerQuality": "4K",\n  "vbankAccount": "888899996868",\n  "verifiedStatus": "VIP Purple"\n}',
   },
   {
@@ -126,7 +126,7 @@ const INITIAL_FILES: FileItem[] = [
     size: '14.2 MB',
     sizeBytes: 14889779,
     dateModified: '2026-08-01 16:00',
-    path: 'C:\\Vplay\\Backup',
+    path: 'C:\\VNRT Online\\Backup',
     isCloud: true,
   },
 ];
@@ -145,7 +145,7 @@ export const VXploreTab: React.FC = () => {
   });
 
   const [recycleBin, setRecycleBin] = useState<FileItem[]>([]);
-  const [currentPath, setCurrentPath] = useState<string>('C:\\Vplay');
+  const [currentPath, setCurrentPath] = useState<string>('C:\\VNRT Online');
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -325,7 +325,7 @@ export const VXploreTab: React.FC = () => {
               </h1>
             </div>
             <p className="text-xs text-[#9CA3AF] mt-0.5">
-              Quản lý tệp tin, sao lưu danh sách phát M3U8 & dữ liệu đám mây Vplay
+              Quản lý tệp tin, sao lưu danh sách phát M3U8 & dữ liệu đám mây VNRT Online
             </p>
           </div>
         </div>
@@ -433,14 +433,14 @@ export const VXploreTab: React.FC = () => {
       <div className="bg-[#1F1E24] rounded-2xl border border-[#2D2D38] p-2.5 flex flex-col sm:flex-row items-center gap-2">
         <div className="flex items-center gap-1 shrink-0">
           <button
-            onClick={() => setCurrentPath('C:\\Vplay')}
+            onClick={() => setCurrentPath('C:\\VNRT Online')}
             className="p-1.5 rounded-xl bg-[#18171E] border border-[#2D2D38] text-zinc-300 hover:text-white transition-all cursor-pointer"
-            title="Trở về thư mục gốc C:\\Vplay"
+            title="Trở về thư mục gốc C:\\VNRT Online"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setCurrentPath('C:\\Vplay')}
+            onClick={() => setCurrentPath('C:\\VNRT Online')}
             className="p-1.5 rounded-xl bg-[#18171E] border border-[#2D2D38] text-zinc-300 hover:text-white transition-all cursor-pointer"
             title="Lên 1 cấp thư mục"
           >

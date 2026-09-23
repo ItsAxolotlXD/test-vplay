@@ -180,7 +180,7 @@ export const MusicTab: React.FC<MusicTabProps> = ({ navigate }) => {
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E6005A]/20 border border-[#E6005A]/30 text-[#FF4C93] text-xs font-bold tracking-wider uppercase">
               <Music className="w-3.5 h-3.5" />
-              <span>Vplay Music • Kho Nhạc Truyền Hình</span>
+              <span>VNRT Online Music • Kho Nhạc Truyền Hình</span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">

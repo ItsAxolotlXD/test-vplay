@@ -760,7 +760,7 @@ export default function App() {
             style={{ fontFamily: "'Inter', 'Integer', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
           >
             <p className="text-[11px] sm:text-xs font-medium tracking-tight text-zinc-300/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
-              Vplay v26.10_devb (26A3667c) - Pre-release build product
+              VNRT Online v26.10_devb (26A3667c) - Pre-release build product
             </p>
             <p className="text-[10px] sm:text-[11px] font-normal text-zinc-400/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
               Anything you've seen here are not finished and may change in future builds

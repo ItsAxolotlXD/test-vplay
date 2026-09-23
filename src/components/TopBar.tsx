@@ -60,40 +60,30 @@ interface TopBarProps {
   onOpenCopilotWindow?: () => void;
 }
 
-// Official Vplay Logo component with fallback (compact size)
+// Official VNRT Online Logo component (compact size)
 const VplayLogo: React.FC<{ onClick?: () => void; isActive?: boolean }> = ({ onClick, isActive = false }) => {
-  const [imgError, setImgError] = useState(false);
-
   return (
     <button
       id="topbar-vplay-logo"
       onClick={onClick}
-      className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 group cursor-pointer focus:outline-none shrink-0 transition-all ${
+      className={`px-3 py-1.5 rounded-full flex items-center gap-2 group cursor-pointer focus:outline-none shrink-0 transition-all ${
         isActive 
           ? 'text-white bg-white/15 font-bold shadow-sm' 
           : 'text-white/90 hover:text-white hover:bg-white/10'
       }`}
-      title="Vplay - Về trang chủ"
+      title="VNRT Online - Về trang chủ"
     >
-      {!imgError ? (
-        <img
-          src="https://static.wikia.nocookie.net/ep-deo/images/f/f8/Vpla.png/revision/latest/scale-to-width-down/1000?cb=20260829062528"
-          alt="Vplay"
-          referrerPolicy="no-referrer"
-          className="h-6 md:h-7 w-auto max-w-[105px] object-contain transition-transform group-hover:scale-105 filter drop-shadow"
-          style={{ imageRendering: '-webkit-optimize-contrast' }}
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        <div className="flex items-center gap-1 font-bold tracking-tight text-white select-none">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-[#FF2020] to-[#E6005A] flex items-center justify-center shadow-md">
-            <span className="text-white text-xs font-black">V</span>
-          </div>
-          <span className="text-base font-black bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent">
-            play
-          </span>
-        </div>
-      )}
+      <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#E6005A] via-[#FF2020] to-[#FF8C00] flex items-center justify-center shadow-md shadow-red-600/30 border border-white/20 shrink-0 group-hover:scale-105 transition-transform">
+        <Tv className="w-4 h-4 text-white drop-shadow-sm" />
+      </div>
+      <div className="flex items-center tracking-tight font-black select-none text-left">
+        <span className="text-base sm:text-lg font-black text-white group-hover:text-white transition-colors">
+          VNRT
+        </span>
+        <span className="text-base sm:text-lg font-black text-[#388BFD] ml-1">
+          Online
+        </span>
+      </div>
     </button>
   );
 };
@@ -288,7 +278,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* 1. Official Vplay Logo */}
+            {/* 1. Official VNRT Online Logo */}
             <VplayLogo 
               onClick={() => navigate('/')} 
               isActive={currentRoute === '/' || currentRoute === '' || currentRoute === '/home'} 
@@ -309,7 +299,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     ? 'bg-white text-black font-bold shadow-md'
                     : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
                 }`}
-                title="Truyền hình Vplay"
+                title="Truyền hình VNRT Online"
               >
                 <Tv className={`w-5 h-5 shrink-0 transition-transform ${
                   isLiveTVActive ? 'text-black' : 'text-white/90 group-hover:scale-105'
@@ -391,7 +381,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     >
                       <div className="space-y-1 py-0.5 pr-1">
                         
-                        {/* 1. Copilot for Vplay */}
+                        {/* 1. Copilot for VNRT Online */}
                         <button
                           id="more-item-copilot"
                           onClick={() => {
@@ -407,7 +397,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                             referrerPolicy="no-referrer"
                             className="w-5 h-5 object-contain group-hover:scale-110 transition-transform shrink-0"
                           />
-                          <span className="font-semibold">Copilot for Vplay</span>
+                          <span className="font-semibold">Copilot for VNRT Online</span>
                         </button>
 
                         {/* 2. Cổng nội dung */}
@@ -781,7 +771,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 id="btn-topbar-user-profile"
                 onClick={() => setUserProfileOpen(!userProfileOpen)}
                 className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#23242E] flex items-center justify-center text-white/90 hover:text-white hover:bg-white/15 transition-all cursor-pointer shadow-sm"
-                title="Tài khoản Vplay"
+                title="Tài khoản VNRT Online"
                 aria-label="Tài khoản cá nhân"
               >
                 <User className="w-5 h-5" />
@@ -798,7 +788,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       V
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold">Vplay Member</h4>
+                      <h4 className="text-sm font-bold">VNRT Online Member</h4>
                       <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                         Gói Miễn Phí (Standard)
@@ -816,7 +806,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     >
                       <span className="flex items-center gap-2 font-bold text-orange-300">
                         <Award className="w-4 h-4 text-amber-400" />
-                        Nâng cấp Vplay VIP
+                        Nâng cấp VNRT Online VIP
                       </span>
                       <ChevronRight className="w-4 h-4 text-orange-300" />
                     </button>
@@ -890,7 +880,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <Ticket className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold">Mã kích hoạt Vplay</h3>
+                  <h3 className="text-lg font-bold">Mã kích hoạt VNRT Online</h3>
                   <p className="text-xs text-gray-400">Nhập mã ưu đãi, voucher đối tác hoặc gói cước VIP</p>
                 </div>
               </div>
@@ -904,7 +894,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     type="text"
                     value={activationCode}
                     onChange={(e) => setActivationCode(e.target.value.toUpperCase())}
-                    placeholder="VD: VPLAYVIP, SPORT2026..."
+                    placeholder="VD: VNRTVIP, SPORT2026..."
                     className="w-full px-4 py-3 bg-[#10111A] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-red-500 uppercase tracking-widest font-mono font-bold"
                   />
                 </div>
@@ -914,10 +904,10 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <span className="text-[11px] text-gray-400">Mã mẫu:</span>
                   <button
                     type="button"
-                    onClick={() => setActivationCode('VPLAYVIP')}
+                    onClick={() => setActivationCode('VNRTVIP')}
                     className="text-xs font-mono bg-white/5 hover:bg-white/10 px-2 py-1 rounded border border-white/10 text-amber-400"
                   >
-                    VPLAYVIP
+                    VNRTVIP
                   </button>
                   <button
                     type="button"
@@ -1152,17 +1142,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold">Vplay Shop - Quà tặng & Kỷ niệm</h3>
-                  <p className="text-xs text-gray-400">Sản phẩm độc quyền kỷ niệm truyền hình & Vplay</p>
+                  <h3 className="text-xl font-bold">VNRT Online Shop - Quà tặng & Kỷ niệm</h3>
+                  <p className="text-xs text-gray-400">Sản phẩm độc quyền kỷ niệm truyền hình & VNRT Online</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { name: 'Áo thun thể thao Vplay 2026', price: '250.000đ', badge: 'Bán chạy', color: 'from-red-600 to-rose-600' },
-                  { name: 'Bình giữ nhiệt Vplay Sport 800ml', price: '190.000đ', badge: 'Hot', color: 'from-blue-600 to-cyan-600' },
-                  { name: 'Nón bảo hiểm Vplay Carbon', price: '320.000đ', badge: 'Chính hãng', color: 'from-amber-600 to-orange-600' },
-                  { name: 'Gấu bông biểu tượng Ong Vplay', price: '150.000đ', badge: 'Quà tặng', color: 'from-purple-600 to-pink-600' }
+                  { name: 'Áo thun thể thao VNRT Online 2026', price: '250.000đ', badge: 'Bán chạy', color: 'from-red-600 to-rose-600' },
+                  { name: 'Bình giữ nhiệt VNRT Online Sport 800ml', price: '190.000đ', badge: 'Hot', color: 'from-blue-600 to-cyan-600' },
+                  { name: 'Nón bảo hiểm VNRT Online Carbon', price: '320.000đ', badge: 'Chính hãng', color: 'from-amber-600 to-orange-600' },
+                  { name: 'Gấu bông biểu tượng Ong VNRT Online', price: '150.000đ', badge: 'Quà tặng', color: 'from-purple-600 to-pink-600' }
                 ].map((prod, i) => (
                   <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
                     <div>
@@ -1208,7 +1198,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold">Vplay Loyalty Club</h3>
+                  <h3 className="text-lg font-bold">VNRT Online Loyalty Club</h3>
                   <p className="text-xs text-gray-400">Tích điểm xem truyền hình, đổi voucher hấp dẫn</p>
                 </div>
               </div>
@@ -1228,7 +1218,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <div className="flex items-center gap-2.5">
                     <Gift className="w-4 h-4 text-red-400" />
                     <div>
-                      <p className="text-xs font-bold">Đổi 1 tháng VIP Vplay</p>
+                      <p className="text-xs font-bold">Đổi 1 tháng VIP VNRT Online</p>
                       <p className="text-[10px] text-gray-400">Cần 1.000 V-Points</p>
                     </div>
                   </div>
@@ -1241,7 +1231,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <div className="flex items-center gap-2.5">
                     <ShoppingBag className="w-4 h-4 text-purple-400" />
                     <div>
-                      <p className="text-xs font-bold">Voucher Vplay Shop 50K</p>
+                      <p className="text-xs font-bold">Voucher VNRT Online Shop 50K</p>
                       <p className="text-[10px] text-gray-400">Cần 500 V-Points</p>
                     </div>
                   </div>
@@ -1281,15 +1271,15 @@ export const TopBar: React.FC<TopBarProps> = ({
 
               <div className="text-center mb-6">
                 <span className="text-xs font-bold uppercase tracking-widest text-red-400">Gói cước truyền hình</span>
-                <h3 className="text-2xl font-black mt-1">Đăng ký Gói Vplay Plus & Thể Thao</h3>
-                <p className="text-xs text-gray-400 mt-1">Không quảng cáo, chất lượng Full HD 4K, trọn vẹn bóng đá & kho phim Vplay</p>
+                <h3 className="text-2xl font-black mt-1">Đăng ký Gói VNRT Online Plus & Thể Thao</h3>
+                <p className="text-xs text-gray-400 mt-1">Không quảng cáo, chất lượng Full HD 4K, trọn vẹn bóng đá & kho phim VNRT Online</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 {/* Package 1 */}
                 <div className="p-5 rounded-2xl bg-white/5 border border-white/10 relative flex flex-col justify-between">
                   <div>
-                    <h4 className="font-bold text-lg">Gói Vplay Plus</h4>
+                    <h4 className="font-bold text-lg">Gói VNRT Online Plus</h4>
                     <p className="text-xs text-gray-400 mt-0.5">Xem truyền hình không quảng cáo gián đoạn</p>
                     <div className="mt-3">
                       <span className="text-2xl font-black text-white">49.000đ</span>

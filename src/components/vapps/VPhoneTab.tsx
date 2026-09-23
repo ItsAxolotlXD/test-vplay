@@ -172,7 +172,7 @@ export interface CallRecord {
 }
 
 const DEFAULT_CONTACTS: Contact[] = [
-  { id: 'c1', name: 'Tổng đài CSKH Vplay 360', phone: '1900 6868', category: 'V-Play', avatarBg: 'from-pink-500 to-rose-600', isFavorite: true },
+  { id: 'c1', name: 'Tổng đài CSKH VNRT Online 360', phone: '1900 6868', category: 'V-Play', avatarBg: 'from-pink-500 to-rose-600', isFavorite: true },
   { id: 'c2', name: 'Cảnh Sát Phản Ứng Nhanh', phone: '113', category: 'Khẩn cấp', avatarBg: 'from-red-600 to-red-800', isFavorite: true },
   { id: 'c3', name: 'Cứu Hỏa & Cứu Nạn', phone: '114', category: 'Khẩn cấp', avatarBg: 'from-amber-600 to-orange-700', isFavorite: true },
   { id: 'c4', name: 'Cấp Cứu Y Tế 115', phone: '115', category: 'Khẩn cấp', avatarBg: 'from-emerald-600 to-teal-800', isFavorite: true },
@@ -183,7 +183,7 @@ const DEFAULT_CONTACTS: Contact[] = [
 ];
 
 const DEFAULT_CALLS: CallRecord[] = [
-  { id: 'rec-1', name: 'Tổng đài CSKH Vplay 360', phone: '1900 6868', type: 'outgoing', time: 'Hôm nay, 10:15', duration: '02:45' },
+  { id: 'rec-1', name: 'Tổng đài CSKH VNRT Online 360', phone: '1900 6868', type: 'outgoing', time: 'Hôm nay, 10:15', duration: '02:45' },
   { id: 'rec-2', name: 'Nguyễn Văn Minh', phone: '0988 123 456', type: 'incoming', time: 'Hôm qua, 18:30', duration: '05:12' },
   { id: 'rec-3', name: '0903 888 999', phone: '0903 888 999', type: 'missed', time: '08/09/2026', duration: '00:00' },
   { id: 'rec-4', name: 'Đài Truyền Hình Việt Nam', phone: '024 3835 5931', type: 'outgoing', time: '07/09/2026', duration: '01:10' },
@@ -598,7 +598,7 @@ export const VPhoneTab: React.FC = () => {
                   <Voicemail className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">Hộp Thư Thoại & Tín Hiệu Vplay</h4>
+                  <h4 className="text-sm font-bold text-white">Hộp Thư Thoại & Tín Hiệu VNRT Online</h4>
                   <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                     Hệ thống thoại hỗ trợ chuẩn âm thanh DTMF tần số kép. Bạn có thể lưu thêm danh bạ các biên tập viên, nhà đài hoặc sử dụng số khẩn cấp trên toàn lãnh thổ Việt Nam.
                   </p>

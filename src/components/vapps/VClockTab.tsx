@@ -277,7 +277,7 @@ export const VClockTab: React.FC = () => {
         isCustom: false
       };
     }
-    return { id: 'chime', name: 'Giai Điệu Vplay', isVideo: false, badge: 'Mặc định', isCustom: false };
+    return { id: 'chime', name: 'Giai Điệu VNRT Online', isVideo: false, badge: 'Mặc định', isCustom: false };
   };
 
   // ---------- STOPWATCH STATE ----------

@@ -39,7 +39,7 @@ export const FeatureVoteModal: React.FC<FeatureVoteModalProps> = ({ isOpen, onCl
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider font-jura drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                Vote for a Vplay Features
+                Vote for a VNRT Online Features
               </h2>
             </div>
           </div>

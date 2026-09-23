@@ -158,7 +158,7 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
     // Trang 1: Trang chủ, Copilot, Settings, Search
     [
       { id: 'floaty-home', title: 'Trang chủ', route: '/', icon: Home },
-      { id: 'floaty-copilot', title: 'Vplay Copilot', route: '/copilot', customIcon: CopilotCustomIcon },
+      { id: 'floaty-copilot', title: 'VNRT Online Copilot', route: '/copilot', customIcon: CopilotCustomIcon },
       { id: 'floaty-settings', title: 'Cài đặt', route: '/settings', icon: SettingsIcon },
       { id: 'floaty-search', title: 'Tìm kiếm', action: onOpenSearch, icon: Search },
     ],
@@ -174,7 +174,7 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
       { id: 'floaty-friends', title: 'Danh sách bạn bè', route: '/friends', icon: Users },
       { id: 'floaty-vflow', title: 'Mạng xã hội V-Flow', route: '/v-flow', icon: Radio },
       { id: 'floaty-chat', title: 'Phòng Chat V-Chat', route: '/chat', icon: MessageSquare },
-      { id: 'floaty-vertical', title: 'Vplay Vertical', route: '/vertical', icon: Smartphone },
+      { id: 'floaty-vertical', title: 'VNRT Online Vertical', route: '/vertical', icon: Smartphone },
     ],
     // Trang 4: Shop Mua sắm
     [
@@ -263,7 +263,7 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
         className="text-center pointer-events-none select-none px-2 space-y-0.5"
       >
         <p className="text-[11px] sm:text-xs font-medium tracking-tight text-zinc-400/90 dark:text-zinc-400/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight">
-          Vplay v26.10_devb (26A3667c) - Pre-release build product
+          VNRT Online v26.10_devb (26A3667c) - Pre-release build product
         </p>
         <p className="text-[10px] sm:text-[11px] font-normal text-zinc-400/75 dark:text-zinc-400/75 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight">
           Anything you've seen here are not finished and may change in future builds

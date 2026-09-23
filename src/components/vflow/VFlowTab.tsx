@@ -113,12 +113,12 @@ const INITIAL_STORIES: VFlowStory[] = [
   },
   {
     id: 's-vplay',
-    authorName: 'Vplay Studio',
+    authorName: 'VNRT Online Studio',
     authorAvatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&auto=format&fit=crop&q=80',
     isVerified: true,
     hasUnread: true,
     storyImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80',
-    caption: 'Chính thức ra mắt mạng xã hội V-Flow kết nối cộng đồng Vplay!',
+    caption: 'Chính thức ra mắt mạng xã hội V-Flow kết nối cộng đồng VNRT Online!',
     time: '45 phút trước'
   },
   {
@@ -163,8 +163,8 @@ const INITIAL_POSTS: VFlowPost[] = [
     isVerified: true,
     timestamp: '15 phút trước',
     createdAt: Date.now() - 15 * 60 * 1000,
-    content: '🔥 Trực tiếp VIETNAM TODAY & Tiêu điểm công nghệ số quốc gia. Toàn cảnh sự chuyển mình mạnh mẽ của truyền thông số và nền tảng xem truyền hình thế hệ mới trên Vplay.',
-    hashtags: ['#VTV1', '#VietnamToday', '#ChuyenDoiSo', '#Vplay'],
+    content: '🔥 Trực tiếp VIETNAM TODAY & Tiêu điểm công nghệ số quốc gia. Toàn cảnh sự chuyển mình mạnh mẽ của truyền thông số và nền tảng xem truyền hình thế hệ mới trên VNRT Online.',
+    hashtags: ['#VTV1', '#VietnamToday', '#ChuyenDoiSo', '#VNRT Online'],
     imageUrl: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1000&auto=format&fit=crop&q=80',
     feeling: 'đang phát trực tiếp 📺',
     channelAttachment: {
@@ -188,22 +188,22 @@ const INITIAL_POSTS: VFlowPost[] = [
         id: 'c-2',
         authorName: 'Thu Hà',
         authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-        text: 'Theo dõi thời sự trên Vplay tiện lợi thật sự.',
+        text: 'Theo dõi thời sự trên VNRT Online tiện lợi thật sự.',
         time: '5 phút trước'
       }
     ]
   },
   {
     id: 'post-2',
-    authorName: 'Vplay Studio & Community',
-    authorHandle: 'vplay_community',
+    authorName: 'VNRT Online Studio & Community',
+    authorHandle: 'vnrt_community',
     authorAvatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&auto=format&fit=crop&q=80',
     authorBadge: 'Nhà Phát Triển',
     isVerified: true,
     timestamp: '42 phút trước',
     createdAt: Date.now() - 42 * 60 * 1000,
-    content: '🎉 Chào mừng toàn bộ cư dân đến với V-Flow — Mạng xã hội chuyên biệt cho fan truyền hình, game thủ V-Arcade và người dùng Vplay! Mời cả nhà bình chọn tính năng bạn đang hào hứng trải nghiệm nhất:',
-    hashtags: ['#VFlow', '#NewFeature', '#Vplay', '#Community'],
+    content: '🎉 Chào mừng toàn bộ cư dân đến với V-Flow — Mạng xã hội chuyên biệt cho fan truyền hình, game thủ V-Arcade và người dùng VNRT Online! Mời cả nhà bình chọn tính năng bạn đang hào hứng trải nghiệm nhất:',
+    hashtags: ['#VFlow', '#NewFeature', '#VNRT Online', '#Community'],
     poll: {
       question: 'Bạn thích trải nghiệm nào nhất trong bản cập nhật hôm nay?',
       options: [
@@ -262,7 +262,7 @@ const INITIAL_POSTS: VFlowPost[] = [
     isVerified: true,
     timestamp: '2 giờ trước',
     createdAt: Date.now() - 120 * 60 * 1000,
-    content: 'Cuối tuần này cùng đón xem chương trình âm nhạc và gameshow đặc biệt quy tụ dàn nghệ sĩ được yêu thích nhất. Bật VTV3 HD trên Vplay để theo dõi trực tiếp với âm thanh sống động!',
+    content: 'Cuối tuần này cùng đón xem chương trình âm nhạc và gameshow đặc biệt quy tụ dàn nghệ sĩ được yêu thích nhất. Bật VTV3 HD trên VNRT Online để theo dõi trực tiếp với âm thanh sống động!',
     hashtags: ['#VTV3', '#GiaiTriCuoiTuan', '#LiveShow', '#AmNhac'],
     channelAttachment: {
       id: 'vtv3',
@@ -314,7 +314,7 @@ const SUGGESTED_CREATORS = [
 ];
 
 const PRESET_IMAGE_OPTIONS = [
-  { label: 'Studio Vplay', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1000&auto=format&fit=crop&q=80' },
+  { label: 'Studio VNRT Online', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1000&auto=format&fit=crop&q=80' },
   { label: 'Tin tức & Thời sự', url: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1000&auto=format&fit=crop&q=80' },
   { label: 'Gaming & Minecraft', url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1000&auto=format&fit=crop&q=80' },
   { label: 'Việt Nam Đẹp', url: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1000&auto=format&fit=crop&q=80' },
@@ -467,7 +467,7 @@ export const VFlowTab: React.FC<VFlowTabProps> = ({
       authorName: settings.userName || 'User',
       authorHandle: (settings.userName || 'user').toLowerCase().replace(/\s+/g, '_'),
       authorAvatar: 'https://mc-heads.net/avatar/Steve/64',
-      authorBadge: 'Cư Dân Vplay',
+      authorBadge: 'Cư Dân VNRT Online',
       isVerified: false,
       timestamp: 'Vừa xong',
       createdAt: Date.now(),
@@ -717,7 +717,7 @@ export const VFlowTab: React.FC<VFlowTabProps> = ({
                 </h1>
               </div>
               <p className="text-xs text-[#9CA3AF] mt-0.5">
-                Dòng chảy tin tức, khoảnh khắc & thảo luận truyền hình Vplay
+                Dòng chảy tin tức, khoảnh khắc & thảo luận truyền hình VNRT Online
               </p>
             </div>
           </div>
@@ -909,7 +909,7 @@ export const VFlowTab: React.FC<VFlowTabProps> = ({
                       <button
                         onClick={() => setShowChannelPicker(!showChannelPicker)}
                         className="p-2 rounded-xl text-zinc-400 hover:text-cyan-400 hover:bg-white/5 transition-colors cursor-pointer"
-                        title="Đính kèm kênh truyền hình Vplay"
+                        title="Đính kèm kênh truyền hình VNRT Online"
                       >
                         <Tv className="w-4.5 h-4.5" />
                       </button>
@@ -1605,7 +1605,7 @@ export const VFlowTab: React.FC<VFlowTabProps> = ({
                 Nơi thảo luận trực tiếp các chương trình truyền hình Việt Nam, giải đấu minigame V-Arcade và kết nối bạn bè mọi miền đất nước.
               </p>
               <div className="pt-1 flex items-center gap-3 text-zinc-500">
-                <span>© 2026 Vplay Waves</span>
+                <span>© 2026 VNRT Online Waves</span>
                 <span>•</span>
                 <span>Quy tắc cộng đồng</span>
               </div>

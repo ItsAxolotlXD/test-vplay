@@ -290,7 +290,7 @@ export const ChatRoomView: React.FC = () => {
     let replyContent = '';
 
     if (cmd === '/copilot') {
-      replyContent = `🤖 **Copilot AI trả lời:** "${arg || 'Tôi luôn sẵn sàng hỗ trợ bạn trên nền tảng Vplay!'}"\n*Gợi ý:* Bạn có thể vào tab Copilot hoặc xem trực tiếp các kênh TV chuẩn HD.`;
+      replyContent = `🤖 **Copilot AI trả lời:** "${arg || 'Tôi luôn sẵn sàng hỗ trợ bạn trên nền tảng VNRT Online!'}"\n*Gợi ý:* Bạn có thể vào tab Copilot hoặc xem trực tiếp các kênh TV chuẩn HD.`;
     } else if (cmd === '/roll') {
       const luckyNum = Math.floor(Math.random() * 100) + 1;
       replyContent = `🎲 **Kết quả tung xúc xắc:** Bạn đã tung được con số may mắn **${luckyNum}/100**!`;
@@ -316,7 +316,7 @@ export const ChatRoomView: React.FC = () => {
         id: 'mem_bot_copilot',
         name: 'Copilot AI Bot',
         tag: '#BOT',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vplay-bot&backgroundColor=1e1b24',
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vnrt-bot&backgroundColor=1e1b24',
         role: 'bot',
         roleColor: '#06B6D4',
         roleName: 'BOT HỖ TRỢ'
@@ -334,7 +334,7 @@ export const ChatRoomView: React.FC = () => {
 
   const simulateBotResponse = (userQuestion: string) => {
     const answers = [
-      `Chào bạn! Rất vui được trò chuyện trong phòng chat Vplay Discord. Bạn cần hỗ trợ kênh nào không?`,
+      `Chào bạn! Rất vui được trò chuyện trong phòng chat VNRT Online Discord. Bạn cần hỗ trợ kênh nào không?`,
       `Tôi đã nhận được tin nhắn của bạn. Kênh thoại hiện đang có các phòng live watch party rất sôi nổi!`,
       `Bạn có thể tham gia vào kênh thoại bên trái để cùng xem phim và thể thao trực tiếp nhé!`
     ];
@@ -347,7 +347,7 @@ export const ChatRoomView: React.FC = () => {
         id: 'mem_bot_copilot',
         name: 'Copilot AI Bot',
         tag: '#BOT',
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vplay-bot&backgroundColor=1e1b24',
+        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=vnrt-bot&backgroundColor=1e1b24',
         role: 'bot',
         roleColor: '#06B6D4',
         roleName: 'BOT HỖ TRỢ'
@@ -1037,7 +1037,7 @@ export const ChatRoomView: React.FC = () => {
                 roleName: CURRENT_USER.badge || 'Bạn (Thành Viên)',
                 roleColor: '#F59E0B',
                 status: 'online',
-                activity: CURRENT_USER.activity || 'Đang ở phòng chat Vplay',
+                activity: CURRENT_USER.activity || 'Đang ở phòng chat VNRT Online',
                 customStatus: CURRENT_USER.bio
               })}
               className="flex items-center gap-2.5 p-2 rounded-xl bg-white/5 transition-colors cursor-pointer group"

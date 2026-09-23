@@ -36,6 +36,21 @@ export const Home: React.FC<HomeProps> = ({
 
   return (
     <div className="space-y-6 sm:space-y-8 pb-16">
+      {/* 0. Yellow Announcement Banner (Thông báo chuyển đổi Vplay sang VNRT Online) */}
+      <div 
+        id="home-announcement-banner"
+        className="w-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300 text-zinc-950 px-4 py-3 shadow-lg shadow-amber-500/10 border-b border-amber-500/40 flex items-center justify-center gap-2.5 sm:gap-3 text-center select-none"
+      >
+        <div className="flex items-center justify-center gap-2 max-w-5xl mx-auto">
+          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-black/15 text-zinc-950 shrink-0 shadow-inner">
+            <Megaphone className="w-3.5 h-3.5 fill-current" />
+          </span>
+          <p className="text-xs sm:text-sm font-black tracking-tight text-zinc-950 leading-snug">
+            The next chapters are here. Vplay is becoming VNRT Online starting October 16, 2026.
+          </p>
+        </div>
+      </div>
+
       {/* Spotlight Search across the entire app when querying in Home tab */}
       {searchQuery.trim() ? (
         <HomeSpotlightSearch
@@ -53,13 +68,13 @@ export const Home: React.FC<HomeProps> = ({
         onSelectChannel={onSelectChannel}
       />
 
-      {/* Aesthetic Headline: Introducing Spatial Glass (Balanced size, glow, pink-white gradient) */}
+      {/* Aesthetic Headline: Introducing Spatial Glass (Cam vàng - Đỏ magenta gradient) */}
       <div id="home-welcome-tagline" className="w-full flex flex-col items-center justify-center my-6 sm:my-8 px-4 text-center select-none">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight font-['Integer','Inter',sans-serif] leading-tight flex flex-wrap items-center justify-center gap-x-3 gap-y-1 drop-shadow-[0_0_24px_rgba(244,114,182,0.4)]">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight font-['Integer','Inter',sans-serif] leading-tight flex flex-wrap items-center justify-center gap-x-3 gap-y-1 drop-shadow-[0_0_24px_rgba(249,115,22,0.45)]">
           <span className="text-white drop-shadow-[0_0_16px_rgba(255,255,255,0.4)]">
             Introducing
           </span>
-          <span className="bg-gradient-to-r from-pink-400 via-rose-300 to-white bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(244,114,182,0.6)]">
+          <span className="bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(249,115,22,0.65)]">
             Spatial Glass
           </span>
         </h2>
@@ -74,7 +89,7 @@ export const Home: React.FC<HomeProps> = ({
           title="Đề xuất cho bạn"
         />
 
-        {/* 3. Vplay Apps (Grid 4 apps/dòng phong cách visionOS / iOS) */}
+        {/* 3. VNRT Online Apps (Grid 4 apps/dòng phong cách visionOS / iOS) */}
         <VplayAppsHomeGrid navigate={navigate} />
 
         {/* 4. Chuyên trang banner tròn - Dạng scroll ngang giống các ô kênh, bỏ nền */}
@@ -109,7 +124,7 @@ export const Home: React.FC<HomeProps> = ({
           />
         </section>
 
-        {/* 4. Copilot is coming to Vplay - Featured Banner Thumbnail */}
+        {/* 4. Copilot is coming to VNRT Online - Featured Banner Thumbnail */}
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-[#1A1A20] via-[#241C2B] to-[#1A1A20] border border-[#3E344A] p-6 sm:p-8 shadow-xl">
           <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-gradient-to-br from-[#E6005A]/20 to-[#A800FF]/15 blur-3xl pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 sm:gap-8 justify-between">
@@ -117,7 +132,7 @@ export const Home: React.FC<HomeProps> = ({
             <div className="relative w-full md:w-[320px] lg:w-[380px] h-[190px] sm:h-[220px] rounded-[20px] overflow-hidden shrink-0 border border-white/10 shadow-lg group">
               <img
                 src="https://news.microsoft.com/source/emea/wp-content/uploads/2025/01/copilot-masthead.png"
-                alt="Copilot is coming to Vplay"
+                alt="Copilot is coming to VNRT Online"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -146,11 +161,11 @@ export const Home: React.FC<HomeProps> = ({
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Copilot is coming to Vplay
+                Copilot is coming to VNRT Online
               </h2>
 
               <p className="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-2xl font-normal">
-                Microsoft is collaborating with Vplay to bring Copilot - an everyday AI companion to your Vplay!
+                Microsoft is collaborating with VNRT Online to bring Copilot - an everyday AI companion to your VNRT Online!
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">

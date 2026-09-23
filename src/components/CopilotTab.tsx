@@ -481,7 +481,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
           <div
             onClick={() => setSpinCount((prev) => prev + 1)}
             className="relative cursor-pointer group shrink-0"
-            title="Nhấn để xoay biểu tượng Copilot for Vplay"
+            title="Nhấn để xoay biểu tượng Copilot for VNRT Online"
           >
             <motion.img
               animate={{ rotate: spinCount * 360 }}
@@ -493,7 +493,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
               }}
               className="w-9 h-9 sm:w-11 sm:h-11 object-contain filter drop-shadow-[0_0_12px_rgba(99,102,241,0.6)] group-hover:scale-110 transition-transform"
               referrerPolicy="no-referrer"
-              alt="Copilot for Vplay"
+              alt="Copilot for VNRT Online"
             />
             {isVIntelLoading && (
               <span className="absolute -inset-1 border-2 border-red-500 animate-ping opacity-75 rounded-full" />
@@ -502,7 +502,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
 
           <div>
             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white font-montserrat">
-              Copilot for Vplay
+              Copilot for VNRT Online
             </h1>
           </div>
         </div>
@@ -767,7 +767,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
               <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
                 <span className="w-2 h-2 rounded-full bg-[#E50914] animate-pulse" />
                 <span>
-                  Copilot for Vplay đang hoạt động dưới dạng <strong>cửa sổ nổi</strong>.
+                  Copilot for VNRT Online đang hoạt động dưới dạng <strong>cửa sổ nổi</strong>.
                 </span>
               </div>
               <button
@@ -873,15 +873,15 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                     }}
                     className="w-10 h-10 object-contain"
                     referrerPolicy="no-referrer"
-                    alt="Copilot for Vplay"
+                    alt="Copilot for VNRT Online"
                   />
                 </div>
 
                 <h2 className="text-xl font-bold font-montserrat text-slate-900 dark:text-white mb-2">
-                  Xin chào! Mình là Copilot for Vplay
+                  Xin chào! Mình là Copilot for VNRT Online
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mb-4 font-sans">
-                  Hãy xưng 'mình' - 'bạn' cùng Copilot for Vplay! Bạn có thể sử dụng lệnh{" "}
+                  Hãy xưng 'mình' - 'bạn' cùng Copilot for VNRT Online! Bạn có thể sử dụng lệnh{" "}
                   <code className="text-[#E50914] font-bold">/search &lt;từ khóa&gt; filter &lt;loại&gt;</code> để tra
                   cứu hoặc trò chuyện trực tiếp.
                 </p>
@@ -964,7 +964,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                         ) : (
                           <>
                             <span className="w-2 h-2 bg-[#E50914] rounded-full" />
-                            <span className="text-[#E50914] font-bold">Copilot for Vplay</span>
+                            <span className="text-[#E50914] font-bold">Copilot for VNRT Online</span>
                           </>
                         )}
                       </div>
@@ -1083,7 +1083,7 @@ export const CopilotTab: React.FC<CopilotTabProps> = ({
                   <div className="flex flex-col items-start animate-pulse">
                     <div className="text-[10px] font-mono font-bold text-[#E50914] mb-1 px-1 flex items-center gap-1.5">
                       <span className="w-2 h-2 bg-[#E50914] rounded-full animate-ping" />
-                      <span>Copilot for Vplay đang xử lý...</span>
+                      <span>Copilot for VNRT Online đang xử lý...</span>
                     </div>
                     <div className="p-4 bg-[#F1F5F9] dark:bg-[#1E1D24] border border-slate-200 dark:border-[#34343E] rounded-2xl text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2 shadow-xs">
                       <RefreshCw className="w-4 h-4 animate-spin text-[#E50914]" />

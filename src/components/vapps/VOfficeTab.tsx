@@ -442,7 +442,7 @@ const VNumbersApp: React.FC = () => {
       .fill(0)
       .map(() => Array(cols).fill(""));
     arr[0] = ["STT", "Tên Sản Phẩm", "Số Lượng", "Đơn Giá (₫)", "Thành Tiền (₫)", "Trạng Thái", "", ""];
-    arr[1] = ["1", "Gói Vplay Premium VIP", "2", "1200000", "2400000", "Đã thanh toán", "", ""];
+    arr[1] = ["1", "Gói VNRT Online Premium VIP", "2", "1200000", "2400000", "Đã thanh toán", "", ""];
     arr[2] = ["2", "Thẻ V-Bank Platinum", "1", "500000", "500000", "Hoàn tất", "", ""];
     arr[3] = ["3", "Thư Viện V-Books Pro", "5", "150000", "750000", "Đã kích hoạt", "", ""];
     return arr;
