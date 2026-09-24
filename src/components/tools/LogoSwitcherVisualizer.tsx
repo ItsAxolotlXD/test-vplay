@@ -53,7 +53,7 @@ export const PRESET_LOGOS: PresetLogo[] = [
     id: 'vnrt-online',
     name: 'VNRT Online Logo',
     category: 'VNRT Online Presets',
-    url: 'https://static.wikia.nocookie.net/ep-deo/images/f/f8/Vpla.png/revision/latest/scale-to-width-down/1000?cb=20260829062528'
+    url: 'https://static.wikia.nocookie.net/ep-deo/images/1/1d/New_logo.png/revision/latest?cb=20260924062053'
   }
 ];
 

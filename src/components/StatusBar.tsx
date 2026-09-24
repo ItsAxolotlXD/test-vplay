@@ -105,6 +105,10 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         aria-hidden="true"
         id="status-bar-progressive-blur"
         className="pointer-events-none fixed top-0 right-0 h-screen w-28 sm:w-36 z-[90] overflow-hidden select-none"
+        style={{
+          paddingRight: 'env(safe-area-inset-right, 0px)',
+          width: 'calc(8rem + env(safe-area-inset-right, 0px))',
+        }}
       >
         {/* Step 1: Broad soft blur */}
         <div 
@@ -136,9 +140,14 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       <aside
         id="app-vertical-status-bar"
         aria-label="Thanh trạng thái và điều khiển nhanh bên phải"
-        className="fixed top-4 sm:top-6 bottom-4 sm:bottom-6 right-3.5 sm:right-6 z-[95] flex flex-col justify-between items-center select-none pointer-events-none"
+        className="fixed z-[95] flex flex-col justify-between items-center select-none pointer-events-none"
         style={{
           fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, sans-serif",
+          top: 'max(1rem, env(safe-area-inset-top, 1rem))',
+          bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))',
+          right: 'max(0.875rem, env(safe-area-inset-right, 0.875rem))',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
         {/* 1. TOP CLUSTER (Dynamic Island, Digital Clock, Gauge, Back Button) */}
@@ -544,7 +553,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
               </svg>
 
               {/* Monochrome White Search Icon */}
-              <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white stroke-[2.4] relative z-10 transition-transform group-hover:scale-110 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+              <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white stroke-[2.4] relative z-10 transition-transform group-hover:scale-110" />
             </motion.button>
           ) : (
             /* Subtle anchor placeholder so bottom position remains aligned during morph */

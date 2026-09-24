@@ -994,6 +994,83 @@ app.get("/api/audio-proxy", async (req, res) => {
   }
 });
 
+// Stream local intro video with full Range / 206 Partial Content support
+const handleStreamIntroVideo = (req: express.Request, res: express.Response) => {
+  const videoPath = path.join(process.cwd(), "public/intro-video.mp4");
+  if (!fs.existsSync(videoPath)) {
+    return res.status(404).send("Intro video not found");
+  }
+
+  const stat = fs.statSync(videoPath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+    const chunksize = end - start + 1;
+    const file = fs.createReadStream(videoPath, { start, end });
+    const head = {
+      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Content-Type": "video/mp4",
+      "Access-Control-Allow-Origin": "*",
+    };
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+    const head = {
+      "Content-Length": fileSize,
+      "Content-Type": "video/mp4",
+      "Accept-Ranges": "bytes",
+      "Access-Control-Allow-Origin": "*",
+    };
+    res.writeHead(200, head);
+    fs.createReadStream(videoPath).pipe(res);
+  }
+};
+
+app.get("/intro-video.mp4", handleStreamIntroVideo);
+app.get("/api/intro-video", handleStreamIntroVideo);
+
+// Video proxy for external wikia links (bypasses hotlink protection)
+app.get("/api/video-proxy", async (req, res) => {
+  try {
+    const videoUrl = (req.query.url as string) || "https://static.wikia.nocookie.net/ep-deo/images/4/4a/5c1imv.mp4/revision/latest?cb=20260924070114";
+    const range = req.headers.range;
+    const fetchHeaders: Record<string, string> = {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Referer": "https://logos.fandom.com/",
+    };
+    if (range) fetchHeaders["Range"] = range;
+
+    const response = await fetch(videoUrl, { headers: fetchHeaders });
+    if (!response.ok && response.status !== 206) {
+      return res.status(response.status).send(`Failed to fetch video: ${response.statusText}`);
+    }
+
+    res.status(response.status);
+    const contentType = response.headers.get("content-type") || "video/mp4";
+    const contentLength = response.headers.get("content-length");
+    const contentRange = response.headers.get("content-range");
+    const acceptRanges = response.headers.get("accept-ranges");
+
+    res.setHeader("Content-Type", contentType);
+    if (contentLength) res.setHeader("Content-Length", contentLength);
+    if (contentRange) res.setHeader("Content-Range", contentRange);
+    if (acceptRanges) res.setHeader("Accept-Ranges", acceptRanges);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    const arrayBuffer = await response.arrayBuffer();
+    res.send(Buffer.from(arrayBuffer));
+  } catch (error: any) {
+    console.error("Video Proxy Error:", error);
+    res.status(500).json({ error: "Failed to proxy video", details: error.message });
+  }
+});
+
 // Serve Vite in development, static files in production
 async function start() {
   if (process.env.NODE_ENV !== "production") {

@@ -7,6 +7,7 @@ import { SpotlightModal } from './components/SpotlightModal';
 import { CustomStreamModal } from './components/CustomStreamModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { SplashScreen } from './components/SplashScreen';
+import { StartupVideoIntro } from './components/StartupVideoIntro';
 import { OobeSetupModal, OobeSetupConfig } from './components/OobeSetupModal';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
@@ -153,16 +154,25 @@ export default function App() {
     return CHANNELS_DATA[0];
   });
 
-  // Splash Screen State
-  const [showSplashScreen, setShowSplashScreen] = useState<boolean>(true);
+  // Startup Intro Video & Splash Screen State
+  const [showStartupVideo, setShowStartupVideo] = useState<boolean>(true);
+  const [showSplashScreen, setShowSplashScreen] = useState<boolean>(false);
 
-  // Allow replaying splash screen from any menu / component via custom event
+  // Allow replaying splash screen or startup intro video via custom events
   useEffect(() => {
     const handleReplaySplash = () => {
       setShowSplashScreen(true);
     };
+    const handleReplayStartupVideo = () => {
+      setShowStartupVideo(true);
+      setShowSplashScreen(false);
+    };
     window.addEventListener('vplay:replay_splash', handleReplaySplash);
-    return () => window.removeEventListener('vplay:replay_splash', handleReplaySplash);
+    window.addEventListener('vplay:replay_startup_video', handleReplayStartupVideo);
+    return () => {
+      window.removeEventListener('vplay:replay_splash', handleReplaySplash);
+      window.removeEventListener('vplay:replay_startup_video', handleReplayStartupVideo);
+    };
   }, []);
 
   // OOBE First-time Setup Modal State
@@ -878,6 +888,17 @@ export default function App() {
           onImportPlaylist={handleImportPlaylist}
         />
 
+        {/* Initial Startup Intro Video (Plays before splash screen) */}
+        {showStartupVideo && (
+          <StartupVideoIntro
+            videoUrl="https://static.wikia.nocookie.net/ep-deo/images/4/4a/5c1imv.mp4/revision/latest?cb=20260924070114"
+            onFinish={() => {
+              setShowStartupVideo(false);
+              setShowSplashScreen(true);
+            }}
+          />
+        )}
+
         {/* Initial Startup / Replay Splash Screen */}
         {showSplashScreen && (
           <SplashScreen
@@ -890,7 +911,7 @@ export default function App() {
 
         {/* Windows 11 Style OOBE First-Time Setup Modal */}
         <OobeSetupModal
-          isOpen={isOobeOpen && !showSplashScreen}
+          isOpen={isOobeOpen && !showSplashScreen && !showStartupVideo}
           onClose={() => setIsOobeOpen(false)}
           onComplete={handleCompleteOobe}
           initialName={settings.userName}

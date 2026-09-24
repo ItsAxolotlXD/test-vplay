@@ -57,9 +57,30 @@ export const Channels: React.FC<ChannelsProps> = ({
         </button>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter and Search Bar - Search on the left */}
       <div className="block-card p-4 rounded-[28px] bg-[#1E1E22] border border-[#2D2D35] flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Groups */}
+        {/* Search on left */}
+        <div className="relative w-full md:w-80 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0 shrink-0">
+          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] shrink-0 mr-2.5" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm kênh truyền hình..."
+            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate border-0"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
+              title="Xóa tìm kiếm"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Groups on right */}
         <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
           {groups.map((grp) => (
             <button
@@ -75,27 +96,6 @@ export const Channels: React.FC<ChannelsProps> = ({
               {grp}
             </button>
           ))}
-        </div>
-
-        {/* Search */}
-        <div className="relative w-full md:w-80 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
-          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm kiếm kênh truyền hình..."
-            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="p-1 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
-              title="Xóa tìm kiếm"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
       </div>
 

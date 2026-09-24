@@ -369,16 +369,16 @@ export const MusicTab: React.FC<MusicTabProps> = ({ navigate }) => {
         </div>
       </div>
 
-      {/* Search Bar (bỏ phân loại) */}
+      {/* Search Bar (bỏ phân loại, căn trái) */}
       <div className="flex items-center justify-between gap-4">
-        <div className="relative w-full max-w-md h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
-          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
+        <div className="relative w-full max-w-md h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0 mr-auto">
+          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] shrink-0 mr-2.5" />
           <input
             type="text"
             placeholder="Tìm kiếm bài nhạc..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
+            className="w-full bg-transparent text-sm text-white placeholder-white/60 focus:outline-none font-semibold truncate border-0"
           />
           {searchQuery && (
             <button

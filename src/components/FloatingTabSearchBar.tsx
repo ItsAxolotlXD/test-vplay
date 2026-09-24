@@ -131,11 +131,12 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
       {isVisible && isSearchExpanded && (
         <div
           id="floating-tab-search-bar"
-          className={`fixed inset-x-0 mx-auto w-full max-w-[540px] px-3 pointer-events-none select-none flex flex-col items-center gap-1.5 ${
-            !isVBoardUp ? 'bottom-3 sm:bottom-5 z-[96]' : 'z-[100002]'
+          className={`fixed left-4 sm:left-6 z-[96] pointer-events-none select-none flex flex-col items-start gap-1.5 ${
+            !isVBoardUp ? 'bottom-3 sm:bottom-5' : 'z-[100002]'
           }`}
           style={{
             bottom: isVBoardUp ? `${keyboardHeight + 12}px` : undefined,
+            left: 'max(1rem, env(safe-area-inset-left, 1rem))',
           }}
         >
           {/* Pre-release build product watermark lines - only shown here when status bar is OFF */}
@@ -146,12 +147,12 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.2 }}
-              className="text-center pointer-events-none select-none px-2 space-y-0.5"
+              className="text-left pointer-events-none select-none px-2 space-y-0.5"
             >
-              <p className="text-[11px] sm:text-xs font-medium tracking-tight text-zinc-300/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
+              <p className="text-[11px] sm:text-xs font-medium tracking-tight text-zinc-300/90 leading-tight">
                 VNRT Online v26.10_devb (26A3667c) - Pre-release build product
               </p>
-              <p className="text-[10px] sm:text-[11px] font-normal text-zinc-300/75 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight">
+              <p className="text-[10px] sm:text-[11px] font-normal text-zinc-300/75 leading-tight">
                 Anything you've seen here are not finished and may change in future builds
               </p>
             </motion.div>
@@ -168,8 +169,8 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
             style={{ fontFamily: "'Inter', 'Integer', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
             className={`pointer-events-auto relative w-full max-w-[320px] sm:max-w-[380px] h-[46px] sm:h-[48px] rounded-full flex items-center px-4 transition-all duration-300 backdrop-blur-2xl shadow-2xl shadow-black/35 overflow-hidden ${
               isFocused
-                ? 'bg-white/35 dark:bg-white/25 shadow-black/40'
-                : 'bg-white/30 dark:bg-white/20'
+                ? 'bg-white/40 dark:bg-white/30 shadow-black/40'
+                : 'bg-white/35 dark:bg-white/25'
             }`}
           >
             {/* Top & Bottom white border with horizontal fade to left & right */}
@@ -199,12 +200,12 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
               />
             </svg>
 
-            {/* Monochrome White Search Icon */}
+            {/* Black Search Icon */}
             <div className="relative z-10 shrink-0 mr-3 w-[22px] h-[22px] sm:w-[24px] sm:h-[24px] flex items-center justify-center pointer-events-none">
-              <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
+              <Search className="w-5 h-5 text-black stroke-[2.4]" />
             </div>
 
-            {/* Input Field - Monochrome White typography */}
+            {/* Input Field - Black typography, no text shadows */}
             <input
               ref={inputRef}
               type="text"
@@ -224,7 +225,7 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
               }}
               placeholder={isListening ? 'Listening...' : placeholder}
               style={{ fontFamily: "'Inter', 'Integer', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
-              className="relative z-10 w-full bg-transparent text-white placeholder:text-white/60 text-sm sm:text-[15px] font-semibold tracking-tight focus:outline-none truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+              className="relative z-10 w-full bg-transparent text-black placeholder:text-black/60 text-sm sm:text-[15px] font-semibold tracking-tight focus:outline-none truncate"
             />
 
             {/* Actions on right: Clear Button & Mic & Close/Collapse Button */}
@@ -237,9 +238,9 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
                     inputRef.current?.focus();
                   }}
                   title="Xóa tìm kiếm"
-                  className="w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-5 h-5 rounded-full bg-black/10 hover:bg-black/20 text-black flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <X className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <X className="w-3.5 h-3.5 stroke-[2.5] text-black" />
                 </button>
               )}
 
@@ -251,13 +252,13 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
                 className={`w-[26px] h-[26px] flex items-center justify-center rounded-full transition-all cursor-pointer ${
                   isListening
                     ? 'text-[#FF267A] animate-pulse bg-[#FF267A]/20 scale-110'
-                    : 'text-white hover:bg-white/15'
+                    : 'text-black hover:bg-black/10'
                 }`}
               >
                 {isListening ? (
                   <MicOff className="w-5 h-5 stroke-[2.2] text-red-500" />
                 ) : (
-                  <Mic className="w-4.5 h-4.5 stroke-[2.2] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
+                  <Mic className="w-4.5 h-4.5 stroke-[2.2] text-black" />
                 )}
               </button>
 
@@ -266,9 +267,9 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
                 type="button"
                 onClick={() => setIsSearchExpanded(false)}
                 title="Thu gọn vào thanh trạng thái"
-                className="w-6 h-6 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="w-6 h-6 rounded-full bg-black/10 hover:bg-black/20 text-black flex items-center justify-center transition-colors cursor-pointer"
               >
-                <X className="w-3.5 h-3.5 stroke-[2.2]" />
+                <X className="w-3.5 h-3.5 stroke-[2.2] text-black" />
               </button>
             </div>
           </motion.div>

@@ -2,11 +2,9 @@ import React from 'react';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { BannerCardItem } from '../components/BannerCardItem';
 import { OnAirSlider } from '../components/OnAirSlider';
-import { NewsCard } from '../components/NewsCard';
 import { CHANNELS_DATA } from '../data/channels';
-import { NEWS_DATA } from '../data/news';
 import { HERO_SLIDES } from '../data/heroSlides';
-import { Channel, NewsArticle } from '../types';
+import { Channel } from '../types';
 import { Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers, Search } from 'lucide-react';
 import { PortalsCircularSection } from '../components/PortalsCircularSection';
 import { VplayAppsHomeGrid } from '../components/VplayAppsHomeGrid';
@@ -25,8 +23,6 @@ export const Home: React.FC<HomeProps> = ({
   channels
 }) => {
   const { searchQuery, clearSearch } = useTabSearch();
-  const featuredArticle = NEWS_DATA[0];
-  const otherArticles = NEWS_DATA.slice(1, 4);
 
   // 2 cái AD banner cho lên đầu khối ngang
   const horizontalBanners = [
@@ -209,39 +205,6 @@ export const Home: React.FC<HomeProps> = ({
               >
                 <BannerCardItem slide={banner} />
               </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 6. Tin tức mới (Latest TV & Broadcast News) */}
-        <section className="space-y-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                <Megaphone className="w-6 h-6 text-[#FF2020]" />
-                <span>Tin tức & Chuyên san Truyền hình</span>
-              </h2>
-              <p className="text-xs text-[#9CA3AF] mt-0.5">
-                Cập nhật xu hướng kỹ thuật, trường quay và nhận diện truyền hình Việt Nam
-              </p>
-            </div>
-
-            <button
-              onClick={() => navigate('/news')}
-              className="flex items-center gap-1.5 text-xs font-semibold text-[#E50914] hover:underline"
-            >
-              <span>Xem tất cả bài viết</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {NEWS_DATA.slice(0, 3).map((article) => (
-              <NewsCard
-                key={article.id}
-                article={article}
-                onClick={(a) => navigate(`/news/${a.slug}`)}
-              />
             ))}
           </div>
         </section>

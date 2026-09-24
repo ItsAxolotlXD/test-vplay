@@ -66,24 +66,19 @@ const VplayLogo: React.FC<{ onClick?: () => void; isActive?: boolean }> = ({ onC
     <button
       id="topbar-vplay-logo"
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-full flex items-center gap-2 group cursor-pointer focus:outline-none shrink-0 transition-all ${
+      className={`px-2.5 py-1 rounded-full flex items-center gap-2 group cursor-pointer focus:outline-none shrink-0 transition-all ${
         isActive 
-          ? 'text-white bg-white/15 font-bold shadow-sm' 
-          : 'text-white/90 hover:text-white hover:bg-white/10'
+          ? 'bg-white/15 shadow-sm' 
+          : 'hover:bg-white/10'
       }`}
       title="VNRT Online - Về trang chủ"
     >
-      <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#E6005A] via-[#FF2020] to-[#FF8C00] flex items-center justify-center shadow-md shadow-red-600/30 border border-white/20 shrink-0 group-hover:scale-105 transition-transform">
-        <Tv className="w-4 h-4 text-white drop-shadow-sm" />
-      </div>
-      <div className="flex items-center tracking-tight font-black select-none text-left">
-        <span className="text-base sm:text-lg font-black text-white group-hover:text-white transition-colors">
-          VNRT
-        </span>
-        <span className="text-base sm:text-lg font-black text-[#388BFD] ml-1">
-          Online
-        </span>
-      </div>
+      <img
+        src="https://static.wikia.nocookie.net/ep-deo/images/1/1d/New_logo.png/revision/latest?cb=20260924062053"
+        alt="VNRT Online"
+        referrerPolicy="no-referrer"
+        className="h-7 sm:h-8 w-auto max-h-8 object-contain shrink-0 group-hover:scale-105 transition-transform"
+      />
     </button>
   );
 };

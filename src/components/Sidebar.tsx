@@ -293,20 +293,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Brand Logo */}
           <div 
             onClick={() => handleNavClick('/')} 
-            className="cursor-pointer flex items-center gap-2.5 p-0 hover:opacity-85 transition-opacity"
+            className="cursor-pointer flex items-center p-0 hover:opacity-85 transition-opacity"
             title="VNRT Online"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E6005A] via-[#FF2020] to-[#FF8C00] flex items-center justify-center shadow-md shadow-red-600/30 border border-white/20 shrink-0">
-              <Tv className="w-4.5 h-4.5 text-white drop-shadow-sm" />
-            </div>
-            <div className="flex flex-col text-left leading-none select-none">
-              <span className="text-lg font-black tracking-tight text-white">
-                VNRT <span className="text-[#388BFD]">Online</span>
-              </span>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 mt-0.5">
-                Media Hub 2026
-              </span>
-            </div>
+            <img
+              src="https://static.wikia.nocookie.net/ep-deo/images/1/1d/New_logo.png/revision/latest?cb=20260924062053"
+              alt="VNRT Online"
+              referrerPolicy="no-referrer"
+              className="h-8 sm:h-9 w-auto max-w-[140px] object-contain shrink-0"
+            />
           </div>
 
           {/* Real-time Clock display */}
@@ -347,13 +342,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           id={isMobile ? 'btn-mobile-spotlight-search' : 'btn-spotlight-search'}
           onClick={handleSpotlightClick}
-          className={`w-full h-[46px] flex items-center justify-center px-4 rounded-full spotlight-bubble-box spotlight-input-container text-sm transition-all group cursor-pointer border-0 ${
+          className={`w-full h-[46px] flex items-center justify-start px-4 rounded-full spotlight-bubble-box spotlight-input-container text-sm transition-all group cursor-pointer border-0 ${
             currentRoute === '/search' || currentRoute === '/spotlight'
               ? 'bg-[#282834] text-white shadow-lg shadow-cyan-500/20'
               : 'text-[#8E8E93] hover:text-white'
           }`}
         >
-          <div className="flex items-center justify-center gap-2.5 min-w-0">
+          <div className="flex items-center justify-start gap-2.5 min-w-0">
             <div className="w-[18px] h-[18px] min-w-[18px] min-h-[18px] max-w-[18px] max-h-[18px] flex items-center justify-center shrink-0">
               <img
                 src="https://static.wikia.nocookie.net/ep-deo/images/2/21/Searchhh.png/revision/latest?cb=20260717131751"
@@ -1174,9 +1169,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className="cursor-pointer flex items-center justify-center p-0 hover:opacity-80 transition-opacity"
                 title="VNRT Online"
               >
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#E6005A] via-[#FF2020] to-[#FF8C00] flex items-center justify-center shadow-md shadow-red-600/30 border border-white/20 shrink-0">
-                  <Tv className="w-4.5 h-4.5 text-white" />
-                </div>
+                <img
+                  src="https://static.wikia.nocookie.net/ep-deo/images/1/1d/New_logo.png/revision/latest?cb=20260924062053"
+                  alt="VNRT Online"
+                  referrerPolicy="no-referrer"
+                  className="w-8 h-8 object-contain shrink-0"
+                />
               </div>
 
               {/* Expand sidebar button */}

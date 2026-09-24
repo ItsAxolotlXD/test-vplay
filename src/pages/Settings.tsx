@@ -148,7 +148,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
           <div className="w-full h-[46px] sm:h-[48px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-sm transition-all border-0">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="w-[20px] h-[20px] min-w-[20px] min-h-[20px] flex items-center justify-center shrink-0">
-                <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
+                <Search className="w-5 h-5 text-white stroke-[2.4]" />
               </div>
               <input
                 id="settings-search-input"
@@ -156,7 +156,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm cài đặt..."
-                className="w-full bg-transparent text-white placeholder-white/60 text-sm focus:outline-none font-semibold truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] border-0"
+                className="w-full bg-transparent text-white placeholder-white/60 text-sm focus:outline-none font-semibold truncate border-0"
               />
             </div>
             {searchQuery && (
@@ -1146,26 +1146,39 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <span>Màn hình khởi động (Splash Screen)</span>
+                    <span>Màn hình khởi động & Video Intro</span>
                     <span className="px-2 py-0.5 text-[10px] font-bold bg-[#E6005A]/20 text-[#E6005A] rounded-full">
                       VNRT Online OS
                     </span>
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hiển thị logo tối giản và vòng tròn tải khi khởi chạy ứng dụng
+                    Phát video intro giới thiệu và hiệu ứng Spatial Glass khi khởi chạy ứng dụng
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  id="btn-settings-replay-splash"
-                  onClick={() => {
-                    window.dispatchEvent(new CustomEvent('vplay:replay_splash'));
-                  }}
-                  className="px-4 py-2 rounded-full bg-[#E6005A] hover:bg-[#FF267A] text-white text-xs font-bold transition-all shadow-md shadow-[#E6005A]/25 cursor-pointer shrink-0"
-                >
-                  Xem lại
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    id="btn-settings-replay-intro-video"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('vplay:replay_startup_video'));
+                    }}
+                    className="px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all shadow-md cursor-pointer shrink-0"
+                    title="Xem video intro khởi động"
+                  >
+                    Video Intro
+                  </button>
+                  <button
+                    type="button"
+                    id="btn-settings-replay-splash"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('vplay:replay_splash'));
+                    }}
+                    className="px-4 py-2 rounded-full bg-[#E6005A] hover:bg-[#FF267A] text-white text-xs font-bold transition-all shadow-md shadow-[#E6005A]/25 cursor-pointer shrink-0"
+                  >
+                    Splash Screen
+                  </button>
+                </div>
               </div>
             )}
 
