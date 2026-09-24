@@ -75,6 +75,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MotionEffectsLayer } from './components/motion/MotionEffectsLayer';
 import { VBoardOverlay } from './components/vboard/VBoardOverlay';
 import { VCursor } from './components/VCursor';
+import { GlobalAnnouncementBanner } from './components/GlobalAnnouncementBanner';
 
 export default function App() {
   const { settings, updateSetting } = useSettings();
@@ -829,6 +830,9 @@ export default function App() {
               />
             </div>
           )}
+
+          {/* Dải thông báo vàng hiển thị ở bất cứ đâu với clock đếm ngược đến 00h00 16/10/2026 */}
+          <GlobalAnnouncementBanner onExplore={() => navigate('/')} />
 
           {/* Dynamic Page Content with smooth motion fade & spring transition */}
           <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out relative z-10 ${

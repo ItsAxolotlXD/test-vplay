@@ -5,11 +5,12 @@ import { OnAirSlider } from '../components/OnAirSlider';
 import { CHANNELS_DATA } from '../data/channels';
 import { HERO_SLIDES } from '../data/heroSlides';
 import { Channel } from '../types';
-import { Megaphone, Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers, Search } from 'lucide-react';
+import { Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers, Search } from 'lucide-react';
 import { PortalsCircularSection } from '../components/PortalsCircularSection';
 import { VplayAppsHomeGrid } from '../components/VplayAppsHomeGrid';
 import { useTabSearch } from '../context/TabSearchContext';
 import { HomeSpotlightSearch } from '../components/HomeSpotlightSearch';
+import { HomeCountdownWidget } from '../components/HomeCountdownWidget';
 
 interface HomeProps {
   navigate: (route: string, state?: any) => void;
@@ -32,21 +33,6 @@ export const Home: React.FC<HomeProps> = ({
 
   return (
     <div className="space-y-6 sm:space-y-8 pb-16">
-      {/* 0. Yellow Announcement Banner (Thông báo chuyển đổi Vplay sang VNRT Online) */}
-      <div 
-        id="home-announcement-banner"
-        className="w-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300 text-zinc-950 px-4 py-3 shadow-lg shadow-amber-500/10 border-b border-amber-500/40 flex items-center justify-center gap-2.5 sm:gap-3 text-center select-none"
-      >
-        <div className="flex items-center justify-center gap-2 max-w-5xl mx-auto">
-          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-black/15 text-zinc-950 shrink-0 shadow-inner">
-            <Megaphone className="w-3.5 h-3.5 fill-current" />
-          </span>
-          <p className="text-xs sm:text-sm font-black tracking-tight text-zinc-950 leading-snug">
-            The next chapters are here. Vplay is becoming VNRT Online starting October 16, 2026.
-          </p>
-        </div>
-      </div>
-
       {/* Spotlight Search across the entire app when querying in Home tab */}
       {searchQuery.trim() ? (
         <HomeSpotlightSearch
@@ -77,6 +63,9 @@ export const Home: React.FC<HomeProps> = ({
       </div>
 
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-10 sm:space-y-12">
+        {/* Countdown to VNRT Online (00h00 16/10/2026) */}
+        <HomeCountdownWidget navigate={navigate} />
+
         {/* 2. Đề xuất cho bạn */}
         <OnAirSlider
           channels={channels}
