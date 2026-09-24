@@ -21,7 +21,9 @@ import {
   Wifi,
   Keyboard,
   Mic,
-  Activity
+  Activity,
+  PanelRight,
+  Sliders
 } from 'lucide-react';
 import { 
   useFeatureFlags, 
@@ -432,6 +434,37 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
                     </div>
                     <span className="text-xs text-zinc-300 font-medium">Dấu chấm đen tối giản (Chạm để mở rộng Card)</span>
                   </div>
+                </div>
+              )}
+
+              {/* SPECIAL INTERACTIVE PREVIEW FOR SETTINGS DRAWER */}
+              {item.key === 'settings_drawer' && (
+                <div className="p-3.5 rounded-2xl bg-[#1D1C24] border border-pink-500/20 space-y-2.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-pink-300 flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-pink-400" />
+                      Settings Right Drawer Mode
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-pink-500/10 text-pink-300">
+                      Slide from Right
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400 leading-relaxed">
+                    Khi bật tính năng này, bất cứ khi nào bạn nhấn vào mục <strong>Cài đặt</strong> trên thanh Sidebar, TopBar, FloatyBar hay BottomDock, bảng Cài đặt sẽ trượt ra dưới dạng Drawer từ cạnh phải màn hình mà không làm gián đoạn kênh truyền hình hay tab bạn đang xem.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!isEnabled) {
+                        handleToggle('settings_drawer', item);
+                      }
+                      window.dispatchEvent(new CustomEvent('vplay:open_settings'));
+                    }}
+                    className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 text-xs font-semibold border border-pink-500/30 transition-all cursor-pointer"
+                  >
+                    <PanelRight className="w-3.5 h-3.5" />
+                    <span>Mở thử Drawer Cài đặt</span>
+                  </button>
                 </div>
               )}
 

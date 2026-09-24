@@ -58,6 +58,7 @@ interface TopBarProps {
   onOpenSearch: () => void;
   onOpenMobileMenu?: () => void;
   onOpenCopilotWindow?: () => void;
+  isSettingsOpen?: boolean;
 }
 
 // Official VNRT Online Logo component (compact size)
@@ -87,7 +88,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   currentRoute,
   navigate,
   onOpenSearch,
-  onOpenMobileMenu
+  onOpenMobileMenu,
+  onOpenCopilotWindow,
+  isSettingsOpen
 }) => {
   const { settings } = useSettings();
   const { flags } = useFeatureFlags();
@@ -749,7 +752,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 id="btn-topbar-settings"
                 onClick={() => navigate('/settings')}
                 className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all cursor-pointer ${
-                  currentRoute === '/settings' || currentRoute.startsWith('/settings')
+                  currentRoute === '/settings' || currentRoute.startsWith('/settings') || isSettingsOpen
                     ? 'text-white bg-white/20 shadow-[0_0_12px_rgba(255,255,255,0.2)]'
                     : 'text-white/90 hover:text-white hover:bg-white/10'
                 }`}

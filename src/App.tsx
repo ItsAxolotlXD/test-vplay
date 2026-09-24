@@ -19,6 +19,7 @@ import { Favorites } from './pages/Favorites';
 import { Toolbox } from './pages/Toolbox';
 import { About } from './pages/About';
 import { Settings } from './pages/Settings';
+import { SettingsDrawer } from './components/SettingsDrawer';
 import { FeatureFlags } from './pages/FeatureFlags';
 import { FriendsAndPeople } from './pages/FriendsAndPeople';
 import { BetArenaPage } from './pages/BetArenaPage';
@@ -90,11 +91,24 @@ export default function App() {
   const isVBoardEnabled = flags.experimental_vboard !== false;
   const isStatusBar = Boolean(flags.status_bar);
   const isDynamicIsland = Boolean(flags.status_bar && flags.dynamic_island);
+  const isSettingsDrawer = Boolean(flags.settings_drawer);
   const isFloatyMode = Boolean(settings.floatyBar);
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
     : true;
   const { favoriteChannelIds, toggleFavoriteChannel } = useFavorites();
+
+  // Settings Drawer State (Feature Flag: settings_drawer)
+  const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState<boolean>(() => {
+    try {
+      const path = window.location.pathname || '/';
+      return (path === '/settings' || path.startsWith('/settings')) && Boolean(flags.settings_drawer);
+    } catch {
+      return false;
+    }
+  });
+  const lastNonSettingsRouteRef = React.useRef<string>('/');
+
   // Security & Construction Gate State: saved in localStorage so the device only requires entering password once
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
     try {
@@ -127,7 +141,11 @@ export default function App() {
 
   // Navigation Route State (supports browser pathname or internal state)
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
-    return window.location.pathname === '/' ? '/' : window.location.pathname;
+    const path = window.location.pathname === '/' ? '/' : window.location.pathname;
+    if ((path === '/settings' || path.startsWith('/settings')) && Boolean(flags.settings_drawer)) {
+      return '/';
+    }
+    return path;
   });
   const [routeState, setRouteState] = useState<any>(null);
 
@@ -268,6 +286,18 @@ export default function App() {
   // Navigation handler
   const navigate = (path: string, state?: any) => {
     setRouteState(state);
+
+    // Feature Flag: Settings Drawer
+    // When enabled, accessing Settings opens the drawer sliding from the right instead of a tab page
+    if (path === '/settings' || path.startsWith('/settings')) {
+      if (isSettingsDrawer) {
+        setIsSettingsDrawerOpen((prev) => !prev);
+        return;
+      }
+    } else {
+      // If navigating to any other route, close the drawer
+      setIsSettingsDrawerOpen(false);
+    }
     
     // Parse query params if any
     if (path.includes('?')) {
@@ -306,14 +336,38 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [channels]);
 
+  // Keep track of the last non-settings route
+  useEffect(() => {
+    if (currentRoute !== '/settings' && !currentRoute.startsWith('/settings')) {
+      lastNonSettingsRouteRef.current = currentRoute;
+    }
+  }, [currentRoute]);
+
+  // Seamless transition: If user turns ON settings_drawer while currently on /settings tab page,
+  // open the drawer and restore the underlying tab!
+  useEffect(() => {
+    if (isSettingsDrawer && (currentRoute === '/settings' || currentRoute.startsWith('/settings'))) {
+      setIsSettingsDrawerOpen(true);
+      const fallback = lastNonSettingsRouteRef.current && lastNonSettingsRouteRef.current !== '/settings'
+        ? lastNonSettingsRouteRef.current
+        : '/';
+      window.history.replaceState(null, '', fallback);
+      setCurrentRoute(fallback);
+    }
+  }, [isSettingsDrawer, currentRoute]);
+
   // Global event listener to open Settings from any widget or copilot
   useEffect(() => {
     const handleOpenSettings = () => {
-      navigate('/settings');
+      if (isSettingsDrawer) {
+        setIsSettingsDrawerOpen(true);
+      } else {
+        navigate('/settings');
+      }
     };
     window.addEventListener('vplay:open_settings', handleOpenSettings);
     return () => window.removeEventListener('vplay:open_settings', handleOpenSettings);
-  }, []);
+  }, [isSettingsDrawer]);
 
   // Handle playing a custom single channel
   const handlePlayCustomChannel = (newChannel: Channel) => {
@@ -806,6 +860,7 @@ export default function App() {
             onToggleCollapse={toggleSidebarCollapse}
             isMobileOpen={isMobileSidebarOpen}
             onCloseMobile={() => setIsMobileSidebarOpen(false)}
+            isSettingsOpen={isSettingsDrawer && isSettingsDrawerOpen}
           />
         )}
 
@@ -831,6 +886,7 @@ export default function App() {
                 onOpenSearch={handleOpenSearch}
                 onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
                 onOpenCopilotWindow={() => toggleCopilotFloating(true)}
+                isSettingsOpen={isSettingsDrawer && isSettingsDrawerOpen}
               />
             </div>
           )}
@@ -869,6 +925,7 @@ export default function App() {
             currentRoute={currentRoute}
             navigate={navigate}
             onOpenSearch={handleOpenSearch}
+            isSettingsOpen={isSettingsDrawer && isSettingsDrawerOpen}
           />
         )}
 
@@ -878,6 +935,7 @@ export default function App() {
             currentRoute={currentRoute}
             navigate={navigate}
             onOpenSearch={handleOpenSearch}
+            isSettingsOpen={isSettingsDrawer && isSettingsDrawerOpen}
           />
         )}
 
@@ -956,6 +1014,18 @@ export default function App() {
           borderColor={settings.vcursorBorderColor || '#FFFFFF'}
           size={settings.vcursorSize || 24}
           glow={settings.vcursorGlow || false}
+        />
+
+        {/* Settings Drawer (Feature Flag: settings_drawer) */}
+        <SettingsDrawer
+          isOpen={isSettingsDrawer && isSettingsDrawerOpen}
+          onClose={() => setIsSettingsDrawerOpen(false)}
+          navigate={navigate}
+          onOpenAsPage={() => {
+            setIsSettingsDrawerOpen(false);
+            toggleFlag('settings_drawer');
+            navigate('/settings');
+          }}
         />
       </div>
     </TabSearchProvider>

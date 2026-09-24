@@ -82,12 +82,14 @@ interface FloatyBarProps {
   currentRoute: string;
   navigate: (route: string, state?: any) => void;
   onOpenSearch: () => void;
+  isSettingsOpen?: boolean;
 }
 
 export const FloatyBar: React.FC<FloatyBarProps> = ({
   currentRoute,
   navigate,
   onOpenSearch,
+  isSettingsOpen,
 }) => {
   // Check active state for a given route
   const isActive = (route?: string, id?: string) => {
@@ -145,6 +147,9 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
     }
     if (route === '/v-shop') {
       return currentRoute.startsWith('/v-shop') || currentRoute.startsWith('/shop');
+    }
+    if (route === '/settings') {
+      return currentRoute.startsWith('/settings') || Boolean(isSettingsOpen);
     }
     return currentRoute.startsWith(route);
   };

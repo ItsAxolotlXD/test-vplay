@@ -21,17 +21,20 @@ interface BottomDockProps {
   currentRoute: string;
   navigate: (route: string) => void;
   onOpenSearch: () => void;
+  isSettingsOpen?: boolean;
 }
 
 export const BottomDock: React.FC<BottomDockProps> = ({
   currentRoute,
   navigate,
-  onOpenSearch
+  onOpenSearch,
+  isSettingsOpen
 }) => {
   const { flags } = useFeatureFlags();
   const isAnimationTest = flags.animation_test !== false;
 
   const isActive = (path: string) => {
+    if (path === '/settings') return currentRoute.startsWith('/settings') || Boolean(isSettingsOpen);
     if (path === '/') return currentRoute === '/' || currentRoute === '/home';
     if (path === '/vertical') return currentRoute === '/vertical' || currentRoute === '/shorts' || currentRoute === '/vplay-vertical';
     return currentRoute.startsWith(path);

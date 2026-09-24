@@ -68,6 +68,7 @@ interface SidebarProps {
   onToggleCollapse?: () => void;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
+  isSettingsOpen?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -79,7 +80,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed = false,
   onToggleCollapse,
   isMobileOpen = false,
-  onCloseMobile
+  onCloseMobile,
+  isSettingsOpen,
 }) => {
   const { settings } = useSettings();
   const { flags } = useFeatureFlags();
@@ -117,6 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     : isCollapsed;
 
   const isActive = (route: string) => {
+    if (route === '/settings' && isSettingsOpen) return true;
     if (route === '/' && currentRoute === '/') return true;
     if (route !== '/' && currentRoute.startsWith(route)) return true;
     return false;

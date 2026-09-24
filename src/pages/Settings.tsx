@@ -18,6 +18,7 @@ import {
   Layout,
   PanelLeft,
   PanelTop,
+  PanelRight,
   Compass,
   Monitor,
   Keyboard as KeyboardIcon,
@@ -33,9 +34,11 @@ import { useSpecialTheme } from '../hooks/useSpecialTheme';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
+  isDrawer?: boolean;
+  onClose?: () => void;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
+export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose }) => {
   const { settings, updateSetting } = useSettings();
   const { flags, setFlag } = useFeatureFlags();
   const { searchQuery, setSearchQuery } = useTabSearch();
@@ -103,6 +106,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
 
   const isSection1Visible = matchesSearch(
     'Giao diện', 'Chế độ giao diện', 'Floaty bar', 'Floaty', 'Navigation bar',
+    'Settings drawer', 'drawer', 'Ngăn kéo', 'Trượt bên phải',
     'floating', 'floats', 'Sáng', 'Tối', 'Theme', 'Thanh điều hướng',
     'Sidebar', 'Top bar', 'topbar', 'Bố cục', 'Dock sang Sidebar', 'Dock',
     'Phông chữ', 'Font', 'Integer', 'Alata', 'Google Sans', 'Montserrat',
@@ -138,7 +142,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const hasAnyResults = !normalizedQuery || isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none">
+    <div className={isDrawer ? "w-full max-w-full space-y-5 pb-16 pt-1 select-none" : "max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none"}>
       {/* 1. Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-extrabold text-white tracking-tight">
@@ -524,6 +528,61 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                   <span
                     className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
                       settings.floatyBar ? 'translate-x-5.5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+
+            {/* Card: Settings drawer (Feature Flag) */}
+            {(matchesSearch('Settings drawer') ||
+              matchesSearch('drawer') ||
+              matchesSearch('Ngăn kéo') ||
+              matchesSearch('Trượt bên phải') ||
+              matchesSearch('Cài đặt') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-settings-drawer"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-pink-500/20 hover:border-pink-500/40 hover:bg-white/[0.03]"
+              >
+                <div>
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <PanelRight className="w-4.5 h-4.5 text-[#E6007A]" />
+                    <span>Settings drawer</span>
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                      BETA
+                    </span>
+                    {flags.settings_drawer && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                        ĐANG BẬT
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    Settings open in a drawer on the right instead of a tab page
+                  </div>
+                  <div className="text-[11px] text-gray-400 mt-1">
+                    Khi bật, trang Cài đặt sẽ mở dạng ngăn kéo (drawer) trượt mượt mà từ cạnh phải màn hình thay vì tải lại toàn trang tab.
+                  </div>
+                </div>
+
+                {/* Switch Toggle */}
+                <button
+                  id="toggle-settings-drawer"
+                  type="button"
+                  role="switch"
+                  aria-checked={Boolean(flags.settings_drawer)}
+                  onClick={() => {
+                    const next = !flags.settings_drawer;
+                    setFlag('settings_drawer', next);
+                  }}
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
+                    flags.settings_drawer ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  }`}
+                >
+                  <span
+                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                      flags.settings_drawer ? 'translate-x-5.5' : 'translate-x-0'
                     }`}
                   />
                 </button>

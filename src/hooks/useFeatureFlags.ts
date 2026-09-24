@@ -68,6 +68,15 @@ export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
     category: 'ui',
     badge: 'STABLE',
     defaultValue: true,
+  },
+  {
+    id: 'flag_settings_drawer',
+    key: 'settings_drawer',
+    name: 'Settings drawer',
+    description: 'Settings open in a drawer on the right instead of a tab page',
+    category: 'ui',
+    badge: 'BETA',
+    defaultValue: false,
   }
 ];
 
