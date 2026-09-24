@@ -174,6 +174,54 @@ export const ChannelPlayer = React.memo(function ChannelPlayer({
       return;
     }
 
+    const isMp4 =
+      streamUrl.endsWith(".mp4") ||
+      streamUrl.includes(".mp4") ||
+      streamUrl.startsWith("/ads/") ||
+      streamUrl.startsWith("/intro-video");
+
+    if (isMp4) {
+      video.loop = true;
+      video.src = streamUrl;
+      video.load();
+
+      const handleLoadedMetadata = () => {
+        setIsLoading(false);
+        playVideo();
+      };
+
+      const handlePlaying = () => {
+        setIsLoading(false);
+        setHasError(false);
+      };
+
+      const handleEnded = () => {
+        video.currentTime = 0;
+        playVideo();
+      };
+
+      const handleError = () => {
+        setHasError(true);
+        setErrorMessage("Lỗi tải video hình hiệu hoặc tệp MP4 không khả dụng.");
+        setIsLoading(false);
+      };
+
+      video.addEventListener("loadedmetadata", handleLoadedMetadata);
+      video.addEventListener("playing", handlePlaying);
+      video.addEventListener("ended", handleEnded);
+      video.addEventListener("error", handleError);
+
+      return () => {
+        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        video.removeEventListener("playing", handlePlaying);
+        video.removeEventListener("ended", handleEnded);
+        video.removeEventListener("error", handleError);
+        video.loop = false;
+      };
+    }
+
+    video.loop = false;
+
     // Check if the source is video format or an absolute m3u8 url
     if (streamUrl.endsWith(".m3u8") || hlsRef.current === null) {
       if (Hls.isSupported()) {

@@ -135,6 +135,28 @@ const VTV_CHANNELS: VtvChannelItem[] = [
     logo: 'https://static.wikia.nocookie.net/logos/images/b/b5/VTV_go_logo_2015.png/revision/latest?cb=20260317072846&path-prefix=uk',
     streamUrl: 'https://live.fptplay53.net/live/media/v1abr/live247-hls-avc/v1abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
+  // 3 luồng kênh phát lặp hình hiệu Ident 2026
+  {
+    id: 'vtv1_ident_2026',
+    name: 'VTV1 ident 2026',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/f/f9/Image_%2812%29.png/revision/latest?cb=20260914074936',
+    streamUrl: '/ads/ad1.mp4',
+    category: 'Kênh VTV',
+  },
+  {
+    id: 'vtv6_ident_2026',
+    name: 'VTV6 ident 2026',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/3/31/Vtv6_front.png/revision/latest?cb=20260913100008',
+    streamUrl: '/ads/ad2.mp4',
+    category: 'Kênh VTV',
+  },
+  {
+    id: 'vtv10_ident_2026',
+    name: 'VTV10 ident 2026',
+    logo: 'https://static.wikia.nocookie.net/ftv/images/a/a0/I10.png/revision/latest/scale-to-width-down/1000?cb=20260601094723&path-prefix=vi',
+    streamUrl: '/ads/ad3.mp4',
+    category: 'Kênh VTV',
+  },
 ];
 
 // Danh sách các kênh HTV
@@ -426,6 +448,58 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
       return;
     }
 
+    // Check if the stream is an MP4 video file or local ad/ident loop
+    const isMp4 =
+      streamUrl.endsWith('.mp4') ||
+      streamUrl.includes('.mp4') ||
+      streamUrl.startsWith('/ads/') ||
+      streamUrl.startsWith('/intro-video');
+
+    if (isMp4) {
+      video.loop = true;
+      video.src = streamUrl;
+      video.load();
+
+      const handleLoadedMetadata = () => {
+        setIsLoading(false);
+        if (isPlaying) {
+          video.play().catch(() => {});
+        }
+      };
+
+      const handlePlaying = () => {
+        setIsLoading(false);
+        setHasPlaybackError(false);
+      };
+
+      const handleEnded = () => {
+        // Continuous seamless loop replay when video ends
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      };
+
+      const handleError = () => {
+        console.warn('MP4 playback error for stream:', streamUrl);
+        setHasPlaybackError(true);
+        setIsLoading(false);
+      };
+
+      video.addEventListener('loadedmetadata', handleLoadedMetadata);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('ended', handleEnded);
+      video.addEventListener('error', handleError);
+
+      return () => {
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('ended', handleEnded);
+        video.removeEventListener('error', handleError);
+        video.loop = false;
+      };
+    }
+
+    video.loop = false;
+
     if (Hls.isSupported()) {
       const hls = new Hls({
         enableWorker: true,
@@ -682,6 +756,25 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                     playsInline
                     autoPlay
                     muted={isMuted}
+                    loop={
+                      selectedChannel.streamUrl.endsWith('.mp4') ||
+                      selectedChannel.streamUrl.includes('.mp4') ||
+                      selectedChannel.streamUrl.startsWith('/ads/')
+                    }
+                    onEnded={() => {
+                      if (
+                        selectedChannel.streamUrl.endsWith('.mp4') ||
+                        selectedChannel.streamUrl.includes('.mp4') ||
+                        selectedChannel.streamUrl.startsWith('/ads/')
+                      ) {
+                        if (videoRef.current) {
+                          videoRef.current.currentTime = 0;
+                          videoRef.current.play().catch(() => {});
+                        }
+                      }
+                    }}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
                   />
 
                   {/* On-screen Toast Notification for Aspect Ratio */}
@@ -861,6 +954,11 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                         } w-auto object-contain select-none pointer-events-none`}
                         referrerPolicy="no-referrer"
                       />
+                      {channel.id.includes('ident') && (
+                        <span className="absolute bottom-1 right-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-[#E60000] text-white tracking-wider uppercase shadow-md pointer-events-none">
+                          IDENT 2026
+                        </span>
+                      )}
                     </button>
                   );
                 })}

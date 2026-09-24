@@ -24,6 +24,9 @@ export const channels: Channel[] = [
   { category: "VTV", name: "VTV5 Tây Nam Bộ", logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/VTV5_logo_24.png", stream: "https://live.fptplay53.net/fnxhd1/vtv5tnb_vhls.smil/chunklist_b5000000.m3u8" },
   { category: "VTV", name: "VTV5 Tây Nguyên", logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/VTV5_logo_24.png", stream: "https://live.fptplay53.net/fnxhd1/vtv5taynguyen_vhls.smil/chunklist_b5000000.m3u8" },
   { category: "VTV", name: "Vietnam Today", logo: "https://static.wikia.nocookie.net/logos/images/f/f2/Logo_Vietnam_Today_07-2025_v2.png/revision/latest?cb=20260228060318&path-prefix=uk", stream: "https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8" },
+  { category: "VTV", name: "VTV1 ident 2026", logo: "https://static.wikia.nocookie.net/ep-deo/images/f/f9/Image_%2812%29.png/revision/latest?cb=20260914074936", stream: "/ads/ad1.mp4", desc: "Hình hiệu chính VTV1 2026 - Phát lặp chu kỳ" },
+  { category: "VTV", name: "VTV6 ident 2026", logo: "https://static.wikia.nocookie.net/ep-deo/images/3/31/Vtv6_front.png/revision/latest?cb=20260913100008", stream: "/ads/ad2.mp4", desc: "Hình hiệu VTV6 2026 (No logo) - Phát lặp chu kỳ" },
+  { category: "VTV", name: "VTV10 ident 2026", logo: "https://static.wikia.nocookie.net/ftv/images/a/a0/I10.png/revision/latest/scale-to-width-down/1000?cb=20260601094723&path-prefix=vi", stream: "/ads/ad3.mp4", desc: "Hình hiệu VTV10 2026 (30.03.2026) - Phát lặp chu kỳ" },
 
   // VTVcab
   // { category: "VTVcab", name: "ON SPORT +", logo: "https://img.vtvprime.vn/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvT04rU1BPUlQrLnBuZw==.png", stream: "https://freem3u.xyz/api/live/play.m3u8?vid=193" },

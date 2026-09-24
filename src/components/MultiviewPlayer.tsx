@@ -100,6 +100,54 @@ const VideoSlot: React.FC<VideoSlotProps> = ({
       return;
     }
 
+    const streamUrl = channel.streamUrl;
+    const isMp4 =
+      streamUrl.endsWith('.mp4') ||
+      streamUrl.includes('.mp4') ||
+      streamUrl.startsWith('/ads/') ||
+      streamUrl.startsWith('/intro-video');
+
+    if (isMp4) {
+      video.loop = true;
+      video.src = streamUrl;
+      video.load();
+
+      const handleLoadedMetadata = () => {
+        setIsLoading(false);
+        video.play().catch(() => {});
+      };
+
+      const handlePlaying = () => {
+        setIsLoading(false);
+        setHasError(false);
+      };
+
+      const handleEnded = () => {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      };
+
+      const handleError = () => {
+        setHasError(true);
+        setIsLoading(false);
+      };
+
+      video.addEventListener('loadedmetadata', handleLoadedMetadata);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('ended', handleEnded);
+      video.addEventListener('error', handleError);
+
+      return () => {
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('ended', handleEnded);
+        video.removeEventListener('error', handleError);
+        video.loop = false;
+      };
+    }
+
+    video.loop = false;
+
     if (Hls.isSupported()) {
       const hls = new Hls({
         enableWorker: true,

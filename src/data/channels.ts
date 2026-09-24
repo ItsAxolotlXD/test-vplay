@@ -23,6 +23,10 @@ const RAW_CHANNELS: RawChannelItem[] = [
   { id: 'vtv9', name: 'VTV9 HD', logo: 'https://static.wikia.nocookie.net/logos/images/7/7b/Logo_VTV9_20.12.2012.png/revision/latest?cb=20260301015846&path-prefix=uk', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v9abr/live247-hls-avc/v9abr-avc1_5600000=10000-mp4a_140800_vie=20000.m3u8' },
   { id: 'vtv10', name: 'VTV10 HD', logo: 'https://static.wikia.nocookie.net/ftv/images/a/a0/I10.png/revision/latest/scale-to-width-down/1000?cb=20260601094723&path-prefix=vi', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/live/media/v10abr/live247-hls-avc/v10abr-avc1_5600000=10000-mp4a_131600=20000.m3u8' },
   { id: 'vn_today', name: 'Vietnam Today HD', logo: 'https://static.wikia.nocookie.net/logos/images/f/f2/Logo_Vietnam_Today_07-2025_v2.png/revision/latest?cb=20260228060318&path-prefix=uk', category: 'Kênh VTV', streamUrl: 'https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8' },
+  // 3 luồng kênh phát lặp hình hiệu Ident 2026
+  { id: 'vtv1_ident_2026', name: 'VTV1 ident 2026', logo: 'https://static.wikia.nocookie.net/ep-deo/images/f/f9/Image_%2812%29.png/revision/latest?cb=20260914074936', category: 'Kênh VTV', streamUrl: '/ads/ad1.mp4' },
+  { id: 'vtv6_ident_2026', name: 'VTV6 ident 2026', logo: 'https://static.wikia.nocookie.net/ep-deo/images/3/31/Vtv6_front.png/revision/latest?cb=20260913100008', category: 'Kênh VTV', streamUrl: '/ads/ad2.mp4' },
+  { id: 'vtv10_ident_2026', name: 'VTV10 ident 2026', logo: 'https://static.wikia.nocookie.net/ftv/images/a/a0/I10.png/revision/latest/scale-to-width-down/1000?cb=20260601094723&path-prefix=vi', category: 'Kênh VTV', streamUrl: '/ads/ad3.mp4' },
 
   // Kênh VTVcab
   { id: 'on_trending', name: 'ON TRENDING TV HD', logo: 'https://img.vtvprime.vn/55xu-sW33ZbTdC_Jok1jkP6jWGpa3U96dXvvDuXoyz0/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGZjNzVhY2EtYjZhYS00MjYwLWIwMDMtZDRkYzg4OWI4ZGNkLnBuZw==.png', category: 'Kênh VTVcab', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=186' },
@@ -229,5 +233,14 @@ export const SCHEDULE_DATA: Record<string, ProgramScheduleItem[]> = {
     { id: 'v4-1', channelId: 'vtv4', startTime: '19:00', endTime: '20:00', title: 'Thời sự VTV4', category: 'Tin tức', description: 'Bản tin đối ngoại.' },
     { id: 'v4-2', channelId: 'vtv4', startTime: '20:00', endTime: '21:00', title: 'VIETNAM TODAY: Kết nối Thế giới', category: 'Đối ngoại', description: 'Cửa sổ thông tin của Việt Nam ra thế giới.', isLive: true },
     { id: 'v4-3', channelId: 'vtv4', startTime: '21:00', endTime: '21:45', title: 'Vietnam Today English News 9PM', category: 'English', description: 'Daily news in English.' }
+  ],
+  vtv1_ident_2026: [
+    { id: 'v1-id-1', channelId: 'vtv1_ident_2026', startTime: '00:00', endTime: '23:59', title: 'VTV1 Ident 2026 (Hình hiệu chính)', category: 'Ident & Nhạc hiệu', description: 'Luồng phát lặp liên tục chu kỳ hình hiệu chính VTV1 năm 2026 chất lượng cao.', isLive: true }
+  ],
+  vtv6_ident_2026: [
+    { id: 'v6-id-1', channelId: 'vtv6_ident_2026', startTime: '00:00', endTime: '23:59', title: 'VTV6 Idents 07-09-2026 (No logo)', category: 'Ident & Nhạc hiệu', description: 'Luồng phát lặp liên tục chu kỳ hình hiệu VTV6 năm 2026 (bản No logo).', isLive: true }
+  ],
+  vtv10_ident_2026: [
+    { id: 'v10-id-1', channelId: 'vtv10_ident_2026', startTime: '00:00', endTime: '23:59', title: 'VTV10 Ident 2026 (30.03.2026)', category: 'Ident & Nhạc hiệu', description: 'Luồng phát lặp liên tục chu kỳ hình hiệu VTV10 năm 2026 bản chuẩn.', isLive: true }
   ]
 };

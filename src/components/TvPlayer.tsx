@@ -62,6 +62,31 @@ export const TvPlayer: React.FC<TvPlayerProps> = ({
     }
 
     if (channel.streamUrl) {
+      const streamUrl = channel.streamUrl;
+      const isMp4 =
+        streamUrl.endsWith('.mp4') ||
+        streamUrl.includes('.mp4') ||
+        streamUrl.startsWith('/ads/') ||
+        streamUrl.startsWith('/intro-video');
+
+      if (isMp4) {
+        video.loop = true;
+        video.src = streamUrl;
+        video.load();
+        if (isPlaying) video.play().catch(() => {});
+        const handleEnded = () => {
+          video.currentTime = 0;
+          if (isPlaying) video.play().catch(() => {});
+        };
+        video.addEventListener('ended', handleEnded);
+        return () => {
+          video.removeEventListener('ended', handleEnded);
+          video.loop = false;
+        };
+      }
+
+      video.loop = false;
+
       if (Hls.isSupported()) {
         const hls = new Hls({
           enableWorker: true,
