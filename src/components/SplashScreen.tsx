@@ -77,19 +77,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
           {/* Centered Spatial Glass Card & Typography */}
           <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center">
-            {/* Top Spatial Eyebrow / Tag */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/[0.04] border border-slate-900/[0.08] backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.03)]"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-sky-500 animate-pulse" />
-              <span className="text-[11px] font-semibold tracking-[0.2em] uppercase text-slate-600">
-                Spatial Glass OS
-              </span>
-            </motion.div>
-
             {/* Main Title: "Welcome to Spatial Glass" with Gentle, Slow Moving Glow */}
             <motion.div
               initial={{ opacity: 0, scale: 0.94 }}

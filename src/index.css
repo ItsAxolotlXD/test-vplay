@@ -1181,9 +1181,8 @@ button.btn-pill::after {
 #vboard-keyboard-container button[class*="rounded-\[7px\]"] {
   border-radius: 7px !important;
 }
-#vboard-keyboard-container button[class*="rounded-\[22px\]"] {
-  border-radius: 18px !important;
+/* 4. V-Cursor custom pointer styles (Hide device cursor when V-Cursor is enabled) */
+html.vplay-custom-cursor-active,
+html.vplay-custom-cursor-active * {
+  cursor: none !important;
 }
-
-
-

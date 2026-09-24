@@ -22,9 +22,11 @@ import {
   Monitor,
   Keyboard as KeyboardIcon,
   Sliders,
-  Droplets
+  Droplets,
+  MousePointer,
+  MousePointerClick
 } from 'lucide-react';
-import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, WALLPAPER_PRESETS, VBOARD_SKIN_OPTIONS, VBoardSkin } from '../hooks/useSettings';
+import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, WALLPAPER_PRESETS, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useTabSearch } from '../context/TabSearchContext';
 
@@ -105,7 +107,8 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
     'Cỡ chữ ứng dụng', 'Cỡ chữ', 'Cài đặt', 'Settings', 'UI', 'Display',
     'Appearance', 'Splash Screen', 'Reload App', 'Màn hình khởi động', 'Tải lại', 'Refresh',
     'Change your background', 'Background', 'Hình nền', 'Wallpaper', 'Spatial Glass', 'Duo Light', 'Duo Dark',
-    'Shiny outline', 'Shiny', 'Outline', 'Viền', 'Viền sáng bóng', 'Specular', 'Rim'
+    'Shiny outline', 'Shiny', 'Outline', 'Viền', 'Viền sáng bóng', 'Specular', 'Rim',
+    'V-Cursor', 'VCursor', 'Cursor', 'Con trỏ chuột', 'Con trỏ', 'Chuột', 'Mouse', 'Pointer', 'Bảng màu'
   );
 
   const isSection2Visible = matchesSearch(
@@ -572,6 +575,364 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                     }`}
                   />
                 </button>
+              </div>
+            )}
+
+            {/* Card: V-Cursor (Con trỏ chuột tùy biến VPlay) */}
+            {(matchesSearch('V-Cursor') ||
+              matchesSearch('VCursor') ||
+              matchesSearch('Cursor') ||
+              matchesSearch('Con trỏ chuột') ||
+              matchesSearch('Con trỏ') ||
+              matchesSearch('Chuột') ||
+              matchesSearch('Mouse') ||
+              matchesSearch('Pointer') ||
+              matchesSearch('Bảng màu') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-vcursor"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-4 transition-colors border border-rose-500/20 hover:border-rose-500/40 hover:bg-white/[0.03]"
+              >
+                {/* Header row with Title and Toggle */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <MousePointer className="w-4.5 h-4.5 text-rose-400" />
+                      <span>V-Cursor</span>
+                      {settings.vcursorEnabled !== false ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                          ĐANG BẬT
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-gray-400 border border-white/10">
+                          TẮT (DÙNG CON TRỎ THIẾT BỊ)
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-[#9CA3AF] leading-normal">
+                      Sử dụng con trỏ chuột độc quyền của VPlay thay vì của device
+                    </div>
+                    <div className="text-[11px] text-gray-400 leading-relaxed">
+                      Con trỏ mặc định là đen viền trắng chuẩn macOS. Cho phép thay đổi màu thân, viền, kích thước và hiệu ứng phát sáng.
+                    </div>
+                  </div>
+
+                  {/* Toggle Switch */}
+                  <button
+                    id="toggle-vcursor-enabled"
+                    type="button"
+                    role="switch"
+                    aria-checked={settings.vcursorEnabled !== false}
+                    onClick={() => updateSetting('vcursorEnabled', settings.vcursorEnabled === false ? true : false)}
+                    className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
+                      settings.vcursorEnabled !== false ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                    }`}
+                  >
+                    <span
+                      className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                        settings.vcursorEnabled !== false ? 'translate-x-5.5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Sub-controls when V-Cursor is enabled */}
+                {settings.vcursorEnabled !== false && (
+                  <div className="space-y-4 pt-2 border-t border-white/10">
+                    {/* 1. Interactive Preview Stage */}
+                    <div className="p-4 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        {/* Live Cursor Visualizer */}
+                        <div className="w-14 h-14 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center relative overflow-hidden group shadow-inner">
+                          <svg
+                            width={Math.max(20, Math.min(32, settings.vcursorSize || 24))}
+                            height={Math.max(20, Math.min(32, settings.vcursorSize || 24))}
+                            viewBox="0 0 24 24"
+                            className="select-none transition-transform group-hover:scale-110"
+                            style={{
+                              filter: settings.vcursorGlow
+                                ? `drop-shadow(0 0 8px ${settings.vcursorColor || '#000000'}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`
+                                : 'drop-shadow(0 2px 4px rgba(0,0,0,0.45))',
+                            }}
+                          >
+                            <path
+                              d="M 1.5 1.5 L 1.5 19.5 L 6.5 15.2 L 10.8 23.2 L 13.8 21.6 L 9.6 13.8 L 16 13.8 Z"
+                              fill={settings.vcursorColor || '#000000'}
+                              stroke={settings.vcursorBorderColor || '#FFFFFF'}
+                              strokeWidth="1.5"
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </div>
+
+                        <div>
+                          <div className="text-xs font-semibold text-white flex items-center gap-2">
+                            <span>Bản xem trước trực tiếp</span>
+                            <span className="text-[10px] text-gray-400 font-normal">
+                              ({settings.vcursorSize || 24}px)
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-gray-400 mt-0.5">
+                            Thân: <span className="font-mono text-white font-medium">{settings.vcursorColor || '#000000'}</span> • Viền: <span className="font-mono text-white font-medium">{settings.vcursorBorderColor || '#FFFFFF'}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Interactive sandbox buttons for immediate test */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                          <MousePointerClick className="w-3.5 h-3.5 text-rose-400" />
+                          <span>Rê chuột thử</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateSetting('vcursorColor', '#000000');
+                            updateSetting('vcursorBorderColor', '#FFFFFF');
+                            updateSetting('vcursorSize', 24);
+                            updateSetting('vcursorGlow', false);
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5"
+                          title="Đặt lại con trỏ macOS chuẩn (đen viền trắng 24px)"
+                        >
+                          <RotateCcw className="w-3 h-3 text-gray-400" />
+                          <span>Đặt lại macOS</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 2. Presets Palette */}
+                    <div className="space-y-2">
+                      <div className="text-xs font-semibold text-white flex items-center justify-between">
+                        <span>Mẫu con trỏ có sẵn</span>
+                        <span className="text-[10px] text-gray-400">Chọn nhanh phong cách</span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {VCURSOR_PRESETS.map((preset) => {
+                          const isSelected =
+                            (settings.vcursorColor || '#000000').toLowerCase() === preset.fill.toLowerCase() &&
+                            (settings.vcursorBorderColor || '#FFFFFF').toLowerCase() === preset.border.toLowerCase();
+
+                          return (
+                            <button
+                              key={preset.id}
+                              type="button"
+                              onClick={() => {
+                                updateSetting('vcursorColor', preset.fill);
+                                updateSetting('vcursorBorderColor', preset.border);
+                              }}
+                              className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 relative ${
+                                isSelected
+                                  ? 'bg-rose-500/15 border-rose-500/50 shadow-md ring-1 ring-rose-500/30'
+                                  : 'bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.06]'
+                              }`}
+                            >
+                              {/* Mini Cursor Icon */}
+                              <div className="w-7 h-7 rounded-lg bg-black/40 border border-white/10 flex items-center justify-center shrink-0">
+                                <svg width="15" height="15" viewBox="0 0 24 24" className="select-none">
+                                  <path
+                                    d="M 1.5 1.5 L 1.5 19.5 L 6.5 15.2 L 10.8 23.2 L 13.8 21.6 L 9.6 13.8 L 16 13.8 Z"
+                                    fill={preset.fill}
+                                    stroke={preset.border}
+                                    strokeWidth="2"
+                                  />
+                                </svg>
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <div className="text-xs font-semibold text-white truncate flex items-center gap-1">
+                                  <span>{preset.name}</span>
+                                  {preset.id === 'macos-dark' && (
+                                    <span className="text-[8px] font-bold px-1 py-0.2 bg-white/20 text-white rounded">Gốc</span>
+                                  )}
+                                </div>
+                                <div className="text-[10px] text-gray-400 truncate">
+                                  {preset.desc}
+                                </div>
+                              </div>
+
+                              {isSelected && (
+                                <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-rose-500 flex items-center justify-center text-white">
+                                  <Check className="w-2.5 h-2.5 stroke-[3]" />
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 3. Custom Color Palette (Thân & Viền) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      {/* Thân con trỏ (Fill) */}
+                      <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-white flex items-center gap-1.5">
+                            <Droplets className="w-3.5 h-3.5 text-rose-400" />
+                            <span>Màu thân con trỏ</span>
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-gray-300">
+                            {settings.vcursorColor || '#000000'}
+                          </span>
+                        </div>
+
+                        {/* Quick Color Chips */}
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {[
+                            '#000000',
+                            '#FFFFFF',
+                            '#E6005A',
+                            '#EF4444',
+                            '#F97316',
+                            '#F59E0B',
+                            '#10B981',
+                            '#00E5FF',
+                            '#3B82F6',
+                            '#8B5CF6',
+                          ].map((hex) => {
+                            const isPicked = (settings.vcursorColor || '#000000').toLowerCase() === hex.toLowerCase();
+                            return (
+                              <button
+                                key={hex}
+                                type="button"
+                                onClick={() => updateSetting('vcursorColor', hex)}
+                                className={`w-6 h-6 rounded-full border transition-all cursor-pointer relative ${
+                                  isPicked ? 'scale-110 ring-2 ring-rose-500 shadow-md' : 'hover:scale-105'
+                                }`}
+                                style={{ backgroundColor: hex, borderColor: hex === '#000000' ? '#444' : '#fff' }}
+                                title={hex}
+                              />
+                            );
+                          })}
+
+                          {/* Native Color Picker for ultimate freedom */}
+                          <label className="w-6 h-6 rounded-full border border-dashed border-white/40 flex items-center justify-center cursor-pointer hover:border-white transition-colors overflow-hidden relative">
+                            <input
+                              type="color"
+                              value={settings.vcursorColor || '#000000'}
+                              onChange={(e) => updateSetting('vcursorColor', e.target.value)}
+                              className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                              title="Chọn màu tự do"
+                            />
+                            <Palette className="w-3 h-3 text-gray-300 pointer-events-none" />
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Viền con trỏ (Border / Stroke) */}
+                      <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-white flex items-center gap-1.5">
+                            <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                            <span>Màu viền con trỏ</span>
+                          </span>
+                          <span className="text-[11px] font-mono font-medium text-gray-300">
+                            {settings.vcursorBorderColor || '#FFFFFF'}
+                          </span>
+                        </div>
+
+                        {/* Quick Border Color Chips */}
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {[
+                            '#FFFFFF',
+                            '#000000',
+                            '#00E5FF',
+                            '#F59E0B',
+                            '#E6005A',
+                            '#10B981',
+                            '#E4E4E7',
+                            '#52525B',
+                          ].map((hex) => {
+                            const isPicked = (settings.vcursorBorderColor || '#FFFFFF').toLowerCase() === hex.toLowerCase();
+                            return (
+                              <button
+                                key={hex}
+                                type="button"
+                                onClick={() => updateSetting('vcursorBorderColor', hex)}
+                                className={`w-6 h-6 rounded-full border transition-all cursor-pointer relative ${
+                                  isPicked ? 'scale-110 ring-2 ring-cyan-500 shadow-md' : 'hover:scale-105'
+                                }`}
+                                style={{ backgroundColor: hex, borderColor: hex === '#000000' ? '#444' : '#fff' }}
+                                title={hex}
+                              />
+                            );
+                          })}
+
+                          {/* Native Color Picker */}
+                          <label className="w-6 h-6 rounded-full border border-dashed border-white/40 flex items-center justify-center cursor-pointer hover:border-white transition-colors overflow-hidden relative">
+                            <input
+                              type="color"
+                              value={settings.vcursorBorderColor || '#FFFFFF'}
+                              onChange={(e) => updateSetting('vcursorBorderColor', e.target.value)}
+                              className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                              title="Chọn màu viền tự do"
+                            />
+                            <Palette className="w-3 h-3 text-gray-300 pointer-events-none" />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. Cursor Size & Glow Effect */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
+                      {/* Size Selector */}
+                      <div className="space-y-1.5 w-full sm:w-auto">
+                        <div className="text-xs font-semibold text-white">Kích thước con trỏ</div>
+                        <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
+                          {[
+                            { label: 'Nhỏ (20px)', val: 20 },
+                            { label: 'Chuẩn macOS (24px)', val: 24 },
+                            { label: 'Lớn (28px)', val: 28 },
+                            { label: 'Rất lớn (34px)', val: 34 },
+                          ].map((sz) => {
+                            const isSelected = (settings.vcursorSize || 24) === sz.val;
+                            return (
+                              <button
+                                key={sz.val}
+                                type="button"
+                                onClick={() => updateSetting('vcursorSize', sz.val)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-[#E50914] text-white shadow-md'
+                                    : 'text-gray-400 hover:text-white'
+                                }`}
+                              >
+                                {sz.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Glow Toggle */}
+                      <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                        <div>
+                          <div className="text-xs font-semibold text-white">Phát sáng Neon</div>
+                          <div className="text-[10px] text-gray-400">Hiệu ứng quầng sáng nhẹ</div>
+                        </div>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={Boolean(settings.vcursorGlow)}
+                          onClick={() => updateSetting('vcursorGlow', !settings.vcursorGlow)}
+                          className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 cursor-pointer shrink-0 flex items-center ${
+                            settings.vcursorGlow ? 'bg-rose-500' : 'bg-white/20'
+                          }`}
+                        >
+                          <span
+                            className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-200 ${
+                              settings.vcursorGlow ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

@@ -86,7 +86,79 @@ export interface SystemSettings {
   shinyOutline: boolean;
   spatialGlassBlur: number; // 0 to 50px
   spatialGlassOpacity: number; // 5 to 100 percent
+  vcursorEnabled: boolean; // Bật / Tắt con trỏ V-Cursor
+  vcursorColor: string; // Màu thân con trỏ (mặc định đen #000000)
+  vcursorBorderColor: string; // Màu viền con trỏ (mặc định trắng #FFFFFF)
+  vcursorSize: number; // Kích thước con trỏ (mặc định 24px)
+  vcursorGlow: boolean; // Hiệu ứng phát sáng nhẹ
 }
+
+export interface VCursorPreset {
+  id: string;
+  name: string;
+  fill: string;
+  border: string;
+  desc: string;
+}
+
+export const VCURSOR_PRESETS: VCursorPreset[] = [
+  {
+    id: 'macos-dark',
+    name: 'macOS Mặc định',
+    fill: '#000000',
+    border: '#FFFFFF',
+    desc: 'Đen viền trắng chuẩn macOS',
+  },
+  {
+    id: 'macos-light',
+    name: 'macOS Trắng',
+    fill: '#FFFFFF',
+    border: '#000000',
+    desc: 'Trắng viền đen sắc nét',
+  },
+  {
+    id: 'vplay-crimson',
+    name: 'VPlay Crimson',
+    fill: '#E6005A',
+    border: '#FFFFFF',
+    desc: 'Đỏ hồng thương hiệu VPlay',
+  },
+  {
+    id: 'cyber-cyan',
+    name: 'Cyber Cyan',
+    fill: '#00E5FF',
+    border: '#000000',
+    desc: 'Xanh neon rực sáng công nghệ',
+  },
+  {
+    id: 'emerald-green',
+    name: 'Emerald Green',
+    fill: '#10B981',
+    border: '#FFFFFF',
+    desc: 'Xanh ngọc lục bảo tươi mát',
+  },
+  {
+    id: 'solar-amber',
+    name: 'Solar Amber',
+    fill: '#F59E0B',
+    border: '#000000',
+    desc: 'Vàng cam hổ phách ấm áp',
+  },
+  {
+    id: 'royal-purple',
+    name: 'Royal Purple',
+    fill: '#8B5CF6',
+    border: '#FFFFFF',
+    desc: 'Tím không gian huyền bí',
+  },
+  {
+    id: 'pure-gold',
+    name: 'Champagne Gold',
+    fill: '#EAB308',
+    border: '#FFFFFF',
+    desc: 'Vàng ánh kim rạng rỡ',
+  },
+];
 
 export const DEFAULT_SETTINGS: SystemSettings = {
   userName: 'User',
@@ -112,6 +184,11 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   shinyOutline: true,
   spatialGlassBlur: 20,
   spatialGlassOpacity: 65,
+  vcursorEnabled: true,
+  vcursorColor: '#000000',
+  vcursorBorderColor: '#FFFFFF',
+  vcursorSize: 24,
+  vcursorGlow: false,
 };
 
 export interface WallpaperOption {
@@ -247,6 +324,12 @@ export const getStoredSettings = (): SystemSettings => {
         ? Math.max(5, Math.min(100, parsed.spatialGlassOpacity))
         : 65;
 
+      const vcursorEnabled = typeof parsed.vcursorEnabled === 'boolean' ? parsed.vcursorEnabled : true;
+      const vcursorColor = typeof parsed.vcursorColor === 'string' && parsed.vcursorColor.trim() ? parsed.vcursorColor : '#000000';
+      const vcursorBorderColor = typeof parsed.vcursorBorderColor === 'string' && parsed.vcursorBorderColor.trim() ? parsed.vcursorBorderColor : '#FFFFFF';
+      const vcursorSize = typeof parsed.vcursorSize === 'number' && !isNaN(parsed.vcursorSize) ? Math.max(16, Math.min(48, parsed.vcursorSize)) : 24;
+      const vcursorGlow = typeof parsed.vcursorGlow === 'boolean' ? parsed.vcursorGlow : false;
+
       return { 
         ...base, 
         ...parsed,
@@ -259,7 +342,12 @@ export const getStoredSettings = (): SystemSettings => {
         floatyBar: typeof parsed.floatyBar === 'boolean' ? parsed.floatyBar : false,
         vboardSkin: ['default', 'ios', 'google', 'butterfly', 'physical'].includes(parsed.vboardSkin) ? parsed.vboardSkin : 'default',
         userName: parsed.userName || legacyUser || 'User',
-        theme: 'dark'
+        theme: 'dark',
+        vcursorEnabled,
+        vcursorColor,
+        vcursorBorderColor,
+        vcursorSize,
+        vcursorGlow,
       };
     } else if (legacyTheme || legacyUser) {
       return {
@@ -272,13 +360,20 @@ export const getStoredSettings = (): SystemSettings => {
   return DEFAULT_SETTINGS;
 };
 
-// Apply side-effects (theme class, font-scale property, font-family, background wallpaper)
+// Apply side-effects (theme class, font-scale property, font-family, background wallpaper, custom cursor)
 export const applySystemSettings = (settings: SystemSettings) => {
   if (typeof document === 'undefined') return;
 
   // App is dark mode only
   document.documentElement.classList.remove('light-mode');
   document.documentElement.classList.add('dark');
+
+  // Apply V-Cursor active class to html
+  if (settings.vcursorEnabled !== false) {
+    document.documentElement.classList.add('vplay-custom-cursor-active');
+  } else {
+    document.documentElement.classList.remove('vplay-custom-cursor-active');
+  }
 
   // Apply font scale
   const scaleVal = FONT_SCALE_CONFIG[settings.fontScale]?.scale || '1';

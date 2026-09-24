@@ -74,6 +74,7 @@ import { useFeatureFlags } from './hooks/useFeatureFlags';
 import { motion, AnimatePresence } from 'motion/react';
 import { MotionEffectsLayer } from './components/motion/MotionEffectsLayer';
 import { VBoardOverlay } from './components/vboard/VBoardOverlay';
+import { VCursor } from './components/VCursor';
 
 export default function App() {
   const { settings, updateSetting } = useSettings();
@@ -938,6 +939,15 @@ export default function App() {
           }}
           channels={channels}
           navigate={navigate}
+        />
+
+        {/* V-Cursor: Con trỏ chuột của VPlay thay vì device, hỗ trợ bảng màu tùy chỉnh */}
+        <VCursor
+          enabled={settings.vcursorEnabled !== false}
+          color={settings.vcursorColor || '#000000'}
+          borderColor={settings.vcursorBorderColor || '#FFFFFF'}
+          size={settings.vcursorSize || 24}
+          glow={settings.vcursorGlow || false}
         />
       </div>
     </TabSearchProvider>
