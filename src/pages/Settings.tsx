@@ -1141,18 +1141,18 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
               </div>
             )}
 
-            {/* Card 4: Màn hình khởi động (Splash Screen) */}
-            {(matchesSearch('Splash Screen') || matchesSearch('Màn hình khởi động')) && (
+            {/* Card 4: Màn hình khởi động & VNRT Ads */}
+            {(matchesSearch('Splash Screen') || matchesSearch('Màn hình khởi động') || matchesSearch('VNRT Ads') || matchesSearch('Ads')) && (
               <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <span>Màn hình khởi động & Video Intro</span>
+                    <span>Màn hình khởi động & VNRT Ads</span>
                     <span className="px-2 py-0.5 text-[10px] font-bold bg-[#E6005A]/20 text-[#E6005A] rounded-full">
                       VNRT Online OS
                     </span>
                   </div>
                   <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Phát video intro giới thiệu và hiệu ứng Spatial Glass khi khởi chạy ứng dụng
+                    Phát ngẫu nhiên VNRT Ads (VTV1, VTV6, VTV10) và hiệu ứng Spatial Glass khi khởi chạy ứng dụng
                   </div>
                 </div>
 
@@ -1164,9 +1164,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                       window.dispatchEvent(new CustomEvent('vplay:replay_startup_video'));
                     }}
                     className="px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all shadow-md cursor-pointer shrink-0"
-                    title="Xem video intro khởi động"
+                    title="Xem ngẫu nhiên VNRT Ads"
                   >
-                    Video Intro
+                    VNRT Ads
                   </button>
                   <button
                     type="button"

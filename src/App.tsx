@@ -888,10 +888,9 @@ export default function App() {
           onImportPlaylist={handleImportPlaylist}
         />
 
-        {/* Initial Startup Intro Video (Plays before splash screen) */}
+        {/* Initial Startup Intro Video / VNRT Ads (Plays before splash screen) */}
         {showStartupVideo && (
           <StartupVideoIntro
-            videoUrl="https://static.wikia.nocookie.net/ep-deo/images/4/4a/5c1imv.mp4/revision/latest?cb=20260924070114"
             onFinish={() => {
               setShowStartupVideo(false);
               setShowSplashScreen(true);

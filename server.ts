@@ -994,11 +994,10 @@ app.get("/api/audio-proxy", async (req, res) => {
   }
 });
 
-// Stream local intro video with full Range / 206 Partial Content support
-const handleStreamIntroVideo = (req: express.Request, res: express.Response) => {
-  const videoPath = path.join(process.cwd(), "public/intro-video.mp4");
+// Stream local video files with full Range / 206 Partial Content support
+const handleStreamVideoFile = (videoPath: string, req: express.Request, res: express.Response) => {
   if (!fs.existsSync(videoPath)) {
-    return res.status(404).send("Intro video not found");
+    return res.status(404).send("Video not found");
   }
 
   const stat = fs.statSync(videoPath);
@@ -1032,8 +1031,25 @@ const handleStreamIntroVideo = (req: express.Request, res: express.Response) => 
   }
 };
 
+const handleStreamIntroVideo = (req: express.Request, res: express.Response) => {
+  const videoPath = path.join(process.cwd(), "public/intro-video.mp4");
+  handleStreamVideoFile(videoPath, req, res);
+};
+
 app.get("/intro-video.mp4", handleStreamIntroVideo);
 app.get("/api/intro-video", handleStreamIntroVideo);
+
+// Stream ads videos
+app.get("/ads/:filename", (req, res) => {
+  const filename = path.basename(req.params.filename);
+  const videoPath = path.join(process.cwd(), "public/ads", filename);
+  handleStreamVideoFile(videoPath, req, res);
+});
+app.get("/api/ads/:filename", (req, res) => {
+  const filename = path.basename(req.params.filename);
+  const videoPath = path.join(process.cwd(), "public/ads", filename);
+  handleStreamVideoFile(videoPath, req, res);
+});
 
 // Video proxy for external wikia links (bypasses hotlink protection)
 app.get("/api/video-proxy", async (req, res) => {
