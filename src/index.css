@@ -1186,3 +1186,45 @@ html.vplay-custom-cursor-active,
 html.vplay-custom-cursor-active * {
   cursor: none !important;
 }
+
+/* 5. Vplay Special Themes (Tết Dương Lịch, Tết Nguyên Đán, Christmas, Yêu Nước) */
+html.theme-new-year,
+html.theme-new-year body {
+  background-color: #060B19 !important;
+  color: #F0F6FC;
+}
+html.theme-new-year ::selection {
+  background-color: #00F0FF !important;
+  color: #000000 !important;
+}
+
+html.theme-lunar-new-year,
+html.theme-lunar-new-year body {
+  background-color: #260303 !important;
+  color: #FFF5F5;
+}
+html.theme-lunar-new-year ::selection {
+  background-color: #FFD700 !important;
+  color: #8B0000 !important;
+}
+
+html.theme-christmas,
+html.theme-christmas body {
+  background-color: #071911 !important;
+  color: #F0FDF4;
+}
+html.theme-christmas ::selection {
+  background-color: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-patriotic,
+html.theme-patriotic body {
+  background-color: #2E0000 !important;
+  color: #FFFDF0;
+}
+html.theme-patriotic ::selection {
+  background-color: #FFE600 !important;
+  color: #900000 !important;
+}
+

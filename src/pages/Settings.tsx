@@ -29,6 +29,7 @@ import {
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, WALLPAPER_PRESETS, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useTabSearch } from '../context/TabSearchContext';
+import { useSpecialTheme } from '../hooks/useSpecialTheme';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -38,6 +39,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
   const { settings, updateSetting } = useSettings();
   const { flags, setFlag } = useFeatureFlags();
   const { searchQuery, setSearchQuery } = useTabSearch();
+  const { activeTheme, currentThemeData } = useSpecialTheme();
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
 
@@ -1054,6 +1056,40 @@ export const Settings: React.FC<SettingsProps> = ({ navigate }) => {
                   <span className="w-2 h-2 rounded-full bg-[#FF3366]" />
                   <span>DARK ONLY</span>
                 </div>
+              </div>
+            )}
+
+            {/* Card: Kho Theme Store (Special Themes) */}
+            {(matchesSearch('Theme Store') || matchesSearch('Theme') || matchesSearch('Giao diện đặc biệt') || matchesSearch('Kho giao diện') || matchesSearch('Tết') || matchesSearch('Christmas') || matchesSearch('Yêu nước')) && (
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-gradient-to-r from-pink-950/20 via-[#181820] to-purple-950/20 border border-pink-500/30 hover:border-pink-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
+                <div>
+                  <div className="font-semibold text-white text-sm flex items-center gap-2 flex-wrap">
+                    <Palette className="w-4 h-4 text-pink-400" />
+                    <span>Kho Giao Diện • Theme Store</span>
+                    {activeTheme !== 'default' ? (
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 text-[10px] font-bold border border-emerald-500/40 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Đang dùng: {currentThemeData?.name}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-zinc-300 text-[10px] font-semibold">
+                        Giao diện mặc định
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-[#9CA3AF] mt-1.5 leading-relaxed">
+                    Cài đặt và thay đổi các theme đặc biệt trong tab Shop: <strong>Tết Dương Lịch</strong> (pháo hoa & lấp lánh), <strong>Tết Nguyên Đán</strong> (cành mai cành đào), <strong>Christmas</strong> (tuyết rơi & đèn LED), <strong>Yêu nước</strong> (cờ đỏ sao vàng).
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => navigate?.('/shop')}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#E6005A] to-[#FF4C93] hover:brightness-110 active:scale-95 text-white text-xs font-bold transition-all shadow-md shadow-pink-600/30 shrink-0 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Mở Theme Store</span>
+                </button>
               </div>
             )}
 

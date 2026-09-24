@@ -7,12 +7,13 @@ export interface VShopProduct {
   priceFormatted: string;
   priceOrbs: number; // 10.000 VND = 10 ORBS => Math.round(price / 1000)
   image: string;
-  category: 'Thực phẩm' | 'Đồ công nghệ - Điện tử' | 'Đồ gia dụng';
+  category: 'Thực phẩm' | 'Đồ công nghệ - Điện tử' | 'Đồ gia dụng' | 'Theme Store';
   badge?: string;
   description: string;
 }
 
 export const SHOP_CATEGORIES = [
+  'Theme Store',
   'Thực phẩm',
   'Đồ công nghệ - Điện tử',
   'Đồ gia dụng'

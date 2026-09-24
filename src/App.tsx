@@ -76,6 +76,7 @@ import { MotionEffectsLayer } from './components/motion/MotionEffectsLayer';
 import { VBoardOverlay } from './components/vboard/VBoardOverlay';
 import { VCursor } from './components/VCursor';
 import { GlobalAnnouncementBanner } from './components/GlobalAnnouncementBanner';
+import { SpecialThemeEffectsLayer } from './components/themes/SpecialThemeEffectsLayer';
 
 export default function App() {
   const { settings, updateSetting } = useSettings();
@@ -786,6 +787,9 @@ export default function App() {
           onToggle={() => toggleFlag('animation_test')}
           navigate={navigate}
         />
+
+        {/* Special App Themes Layer (Tết Dương Lịch, Tết Nguyên Đán, Christmas, Yêu Nước) */}
+        <SpecialThemeEffectsLayer />
 
         {/* Experimental V-board iOS Virtual Keyboard System */}
         <VBoardOverlay isEnabled={isVBoardEnabled} navigate={navigate} />

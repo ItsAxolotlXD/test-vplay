@@ -12,7 +12,9 @@ import {
   Search,
   ArrowRight,
   Coins,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  Palette
 } from 'lucide-react';
 import { 
   V_SHOP_PRODUCTS, 
@@ -24,6 +26,8 @@ import {
 import { HeroCarousel } from '../components/HeroCarousel';
 import { useOrbs } from '../hooks/useOrbs';
 import { useTabSearch } from '../context/TabSearchContext';
+import { ThemeStoreSection } from '../components/themes/ThemeStoreSection';
+import { SpecialTheme } from '../data/specialThemesData';
 
 interface VShopTabProps {
   navigate: (route: string, state?: any) => void;
@@ -137,13 +141,13 @@ export const VShopTab: React.FC<VShopTabProps> = ({ navigate }) => {
   });
 
   // Category refs for smooth scrolling
-  const categoryRefs = {
+  const categoryRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
     'Thực phẩm': useRef<HTMLDivElement>(null),
     'Đồ công nghệ - Điện tử': useRef<HTMLDivElement>(null),
     'Đồ gia dụng': useRef<HTMLDivElement>(null),
   };
 
-  const scrollRow = (category: ShopCategory, direction: 'left' | 'right') => {
+  const scrollRow = (category: string, direction: 'left' | 'right') => {
     const ref = categoryRefs[category];
     if (!ref || !ref.current) return;
     const scrollAmount = 350;
@@ -320,24 +324,62 @@ export const VShopTab: React.FC<VShopTabProps> = ({ navigate }) => {
           >
             Tất cả danh mục
           </button>
-          {SHOP_CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                selectedCategory === cat
-                  ? 'bg-[#E6005A] text-white shadow-md shadow-[#E6005A]/30'
-                  : 'bg-[#1E1E2C] text-zinc-400 hover:text-white border border-white/5'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {SHOP_CATEGORIES.map((cat) => {
+            const isThemeCategory = cat === 'Theme Store';
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  selectedCategory === cat
+                    ? 'bg-gradient-to-r from-[#E6005A] to-[#FF4C93] text-white shadow-md shadow-[#E6005A]/30'
+                    : isThemeCategory
+                      ? 'bg-purple-950/60 text-purple-200 border border-purple-500/40 hover:bg-purple-900/60'
+                      : 'bg-[#1E1E2C] text-zinc-400 hover:text-white border border-white/5'
+                }`}
+              >
+                {isThemeCategory && <Sparkles className="w-3.5 h-3.5 text-pink-400 shrink-0" />}
+                <span>{cat}</span>
+                {isThemeCategory && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-pink-500 text-[9px] font-black text-white">
+                    MỚI
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* SEARCH RESULT VIEW (If searching or single category filtered) */}
-        {(searchQuery || selectedCategory !== 'all') ? (
-          <div className="space-y-4 pt-2">
+        {/* SPECIAL THEME STORE DEDICATED CATEGORY VIEW */}
+        {selectedCategory === 'Theme Store' ? (
+          <div className="space-y-6 pt-2">
+            <ThemeStoreSection
+              onThemeApplied={(theme) => {
+                showToast(`Đã áp dụng thành công theme "${theme.name}"!`);
+              }}
+            />
+          </div>
+        ) : (searchQuery || selectedCategory !== 'all') ? (
+          /* SEARCH RESULT VIEW (If searching or other single category filtered) */
+          <div className="space-y-6 pt-2">
+            {/* Show Theme Store card if search term is relevant to themes */}
+            {(searchQuery.toLowerCase().includes('theme') ||
+              searchQuery.toLowerCase().includes('tết') ||
+              searchQuery.toLowerCase().includes('tet') ||
+              searchQuery.toLowerCase().includes('christmas') ||
+              searchQuery.toLowerCase().includes('noel') ||
+              searchQuery.toLowerCase().includes('yêu nước') ||
+              searchQuery.toLowerCase().includes('cờ') ||
+              searchQuery.toLowerCase().includes('giao diện')) && (
+              <div className="mb-6">
+                <ThemeStoreSection
+                  onThemeApplied={(theme) => {
+                    showToast(`Đã áp dụng thành công theme "${theme.name}"!`);
+                  }}
+                />
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <span>Kết quả lọc sản phẩm</span>
@@ -369,13 +411,20 @@ export const VShopTab: React.FC<VShopTabProps> = ({ navigate }) => {
             )}
           </div>
         ) : (
-          /* 3 KHỐI NGANG CẤP 2 THEO ĐÚNG 3 CATEGORY YÊU CẦU:
-             1. Thực phẩm
-             2. Đồ công nghệ - Điện tử
-             3. Đồ gia dụng
-             (Đã bỏ description theo yêu cầu)
-          */
-          <div className="space-y-10 pt-2">
+          /* TOÀN BỘ DANH MỤC (ALL): KHO THEME STORE + 3 KHỐI HÀNG HÓA */
+          <div className="space-y-12 pt-2">
+            {/* 1. KHO THEME STORE ĐẶC BIỆT TRONG TAB SHOP */}
+            <ThemeStoreSection
+              onThemeApplied={(theme) => {
+                showToast(`Đã áp dụng thành công theme "${theme.name}"!`);
+              }}
+            />
+
+            {/* 3 KHỐI NGANG CẤP 2 THEO ĐÚNG 3 CATEGORY YÊU CẦU:
+               1. Thực phẩm
+               2. Đồ công nghệ - Điện tử
+               3. Đồ gia dụng
+            */}
             {/* CATEGORY 1: Thực phẩm */}
             <section className="space-y-3">
               <div className="flex items-center justify-between">
