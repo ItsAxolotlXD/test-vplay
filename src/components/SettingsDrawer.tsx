@@ -106,9 +106,9 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             className="relative z-10 w-full sm:w-[580px] md:w-[680px] lg:w-[760px] h-full max-h-screen bg-[#141417]/95 text-[#E0E0E6] backdrop-blur-2xl border-l border-white/10 shadow-[-16px_0_48px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden"
           >
             {/* Top Bar / Header */}
-            <div className="shrink-0 px-5 sm:px-6 py-4 bg-[#18181C]/90 border-b border-white/10 flex items-center justify-between gap-4 backdrop-blur-xl z-20">
+            <div className="shrink-0 px-5 sm:px-6 py-4 bg-[#18181C]/90 border-b border-white/20 flex items-center justify-between gap-4 backdrop-blur-xl z-20">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#E6007A] to-[#FF6699] flex items-center justify-center shadow-lg shadow-[#E6007A]/25 shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white shadow-md shrink-0">
                   <SettingsIcon className="w-5 h-5 text-white animate-[spin_12s_linear_infinite]" />
                 </div>
                 <div className="min-w-0">
@@ -116,11 +116,11 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                     <h2 className="text-base sm:text-lg font-extrabold text-white tracking-tight truncate">
                       Cài đặt
                     </h2>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#E6007A]/20 text-[#FF6699] border border-[#E6007A]/30 shrink-0">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20 shrink-0">
                       DRAWER
                     </span>
                   </div>
-                  <p className="text-[11px] sm:text-xs text-[#9CA3AF] truncate">
+                  <p className="text-[11px] sm:text-xs text-white/70 truncate">
                     Trượt từ bên phải • Tùy chỉnh hệ thống & giao diện
                   </p>
                 </div>
@@ -133,9 +133,9 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                   type="button"
                   onClick={handleSwitchToPageMode}
                   title="Mở dưới dạng tab trang (Tắt Drawer)"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-zinc-300 hover:text-white border border-white/5 transition-all cursor-pointer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-white/80 hover:text-white border border-white/20 transition-all cursor-pointer"
                 >
-                  <Maximize2 className="w-3.5 h-3.5 text-zinc-400" />
+                  <Maximize2 className="w-3.5 h-3.5 text-white" />
                   <span>Dạng Tab</span>
                 </button>
 
@@ -144,9 +144,9 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                   type="button"
                   onClick={onClose}
                   title="Đóng cài đặt (Esc)"
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white transition-all cursor-pointer border border-white/5 group"
+                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all cursor-pointer border border-white/20 group"
                 >
-                  <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+                  <X className="w-5 h-5 text-white group-hover:rotate-90 transition-transform duration-200" />
                 </button>
               </div>
             </div>

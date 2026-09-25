@@ -143,20 +143,57 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
   const isFeatureFlagsVisible = matchesSearch(
     'Feature Flags', 'Cờ tính năng', 'Thử nghiệm', 'Experimental',
-    'AI Copilot', 'Gỡ lỗi', 'Labs', 'Flags'
+    'AI Copilot', 'Gỡ lỗi', 'Labs', 'Flags', 'Minimalism', 'Minimal'
   );
 
-  const hasAnyResults = !normalizedQuery || isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible;
+  const isAboutVisible = matchesSearch(
+    'Giới thiệu', 'Tên người dùng', 'Username', 'User', 'Tên', 'Hồ sơ', 'Profile', 'OOBE', 'About', 'Phiên bản', 'Version'
+  );
+
+  const isSearchActive = Boolean(normalizedQuery);
+  const showCategoryMenu = !isSearchActive && activeCategory === 'main';
+  const showSpatialGlass = isSearchActive ? isSpatialGlassVisible : (activeCategory === 'spatial_glass');
+  const showAppearance = isSearchActive ? isSection1Visible : (activeCategory === 'appearance');
+  const showAccessibility = isSearchActive ? isSection2Visible : (activeCategory === 'accessibility');
+  const showTools = isSearchActive ? (isSection4Visible || matchesSearch('Copilot', 'Lệnh', 'Slash', 'V-Duo')) : (activeCategory === 'tools');
+  const showAbout = isSearchActive ? isAboutVisible : (activeCategory === 'about');
+  const showExperimental = isSearchActive ? isFeatureFlagsVisible : (activeCategory === 'experimental');
+
+  const hasAnyResults = showCategoryMenu || (isSearchActive ? (isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible || isAboutVisible) : true);
 
   return (
     <div className={isDrawer ? "w-full max-w-full space-y-5 pb-16 pt-1 select-none" : "max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none"}>
       {/* 1. Header */}
       <div className="space-y-2">
+        {/* Back navigation pill if viewing a specific category */}
+        {!isSearchActive && activeCategory !== 'main' && (
+          <div className="flex items-center gap-2 pt-1 pb-1">
+            <button
+              type="button"
+              onClick={() => setActiveCategory('main')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-semibold transition-all cursor-pointer shadow-sm border border-white/20"
+              title="Quay lại danh mục Cài đặt"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-white" />
+              <span>Quay lại Cài đặt</span>
+            </button>
+            <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+            <span className="text-white font-bold text-xs uppercase tracking-wider">
+              {activeCategory === 'about' && 'Giới thiệu'}
+              {activeCategory === 'spatial_glass' && 'Spatial Glass'}
+              {activeCategory === 'appearance' && 'Giao diện'}
+              {activeCategory === 'accessibility' && 'Trợ năng'}
+              {activeCategory === 'tools' && 'Công cụ'}
+              {activeCategory === 'experimental' && 'Thử nghiệm'}
+            </span>
+          </div>
+        )}
+
         <h1 className="text-3xl font-extrabold text-white tracking-tight">
           Cài đặt
         </h1>
-        <p className="text-xs sm:text-sm text-[#9CA3AF]">
-          Quản lý giao diện, trợ năng và tiện ích hệ thống
+        <p className="text-xs sm:text-sm text-white/70">
+          Quản lý giao diện, trợ năng và tiện ích hệ thống.
         </p>
 
         {/* Search Bar Capsule with Spotlight Search Styling */}
@@ -187,47 +224,140 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
           </div>
         </div>
 
-        {/* Feature Flags Quick Entry Card */}
-        {isFeatureFlagsVisible && (
-          <div 
-            onClick={() => navigate ? navigate('/feature-flags') : window.location.assign('/feature-flags')}
-            className="p-4 sm:p-5 rounded-[22px] bg-gradient-to-r from-cyan-950/40 via-[#1E1D24] to-[#1E1D24] border-0 shadow-lg flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-2xl bg-cyan-500/15 border-0 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                <Flag className="w-5 h-5 text-cyan-400" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">
-                    Feature Flags
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border-0">
-                    EXPERIMENTAL
+        {/* ============================================================== */}
+        {/* CATEGORY MENU - GRADIENT ICON BACKGROUNDS, WHITE ICONS & TEXT  */}
+        {/* ============================================================== */}
+        {showCategoryMenu && (
+          <div className="space-y-4 pt-2 animate-in fade-in duration-200">
+            {/* Group 1 Card: Giới thiệu, Spatial Glass, Giao diện, Trợ năng */}
+            <div className="rounded-[24px] bg-[#222225] border border-white/20 overflow-hidden shadow-2xl">
+              {/* Row 1: Giới thiệu */}
+              <div 
+                id="category-item-about"
+                onClick={() => setActiveCategory('about')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#3B82F6] to-[#1D4ED8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                    <Info className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                    Giới thiệu
                   </span>
                 </div>
-                <p className="text-xs text-[#9CA3AF] mt-0.5">
-                  Bật/tắt các cờ tính năng thử nghiệm, AI Copilot, tối ưu luồng video và gỡ lỗi
-                </p>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
+
+              <div className="border-t border-white/20 ml-16" />
+
+              {/* Row 2: Spatial Glass */}
+              <div 
+                id="category-item-spatial-glass"
+                onClick={() => setActiveCategory('spatial_glass')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#38BDF8] to-[#0284C7] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                    <Box className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                    Spatial Glass
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
+
+              <div className="border-t border-white/20 ml-16" />
+
+              {/* Row 3: Giao diện */}
+              <div 
+                id="category-item-appearance"
+                onClick={() => setActiveCategory('appearance')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#FF4D6D] to-[#C9184A] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                    <Palette className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                    Giao diện
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
+
+              <div className="border-t border-white/20 ml-16" />
+
+              {/* Row 4: Trợ năng */}
+              <div 
+                id="category-item-accessibility"
+                onClick={() => setActiveCategory('accessibility')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#10B981] to-[#047857] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                    <Key className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                    Trợ năng
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
               </div>
             </div>
-            <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-cyan-500/20 flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors shrink-0">
-              <ChevronRight className="w-4 h-4" />
+
+            {/* Group 2 Card: Công cụ, Thử nghiệm */}
+            <div className="rounded-[24px] bg-[#222225] border border-white/20 overflow-hidden shadow-2xl mt-4">
+              {/* Row 5: Công cụ */}
+              <div 
+                id="category-item-tools"
+                onClick={() => setActiveCategory('tools')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#64748B] to-[#334155] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                    <Wrench className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                    Công cụ
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
+
+              <div className="border-t border-white/20 ml-16" />
+
+              {/* Row 6: Thử nghiệm */}
+              <div 
+                id="category-item-experimental"
+                onClick={() => setActiveCategory('experimental')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#A855F7] to-[#6B21A8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                    <FlaskConical className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                    Thử nghiệm
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* 0. Section Spatial Glass: Tùy chỉnh độ mờ (Blur) & độ trong (Opacity) - Đặt trên đầu */}
-      {isSpatialGlassVisible && (
+      {/* 0. Section Spatial Glass: Tùy chỉnh độ mờ (Blur) & độ trong (Opacity) */}
+      {showSpatialGlass && (
         <section 
           id="settings-section-spatial-glass"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-5"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-5"
         >
           {/* Section Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#FBBF24] via-[#F97316] to-[#E6007A] flex items-center justify-center shrink-0 shadow-lg shadow-orange-500/20 mt-0.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#38BDF8] to-[#0284C7] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
                 <Sparkles className="w-4.5 h-4.5 text-white" />
               </div>
               <div>
@@ -235,11 +365,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <h2 className="text-base font-bold text-white leading-tight">
                     Spatial Glass
                   </h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-[#FBBF24]/20 to-[#E6007A]/20 text-amber-300 border border-amber-500/30">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-white border border-white/20">
                     LIQUID UI
                   </span>
                 </div>
-                <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
+                <p className="text-xs text-white/70 mt-1 leading-relaxed">
                   Tùy chỉnh độ mờ (blur) và độ trong suốt (opacity) cho các thành phần kính không gian trên VNRT Online
                 </p>
               </div>
@@ -254,17 +384,17 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   updateSetting('spatialGlassBlur', 20);
                   updateSetting('spatialGlassOpacity', 65);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-zinc-300 hover:text-white text-xs font-semibold transition-all cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-semibold transition-all cursor-pointer shrink-0"
                 title="Khôi phục mặc định (20px / 65%)"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-3.5 h-3.5 text-white" />
                 <span className="hidden sm:inline">Mặc định</span>
               </button>
             )}
           </div>
 
           {/* Interactive Live Glass Preview Banner */}
-          <div className="relative w-full h-32 sm:h-36 rounded-[22px] overflow-hidden border border-white/10 shadow-inner flex items-center justify-center p-4">
+          <div className="relative w-full h-32 sm:h-36 rounded-[22px] overflow-hidden border border-white/20 shadow-inner flex items-center justify-center p-4">
             {/* Colorful vibrant background mimicking wallpapers/content */}
             <div 
               className="absolute inset-0 bg-cover bg-center transition-all duration-300"
@@ -287,13 +417,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
             >
               <div className="flex items-center gap-3 text-left min-w-0">
                 <div className="w-9 h-9 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center shrink-0 shadow">
-                  <Sparkles className="w-4.5 h-4.5 text-amber-300" />
+                  <Sparkles className="w-4.5 h-4.5 text-white" />
                 </div>
                 <div className="min-w-0">
                   <div className="font-extrabold text-xs sm:text-sm text-white tracking-tight truncate drop-shadow">
                     Kính xem trước (Live Preview)
                   </div>
-                  <div className="text-[11px] text-white/80 font-mono">
+                  <div className="text-[11px] text-white/90 font-mono">
                     Blur: {spatialBlur}px • Opacity: {spatialOpacity}%
                   </div>
                 </div>
@@ -306,7 +436,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
           {/* Quick Preset Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
-            <span className="text-[11px] font-semibold text-zinc-400 shrink-0 mr-1">
+            <span className="text-[11px] font-semibold text-white/80 shrink-0 mr-1">
               Mẫu sẵn:
             </span>
             {[
@@ -327,8 +457,8 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   }}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     isActive 
-                      ? 'bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] text-white font-bold shadow-md shadow-orange-500/20' 
-                      : 'bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10'
+                      ? 'bg-white text-black font-bold shadow-md' 
+                      : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                   }`}
                 >
                   {preset.label}
@@ -341,32 +471,32 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
             {/* Slider 1: Độ mờ (Blur) */}
             <div 
               id="settings-card-spatial-blur"
-              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border-0 hover:bg-white/[0.03] space-y-3"
+              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <Sliders className="w-4.5 h-4.5 text-amber-400" />
+                  <Sliders className="w-4.5 h-4.5 text-white" />
                   <div>
                     <span className="font-semibold text-white text-sm block">
                       Độ mờ hậu cảnh (Blur)
                     </span>
-                    <span className="text-[11px] text-[#9CA3AF]">
+                    <span className="text-[11px] text-white/70">
                       Hiệu ứng nhòe mờ làm nổi bật chi tiết sau các lớp kính
                     </span>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/20">
                   {spatialBlur}px
                 </span>
               </div>
 
               {/* Slider Capsule */}
               <div className="pt-1">
-                <div className="group relative w-full h-14 sm:h-16 rounded-[24px] bg-white/[0.04] border-0 flex items-center px-6 transition-all settings-slider-capsule">
-                  <div className="relative w-full h-2 rounded-full bg-[#383842] overflow-visible">
-                    {/* Active Gradient Track */}
+                <div className="group relative w-full h-14 sm:h-16 rounded-[24px] bg-white/[0.04] border border-white/20 flex items-center px-6 transition-all settings-slider-capsule">
+                  <div className="relative w-full h-2 rounded-full bg-white/20 overflow-visible">
+                    {/* Active Track */}
                     <div 
-                      className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] transition-all duration-75 ease-out shadow-[0_0_12px_rgba(249,115,22,0.5)]"
+                      className="absolute left-0 top-0 h-full rounded-full bg-white transition-all duration-75 ease-out shadow-[0_0_12px_rgba(255,255,255,0.5)]"
                       style={{ width: `${(spatialBlur / 50) * 100}%` }}
                     />
                     
@@ -375,7 +505,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-6 rounded-full bg-white shadow-[0_2px_12px_rgba(0,0,0,0.5)] transition-all duration-75 ease-out pointer-events-none flex items-center justify-center group-hover:scale-125"
                       style={{ left: `${(spatialBlur / 50) * 100}%` }}
                     >
-                      <div className="w-4 h-1 rounded-full bg-orange-400" />
+                      <div className="w-4 h-1 rounded-full bg-black/60" />
                     </div>
                   </div>
 
@@ -394,7 +524,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 </div>
 
                 {/* Markers */}
-                <div className="flex items-center justify-between text-[11px] pt-2 px-2 text-zinc-400 font-mono">
+                <div className="flex items-center justify-between text-[11px] pt-2 px-2 text-white/70 font-mono">
                   <span>0px (Rõ nét)</span>
                   <span>20px (Chuẩn)</span>
                   <span>35px (Mờ sâu)</span>
@@ -406,32 +536,32 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
             {/* Slider 2: Độ trong suốt (Opacity) */}
             <div 
               id="settings-card-spatial-opacity"
-              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border-0 hover:bg-white/[0.03] space-y-3"
+              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <Droplets className="w-4.5 h-4.5 text-pink-400" />
+                  <Droplets className="w-4.5 h-4.5 text-white" />
                   <div>
                     <span className="font-semibold text-white text-sm block">
                       Độ trong suốt / Đậm màu (Opacity)
                     </span>
-                    <span className="text-[11px] text-[#9CA3AF]">
+                    <span className="text-[11px] text-white/70">
                       Tỷ lệ phủ màu bề mặt kính từ gần như trong suốt đến tối màu đậm
                     </span>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-pink-400/20 text-pink-300 border border-pink-400/30">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/20">
                   {spatialOpacity}%
                 </span>
               </div>
 
               {/* Slider Capsule */}
               <div className="pt-1">
-                <div className="group relative w-full h-14 sm:h-16 rounded-[24px] bg-white/[0.04] border-0 flex items-center px-6 transition-all settings-slider-capsule">
-                  <div className="relative w-full h-2 rounded-full bg-[#383842] overflow-visible">
-                    {/* Active Gradient Track */}
+                <div className="group relative w-full h-14 sm:h-16 rounded-[24px] bg-white/[0.04] border border-white/20 flex items-center px-6 transition-all settings-slider-capsule">
+                  <div className="relative w-full h-2 rounded-full bg-white/20 overflow-visible">
+                    {/* Active Track */}
                     <div 
-                      className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[#FBBF24] via-[#F97316] to-[#E6007A] transition-all duration-75 ease-out shadow-[0_0_12px_rgba(230,0,122,0.5)]"
+                      className="absolute left-0 top-0 h-full rounded-full bg-white transition-all duration-75 ease-out shadow-[0_0_12px_rgba(255,255,255,0.5)]"
                       style={{ width: `${((spatialOpacity - 5) / 95) * 100}%` }}
                     />
                     
@@ -440,7 +570,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-6 rounded-full bg-white shadow-[0_2px_12px_rgba(0,0,0,0.5)] transition-all duration-75 ease-out pointer-events-none flex items-center justify-center group-hover:scale-125"
                       style={{ left: `${((spatialOpacity - 5) / 95) * 100}%` }}
                     >
-                      <div className="w-4 h-1 rounded-full bg-pink-500" />
+                      <div className="w-4 h-1 rounded-full bg-black/60" />
                     </div>
                   </div>
 
@@ -459,7 +589,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 </div>
 
                 {/* Markers */}
-                <div className="flex items-center justify-between text-[11px] pt-2 px-2 text-zinc-400 font-mono">
+                <div className="flex items-center justify-between text-[11px] pt-2 px-2 text-white/70 font-mono">
                   <span>5% (Siêu trong)</span>
                   <span>40% (Thoáng)</span>
                   <span>65% (Chuẩn)</span>
@@ -472,19 +602,21 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       )}
 
       {/* 2. Section 1: Giao diện */}
-      {isSection1Visible && (
+      {showAppearance && (
         <section 
           id="settings-section-interface"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
         >
-          {/* Section Header without background container on icon */}
+          {/* Section Header */}
           <div className="flex items-start gap-3">
-            <Palette className="w-5 h-5 text-[#E50914] dark:text-[#E50914] shrink-0 mt-0.5" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#FF4D6D] to-[#C9184A] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+              <Palette className="w-4.5 h-4.5 text-white" />
+            </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
                 Giao diện
               </h2>
-              <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
+              <p className="text-xs text-white/70 mt-1 leading-relaxed">
                 Tùy biến thanh điều hướng (Sidebar, Top bar hoặc Floaty bar), thanh Dock và tỷ lệ cỡ chữ toàn hệ thống
               </p>
             </div>
@@ -501,40 +633,40 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-floaty-bar"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-cyan-500/20 hover:border-cyan-500/40 hover:bg-white/[0.03]"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
               >
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <Compass className="w-4.5 h-4.5 text-cyan-400" />
+                    <Compass className="w-4.5 h-4.5 text-white" />
                     <span>Floaty bar</span>
                     {settings.floatyBar && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
                         ĐANG BẬT
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Navigation bar that floats on your screen
                   </div>
-                  <div className="text-[11px] text-gray-400 mt-1">
+                  <div className="text-[11px] text-white/60 mt-1">
                     Khi bật, thanh Top bar và Sidebar sẽ trở thành thanh điều hướng lơ lửng dạng pill ở dưới màn hình (tối đa 4 tabs/trang, chuyển trang mũi tên 2 cực).
                   </div>
                 </div>
 
-                {/* Red/Cyan Toggle Switch */}
+                {/* Orange Toggle Switch */}
                 <button
                   id="toggle-floaty-bar"
                   type="button"
                   role="switch"
                   aria-checked={settings.floatyBar}
                   onClick={() => updateSetting('floatyBar', !settings.floatyBar)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.floatyBar ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                    settings.floatyBar ? 'bg-[#FF6A00]' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.floatyBar ? 'translate-x-5.5' : 'translate-x-0'
+                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.floatyBar ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                     }`}
                   />
                 </button>
@@ -550,30 +682,30 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-settings-drawer"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-pink-500/20 hover:border-pink-500/40 hover:bg-white/[0.03]"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
               >
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <PanelRight className="w-4.5 h-4.5 text-[#E6007A]" />
+                    <PanelRight className="w-4.5 h-4.5 text-white" />
                     <span>Settings drawer</span>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
                       BETA
                     </span>
                     {flags.settings_drawer && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
                         ĐANG BẬT
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Settings open in a drawer on the right instead of a tab page
                   </div>
-                  <div className="text-[11px] text-gray-400 mt-1">
+                  <div className="text-[11px] text-white/60 mt-1">
                     Khi bật, trang Cài đặt sẽ mở dạng ngăn kéo (drawer) trượt mượt mà từ cạnh phải màn hình thay vì tải lại toàn trang tab.
                   </div>
                 </div>
 
-                {/* Switch Toggle */}
+                {/* Orange Switch Toggle */}
                 <button
                   id="toggle-settings-drawer"
                   type="button"
@@ -583,13 +715,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     const next = !flags.settings_drawer;
                     setFlag('settings_drawer', next);
                   }}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    flags.settings_drawer ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                    flags.settings_drawer ? 'bg-[#FF6A00]' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      flags.settings_drawer ? 'translate-x-5.5' : 'translate-x-0'
+                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                      flags.settings_drawer ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                     }`}
                   />
                 </button>
@@ -606,40 +738,40 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-shiny-outline"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-white/10 hover:border-white/25 hover:bg-white/[0.03]"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
               >
                 <div className="space-y-1">
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <Sparkles className="w-4.5 h-4.5 text-amber-300" />
+                    <Sparkles className="w-4.5 h-4.5 text-white" />
                     <span>Shiny outline</span>
                     {settings.shinyOutline !== false && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white/90 border border-white/20">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
                         ĐANG BẬT
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-[#9CA3AF] leading-normal">
+                  <div className="text-xs text-white/70 leading-normal">
                     Viền 2 cạnh trên dưới phản chiếu kính mờ cho toàn bộ giao diện
                   </div>
-                  <div className="text-[11px] text-gray-400 leading-relaxed">
+                  <div className="text-[11px] text-white/60 leading-relaxed">
                     Thêm viền phản chiếu ánh sáng trắng (Specular top & bottom rim highlight) ở 2 cạnh trên và dưới của các nút status bar vào toàn bộ elements trong ứng dụng (ô kênh, menus, buttons, toggles, nền danh mục, các khối thẻ, banner, search boxes và input boxes).
                   </div>
                 </div>
 
-                {/* Toggle Switch */}
+                {/* Orange Toggle Switch */}
                 <button
                   id="toggle-shiny-outline"
                   type="button"
                   role="switch"
                   aria-checked={settings.shinyOutline !== false}
                   onClick={() => updateSetting('shinyOutline', settings.shinyOutline === false ? true : false)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.shinyOutline !== false ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                    settings.shinyOutline !== false ? 'bg-[#FF6A00]' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.shinyOutline !== false ? 'translate-x-5.5' : 'translate-x-0'
+                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.shinyOutline !== false ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                     }`}
                   />
                 </button>
@@ -659,46 +791,46 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-vcursor"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-4 transition-colors border border-rose-500/20 hover:border-rose-500/40 hover:bg-white/[0.03]"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-4 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
               >
                 {/* Header row with Title and Toggle */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
-                      <MousePointer className="w-4.5 h-4.5 text-rose-400" />
+                      <MousePointer className="w-4.5 h-4.5 text-white" />
                       <span>V-Cursor</span>
                       {settings.vcursorEnabled !== false ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
                           ĐANG BẬT
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-gray-400 border border-white/10">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white/60 border border-white/10">
                           TẮT (DÙNG CON TRỎ THIẾT BỊ)
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-[#9CA3AF] leading-normal">
+                    <div className="text-xs text-white/70 leading-normal">
                       Sử dụng con trỏ chuột độc quyền của VPlay thay vì của device
                     </div>
-                    <div className="text-[11px] text-gray-400 leading-relaxed">
+                    <div className="text-[11px] text-white/60 leading-relaxed">
                       Con trỏ mặc định là đen viền trắng chuẩn macOS. Cho phép thay đổi màu thân, viền, kích thước và hiệu ứng phát sáng.
                     </div>
                   </div>
 
-                  {/* Toggle Switch */}
+                  {/* Orange Toggle Switch */}
                   <button
                     id="toggle-vcursor-enabled"
                     type="button"
                     role="switch"
                     aria-checked={settings.vcursorEnabled !== false}
                     onClick={() => updateSetting('vcursorEnabled', settings.vcursorEnabled === false ? true : false)}
-                    className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                      settings.vcursorEnabled !== false ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                    className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                      settings.vcursorEnabled !== false ? 'bg-[#FF6A00]' : 'bg-white/15'
                     }`}
                   >
                     <span
-                      className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                        settings.vcursorEnabled !== false ? 'translate-x-5.5' : 'translate-x-0'
+                      className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                        settings.vcursorEnabled !== false ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                       }`}
                     />
                   </button>
@@ -706,12 +838,12 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
                 {/* Sub-controls when V-Cursor is enabled */}
                 {settings.vcursorEnabled !== false && (
-                  <div className="space-y-4 pt-2 border-t border-white/10">
+                  <div className="space-y-4 pt-2 border-t border-white/15">
                     {/* 1. Interactive Preview Stage */}
-                    <div className="p-4 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="p-4 rounded-xl bg-black/40 border border-white/15 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
                       <div className="flex items-center gap-4">
                         {/* Live Cursor Visualizer */}
-                        <div className="w-14 h-14 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center relative overflow-hidden group shadow-inner">
+                        <div className="w-14 h-14 rounded-xl bg-white/[0.06] border border-white/15 flex items-center justify-center relative overflow-hidden group shadow-inner">
                           <svg
                             width={Math.max(20, Math.min(32, settings.vcursorSize || 24))}
                             height={Math.max(20, Math.min(32, settings.vcursorSize || 24))}
@@ -737,11 +869,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                         <div>
                           <div className="text-xs font-semibold text-white flex items-center gap-2">
                             <span>Bản xem trước trực tiếp</span>
-                            <span className="text-[10px] text-gray-400 font-normal">
+                            <span className="text-[10px] text-white/60 font-normal">
                               ({settings.vcursorSize || 24}px)
                             </span>
                           </div>
-                          <div className="text-[11px] text-gray-400 mt-0.5">
+                          <div className="text-[11px] text-white/70 mt-0.5">
                             Thân: <span className="font-mono text-white font-medium">{settings.vcursorColor || '#000000'}</span> • Viền: <span className="font-mono text-white font-medium">{settings.vcursorBorderColor || '#FFFFFF'}</span>
                           </div>
                         </div>
@@ -751,9 +883,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border border-white/15"
                         >
-                          <MousePointerClick className="w-3.5 h-3.5 text-rose-400" />
+                          <MousePointerClick className="w-3.5 h-3.5 text-white" />
                           <span>Rê chuột thử</span>
                         </button>
                         <button
@@ -764,10 +896,10 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                             updateSetting('vcursorSize', 24);
                             updateSetting('vcursorGlow', false);
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/10 active:scale-95 text-gray-300 hover:text-white text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/15 active:scale-95 text-white/80 hover:text-white text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border border-white/10"
                           title="Đặt lại con trỏ macOS chuẩn (đen viền trắng 24px)"
                         >
-                          <RotateCcw className="w-3 h-3 text-gray-400" />
+                          <RotateCcw className="w-3 h-3 text-white" />
                           <span>Đặt lại macOS</span>
                         </button>
                       </div>
@@ -777,7 +909,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <div className="space-y-2">
                       <div className="text-xs font-semibold text-white flex items-center justify-between">
                         <span>Mẫu con trỏ có sẵn</span>
-                        <span className="text-[10px] text-gray-400">Chọn nhanh phong cách</span>
+                        <span className="text-[10px] text-white/60">Chọn nhanh phong cách</span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {VCURSOR_PRESETS.map((preset) => {
@@ -795,12 +927,12 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                               }}
                               className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 relative ${
                                 isSelected
-                                  ? 'bg-rose-500/15 border-rose-500/50 shadow-md ring-1 ring-rose-500/30'
-                                  : 'bg-white/[0.03] border-white/10 hover:border-white/20 hover:bg-white/[0.06]'
+                                  ? 'bg-white/15 border-white ring-1 ring-white/30 shadow-md'
+                                  : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                               }`}
                             >
                               {/* Mini Cursor Icon */}
-                              <div className="w-7 h-7 rounded-lg bg-black/40 border border-white/10 flex items-center justify-center shrink-0">
+                              <div className="w-7 h-7 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center shrink-0">
                                 <svg width="15" height="15" viewBox="0 0 24 24" className="select-none">
                                   <path
                                     d="M 1.5 1.5 L 1.5 19.5 L 6.5 15.2 L 10.8 23.2 L 13.8 21.6 L 9.6 13.8 L 16 13.8 Z"
@@ -818,13 +950,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                                     <span className="text-[8px] font-bold px-1 py-0.2 bg-white/20 text-white rounded">Gốc</span>
                                   )}
                                 </div>
-                                <div className="text-[10px] text-gray-400 truncate">
+                                <div className="text-[10px] text-white/60 truncate">
                                   {preset.desc}
                                 </div>
                               </div>
 
                               {isSelected && (
-                                <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-rose-500 flex items-center justify-center text-white">
+                                <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-white text-black flex items-center justify-center">
                                   <Check className="w-2.5 h-2.5 stroke-[3]" />
                                 </div>
                               )}
@@ -837,13 +969,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     {/* 3. Custom Color Palette (Thân & Viền) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                       {/* Thân con trỏ (Fill) */}
-                      <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5">
+                      <div className="p-3 rounded-xl bg-white/[0.03] border border-white/15 space-y-2.5">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-semibold text-white flex items-center gap-1.5">
-                            <Droplets className="w-3.5 h-3.5 text-rose-400" />
+                            <Droplets className="w-3.5 h-3.5 text-white" />
                             <span>Màu thân con trỏ</span>
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-gray-300">
+                          <span className="text-[11px] font-mono font-medium text-white/80">
                             {settings.vcursorColor || '#000000'}
                           </span>
                         </div>
@@ -869,7 +1001,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                                 type="button"
                                 onClick={() => updateSetting('vcursorColor', hex)}
                                 className={`w-6 h-6 rounded-full border transition-all cursor-pointer relative ${
-                                  isPicked ? 'scale-110 ring-2 ring-rose-500 shadow-md' : 'hover:scale-105'
+                                  isPicked ? 'scale-110 ring-2 ring-white shadow-md' : 'hover:scale-105'
                                 }`}
                                 style={{ backgroundColor: hex, borderColor: hex === '#000000' ? '#444' : '#fff' }}
                                 title={hex}
@@ -877,7 +1009,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                             );
                           })}
 
-                          {/* Native Color Picker for ultimate freedom */}
+                          {/* Native Color Picker */}
                           <label className="w-6 h-6 rounded-full border border-dashed border-white/40 flex items-center justify-center cursor-pointer hover:border-white transition-colors overflow-hidden relative">
                             <input
                               type="color"
@@ -886,19 +1018,19 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                               className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
                               title="Chọn màu tự do"
                             />
-                            <Palette className="w-3 h-3 text-gray-300 pointer-events-none" />
+                            <Palette className="w-3 h-3 text-white pointer-events-none" />
                           </label>
                         </div>
                       </div>
 
                       {/* Viền con trỏ (Border / Stroke) */}
-                      <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5">
+                      <div className="p-3 rounded-xl bg-white/[0.03] border border-white/15 space-y-2.5">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-semibold text-white flex items-center gap-1.5">
-                            <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                            <Sliders className="w-3.5 h-3.5 text-white" />
                             <span>Màu viền con trỏ</span>
                           </span>
-                          <span className="text-[11px] font-mono font-medium text-gray-300">
+                          <span className="text-[11px] font-mono font-medium text-white/80">
                             {settings.vcursorBorderColor || '#FFFFFF'}
                           </span>
                         </div>
@@ -922,7 +1054,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                                 type="button"
                                 onClick={() => updateSetting('vcursorBorderColor', hex)}
                                 className={`w-6 h-6 rounded-full border transition-all cursor-pointer relative ${
-                                  isPicked ? 'scale-110 ring-2 ring-cyan-500 shadow-md' : 'hover:scale-105'
+                                  isPicked ? 'scale-110 ring-2 ring-white shadow-md' : 'hover:scale-105'
                                 }`}
                                 style={{ backgroundColor: hex, borderColor: hex === '#000000' ? '#444' : '#fff' }}
                                 title={hex}
@@ -939,7 +1071,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                               className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
                               title="Chọn màu viền tự do"
                             />
-                            <Palette className="w-3 h-3 text-gray-300 pointer-events-none" />
+                            <Palette className="w-3 h-3 text-white pointer-events-none" />
                           </label>
                         </div>
                       </div>
@@ -950,7 +1082,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       {/* Size Selector */}
                       <div className="space-y-1.5 w-full sm:w-auto">
                         <div className="text-xs font-semibold text-white">Kích thước con trỏ</div>
-                        <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
+                        <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/15">
                           {[
                             { label: 'Nhỏ (20px)', val: 20 },
                             { label: 'Chuẩn macOS (24px)', val: 24 },
@@ -965,8 +1097,8 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                                 onClick={() => updateSetting('vcursorSize', sz.val)}
                                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                                   isSelected
-                                    ? 'bg-[#E50914] text-white shadow-md'
-                                    : 'text-gray-400 hover:text-white'
+                                    ? 'bg-white text-black shadow-md font-bold'
+                                    : 'text-white/60 hover:text-white'
                                 }`}
                               >
                                 {sz.label}
@@ -980,20 +1112,20 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                         <div>
                           <div className="text-xs font-semibold text-white">Phát sáng Neon</div>
-                          <div className="text-[10px] text-gray-400">Hiệu ứng quầng sáng nhẹ</div>
+                          <div className="text-[10px] text-white/60">Hiệu ứng quầng sáng nhẹ</div>
                         </div>
                         <button
                           type="button"
                           role="switch"
                           aria-checked={Boolean(settings.vcursorGlow)}
                           onClick={() => updateSetting('vcursorGlow', !settings.vcursorGlow)}
-                          className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 cursor-pointer shrink-0 flex items-center ${
-                            settings.vcursorGlow ? 'bg-rose-500' : 'bg-white/20'
+                          className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                            settings.vcursorGlow ? 'bg-[#FF6A00]' : 'bg-white/15'
                           }`}
                         >
                           <span
-                            className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-200 ${
-                              settings.vcursorGlow ? 'translate-x-5' : 'translate-x-0'
+                            className={`w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 ${
+                              settings.vcursorGlow ? 'translate-x-5 bg-white' : 'translate-x-0 bg-white'
                             }`}
                           />
                         </button>
@@ -1015,28 +1147,28 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-change-background"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-3.5 transition-colors border-0 hover:bg-white/[0.03]"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-3.5 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
               >
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4.5 h-4.5 text-purple-400" />
+                      <Sparkles className="w-4.5 h-4.5 text-white" />
                       <span>Change your background</span>
                     </div>
                     {settings.appBackground && settings.appBackground !== 'default' && (
                       <button
                         type="button"
                         onClick={() => updateSetting('appBackground', 'default')}
-                        className="text-[11px] text-zinc-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                        className="text-[11px] text-white/80 hover:text-white px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer border border-white/20"
                       >
                         Khôi phục nền mặc định
                       </button>
                     )}
                   </div>
-                  <div className="text-xs text-purple-300 font-medium mt-1">
+                  <div className="text-xs text-white/80 font-medium mt-1">
                     Changing your background to see how Spatial Glass on VNRT Online reacts!
                   </div>
-                  <div className="text-[11px] text-[#9CA3AF] mt-1 leading-relaxed">
+                  <div className="text-[11px] text-white/70 mt-1 leading-relaxed">
                     Người dùng chọn một mẫu nền cho sẵn và app background sẽ đổi theo hình đó thay vì là solid color mặc định. Các thành phần kính mờ Spatial Glass (Top bar, Sidebar, Floating Search Bar, V-board) sẽ phản chiếu và khúc xạ màu sắc chân thực.
                   </div>
                 </div>
@@ -1053,12 +1185,12 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                         onClick={() => updateSetting('appBackground', wp.id)}
                         className={`relative flex flex-col p-2.5 rounded-2xl border text-left transition-all group cursor-pointer ${
                           isSelected 
-                            ? 'bg-purple-950/30 border-purple-500 ring-2 ring-purple-500/40 shadow-lg' 
-                            : 'bg-[#1E1D24] border-white/5 hover:border-white/20 hover:bg-[#23222B]'
+                            ? 'bg-white/10 border-white ring-2 ring-white/30 shadow-lg' 
+                            : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                         }`}
                       >
                         {/* Visual Preview Box */}
-                        <div className="w-full h-24 rounded-xl overflow-hidden relative border border-white/10 mb-2.5 bg-[#121216] flex items-center justify-center">
+                        <div className="w-full h-24 rounded-xl overflow-hidden relative border border-white/15 mb-2.5 bg-[#121216] flex items-center justify-center">
                           {wp.type === 'image' ? (
                             <img
                               src={wp.previewUrl}
@@ -1067,25 +1199,25 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
-                            <div className="w-full h-full bg-[#181818] flex flex-col items-center justify-center gap-1 text-zinc-400">
+                            <div className="w-full h-full bg-[#181818] flex flex-col items-center justify-center gap-1 text-white/60">
                               <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center">
-                                <Moon className="w-4 h-4 text-zinc-300" />
+                                <Moon className="w-4 h-4 text-white" />
                               </div>
-                              <span className="text-[10px] font-mono text-zinc-400">Solid #181818</span>
+                              <span className="text-[10px] font-mono text-white/70">Solid #181818</span>
                             </div>
                           )}
 
                           {/* Selected Badge */}
                           {isSelected && (
-                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-md">
+                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white text-black flex items-center justify-center shadow-md">
                               <Check className="w-3 h-3 stroke-[3]" />
                             </div>
                           )}
 
                           {/* Spatial Glass reaction preview badge */}
-                          <div className="absolute bottom-1.5 inset-x-2 py-0.5 px-2 rounded-full bg-black/40 backdrop-blur-md border-0 flex items-center justify-between text-[9px] text-white pointer-events-none">
+                          <div className="absolute bottom-1.5 inset-x-2 py-0.5 px-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-between text-[9px] text-white pointer-events-none">
                             <span className="truncate">Spatial Glass</span>
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]" />
                           </div>
                         </div>
 
@@ -1094,7 +1226,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                           <div className="font-bold text-white text-xs flex items-center justify-between">
                             <span>{wp.name}</span>
                           </div>
-                          <p className="text-[10px] text-zinc-400 line-clamp-2 leading-tight">
+                          <p className="text-[10px] text-white/60 line-clamp-2 leading-tight">
                             {wp.subtext}
                           </p>
                         </div>
@@ -1107,19 +1239,19 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
             {/* Card 0: Chế độ giao diện (Dark Mode mặc định) */}
             {(matchesSearch('Chế độ giao diện') || matchesSearch('Giao diện') || matchesSearch('Theme') || matchesSearch('Dark')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <Moon className="w-4 h-4 text-[#FF3366]" />
+                    <Moon className="w-4 h-4 text-white" />
                     <span>Chế độ giao diện Dark Mode</span>
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Ứng dụng VNRT Online hoạt động ở chế độ nền tối chuyên biệt (#181818) tối ưu thị giác cho trải nghiệm truyền hình.
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#18181B] text-xs font-bold text-[#FF6699] shrink-0 border-0">
-                  <span className="w-2 h-2 rounded-full bg-[#FF3366]" />
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold text-white shrink-0 border border-white/20">
+                  <span className="w-2 h-2 rounded-full bg-white" />
                   <span>DARK ONLY</span>
                 </div>
               </div>
@@ -1127,23 +1259,23 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
             {/* Card: Kho Theme Store (Special Themes) */}
             {(matchesSearch('Theme Store') || matchesSearch('Theme') || matchesSearch('Giao diện đặc biệt') || matchesSearch('Kho giao diện') || matchesSearch('Tết') || matchesSearch('Christmas') || matchesSearch('Yêu nước')) && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-gradient-to-r from-pink-950/20 via-[#181820] to-purple-950/20 border border-pink-500/30 hover:border-pink-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2 flex-wrap">
-                    <Palette className="w-4 h-4 text-pink-400" />
+                    <Palette className="w-4 h-4 text-white" />
                     <span>Kho Giao Diện • Theme Store</span>
                     {activeTheme !== 'default' ? (
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 text-[10px] font-bold border border-emerald-500/40 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold border border-white/20 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                         Đang dùng: {currentThemeData?.name}
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-zinc-300 text-[10px] font-semibold">
+                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/80 text-[10px] font-semibold border border-white/15">
                         Giao diện mặc định
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1.5 leading-relaxed">
+                  <div className="text-xs text-white/70 mt-1.5 leading-relaxed">
                     Cài đặt và thay đổi các theme đặc biệt trong tab Shop: <strong>Tết Dương Lịch</strong> (pháo hoa & lấp lánh), <strong>Tết Nguyên Đán</strong> (cành mai cành đào), <strong>Christmas</strong> (tuyết rơi & đèn LED), <strong>Yêu nước</strong> (cờ đỏ sao vàng).
                   </div>
                 </div>
@@ -1151,7 +1283,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <button
                   type="button"
                   onClick={() => navigate?.('/shop')}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#E6005A] to-[#FF4C93] hover:brightness-110 active:scale-95 text-white text-xs font-bold transition-all shadow-md shadow-pink-600/30 shrink-0 flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-white hover:bg-white/90 active:scale-95 text-black text-xs font-bold transition-all shadow-md shrink-0 flex items-center gap-1.5 cursor-pointer border border-white"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Mở Theme Store</span>
@@ -1165,14 +1297,14 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Top bar') ||
               matchesSearch('Bố cục') ||
               matchesSearch('Giao diện')) && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3.5 transition-colors">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3.5 transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
-                      <Layout className="w-4.5 h-4.5 text-[#E50914]" />
+                      <Layout className="w-4.5 h-4.5 text-white" />
                       <span>Thanh điều hướng chính</span>
                     </div>
-                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    <div className="text-xs text-white/70 mt-1 leading-normal">
                       Lựa chọn giao diện điều hướng: thanh Sidebar bên cạnh hoặc thanh Top bar phía trên cùng.
                     </div>
                   </div>
@@ -1189,35 +1321,35 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     }}
                     className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
                       settings.navigationMode === 'sidebar'
-                        ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
-                        : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
+                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                           settings.navigationMode === 'sidebar'
-                            ? 'bg-[#E50914]/20 text-[#E50914]'
-                            : 'bg-white/5 text-gray-400 group-hover:text-white'
+                            ? 'bg-white text-black'
+                            : 'bg-white/10 text-white/60 group-hover:text-white'
                         }`}>
                           <PanelLeft className="w-4.5 h-4.5" />
                         </div>
                         <div>
                           <span className="text-sm font-bold text-white block">Sidebar</span>
-                          <span className="text-[11px] text-gray-400">Thanh bên trái</span>
+                          <span className="text-[11px] text-white/60">Thanh bên trái</span>
                         </div>
                       </div>
 
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
                         settings.navigationMode === 'sidebar'
-                          ? 'bg-[#E50914] text-white'
+                          ? 'bg-white text-black'
                           : 'border border-white/20 text-transparent'
                       }`}>
                         <Check className="w-3 h-3 stroke-[3]" />
                       </div>
                     </div>
 
-                    <p className="text-xs text-[#9CA3AF] mt-3 leading-relaxed">
+                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
                       Giao diện thanh menu dọc bên trái đầy đủ với đồng hồ số, ô tìm kiếm nhanh, các danh mục và nút thu gọn.
                     </p>
                   </button>
@@ -1231,35 +1363,35 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     }}
                     className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
                       settings.navigationMode !== 'sidebar'
-                        ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
-                        : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
+                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                           settings.navigationMode !== 'sidebar'
-                            ? 'bg-[#E50914]/20 text-[#E50914]'
-                            : 'bg-white/5 text-gray-400 group-hover:text-white'
+                            ? 'bg-white text-black'
+                            : 'bg-white/10 text-white/60 group-hover:text-white'
                         }`}>
                           <PanelTop className="w-4.5 h-4.5" />
                         </div>
                         <div>
                           <span className="text-sm font-bold text-white block">Top bar</span>
-                          <span className="text-[11px] text-gray-400">Thanh trên cùng</span>
+                          <span className="text-[11px] text-white/60">Thanh trên cùng</span>
                         </div>
                       </div>
 
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
                         settings.navigationMode !== 'sidebar'
-                          ? 'bg-[#E50914] text-white'
+                          ? 'bg-white text-black'
                           : 'border border-white/20 text-transparent'
                       }`}>
                         <Check className="w-3 h-3 stroke-[3]" />
                       </div>
                     </div>
 
-                    <p className="text-xs text-[#9CA3AF] mt-3 leading-relaxed">
+                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
                       Thanh điều hướng ngang hiện đại phong cách truyền hình với logo VNRT Online, danh mục Truyền Hình và menu Xem thêm.
                     </p>
                   </button>
@@ -1267,32 +1399,32 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               </div>
             )}
 
-            {/* Card 2: Dock sang Sidebar (No Border) */}
+            {/* Card 2: Dock sang Sidebar */}
             {matchesSearch('Dock sang Sidebar') && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Dock sang Sidebar
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Chuyển thanh điều hướng dưới cùng sang thanh Sidebar bên trái (khi sử dụng chế độ Sidebar)
                   </div>
                 </div>
 
-                {/* Red Toggle Switch */}
+                {/* Orange Toggle Switch */}
                 <button
                   id="toggle-dock-to-sidebar"
                   type="button"
                   role="switch"
                   aria-checked={settings.dockToSidebar}
                   onClick={() => updateSetting('dockToSidebar', !settings.dockToSidebar)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.dockToSidebar ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                    settings.dockToSidebar ? 'bg-[#FF6A00]' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.dockToSidebar ? 'translate-x-5.5' : 'translate-x-0'
+                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.dockToSidebar ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                     }`}
                   />
                 </button>
@@ -1309,19 +1441,19 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-font-family"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3.5 transition-colors"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3.5 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
-                      <Type className="w-4.5 h-4.5 text-[#E50914]" />
+                      <Type className="w-4.5 h-4.5 text-white" />
                       <span>Phông chữ</span>
                     </div>
-                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    <div className="text-xs text-white/70 mt-1 leading-normal">
                       Chọn phông chữ hiển thị cho ứng dụng. Tùy chọn sẽ được áp dụng ngay lập tức cho toàn bộ giao diện.
                     </div>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/90 border border-white/10 shrink-0">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white border border-white/20 shrink-0">
                     {FONT_FAMILY_CONFIG.find(f => f.id === settings.fontFamily)?.name || 'Integer'}
                   </span>
                 </div>
@@ -1338,16 +1470,16 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                         onClick={() => updateSetting('fontFamily', font.id)}
                         className={`p-3.5 rounded-2xl border text-left flex items-start gap-3.5 transition-all cursor-pointer relative group ${
                           isSelected
-                            ? 'bg-[#1E1D24] border-[#E50914] shadow-[0_0_16px_rgba(229,9,20,0.25)] ring-1 ring-[#E50914]'
-                            : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
+                            ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                            : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                         }`}
                       >
                         {/* Checkbox Box Element */}
                         <div 
                           className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 ${
                             isSelected
-                              ? 'bg-[#E50914] border-[#E50914] text-white shadow-sm'
-                              : 'border-[#4B4B58] bg-[#141419] text-transparent group-hover:border-[#71717A]'
+                              ? 'bg-white border-white text-black shadow-sm'
+                              : 'border-white/30 bg-transparent text-transparent group-hover:border-white/60'
                           }`}
                           aria-checked={isSelected}
                           role="checkbox"
@@ -1360,23 +1492,23 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                           <div className="flex items-center gap-2">
                             <span 
                               className={`text-sm font-semibold transition-colors ${
-                                isSelected ? 'text-white' : 'text-gray-200 group-hover:text-white'
+                                isSelected ? 'text-white' : 'text-white/80 group-hover:text-white'
                               }`}
                               style={{ fontFamily: font.cssFamily }}
                             >
                               {font.name}
                             </span>
                             {font.badge && (
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-[#E50914]/20 text-[#FF4D6D] border border-[#E50914]/30">
+                              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-white/10 text-white border border-white/20">
                                 {font.badge}
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-[#9CA3AF] mt-1 leading-snug">
+                          <p className="text-[11px] text-white/70 mt-1 leading-snug">
                             {font.subtext}
                           </p>
                           <div 
-                            className="text-xs text-white/70 mt-2 px-2 py-1 rounded-lg bg-black/20 border border-white/5 truncate tracking-wide"
+                            className="text-xs text-white/80 mt-2 px-2 py-1 rounded-lg bg-black/40 border border-white/15 truncate tracking-wide"
                             style={{ fontFamily: font.cssFamily }}
                           >
                             VNRT Online: Truyền hình trực tuyến 2026
@@ -1404,19 +1536,19 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-vboard-skin"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-4 transition-colors"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-4 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
-                      <KeyboardIcon className="w-4.5 h-4.5 text-cyan-400" />
+                      <KeyboardIcon className="w-4.5 h-4.5 text-white" />
                       <span>Giao diện bàn phím ảo (V-Board Skins)</span>
                     </div>
-                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    <div className="text-xs text-white/70 mt-1 leading-normal">
                       Tùy chọn phong cách hiển thị cho bàn phím ảo V-board. Mỗi giao diện được mô phỏng chuẩn xác từ bố cục, phím bấm đến âm thanh tương tác.
                     </div>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shrink-0">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white border border-white/20 shrink-0">
                     {VBOARD_SKIN_OPTIONS.find(s => s.id === (settings.vboardSkin || 'default'))?.name.split(' ')[0] || 'Default'}
                   </span>
                 </div>
@@ -1433,8 +1565,8 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                         onClick={() => updateSetting('vboardSkin', skinOption.id)}
                         className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
                           isSelected
-                            ? 'bg-[#1E1D24] border-cyan-400 shadow-[0_0_18px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400'
-                            : 'bg-[#1E1D24]/60 border-white/5 hover:border-white/20 hover:bg-[#1E1D24]'
+                            ? 'bg-white/10 border-white shadow-[0_0_18px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                            : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                         }`}
                       >
                         {/* Header: Title + Checkbox */}
@@ -1442,15 +1574,15 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className={`text-sm font-semibold transition-colors ${
-                                isSelected ? 'text-white' : 'text-gray-200 group-hover:text-white'
+                                isSelected ? 'text-white' : 'text-white/80 group-hover:text-white'
                               }`}>
                                 {skinOption.name}
                               </span>
-                              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-md bg-white/10 text-gray-300 border border-white/10">
+                              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-md bg-white/10 text-white border border-white/20">
                                 {skinOption.badge}
                               </span>
                             </div>
-                            <p className="text-[11px] text-[#9CA3AF] mt-1.5 leading-snug">
+                            <p className="text-[11px] text-white/70 mt-1.5 leading-snug">
                               {skinOption.description}
                             </p>
                           </div>
@@ -1458,8 +1590,8 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                           <div 
                             className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 ${
                               isSelected
-                                ? 'bg-cyan-500 border-cyan-500 text-black shadow-sm'
-                                : 'border-[#4B4B58] bg-[#141419] text-transparent group-hover:border-[#71717A]'
+                                ? 'bg-white border-white text-black shadow-sm'
+                                : 'border-white/30 bg-transparent text-transparent group-hover:border-white/60'
                             }`}
                             aria-checked={isSelected}
                             role="checkbox"
@@ -1470,7 +1602,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
                         {/* Visual Keycap Preview Widget */}
                         <div 
-                          className="w-full mt-3 p-2 rounded-xl border border-white/10 flex items-center justify-center gap-1.5 overflow-hidden"
+                          className="w-full mt-3 p-2 rounded-xl border border-white/15 flex items-center justify-center gap-1.5 overflow-hidden"
                           style={{ backgroundColor: skinOption.previewBg }}
                         >
                           {['Q', 'W', 'E', 'R', 'T'].map((char, i) => {
@@ -1532,37 +1664,37 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
             {/* Card 2: Cỡ chữ ứng dụng (Spatial Glass Pill Slider Style) */}
             {matchesSearch('Cỡ chữ ứng dụng') && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border-0 hover:bg-white/[0.03] space-y-4">
+              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-4">
                 {/* Header Row */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Type className="w-4.5 h-4.5 text-[#9CA3AF]" />
+                    <Type className="w-4.5 h-4.5 text-white" />
                     <span className="font-semibold text-white text-sm">
                       Cỡ chữ ứng dụng
                     </span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white/90 border-0">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white border border-white/20">
                     Phông chữ: {FONT_FAMILY_CONFIG.find(f => f.id === settings.fontFamily)?.name || 'Integer'}
                   </span>
                 </div>
 
                 {/* Spatial Glass Capsule Slider Container */}
                 <div className="pt-1">
-                  <div className="group relative w-full h-16 rounded-[24px] bg-white/[0.04] border-0 flex items-center px-6 transition-all settings-slider-capsule">
+                  <div className="group relative w-full h-16 rounded-[24px] bg-white/[0.04] border border-white/20 flex items-center px-6 transition-all settings-slider-capsule">
                     {/* Track Background */}
-                    <div className="relative w-full h-2 rounded-full bg-[#383842] dark:bg-[#383842] overflow-visible">
-                      {/* Active Red Track */}
+                    <div className="relative w-full h-2 rounded-full bg-white/20 overflow-visible">
+                      {/* Active White Track */}
                       <div 
-                        className="absolute left-0 top-0 h-full rounded-full bg-[#E50914] transition-all duration-150 ease-out"
+                        className="absolute left-0 top-0 h-full rounded-full bg-white transition-all duration-150 ease-out"
                         style={{ width: `${(settings.fontScale / 3) * 100}%` }}
                       />
                       
                       {/* White Pill Thumb Handle with Hover Scale-up */}
                       <div 
-                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-6 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.3)] transition-all duration-200 ease-out pointer-events-none flex items-center justify-center group-hover:scale-125 hover:scale-125"
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-6 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.4)] transition-all duration-200 ease-out pointer-events-none flex items-center justify-center group-hover:scale-125 hover:scale-125"
                         style={{ left: `${(settings.fontScale / 3) * 100}%` }}
                       >
-                        <div className="w-4 h-1 rounded-full bg-gray-300" />
+                        <div className="w-4 h-1 rounded-full bg-black/40" />
                       </div>
                     </div>
 
@@ -1591,8 +1723,8 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                           onClick={() => updateSetting('fontScale', idx)}
                           className={`cursor-pointer transition-colors ${
                             isSelected
-                              ? 'text-[#E50914] font-bold text-xs'
-                              : 'text-[#6B7280] hover:text-[#9CA3AF]'
+                              ? 'text-white font-bold text-xs underline underline-offset-4'
+                              : 'text-white/50 hover:text-white/80'
                           }`}
                         >
                           {item.label}
@@ -1606,15 +1738,15 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
             {/* Card 4: Màn hình khởi động & VNRT Ads */}
             {(matchesSearch('Splash Screen') || matchesSearch('Màn hình khởi động') || matchesSearch('VNRT Ads') || matchesSearch('Ads')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <span>Màn hình khởi động & VNRT Ads</span>
-                    <span className="px-2 py-0.5 text-[10px] font-bold bg-[#E6005A]/20 text-[#E6005A] rounded-full">
+                    <span className="px-2 py-0.5 text-[10px] font-bold bg-white/10 text-white rounded-full border border-white/20">
                       VNRT Online OS
                     </span>
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Phát ngẫu nhiên VNRT Ads (VTV1, VTV6, VTV10) và hiệu ứng Spatial Glass khi khởi chạy ứng dụng
                   </div>
                 </div>
@@ -1626,7 +1758,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     onClick={() => {
                       window.dispatchEvent(new CustomEvent('vplay:replay_startup_video'));
                     }}
-                    className="px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all shadow-md cursor-pointer shrink-0"
+                    className="px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all shadow-md cursor-pointer shrink-0 border border-white/20"
                     title="Xem ngẫu nhiên VNRT Ads"
                   >
                     VNRT Ads
@@ -1637,7 +1769,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     onClick={() => {
                       window.dispatchEvent(new CustomEvent('vplay:replay_splash'));
                     }}
-                    className="px-4 py-2 rounded-full bg-[#E6005A] hover:bg-[#FF267A] text-white text-xs font-bold transition-all shadow-md shadow-[#E6005A]/25 cursor-pointer shrink-0"
+                    className="px-4 py-2 rounded-full bg-white hover:bg-white/90 text-black text-xs font-bold transition-all shadow-md cursor-pointer shrink-0 border border-white"
                   >
                     Splash Screen
                   </button>
@@ -1647,16 +1779,16 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
             {/* Card 5: Tải lại ứng dụng (Reload App) */}
             {(matchesSearch('Reload App') || matchesSearch('Tải lại') || matchesSearch('Làm mới') || matchesSearch('Reload')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <RotateCw className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <RotateCw className="w-4 h-4 text-white shrink-0" />
                     <span>Tải lại ứng dụng (Reload App)</span>
-                    <span className="px-2 py-0.5 text-[10px] font-mono bg-cyan-500/20 text-cyan-300 rounded-full">
+                    <span className="px-2 py-0.5 text-[10px] font-mono bg-white/10 text-white rounded-full border border-white/20">
                       F5
                     </span>
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Làm mới toàn bộ dữ liệu, bộ nhớ tạm và tái khởi động ứng dụng mượt mà
                   </div>
                 </div>
@@ -1667,7 +1799,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   onClick={() => {
                     window.location.reload();
                   }}
-                  className="px-4 py-2 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md shadow-cyan-600/25 cursor-pointer shrink-0 flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-full bg-white hover:bg-white/90 text-black text-xs font-bold transition-all shadow-md cursor-pointer shrink-0 flex items-center gap-1.5 border border-white"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
                   <span>Reload App</span>
@@ -1679,83 +1811,85 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       )}
 
       {/* 3. Section 2: Trợ năng */}
-      {isSection2Visible && (
+      {showAccessibility && (
         <section 
           id="settings-section-accessibility"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
         >
-          {/* Section Header without background container on icon */}
+          {/* Section Header */}
           <div className="flex items-start gap-3">
-            <Key className="w-5 h-5 text-[#E50914] dark:text-[#E50914] shrink-0 mt-0.5" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#10B981] to-[#047857] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+              <Key className="w-4.5 h-4.5 text-white" />
+            </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
                 Trợ năng
               </h2>
-              <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
+              <p className="text-xs text-white/70 mt-1 leading-relaxed">
                 Điều chỉnh tự động trượt banner và tương tác menu
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
-            {/* Card 1: Tự động trượt hình Banner (No Border) */}
+            {/* Card 1: Tự động trượt hình Banner */}
             {matchesSearch('Tự động trượt hình Banner') && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Tự động trượt hình Banner
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Banner hình ảnh ở trang chủ tự động trượt sau mỗi 5 giây
                   </div>
                 </div>
 
-                {/* Red Toggle Switch */}
+                {/* Orange Toggle Switch */}
                 <button
                   id="toggle-autoscroll-banner"
                   type="button"
                   role="switch"
                   aria-checked={settings.autoScrollBanner}
                   onClick={() => updateSetting('autoScrollBanner', !settings.autoScrollBanner)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.autoScrollBanner ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                    settings.autoScrollBanner ? 'bg-[#FF6A00]' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.autoScrollBanner ? 'translate-x-5.5' : 'translate-x-0'
+                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.autoScrollBanner ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                     }`}
                   />
                 </button>
               </div>
             )}
 
-            {/* Card 2: Tự động ẩn Sidebar (No Border) */}
+            {/* Card 2: Tự động ẩn Sidebar */}
             {matchesSearch('Tự động ẩn Sidebar') && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Tự động ẩn Sidebar
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                  <div className="text-xs text-white/70 mt-1 leading-normal">
                     Tự động thu gọn thanh menu khi không di chuột vào
                   </div>
                 </div>
 
-                {/* Red Toggle Switch */}
+                {/* Orange Toggle Switch */}
                 <button
                   id="toggle-autohide-sidebar"
                   type="button"
                   role="switch"
                   aria-checked={settings.autoHideSidebar}
                   onClick={() => updateSetting('autoHideSidebar', !settings.autoHideSidebar)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.autoHideSidebar ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                    settings.autoHideSidebar ? 'bg-[#FF6A00]' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.autoHideSidebar ? 'translate-x-5.5' : 'translate-x-0'
+                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.autoHideSidebar ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                     }`}
                   />
                 </button>
@@ -1764,42 +1898,42 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
             {/* Card 3: Inspect Elements (Inspect web này) */}
             {(matchesSearch('Inspect elements', 'Inspect web này', 'Kiểm tra phần tử', 'DevTools', 'DOM', 'Elements', 'Soi phần tử')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3 transition-colors">
+              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3 transition-colors">
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
                       <span>Inspect Elements (Inspect web này)</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#007AFF]/20 text-[#007AFF] border border-[#007AFF]/30">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-white border border-white/20">
                         DevTools
                       </span>
                     </div>
-                    <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
+                    <div className="text-xs text-white/70 mt-1 leading-normal">
                       Bật công cụ soi phần tử DOM, tra cứu mã nguồn HTML, xem thuộc tính CSS và mở bảng điều khiển DevTools trực tiếp trên web
                     </div>
                   </div>
 
-                  {/* Toggle Switch */}
+                  {/* Orange Toggle Switch */}
                   <button
                     id="toggle-inspect-elements"
                     type="button"
                     role="switch"
                     aria-checked={settings.inspectElements}
                     onClick={() => updateSetting('inspectElements', !settings.inspectElements)}
-                    className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                      settings.inspectElements ? 'bg-[#007AFF]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                    className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                      settings.inspectElements ? 'bg-[#FF6A00]' : 'bg-white/15'
                     }`}
                   >
                     <span
-                      className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                        settings.inspectElements ? 'translate-x-5.5' : 'translate-x-0'
+                      className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                        settings.inspectElements ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                       }`}
                     />
                   </button>
                 </div>
 
                 {settings.inspectElements && (
-                  <div className="pt-2 border-t border-white/5 text-xs text-[#34C759] flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#34C759] animate-pulse" />
+                  <div className="pt-2 border-t border-white/15 text-xs text-white flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
                     <span>Đã kích hoạt: Nút công cụ nổi &quot;Soi phần tử&quot; &amp; DevTools đã sẵn sàng ở góc màn hình.</span>
                   </div>
                 )}
@@ -1809,413 +1943,553 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
         </section>
       )}
 
-      {/* 4. Section 3: Copilot for VNRT Online */}
-      {isSection3Visible && (
+      {/* 4. Section: Giới thiệu (About & User Profile) */}
+      {showAbout && (
         <section 
-          id="settings-section-copilot"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
+          id="settings-section-about"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
         >
-          {/* Section Header with Monochrome Red Icon matching interface, accessibility & search */}
+          {/* Section Header */}
           <div className="flex items-start gap-3">
-            <Bot className="w-5 h-5 text-[#E50914] dark:text-[#E50914] shrink-0 mt-0.5" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#3B82F6] to-[#1D4ED8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+              <Info className="w-4.5 h-4.5 text-white" />
+            </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
-                Copilot for VNRT Online
+                Giới thiệu
               </h2>
-              <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
-                Quản lý tên người dùng, trợ lý trí tuệ nhân tạo, tính năng hợp nhất tìm kiếm và gợi ý lệnh
+              <p className="text-xs text-white/70 mt-1 leading-relaxed">
+                Thông tin hệ thống VNRT Online, hồ sơ người dùng và cài đặt ban đầu
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
-            {/* Card 0: Tên người dùng (User Name) */}
-            {(matchesSearch('Tên người dùng') || matchesSearch('Username') || matchesSearch('User') || matchesSearch('Tên') || matchesSearch('Hồ sơ') || matchesSearch('Profile') || matchesSearch('Copilot')) && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-3.5 transition-colors">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <div className="font-semibold text-white text-sm flex items-center gap-2">
-                      <User className="w-4 h-4 text-[#E50914]" />
-                      <span>Tên người dùng (Username)</span>
-                    </div>
-                    <div className="text-xs text-[#9CA3AF] mt-0.5 leading-normal">
-                      Tên gọi chào mừng trong Copilot AI và giao diện Standalone (Mặc định: <span className="text-white font-medium">User</span>)
-                    </div>
+            {/* System Info Card */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white font-black text-sm shadow">
+                    VNRT
                   </div>
-
-                  {/* Live greeting preview tag */}
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#18181B] text-xs text-zinc-300 border border-white/5 shrink-0 self-start sm:self-auto">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Hi <strong className="text-white">{settings.userName || 'User'}</strong>!</span>
+                  <div>
+                    <h3 className="font-bold text-white text-sm">Vplay by Waves</h3>
+                    <p className="text-xs text-white/70">Nền tảng truyền hình & tiện ích Việt Nam thế hệ mới</p>
                   </div>
                 </div>
-
-                {/* Input & Action buttons */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                  <div className="relative flex-1">
-                    <input
-                      id="settings-username-input"
-                      type="text"
-                      value={inputUserName}
-                      onChange={(e) => setInputUserName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleSaveUserName();
-                        }
-                      }}
-                      placeholder="Nhập tên của bạn (vd: User, Alex, Minh...)"
-                      maxLength={30}
-                      className="w-full h-10 px-3.5 rounded-xl bg-[#1E1D22] border border-[#3E3E4A] text-white text-sm placeholder-[#71717A] focus:outline-none focus:border-[#E50914] transition-all"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      id="btn-save-username"
-                      type="button"
-                      onClick={() => handleSaveUserName()}
-                      className={`h-10 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-                        isNameSaved
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-[#E50914] hover:bg-[#c80812] text-white'
-                      }`}
-                    >
-                      {isNameSaved ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Đã lưu</span>
-                        </>
-                      ) : (
-                        <span>Lưu tên</span>
-                      )}
-                    </button>
-
-                    <button
-                      id="btn-reset-username"
-                      type="button"
-                      onClick={() => handleSaveUserName('User')}
-                      title="Đặt lại về mặc định (User)"
-                      className="h-10 px-3 rounded-xl text-xs font-medium bg-[#1E1D22] hover:bg-[#34343E] text-[#9CA3AF] hover:text-white border border-[#3E3E4A] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Mặc định</span>
-                    </button>
-                  </div>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/20">
+                  v3.4.0
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-white/10 text-center text-xs">
+                <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+                  <span className="text-white/60 block text-[10px]">Trạng thái</span>
+                  <span className="text-white font-bold">Online</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+                  <span className="text-white/60 block text-[10px]">Phiên bản</span>
+                  <span className="text-white font-bold">2026.09</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+                  <span className="text-white/60 block text-[10px]">Đa nhiệm</span>
+                  <span className="text-white font-bold">V-Duo Ready</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10">
+                  <span className="text-white/60 block text-[10px]">Mô phỏng</span>
+                  <span className="text-white font-bold">Driving Sim</span>
                 </div>
               </div>
-            )}
+            </div>
 
-            {/* Card 0.5: Reset OOBE Setup Screen */}
-            {(matchesSearch('OOBE') || matchesSearch('Reset OOBE') || matchesSearch('Thiết lập lần đầu') || matchesSearch('Setup') || matchesSearch('Windows') || matchesSearch("Who's going to use VNRT Online") || matchesSearch('Khởi động')) && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
+            {/* Card 0: Tên người dùng (User Name) */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3.5 transition-colors">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <Monitor className="w-4 h-4 text-[#0078D4]" />
-                    <span>Màn hình thiết lập OOBE lần đầu</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0078D4]/20 text-[#38A6FF] border border-[#0078D4]/30">
-                      Windows 11 OOBE
-                    </span>
+                    <User className="w-4 h-4 text-white" />
+                    <span>Tên người dùng (Username)</span>
                   </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Trải nghiệm lại màn hình chào mừng và thiết lập &ldquo;Who&apos;s going to use VNRT Online?&rdquo; phong cách Windows Out-of-Box Experience
+                  <div className="text-xs text-white/70 mt-0.5 leading-normal">
+                    Tên hiển thị chào mừng trong hệ thống (Mặc định: <span className="text-white font-medium">User</span>)
                   </div>
                 </div>
 
-                <button
-                  id="btn-reset-oobe"
-                  type="button"
-                  onClick={handleResetOobe}
-                  className="h-10 px-4 rounded-xl text-xs font-semibold bg-[#0067C0] hover:bg-[#005FB8] active:bg-[#0054A4] text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0 self-start sm:self-auto"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>{oobeResetTriggered ? 'Đang mở OOBE...' : 'Reset OOBE'}</span>
-                </button>
+                {/* Live greeting preview tag */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs text-white border border-white/20 shrink-0 self-start sm:self-auto">
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                  <span>Hi <strong className="text-white">{settings.userName || 'User'}</strong>!</span>
+                </div>
               </div>
-            )}
 
-            {/* Card 1: Merge Spotlight Search to Copilot */}
-            {(matchesSearch('Merge Spotlight Search to Copilot') || matchesSearch('Hợp nhất') || matchesSearch('Spotlight') || matchesSearch('Copilot') || matchesSearch('Tìm kiếm')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Merge Spotlight Search to Copilot
-                  </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hợp nhất tìm kiếm nhanh Spotlight Search vào trợ lý Copilot for VNRT Online để có trải nghiệm tìm kiếm thông minh hơn
-                  </div>
-                </div>
-
-                {/* Red Toggle Switch */}
-                <button
-                  id="toggle-merge-spotlight-to-copilot"
-                  type="button"
-                  role="switch"
-                  aria-checked={settings.mergeSpotlightToCopilot}
-                  onClick={() => updateSetting('mergeSpotlightToCopilot', !settings.mergeSpotlightToCopilot)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.mergeSpotlightToCopilot ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
-                  }`}
-                >
-                  <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.mergeSpotlightToCopilot ? 'translate-x-5.5' : 'translate-x-0'
-                    }`}
+              {/* Input & Action buttons */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                <div className="relative flex-1">
+                  <input
+                    id="settings-username-input"
+                    type="text"
+                    value={inputUserName}
+                    onChange={(e) => setInputUserName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSaveUserName();
+                      }
+                    }}
+                    placeholder="Nhập tên của bạn (vd: User, Alex, Minh...)"
+                    maxLength={30}
+                    className="w-full h-10 px-3.5 rounded-xl bg-[#1E1D22] border border-white/20 text-white text-sm placeholder-white/40 focus:outline-none focus:border-white transition-all"
                   />
-                </button>
-              </div>
-            )}
-
-            {/* Card 2: Gợi ý lệnh thông minh Slash Commands */}
-            {(matchesSearch('Gợi ý lệnh') || matchesSearch('Slash') || matchesSearch('Copilot') || matchesSearch('Lệnh')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Gợi ý lệnh Slash Commands
-                  </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hiển thị các phím tắt lệnh nhanh (/search, /mode, /navigation, /subscribe) phía trên khung chat
-                  </div>
                 </div>
 
-                {/* Red Toggle Switch */}
-                <button
-                  id="toggle-copilot-slash-suggestions"
-                  type="button"
-                  role="switch"
-                  aria-checked={settings.copilotSlashSuggestions}
-                  onClick={() => updateSetting('copilotSlashSuggestions', !settings.copilotSlashSuggestions)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    settings.copilotSlashSuggestions ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
-                  }`}
-                >
-                  <span
-                    className={`w-5.5 h-5.5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.copilotSlashSuggestions ? 'translate-x-5.5' : 'translate-x-0'
+                <div className="flex items-center gap-2">
+                  <button
+                    id="btn-save-username"
+                    type="button"
+                    onClick={() => handleSaveUserName()}
+                    className={`h-10 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+                      isNameSaved
+                        ? 'bg-white text-black border-white'
+                        : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
                     }`}
-                  />
-                </button>
+                  >
+                    {isNameSaved ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Đã lưu</span>
+                      </>
+                    ) : (
+                      <span>Lưu tên</span>
+                    )}
+                  </button>
+
+                  <button
+                    id="btn-reset-username"
+                    type="button"
+                    onClick={() => handleSaveUserName('User')}
+                    title="Đặt lại về mặc định (User)"
+                    className="h-10 px-3 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/15 text-white/80 hover:text-white border border-white/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Mặc định</span>
+                  </button>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Card 0.5: Reset OOBE Setup Screen */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="font-semibold text-white text-sm flex items-center gap-2">
+                  <Monitor className="w-4 h-4 text-white" />
+                  <span>Màn hình thiết lập OOBE lần đầu</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-white border border-white/20">
+                    OOBE Setup
+                  </span>
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Trải nghiệm lại màn hình chào mừng và thiết lập ban đầu phong cách Out-of-Box Experience
+                </div>
+              </div>
+
+              <button
+                id="btn-reset-oobe"
+                type="button"
+                onClick={handleResetOobe}
+                className="h-10 px-4 rounded-xl text-xs font-semibold bg-white hover:bg-white/90 active:scale-95 text-black border border-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0 self-start sm:self-auto"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>{oobeResetTriggered ? 'Đang mở OOBE...' : 'Reset OOBE'}</span>
+              </button>
+            </div>
+
+            {/* Clear Local Cache */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="font-semibold text-white text-sm">
+                  Dọn dẹp bộ nhớ tạm (Cache)
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Xóa bộ nhớ đệm lịch sử, dữ liệu kênh tuỳ chỉnh và khôi phục trạng thái chuẩn
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    localStorage.removeItem('waves_custom_channels');
+                    localStorage.removeItem('vshop_cart');
+                    alert('Đã làm sạch dữ liệu bộ nhớ tạm!');
+                  } catch {}
+                }}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold cursor-pointer transition-colors shrink-0"
+              >
+                Xóa Cache
+              </button>
+            </div>
           </div>
         </section>
       )}
 
-      {/* 5. Section 4: Tìm kiếm */}
-      {isSection4Visible && (
+      {/* 5. Section: Công cụ (Tools & Search & V-Duo) */}
+      {showTools && (
         <section 
-          id="settings-section-search"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
+          id="settings-section-tools"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
         >
-          {/* Section Header without background container on icon */}
+          {/* Section Header */}
           <div className="flex items-start gap-3">
-            <Search className="w-5 h-5 text-[#E50914] dark:text-[#E50914] shrink-0 mt-0.5" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#64748B] to-[#334155] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+              <Wrench className="w-4.5 h-4.5 text-white" />
+            </div>
             <div>
               <h2 className="text-base font-bold text-white leading-tight">
-                Tìm kiếm
+                Công cụ
               </h2>
-              <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
-                Tùy chỉnh các danh mục kết quả trong tìm kiếm Spotlight
+              <p className="text-xs text-white/70 mt-1 leading-relaxed">
+                Tùy chỉnh tính năng đa nhiệm V-Duo, trợ lý Copilot AI và phạm vi tìm kiếm
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
-
-            {/* 1. Danh mục */}
-            {matchesSearch('Danh mục') && (
-              <div 
-                onClick={() => updateSetting('searchCategories', !settings.searchCategories)}
-                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
-              >
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Danh mục
-                  </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hiển thị các tab và điều hướng hệ thống (Home, Live TV, News, v.v.)
-                  </div>
+            {/* V-Duo Split Screen Quick Tool Card */}
+            <div 
+              onClick={() => navigate ? navigate('/v-duo') : window.location.assign('/v-duo')}
+              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
+                  <Columns2 className="w-5 h-5" />
                 </div>
-
-                <div 
-                  className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                    settings.searchCategories
-                      ? 'bg-[#E50914] text-white shadow-sm'
-                      : 'bg-[#24242A] border border-[#4B5563]'
-                  }`}
-                >
-                  {settings.searchCategories && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-white text-sm transition-colors">
+                      Mở tính năng V-Duo (Chia đôi màn hình)
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
+                      MỚI
+                    </span>
+                  </div>
+                  <p className="text-xs text-white/70 mt-0.5">
+                    Chia ứng dụng làm 2 nửa màn hình để thực hiện 2 thao tác khác nhau đồng thời (TV, Shop, Đặt xe, Driving Simulator, v.v.)
+                  </p>
                 </div>
               </div>
-            )}
+              <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+            </div>
+
+            {/* Merge Spotlight Search to Copilot */}
+            <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="font-semibold text-white text-sm">
+                  Merge Spotlight Search to Copilot
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Hợp nhất tìm kiếm nhanh Spotlight Search vào trợ lý Copilot for VNRT Online để có trải nghiệm tìm kiếm thông minh hơn
+                </div>
+              </div>
+
+              <button
+                id="toggle-merge-spotlight-to-copilot"
+                type="button"
+                role="switch"
+                aria-checked={settings.mergeSpotlightToCopilot}
+                onClick={() => updateSetting('mergeSpotlightToCopilot', !settings.mergeSpotlightToCopilot)}
+                className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                  settings.mergeSpotlightToCopilot ? 'bg-[#FF6A00]' : 'bg-white/15'
+                }`}
+              >
+                <span
+                  className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    settings.mergeSpotlightToCopilot ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Gợi ý lệnh thông minh Slash Commands */}
+            <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="font-semibold text-white text-sm">
+                  Gợi ý lệnh Slash Commands
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Hiển thị các phím tắt lệnh nhanh (/search, /mode, /navigation, /subscribe) phía trên khung chat
+                </div>
+              </div>
+
+              <button
+                id="toggle-copilot-slash-suggestions"
+                type="button"
+                role="switch"
+                aria-checked={settings.copilotSlashSuggestions}
+                onClick={() => updateSetting('copilotSlashSuggestions', !settings.copilotSlashSuggestions)}
+                className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                  settings.copilotSlashSuggestions ? 'bg-[#FF6A00]' : 'bg-white/15'
+                }`}
+              >
+                <span
+                  className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    settings.copilotSlashSuggestions ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* 1. Danh mục tìm kiếm */}
+            <div 
+              onClick={() => updateSetting('searchCategories', !settings.searchCategories)}
+              className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
+            >
+              <div>
+                <div className="font-semibold text-white text-sm">
+                  Tìm kiếm: Danh mục hệ thống
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Hiển thị các tab và điều hướng hệ thống trong kết quả tìm kiếm Spotlight
+                </div>
+              </div>
+
+              <div 
+                className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors border ${
+                  settings.searchCategories
+                    ? 'bg-white border-white text-black shadow-sm'
+                    : 'bg-transparent border-white/30 text-transparent'
+                }`}
+              >
+                {settings.searchCategories && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+            </div>
 
             {/* 2. Tin tức */}
-            {matchesSearch('Tin tức') && (
+            <div 
+              onClick={() => updateSetting('searchNews', !settings.searchNews)}
+              className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
+            >
+              <div>
+                <div className="font-semibold text-white text-sm">
+                  Tìm kiếm: Tin tức & Cổng thông tin
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Hiển thị bài viết tin tức, thông báo cộng đồng và sự kiện
+                </div>
+              </div>
+
               <div 
-                onClick={() => updateSetting('searchNews', !settings.searchNews)}
-                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
+                className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors border ${
+                  settings.searchNews
+                    ? 'bg-white border-white text-black shadow-sm'
+                    : 'bg-transparent border-white/30 text-transparent'
+                }`}
               >
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Tin tức
-                  </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hiển thị các bài viết tin tức, thông báo cộng đồng và sự kiện Discord
-                  </div>
-                </div>
+                {settings.searchNews && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+            </div>
 
-                <div 
-                  className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                    settings.searchNews
-                      ? 'bg-[#E50914] text-white shadow-sm'
-                      : 'bg-[#24242A] border border-[#4B5563]'
-                  }`}
-                >
-                  {settings.searchNews && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+            {/* 3. Truyền hình */}
+            <div 
+              onClick={() => updateSetting('searchTv', !settings.searchTv)}
+              className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
+            >
+              <div>
+                <div className="font-semibold text-white text-sm">
+                  Tìm kiếm: Kênh truyền hình
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Hiển thị danh sách kênh truyền hình trực tiếp theo tên hoặc nhóm kênh
                 </div>
               </div>
-            )}
 
-            {/* 3. Truyền hình & Tìm kênh theo số hiệu */}
-            {(matchesSearch('Truyền hình') || matchesSearch('Tìm kênh theo số hiệu kênh')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] space-y-4">
-                {/* 3.1 Truyền hình */}
-                {matchesSearch('Truyền hình') && (
-                  <div 
-                    onClick={() => updateSetting('searchTv', !settings.searchTv)}
-                    className="flex items-center justify-between gap-4 cursor-pointer"
-                  >
-                    <div>
-                      <div className="font-semibold text-white text-sm">
-                        Truyền hình
-                      </div>
-                      <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                        Hiển thị danh sách kênh truyền hình trực tiếp theo tên hoặc nhóm kênh
-                      </div>
-                    </div>
-
-                    <div 
-                      className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                        settings.searchTv
-                          ? 'bg-[#E50914] text-white shadow-sm'
-                          : 'bg-[#24242A] border border-[#4B5563]'
-                      }`}
-                    >
-                      {settings.searchTv && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                    </div>
-                  </div>
-                )}
-
-                {/* Divider */}
-                <hr className="border-[#383742]" />
-
-                {/* 3.2 Tìm kênh theo số hiệu kênh */}
-                {matchesSearch('Tìm kênh theo số hiệu kênh') && (
-                  <div 
-                    onClick={() => updateSetting('searchChannelNumber', !settings.searchChannelNumber)}
-                    className="flex items-center justify-between gap-4 cursor-pointer"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-[#E50914] text-sm">
-                          Tìm kênh theo số hiệu kênh
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-[#E50914]/20 text-[#E50914] tracking-wider">
-                          CH #
-                        </span>
-                      </div>
-                      <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                        Cho phép gõ số kênh (ví dụ: 1, 001, #12, kênh 5) để tìm nhanh
-                      </div>
-                    </div>
-
-                    <div 
-                      className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                        settings.searchChannelNumber
-                          ? 'bg-[#E50914] text-white shadow-sm'
-                          : 'bg-[#24242A] border border-[#4B5563]'
-                      }`}
-                    >
-                      {settings.searchChannelNumber && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 4. Toolbox */}
-            {matchesSearch('Toolbox') && (
               <div 
-                onClick={() => updateSetting('searchToolbox', !settings.searchToolbox)}
-                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
+                className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors border ${
+                  settings.searchTv
+                    ? 'bg-white border-white text-black shadow-sm'
+                    : 'bg-transparent border-white/30 text-transparent'
+                }`}
               >
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Toolbox
-                  </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Hiển thị các công cụ tiện ích (Xem URL, Thêm kênh, Nhập/Xuất M3U, Multiview,...)
-                  </div>
-                </div>
+                {settings.searchTv && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
-                <div 
-                  className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                    settings.searchToolbox
-                      ? 'bg-[#E50914] text-white shadow-sm'
-                      : 'bg-[#24242A] border border-[#4B5563]'
-                  }`}
-                >
-                  {settings.searchToolbox && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+      {/* 6. Section: Thử nghiệm (Feature Flags & Labs) */}
+      {showExperimental && (
+        <section 
+          id="settings-section-experimental"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
+        >
+          {/* Section Header */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#A855F7] to-[#6B21A8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+                <FlaskConical className="w-4.5 h-4.5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-white leading-tight">
+                  Thử nghiệm
+                </h2>
+                <p className="text-xs text-white/70 mt-1 leading-relaxed">
+                  Bật/tắt các cờ tính năng thử nghiệm (Feature Flags), giao diện tối giản và các tiện ích mới
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate ? navigate('/feature-flags') : window.location.assign('/feature-flags')}
+              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1.5 border border-white/20"
+            >
+              <span>Trang Flags</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="space-y-3 pt-1">
+            {/* Flag 1: Minimalism Home Page */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white text-sm">Minimalism Home Page</span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
+                    NEW
+                  </span>
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Khi bật thì home page chỉ xuất hiện nguyên 1 thanh search đơn giản, ko xuất hiện gì thêm
                 </div>
               </div>
-            )}
 
-            {/* 5. Cài đặt */}
-            {matchesSearch('Cài đặt') && (
-              <div 
-                onClick={() => updateSetting('searchSettings', !settings.searchSettings)}
-                className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/10 hover:border-white/20 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-colors"
+              <button
+                type="button"
+                role="switch"
+                aria-checked={Boolean(flags.minimalism_home_page)}
+                onClick={() => setFlag('minimalism_home_page', !flags.minimalism_home_page)}
+                className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                  flags.minimalism_home_page ? 'bg-[#FF6A00]' : 'bg-white/15'
+                }`}
               >
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Cài đặt
-                  </div>
-                  <div className="text-xs text-[#9CA3AF] mt-1 leading-normal">
-                    Quản lý và chuyển nhanh tới các mục tùy chọn hệ thống
-                  </div>
-                </div>
-
-                <div 
-                  className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                    settings.searchSettings
-                      ? 'bg-[#E50914] text-white shadow-sm'
-                      : 'bg-[#24242A] border border-[#4B5563]'
+                <span
+                  className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    flags.minimalism_home_page ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                   }`}
-                >
-                  {settings.searchSettings && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                />
+              </button>
+            </div>
+
+            {/* Flag 2: Animation Test */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white text-sm">Animation Test</span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
+                    MOTION
+                  </span>
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Thêm thật nhiều animation và motion mượt mà vào toàn bộ ứng dụng: chuyển trang đàn hồi và hiệu ứng spring
                 </div>
               </div>
-            )}
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={Boolean(flags.animation_test)}
+                onClick={() => setFlag('animation_test', !flags.animation_test)}
+                className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                  flags.animation_test ? 'bg-[#FF6A00]' : 'bg-white/15'
+                }`}
+              >
+                <span
+                  className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    flags.animation_test ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Flag 3: Experimental V-board */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white text-sm">Experimental V-board</span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
+                    TELEX KEYBOARD
+                  </span>
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Bàn phím ảo độc quyền V-board mang phong cách iOS dark mode khi chạm ô tìm kiếm
+                </div>
+              </div>
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={Boolean(flags.experimental_vboard)}
+                onClick={() => setFlag('experimental_vboard', !flags.experimental_vboard)}
+                className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                  flags.experimental_vboard ? 'bg-[#FF6A00]' : 'bg-white/15'
+                }`}
+              >
+                <span
+                  className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    flags.experimental_vboard ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Flag 4: Vertical Status Bar */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white text-sm">Vertical Status Bar</span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
+                    UI
+                  </span>
+                </div>
+                <div className="text-xs text-white/70 mt-1 leading-normal">
+                  Hiển thị thanh trạng thái và Dynamic Island đặt dọc ở góc trên bên phải màn hình
+                </div>
+              </div>
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={Boolean(flags.status_bar)}
+                onClick={() => setFlag('status_bar', !flags.status_bar)}
+                className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                  flags.status_bar ? 'bg-[#FF6A00]' : 'bg-white/15'
+                }`}
+              >
+                <span
+                  className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    flags.status_bar ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </section>
       )}
 
       {/* Empty State when no settings match query */}
       {!hasAnyResults && (
-        <div className="py-12 px-6 text-center rounded-[28px] bg-[#1E1D22] border border-white/10 space-y-3 shadow-xl">
-          <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto text-zinc-400">
+        <div className="py-12 px-6 text-center rounded-[28px] bg-[#1E1D22] border border-white/20 space-y-3 shadow-xl">
+          <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto text-white">
             <Search className="w-6 h-6" />
           </div>
           <h3 className="text-base font-bold text-white">
             Không tìm thấy cài đặt nào
           </h3>
-          <p className="text-xs text-[#9CA3AF] max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-white/70 max-w-sm mx-auto leading-relaxed">
             Không tìm thấy cài đặt khớp với từ khóa &quot;{searchQuery}&quot;. Thử tìm kiếm với từ khóa như giao diện, sidebar, font, trợ năng, copilot...
           </p>
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors cursor-pointer border border-white/20"
           >
             Xóa tìm kiếm
           </button>

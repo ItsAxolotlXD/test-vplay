@@ -46,7 +46,10 @@ import {
   MessageSquare,
   Music,
   ShoppingBag,
-  UtensilsCrossed
+  UtensilsCrossed,
+  Columns2,
+  Car,
+  Gauge
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -139,6 +142,23 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   };
 
   const isSpace360AppActive = (appId: string) => {
+    if (appId === 'ride_booking') {
+      return (
+        currentRoute === '/v-ride' ||
+        currentRoute === '/ride' ||
+        currentRoute === '/dat-xe' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'ride_booking')
+      );
+    }
+    if (appId === 'driving_simulator') {
+      return (
+        currentRoute === '/driving-simulator' ||
+        currentRoute === '/driving' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'driving_simulator')
+      );
+    }
     if (appId === 'v_minecraft') {
       return (
         currentRoute.startsWith('/minecraft') ||
@@ -583,6 +603,24 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
           <span className="truncate">Shop</span>
         </button>
 
+        {/* V-Duo (Chia đôi màn hình) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-vduo' : 'nav-item-vduo'}
+          onClick={() => handleNavClick('/v-duo')}
+          title="V-Duo (Chia đôi màn hình)"
+          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/v-duo') || isActive('/duo')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <Columns2 className="w-5 h-5 shrink-0 text-cyan-400" />
+          <span className="truncate">V-Duo (Chia đôi màn hình)</span>
+          <span className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300">
+            Mới
+          </span>
+        </button>
+
         {/* Divider 1 */}
         <div className="py-1">
           <div className="border-t border-white/10" />
@@ -599,6 +637,11 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
               isActive("/v-space") ||
               isActive("/space-360") ||
               isActive("/v-apps") ||
+              isActive("/v-ride") ||
+              isActive("/ride") ||
+              isActive("/dat-xe") ||
+              isActive("/driving-simulator") ||
+              isActive("/driving") ||
               isActive("/v-arcade") ||
               isActive("/v-games") ||
               isActive("/v-files") ||
@@ -624,7 +667,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="px-2 py-0.5 text-[9px] font-mono font-bold bg-white/10 rounded-full">
-                19 Apps
+                21 Apps
               </span>
               <div
                 onClick={(e) => {
@@ -666,6 +709,44 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                     <Sparkles className="w-4 h-4 text-pink-400 shrink-0" />
                     <span className="truncate">Tất cả Space 360</span>
                   </div>
+                </button>
+
+                {/* Đặt xe (Ride Booking) */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-ride" : "space360-tab-ride"}
+                  onClick={() => handleNavClick("/v-ride", { appId: "ride_booking" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("ride_booking")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Car className="w-4 h-4 text-sky-400 shrink-0" />
+                    <span className="truncate">Đặt xe</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-sky-500/20 text-sky-300">
+                    Mới
+                  </span>
+                </button>
+
+                {/* Driving Simulator */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-driving" : "space360-tab-driving"}
+                  onClick={() => handleNavClick("/driving-simulator", { appId: "driving_simulator" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("driving_simulator")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Gauge className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="truncate">Driving Sim</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300">
+                    3D
+                  </span>
                 </button>
 
                 <button

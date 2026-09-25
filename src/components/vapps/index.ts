@@ -21,3 +21,5 @@ export { VStockTab } from "./VStockTab";
 export { VHealthTab } from "./VHealthTab";
 export { VMapsTab } from "./VMapsTab";
 export { CookbookTab } from "./CookbookTab";
+export { VRideBookingTab } from "./VRideBookingTab";
+export { DrivingSimulatorTab } from "./DrivingSimulatorTab";

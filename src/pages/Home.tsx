@@ -47,10 +47,8 @@ export const Home: React.FC<HomeProps> = ({
   // Feature Flag: Minimalism Home Page
   // Khi bật thì home page chỉ xuất hiện nguyên 1 thanh search đơn giản, ko xuất hiện gì thêm
   if (isMinimalism) {
-    const activeQuery = searchQuery.trim() || localSearch.trim();
-
     return (
-      <div className="min-h-[78vh] flex flex-col items-center justify-center px-4 select-none animate-in fade-in duration-300">
+      <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 select-none animate-in fade-in duration-300">
         {/* Spotlight Search Overlay when user actively enters query */}
         {searchQuery.trim() ? (
           <div className="w-full max-w-4xl">
@@ -66,20 +64,10 @@ export const Home: React.FC<HomeProps> = ({
             />
           </div>
         ) : (
-          <div className="w-full max-w-2xl flex flex-col items-center space-y-7 text-center">
-            {/* Minimal Brand Logo */}
-            <div className="space-y-1.5">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight font-['Integer','Inter',sans-serif] bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)]">
-                VNRT Online
-              </h1>
-              <p className="text-xs sm:text-sm text-zinc-400 font-medium">
-                Tìm kiếm thông minh & tối giản
-              </p>
-            </div>
-
-            {/* Single Centered Minimal Search Bar */}
+          <div className="w-full max-w-2xl flex flex-col items-center justify-center text-center">
+            {/* Single Centered Minimal Search Bar: Không xuất hiện gì thêm */}
             <form onSubmit={handleMinimalSearchSubmit} className="w-full">
-              <div className="w-full h-14 sm:h-16 px-5 rounded-full bg-zinc-900/90 border border-white/20 shadow-2xl backdrop-blur-xl flex items-center gap-3.5 focus-within:border-white/50 focus-within:ring-2 focus-within:ring-white/20 transition-all group">
+              <div className="w-full h-14 sm:h-16 px-5 rounded-full bg-zinc-900/95 border border-white/20 shadow-2xl backdrop-blur-2xl flex items-center gap-3.5 focus-within:border-white/50 focus-within:ring-2 focus-within:ring-white/20 transition-all group">
                 <Search className="w-6 h-6 text-zinc-400 group-focus-within:text-white shrink-0 transition-colors" />
                 <input
                   type="text"
@@ -95,7 +83,7 @@ export const Home: React.FC<HomeProps> = ({
                       }
                     }
                   }}
-                  placeholder="Tìm kiếm kênh, tin tức, nội dung..."
+                  placeholder="Tìm kiếm..."
                   autoFocus
                   className="w-full bg-transparent text-white placeholder-zinc-500 text-base sm:text-lg font-medium focus:outline-none"
                 />
@@ -114,30 +102,12 @@ export const Home: React.FC<HomeProps> = ({
                 <button
                   type="submit"
                   disabled={!localSearch.trim()}
-                  className="px-4 py-2 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shrink-0"
+                  className="px-5 py-2.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shrink-0"
                 >
-                  Tìm
+                  Tìm kiếm
                 </button>
               </div>
             </form>
-
-            {/* Suggested quick pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-zinc-400">
-              <span className="text-zinc-500 font-medium mr-1">Gợi ý:</span>
-              {['VTV3', 'Thời sự 19h', 'Bóng đá', 'V-Shop', 'Đặt xe', 'Driving Simulator'].map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => {
-                    setLocalSearch(tag);
-                    setSearchQuery(tag);
-                  }}
-                  className="px-3 py-1.5 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/10 text-zinc-300 hover:text-white transition-all cursor-pointer"
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
           </div>
         )}
       </div>

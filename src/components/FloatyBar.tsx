@@ -16,6 +16,7 @@ import {
   Smartphone,
   Music,
   ShoppingBag,
+  Columns2,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -181,9 +182,10 @@ export const FloatyBar: React.FC<FloatyBarProps> = React.memo(({
       { id: 'floaty-chat', title: 'Phòng Chat V-Chat', route: '/chat', icon: MessageSquare },
       { id: 'floaty-vertical', title: 'VNRT Online Vertical', route: '/vertical', icon: Smartphone },
     ],
-    // Trang 4: Shop Mua sắm
+    // Trang 4: Shop Mua sắm & Tiện ích V-Duo
     [
       { id: 'floaty-shop', title: 'Shop', route: '/v-shop', icon: ShoppingBag },
+      { id: 'floaty-vduo', title: 'V-Duo (Chia đôi màn hình)', route: '/v-duo', icon: Columns2 },
     ],
   ];
 

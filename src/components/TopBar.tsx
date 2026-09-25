@@ -44,7 +44,10 @@ import {
   StickyNote,
   Armchair,
   Music,
-  Settings
+  Settings,
+  Columns2,
+  Car,
+  Gauge
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
@@ -324,7 +327,26 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                 <span className="tracking-wide">Shop</span>
               </button>
 
-              {/* Item 3: App v with Dropdown Menu */}
+              {/* Item 3: V-Duo (Chia đôi màn hình) */}
+              <button
+                id="topbar-nav-vduo"
+                onClick={() => navigate('/v-duo')}
+                className={`relative px-4 py-2 rounded-full text-[14.5px] transition-all flex items-center gap-2 cursor-pointer group ${
+                  currentRoute === '/v-duo' || currentRoute.startsWith('/v-duo') || currentRoute === '/duo'
+                    ? 'bg-white text-black font-bold shadow-md'
+                    : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
+                }`}
+                title="V-Duo - Chia đôi màn hình thực hiện 2 thao tác cùng lúc"
+              >
+                <Columns2 className={`w-5 h-5 shrink-0 transition-transform ${
+                  currentRoute === '/v-duo' || currentRoute.startsWith('/v-duo') || currentRoute === '/duo'
+                    ? 'text-black'
+                    : 'text-cyan-400 group-hover:scale-105'
+                }`} />
+                <span className="tracking-wide">V-Duo</span>
+              </button>
+
+              {/* Item 4: App v with Dropdown Menu */}
               <div
                 className="relative h-full flex items-center"
                 ref={moreMenuDropdownRef}
@@ -456,6 +478,46 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                             <span>Cổng không gian (Space 360)</span>
                           </div>
                           <ChevronRight className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+
+                        {/* Đặt xe (Space 360) */}
+                        <button
+                          id="more-item-dat-xe"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
+                            navigate('/v-ride');
+                          }}
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                          title="Đặt xe công nghệ & Taxi Space 360"
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <Car className="w-5 h-5 shrink-0 text-sky-400 group-hover:scale-105 transition-transform" />
+                            <span>Đặt xe (Space 360)</span>
+                          </div>
+                          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-400/30 rounded-md">
+                            Mới
+                          </span>
+                        </button>
+
+                        {/* Driving Simulator */}
+                        <button
+                          id="more-item-driving-sim"
+                          onClick={() => {
+                            setMoreMenuOpen(false);
+                            setIsSpaceMenuOpen(false);
+                            navigate('/driving-simulator');
+                          }}
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-[14px] font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer group"
+                          title="Mô phỏng khoang ghế lái 3D chân thực"
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <Gauge className="w-5 h-5 shrink-0 text-amber-400 group-hover:scale-105 transition-transform" />
+                            <span>Driving Simulator</span>
+                          </div>
+                          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-md">
+                            3D
+                          </span>
                         </button>
 
                         {/* Spatial Design Visualizer */}

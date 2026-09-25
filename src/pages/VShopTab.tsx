@@ -14,7 +14,8 @@ import {
   Coins,
   AlertCircle,
   Sparkles,
-  Palette
+  Palette,
+  MessageSquare
 } from 'lucide-react';
 import { 
   V_SHOP_PRODUCTS, 
@@ -284,6 +285,23 @@ export const VShopTab: React.FC<VShopTabProps> = ({ navigate }) => {
                 </button>
               )}
             </div>
+
+            {/* Comments Jump Button */}
+            <button
+              id="btn-shop-jump-comments"
+              onClick={() => {
+                const el = document.getElementById('shop-comments-section');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-xs transition-all flex items-center gap-2 cursor-pointer shrink-0"
+              title="Xem bình luận & đánh giá của khách hàng"
+            >
+              <MessageSquare className="w-4 h-4 text-pink-400" />
+              <span>Bình luận</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            </button>
 
             {/* Cart Trigger Button */}
             <button

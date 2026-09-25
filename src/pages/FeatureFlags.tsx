@@ -339,7 +339,7 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
                   aria-checked={isEnabled}
                   onClick={() => handleToggle(item.key, item)}
                   className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center ${
-                    isEnabled ? 'bg-[#E50914]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
+                    isEnabled ? 'bg-[#FF6A00]' : 'bg-[#E4E4E7] dark:bg-[#3F3F46]'
                   }`}
                 >
                   <span
