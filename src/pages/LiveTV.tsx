@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays, Ratio, LayoutGrid } from 'lucide-react';
+import { ExternalLink, Play, Pause, Volume2, VolumeX, Maximize2, Tv, Plus, CalendarDays, Ratio, LayoutGrid, MessageSquare, X } from 'lucide-react';
 import { Channel } from '../types';
 import { ChannelSchedule } from '../components/ChannelSchedule';
 import { ChannelAdOverlay } from '../components/ChannelAdOverlay';
 import { MultiviewPlayer } from '../components/MultiviewPlayer';
+import LiveComments from '../components/LiveComments';
 import { useTabSearch } from '../context/TabSearchContext';
 import Hls from 'hls.js';
 
@@ -315,6 +316,8 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
   const [hasPlaybackError, setHasPlaybackError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isMobileScheduleOpen, setIsMobileScheduleOpen] = useState<boolean>(false);
+  const [isMobileCommentsOpen, setIsMobileCommentsOpen] = useState<boolean>(false);
+  const [activeRightTab, setActiveRightTab] = useState<'schedule' | 'comments'>('schedule');
   const [playerHeight, setPlayerHeight] = useState<number | undefined>(undefined);
   const [isAdOpen, setIsAdOpen] = useState<boolean>(false);
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '4:3'>(() => {
@@ -703,7 +706,19 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                 title="Xem lịch phát sóng 24h"
               >
                 <CalendarDays className="w-4 h-4 text-red-400" />
-                <span className="text-xs font-medium">Lịch phát sóng</span>
+                <span className="text-xs font-medium">Lịch</span>
+              </button>
+
+              {/* Mobile Comments Button */}
+              <button
+                type="button"
+                onClick={() => setIsMobileCommentsOpen(true)}
+                className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-600/25 to-indigo-600/25 hover:from-blue-600/35 hover:to-indigo-600/35 border border-blue-500/40 text-blue-200 text-xs font-semibold shadow-md active:scale-95 transition-all cursor-pointer"
+                title="Bình luận trực tiếp"
+              >
+                <MessageSquare className="w-4 h-4 text-blue-400" />
+                <span className="text-xs font-medium">Bình luận</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               </button>
             </div>
           </div>
@@ -872,13 +887,53 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                 </div>
               </div>
 
-              {/* Desktop LPS sidebar: Height is strictly locked to video player, scrollable inside */}
+              {/* Desktop Sidebar: Tab Switcher between Lịch phát sóng & Bình luận trực tiếp */}
               <div
-                className="hidden lg:block lg:col-span-4 relative min-h-0 overflow-hidden"
+                className="hidden lg:flex lg:col-span-4 flex-col relative min-h-0 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80 shadow-xl"
                 style={playerHeight ? { height: `${playerHeight}px`, maxHeight: `${playerHeight}px` } : undefined}
               >
-                <div className="absolute inset-0 h-full w-full overflow-hidden">
-                  <ChannelSchedule channel={selectedChannel} variant="sidebar" />
+                {/* Tab Switcher Header */}
+                <div className="flex items-center justify-between px-3 py-2 bg-zinc-900/90 border-b border-white/10 shrink-0">
+                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10 w-full">
+                    <button
+                      type="button"
+                      onClick={() => setActiveRightTab('schedule')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeRightTab === 'schedule'
+                          ? 'bg-red-600 text-white shadow-md'
+                          : 'text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <CalendarDays className="w-3.5 h-3.5" />
+                      <span>Lịch phát sóng</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveRightTab('comments')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        activeRightTab === 'comments'
+                          ? 'bg-blue-600 text-white shadow-md'
+                          : 'text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Bình luận</span>
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tab Body */}
+                <div className="flex-1 min-h-0 relative overflow-hidden">
+                  {activeRightTab === 'schedule' ? (
+                    <div className="absolute inset-0 h-full w-full overflow-hidden">
+                      <ChannelSchedule channel={selectedChannel} variant="sidebar" />
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 h-full w-full overflow-hidden flex flex-col">
+                      <LiveComments channel={selectedChannel} />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -892,6 +947,43 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
           isOpen={isMobileScheduleOpen}
           onClose={() => setIsMobileScheduleOpen(false)}
         />
+
+        {/* Mobile Live Comments Drawer (Slide-in from right edge) */}
+        {isMobileCommentsOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
+            <div
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm animate-fade-in"
+              onClick={() => setIsMobileCommentsOpen(false)}
+            />
+            <div className="relative w-full max-w-md h-full bg-zinc-950 border-l border-white/10 shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
+              <div className="flex items-center justify-between p-3.5 border-b border-white/10 bg-zinc-900/90">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm text-white leading-tight">
+                      Bình luận trực tiếp
+                    </h3>
+                    <p className="text-[10px] text-zinc-400 font-medium">
+                      {selectedChannel.name} • Trò chuyện thời gian thực
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileCommentsOpen(false)}
+                  className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 relative">
+                <LiveComments channel={selectedChannel} />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Section 1: Kênh VTV (Bao gồm các luồng chính và luồng duplicate/test) */}
         <div className="w-full space-y-4">

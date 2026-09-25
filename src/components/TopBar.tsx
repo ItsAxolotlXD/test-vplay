@@ -84,7 +84,7 @@ const VplayLogo: React.FC<{ onClick?: () => void; isActive?: boolean }> = ({ onC
   );
 };
 
-export const TopBar: React.FC<TopBarProps> = ({
+export const TopBar: React.FC<TopBarProps> = React.memo(({
   currentRoute,
   navigate,
   onOpenSearch,
@@ -1362,4 +1362,4 @@ export const TopBar: React.FC<TopBarProps> = ({
       </AnimatePresence>
     </>
   );
-};
+});

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export type FlagCategory = 'ai' | 'ui' | 'features' | 'player' | 'developer';
-export type FlagBadge = 'PREVIEW' | 'BETA' | 'STABLE' | 'EXPERIMENTAL';
+export type FlagBadge = 'PREVIEW' | 'BETA' | 'STABLE' | 'EXPERIMENTAL' | 'NEW';
 
 export interface FeatureFlagItem {
   id: string;
@@ -76,6 +76,15 @@ export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
     description: 'Settings open in a drawer on the right instead of a tab page',
     category: 'ui',
     badge: 'BETA',
+    defaultValue: false,
+  },
+  {
+    id: 'flag_minimalism_home_page',
+    key: 'minimalism_home_page',
+    name: 'Minimalism Home Page',
+    description: 'Khi bật thì home page chỉ xuất hiện nguyên 1 thanh search đơn giản, ko xuất hiện gì thêm.',
+    category: 'ui',
+    badge: 'NEW',
     defaultValue: false,
   }
 ];

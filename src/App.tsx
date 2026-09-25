@@ -891,8 +891,10 @@ export default function App() {
             </div>
           )}
 
-          {/* Dải thông báo vàng hiển thị ở bất cứ đâu với clock đếm ngược đến 00h00 16/10/2026 */}
-          <GlobalAnnouncementBanner onExplore={() => navigate('/')} />
+          {/* Dải thông báo vàng hiển thị ở bất cứ đâu với clock đếm ngược đến 00h00 16/10/2026 (Ẩn khi bật Minimalism Home Page) */}
+          {(!flags.minimalism_home_page || (currentRoute !== '/' && currentRoute !== '/home')) && (
+            <GlobalAnnouncementBanner onExplore={() => navigate('/')} />
+          )}
 
           {/* Dynamic Page Content with smooth motion fade & spring transition */}
           <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out relative z-10 ${

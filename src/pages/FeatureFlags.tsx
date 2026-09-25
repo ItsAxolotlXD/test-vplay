@@ -125,6 +125,8 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
         return 'bg-blue-500/15 text-blue-300 border-blue-500/30';
       case 'STABLE':
         return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+      case 'NEW':
+        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
       default:
         return 'bg-zinc-500/15 text-zinc-300 border-zinc-500/30';
     }

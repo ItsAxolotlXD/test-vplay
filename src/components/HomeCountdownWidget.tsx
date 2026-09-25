@@ -6,7 +6,7 @@ interface HomeCountdownWidgetProps {
   navigate?: (path: string) => void;
 }
 
-export const HomeCountdownWidget: React.FC<HomeCountdownWidgetProps> = ({ navigate }) => {
+export const HomeCountdownWidget: React.FC<HomeCountdownWidgetProps> = React.memo(({ navigate }) => {
   const countdown = useCountdown();
 
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -120,4 +120,4 @@ export const HomeCountdownWidget: React.FC<HomeCountdownWidgetProps> = ({ naviga
       </div>
     </div>
   );
-};
+});

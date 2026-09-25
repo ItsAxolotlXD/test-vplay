@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Channel } from '../types';
 
@@ -9,7 +9,7 @@ interface OnAirSliderProps {
   title?: string;
 }
 
-export const OnAirSlider: React.FC<OnAirSliderProps> = ({
+export const OnAirSlider: React.FC<OnAirSliderProps> = React.memo(({
   channels,
   onSelectChannel,
   navigate,
@@ -18,12 +18,14 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Chỉ hiển thị các kênh VTV trong chuyên mục Đang phát sóng
-  const vtvChannels = channels.filter((ch) => {
-    const isCategoryVtv = ch.category === 'Kênh VTV' || ch.category === 'VTV';
-    const isVtvName = ch.name.toUpperCase().startsWith('VTV') && !ch.name.toUpperCase().includes('VTVCAB');
-    const isVtvId = ch.id.toLowerCase().startsWith('vtv') && !ch.id.toLowerCase().includes('vtvcab');
-    return isCategoryVtv || isVtvName || isVtvId;
-  });
+  const vtvChannels = useMemo(() => {
+    return channels.filter((ch) => {
+      const isCategoryVtv = ch.category === 'Kênh VTV' || ch.category === 'VTV';
+      const isVtvName = ch.name.toUpperCase().startsWith('VTV') && !ch.name.toUpperCase().includes('VTVCAB');
+      const isVtvId = ch.id.toLowerCase().startsWith('vtv') && !ch.id.toLowerCase().includes('vtvcab');
+      return isCategoryVtv || isVtvName || isVtvId;
+    });
+  }, [channels]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -97,4 +99,4 @@ export const OnAirSlider: React.FC<OnAirSliderProps> = ({
       </div>
     </section>
   );
-};
+});

@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { BannerCardItem } from '../components/BannerCardItem';
 import { OnAirSlider } from '../components/OnAirSlider';
 import { CHANNELS_DATA } from '../data/channels';
 import { HERO_SLIDES } from '../data/heroSlides';
 import { Channel } from '../types';
-import { Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers, Search } from 'lucide-react';
+import { Sparkles, Radio, ArrowRight, ShieldCheck, Cpu, Film, Layers, Search, X } from 'lucide-react';
 import { PortalsCircularSection } from '../components/PortalsCircularSection';
 import { VplayAppsHomeGrid } from '../components/VplayAppsHomeGrid';
 import { useTabSearch } from '../context/TabSearchContext';
 import { HomeSpotlightSearch } from '../components/HomeSpotlightSearch';
 import { HomeCountdownWidget } from '../components/HomeCountdownWidget';
+import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
 interface HomeProps {
   navigate: (route: string, state?: any) => void;
@@ -23,13 +24,125 @@ export const Home: React.FC<HomeProps> = ({
   onSelectChannel,
   channels
 }) => {
-  const { searchQuery, clearSearch } = useTabSearch();
+  const { searchQuery, setSearchQuery, clearSearch } = useTabSearch();
+  const { flags } = useFeatureFlags();
+  const [localSearch, setLocalSearch] = useState('');
+
+  const isMinimalism = Boolean(flags.minimalism_home_page || (flags as any).minimalism_home);
+
+  const handleMinimalSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = localSearch.trim() || searchQuery.trim();
+    if (query) {
+      setSearchQuery(query);
+    }
+  };
 
   // 2 cái AD banner cho lên đầu khối ngang
   const horizontalBanners = [
     ...HERO_SLIDES.filter((s) => s.isAd),
     ...HERO_SLIDES.filter((s) => !s.isAd)
   ];
+
+  // Feature Flag: Minimalism Home Page
+  // Khi bật thì home page chỉ xuất hiện nguyên 1 thanh search đơn giản, ko xuất hiện gì thêm
+  if (isMinimalism) {
+    const activeQuery = searchQuery.trim() || localSearch.trim();
+
+    return (
+      <div className="min-h-[78vh] flex flex-col items-center justify-center px-4 select-none animate-in fade-in duration-300">
+        {/* Spotlight Search Overlay when user actively enters query */}
+        {searchQuery.trim() ? (
+          <div className="w-full max-w-4xl">
+            <HomeSpotlightSearch
+              query={searchQuery}
+              onClear={() => {
+                clearSearch();
+                setLocalSearch('');
+              }}
+              navigate={navigate}
+              onSelectChannel={onSelectChannel}
+              channels={channels}
+            />
+          </div>
+        ) : (
+          <div className="w-full max-w-2xl flex flex-col items-center space-y-7 text-center">
+            {/* Minimal Brand Logo */}
+            <div className="space-y-1.5">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight font-['Integer','Inter',sans-serif] bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)]">
+                VNRT Online
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-400 font-medium">
+                Tìm kiếm thông minh & tối giản
+              </p>
+            </div>
+
+            {/* Single Centered Minimal Search Bar */}
+            <form onSubmit={handleMinimalSearchSubmit} className="w-full">
+              <div className="w-full h-14 sm:h-16 px-5 rounded-full bg-zinc-900/90 border border-white/20 shadow-2xl backdrop-blur-xl flex items-center gap-3.5 focus-within:border-white/50 focus-within:ring-2 focus-within:ring-white/20 transition-all group">
+                <Search className="w-6 h-6 text-zinc-400 group-focus-within:text-white shrink-0 transition-colors" />
+                <input
+                  type="text"
+                  value={localSearch}
+                  onChange={(e) => {
+                    setLocalSearch(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (localSearch.trim()) {
+                        setSearchQuery(localSearch.trim());
+                      }
+                    }
+                  }}
+                  placeholder="Tìm kiếm kênh, tin tức, nội dung..."
+                  autoFocus
+                  className="w-full bg-transparent text-white placeholder-zinc-500 text-base sm:text-lg font-medium focus:outline-none"
+                />
+                {localSearch && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLocalSearch('');
+                      clearSearch();
+                    }}
+                    className="p-1 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={!localSearch.trim()}
+                  className="px-4 py-2 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer shrink-0"
+                >
+                  Tìm
+                </button>
+              </div>
+            </form>
+
+            {/* Suggested quick pills */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs text-zinc-400">
+              <span className="text-zinc-500 font-medium mr-1">Gợi ý:</span>
+              {['VTV3', 'Thời sự 19h', 'Bóng đá', 'V-Shop', 'Đặt xe', 'Driving Simulator'].map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => {
+                    setLocalSearch(tag);
+                    setSearchQuery(tag);
+                  }}
+                  className="px-3 py-1.5 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/10 text-zinc-300 hover:text-white transition-all cursor-pointer"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8 pb-16">

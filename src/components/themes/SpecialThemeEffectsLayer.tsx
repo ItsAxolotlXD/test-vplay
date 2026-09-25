@@ -60,7 +60,7 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
       alpha: number;
       speed: number;
     }
-    const twinkleStars: TwinkleStar[] = Array.from({ length: 65 }, () => ({
+    const twinkleStars: TwinkleStar[] = Array.from({ length: 24 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height * 0.8,
       size: Math.random() * 2 + 1,
@@ -70,6 +70,7 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
 
     const launchRocket = () => {
       if (activeTheme !== 'new-year') return;
+      if (fireworkRockets.length >= 2) return;
       fireworkRockets.push({
         x: width * 0.15 + Math.random() * (width * 0.7),
         y: height,
@@ -80,19 +81,19 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
     };
 
     const explodeRocket = (x: number, y: number, color: string) => {
-      const particleCount = 48 + Math.floor(Math.random() * 24);
+      const particleCount = 18 + Math.floor(Math.random() * 10);
       for (let i = 0; i < particleCount; i++) {
         const angle = (Math.PI * 2 * i) / particleCount + (Math.random() * 0.2 - 0.1);
-        const speed = 2 + Math.random() * 5.5;
+        const speed = 2 + Math.random() * 4.5;
         fireworkParticles.push({
           x,
           y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           alpha: 1,
-          decay: 0.012 + Math.random() * 0.015,
+          decay: 0.018 + Math.random() * 0.02,
           color,
-          size: 2.2 + Math.random() * 2,
+          size: 1.8 + Math.random() * 1.5,
         });
       }
     };
@@ -110,12 +111,12 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
       rotSpeed: number;
       type: 'mai' | 'dao'; // mai vàng hoặc đào hồng
     }
-    const petals: Petal[] = Array.from({ length: 32 }, () => ({
+    const petals: Petal[] = Array.from({ length: 16 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      size: 7 + Math.random() * 9,
-      speedY: 1 + Math.random() * 1.6,
-      speedX: (Math.random() - 0.5) * 1.2,
+      size: 7 + Math.random() * 8,
+      speedY: 1 + Math.random() * 1.4,
+      speedX: (Math.random() - 0.5) * 1.0,
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (Math.random() - 0.5) * 0.04,
       type: Math.random() > 0.45 ? 'mai' : 'dao',
@@ -132,13 +133,13 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
       speedX: number;
       alpha: number;
     }
-    const snowflakes: Snowflake[] = Array.from({ length: 70 }, () => ({
+    const snowflakes: Snowflake[] = Array.from({ length: 30 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: 1.2 + Math.random() * 3.2,
-      speedY: 0.8 + Math.random() * 1.8,
-      speedX: (Math.random() - 0.5) * 0.8,
-      alpha: 0.3 + Math.random() * 0.7,
+      radius: 1.2 + Math.random() * 2.8,
+      speedY: 0.8 + Math.random() * 1.5,
+      speedX: (Math.random() - 0.5) * 0.7,
+      alpha: 0.3 + Math.random() * 0.6,
     }));
 
     // ==========================================
@@ -153,20 +154,25 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
       alpha: number;
       pulseSpeed: number;
     }
-    const goldenSparks: GoldenSpark[] = Array.from({ length: 36 }, () => ({
+    const goldenSparks: GoldenSpark[] = Array.from({ length: 16 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      size: 2 + Math.random() * 4,
-      vy: -(0.5 + Math.random() * 1.2),
+      size: 2 + Math.random() * 3.5,
+      vy: -(0.5 + Math.random() * 1.0),
       vx: (Math.random() - 0.5) * 0.6,
       alpha: 0.2 + Math.random() * 0.8,
-      pulseSpeed: 0.03 + Math.random() * 0.04,
+      pulseSpeed: 0.02 + Math.random() * 0.03,
     }));
 
     let lastRocketTime = 0;
 
     // RENDER LOOP
     const render = (time: number) => {
+      if (document.hidden) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       // --- THEME: NEW YEAR (Tết Dương Lịch) ---
@@ -178,16 +184,12 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
           ctx.beginPath();
           ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, Math.min(1, star.alpha))})`;
-          ctx.shadowBlur = 6;
-          ctx.shadowColor = '#00F0FF';
           ctx.fill();
         });
-        ctx.shadowBlur = 0;
 
         // Auto launch rockets periodically
-        if (time - lastRocketTime > 1400) {
+        if (time - lastRocketTime > 2400) {
           launchRocket();
-          if (Math.random() > 0.5) launchRocket();
           lastRocketTime = time;
         }
 
@@ -200,8 +202,6 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
           ctx.beginPath();
           ctx.arc(r.x, r.y, 2, 0, Math.PI * 2);
           ctx.fillStyle = r.color;
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = r.color;
           ctx.fill();
 
           if (r.y <= r.targetY) {
@@ -227,12 +227,9 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fillStyle = p.color;
           ctx.globalAlpha = Math.max(0, p.alpha);
-          ctx.shadowBlur = 6;
-          ctx.shadowColor = p.color;
           ctx.fill();
         }
         ctx.globalAlpha = 1;
-        ctx.shadowBlur = 0;
       }
 
       // --- THEME: LUNAR NEW YEAR (Tết Nguyên Đán) ---
@@ -285,11 +282,8 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
           ctx.beginPath();
           ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255, 255, 255, ${flake.alpha})`;
-          ctx.shadowBlur = 5;
-          ctx.shadowColor = 'rgba(224, 242, 254, 0.8)';
           ctx.fill();
         });
-        ctx.shadowBlur = 0;
       }
 
       // --- THEME: PATRIOTIC (Yêu Nước) ---
@@ -331,12 +325,9 @@ export const SpecialThemeEffectsLayer: React.FC = () => {
           ctx.lineTo(0, -outerRadius);
           ctx.closePath();
           ctx.fillStyle = `rgba(255, 223, 0, ${Math.max(0.15, Math.min(1, spark.alpha))})`;
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = '#FFD700';
           ctx.fill();
           ctx.restore();
         });
-        ctx.shadowBlur = 0;
       }
 
       animId = requestAnimationFrame(render);

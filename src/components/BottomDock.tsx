@@ -24,7 +24,7 @@ interface BottomDockProps {
   isSettingsOpen?: boolean;
 }
 
-export const BottomDock: React.FC<BottomDockProps> = ({
+export const BottomDock: React.FC<BottomDockProps> = React.memo(({
   currentRoute,
   navigate,
   onOpenSearch,
@@ -121,4 +121,4 @@ export const BottomDock: React.FC<BottomDockProps> = ({
       </motion.div>
     </div>
   );
-};
+});

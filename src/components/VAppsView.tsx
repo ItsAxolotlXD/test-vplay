@@ -30,10 +30,14 @@ import {
   Activity,
   UtensilsCrossed,
   RotateCw,
-  LucideIcon
+  LucideIcon,
+  Car,
+  Gauge
 } from 'lucide-react';
 
 export type VAppId =
+  | 'ride_booking'
+  | 'driving_simulator'
   | 'v_arcade'
   | 'v_xplore'
   | 'explore_vietnam'
@@ -75,6 +79,32 @@ export interface VAppDefinition {
 }
 
 export const VAPPS_LIST: VAppDefinition[] = [
+  {
+    id: 'ride_booking',
+    name: 'Đặt xe',
+    tagline: 'Đặt Xe Công Nghệ & Taxi 360',
+    description: 'Đặt xe máy, ô tô 4 chỗ, 7 chỗ, xe điện cao cấp và giao hàng siêu tốc với bản đồ định vị thời gian thực.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Mới',
+    gradientBg: 'bg-gradient-to-br from-[#0284C7] via-[#2563EB] to-[#4F46E5]',
+    borderClass: 'border-[#38BDF8]/50 group-hover:border-[#38BDF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(2,132,199,0.35)]',
+    icon: Car,
+    tags: ['Đặt xe', 'V-Ride', 'Taxi', 'Grab', 'Be', 'Xe ôm', 'Xe điện', 'Giao hàng', 'Space 360'],
+  },
+  {
+    id: 'driving_simulator',
+    name: 'Driving Simulator',
+    tagline: 'Mô Phỏng Ghế Lái Ô Tô 3D',
+    description: 'Mô phỏng chân thực bạn đang ngồi trong ghế lái: vô lăng xoay tương tác, bàn đạp ga & phanh, cần số tự động, táp-lô hiển thị km/h và kính chắn gió.',
+    category: 'Trò chơi (Arcade)',
+    badge: '3D Cockpit',
+    gradientBg: 'bg-gradient-to-br from-[#D97706] via-[#DC2626] to-[#7F1D1D]',
+    borderClass: 'border-[#F59E0B]/50 group-hover:border-[#F59E0B]',
+    glowClass: 'shadow-[0_10px_30px_rgba(220,38,38,0.35)]',
+    icon: Gauge,
+    tags: ['Driving Simulator', 'Mô phỏng lái xe', 'Vô lăng', 'Khoang xe', 'Ghế lái', 'Cockpit', 'Arcade', 'Táp lô', 'Cần số'],
+  },
   // Hàng 1 (4 ứng dụng)
   {
     id: 'v_arcade',
@@ -506,6 +536,12 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'logo_switcher':
         navigate('/logo-switcher', { appId: 'logo_switcher' });
+        break;
+      case 'ride_booking':
+        navigate('/v-ride', { appId: 'ride_booking' });
+        break;
+      case 'driving_simulator':
+        navigate('/driving-simulator', { appId: 'driving_simulator' });
         break;
       default:
         navigate('/space-360');

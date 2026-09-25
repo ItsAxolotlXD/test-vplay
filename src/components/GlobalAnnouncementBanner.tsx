@@ -6,7 +6,7 @@ interface GlobalAnnouncementBannerProps {
   onExplore?: () => void;
 }
 
-export const GlobalAnnouncementBanner: React.FC<GlobalAnnouncementBannerProps> = ({ onExplore }) => {
+export const GlobalAnnouncementBanner: React.FC<GlobalAnnouncementBannerProps> = React.memo(({ onExplore }) => {
   const countdown = useCountdown();
 
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -55,4 +55,4 @@ export const GlobalAnnouncementBanner: React.FC<GlobalAnnouncementBannerProps> =
       </div>
     </div>
   );
-};
+});

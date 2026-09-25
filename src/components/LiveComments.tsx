@@ -91,7 +91,12 @@ interface CommentItem {
 }
 
 interface LiveCommentsProps {
-  channel: Channel;
+  channel: {
+    id: string;
+    name: string;
+    group?: string;
+    [key: string]: any;
+  };
   isMaterialDesignActive?: boolean;
 }
 

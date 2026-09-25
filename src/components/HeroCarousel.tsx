@@ -13,7 +13,7 @@ interface HeroCarouselProps {
   idPrefix?: string;
 }
 
-export const HeroCarousel: React.FC<HeroCarouselProps> = ({ 
+export const HeroCarousel: React.FC<HeroCarouselProps> = React.memo(({ 
   slides = HERO_SLIDES, 
   idPrefix = 'hero',
   navigate,
@@ -267,5 +267,5 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
       </div>
     </section>
   );
-};
+});
 

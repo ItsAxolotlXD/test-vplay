@@ -85,7 +85,7 @@ interface FloatyBarProps {
   isSettingsOpen?: boolean;
 }
 
-export const FloatyBar: React.FC<FloatyBarProps> = ({
+export const FloatyBar: React.FC<FloatyBarProps> = React.memo(({
   currentRoute,
   navigate,
   onOpenSearch,
@@ -348,4 +348,4 @@ export const FloatyBar: React.FC<FloatyBarProps> = ({
       </div>
     </div>
   );
-};
+});

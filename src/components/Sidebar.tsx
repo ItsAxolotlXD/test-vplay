@@ -71,7 +71,21 @@ interface SidebarProps {
   isSettingsOpen?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
+const SidebarClock: React.FC = React.memo(() => {
+  const { timeString, dateString } = useClock();
+  return (
+    <div className="flex flex-col">
+      <div className="text-white text-base font-bold tracking-tight font-mono leading-tight">
+        {timeString || '20:16:35'}
+      </div>
+      <div className="text-[#A1A1AA] text-[11px] font-medium leading-none mt-0.5">
+        {dateString || 'Th 5, 27/08/2026'}
+      </div>
+    </div>
+  );
+});
+
+export const Sidebar: React.FC<SidebarProps> = React.memo(({
   currentRoute,
   routeState,
   navigate,
@@ -89,7 +103,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
     : true;
-  const { timeString, dateString } = useClock();
   const { favoriteChannelIds } = useFavorites();
   const { orbs, addOrbs } = useOrbs();
 
@@ -308,14 +321,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Real-time Clock display */}
-          <div className="flex flex-col">
-            <div className="text-white text-base font-bold tracking-tight font-mono leading-tight">
-              {timeString || '20:16:35'}
-            </div>
-            <div className="text-[#A1A1AA] text-[11px] font-medium leading-none mt-0.5">
-              {dateString || 'Th 5, 27/08/2026'}
-            </div>
-          </div>
+          <SidebarClock />
         </div>
 
         {/* Action Button: Close on Mobile / Collapse on Desktop */}
@@ -1467,4 +1473,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
       />
     </>
   );
-};
+});

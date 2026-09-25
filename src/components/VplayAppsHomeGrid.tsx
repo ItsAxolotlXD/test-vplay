@@ -19,7 +19,7 @@ interface VplayAppsHomeGridProps {
   className?: string;
 }
 
-export const VplayAppsHomeGrid: React.FC<VplayAppsHomeGridProps> = ({
+export const VplayAppsHomeGrid: React.FC<VplayAppsHomeGridProps> = React.memo(({
   navigate,
   className = ''
 }) => {
@@ -38,6 +38,40 @@ export const VplayAppsHomeGrid: React.FC<VplayAppsHomeGridProps> = ({
   // - Màu sắc siêu saturate, tươi tắn, độ sâu 3D bóng bẩy
   // - 100% tự craft vector SVG không dùng preset iconography
   const apps: VplayAppItem[] = useMemo(() => [
+    // 0. Đặt xe (Space 360 Ride Hailing)
+    {
+      id: 'ride_booking',
+      name: 'Đặt xe',
+      category: 'Tiện ích',
+      route: '/v-ride',
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#38BDF8] via-[#0284C7] to-[#1E3A8A] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[68%] h-[68%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+            <circle cx="7" cy="17" r="2" />
+            <path d="M9 17h6" />
+            <circle cx="17" cy="17" r="2" />
+          </svg>
+        </div>
+      )
+    },
+    // 0. Driving Simulator (Mô phỏng khoang lái 3D)
+    {
+      id: 'driving_simulator',
+      name: 'Driving Simulator',
+      category: 'Trò chơi',
+      route: '/driving-simulator',
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#F59E0B] via-[#DC2626] to-[#7F1D1D] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[68%] h-[68%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m12 14 4-4" />
+            <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+          </svg>
+        </div>
+      )
+    },
     // 1. Browser (Màu tím, icon Sao Thổ)
     {
       id: 'browser',
@@ -807,4 +841,4 @@ export const VplayAppsHomeGrid: React.FC<VplayAppsHomeGridProps> = ({
       </div>
     </section>
   );
-};
+});

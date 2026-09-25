@@ -25,7 +25,13 @@ import {
   Sliders,
   Droplets,
   MousePointer,
-  MousePointerClick
+  MousePointerClick,
+  Info,
+  Box,
+  Wrench,
+  FlaskConical,
+  ArrowLeft,
+  Columns2
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, WALLPAPER_PRESETS, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -43,6 +49,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const { flags, setFlag } = useFeatureFlags();
   const { searchQuery, setSearchQuery } = useTabSearch();
   const { activeTheme, currentThemeData } = useSpecialTheme();
+  const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental'>('main');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
 

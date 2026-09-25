@@ -93,6 +93,24 @@ export const TOOLBOX_DATA = [
 // 2. Static dataset: Space 360 (renamed from V-Apps)
 export const SPACE360_DATA = [
   {
+    id: "ride_booking",
+    title: "Đặt xe: VNRT Ride 360",
+    subtitle: "Đặt xe máy, ô tô 4 chỗ, 7 chỗ, xe điện cao cấp và giao hàng",
+    badge: "Mới • Tiện ích",
+    route: "/v-ride",
+    appId: "ride_booking",
+    category: "utilities"
+  },
+  {
+    id: "driving_simulator",
+    title: "Driving Simulator: Khoang Lái Ghế Lái 3D",
+    subtitle: "Mô phỏng ngồi ghế lái: vô lăng, bàn đạp ga/phanh, cần số, táp lô",
+    badge: "3D Cockpit • Hot",
+    route: "/driving-simulator",
+    appId: "driving_simulator",
+    category: "games"
+  },
+  {
     id: "v_arcade",
     title: "V-Arcade: 5 Trò Chơi Ore UI",
     subtitle: "Caro XO, Oẳn Tù Tì, Nối Từ Tiếng Việt, Đếm Số, Rắn Săn Mồi",

@@ -28,6 +28,7 @@ import { useOrbs } from '../hooks/useOrbs';
 import { useTabSearch } from '../context/TabSearchContext';
 import { ThemeStoreSection } from '../components/themes/ThemeStoreSection';
 import { SpecialTheme } from '../data/specialThemesData';
+import { ShopCommentsSection } from '../components/vshop/ShopCommentsSection';
 
 interface VShopTabProps {
   navigate: (route: string, state?: any) => void;
@@ -525,6 +526,9 @@ export const VShopTab: React.FC<VShopTabProps> = ({ navigate }) => {
             </section>
           </div>
         )}
+
+        {/* Customer Reviews & Comments Section */}
+        <ShopCommentsSection />
       </div>
 
       {/* Cart Drawer Modal */}
