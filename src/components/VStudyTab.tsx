@@ -47,6 +47,7 @@ import {
 import { playSynthSound } from "../utils/audio";
 import EnglishCefrModule from "./vstudy/EnglishCefrModule";
 import LiteratureWritingModule from "./vstudy/LiteratureWritingModule";
+import WebDevelopmentModule from "./vstudy/WebDevelopmentModule";
 
 export interface ExamHistoryItem {
   id: string;
@@ -164,7 +165,7 @@ interface VStudyTabProps {
 
 export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter }: VStudyTabProps) {
   // Main Module Tab Mode
-  const [modeTab, setModeTab] = useState<"quizzes" | "english_cefr" | "literature_writing" | "hoc_ba">(() => {
+  const [modeTab, setModeTab] = useState<"quizzes" | "english_cefr" | "literature_writing" | "web_dev" | "hoc_ba">(() => {
     if (subFilter === "hoc_ba") return "hoc_ba";
     return "quizzes";
   });
@@ -858,6 +859,22 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
 
           <button
             onClick={() => {
+              setModeTab("web_dev");
+              if (onSelectSubFilter && subFilter === "hoc_ba") onSelectSubFilter("all");
+            }}
+            className={`flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer rounded-xl border ${
+              modeTab === "web_dev"
+                ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white border-transparent shadow-md"
+                : "bg-[#2A2933] border-[#3E3D4D] text-[#9CA3AF] hover:text-white"
+            }`}
+          >
+            <BookOpenCheck className="w-4 h-4 text-orange-400" />
+            <span>4. Khóa Học WEB / HTML / CSS</span>
+            <span className="px-1.5 py-0.5 bg-[#18171E] text-orange-300 text-[10px] rounded-md border border-[#2D2D38]">Thực Hành Live</span>
+          </button>
+
+          <button
+            onClick={() => {
               setModeTab("hoc_ba");
               if (onSelectSubFilter) onSelectSubFilter("hoc_ba");
             }}
@@ -868,7 +885,7 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
             }`}
           >
             <GraduationCap className="w-4 h-4" />
-            <span>4. Tra Cứu Học Bạ</span>
+            <span>5. Tra Cứu Học Bạ</span>
           </button>
         </div>
       )}
@@ -879,6 +896,8 @@ export default function VStudyTab({ onBack, subFilter = "all", onSelectSubFilter
           <EnglishCefrModule onAddScoreAndXp={handleAddScoreAndXp} playSynthSound={playSynthSound} />
         ) : modeTab === "literature_writing" ? (
           <LiteratureWritingModule onAddScoreAndXp={handleAddScoreAndXp} playSynthSound={playSynthSound} />
+        ) : modeTab === "web_dev" ? (
+          <WebDevelopmentModule onAddScoreAndXp={handleAddScoreAndXp} playSynthSound={playSynthSound} />
         ) : modeTab === "hoc_ba" || subFilter === "hoc_ba" ? (
           /* TRANG TRA CỨU HỌC BẠ FULL VIEW */
           <div className="space-y-6 text-left">

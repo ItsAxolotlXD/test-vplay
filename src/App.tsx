@@ -95,10 +95,8 @@ export default function App() {
   const isStatusBar = Boolean(flags.status_bar);
   const isDynamicIsland = Boolean(flags.status_bar && flags.dynamic_island);
   const isSettingsDrawer = Boolean(flags.settings_drawer);
-  const isFloatyMode = Boolean(settings.floatyBar);
-  const isTopBarMode = settings.navigationMode 
-    ? settings.navigationMode === 'topbar' 
-    : true;
+  const isFloatyMode = Boolean(settings.floatyBar || settings.navigationMode === 'tabview');
+  const isTopBarMode = settings.navigationMode === 'topbar' && !isFloatyMode;
   const { favoriteChannelIds, toggleFavoriteChannel } = useFavorites();
 
   // Settings Drawer State (Feature Flag: settings_drawer)
@@ -1039,7 +1037,7 @@ export default function App() {
 
         {/* V-Cursor: Con trỏ chuột của VPlay thay vì device, hỗ trợ bảng màu tùy chỉnh */}
         <VCursor
-          enabled={settings.vcursorEnabled !== false}
+          enabled={Boolean(settings.vcursorEnabled)}
           color={settings.vcursorColor || '#000000'}
           borderColor={settings.vcursorBorderColor || '#FFFFFF'}
           size={settings.vcursorSize || 24}

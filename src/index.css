@@ -355,12 +355,7 @@ body.has-custom-wallpaper {
 .search-box-capsule,
 .float-search-style,
 .search-bar,
-.search-container,
-div:has(> input[placeholder*="Tìm"]),
-div:has(> input[placeholder*="search" i]),
-div:has(> input[type="search"]),
-form:has(> input[placeholder*="Tìm"]),
-form:has(> input[placeholder*="search" i]) {
+.search-container {
   position: relative !important;
   border-radius: 9999px !important;
   background-color: rgba(255, 255, 255, calc(var(--spatial-glass-opacity, 0.65) * 0.38)) !important;
@@ -378,9 +373,7 @@ form:has(> input[placeholder*="search" i]) {
 
 .has-custom-wallpaper .spotlight-bubble-box,
 .has-custom-wallpaper .search-box-capsule,
-.has-custom-wallpaper .float-search-style,
-.has-custom-wallpaper div:has(> input[placeholder*="Tìm"]),
-.has-custom-wallpaper div:has(> input[placeholder*="search" i]) {
+.has-custom-wallpaper .float-search-style {
   background-color: rgba(255, 255, 255, calc(var(--spatial-glass-opacity, 0.65) * 0.34)) !important;
   -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
   backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
@@ -389,19 +382,37 @@ form:has(> input[placeholder*="search" i]) {
 
 .spotlight-bubble-box:focus-within,
 .search-box-capsule:focus-within,
-.float-search-style:focus-within,
-div:has(> input[placeholder*="Tìm"]):focus-within,
-div:has(> input[placeholder*="search" i]):focus-within {
+.float-search-style:focus-within {
   background-color: rgba(255, 255, 255, 0.32) !important;
   box-shadow: 0 20px 44px 0 rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Đảm bảo toàn bộ div, wrapper bên trong thanh search KHÔNG bị áp nền riêng biệt */
+.spotlight-bubble-box div,
+.search-box-capsule div,
+.float-search-style div {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: 0 none transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.spotlight-bubble-box div::before,
+.spotlight-bubble-box div::after,
+.search-box-capsule div::before,
+.search-box-capsule div::after,
+.float-search-style div::before,
+.float-search-style div::after {
+  display: none !important;
+  content: none !important;
 }
 
 /* Lớp viền phản chiếu Specular rim highlight với horizontal fade như Float search */
 .spotlight-bubble-box::before,
 .search-box-capsule::before,
-.float-search-style::before,
-div:has(> input[placeholder*="Tìm"])::before,
-div:has(> input[placeholder*="search" i])::before {
+.float-search-style::before {
   content: "" !important;
   position: absolute !important;
   inset: 0 !important;
@@ -542,6 +553,8 @@ div:has(> input[placeholder*="search" i]) button {
 /* 1. Bỏ border khỏi các cài đặt và danh mục cài đặt */
 .settings-category-section,
 [id^="settings-section-"],
+[id^="category-item-"],
+.settings-category-menu-group,
 .settings-item-card,
 [id^="settings-card-"],
 .settings-slider-capsule,
@@ -551,12 +564,15 @@ div:has(> input[placeholder*="search" i]) button {
 .settings-item-card div {
   border-width: 0 !important;
   border-color: transparent !important;
+  border: 0 none transparent !important;
 }
 
 .settings-item-card,
 [id^="settings-card-"],
 .settings-category-section,
-[id^="settings-section-"] {
+[id^="settings-section-"],
+[id^="category-item-"],
+.settings-category-menu-group {
   border: 0 none transparent !important;
   box-shadow: none !important;
 }
@@ -564,7 +580,9 @@ div:has(> input[placeholder*="search" i]) button {
 .settings-item-card::before,
 .settings-item-card::after,
 .settings-category-section::before,
-.settings-category-section::after {
+.settings-category-section::after,
+.settings-category-menu-group::before,
+.settings-category-menu-group::after {
   display: none !important;
   content: none !important;
 }

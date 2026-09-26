@@ -414,7 +414,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                       <span className="mt-4 text-[11px] font-semibold text-[#0067C0]">Thanh trên hiện đại</span>
                     </button>
 
-                    {/* Option 3: Floaty Bar */}
+                    {/* Option 3: Tab View */}
                     <button
                       type="button"
                       onClick={() => setNavStyle('floaty')}
@@ -428,12 +428,12 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                         <div className="w-10 h-10 rounded-lg bg-[#0067C0]/10 flex items-center justify-center text-[#0067C0] mb-3">
                           <Compass className="w-5 h-5" />
                         </div>
-                        <h3 className="text-sm font-semibold text-[#1A1A1A] font-sans">Floaty Bar</h3>
+                        <h3 className="text-sm font-semibold text-[#1A1A1A] font-sans">Tab View</h3>
                         <p className="text-xs text-[#5C5C5C] mt-1 leading-relaxed font-sans">
-                          Thanh điều hướng lơ lửng tối giản ở đáy màn hình với phân trang tab linh hoạt.
+                          Thanh điều hướng dạng viên thuốc frosted glass lơ lửng tối giản ở đáy màn hình.
                         </p>
                       </div>
-                      <span className="mt-4 text-[11px] font-semibold text-[#0067C0]">Lơ lửng tối giản</span>
+                      <span className="mt-4 text-[11px] font-semibold text-[#0067C0]">Viên thuốc nổi</span>
                     </button>
                   </div>
                 </motion.div>
@@ -503,54 +503,6 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
                         Chuẩn giao diện ứng dụng số, hiển thị chi tiết rõ ràng
                       </p>
                       <div className="mt-3 p-2 rounded bg-black/3 text-xs text-[#2A2A2A] font-['Inter']">
-                        VNRT Online 26.9 - Trải nghiệm truyền hình tương lai
-                      </div>
-                    </button>
-
-                    {/* Google Sans */}
-                    <button
-                      type="button"
-                      onClick={() => setFontFamily('google-sans')}
-                      className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
-                        fontFamily === 'google-sans'
-                          ? 'border-[#0067C0] bg-[#0067C0]/8 ring-2 ring-[#0067C0]/40'
-                          : 'border-[#E0E0E0] bg-white hover:border-[#B0B0B0]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-[#1A1A1A]">Google Sans</span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-black/5 text-[#5C5C5C]">
-                          Thân thiện
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#5C5C5C] mt-1 font-sans">
-                        Đường nét mềm mại, thân thiện phong cách Google Material
-                      </p>
-                      <div className="mt-3 p-2 rounded bg-black/3 text-xs text-[#2A2A2A] font-['Google_Sans']">
-                        VNRT Online 26.9 - Trải nghiệm truyền hình tương lai
-                      </div>
-                    </button>
-
-                    {/* Montserrat */}
-                    <button
-                      type="button"
-                      onClick={() => setFontFamily('montserrat')}
-                      className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
-                        fontFamily === 'montserrat'
-                          ? 'border-[#0067C0] bg-[#0067C0]/8 ring-2 ring-[#0067C0]/40'
-                          : 'border-[#E0E0E0] bg-white hover:border-[#B0B0B0]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-[#1A1A1A]">Montserrat</span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-black/5 text-[#5C5C5C]">
-                          Thanh lịch
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#5C5C5C] mt-1 font-sans">
-                        Cân đối, thanh lịch, độ nét cao cho các tựa đề nổi bật
-                      </p>
-                      <div className="mt-3 p-2 rounded bg-black/3 text-xs text-[#2A2A2A] font-['Montserrat']">
                         VNRT Online 26.9 - Trải nghiệm truyền hình tương lai
                       </div>
                     </button>

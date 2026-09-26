@@ -33,10 +33,9 @@ import {
   ArrowLeft,
   Columns2
 } from 'lucide-react';
-import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, WALLPAPER_PRESETS, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
+import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useTabSearch } from '../context/TabSearchContext';
-import { useSpecialTheme } from '../hooks/useSpecialTheme';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -48,7 +47,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const { settings, updateSetting } = useSettings();
   const { flags, setFlag } = useFeatureFlags();
   const { searchQuery, setSearchQuery } = useTabSearch();
-  const { activeTheme, currentThemeData } = useSpecialTheme();
   const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental'>('main');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
@@ -112,14 +110,13 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   );
 
   const isSection1Visible = matchesSearch(
-    'Giao diện', 'Chế độ giao diện', 'Floaty bar', 'Floaty', 'Navigation bar',
+    'Giao diện', 'Tab View', 'Tabview', 'Tab view', 'Navigation bar',
     'Settings drawer', 'drawer', 'Ngăn kéo', 'Trượt bên phải',
-    'floating', 'floats', 'Sáng', 'Tối', 'Theme', 'Thanh điều hướng',
-    'Sidebar', 'Top bar', 'topbar', 'Bố cục', 'Dock sang Sidebar', 'Dock',
-    'Phông chữ', 'Font', 'Integer', 'Alata', 'Google Sans', 'Montserrat',
+    'floating', 'floats', 'Thanh điều hướng', 'Thanh điều hướng chính',
+    'Sidebar', 'Top bar', 'topbar', 'Bố cục',
+    'Phông chữ', 'Font', 'Integer', 'Alata',
     'Cỡ chữ ứng dụng', 'Cỡ chữ', 'Cài đặt', 'Settings', 'UI', 'Display',
     'Appearance', 'Splash Screen', 'Reload App', 'Màn hình khởi động', 'Tải lại', 'Refresh',
-    'Change your background', 'Background', 'Hình nền', 'Wallpaper', 'Spatial Glass', 'Duo Light', 'Duo Dark',
     'Shiny outline', 'Shiny', 'Outline', 'Viền', 'Viền sáng bóng', 'Specular', 'Rim',
     'V-Cursor', 'VCursor', 'Cursor', 'Con trỏ chuột', 'Con trỏ', 'Chuột', 'Mouse', 'Pointer', 'Bảng màu'
   );
@@ -198,18 +195,16 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
         {/* Search Bar Capsule with Spotlight Search Styling */}
         <div className="pt-2">
-          <div className="w-full h-[46px] sm:h-[48px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-sm transition-all border-0">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-[20px] h-[20px] min-w-[20px] min-h-[20px] flex items-center justify-center shrink-0">
-                <Search className="w-5 h-5 text-white stroke-[2.4]" />
-              </div>
+          <div className="w-full h-[46px] sm:h-[48px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-sm transition-all border-0 shadow-none">
+            <div className="flex items-center gap-3 flex-1 min-w-0 bg-transparent">
+              <Search className="w-5 h-5 text-white stroke-[2.4] shrink-0" />
               <input
                 id="settings-search-input"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm cài đặt..."
-                className="w-full bg-transparent text-white placeholder-white/60 text-sm focus:outline-none font-semibold truncate border-0"
+                className="w-full bg-transparent text-white placeholder-white/60 text-sm focus:outline-none font-semibold truncate border-0 shadow-none outline-none"
               />
             </div>
             {searchQuery && (
@@ -230,15 +225,15 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
         {showCategoryMenu && (
           <div className="space-y-4 pt-2 animate-in fade-in duration-200">
             {/* Group 1 Card: Giới thiệu, Spatial Glass, Giao diện, Trợ năng */}
-            <div className="rounded-[24px] bg-[#222225] border border-white/20 overflow-hidden shadow-2xl">
+            <div className="settings-category-menu-group rounded-[24px] bg-[#222225] border-0 overflow-hidden shadow-2xl">
               {/* Row 1: Giới thiệu */}
               <div 
                 id="category-item-about"
                 onClick={() => setActiveCategory('about')}
-                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#3B82F6] to-[#1D4ED8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#22c55e] to-[#16a34a] text-white flex items-center justify-center shrink-0 shadow-md border-0">
                     <Info className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
@@ -248,16 +243,17 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
               </div>
 
-              <div className="border-t border-white/20 ml-16" />
+              {/* Divider: 1 thanh màu solid thường màu xám tối nhẹ */}
+              <div className="h-[1px] bg-[#323236] ml-16" />
 
               {/* Row 2: Spatial Glass */}
               <div 
                 id="category-item-spatial-glass"
                 onClick={() => setActiveCategory('spatial_glass')}
-                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#38BDF8] to-[#0284C7] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#ef4444] to-[#dc2626] text-white flex items-center justify-center shrink-0 shadow-md border-0">
                     <Box className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
@@ -267,16 +263,17 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
               </div>
 
-              <div className="border-t border-white/20 ml-16" />
+              {/* Divider: 1 thanh màu solid thường màu xám tối nhẹ */}
+              <div className="h-[1px] bg-[#323236] ml-16" />
 
               {/* Row 3: Giao diện */}
               <div 
                 id="category-item-appearance"
                 onClick={() => setActiveCategory('appearance')}
-                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#FF4D6D] to-[#C9184A] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#ef4444] to-[#dc2626] text-white flex items-center justify-center shrink-0 shadow-md border-0">
                     <Palette className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
@@ -286,16 +283,17 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
               </div>
 
-              <div className="border-t border-white/20 ml-16" />
+              {/* Divider: 1 thanh màu solid thường màu xám tối nhẹ */}
+              <div className="h-[1px] bg-[#323236] ml-16" />
 
               {/* Row 4: Trợ năng */}
               <div 
                 id="category-item-accessibility"
                 onClick={() => setActiveCategory('accessibility')}
-                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#10B981] to-[#047857] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#f59e0b] to-[#d97706] text-white flex items-center justify-center shrink-0 shadow-md border-0">
                     <Key className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
@@ -307,15 +305,15 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
             </div>
 
             {/* Group 2 Card: Công cụ, Thử nghiệm */}
-            <div className="rounded-[24px] bg-[#222225] border border-white/20 overflow-hidden shadow-2xl mt-4">
+            <div className="settings-category-menu-group rounded-[24px] bg-[#222225] border-0 overflow-hidden shadow-2xl mt-4">
               {/* Row 5: Công cụ */}
               <div 
                 id="category-item-tools"
                 onClick={() => setActiveCategory('tools')}
-                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#64748B] to-[#334155] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#6b7280] to-[#4b5563] text-white flex items-center justify-center shrink-0 shadow-md border-0">
                     <Wrench className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
@@ -325,16 +323,17 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
               </div>
 
-              <div className="border-t border-white/20 ml-16" />
+              {/* Divider: 1 thanh màu solid thường màu xám tối nhẹ */}
+              <div className="h-[1px] bg-[#323236] ml-16" />
 
               {/* Row 6: Thử nghiệm */}
               <div 
                 id="category-item-experimental"
                 onClick={() => setActiveCategory('experimental')}
-                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group"
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#A855F7] to-[#6B21A8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#6b7280] to-[#4b5563] text-white flex items-center justify-center shrink-0 shadow-md border-0">
                     <FlaskConical className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
@@ -352,12 +351,12 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       {showSpatialGlass && (
         <section 
           id="settings-section-spatial-glass"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-5"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-5"
         >
           {/* Section Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#38BDF8] to-[#0284C7] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#ef4444] to-[#dc2626] text-white flex items-center justify-center shrink-0 shadow-md mt-0.5 border-0">
                 <Sparkles className="w-4.5 h-4.5 text-white" />
               </div>
               <div>
@@ -365,9 +364,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <h2 className="text-base font-bold text-white leading-tight">
                     Spatial Glass
                   </h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-white border border-white/20">
-                    LIQUID UI
-                  </span>
                 </div>
                 <p className="text-xs text-white/70 mt-1 leading-relaxed">
                   Tùy chỉnh độ mờ (blur) và độ trong suốt (opacity) cho các thành phần kính không gian trên VNRT Online
@@ -428,9 +424,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   </div>
                 </div>
               </div>
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/20 shrink-0">
-                Active
-              </span>
             </div>
           </div>
 
@@ -605,11 +598,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       {showAppearance && (
         <section 
           id="settings-section-interface"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header */}
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#FF4D6D] to-[#C9184A] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#ef4444] to-[#dc2626] text-white flex items-center justify-center shrink-0 shadow-md mt-0.5 border-0">
               <Palette className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
@@ -617,59 +610,169 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 Giao diện
               </h2>
               <p className="text-xs text-white/70 mt-1 leading-relaxed">
-                Tùy biến thanh điều hướng (Sidebar, Top bar hoặc Floaty bar), thanh Dock và tỷ lệ cỡ chữ toàn hệ thống
+                Tùy biến thanh điều hướng chính (Top bar, Sidebar hoặc Tab View) và tỷ lệ cỡ chữ toàn hệ thống
               </p>
             </div>
           </div>
 
           <div className="space-y-3 pt-1">
-            {/* Card: Floaty bar */}
-            {(matchesSearch('Floaty bar') ||
-              matchesSearch('Floaty') ||
-              matchesSearch('Navigation bar') ||
-              matchesSearch('Navigation bar that floats on your screen') ||
-              matchesSearch('floats') ||
+            {/* Card 1: Thanh điều hướng chính (Top bar, Sidebar, hoặc Tab View) */}
+            {(matchesSearch('Thanh điều hướng chính') ||
               matchesSearch('Thanh điều hướng') ||
+              matchesSearch('Navigation') ||
+              matchesSearch('Top bar') ||
+              matchesSearch('Sidebar') ||
+              matchesSearch('Tab View') ||
+              matchesSearch('Tabview') ||
+              matchesSearch('Bố cục') ||
               matchesSearch('Giao diện')) && (
               <div 
-                id="settings-card-floaty-bar"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent flex items-center justify-between gap-4 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
+                id="settings-card-main-navigation"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3.5 transition-colors"
               >
-                <div>
-                  <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <Compass className="w-4.5 h-4.5 text-white" />
-                    <span>Floaty bar</span>
-                    {settings.floatyBar && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                        ĐANG BẬT
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Navigation bar that floats on your screen
-                  </div>
-                  <div className="text-[11px] text-white/60 mt-1">
-                    Khi bật, thanh Top bar và Sidebar sẽ trở thành thanh điều hướng lơ lửng dạng pill ở dưới màn hình (tối đa 4 tabs/trang, chuyển trang mũi tên 2 cực).
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <Layout className="w-4.5 h-4.5 text-white" />
+                      <span>Thanh điều hướng chính</span>
+                    </div>
+                    <div className="text-xs text-white/70 mt-1 leading-normal">
+                      Lựa chọn kiểu thanh điều hướng phù hợp với trải nghiệm của bạn: Top bar phía trên cùng, Sidebar bên trái hoặc Tab View dạng viên thuốc nổi.
+                    </div>
                   </div>
                 </div>
 
-                {/* Orange Toggle Switch */}
-                <button
-                  id="toggle-floaty-bar"
-                  type="button"
-                  role="switch"
-                  aria-checked={settings.floatyBar}
-                  onClick={() => updateSetting('floatyBar', !settings.floatyBar)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
-                    settings.floatyBar ? 'bg-[#FF6A00]' : 'bg-white/15'
-                  }`}
-                >
-                  <span
-                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.floatyBar ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                {/* Grid 3 tùy chọn: Top bar, Sidebar, hoặc Tab View */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  {/* Tùy chọn 1: Top bar */}
+                  <button
+                    id="setting-nav-topbar"
+                    type="button"
+                    onClick={() => {
+                      updateSetting('navigationMode', 'topbar');
+                      updateSetting('floatyBar', false);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                      settings.navigationMode === 'topbar' && !settings.floatyBar
+                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                     }`}
-                  />
-                </button>
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                          settings.navigationMode === 'topbar' && !settings.floatyBar
+                            ? 'bg-white text-black'
+                            : 'bg-white/10 text-white/60 group-hover:text-white'
+                        }`}>
+                          <PanelTop className="w-4.5 h-4.5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-white block">Top bar</span>
+                          <span className="text-[11px] text-white/60">Thanh trên cùng</span>
+                        </div>
+                      </div>
+
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                        settings.navigationMode === 'topbar' && !settings.floatyBar
+                          ? 'bg-white text-black'
+                          : 'border border-white/20 text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
+                      Thanh điều hướng ngang hiện đại phía trên cùng phong cách truyền hình với logo VNRT Online và menu danh mục.
+                    </p>
+                  </button>
+
+                  {/* Tùy chọn 2: Sidebar */}
+                  <button
+                    id="setting-nav-sidebar"
+                    type="button"
+                    onClick={() => {
+                      updateSetting('navigationMode', 'sidebar');
+                      updateSetting('floatyBar', false);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                      settings.navigationMode === 'sidebar' && !settings.floatyBar
+                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                          settings.navigationMode === 'sidebar' && !settings.floatyBar
+                            ? 'bg-white text-black'
+                            : 'bg-white/10 text-white/60 group-hover:text-white'
+                        }`}>
+                          <PanelLeft className="w-4.5 h-4.5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-white block">Sidebar</span>
+                          <span className="text-[11px] text-white/60">Thanh bên trái</span>
+                        </div>
+                      </div>
+
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                        settings.navigationMode === 'sidebar' && !settings.floatyBar
+                          ? 'bg-white text-black'
+                          : 'border border-white/20 text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
+                      Giao diện thanh menu dọc bên trái đầy đủ với đồng hồ số, ô tìm kiếm nhanh, các danh mục và nút thu gọn.
+                    </p>
+                  </button>
+
+                  {/* Tùy chọn 3: Tab View */}
+                  <button
+                    id="setting-nav-tabview"
+                    type="button"
+                    onClick={() => {
+                      updateSetting('navigationMode', 'tabview');
+                      updateSetting('floatyBar', true);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                      settings.navigationMode === 'tabview' || settings.floatyBar
+                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                          settings.navigationMode === 'tabview' || settings.floatyBar
+                            ? 'bg-white text-black'
+                            : 'bg-white/10 text-white/60 group-hover:text-white'
+                        }`}>
+                          <Compass className="w-4.5 h-4.5" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-white block">Tab View</span>
+                          <span className="text-[11px] text-white/60">Thanh viên thuốc nổi</span>
+                        </div>
+                      </div>
+
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                        settings.navigationMode === 'tabview' || settings.floatyBar
+                          ? 'bg-white text-black'
+                          : 'border border-white/20 text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
+                      Thanh điều hướng dạng viên thuốc lơ lửng phong cách frosted glass hiện đại gồm Home, Watch, News, Settings và nút Tìm kiếm riêng.
+                    </p>
+                  </button>
+                </div>
               </div>
             )}
 
@@ -688,14 +791,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <PanelRight className="w-4.5 h-4.5 text-white" />
                     <span>Settings drawer</span>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                      BETA
-                    </span>
-                    {flags.settings_drawer && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                        ĐANG BẬT
-                      </span>
-                    )}
                   </div>
                   <div className="text-xs text-white/70 mt-1 leading-normal">
                     Settings open in a drawer on the right instead of a tab page
@@ -744,11 +839,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <Sparkles className="w-4.5 h-4.5 text-white" />
                     <span>Shiny outline</span>
-                    {settings.shinyOutline !== false && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                        ĐANG BẬT
-                      </span>
-                    )}
                   </div>
                   <div className="text-xs text-white/70 leading-normal">
                     Viền 2 cạnh trên dưới phản chiếu kính mờ cho toàn bộ giao diện
@@ -799,15 +889,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
                       <MousePointer className="w-4.5 h-4.5 text-white" />
                       <span>V-Cursor</span>
-                      {settings.vcursorEnabled !== false ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                          ĐANG BẬT
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-white/60 border border-white/10">
-                          TẮT (DÙNG CON TRỎ THIẾT BỊ)
-                        </span>
-                      )}
                     </div>
                     <div className="text-xs text-white/70 leading-normal">
                       Sử dụng con trỏ chuột độc quyền của VPlay thay vì của device
@@ -822,22 +903,22 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     id="toggle-vcursor-enabled"
                     type="button"
                     role="switch"
-                    aria-checked={settings.vcursorEnabled !== false}
-                    onClick={() => updateSetting('vcursorEnabled', settings.vcursorEnabled === false ? true : false)}
+                    aria-checked={Boolean(settings.vcursorEnabled)}
+                    onClick={() => updateSetting('vcursorEnabled', !settings.vcursorEnabled)}
                     className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
-                      settings.vcursorEnabled !== false ? 'bg-[#FF6A00]' : 'bg-white/15'
+                      settings.vcursorEnabled ? 'bg-[#FF6A00]' : 'bg-white/15'
                     }`}
                   >
                     <span
                       className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
-                        settings.vcursorEnabled !== false ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                        settings.vcursorEnabled ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
                       }`}
                     />
                   </button>
                 </div>
 
                 {/* Sub-controls when V-Cursor is enabled */}
-                {settings.vcursorEnabled !== false && (
+                {Boolean(settings.vcursorEnabled) && (
                   <div className="space-y-4 pt-2 border-t border-white/15">
                     {/* 1. Interactive Preview Stage */}
                     <div className="p-4 rounded-xl bg-black/40 border border-white/15 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -946,9 +1027,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                               <div className="min-w-0 flex-1">
                                 <div className="text-xs font-semibold text-white truncate flex items-center gap-1">
                                   <span>{preset.name}</span>
-                                  {preset.id === 'macos-dark' && (
-                                    <span className="text-[8px] font-bold px-1 py-0.2 bg-white/20 text-white rounded">Gốc</span>
-                                  )}
                                 </div>
                                 <div className="text-[10px] text-white/60 truncate">
                                   {preset.desc}
@@ -1136,308 +1214,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               </div>
             )}
 
-            {/* Card: Change your background */}
-            {(matchesSearch('Change your background') ||
-              matchesSearch('Background') ||
-              matchesSearch('Hình nền') ||
-              matchesSearch('Wallpaper') ||
-              matchesSearch('Spatial Glass') ||
-              matchesSearch('Duo Light') ||
-              matchesSearch('Duo Dark') ||
-              matchesSearch('Giao diện')) && (
-              <div 
-                id="settings-card-change-background"
-                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-3.5 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
-              >
-                <div>
-                  <div className="font-semibold text-white text-sm flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4.5 h-4.5 text-white" />
-                      <span>Change your background</span>
-                    </div>
-                    {settings.appBackground && settings.appBackground !== 'default' && (
-                      <button
-                        type="button"
-                        onClick={() => updateSetting('appBackground', 'default')}
-                        className="text-[11px] text-white/80 hover:text-white px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer border border-white/20"
-                      >
-                        Khôi phục nền mặc định
-                      </button>
-                    )}
-                  </div>
-                  <div className="text-xs text-white/80 font-medium mt-1">
-                    Changing your background to see how Spatial Glass on VNRT Online reacts!
-                  </div>
-                  <div className="text-[11px] text-white/70 mt-1 leading-relaxed">
-                    Người dùng chọn một mẫu nền cho sẵn và app background sẽ đổi theo hình đó thay vì là solid color mặc định. Các thành phần kính mờ Spatial Glass (Top bar, Sidebar, Floating Search Bar, V-board) sẽ phản chiếu và khúc xạ màu sắc chân thực.
-                  </div>
-                </div>
-
-                {/* Wallpaper Previews Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                  {WALLPAPER_PRESETS.map((wp) => {
-                    const isSelected = settings.appBackground === wp.id || (!settings.appBackground && wp.id === 'default');
-                    return (
-                      <button
-                        key={wp.id}
-                        id={`wallpaper-preset-${wp.id}`}
-                        type="button"
-                        onClick={() => updateSetting('appBackground', wp.id)}
-                        className={`relative flex flex-col p-2.5 rounded-2xl border text-left transition-all group cursor-pointer ${
-                          isSelected 
-                            ? 'bg-white/10 border-white ring-2 ring-white/30 shadow-lg' 
-                            : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
-                        }`}
-                      >
-                        {/* Visual Preview Box */}
-                        <div className="w-full h-24 rounded-xl overflow-hidden relative border border-white/15 mb-2.5 bg-[#121216] flex items-center justify-center">
-                          {wp.type === 'image' ? (
-                            <img
-                              src={wp.previewUrl}
-                              alt={wp.name}
-                              referrerPolicy="no-referrer"
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-[#181818] flex flex-col items-center justify-center gap-1 text-white/60">
-                              <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center">
-                                <Moon className="w-4 h-4 text-white" />
-                              </div>
-                              <span className="text-[10px] font-mono text-white/70">Solid #181818</span>
-                            </div>
-                          )}
-
-                          {/* Selected Badge */}
-                          {isSelected && (
-                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white text-black flex items-center justify-center shadow-md">
-                              <Check className="w-3 h-3 stroke-[3]" />
-                            </div>
-                          )}
-
-                          {/* Spatial Glass reaction preview badge */}
-                          <div className="absolute bottom-1.5 inset-x-2 py-0.5 px-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-between text-[9px] text-white pointer-events-none">
-                            <span className="truncate">Spatial Glass</span>
-                            <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]" />
-                          </div>
-                        </div>
-
-                        {/* Name and description */}
-                        <div className="space-y-0.5">
-                          <div className="font-bold text-white text-xs flex items-center justify-between">
-                            <span>{wp.name}</span>
-                          </div>
-                          <p className="text-[10px] text-white/60 line-clamp-2 leading-tight">
-                            {wp.subtext}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Card 0: Chế độ giao diện (Dark Mode mặc định) */}
-            {(matchesSearch('Chế độ giao diện') || matchesSearch('Giao diện') || matchesSearch('Theme') || matchesSearch('Dark')) && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
-                <div>
-                  <div className="font-semibold text-white text-sm flex items-center gap-2">
-                    <Moon className="w-4 h-4 text-white" />
-                    <span>Chế độ giao diện Dark Mode</span>
-                  </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Ứng dụng VNRT Online hoạt động ở chế độ nền tối chuyên biệt (#181818) tối ưu thị giác cho trải nghiệm truyền hình.
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold text-white shrink-0 border border-white/20">
-                  <span className="w-2 h-2 rounded-full bg-white" />
-                  <span>DARK ONLY</span>
-                </div>
-              </div>
-            )}
-
-            {/* Card: Kho Theme Store (Special Themes) */}
-            {(matchesSearch('Theme Store') || matchesSearch('Theme') || matchesSearch('Giao diện đặc biệt') || matchesSearch('Kho giao diện') || matchesSearch('Tết') || matchesSearch('Christmas') || matchesSearch('Yêu nước')) && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
-                <div>
-                  <div className="font-semibold text-white text-sm flex items-center gap-2 flex-wrap">
-                    <Palette className="w-4 h-4 text-white" />
-                    <span>Kho Giao Diện • Theme Store</span>
-                    {activeTheme !== 'default' ? (
-                      <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold border border-white/20 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        Đang dùng: {currentThemeData?.name}
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/80 text-[10px] font-semibold border border-white/15">
-                        Giao diện mặc định
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-white/70 mt-1.5 leading-relaxed">
-                    Cài đặt và thay đổi các theme đặc biệt trong tab Shop: <strong>Tết Dương Lịch</strong> (pháo hoa & lấp lánh), <strong>Tết Nguyên Đán</strong> (cành mai cành đào), <strong>Christmas</strong> (tuyết rơi & đèn LED), <strong>Yêu nước</strong> (cờ đỏ sao vàng).
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => navigate?.('/shop')}
-                  className="px-4 py-2 rounded-xl bg-white hover:bg-white/90 active:scale-95 text-black text-xs font-bold transition-all shadow-md shrink-0 flex items-center gap-1.5 cursor-pointer border border-white"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Mở Theme Store</span>
-                </button>
-              </div>
-            )}
-
-            {/* Card 1: Bố cục thanh điều hướng (Sidebar hoặc Top bar) */}
-            {(matchesSearch('Thanh điều hướng') ||
-              matchesSearch('Sidebar') ||
-              matchesSearch('Top bar') ||
-              matchesSearch('Bố cục') ||
-              matchesSearch('Giao diện')) && (
-              <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3.5 transition-colors">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="font-semibold text-white text-sm flex items-center gap-2">
-                      <Layout className="w-4.5 h-4.5 text-white" />
-                      <span>Thanh điều hướng chính</span>
-                    </div>
-                    <div className="text-xs text-white/70 mt-1 leading-normal">
-                      Lựa chọn giao diện điều hướng: thanh Sidebar bên cạnh hoặc thanh Top bar phía trên cùng.
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grid 2 tùy chọn: Sidebar hoặc Top bar */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  {/* Tùy chọn 1: Sidebar */}
-                  <button
-                    id="setting-nav-sidebar"
-                    type="button"
-                    onClick={() => {
-                      updateSetting('navigationMode', 'sidebar');
-                    }}
-                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
-                      settings.navigationMode === 'sidebar'
-                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
-                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                          settings.navigationMode === 'sidebar'
-                            ? 'bg-white text-black'
-                            : 'bg-white/10 text-white/60 group-hover:text-white'
-                        }`}>
-                          <PanelLeft className="w-4.5 h-4.5" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold text-white block">Sidebar</span>
-                          <span className="text-[11px] text-white/60">Thanh bên trái</span>
-                        </div>
-                      </div>
-
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        settings.navigationMode === 'sidebar'
-                          ? 'bg-white text-black'
-                          : 'border border-white/20 text-transparent'
-                      }`}>
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
-                      Giao diện thanh menu dọc bên trái đầy đủ với đồng hồ số, ô tìm kiếm nhanh, các danh mục và nút thu gọn.
-                    </p>
-                  </button>
-
-                  {/* Tùy chọn 2: Top bar */}
-                  <button
-                    id="setting-nav-topbar"
-                    type="button"
-                    onClick={() => {
-                      updateSetting('navigationMode', 'topbar');
-                    }}
-                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
-                      settings.navigationMode !== 'sidebar'
-                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
-                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                          settings.navigationMode !== 'sidebar'
-                            ? 'bg-white text-black'
-                            : 'bg-white/10 text-white/60 group-hover:text-white'
-                        }`}>
-                          <PanelTop className="w-4.5 h-4.5" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold text-white block">Top bar</span>
-                          <span className="text-[11px] text-white/60">Thanh trên cùng</span>
-                        </div>
-                      </div>
-
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        settings.navigationMode !== 'sidebar'
-                          ? 'bg-white text-black'
-                          : 'border border-white/20 text-transparent'
-                      }`}>
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
-                      Thanh điều hướng ngang hiện đại phong cách truyền hình với logo VNRT Online, danh mục Truyền Hình và menu Xem thêm.
-                    </p>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Card 2: Dock sang Sidebar */}
-            {matchesSearch('Dock sang Sidebar') && (
-              <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
-                <div>
-                  <div className="font-semibold text-white text-sm">
-                    Dock sang Sidebar
-                  </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Chuyển thanh điều hướng dưới cùng sang thanh Sidebar bên trái (khi sử dụng chế độ Sidebar)
-                  </div>
-                </div>
-
-                {/* Orange Toggle Switch */}
-                <button
-                  id="toggle-dock-to-sidebar"
-                  type="button"
-                  role="switch"
-                  aria-checked={settings.dockToSidebar}
-                  onClick={() => updateSetting('dockToSidebar', !settings.dockToSidebar)}
-                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
-                    settings.dockToSidebar ? 'bg-[#FF6A00]' : 'bg-white/15'
-                  }`}
-                >
-                  <span
-                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
-                      settings.dockToSidebar ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
-                    }`}
-                  />
-                </button>
-              </div>
-            )}
-
-            {/* Card 1.5: Phông chữ (Checkbox List: Integer, Alata, Google Sans, Montserrat) */}
+            {/* Card 1.5: Phông chữ (Checkbox List: Integer, Alata) */}
             {(matchesSearch('Phông chữ') ||
               matchesSearch('Font') ||
               matchesSearch('Integer') ||
               matchesSearch('Alata') ||
-              matchesSearch('Google Sans') ||
-              matchesSearch('Montserrat') ||
               matchesSearch('Giao diện')) && (
               <div 
                 id="settings-card-font-family"
@@ -1498,11 +1279,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                             >
                               {font.name}
                             </span>
-                            {font.badge && (
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-white/10 text-white border border-white/20">
-                                {font.badge}
-                              </span>
-                            )}
                           </div>
                           <p className="text-[11px] text-white/70 mt-1 leading-snug">
                             {font.subtext}
@@ -1577,9 +1353,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                                 isSelected ? 'text-white' : 'text-white/80 group-hover:text-white'
                               }`}>
                                 {skinOption.name}
-                              </span>
-                              <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded-md bg-white/10 text-white border border-white/20">
-                                {skinOption.badge}
                               </span>
                             </div>
                             <p className="text-[11px] text-white/70 mt-1.5 leading-snug">
@@ -1742,9 +1515,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <div>
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <span>Màn hình khởi động & VNRT Ads</span>
-                    <span className="px-2 py-0.5 text-[10px] font-bold bg-white/10 text-white rounded-full border border-white/20">
-                      VNRT Online OS
-                    </span>
                   </div>
                   <div className="text-xs text-white/70 mt-1 leading-normal">
                     Phát ngẫu nhiên VNRT Ads (VTV1, VTV6, VTV10) và hiệu ứng Spatial Glass khi khởi chạy ứng dụng
@@ -1784,9 +1554,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <RotateCw className="w-4 h-4 text-white shrink-0" />
                     <span>Tải lại ứng dụng (Reload App)</span>
-                    <span className="px-2 py-0.5 text-[10px] font-mono bg-white/10 text-white rounded-full border border-white/20">
-                      F5
-                    </span>
                   </div>
                   <div className="text-xs text-white/70 mt-1 leading-normal">
                     Làm mới toàn bộ dữ liệu, bộ nhớ tạm và tái khởi động ứng dụng mượt mà
@@ -1814,11 +1581,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       {showAccessibility && (
         <section 
           id="settings-section-accessibility"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header */}
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#10B981] to-[#047857] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#f59e0b] to-[#d97706] text-white flex items-center justify-center shrink-0 shadow-md mt-0.5 border-0">
               <Key className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
@@ -1903,9 +1670,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
                       <span>Inspect Elements (Inspect web này)</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-white border border-white/20">
-                        DevTools
-                      </span>
                     </div>
                     <div className="text-xs text-white/70 mt-1 leading-normal">
                       Bật công cụ soi phần tử DOM, tra cứu mã nguồn HTML, xem thuộc tính CSS và mở bảng điều khiển DevTools trực tiếp trên web
@@ -1947,11 +1711,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       {showAbout && (
         <section 
           id="settings-section-about"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header */}
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#3B82F6] to-[#1D4ED8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#22c55e] to-[#16a34a] text-white flex items-center justify-center shrink-0 shadow-md mt-0.5 border-0">
               <Info className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
@@ -2082,9 +1846,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <div className="font-semibold text-white text-sm flex items-center gap-2">
                   <Monitor className="w-4 h-4 text-white" />
                   <span>Màn hình thiết lập OOBE lần đầu</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-white border border-white/20">
-                    OOBE Setup
-                  </span>
                 </div>
                 <div className="text-xs text-white/70 mt-1 leading-normal">
                   Trải nghiệm lại màn hình chào mừng và thiết lập ban đầu phong cách Out-of-Box Experience
@@ -2134,11 +1895,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       {showTools && (
         <section 
           id="settings-section-tools"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header */}
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#64748B] to-[#334155] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#6b7280] to-[#4b5563] text-white flex items-center justify-center shrink-0 shadow-md mt-0.5 border-0">
               <Wrench className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
@@ -2165,9 +1926,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-white text-sm transition-colors">
                       Mở tính năng V-Duo (Chia đôi màn hình)
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                      MỚI
                     </span>
                   </div>
                   <p className="text-xs text-white/70 mt-0.5">
@@ -2318,12 +2076,12 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
       {showExperimental && (
         <section 
           id="settings-section-experimental"
-          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border border-white/20 shadow-xl space-y-4"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-4"
         >
           {/* Section Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#A855F7] to-[#6B21A8] border border-white/20 text-white flex items-center justify-center shrink-0 shadow-md mt-0.5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-b from-[#6b7280] to-[#4b5563] text-white flex items-center justify-center shrink-0 shadow-md mt-0.5 border-0">
                 <FlaskConical className="w-4.5 h-4.5 text-white" />
               </div>
               <div>
@@ -2352,9 +2110,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Minimalism Home Page</span>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                    NEW
-                  </span>
                 </div>
                 <div className="text-xs text-white/70 mt-1 leading-normal">
                   Khi bật thì home page chỉ xuất hiện nguyên 1 thanh search đơn giản, ko xuất hiện gì thêm
@@ -2383,9 +2138,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Animation Test</span>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                    MOTION
-                  </span>
                 </div>
                 <div className="text-xs text-white/70 mt-1 leading-normal">
                   Thêm thật nhiều animation và motion mượt mà vào toàn bộ ứng dụng: chuyển trang đàn hồi và hiệu ứng spring
@@ -2414,9 +2166,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Experimental V-board</span>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                    TELEX KEYBOARD
-                  </span>
                 </div>
                 <div className="text-xs text-white/70 mt-1 leading-normal">
                   Bàn phím ảo độc quyền V-board mang phong cách iOS dark mode khi chạm ô tìm kiếm
@@ -2445,9 +2194,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Vertical Status Bar</span>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-white/10 text-white border border-white/20">
-                    UI
-                  </span>
                 </div>
                 <div className="text-xs text-white/70 mt-1 leading-normal">
                   Hiển thị thanh trạng thái và Dynamic Island đặt dọc ở góc trên bên phải màn hình

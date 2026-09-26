@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 
-export type FontFamilyOption = 'integer' | 'alata' | 'google-sans' | 'montserrat';
+export type FontFamilyOption = 'integer' | 'alata';
+
+export type NavigationMode = 'sidebar' | 'topbar' | 'tabview';
 
 export type VBoardSkin = 'default' | 'ios' | 'google' | 'butterfly' | 'physical';
 
@@ -66,7 +68,7 @@ export interface SystemSettings {
   userName: string;
   theme: 'light' | 'dark';
   dockToSidebar: boolean;
-  navigationMode: 'sidebar' | 'topbar';
+  navigationMode: NavigationMode;
   floatyBar: boolean;
   vboardSkin: VBoardSkin;
   fontFamily: FontFamilyOption;
@@ -184,7 +186,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   shinyOutline: true,
   spatialGlassBlur: 20,
   spatialGlassOpacity: 65,
-  vcursorEnabled: true,
+  vcursorEnabled: false,
   vcursorColor: '#000000',
   vcursorBorderColor: '#FFFFFF',
   vcursorSize: 24,
@@ -241,25 +243,12 @@ export const FONT_FAMILY_CONFIG: FontFamilyItem[] = [
     name: 'Integer',
     subtext: 'Phông chữ hiện đại, hình khối sắc nét chuẩn giao diện số (Integer Bold / Inter)',
     cssFamily: "'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    badge: 'Mặc định',
   },
   {
     id: 'alata',
     name: 'Alata',
     subtext: 'Phông chữ phong cách hình học độc đáo, dứt khoát và ấn tượng',
     cssFamily: "'Alata', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  },
-  {
-    id: 'google-sans',
-    name: 'Google Sans',
-    subtext: 'Phông chữ mềm mại, thân thiện phong cách Material Design của Google',
-    cssFamily: "'Google Sans', 'Open Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  },
-  {
-    id: 'montserrat',
-    name: 'Montserrat',
-    subtext: 'Phông chữ hình học cân đối, thanh lịch và độ nét cao trên mọi màn hình',
-    cssFamily: "'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
 ];
 
@@ -296,9 +285,17 @@ export const getStoredSettings = (): SystemSettings => {
 
     if (saved) {
       const parsed = JSON.parse(saved);
-      const navMode = parsed.navigationMode || (parsed.dockToSidebar === false ? 'sidebar' : fallbackNavMode);
+      let navMode: NavigationMode = fallbackNavMode;
+      if (parsed.navigationMode === 'sidebar' || parsed.navigationMode === 'topbar' || parsed.navigationMode === 'tabview') {
+        navMode = parsed.navigationMode;
+      } else if (parsed.floatyBar === true) {
+        navMode = 'tabview';
+      } else if (parsed.dockToSidebar === false) {
+        navMode = 'sidebar';
+      }
+      const isFloaty = navMode === 'tabview' || Boolean(parsed.floatyBar);
       let font: FontFamilyOption = 'integer';
-      if (parsed.fontFamily && ['alata', 'integer', 'google-sans', 'montserrat'].includes(parsed.fontFamily)) {
+      if (parsed.fontFamily && ['alata', 'integer'].includes(parsed.fontFamily)) {
         font = parsed.fontFamily;
       }
       // Check shinyOutline with feature flag fallback
@@ -324,7 +321,7 @@ export const getStoredSettings = (): SystemSettings => {
         ? Math.max(5, Math.min(100, parsed.spatialGlassOpacity))
         : 65;
 
-      const vcursorEnabled = typeof parsed.vcursorEnabled === 'boolean' ? parsed.vcursorEnabled : true;
+      const vcursorEnabled = typeof parsed.vcursorEnabled === 'boolean' ? parsed.vcursorEnabled : false;
       const vcursorColor = typeof parsed.vcursorColor === 'string' && parsed.vcursorColor.trim() ? parsed.vcursorColor : '#000000';
       const vcursorBorderColor = typeof parsed.vcursorBorderColor === 'string' && parsed.vcursorBorderColor.trim() ? parsed.vcursorBorderColor : '#FFFFFF';
       const vcursorSize = typeof parsed.vcursorSize === 'number' && !isNaN(parsed.vcursorSize) ? Math.max(16, Math.min(48, parsed.vcursorSize)) : 24;
@@ -339,7 +336,7 @@ export const getStoredSettings = (): SystemSettings => {
         spatialGlassBlur: glassBlur,
         spatialGlassOpacity: glassOpacity,
         appBackground: parsed.appBackground || 'default',
-        floatyBar: typeof parsed.floatyBar === 'boolean' ? parsed.floatyBar : false,
+        floatyBar: isFloaty,
         vboardSkin: ['default', 'ios', 'google', 'butterfly', 'physical'].includes(parsed.vboardSkin) ? parsed.vboardSkin : 'default',
         userName: parsed.userName || legacyUser || 'User',
         theme: 'dark',

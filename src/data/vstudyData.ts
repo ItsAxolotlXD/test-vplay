@@ -1281,6 +1281,105 @@ export const subjectsData: Subject[] = [
         explanation: "Đô thị hóa đang diễn ra nhanh chóng song tỷ lệ dân đô thị vẫn đang tiếp tục phát triển."
       }
     ]
+  },
+  // ==================== V-STUDY KHÓA HỌC WEB / HTML / CSS ====================
+  {
+    id: "web_html_css",
+    name: "Lập Trình Web (HTML / CSS)",
+    level: "thpt",
+    levelName: "Công Nghệ & Lập Trình",
+    color: "from-orange-500 via-amber-500 to-blue-500",
+    icon: "🌐",
+    grade: "Căn Bản & Nâng Cao",
+    description: "Khóa học nhập môn Lập trình Web hiện đại: Cấu trúc HTML5, định kiểu giao diện CSS3, Flexbox, Grid, Responsive và Glassmorphism.",
+    questions: [
+      {
+        id: 1,
+        question: "Phần tử nào là thẻ gốc bao bọc toàn bộ nội dung của một tài liệu HTML?",
+        options: ["<body>", "<html>", "<head>", "<doctype>"],
+        correctIndex: 1,
+        explanation: "Thẻ <html> là thẻ phần tử gốc (root element) chứa tất cả các phần tử khác trong trang web."
+      },
+      {
+        id: 2,
+        question: "Để liên kết một tập tin kiểu CSS bên ngoài vào tài liệu HTML, ta đặt thẻ nào trong phần <head>?",
+        options: [
+          "<link rel=\"stylesheet\" href=\"style.css\">",
+          "<style src=\"style.css\">",
+          "<script href=\"style.css\">",
+          "<css link=\"style.css\">"
+        ],
+        correctIndex: 0,
+        explanation: "Thẻ <link rel=\"stylesheet\" href=\"...\"> được dùng để nạp file CSS ngoại trú vào trang HTML."
+      },
+      {
+        id: 3,
+        question: "Thuộc tính CSS nào cho phép căn giữa các phần tử con theo trục chính (Main Axis) trong bố cục Flexbox?",
+        options: [
+          "align-items: center;",
+          "justify-content: center;",
+          "text-align: center;",
+          "margin: center;"
+        ],
+        correctIndex: 1,
+        explanation: "Trong Flexbox, 'justify-content' căn chỉnh các phần tử theo trục chính (Main Axis), còn 'align-items' căn theo trục phụ (Cross Axis)."
+      },
+      {
+        id: 4,
+        question: "Trong mô hình hộp CSS Box Model, thứ tự từ ngoài vào trong của một phần tử là gì?",
+        options: [
+          "Margin -> Border -> Padding -> Content",
+          "Content -> Padding -> Border -> Margin",
+          "Border -> Margin -> Padding -> Content",
+          "Padding -> Border -> Margin -> Content"
+        ],
+        correctIndex: 0,
+        explanation: "CSS Box Model bao gồm từ ngoài vào trong: Margin (Lề ngoài) -> Border (Viền) -> Padding (Đệm trong) -> Content (Nội dung)."
+      },
+      {
+        id: 5,
+        question: "Cú pháp CSS Media Query nào dưới đây áp dụng kiểu dáng khi chiều rộng màn hình tối đa là 768px (Mobile/Tablet)?",
+        options: [
+          "@media (max-width: 768px) { ... }",
+          "@media (min-width: 768px) { ... }",
+          "@screen (width < 768px) { ... }",
+          "@media-screen <= 768px { ... }"
+        ],
+        correctIndex: 0,
+        explanation: "@media (max-width: 768px) kích hoạt CSS khi viewport có bề rộng từ 768px trở xuống."
+      },
+      {
+        id: 6,
+        question: "Để tạo hiệu ứng mờ nền kính Frosted Glass (Glassmorphism), ta kết hợp background bán trong suốt với thuộc tính CSS nào?",
+        options: [
+          "filter: blur()",
+          "backdrop-filter: blur()",
+          "opacity: blur()",
+          "background-blur: 20px"
+        ],
+        correctIndex: 1,
+        explanation: "'backdrop-filter: blur(...)' làm mờ các lớp nội dung nằm phía sau phần tử bán trong suốt."
+      },
+      {
+        id: 7,
+        question: "Thẻ HTML5 nào mang ý nghĩa ngữ nghĩa (Semantic) đại diện cho khu vực điều hướng chứa các liên kết chính của trang web?",
+        options: ["<header>", "<section>", "<nav>", "<aside>"],
+        correctIndex: 2,
+        explanation: "Thẻ <nav> (navigation) được quy định để chứa các liên kết điều hướng quan trọng của website."
+      },
+      {
+        id: 8,
+        question: "Thuộc tính CSS nào giúp kích thước width và height của phần tử bao gồm luôn cả padding và border?",
+        options: [
+          "box-sizing: border-box;",
+          "box-sizing: content-box;",
+          "box-model: include-padding;",
+          "display: inline-block;"
+        ],
+        correctIndex: 0,
+        explanation: "'box-sizing: border-box' tính tổng chiều rộng bao gồm cả padding và viền, giúp quản lý bố cục dễ dàng và chính xác."
+      }
+    ]
   }
 ];
 
