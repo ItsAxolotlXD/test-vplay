@@ -78,7 +78,7 @@ const VplayLogo: React.FC<{ onClick?: () => void; isActive?: boolean }> = ({ onC
       title="VNRT Online - Về trang chủ"
     >
       <img
-        src="https://static.wikia.nocookie.net/ep-deo/images/1/1d/New_logo.png/revision/latest?cb=20260924062053"
+        src="https://static.wikia.nocookie.net/ep-deo/images/5/51/New_official_vnrt_logo.png/revision/latest?cb=20260926162432"
         alt="VNRT Online"
         referrerPolicy="no-referrer"
         className="h-7 sm:h-8 w-auto max-h-8 object-contain shrink-0 group-hover:scale-105 transition-transform"
@@ -344,6 +344,32 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                     : 'text-cyan-400 group-hover:scale-105'
                 }`} />
                 <span className="tracking-wide">V-Duo</span>
+              </button>
+
+              {/* Item 4: Event Tab */}
+              <button
+                id="topbar-nav-event"
+                onClick={() => navigate('/event')}
+                className={`relative px-4 py-2 rounded-full text-[14.5px] transition-all flex items-center gap-2 cursor-pointer group ${
+                  currentRoute === '/event' || currentRoute.startsWith('/event') || currentRoute.startsWith('/events')
+                    ? 'bg-white text-black font-bold shadow-md'
+                    : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
+                }`}
+                title="Sự kiện Gathering Discord & VNRT Online"
+              >
+                <Sparkles className={`w-5 h-5 shrink-0 transition-transform ${
+                  currentRoute === '/event' || currentRoute.startsWith('/event')
+                    ? 'text-red-600'
+                    : 'text-red-400 group-hover:scale-105'
+                }`} />
+                <span className="tracking-wide">Event</span>
+                <span className={`px-1.5 py-0.5 rounded-full text-[9.5px] font-extrabold leading-none ${
+                  currentRoute === '/event' || currentRoute.startsWith('/event')
+                    ? 'bg-red-600 text-white'
+                    : 'bg-red-500/25 text-red-300 border border-red-400/40'
+                }`}>
+                  HOT
+                </span>
               </button>
 
               {/* Item 4: App v with Dropdown Menu */}

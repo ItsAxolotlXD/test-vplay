@@ -14,7 +14,8 @@ import {
   Radio,
   Music,
   ShoppingBag,
-  Columns2
+  Columns2,
+  Calendar
 } from 'lucide-react';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
@@ -44,6 +45,7 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
   const navItems = [
     { id: 'dock-home', label: 'Trang chủ', isCustomHome: true, route: '/' },
     { id: 'dock-tv', label: 'Truyền hình', icon: Tv, route: '/live-tv' },
+    { id: 'dock-event', label: 'Event', icon: Calendar, route: '/event' },
     { id: 'dock-music', label: 'Kho nhạc TV', icon: Music, route: '/music' },
     { id: 'dock-shop', label: 'Shop', icon: ShoppingBag, route: '/v-shop' },
     { id: 'dock-vduo', label: 'V-Duo (Chia đôi màn hình)', icon: Columns2, route: '/v-duo' },

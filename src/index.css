@@ -350,7 +350,7 @@ body.has-custom-wallpaper {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22) !important;
 }
 
-/* STYLE THANH TÌM KIẾM TOÀN BỘ APP GIỐNG THANH FLOAT SEARCH (SPATIAL GLASS PILL) - CĂN TRÁI, KO ĐỔ BÓNG CHỮ */
+/* STYLE THANH TÌM KIẾM TOÀN BỘ APP GIỐNG THANH FLOAT SEARCH VÀ TAB VIEW BAR - OPACITY 0.45, BLUR 2.5PX, ICON VÀ CHỮ MÀU ĐEN */
 .spotlight-bubble-box,
 .search-box-capsule,
 .float-search-style,
@@ -358,11 +358,11 @@ body.has-custom-wallpaper {
 .search-container {
   position: relative !important;
   border-radius: 9999px !important;
-  background-color: rgba(255, 255, 255, calc(var(--spatial-glass-opacity, 0.65) * 0.38)) !important;
-  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
-  backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
-  box-shadow: 0 16px 36px 0 rgba(0, 0, 0, 0.35) !important;
-  border: 0 none transparent !important;
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  -webkit-backdrop-filter: blur(2.5px) !important;
+  backdrop-filter: blur(2.5px) !important;
+  box-shadow: 0 10px 36px 0 rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
   overflow: hidden !important;
   font-family: 'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   transition: all 0.3s ease !important;
@@ -374,17 +374,17 @@ body.has-custom-wallpaper {
 .has-custom-wallpaper .spotlight-bubble-box,
 .has-custom-wallpaper .search-box-capsule,
 .has-custom-wallpaper .float-search-style {
-  background-color: rgba(255, 255, 255, calc(var(--spatial-glass-opacity, 0.65) * 0.34)) !important;
-  -webkit-backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
-  backdrop-filter: blur(var(--spatial-glass-blur, 24px)) saturate(180%) !important;
-  border: 0 none transparent !important;
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  -webkit-backdrop-filter: blur(2.5px) !important;
+  backdrop-filter: blur(2.5px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
 }
 
 .spotlight-bubble-box:focus-within,
 .search-box-capsule:focus-within,
 .float-search-style:focus-within {
-  background-color: rgba(255, 255, 255, 0.32) !important;
-  box-shadow: 0 20px 44px 0 rgba(0, 0, 0, 0.45) !important;
+  background-color: rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.30) !important;
 }
 
 /* Đảm bảo toàn bộ div, wrapper bên trong thanh search KHÔNG bị áp nền riêng biệt */
@@ -433,7 +433,7 @@ body.has-custom-wallpaper {
   z-index: 10 !important;
 }
 
-/* Search input typography - CĂN TRÁI VÀ KO ĐỔ BÓNG CHỮ */
+/* Search input typography - CĂN TRÁI, CHỮ VÀ ICON MÀU ĐEN, KO ĐỔ BÓNG CHỮ */
 .spotlight-bubble-box input,
 .search-box-capsule input,
 .float-search-style input,
@@ -445,7 +445,7 @@ input[type="search"] {
   position: relative !important;
   z-index: 11 !important;
   background-color: transparent !important;
-  color: #ffffff !important;
+  color: #000000 !important;
   font-family: 'Integer', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
@@ -463,13 +463,13 @@ div:has(> input[placeholder*="Tìm"]) input::placeholder,
 div:has(> input[placeholder*="search" i]) input::placeholder,
 input[placeholder*="Tìm"]::placeholder,
 input[placeholder*="search" i]::placeholder {
-  color: rgba(255, 255, 255, 0.60) !important;
+  color: rgba(0, 0, 0, 0.60) !important;
   font-weight: 600 !important;
   text-shadow: none !important;
   filter: none !important;
 }
 
-/* Monochrome White Search Icon matching float search - ko đổ bóng */
+/* Monochrome Black Search Icon matching tab view bar - ko đổ bóng */
 .spotlight-bubble-box svg,
 .search-box-capsule svg,
 .float-search-style svg,
@@ -477,7 +477,8 @@ div:has(> input[placeholder*="Tìm"]) svg,
 div:has(> input[placeholder*="search" i]) svg {
   position: relative !important;
   z-index: 11 !important;
-  color: #ffffff !important;
+  color: #000000 !important;
+  stroke: #000000 !important;
   filter: none !important;
 }
 
@@ -488,7 +489,7 @@ div:has(> input[placeholder*="Tìm"]) button,
 div:has(> input[placeholder*="search" i]) button {
   position: relative !important;
   z-index: 12 !important;
-  color: #ffffff !important;
+  color: #000000 !important;
 }
 
 /* =========================================================================

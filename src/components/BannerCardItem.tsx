@@ -37,24 +37,18 @@ export const BannerCardItem: React.FC<BannerCardItemProps> = ({
   onClick
 }) => {
   const [hasError, setHasError] = useState(false);
-  const glowColor = getSlideThemeColor(slide);
-  const rgb = hexToRgb(glowColor);
   const isGradientBanner = !slide.backgroundImage || slide.id === 'banner-prototype-test-build';
 
   return (
     <div 
       onClick={onClick}
-      className={`banner-card w-full h-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#181818] select-none transition-all duration-700 cursor-pointer ${
+      className={`banner-card w-full h-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#181818] select-none transition-all duration-500 cursor-pointer border ${
         isActive 
-          ? 'ring-1' 
-          : 'shadow-xl ring-1 ring-white/10 hover:ring-white/20'
+          ? 'border-white/30 shadow-2xl shadow-black/80' 
+          : 'border-white/10 hover:border-white/20 shadow-lg shadow-black/50'
       }`}
       style={{
         backfaceVisibility: 'hidden',
-        boxShadow: isActive
-          ? `0 0 35px 2px rgba(${rgb}, 0.45), 0 16px 50px 0 rgba(${rgb}, 0.25), 0 20px 60px rgba(0, 0, 0, 0.9)`
-          : undefined,
-        borderColor: isActive ? `rgba(${rgb}, 0.6)` : undefined,
       }}
     >
       {/* Background Banner Content - Edge to Edge */}

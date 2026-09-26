@@ -11,6 +11,7 @@ import { StartupVideoIntro } from './components/StartupVideoIntro';
 import { OobeSetupModal, OobeSetupConfig } from './components/OobeSetupModal';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
+import { EventPage } from './pages/Event';
 import { LiveTV } from './pages/LiveTV';
 import { News } from './pages/News';
 import { Article } from './pages/Article';
@@ -497,6 +498,11 @@ export default function App() {
             routeState={routeState}
           />
         );
+
+      case '/event':
+      case '/events':
+      case '/su-kien':
+        return <EventPage navigate={navigate} />;
 
       case '/music':
       case '/v-music':

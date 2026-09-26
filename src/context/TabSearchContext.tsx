@@ -7,9 +7,17 @@ interface TabSearchContextType {
   placeholder: string;
   setCustomPlaceholder: (placeholder: string | null) => void;
   currentRoute: string;
+  // Shared / backward-compatible
   isSearchExpanded: boolean;
   setIsSearchExpanded: (expanded: boolean) => void;
   toggleSearchExpanded: () => void;
+  // Status Bar specific search
+  isStatusBarSearchExpanded: boolean;
+  setIsStatusBarSearchExpanded: (expanded: boolean) => void;
+  toggleStatusBarSearch: () => void;
+  // Tab View specific search
+  isTabViewSearchExpanded: boolean;
+  setIsTabViewSearchExpanded: (expanded: boolean) => void;
 }
 
 const TabSearchContext = createContext<TabSearchContextType | undefined>(undefined);
@@ -115,13 +123,18 @@ interface TabSearchProviderProps {
 export const TabSearchProvider: React.FC<TabSearchProviderProps> = ({ children, currentRoute }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [customPlaceholder, setCustomPlaceholder] = useState<string | null>(null);
-  const [isSearchExpanded, setIsSearchExpanded] = useState<boolean>(false);
+  const [isStatusBarSearchExpanded, setIsStatusBarSearchExpanded] = useState<boolean>(false);
+  const [isTabViewSearchExpanded, setIsTabViewSearchExpanded] = useState<boolean>(false);
+
+  // Backward-compatible computed flag: true if either is expanded
+  const isSearchExpanded = isStatusBarSearchExpanded || isTabViewSearchExpanded;
 
   // Clear search query whenever route changes so search belongs to each tab
   useEffect(() => {
     setSearchQuery('');
     setCustomPlaceholder(null);
-    setIsSearchExpanded(false);
+    setIsStatusBarSearchExpanded(false);
+    setIsTabViewSearchExpanded(false);
   }, [currentRoute]);
 
   const placeholder = useMemo(() => {
@@ -140,8 +153,27 @@ export const TabSearchProvider: React.FC<TabSearchProviderProps> = ({ children, 
     setSearchQuery('');
   };
 
+  const toggleStatusBarSearch = () => {
+    setIsStatusBarSearchExpanded((prev) => !prev);
+  };
+
   const toggleSearchExpanded = () => {
-    setIsSearchExpanded((prev) => !prev);
+    // If neither is expanded, expand tab view search by default
+    if (!isSearchExpanded) {
+      setIsTabViewSearchExpanded(true);
+    } else {
+      setIsStatusBarSearchExpanded(false);
+      setIsTabViewSearchExpanded(false);
+    }
+  };
+
+  const setIsSearchExpanded = (expanded: boolean) => {
+    if (!expanded) {
+      setIsStatusBarSearchExpanded(false);
+      setIsTabViewSearchExpanded(false);
+    } else {
+      setIsTabViewSearchExpanded(true);
+    }
   };
 
   return (
@@ -156,6 +188,11 @@ export const TabSearchProvider: React.FC<TabSearchProviderProps> = ({ children, 
         isSearchExpanded,
         setIsSearchExpanded,
         toggleSearchExpanded,
+        isStatusBarSearchExpanded,
+        setIsStatusBarSearchExpanded,
+        toggleStatusBarSearch,
+        isTabViewSearchExpanded,
+        setIsTabViewSearchExpanded,
       }}
     >
       {children}
@@ -177,6 +214,11 @@ export const useTabSearch = (): TabSearchContextType => {
       isSearchExpanded: false,
       setIsSearchExpanded: () => {},
       toggleSearchExpanded: () => {},
+      isStatusBarSearchExpanded: false,
+      setIsStatusBarSearchExpanded: () => {},
+      toggleStatusBarSearch: () => {},
+      isTabViewSearchExpanded: false,
+      setIsTabViewSearchExpanded: () => {},
     };
   }
   return context;

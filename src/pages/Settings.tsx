@@ -190,9 +190,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
         <h1 className="text-3xl font-extrabold text-white tracking-tight">
           Cài đặt
         </h1>
-        <p className="text-xs sm:text-sm text-white/70">
-          Quản lý giao diện, trợ năng và tiện ích hệ thống.
-        </p>
 
         {/* Search Bar Capsule with Spotlight Search Styling */}
         <div className="pt-2">
@@ -366,9 +363,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     Spatial Glass
                   </h2>
                 </div>
-                <p className="text-xs text-white/70 mt-1 leading-relaxed">
-                  Tùy chỉnh độ mờ (blur) và độ trong suốt (opacity) cho các thành phần kính không gian trên VNRT Online
-                </p>
               </div>
             </div>
 
@@ -493,9 +487,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <span className="font-semibold text-white text-sm block">
                       Độ mờ hậu cảnh (Blur)
                     </span>
-                    <span className="text-[11px] text-white/70">
-                      Hiệu ứng nhòe mờ làm nổi bật chi tiết sau các lớp kính
-                    </span>
                   </div>
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/20">
@@ -558,9 +549,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <span className="font-semibold text-white text-sm block">
                       Độ trong suốt / Đậm màu (Opacity)
                     </span>
-                    <span className="text-[11px] text-white/70">
-                      Tỷ lệ phủ màu bề mặt kính từ gần như trong suốt đến tối màu đậm
-                    </span>
                   </div>
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/20">
@@ -618,7 +606,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 settings.liquidDistortion ? 'ring-1 ring-sky-400/40 bg-sky-500/[0.04]' : ''
               }`}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <Droplet className="w-4.5 h-4.5 text-sky-400" />
@@ -628,12 +616,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                         Đang bật
                       </span>
                     )}
-                  </div>
-                  <div className="text-xs text-white/80 font-medium">
-                    Test distortion of liquid elements
-                  </div>
-                  <div className="text-[11px] text-white/60 leading-relaxed">
-                    Khi bật lên thì hiệu ứng Spatial Glass sẽ biến dạng hình giống như giọt nước / khối thủy tinh (kiểu backdrop blur distortion) với độ cong thấu kính và khúc xạ quang học.
                   </div>
                 </div>
 
@@ -656,14 +638,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   />
                 </button>
               </div>
-
-              {/* Status Note when Active */}
-              {settings.liquidDistortion && (
-                <div className="pt-1.5 flex items-center gap-2 text-[11px] text-sky-300 font-mono bg-sky-950/40 border border-sky-500/30 rounded-xl px-3 py-2">
-                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping shrink-0" />
-                  <span>Đã áp dụng hiệu ứng giọt nước lỏng & thấu kính khúc xạ cho toàn bộ Spatial Glass.</span>
-                </div>
-              )}
             </div>
           </div>
         </section>
@@ -684,9 +658,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <h2 className="text-base font-bold text-white leading-tight">
                 Giao diện
               </h2>
-              <p className="text-xs text-white/70 mt-1 leading-relaxed">
-                Tùy biến thanh điều hướng chính (Top bar, Sidebar hoặc Tab View) và tỷ lệ cỡ chữ toàn hệ thống
-              </p>
             </div>
           </div>
 
@@ -711,9 +682,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       <Layout className="w-4.5 h-4.5 text-white" />
                       <span>Thanh điều hướng chính</span>
                     </div>
-                    <div className="text-xs text-white/70 mt-1 leading-normal">
-                      Lựa chọn kiểu thanh điều hướng phù hợp với trải nghiệm của bạn: Top bar phía trên cùng, Sidebar bên trái hoặc Tab View dạng viên thuốc nổi.
-                    </div>
                   </div>
                 </div>
 
@@ -727,39 +695,30 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       updateSetting('navigationMode', 'topbar');
                       updateSetting('floatyBar', false);
                     }}
-                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                    className={`p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer relative group ${
                       settings.navigationMode === 'topbar' && !settings.floatyBar
                         ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
                         : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                          settings.navigationMode === 'topbar' && !settings.floatyBar
-                            ? 'bg-white text-black'
-                            : 'bg-white/10 text-white/60 group-hover:text-white'
-                        }`}>
-                          <PanelTop className="w-4.5 h-4.5" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold text-white block">Top bar</span>
-                          <span className="text-[11px] text-white/60">Thanh trên cùng</span>
-                        </div>
-                      </div>
-
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                         settings.navigationMode === 'topbar' && !settings.floatyBar
                           ? 'bg-white text-black'
-                          : 'border border-white/20 text-transparent'
+                          : 'bg-white/10 text-white/60 group-hover:text-white'
                       }`}>
-                        <Check className="w-3 h-3 stroke-[3]" />
+                        <PanelTop className="w-4.5 h-4.5" />
                       </div>
+                      <span className="text-sm font-bold text-white block">Top bar</span>
                     </div>
 
-                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
-                      Thanh điều hướng ngang hiện đại phía trên cùng phong cách truyền hình với logo VNRT Online và menu danh mục.
-                    </p>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                      settings.navigationMode === 'topbar' && !settings.floatyBar
+                        ? 'bg-white text-black'
+                        : 'border border-white/20 text-transparent'
+                    }`}>
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
                   </button>
 
                   {/* Tùy chọn 2: Sidebar */}
@@ -770,39 +729,30 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       updateSetting('navigationMode', 'sidebar');
                       updateSetting('floatyBar', false);
                     }}
-                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                    className={`p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer relative group ${
                       settings.navigationMode === 'sidebar' && !settings.floatyBar
                         ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
                         : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                          settings.navigationMode === 'sidebar' && !settings.floatyBar
-                            ? 'bg-white text-black'
-                            : 'bg-white/10 text-white/60 group-hover:text-white'
-                        }`}>
-                          <PanelLeft className="w-4.5 h-4.5" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold text-white block">Sidebar</span>
-                          <span className="text-[11px] text-white/60">Thanh bên trái</span>
-                        </div>
-                      </div>
-
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                         settings.navigationMode === 'sidebar' && !settings.floatyBar
                           ? 'bg-white text-black'
-                          : 'border border-white/20 text-transparent'
+                          : 'bg-white/10 text-white/60 group-hover:text-white'
                       }`}>
-                        <Check className="w-3 h-3 stroke-[3]" />
+                        <PanelLeft className="w-4.5 h-4.5" />
                       </div>
+                      <span className="text-sm font-bold text-white block">Sidebar</span>
                     </div>
 
-                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
-                      Giao diện thanh menu dọc bên trái đầy đủ với đồng hồ số, ô tìm kiếm nhanh, các danh mục và nút thu gọn.
-                    </p>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                      settings.navigationMode === 'sidebar' && !settings.floatyBar
+                        ? 'bg-white text-black'
+                        : 'border border-white/20 text-transparent'
+                    }`}>
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
                   </button>
 
                   {/* Tùy chọn 3: Tab View */}
@@ -813,39 +763,30 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       updateSetting('navigationMode', 'tabview');
                       updateSetting('floatyBar', true);
                     }}
-                    className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                    className={`p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer relative group ${
                       settings.navigationMode === 'tabview' || settings.floatyBar
                         ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
                         : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
-                          settings.navigationMode === 'tabview' || settings.floatyBar
-                            ? 'bg-white text-black'
-                            : 'bg-white/10 text-white/60 group-hover:text-white'
-                        }`}>
-                          <Compass className="w-4.5 h-4.5" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold text-white block">Tab View</span>
-                          <span className="text-[11px] text-white/60">Thanh viên thuốc nổi</span>
-                        </div>
-                      </div>
-
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                         settings.navigationMode === 'tabview' || settings.floatyBar
                           ? 'bg-white text-black'
-                          : 'border border-white/20 text-transparent'
+                          : 'bg-white/10 text-white/60 group-hover:text-white'
                       }`}>
-                        <Check className="w-3 h-3 stroke-[3]" />
+                        <Compass className="w-4.5 h-4.5" />
                       </div>
+                      <span className="text-sm font-bold text-white block">Tab View</span>
                     </div>
 
-                    <p className="text-xs text-white/70 mt-3 leading-relaxed">
-                      Thanh điều hướng dạng viên thuốc lơ lửng phong cách frosted glass hiện đại gồm Home, Watch, News, Settings và nút Tìm kiếm riêng.
-                    </p>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                      settings.navigationMode === 'tabview' || settings.floatyBar
+                        ? 'bg-white text-black'
+                        : 'border border-white/20 text-transparent'
+                    }`}>
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
                   </button>
                 </div>
               </div>
@@ -866,12 +807,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <PanelRight className="w-4.5 h-4.5 text-white" />
                     <span>Settings drawer</span>
-                  </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Settings open in a drawer on the right instead of a tab page
-                  </div>
-                  <div className="text-[11px] text-white/60 mt-1">
-                    Khi bật, trang Cài đặt sẽ mở dạng ngăn kéo (drawer) trượt mượt mà từ cạnh phải màn hình thay vì tải lại toàn trang tab.
                   </div>
                 </div>
 
@@ -915,12 +850,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <Sparkles className="w-4.5 h-4.5 text-white" />
                     <span>Shiny outline</span>
                   </div>
-                  <div className="text-xs text-white/70 leading-normal">
-                    Viền 2 cạnh trên dưới phản chiếu kính mờ cho toàn bộ giao diện
-                  </div>
-                  <div className="text-[11px] text-white/60 leading-relaxed">
-                    Thêm viền phản chiếu ánh sáng trắng (Specular top & bottom rim highlight) ở 2 cạnh trên và dưới của các nút status bar vào toàn bộ elements trong ứng dụng (ô kênh, menus, buttons, toggles, nền danh mục, các khối thẻ, banner, search boxes và input boxes).
-                  </div>
                 </div>
 
                 {/* Orange Toggle Switch */}
@@ -959,17 +888,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent space-y-4 transition-colors border border-white/20 hover:border-white/40 hover:bg-white/[0.03]"
               >
                 {/* Header row with Title and Toggle */}
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
                       <MousePointer className="w-4.5 h-4.5 text-white" />
                       <span>V-Cursor</span>
-                    </div>
-                    <div className="text-xs text-white/70 leading-normal">
-                      Sử dụng con trỏ chuột độc quyền của VPlay thay vì của device
-                    </div>
-                    <div className="text-[11px] text-white/60 leading-relaxed">
-                      Con trỏ mặc định là đen viền trắng chuẩn macOS. Cho phép thay đổi màu thân, viền, kích thước và hiệu ứng phát sáng.
                     </div>
                   </div>
 
@@ -1065,7 +988,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <div className="space-y-2">
                       <div className="text-xs font-semibold text-white flex items-center justify-between">
                         <span>Mẫu con trỏ có sẵn</span>
-                        <span className="text-[10px] text-white/60">Chọn nhanh phong cách</span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {VCURSOR_PRESETS.map((preset) => {
@@ -1102,9 +1024,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                               <div className="min-w-0 flex-1">
                                 <div className="text-xs font-semibold text-white truncate flex items-center gap-1">
                                   <span>{preset.name}</span>
-                                </div>
-                                <div className="text-[10px] text-white/60 truncate">
-                                  {preset.desc}
                                 </div>
                               </div>
 
@@ -1265,7 +1184,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                         <div>
                           <div className="text-xs font-semibold text-white">Phát sáng Neon</div>
-                          <div className="text-[10px] text-white/60">Hiệu ứng quầng sáng nhẹ</div>
                         </div>
                         <button
                           type="button"
@@ -1304,9 +1222,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
                       <Type className="w-4.5 h-4.5 text-white" />
                       <span>Phông chữ</span>
-                    </div>
-                    <div className="text-xs text-white/70 mt-1 leading-normal">
-                      Chọn phông chữ hiển thị cho ứng dụng. Tùy chọn sẽ được áp dụng ngay lập tức cho toàn bộ giao diện.
                     </div>
                   </div>
                   <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white border border-white/20 shrink-0">
@@ -1355,9 +1270,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                               {font.name}
                             </span>
                           </div>
-                          <p className="text-[11px] text-white/70 mt-1 leading-snug">
-                            {font.subtext}
-                          </p>
                           <div 
                             className="text-xs text-white/80 mt-2 px-2 py-1 rounded-lg bg-black/40 border border-white/15 truncate tracking-wide"
                             style={{ fontFamily: font.cssFamily }}
@@ -1395,9 +1307,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       <KeyboardIcon className="w-4.5 h-4.5 text-white" />
                       <span>Giao diện bàn phím ảo (V-Board Skins)</span>
                     </div>
-                    <div className="text-xs text-white/70 mt-1 leading-normal">
-                      Tùy chọn phong cách hiển thị cho bàn phím ảo V-board. Mỗi giao diện được mô phỏng chuẩn xác từ bố cục, phím bấm đến âm thanh tương tác.
-                    </div>
                   </div>
                   <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/10 text-white border border-white/20 shrink-0">
                     {VBOARD_SKIN_OPTIONS.find(s => s.id === (settings.vboardSkin || 'default'))?.name.split(' ')[0] || 'Default'}
@@ -1430,9 +1339,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                                 {skinOption.name}
                               </span>
                             </div>
-                            <p className="text-[11px] text-white/70 mt-1.5 leading-snug">
-                              {skinOption.description}
-                            </p>
                           </div>
 
                           <div 
@@ -1591,9 +1497,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <span>Màn hình khởi động & VNRT Ads</span>
                   </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Phát ngẫu nhiên VNRT Ads (VTV1, VTV6, VTV10) và hiệu ứng Spatial Glass khi khởi chạy ứng dụng
-                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
@@ -1630,9 +1533,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                     <RotateCw className="w-4 h-4 text-white shrink-0" />
                     <span>Tải lại ứng dụng (Reload App)</span>
                   </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Làm mới toàn bộ dữ liệu, bộ nhớ tạm và tái khởi động ứng dụng mượt mà
-                  </div>
                 </div>
 
                 <button
@@ -1667,9 +1567,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <h2 className="text-base font-bold text-white leading-tight">
                 Trợ năng
               </h2>
-              <p className="text-xs text-white/70 mt-1 leading-relaxed">
-                Điều chỉnh tự động trượt banner và tương tác menu
-              </p>
             </div>
           </div>
 
@@ -1680,9 +1577,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <div>
                   <div className="font-semibold text-white text-sm">
                     Tự động trượt hình Banner
-                  </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Banner hình ảnh ở trang chủ tự động trượt sau mỗi 5 giây
                   </div>
                 </div>
 
@@ -1713,9 +1607,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="font-semibold text-white text-sm">
                     Tự động ẩn Sidebar
                   </div>
-                  <div className="text-xs text-white/70 mt-1 leading-normal">
-                    Tự động thu gọn thanh menu khi không di chuột vào
-                  </div>
                 </div>
 
                 {/* Orange Toggle Switch */}
@@ -1745,9 +1636,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div>
                     <div className="font-semibold text-white text-sm flex items-center gap-2">
                       <span>Inspect Elements (Inspect web này)</span>
-                    </div>
-                    <div className="text-xs text-white/70 mt-1 leading-normal">
-                      Bật công cụ soi phần tử DOM, tra cứu mã nguồn HTML, xem thuộc tính CSS và mở bảng điều khiển DevTools trực tiếp trên web
                     </div>
                   </div>
 
@@ -1797,9 +1685,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <h2 className="text-base font-bold text-white leading-tight">
                 Giới thiệu
               </h2>
-              <p className="text-xs text-white/70 mt-1 leading-relaxed">
-                Thông tin hệ thống VNRT Online, hồ sơ người dùng và cài đặt ban đầu
-              </p>
             </div>
           </div>
 
@@ -1813,7 +1698,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   </div>
                   <div>
                     <h3 className="font-bold text-white text-sm">Vplay by Waves</h3>
-                    <p className="text-xs text-white/70">Nền tảng truyền hình & tiện ích Việt Nam thế hệ mới</p>
                   </div>
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/10 text-white border border-white/20">
@@ -1847,9 +1731,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <div className="font-semibold text-white text-sm flex items-center gap-2">
                     <User className="w-4 h-4 text-white" />
                     <span>Tên người dùng (Username)</span>
-                  </div>
-                  <div className="text-xs text-white/70 mt-0.5 leading-normal">
-                    Tên hiển thị chào mừng trong hệ thống (Mặc định: <span className="text-white font-medium">User</span>)
                   </div>
                 </div>
 
@@ -1922,9 +1803,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <Monitor className="w-4 h-4 text-white" />
                   <span>Màn hình thiết lập OOBE lần đầu</span>
                 </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Trải nghiệm lại màn hình chào mừng và thiết lập ban đầu phong cách Out-of-Box Experience
-                </div>
               </div>
 
               <button
@@ -1943,9 +1821,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="font-semibold text-white text-sm">
                   Dọn dẹp bộ nhớ tạm (Cache)
-                </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Xóa bộ nhớ đệm lịch sử, dữ liệu kênh tuỳ chỉnh và khôi phục trạng thái chuẩn
                 </div>
               </div>
               <button
@@ -1981,9 +1856,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <h2 className="text-base font-bold text-white leading-tight">
                 Công cụ
               </h2>
-              <p className="text-xs text-white/70 mt-1 leading-relaxed">
-                Tùy chỉnh tính năng đa nhiệm V-Duo, trợ lý Copilot AI và phạm vi tìm kiếm
-              </p>
             </div>
           </div>
 
@@ -2003,9 +1875,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                       Mở tính năng V-Duo (Chia đôi màn hình)
                     </span>
                   </div>
-                  <p className="text-xs text-white/70 mt-0.5">
-                    Chia ứng dụng làm 2 nửa màn hình để thực hiện 2 thao tác khác nhau đồng thời (TV, Shop, Đặt xe, Driving Simulator, v.v.)
-                  </p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
@@ -2016,9 +1885,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="font-semibold text-white text-sm">
                   Merge Spotlight Search to Copilot
-                </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Hợp nhất tìm kiếm nhanh Spotlight Search vào trợ lý Copilot for VNRT Online để có trải nghiệm tìm kiếm thông minh hơn
                 </div>
               </div>
 
@@ -2045,9 +1911,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="font-semibold text-white text-sm">
                   Gợi ý lệnh Slash Commands
-                </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Hiển thị các phím tắt lệnh nhanh (/search, /mode, /navigation, /subscribe) phía trên khung chat
                 </div>
               </div>
 
@@ -2078,9 +1941,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <div className="font-semibold text-white text-sm">
                   Tìm kiếm: Danh mục hệ thống
                 </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Hiển thị các tab và điều hướng hệ thống trong kết quả tìm kiếm Spotlight
-                </div>
               </div>
 
               <div 
@@ -2103,9 +1963,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <div className="font-semibold text-white text-sm">
                   Tìm kiếm: Tin tức & Cổng thông tin
                 </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Hiển thị bài viết tin tức, thông báo cộng đồng và sự kiện
-                </div>
               </div>
 
               <div 
@@ -2127,9 +1984,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="font-semibold text-white text-sm">
                   Tìm kiếm: Kênh truyền hình
-                </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Hiển thị danh sách kênh truyền hình trực tiếp theo tên hoặc nhóm kênh
                 </div>
               </div>
 
@@ -2163,9 +2017,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <h2 className="text-base font-bold text-white leading-tight">
                   Thử nghiệm
                 </h2>
-                <p className="text-xs text-white/70 mt-1 leading-relaxed">
-                  Bật/tắt các cờ tính năng thử nghiệm (Feature Flags), giao diện tối giản và các tiện ích mới
-                </p>
               </div>
             </div>
 
@@ -2185,9 +2036,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Minimalism Home Page</span>
-                </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Khi bật thì home page chỉ xuất hiện nguyên 1 thanh search đơn giản, ko xuất hiện gì thêm
                 </div>
               </div>
 
@@ -2214,9 +2062,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Animation Test</span>
                 </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Thêm thật nhiều animation và motion mượt mà vào toàn bộ ứng dụng: chuyển trang đàn hồi và hiệu ứng spring
-                </div>
               </div>
 
               <button
@@ -2242,9 +2087,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Experimental V-board</span>
                 </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Bàn phím ảo độc quyền V-board mang phong cách iOS dark mode khi chạm ô tìm kiếm
-                </div>
               </div>
 
               <button
@@ -2269,9 +2111,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-white text-sm">Vertical Status Bar</span>
-                </div>
-                <div className="text-xs text-white/70 mt-1 leading-normal">
-                  Hiển thị thanh trạng thái và Dynamic Island đặt dọc ở góc trên bên phải màn hình
                 </div>
               </div>
 

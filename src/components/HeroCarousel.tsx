@@ -256,7 +256,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = React.memo(({
               onClick={() => goToSlide(idx)}
               className={`transition-all duration-500 rounded-full cursor-pointer ${
                 isActive
-                  ? 'w-7 sm:w-8 h-1.5 bg-[#E50914] shadow-[0_0_12px_rgba(229,9,20,0.8)]'
+                  ? 'w-7 sm:w-8 h-1.5 bg-[#E50914]'
                   : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'
               }`}
               aria-label={`Đi tới thẻ banner ${idx + 1}`}

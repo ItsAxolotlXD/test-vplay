@@ -333,7 +333,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
             title="VNRT Online"
           >
             <img
-              src="https://static.wikia.nocookie.net/ep-deo/images/1/1d/New_logo.png/revision/latest?cb=20260924062053"
+              src="https://static.wikia.nocookie.net/ep-deo/images/5/51/New_official_vnrt_logo.png/revision/latest?cb=20260926162432"
               alt="VNRT Online"
               referrerPolicy="no-referrer"
               className="h-8 sm:h-9 w-auto max-w-[140px] object-contain shrink-0"
@@ -618,6 +618,24 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
           <span className="truncate">V-Duo (Chia đôi màn hình)</span>
           <span className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300">
             Mới
+          </span>
+        </button>
+
+        {/* Event (Sự kiện Gathering Discord) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-event' : 'nav-item-event'}
+          onClick={() => handleNavClick('/event')}
+          title="Sự kiện Gathering Discord & VNRT Online"
+          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/event') || isActive('/events')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <Sparkles className="w-5 h-5 shrink-0 text-red-400" />
+          <span className="truncate">Event (Gathering)</span>
+          <span className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-600/30 text-red-300 border border-red-500/30">
+            HOT
           </span>
         </button>
 
@@ -1260,7 +1278,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                 title="VNRT Online"
               >
                 <img
-                  src="https://static.wikia.nocookie.net/ep-deo/images/1/1d/New_logo.png/revision/latest?cb=20260924062053"
+                  src="https://static.wikia.nocookie.net/ep-deo/images/5/51/New_official_vnrt_logo.png/revision/latest?cb=20260926162432"
                   alt="VNRT Online"
                   referrerPolicy="no-referrer"
                   className="w-8 h-8 object-contain shrink-0"
@@ -1399,6 +1417,18 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                   }`}
                 >
                   <ShoppingBag className="w-4 h-4 text-white shrink-0" />
+                </button>
+
+                {/* Event mini */}
+                <button
+                  id="mini-nav-item-event"
+                  onClick={() => handleNavClick('/event')}
+                  title="Event"
+                  className={`w-10 h-10 min-w-[40px] min-h-[40px] shrink-0 rounded-[12px] flex items-center justify-center p-0 transition-all cursor-pointer ${
+                    isActive('/event') || isActive('/events') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                  }`}
+                >
+                  <Sparkles className="w-4 h-4 text-red-400 shrink-0" />
                 </button>
 
                 <div className="w-6 border-t border-white/10 my-0.5 shrink-0" />

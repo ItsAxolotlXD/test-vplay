@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { BannerCardItem } from '../components/BannerCardItem';
 import { OnAirSlider } from '../components/OnAirSlider';
@@ -11,6 +11,7 @@ import { VplayAppsHomeGrid } from '../components/VplayAppsHomeGrid';
 import { useTabSearch } from '../context/TabSearchContext';
 import { HomeSpotlightSearch } from '../components/HomeSpotlightSearch';
 import { HomeCountdownWidget } from '../components/HomeCountdownWidget';
+import { DiscordEventSection } from '../components/DiscordEventSection';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 
 interface HomeProps {
@@ -126,6 +127,9 @@ export const Home: React.FC<HomeProps> = ({
           channels={channels}
         />
       ) : null}
+
+      {/* Brand Official VNRT Logo & Gathering Discord Event Area */}
+      <DiscordEventSection navigate={navigate} showOpenEventTab={true} />
 
       {/* 1. Banner Cards Carousel */}
       <HeroCarousel

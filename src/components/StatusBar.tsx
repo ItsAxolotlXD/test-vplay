@@ -23,7 +23,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   currentChannel,
   onSelectChannel,
 }) => {
-  const { isSearchExpanded, toggleSearchExpanded } = useTabSearch();
+  const { isStatusBarSearchExpanded, toggleStatusBarSearch } = useTabSearch();
   const [timeStr, setTimeStr] = useState('9:41');
   const [fullDateStr, setFullDateStr] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
@@ -517,11 +517,11 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         {/* 3. BOTTOM FOOT CLUSTER ("Dưới tít cùng chân status bar - Search Button Only") */}
         <div className="flex flex-col items-center pointer-events-auto">
           {/* CIRCULAR SEARCH BUTTON AT BOTTOM FOOT - Morphs to Center Float Search Bar */}
-          {!isSearchExpanded ? (
+          {!isStatusBarSearchExpanded ? (
             <motion.button
               layoutId="vplay-floating-search-pill"
               type="button"
-              onClick={() => toggleSearchExpanded()}
+              onClick={() => toggleStatusBarSearch()}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{
