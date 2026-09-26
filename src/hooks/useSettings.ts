@@ -88,6 +88,7 @@ export interface SystemSettings {
   shinyOutline: boolean;
   spatialGlassBlur: number; // 0 to 50px
   spatialGlassOpacity: number; // 5 to 100 percent
+  liquidDistortion?: boolean; // Biến dạng giọt nước / khối thủy tinh lỏng cho Spatial Glass
   vcursorEnabled: boolean; // Bật / Tắt con trỏ V-Cursor
   vcursorColor: string; // Màu thân con trỏ (mặc định đen #000000)
   vcursorBorderColor: string; // Màu viền con trỏ (mặc định trắng #FFFFFF)
@@ -186,6 +187,7 @@ export const DEFAULT_SETTINGS: SystemSettings = {
   shinyOutline: true,
   spatialGlassBlur: 20,
   spatialGlassOpacity: 65,
+  liquidDistortion: false,
   vcursorEnabled: false,
   vcursorColor: '#000000',
   vcursorBorderColor: '#FFFFFF',
@@ -335,6 +337,7 @@ export const getStoredSettings = (): SystemSettings => {
         navigationMode: navMode,
         spatialGlassBlur: glassBlur,
         spatialGlassOpacity: glassOpacity,
+        liquidDistortion: typeof parsed.liquidDistortion === 'boolean' ? parsed.liquidDistortion : false,
         appBackground: parsed.appBackground || 'default',
         floatyBar: isFloaty,
         vboardSkin: ['default', 'ios', 'google', 'butterfly', 'physical'].includes(parsed.vboardSkin) ? parsed.vboardSkin : 'default',
@@ -425,6 +428,16 @@ export const applySystemSettings = (settings: SystemSettings) => {
   } else {
     document.documentElement.classList.remove('has-shiny-outline');
     document.body.classList.remove('has-shiny-outline');
+  }
+
+  // Apply Liquid Distortion for Spatial Glass
+  const isLiquidActive = Boolean(settings.liquidDistortion);
+  if (isLiquidActive) {
+    document.documentElement.classList.add('has-liquid-distortion');
+    document.body.classList.add('has-liquid-distortion');
+  } else {
+    document.documentElement.classList.remove('has-liquid-distortion');
+    document.body.classList.remove('has-liquid-distortion');
   }
 };
 

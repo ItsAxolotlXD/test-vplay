@@ -24,6 +24,7 @@ import {
   Keyboard as KeyboardIcon,
   Sliders,
   Droplets,
+  Droplet,
   MousePointer,
   MousePointerClick,
   Info,
@@ -106,7 +107,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const isSpatialGlassVisible = matchesSearch(
     'Spatial Glass', 'Kính', 'Glass', 'Độ mờ', 'Độ trong', 'Blur', 'Opacity',
     'Transparency', 'Thành phần', 'Kính không gian', 'Hậu cảnh', 'Trong suốt',
-    'Liquid UI', 'Slider', 'Thanh trượt'
+    'Liquid UI', 'Slider', 'Thanh trượt', 'Liquid Distortion', 'Liquid', 'Distortion', 'Giọt nước', 'Thủy tinh'
   );
 
   const isSection1Visible = matchesSearch(
@@ -404,23 +405,42 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
 
             {/* Live Spatial Glass Card Element inside preview */}
             <div 
-              className="relative z-10 w-full max-w-sm rounded-[18px] p-3.5 sm:p-4 text-center transition-all duration-100 flex items-center justify-between gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.36)] border border-white/25"
+              className={`relative z-10 w-full max-w-sm rounded-[18px] p-3.5 sm:p-4 text-center transition-all duration-300 flex items-center justify-between gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.36)] border border-white/25 spatial-liquid-card ${
+                settings.liquidDistortion ? 'liquid-droplet-active' : ''
+              }`}
               style={{
-                backdropFilter: `blur(${spatialBlur}px) saturate(175%)`,
-                WebkitBackdropFilter: `blur(${spatialBlur}px) saturate(175%)`,
+                backdropFilter: `blur(${spatialBlur}px) saturate(${settings.liquidDistortion ? 220 : 175}%) contrast(${settings.liquidDistortion ? 110 : 100}%)`,
+                WebkitBackdropFilter: `blur(${spatialBlur}px) saturate(${settings.liquidDistortion ? 220 : 175}%) contrast(${settings.liquidDistortion ? 110 : 100}%)`,
                 backgroundColor: `rgba(28, 27, 36, ${spatialOpacity / 100})`,
+                ...(settings.liquidDistortion ? {
+                  borderRadius: '34px 22px 30px 24px / 24px 32px 22px 34px',
+                  boxShadow: '0 16px 40px rgba(0,0,0,0.45), inset 0 2.5px 12px rgba(255,255,255,0.5), inset 0 -2.5px 10px rgba(0,0,0,0.35)',
+                } : {})
               }}
             >
               <div className="flex items-center gap-3 text-left min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center shrink-0 shadow">
-                  <Sparkles className="w-4.5 h-4.5 text-white" />
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow transition-all ${
+                  settings.liquidDistortion 
+                    ? 'bg-sky-500/30 border border-sky-300/50 text-sky-200' 
+                    : 'bg-white/20 border border-white/30 text-white'
+                }`}>
+                  {settings.liquidDistortion ? (
+                    <Droplet className="w-4.5 h-4.5 text-sky-300 animate-pulse" />
+                  ) : (
+                    <Sparkles className="w-4.5 h-4.5 text-white" />
+                  )}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-extrabold text-xs sm:text-sm text-white tracking-tight truncate drop-shadow">
-                    Kính xem trước (Live Preview)
+                  <div className="font-extrabold text-xs sm:text-sm text-white tracking-tight truncate drop-shadow flex items-center gap-1.5">
+                    <span>Kính xem trước (Live Preview)</span>
+                    {settings.liquidDistortion && (
+                      <span className="text-[10px] text-sky-300 font-semibold px-1.5 py-0.2 rounded bg-sky-500/20 border border-sky-400/30">
+                        💧 Liquid
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] text-white/90 font-mono">
-                    Blur: {spatialBlur}px • Opacity: {spatialOpacity}%
+                    Blur: {spatialBlur}px • Opacity: {spatialOpacity}% {settings.liquidDistortion && '• Liquid: ON'}
                   </div>
                 </div>
               </div>
@@ -589,6 +609,61 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <span>100% (Đậm kín)</span>
                 </div>
               </div>
+            </div>
+
+            {/* Option con: Liquid Distortion */}
+            <div 
+              id="settings-card-liquid-distortion"
+              className={`settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3 transition-all ${
+                settings.liquidDistortion ? 'ring-1 ring-sky-400/40 bg-sky-500/[0.04]' : ''
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="font-semibold text-white text-sm flex items-center gap-2">
+                    <Droplet className="w-4.5 h-4.5 text-sky-400" />
+                    <span>Liquid Distortion</span>
+                    {settings.liquidDistortion && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 animate-pulse">
+                        Đang bật
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-white/80 font-medium">
+                    Test distortion of liquid elements
+                  </div>
+                  <div className="text-[11px] text-white/60 leading-relaxed">
+                    Khi bật lên thì hiệu ứng Spatial Glass sẽ biến dạng hình giống như giọt nước / khối thủy tinh (kiểu backdrop blur distortion) với độ cong thấu kính và khúc xạ quang học.
+                  </div>
+                </div>
+
+                {/* Orange Toggle Switch */}
+                <button
+                  id="toggle-liquid-distortion"
+                  type="button"
+                  role="switch"
+                  aria-checked={Boolean(settings.liquidDistortion)}
+                  onClick={() => updateSetting('liquidDistortion', !settings.liquidDistortion)}
+                  className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                    settings.liquidDistortion ? 'bg-[#FF6A00]' : 'bg-white/15'
+                  }`}
+                  aria-label="Bật hoặc tắt Liquid Distortion"
+                >
+                  <span
+                    className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                      settings.liquidDistortion ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Status Note when Active */}
+              {settings.liquidDistortion && (
+                <div className="pt-1.5 flex items-center gap-2 text-[11px] text-sky-300 font-mono bg-sky-950/40 border border-sky-500/30 rounded-xl px-3 py-2">
+                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping shrink-0" />
+                  <span>Đã áp dụng hiệu ứng giọt nước lỏng & thấu kính khúc xạ cho toàn bộ Spatial Glass.</span>
+                </div>
+              )}
             </div>
           </div>
         </section>
