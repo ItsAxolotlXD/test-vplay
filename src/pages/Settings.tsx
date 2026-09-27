@@ -31,8 +31,7 @@ import {
   Box,
   Wrench,
   FlaskConical,
-  ArrowLeft,
-  Columns2
+  ArrowLeft
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -153,7 +152,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const showSpatialGlass = isSearchActive ? isSpatialGlassVisible : (activeCategory === 'spatial_glass');
   const showAppearance = isSearchActive ? isSection1Visible : (activeCategory === 'appearance');
   const showAccessibility = isSearchActive ? isSection2Visible : (activeCategory === 'accessibility');
-  const showTools = isSearchActive ? (isSection4Visible || matchesSearch('Copilot', 'Lệnh', 'Slash', 'V-Duo')) : (activeCategory === 'tools');
+  const showTools = isSearchActive ? (isSection4Visible || matchesSearch('Copilot', 'Lệnh', 'Slash')) : (activeCategory === 'tools');
   const showAbout = isSearchActive ? isAboutVisible : (activeCategory === 'about');
   const showExperimental = isSearchActive ? isFeatureFlagsVisible : (activeCategory === 'experimental');
 
@@ -1715,7 +1714,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 </div>
                 <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10">
                   <span className="text-white/60 block text-[10px]">Đa nhiệm</span>
-                  <span className="text-white font-bold">V-Duo Ready</span>
+                  <span className="text-white font-bold">Spatial Ready</span>
                 </div>
                 <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10">
                   <span className="text-white/60 block text-[10px]">Mô phỏng</span>
@@ -1841,7 +1840,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
         </section>
       )}
 
-      {/* 5. Section: Công cụ (Tools & Search & V-Duo) */}
+      {/* 5. Section: Công cụ (Tools & Search) */}
       {showTools && (
         <section 
           id="settings-section-tools"
@@ -1860,26 +1859,6 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
           </div>
 
           <div className="space-y-3 pt-1">
-            {/* V-Duo Split Screen Quick Tool Card */}
-            <div 
-              onClick={() => navigate ? navigate('/v-duo') : window.location.assign('/v-duo')}
-              className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 cursor-pointer transition-all duration-200 group"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-                  <Columns2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-white text-sm transition-colors">
-                      Mở tính năng V-Duo (Chia đôi màn hình)
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
-            </div>
-
             {/* Merge Spotlight Search to Copilot */}
             <div className="settings-item-card p-4 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
               <div>

@@ -14,7 +14,6 @@ import {
   Radio,
   Music,
   ShoppingBag,
-  Columns2,
   Calendar
 } from 'lucide-react';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -48,7 +47,6 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
     { id: 'dock-event', label: 'Event', icon: Calendar, route: '/event' },
     { id: 'dock-music', label: 'Kho nhạc TV', icon: Music, route: '/music' },
     { id: 'dock-shop', label: 'Shop', icon: ShoppingBag, route: '/v-shop' },
-    { id: 'dock-vduo', label: 'V-Duo (Chia đôi màn hình)', icon: Columns2, route: '/v-duo' },
     { id: 'dock-vertical', label: 'VNRT Online Vertical', icon: Smartphone, route: '/vertical' },
     { id: 'dock-news', label: 'Tin tức', icon: Megaphone, route: '/news' },
     { id: 'dock-vflow', label: 'Mạng xã hội V-Flow', icon: Radio, route: '/v-flow' },

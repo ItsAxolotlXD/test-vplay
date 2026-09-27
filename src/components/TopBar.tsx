@@ -45,7 +45,6 @@ import {
   Armchair,
   Music,
   Settings,
-  Columns2,
   Car,
   Gauge
 } from 'lucide-react';
@@ -327,25 +326,6 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                 <span className="tracking-wide">Shop</span>
               </button>
 
-              {/* Item 3: V-Duo (Chia đôi màn hình) */}
-              <button
-                id="topbar-nav-vduo"
-                onClick={() => navigate('/v-duo')}
-                className={`relative px-4 py-2 rounded-full text-[14.5px] transition-all flex items-center gap-2 cursor-pointer group ${
-                  currentRoute === '/v-duo' || currentRoute.startsWith('/v-duo') || currentRoute === '/duo'
-                    ? 'bg-white text-black font-bold shadow-md'
-                    : 'text-white/90 hover:text-white hover:bg-white/10 font-medium'
-                }`}
-                title="V-Duo - Chia đôi màn hình thực hiện 2 thao tác cùng lúc"
-              >
-                <Columns2 className={`w-5 h-5 shrink-0 transition-transform ${
-                  currentRoute === '/v-duo' || currentRoute.startsWith('/v-duo') || currentRoute === '/duo'
-                    ? 'text-black'
-                    : 'text-cyan-400 group-hover:scale-105'
-                }`} />
-                <span className="tracking-wide">V-Duo</span>
-              </button>
-
               {/* Item 4: Event Tab */}
               <button
                 id="topbar-nav-event"
@@ -363,13 +343,6 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                     : 'text-red-400 group-hover:scale-105'
                 }`} />
                 <span className="tracking-wide">Event</span>
-                <span className={`px-1.5 py-0.5 rounded-full text-[9.5px] font-extrabold leading-none ${
-                  currentRoute === '/event' || currentRoute.startsWith('/event')
-                    ? 'bg-red-600 text-white'
-                    : 'bg-red-500/25 text-red-300 border border-red-400/40'
-                }`}>
-                  HOT
-                </span>
               </button>
 
               {/* Item 4: App v with Dropdown Menu */}

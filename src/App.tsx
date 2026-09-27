@@ -50,7 +50,6 @@ import {
   VRideBookingTab,
   DrivingSimulatorTab,
 } from './components/vapps';
-import { VDuoView } from './components/vduo/VDuoView';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
 import VplayVBoxTab from './components/VplayVBoxTab';
 import VStudyTab from './components/VStudyTab';
@@ -651,21 +650,6 @@ export default function App() {
       case '/driving':
       case '/lai-xe':
         return renderSpace360App('Driving Simulator', <DrivingSimulatorTab onBack={() => navigate('/space-360')} navigate={navigate} />);
-
-      case '/v-duo':
-      case '/vduo':
-      case '/duo':
-      case '/split-screen':
-        return (
-          <div className="w-full h-[calc(100vh-80px)] min-h-[640px] pb-6">
-            <VDuoView
-              channels={channels}
-              onSelectChannel={setCurrentChannel}
-              navigate={navigate}
-              onCloseVDuo={() => navigate('/')}
-            />
-          </div>
-        );
 
       case '/v-space':
       case '/v-apps':

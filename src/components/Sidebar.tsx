@@ -47,7 +47,6 @@ import {
   Music,
   ShoppingBag,
   UtensilsCrossed,
-  Columns2,
   Car,
   Gauge
 } from 'lucide-react';
@@ -603,24 +602,6 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
           <span className="truncate">Shop</span>
         </button>
 
-        {/* V-Duo (Chia đôi màn hình) */}
-        <button
-          id={isMobile ? 'mobile-nav-item-vduo' : 'nav-item-vduo'}
-          onClick={() => handleNavClick('/v-duo')}
-          title="V-Duo (Chia đôi màn hình)"
-          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
-            isActive('/v-duo') || isActive('/duo')
-              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
-              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
-          }`}
-        >
-          <Columns2 className="w-5 h-5 shrink-0 text-cyan-400" />
-          <span className="truncate">V-Duo (Chia đôi màn hình)</span>
-          <span className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300">
-            Mới
-          </span>
-        </button>
-
         {/* Event (Sự kiện Gathering Discord) */}
         <button
           id={isMobile ? 'mobile-nav-item-event' : 'nav-item-event'}
@@ -634,9 +615,6 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
         >
           <Sparkles className="w-5 h-5 shrink-0 text-red-400" />
           <span className="truncate">Event (Gathering)</span>
-          <span className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-600/30 text-red-300 border border-red-500/30">
-            HOT
-          </span>
         </button>
 
         {/* Divider 1 */}
