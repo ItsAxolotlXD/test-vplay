@@ -10,6 +10,7 @@ import { SplashScreen } from './components/SplashScreen';
 import { StartupVideoIntro } from './components/StartupVideoIntro';
 import { BrandTransitionScreen } from './components/BrandTransitionScreen';
 import { OobeSetupModal, OobeSetupConfig } from './components/OobeSetupModal';
+import { IntermissionMusicProvider } from './context/IntermissionMusicContext';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
 import { EventPage } from './pages/Event';
@@ -242,6 +243,7 @@ export default function App() {
       updateSetting('fontFamily', config.fontFamily);
     }
     setIsOobeOpen(false);
+    setShowBrandTransitionScreen(false);
   };
 
   // Modals state
@@ -805,7 +807,8 @@ export default function App() {
   const isFloatingSearchVisible = (isStatusBar || (isTopBarMode && !isFloatyMode)) && !isDedicatedSearchRoute;
 
   return (
-    <TabSearchProvider currentRoute={currentRoute}>
+    <IntermissionMusicProvider isActive={showBrandTransitionScreen || isOobeOpen}>
+      <TabSearchProvider currentRoute={currentRoute}>
       <div className={`min-h-screen ${hasCustomWallpaper ? 'has-custom-wallpaper bg-transparent' : 'bg-[#181818]'} text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative transition-colors duration-500 ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
         {/* Custom App Wallpaper Layer (Spatial Glass interactive background) */}
         {hasCustomWallpaper && (
@@ -987,6 +990,10 @@ export default function App() {
             onContinue={() => {
               setShowBrandTransitionScreen(false);
             }}
+            onStartSetup={() => {
+              setShowBrandTransitionScreen(false);
+              setIsOobeOpen(true);
+            }}
           />
         )}
 
@@ -1012,7 +1019,10 @@ export default function App() {
         {/* Windows 11 Style OOBE First-Time Setup Modal */}
         <OobeSetupModal
           isOpen={isOobeOpen && !showSplashScreen && !showStartupVideo && !showBrandTransitionScreen}
-          onClose={() => setIsOobeOpen(false)}
+          onClose={() => {
+            setIsOobeOpen(false);
+            setShowBrandTransitionScreen(false);
+          }}
           onComplete={handleCompleteOobe}
           initialName={settings.userName}
           initialNavStyle={settings.floatyBar ? 'floaty' : settings.navigationMode === 'sidebar' ? 'sidebar' : 'topbar'}
@@ -1063,5 +1073,6 @@ export default function App() {
         />
       </div>
     </TabSearchProvider>
+    </IntermissionMusicProvider>
   );
 }

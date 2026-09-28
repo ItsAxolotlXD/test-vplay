@@ -22,8 +22,14 @@ import {
   Coins,
   BookOpen,
   Package,
+  Music,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
 } from 'lucide-react';
 import { FontFamilyOption } from '../hooks/useSettings';
+import { useIntermissionMusic } from '../context/IntermissionMusicContext';
 
 export interface OobeSetupConfig {
   userName: string;
@@ -51,6 +57,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
   initialNavStyle = 'topbar',
   initialFontFamily = 'alata',
 }) => {
+  const { isPlaying, isMuted, togglePlay, toggleMute, boostMaxVolume } = useIntermissionMusic();
   const [currentStep, setCurrentStep] = useState<OobeStep>(1);
   const [userName, setUserName] = useState<string>(initialName || '');
   const [navStyle, setNavStyle] = useState<'sidebar' | 'topbar' | 'floaty'>(initialNavStyle);
@@ -111,6 +118,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
     <AnimatePresence>
       <motion.div
         id="vplay-oobe-backdrop"
+        onClick={boostMaxVolume}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -130,6 +138,35 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="relative w-full max-w-[940px] min-h-[530px] sm:min-h-[560px] md:min-h-[580px] bg-[#FDFDFE]/98 rounded-[16px] sm:rounded-[20px] shadow-[0_24px_70px_rgba(0,0,0,0.22),0_4px_16px_rgba(0,0,0,0.06)] border border-black/10 flex flex-col justify-between p-6 sm:p-10 md:p-12 overflow-hidden backdrop-blur-2xl"
         >
+          {/* Subtle Intermission Music Pill in OOBE */}
+          <div
+            className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center gap-1.5 sm:gap-2 bg-black/[0.04] hover:bg-black/[0.07] border border-black/5 rounded-full px-2.5 py-1 text-xs text-slate-700 select-none transition-colors"
+            title="Nhạc Intermission đang phát"
+          >
+            <div className="w-5 h-5 rounded-full bg-[#0067C0] text-white flex items-center justify-center shrink-0">
+              <Music className={`w-2.5 h-2.5 ${isPlaying ? 'animate-pulse text-sky-200' : 'text-slate-300'}`} />
+            </div>
+            <span className="font-semibold hidden sm:inline text-slate-700 text-[11px] tracking-tight">
+              Intermission Music
+            </span>
+            <button
+              type="button"
+              onClick={togglePlay}
+              className="p-1 hover:bg-black/10 rounded-full transition-colors text-slate-700 hover:text-black cursor-pointer"
+              title={isPlaying ? 'Tạm dừng nhạc' : 'Phát tiếp nhạc'}
+            >
+              {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 fill-current" />}
+            </button>
+            <button
+              type="button"
+              onClick={toggleMute}
+              className="p-1 hover:bg-black/10 rounded-full transition-colors text-slate-700 hover:text-black cursor-pointer"
+              title={isMuted ? 'Bật âm thanh' : 'Tắt tiếng'}
+            >
+              {isMuted ? <VolumeX className="w-3 h-3 text-red-500" /> : <Volume2 className="w-3 h-3 text-emerald-600" />}
+            </button>
+          </div>
+
           {/* Subtle Close Button */}
           <button
             id="btn-oobe-close"
