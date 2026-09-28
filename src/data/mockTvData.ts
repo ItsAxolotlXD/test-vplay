@@ -25,26 +25,6 @@ https://live.fptplay53.net/live/media/v10abr/live247-hls-avc/v10abr-avc1_5600000
 https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8
 #EXTINF:-1 tvg-id="vtv_test_hevc1" tvg-name="VTV test HEVC-1" tvg-logo="https://static.wikia.nocookie.net/logos/images/b/b5/VTV_go_logo_2015.png/revision/latest?cb=20260317072846&path-prefix=uk" group-title="Kênh VTV",VTV test HEVC-1
 https://live.fptplay53.net/live/media/v1abr/live247-hls-avc/v1abr-avc1_5600000=10000-mp4a_131600=20000.m3u8
-#EXTINF:-1 tvg-id="vtvgo_1" tvg-name="VTVgo 1" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 1
-https://canal.mediaserver.com.co/live/buenisimatv.m3u8
-#EXTINF:-1 tvg-id="vtvgo_1_oceans" tvg-name="VTVgo 1 (Oceans)" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 1 (Oceans)
-http://vjs.zencdn.net/v/oceans.mp4
-#EXTINF:-1 tvg-id="vtvgo_2" tvg-name="VTVgo 2" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 2
-http://vjs.zencdn.net/v/oceans.mp4
-#EXTINF:-1 tvg-id="vtvgo_3_wild" tvg-name="VTVgo 3: Vietnam Wild LIVE Test" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 3: Vietnam Wild LIVE Test
-https://events.vtvdigital.vn/livestream/wildlife-720p50fps.m3u8
-#EXTINF:-1 tvg-id="vtvgo_4" tvg-name="VTVgo 4" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 4
-https://vplay.live/Colorbars
-#EXTINF:-1 tvg-id="vtvgo_5" tvg-name="VTVgo 5" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 5
-https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
-#EXTINF:-1 tvg-id="vtvgo_6" tvg-name="VTVgo 6" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 6
-https://live.fptplay53.net/fnxhd1/vtv6hd_vhls.smil/chunklist_b5000000.m3u8
-#EXTINF:-1 tvg-id="vtvgo_7" tvg-name="VTVgo 7" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 7
-http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8
-#EXTINF:-1 tvg-id="vtvgo_8" tvg-name="VTVgo 8" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 8
-http://content.jwplatform.com/manifests/vM7nH0Kl.m3u8
-#EXTINF:-1 tvg-id="vtvgo_9" tvg-name="VTVgo 9" tvg-logo="https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702" group-title="Kênh Đặc biệt",VTVgo 9
-https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8
 #EXTINF:-1 tvg-id="on_trending" tvg-name="ON TRENDING TV HD" tvg-logo="https://img.vtvprime.vn/55xu-sW33ZbTdC_Jok1jkP6jWGpa3U96dXvvDuXoyz0/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGZjNzVhY2EtYjZhYS00MjYwLWIwMDMtZDRkYzg4OWI4ZGNkLnBuZw==.png" group-title="Kênh VTVcab",ON TRENDING TV HD
 https://vpsttt.vietanhtv.top/tv360/tv360.php?id=186
 #EXTINF:-1 tvg-id="on_kids" tvg-name="ON Kids HD" tvg-logo="https://img.vtvprime.vn/L7ERumqY3GEtK8vTe_DtMEJRYJkZPrVD3O4cbdT5P44/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGFlYmUzZGMtODZmYS00NGFkLTlhNzUtODg5NmFkODZhNGI3LnBuZw==.png" group-title="Kênh VTVcab",ON Kids HD

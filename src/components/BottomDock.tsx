@@ -57,7 +57,7 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
   ];
 
   return (
-    <div id="waves-bottom-dock" className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 select-none">
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 select-none">
       <motion.div 
         animate={isAnimationTest ? { y: [0, -2, 0] } : undefined}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}

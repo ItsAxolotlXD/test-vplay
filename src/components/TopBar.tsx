@@ -46,9 +46,7 @@ import {
   Music,
   Settings,
   Car,
-  Gauge,
-  Sun,
-  Moon
+  Gauge
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
@@ -96,7 +94,7 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
   onOpenCopilotWindow,
   isSettingsOpen
 }) => {
-  const { settings, updateSetting } = useSettings();
+  const { settings } = useSettings();
   const { flags } = useFeatureFlags();
   const isStatusBar = Boolean(flags.status_bar);
 
@@ -816,32 +814,13 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                 onClick={() => navigate('/settings')}
                 className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all cursor-pointer ${
                   currentRoute === '/settings' || currentRoute.startsWith('/settings') || isSettingsOpen
-                    ? (isLightMode ? 'text-zinc-900 bg-black/10 shadow-sm' : 'text-white bg-white/20 shadow-[0_0_12px_rgba(255,255,255,0.2)]')
-                    : (isLightMode ? 'text-zinc-700 hover:text-black hover:bg-black/5' : 'text-white/90 hover:text-white hover:bg-white/10')
+                    ? 'text-white bg-white/20 shadow-[0_0_12px_rgba(255,255,255,0.2)]'
+                    : 'text-white/90 hover:text-white hover:bg-white/10'
                 }`}
                 title="Cài đặt hệ thống"
                 aria-label="Cài đặt hệ thống"
               >
                 <Settings className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
-              </button>
-
-              {/* 5. Theme Toggle Button (Light / Dark Mode) */}
-              <button
-                id="btn-topbar-theme-toggle"
-                onClick={() => updateSetting('theme', isLightMode ? 'dark' : 'light')}
-                className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all cursor-pointer ${
-                  isLightMode
-                    ? 'text-amber-600 hover:text-amber-700 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 shadow-xs'
-                    : 'text-amber-300 hover:text-amber-200 bg-white/5 hover:bg-white/10 border border-white/10 shadow-xs'
-                }`}
-                title={isLightMode ? "Đang bật Giao diện Sáng (bấm để chuyển sang Tối)" : "Đang bật Giao diện Tối (bấm để chuyển sang Sáng)"}
-                aria-label="Chuyển đổi giao diện Sáng / Tối"
-              >
-                {isLightMode ? (
-                  <Sun className="w-5 h-5 text-amber-600 stroke-[1.8]" />
-                ) : (
-                  <Moon className="w-5 h-5 text-amber-300 stroke-[1.8]" />
-                )}
               </button>
             </div>
 
@@ -924,27 +903,6 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                       <Settings className="w-4 h-4 text-red-500 group-hover:rotate-45 transition-transform" />
                       <span>Cài đặt hệ thống & Tài khoản</span>
                     </button>
-
-                    {/* Quick Theme Switcher */}
-                    <div className="pt-1.5 mt-1 border-t border-white/10 flex items-center justify-between px-2 py-1.5 rounded-xl bg-white/[0.04]">
-                      <span className="flex items-center gap-2 text-xs">
-                        {isLightMode ? (
-                          <Sun className="w-3.5 h-3.5 text-amber-500" />
-                        ) : (
-                          <Moon className="w-3.5 h-3.5 text-amber-300" />
-                        )}
-                        <span>Giao diện {isLightMode ? 'Sáng' : 'Tối'}</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          updateSetting('theme', isLightMode ? 'dark' : 'light');
-                        }}
-                        className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-white/90 hover:text-white transition-all cursor-pointer"
-                      >
-                        Đổi sang {isLightMode ? 'Tối' : 'Sáng'}
-                      </button>
-                    </div>
                   </div>
                 </div>
               )}

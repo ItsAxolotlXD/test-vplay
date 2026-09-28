@@ -6,26 +6,8 @@
     <script>
       (function() {
         try {
-          var savedSettings = localStorage.getItem('waves_system_settings');
-          var savedTheme = localStorage.getItem('waves_theme');
-          var theme = 'dark';
-          if (savedSettings) {
-            try {
-              var parsed = JSON.parse(savedSettings);
-              if (parsed && (parsed.theme === 'light' || parsed.theme === 'dark')) {
-                theme = parsed.theme;
-              }
-            } catch(e) {}
-          } else if (savedTheme === 'light' || savedTheme === 'dark') {
-            theme = savedTheme;
-          }
-          if (theme === 'light') {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.add('light-mode', 'light');
-          } else {
-            document.documentElement.classList.remove('light-mode', 'light');
-            document.documentElement.classList.add('dark');
-          }
+          document.documentElement.classList.remove('light-mode');
+          document.documentElement.classList.add('dark');
         } catch(e) {}
       })();
     </script>

@@ -798,7 +798,7 @@ export default function App() {
 
   return (
     <TabSearchProvider currentRoute={currentRoute}>
-      <div className={`min-h-screen ${hasCustomWallpaper ? 'has-custom-wallpaper bg-transparent' : (settings.theme === 'light' ? 'bg-[#F4F5F8] text-[#18181B]' : 'bg-[#181818] text-[#E0E0E6]')} flex font-sans selection:bg-[#388BFD] selection:text-white relative transition-colors duration-300 ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
+      <div className={`min-h-screen ${hasCustomWallpaper ? 'has-custom-wallpaper bg-transparent' : 'bg-[#181818]'} text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative transition-colors duration-500 ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
         {/* Custom App Wallpaper Layer (Spatial Glass interactive background) */}
         {hasCustomWallpaper && (
           <div
@@ -809,8 +809,8 @@ export default function App() {
               backgroundAttachment: 'fixed',
             }}
           >
-            {/* Soft backdrop overlay for perfect text contrast while highlighting Spatial Glass blurs */}
-            <div className={`absolute inset-0 pointer-events-none ${settings.theme === 'light' ? 'bg-white/20' : 'bg-black/30'}`} />
+            {/* Soft dark overlay for perfect text contrast while highlighting Spatial Glass blurs */}
+            <div className="absolute inset-0 bg-black/30 pointer-events-none" />
           </div>
         )}
 

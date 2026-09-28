@@ -847,26 +847,15 @@ Cú pháp:
       };
     }
 
-    const targetTheme: 'light' | 'dark' = isLight ? 'light' : 'dark';
-
     try {
       const saved = localStorage.getItem("waves_system_settings");
       const current = saved ? JSON.parse(saved) : {};
-      const updated = { ...current, theme: targetTheme };
+      const updated = { ...current, theme: "dark" };
       localStorage.setItem("waves_system_settings", JSON.stringify(updated));
-      localStorage.setItem("waves_theme", targetTheme);
+      localStorage.setItem("waves_theme", "dark");
 
-      if (targetTheme === 'light') {
-        document.documentElement.classList.remove("dark");
-        document.documentElement.classList.add("light-mode", "light");
-        document.body.classList.remove("dark");
-        document.body.classList.add("light-mode", "light");
-      } else {
-        document.documentElement.classList.remove("light-mode", "light");
-        document.documentElement.classList.add("dark");
-        document.body.classList.remove("light-mode", "light");
-        document.body.classList.add("dark");
-      }
+      document.documentElement.classList.remove("light-mode");
+      document.documentElement.classList.add("dark");
       window.dispatchEvent(new Event("waves_settings_change"));
     } catch (e) {
       console.error(e);
@@ -875,17 +864,17 @@ Cú pháp:
     if (isLight) {
       return {
         handled: true,
-        replyText: `☀️ Đã chuyển sang giao diện **Light Mode (Sáng)** thành công! Giao diện sáng sủa, thanh lịch và sắc nét.`,
+        replyText: `✨ **VNRT Online** hiện tại hoạt động độc quyền ở chế độ **Dark Mode (#181818)** để mang lại trải nghiệm xem truyền hình điện ảnh và bảo vệ mắt tối ưu nhất!`,
         action: {
           type: "theme",
-          payload: "light"
+          payload: "dark"
         }
       };
     }
 
     return {
       handled: true,
-      replyText: `🌙 Đã chuyển sang giao diện **Dark Mode (Tối)** thành công! Tối ưu trải nghiệm xem truyền hình điện ảnh và bảo vệ mắt.`,
+      replyText: `✨ **VNRT Online** đang ở chế độ **Dark Mode (#181818)** hoàn hảo cho trải nghiệm truyền hình.`,
       action: {
         type: "theme",
         payload: "dark"

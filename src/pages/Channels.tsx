@@ -20,13 +20,10 @@ export const Channels: React.FC<ChannelsProps> = ({
   const [selectedGroup, setSelectedGroup] = useState<string>('Tất cả');
   const { searchQuery, setSearchQuery } = useTabSearch();
 
-  const groups = ['Tất cả', 'VTV', 'Đặc biệt', 'HTV', 'VTC', 'Địa phương', 'Chuyên biệt', 'Quốc tế'];
+  const groups = ['Tất cả', 'VTV', 'HTV', 'VTC', 'Địa phương', 'Chuyên biệt', 'Quốc tế'];
 
   const filteredChannels = channels.filter((c) => {
-    const matchesGroup =
-      selectedGroup === 'Tất cả' ||
-      c.category === selectedGroup ||
-      (selectedGroup === 'Đặc biệt' && (c.category === 'Kênh Đặc biệt' || c.category === 'Đặc biệt'));
+    const matchesGroup = selectedGroup === 'Tất cả' || c.category === selectedGroup;
     const matchesSearch =
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
