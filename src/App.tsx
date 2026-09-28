@@ -8,6 +8,7 @@ import { CustomStreamModal } from './components/CustomStreamModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { SplashScreen } from './components/SplashScreen';
 import { StartupVideoIntro } from './components/StartupVideoIntro';
+import { BrandTransitionScreen } from './components/BrandTransitionScreen';
 import { OobeSetupModal, OobeSetupConfig } from './components/OobeSetupModal';
 import { CrashScreen } from './components/CrashScreen';
 import { Home } from './pages/Home';
@@ -176,11 +177,13 @@ export default function App() {
     return CHANNELS_DATA[0];
   });
 
-  // Startup Intro Video & Splash Screen State
-  const [showStartupVideo, setShowStartupVideo] = useState<boolean>(true);
+  // Startup Intro Video & Splash Screen State (disabled on startup per user request)
+  const [showStartupVideo, setShowStartupVideo] = useState<boolean>(false);
   const [showSplashScreen, setShowSplashScreen] = useState<boolean>(false);
+  // Startup Brand Transition Message Screen
+  const [showBrandTransitionScreen, setShowBrandTransitionScreen] = useState<boolean>(true);
 
-  // Allow replaying splash screen or startup intro video via custom events
+  // Allow replaying splash screen, startup intro video, or brand transition message via custom events
   useEffect(() => {
     const handleReplaySplash = () => {
       setShowSplashScreen(true);
@@ -189,11 +192,16 @@ export default function App() {
       setShowStartupVideo(true);
       setShowSplashScreen(false);
     };
+    const handleReplayBrandTransition = () => {
+      setShowBrandTransitionScreen(true);
+    };
     window.addEventListener('vplay:replay_splash', handleReplaySplash);
     window.addEventListener('vplay:replay_startup_video', handleReplayStartupVideo);
+    window.addEventListener('vplay:replay_brand_transition', handleReplayBrandTransition);
     return () => {
       window.removeEventListener('vplay:replay_splash', handleReplaySplash);
       window.removeEventListener('vplay:replay_startup_video', handleReplayStartupVideo);
+      window.removeEventListener('vplay:replay_brand_transition', handleReplayBrandTransition);
     };
   }, []);
 
@@ -973,17 +981,25 @@ export default function App() {
           onImportPlaylist={handleImportPlaylist}
         />
 
-        {/* Initial Startup Intro Video / VNRT Ads (Plays before splash screen) */}
-        {showStartupVideo && (
-          <StartupVideoIntro
-            onFinish={() => {
-              setShowStartupVideo(false);
-              setShowSplashScreen(true);
+        {/* Startup Brand Transition Message Screen (Replaces old splash screen & VNRT ads on startup) */}
+        {showBrandTransitionScreen && (
+          <BrandTransitionScreen
+            onContinue={() => {
+              setShowBrandTransitionScreen(false);
             }}
           />
         )}
 
-        {/* Initial Startup / Replay Splash Screen */}
+        {/* Initial Startup Intro Video / VNRT Ads (Replay only) */}
+        {showStartupVideo && (
+          <StartupVideoIntro
+            onFinish={() => {
+              setShowStartupVideo(false);
+            }}
+          />
+        )}
+
+        {/* Initial Startup / Replay Splash Screen (Replay only) */}
         {showSplashScreen && (
           <SplashScreen
             duration={2000}
@@ -995,7 +1011,7 @@ export default function App() {
 
         {/* Windows 11 Style OOBE First-Time Setup Modal */}
         <OobeSetupModal
-          isOpen={isOobeOpen && !showSplashScreen && !showStartupVideo}
+          isOpen={isOobeOpen && !showSplashScreen && !showStartupVideo && !showBrandTransitionScreen}
           onClose={() => setIsOobeOpen(false)}
           onComplete={handleCompleteOobe}
           initialName={settings.userName}

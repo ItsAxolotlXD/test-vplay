@@ -1498,7 +1498,18 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                  <button
+                    type="button"
+                    id="btn-settings-replay-brand-transition"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('vplay:replay_brand_transition'));
+                    }}
+                    className="px-3.5 py-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer shrink-0"
+                    title="Mở lại thông điệp chuyển giao thương hiệu đa ngôn ngữ"
+                  >
+                    Thông điệp VNRT
+                  </button>
                   <button
                     type="button"
                     id="btn-settings-replay-intro-video"
