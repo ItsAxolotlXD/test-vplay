@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { showIslandNotification } from '../utils/islandNotifications';
 
 export type FlagCategory = 'ai' | 'ui' | 'features' | 'player' | 'developer';
 export type FlagBadge = 'PREVIEW' | 'BETA' | 'STABLE' | 'EXPERIMENTAL' | 'NEW';
@@ -55,9 +56,9 @@ export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
     id: 'flag_dynamic_island',
     key: 'dynamic_island',
     name: 'Dynamic Island',
-    description: 'Kích hoạt camera punch-hole và khả năng mở rộng tương tác cho Dynamic Island khi chạm vào ở góc trên bên phải.',
+    description: 'Hiện 1 Dynamic Island pill đen đơn giản trên đầu web, khi hover qua sẽ expand kéo dài ra thành thanh tìm kiếm với placeholder text "Search for anything".',
     category: 'ui',
-    badge: 'STABLE',
+    badge: 'EXPERIMENTAL',
     defaultValue: true,
   },
   {
@@ -193,12 +194,26 @@ export const useFeatureFlags = () => {
     const nextVal = !flags[key];
     const updated = { ...flags, [key]: nextVal };
     saveFlags(updated);
+    const flagDef = FEATURE_FLAGS_DEFINITIONS.find((f) => f.key === key);
+    showIslandNotification({
+      title: nextVal ? 'Đã bật tính năng' : 'Đã tắt tính năng',
+      message: flagDef?.name || key,
+      icon: 'flag',
+      duration: 3200,
+    });
     return nextVal;
   };
 
   const setFlag = (key: string, value: boolean) => {
     const updated = { ...flags, [key]: value };
     saveFlags(updated);
+    const flagDef = FEATURE_FLAGS_DEFINITIONS.find((f) => f.key === key);
+    showIslandNotification({
+      title: value ? 'Đã bật tính năng' : 'Đã tắt tính năng',
+      message: flagDef?.name || key,
+      icon: 'flag',
+      duration: 3200,
+    });
   };
 
   const resetToDefaults = () => {

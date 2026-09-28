@@ -71,6 +71,8 @@ import { TabSearchProvider } from './context/TabSearchContext';
 import { FloatingTabSearchBar } from './components/FloatingTabSearchBar';
 import { InspectElementsOverlay } from './components/InspectElementsOverlay';
 import { StatusBar } from './components/StatusBar';
+import { DynamicIsland } from './components/DynamicIsland';
+import { showIslandNotification } from './utils/islandNotifications';
 import { ArrowLeft } from 'lucide-react';
 import { CHANNELS_DATA } from './data/channels';
 import { Channel } from './types';
@@ -95,7 +97,7 @@ export default function App() {
   const isAnimationTest = Boolean(flags.animation_test);
   const isVBoardEnabled = flags.experimental_vboard !== false;
   const isStatusBar = Boolean(flags.status_bar);
-  const isDynamicIsland = Boolean(flags.status_bar && flags.dynamic_island);
+  const isDynamicIsland = Boolean(flags.dynamic_island);
   const isSettingsDrawer = Boolean(flags.settings_drawer);
   const isFloatyMode = Boolean(settings.floatyBar || settings.navigationMode === 'tabview');
   const isTopBarMode = settings.navigationMode === 'topbar' && !isFloatyMode;
@@ -825,6 +827,20 @@ export default function App() {
           </div>
         )}
 
+        {/* Dynamic Island on Top of Web (Feature Flag: dynamic_island) - Displayed across App, Intermission & Setup screens */}
+        {isDynamicIsland && !isCrashed && (
+          <DynamicIsland
+            navigate={navigate}
+            channels={channels}
+            currentChannel={currentChannel}
+            onSelectChannel={(ch) => {
+              setCurrentChannel(ch);
+              showIslandNotification({ title: 'Đang phát trực tiếp', message: ch.name, icon: 'tv', duration: 3200 });
+              navigate(`/live-tv?channel=${ch.slug}`);
+            }}
+          />
+        )}
+
         {/* Vertical Right Status Bar & Dynamic Island (Feature Flag: status_bar & dynamic_island) */}
         {isStatusBar && (
           <StatusBar 
@@ -903,6 +919,11 @@ export default function App() {
                   ? 'md:pl-[80px]' 
                   : 'md:pl-[290px]'
         }`}>
+          {/* Dynamic Island Top Safe Area Buffer */}
+          {isDynamicIsland && (
+            <div className="w-full h-12 sm:h-14 shrink-0 pointer-events-none transition-all duration-300" aria-hidden="true" />
+          )}
+
           {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar.
               When Floaty bar is active, topbar is completely replaced by Floaty bar. */}
           {!isFloatyMode && (

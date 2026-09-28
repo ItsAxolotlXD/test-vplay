@@ -32,6 +32,7 @@ import {
   FlagBadge, 
   FeatureFlagItem 
 } from '../hooks/useFeatureFlags';
+import { showIslandNotification } from '../utils/islandNotifications';
 
 interface FeatureFlagsProps {
   navigate?: (route: string) => void;
@@ -48,6 +49,7 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
+    showIslandNotification({ title: 'Feature Flags', message: msg, icon: 'flag' });
     setTimeout(() => setToastMessage(null), 2500);
   };
 
@@ -71,14 +73,8 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
   };
 
   const handleToggle = (key: string, item?: FeatureFlagItem) => {
-    if (key === 'dynamic_island' && !flags.dynamic_island && !flags.status_bar) {
-      toggleFlag('status_bar');
-      toggleFlag('dynamic_island');
-      showToast('Đã bật Dynamic Island (và tự động bật Status Bar)');
-    } else {
-      const newState = toggleFlag(key);
-      showToast(`Đã ${newState ? 'bật' : 'tắt'}: ${item?.name || key}`);
-    }
+    const newState = toggleFlag(key);
+    showToast(`Đã ${newState ? 'bật' : 'tắt'}: ${item?.name || key}`);
   };
 
   const normalizeSearch = (s: string) =>

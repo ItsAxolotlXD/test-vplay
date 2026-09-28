@@ -123,7 +123,7 @@ export const OobeSetupModal: React.FC<OobeSetupModalProps> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.35 }}
-        className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 md:p-10 select-none overflow-hidden bg-gradient-to-br from-[#CBD9EA] via-[#DEE7F2] to-[#CBD5E6]"
+        className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 md:p-10 pt-16 sm:pt-20 select-none overflow-hidden bg-gradient-to-br from-[#CBD9EA] via-[#DEE7F2] to-[#CBD5E6]"
       >
         {/* Soft Ambient Windows 11 Bloom / Light Orbs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-blue-300/40 blur-3xl pointer-events-none" />

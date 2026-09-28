@@ -31,11 +31,18 @@ import {
   Box,
   Wrench,
   FlaskConical,
-  ArrowLeft
+  ArrowLeft,
+  BookOpen,
+  MessageSquarePlus,
+  ExternalLink,
+  Send,
+  Star,
+  MessageSquare
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useTabSearch } from '../context/TabSearchContext';
+import { showIslandNotification } from '../utils/islandNotifications';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -47,9 +54,16 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const { settings, updateSetting } = useSettings();
   const { flags, setFlag } = useFeatureFlags();
   const { searchQuery, setSearchQuery } = useTabSearch();
-  const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental'>('main');
+  const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental' | 'feedback'>('main');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
+
+  // Give Feedback form state
+  const [feedbackTitle, setFeedbackTitle] = useState('');
+  const [feedbackContent, setFeedbackContent] = useState('');
+  const [feedbackType, setFeedbackType] = useState<'Suggestion' | 'Issue' | 'Question'>('Suggestion');
+  const [feedbackRating, setFeedbackRating] = useState<number>(5);
+  const [feedbackSuccessMsg, setFeedbackSuccessMsg] = useState(false);
 
   const spatialBlur = typeof settings.spatialGlassBlur === 'number' && !isNaN(settings.spatialGlassBlur)
     ? settings.spatialGlassBlur
@@ -147,6 +161,10 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
     'Giới thiệu', 'Tên người dùng', 'Username', 'User', 'Tên', 'Hồ sơ', 'Profile', 'OOBE', 'About', 'Phiên bản', 'Version'
   );
 
+  const isFeedbackVisible = matchesSearch(
+    'Give Feedback', 'Feedback', 'Góp ý', 'Phản hồi', 'Báo lỗi', 'Bug', 'Ý kiến', 'Đề xuất', 'V-Box', 'Feedback Hub', 'Hub'
+  );
+
   const isSearchActive = Boolean(normalizedQuery);
   const showCategoryMenu = !isSearchActive && activeCategory === 'main';
   const showSpatialGlass = isSearchActive ? isSpatialGlassVisible : (activeCategory === 'spatial_glass');
@@ -155,8 +173,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const showTools = isSearchActive ? (isSection4Visible || matchesSearch('Copilot', 'Lệnh', 'Slash')) : (activeCategory === 'tools');
   const showAbout = isSearchActive ? isAboutVisible : (activeCategory === 'about');
   const showExperimental = isSearchActive ? isFeatureFlagsVisible : (activeCategory === 'experimental');
+  const showFeedback = isSearchActive ? isFeedbackVisible : (activeCategory === 'feedback');
 
-  const hasAnyResults = showCategoryMenu || (isSearchActive ? (isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible || isAboutVisible) : true);
+  const hasAnyResults = showCategoryMenu || (isSearchActive ? (isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible || isAboutVisible || isFeedbackVisible) : true);
 
   return (
     <div className={isDrawer ? "w-full max-w-full space-y-5 pb-16 pt-1 select-none" : "max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none"}>
@@ -182,6 +201,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               {activeCategory === 'accessibility' && 'Trợ năng'}
               {activeCategory === 'tools' && 'Công cụ'}
               {activeCategory === 'experimental' && 'Thử nghiệm'}
+              {activeCategory === 'feedback' && 'Give Feedback'}
             </span>
           </div>
         )}
@@ -335,6 +355,26 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   </div>
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
                     Thử nghiệm
+                  </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
+
+              {/* Divider: 1 thanh màu solid thường màu xám tối nhẹ */}
+              <div className="h-[1px] bg-[#323236] ml-16" />
+
+              {/* Row 7: Give Feedback (icon sách) */}
+              <div 
+                id="category-item-feedback"
+                onClick={() => setActiveCategory('feedback')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] text-white flex items-center justify-center shrink-0 shadow-md border-0">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                    Give Feedback
                   </span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
@@ -2120,6 +2160,296 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                 />
               </button>
             </div>
+
+            {/* Flag 5: Dynamic Island */}
+            <div className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] flex items-center justify-between gap-4 transition-colors">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white text-sm">Dynamic Island</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#FF7A00]/20 text-[#FF7A00] border border-[#FF7A00]/30 uppercase">
+                    Mới
+                  </span>
+                </div>
+                <p className="text-xs text-white/60 mt-1">
+                  Pill đen đơn giản trên đầu web, khi hover sẽ mở rộng kéo dài thành thanh tìm kiếm &quot;Search for anything&quot;.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                role="switch"
+                aria-checked={Boolean(flags.dynamic_island)}
+                onClick={() => setFlag('dynamic_island', !flags.dynamic_island)}
+                className={`w-12 h-6.5 rounded-full p-0.5 transition-colors duration-200 ease-in-out cursor-pointer shrink-0 flex items-center border border-white/20 ${
+                  flags.dynamic_island ? 'bg-[#FF6A00]' : 'bg-white/15'
+                }`}
+              >
+                <span
+                  className={`w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    flags.dynamic_island ? 'translate-x-5.5 bg-white' : 'translate-x-0 bg-white'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 7. Section Give Feedback */}
+      {showFeedback && (
+        <section
+          id="settings-section-feedback"
+          className="settings-category-section p-5 sm:p-6 rounded-[28px] bg-transparent backdrop-blur-2xl border-0 shadow-xl space-y-5"
+        >
+          {/* Section Header */}
+          <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-white/10">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] text-white flex items-center justify-center shrink-0 shadow-md border-0 mt-0.5">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white leading-tight">
+                  Give Feedback
+                </h2>
+                <p className="text-xs text-white/60 mt-1">
+                  Đóng góp ý kiến, phản hồi lỗi hoặc đề xuất tính năng mới cho nhà phát triển VNRT Online.
+                </p>
+              </div>
+            </div>
+
+            {/* Nút "Open in Feedback Hub" (aka V-Box) */}
+            <button
+              type="button"
+              onClick={() => {
+                if (navigate) {
+                  navigate('/v-box');
+                } else {
+                  window.location.assign('/v-box');
+                }
+              }}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-2 shadow-lg border border-white/20 active:scale-95 group"
+              title="Mở trong Trung tâm phản hồi Feedback Hub (V-Box)"
+            >
+              <MessageSquarePlus className="w-4 h-4 text-white" />
+              <span>Open in Feedback Hub (aka V-Box)</span>
+              <ExternalLink className="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-colors" />
+            </button>
+          </div>
+
+          {/* Feedback Form Card */}
+          <div className="settings-item-card p-5 sm:p-6 rounded-[22px] bg-white/[0.03] border border-white/15 space-y-4">
+            {feedbackSuccessMsg ? (
+              <div className="py-8 px-4 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
+                  <Check className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-bold text-white">
+                  Cảm ơn bạn đã gửi phản hồi!
+                </h3>
+                <p className="text-xs text-white/70 max-w-md mx-auto leading-relaxed">
+                  Phản hồi của bạn đã được ghi nhận và gửi đến nhóm phát triển. Phản hồi cũng đã được đồng bộ vào Feedback Hub (V-Box).
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (navigate) navigate('/v-box');
+                      else window.location.assign('/v-box');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Xem trong Feedback Hub (V-Box)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFeedbackSuccessMsg(false);
+                      setFeedbackTitle('');
+                      setFeedbackContent('');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all cursor-pointer"
+                  >
+                    Gửi thêm góp ý khác
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!feedbackTitle.trim() || !feedbackContent.trim()) {
+                    showIslandNotification({
+                      title: 'Vui lòng nhập đủ thông tin',
+                      message: 'Nhập tiêu đề và nội dung phản hồi',
+                      icon: 'info',
+                    });
+                    return;
+                  }
+
+                  const prefix = feedbackType === 'Question' ? 'VFQ' : feedbackType === 'Issue' ? 'VFI' : 'VFS';
+                  const newFeedback = {
+                    id: `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`,
+                    title: feedbackTitle.trim(),
+                    description: feedbackContent.trim(),
+                    type: feedbackType,
+                    dateCreated: 'Vừa xong',
+                    rating: feedbackRating,
+                    votes: 1,
+                    userVoted: true,
+                  };
+
+                  try {
+                    const raw = localStorage.getItem('vplay_user_feedbacks');
+                    const existing = raw ? JSON.parse(raw) : [];
+                    const updated = [newFeedback, ...existing];
+                    localStorage.setItem('vplay_user_feedbacks', JSON.stringify(updated));
+                  } catch (err) {
+                    console.error('Failed to save feedback to localStorage:', err);
+                  }
+
+                  showIslandNotification({
+                    title: 'Đã gửi phản hồi thành công!',
+                    message: feedbackTitle.trim(),
+                    icon: 'check',
+                  });
+
+                  setFeedbackSuccessMsg(true);
+                }}
+                className="space-y-4"
+              >
+                {/* Type Selection */}
+                <div>
+                  <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-2">
+                    Loại phản hồi (Feedback Type)
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFeedbackType('Suggestion')}
+                      className={`p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                        feedbackType === 'Suggestion'
+                          ? 'bg-purple-600/30 border-purple-500 text-purple-200 ring-1 ring-purple-500/50'
+                          : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <Sparkles className="w-4 h-4 text-purple-400" />
+                      <span>Đề xuất (Suggestion)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFeedbackType('Issue')}
+                      className={`p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                        feedbackType === 'Issue'
+                          ? 'bg-red-600/30 border-red-500 text-red-200 ring-1 ring-red-500/50'
+                          : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <X className="w-4 h-4 text-red-400" />
+                      <span>Báo lỗi (Issue)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFeedbackType('Question')}
+                      className={`p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                        feedbackType === 'Question'
+                          ? 'bg-blue-600/30 border-blue-500 text-blue-200 ring-1 ring-blue-500/50'
+                          : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                      }`}
+                    >
+                      <MessageSquare className="w-4 h-4 text-blue-400" />
+                      <span>Câu hỏi (Question)</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Title Input */}
+                <div>
+                  <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+                    Tiêu đề phản hồi (Title) *
+                  </label>
+                  <input
+                    type="text"
+                    value={feedbackTitle}
+                    onChange={(e) => setFeedbackTitle(e.target.value)}
+                    placeholder="Tóm tắt góp ý hoặc lỗi bạn gặp phải..."
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 focus:border-purple-400 focus:bg-white/10 text-white placeholder-white/40 text-sm focus:outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                {/* Rating (Stars) */}
+                <div>
+                  <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+                    Đánh giá trải nghiệm ứng dụng (Rating)
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setFeedbackRating(star)}
+                        className="p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                        title={`${star} sao`}
+                      >
+                        <Star
+                          className={`w-5 h-5 transition-colors ${
+                            star <= feedbackRating
+                              ? 'text-amber-400 fill-amber-400'
+                              : 'text-white/20'
+                          }`}
+                        />
+                      </button>
+                    ))}
+                    <span className="text-xs text-white/60 ml-2 font-medium">
+                      {feedbackRating === 5 && 'Tuyệt vời (5/5)'}
+                      {feedbackRating === 4 && 'Rất tốt (4/5)'}
+                      {feedbackRating === 3 && 'Bình thường (3/5)'}
+                      {feedbackRating === 2 && 'Cần cải thiện (2/5)'}
+                      {feedbackRating === 1 && 'Kém (1/5)'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content Textarea */}
+                <div>
+                  <label className="block text-xs font-bold text-white/80 uppercase tracking-wider mb-1.5">
+                    Nội dung chi tiết (Details) *
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={feedbackContent}
+                    onChange={(e) => setFeedbackContent(e.target.value)}
+                    placeholder="Mô tả cụ thể trải nghiệm của bạn, các bước gây ra lỗi hoặc ý tưởng bạn muốn thêm vào VNRT ONLINE..."
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/20 focus:border-purple-400 focus:bg-white/10 text-white placeholder-white/40 text-sm focus:outline-none transition-all resize-y min-h-[90px]"
+                    required
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (navigate) navigate('/v-box');
+                      else window.location.assign('/v-box');
+                    }}
+                    className="text-xs text-purple-300 hover:text-purple-200 underline font-semibold cursor-pointer flex items-center gap-1"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Xem phản hồi của cộng đồng trong Feedback Hub (V-Box)</span>
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Gửi phản hồi cho nhà phát triển</span>
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </section>
       )}
