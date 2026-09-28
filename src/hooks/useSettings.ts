@@ -329,6 +329,11 @@ export const getStoredSettings = (): SystemSettings => {
       const vcursorSize = typeof parsed.vcursorSize === 'number' && !isNaN(parsed.vcursorSize) ? Math.max(16, Math.min(48, parsed.vcursorSize)) : 24;
       const vcursorGlow = typeof parsed.vcursorGlow === 'boolean' ? parsed.vcursorGlow : false;
 
+      const storedTheme: 'light' | 'dark' = 
+        parsed.theme === 'light' || parsed.theme === 'dark' 
+          ? parsed.theme 
+          : (legacyTheme === 'light' ? 'light' : 'dark');
+
       return { 
         ...base, 
         ...parsed,
@@ -342,7 +347,7 @@ export const getStoredSettings = (): SystemSettings => {
         floatyBar: isFloaty,
         vboardSkin: ['default', 'ios', 'google', 'butterfly', 'physical'].includes(parsed.vboardSkin) ? parsed.vboardSkin : 'default',
         userName: parsed.userName || legacyUser || 'User',
-        theme: 'dark',
+        theme: storedTheme,
         vcursorEnabled,
         vcursorColor,
         vcursorBorderColor,
@@ -353,7 +358,7 @@ export const getStoredSettings = (): SystemSettings => {
       return {
         ...base,
         userName: legacyUser || 'User',
-        theme: 'dark'
+        theme: legacyTheme === 'light' ? 'light' : 'dark'
       };
     }
   } catch {}
@@ -364,9 +369,26 @@ export const getStoredSettings = (): SystemSettings => {
 export const applySystemSettings = (settings: SystemSettings) => {
   if (typeof document === 'undefined') return;
 
-  // App is dark mode only
-  document.documentElement.classList.remove('light-mode');
-  document.documentElement.classList.add('dark');
+  const isLight = settings.theme === 'light';
+
+  // Apply Theme Mode classes (Light vs Dark)
+  if (isLight) {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light-mode', 'light');
+    document.body.classList.remove('dark');
+    document.body.classList.add('light-mode', 'light');
+    document.documentElement.style.setProperty('--dark-bg', '#F4F5F8');
+    document.documentElement.style.setProperty('--sidebar-bg', '#FFFFFF');
+    document.documentElement.style.setProperty('--card-bg', '#FFFFFF');
+  } else {
+    document.documentElement.classList.remove('light-mode', 'light');
+    document.documentElement.classList.add('dark');
+    document.body.classList.remove('light-mode', 'light');
+    document.body.classList.add('dark');
+    document.documentElement.style.setProperty('--dark-bg', '#181818');
+    document.documentElement.style.setProperty('--sidebar-bg', '#202020');
+    document.documentElement.style.setProperty('--card-bg', '#222222');
+  }
 
   // Apply V-Cursor active class to html
   if (settings.vcursorEnabled !== false) {
@@ -402,7 +424,7 @@ export const applySystemSettings = (settings: SystemSettings) => {
     document.body.classList.remove('has-custom-wallpaper');
     document.documentElement.style.setProperty('--waves-custom-bg', 'none');
     document.body.style.backgroundImage = 'none';
-    document.body.style.backgroundColor = '#181818';
+    document.body.style.backgroundColor = isLight ? '#F4F5F8' : '#181818';
   }
 
   // Apply Spatial Glass blur & opacity CSS variables
@@ -416,9 +438,9 @@ export const applySystemSettings = (settings: SystemSettings) => {
 
   document.documentElement.style.setProperty('--spatial-glass-blur', `${glassBlur}px`);
   document.documentElement.style.setProperty('--spatial-glass-opacity', opacityFraction);
-  document.documentElement.style.setProperty('--spatial-glass-bg', `rgba(28, 27, 36, ${opacityFraction})`);
-  document.documentElement.style.setProperty('--spatial-glass-card-bg', `rgba(255, 255, 255, ${(glassOpacity * 0.0012).toFixed(3)})`);
-  document.documentElement.style.setProperty('--spatial-glass-border', `rgba(255, 255, 255, ${(glassOpacity * 0.0025).toFixed(3)})`);
+  document.documentElement.style.setProperty('--spatial-glass-bg', isLight ? `rgba(255, 255, 255, ${opacityFraction})` : `rgba(28, 27, 36, ${opacityFraction})`);
+  document.documentElement.style.setProperty('--spatial-glass-card-bg', isLight ? `rgba(0, 0, 0, ${(glassOpacity * 0.0006).toFixed(3)})` : `rgba(255, 255, 255, ${(glassOpacity * 0.0012).toFixed(3)})`);
+  document.documentElement.style.setProperty('--spatial-glass-border', isLight ? `rgba(0, 0, 0, ${(glassOpacity * 0.0015).toFixed(3)})` : `rgba(255, 255, 255, ${(glassOpacity * 0.0025).toFixed(3)})`);
 
   // Apply Shiny outline (Specular 2-edge top & bottom rim highlight)
   const isShinyActive = settings.shinyOutline !== false;

@@ -48,7 +48,9 @@ import {
   ShoppingBag,
   UtensilsCrossed,
   Car,
-  Gauge
+  Gauge,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -99,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   onCloseMobile,
   isSettingsOpen,
 }) => {
-  const { settings } = useSettings();
+  const { settings, updateSetting } = useSettings();
   const { flags } = useFeatureFlags();
   const isStatusBar = Boolean(flags.status_bar);
   const isTopBarMode = settings.navigationMode 
@@ -1218,6 +1220,23 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
       >
         <Settings className="w-5 h-5 shrink-0 text-gray-400" />
         <span className="truncate">Cài đặt</span>
+      </button>
+
+      {/* 16. Chế độ giao diện (Theme Toggle) */}
+      <button
+        id={isMobile ? "mobile-nav-item-theme-toggle" : "nav-item-theme-toggle"}
+        onClick={() => updateSetting('theme', settings.theme === 'light' ? 'dark' : 'light')}
+        title={settings.theme === 'light' ? "Chuyển sang Giao diện Tối" : "Chuyển sang Giao diện Sáng"}
+        className="w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]"
+      >
+        {settings.theme === 'light' ? (
+          <Sun className="w-5 h-5 shrink-0 text-amber-500" />
+        ) : (
+          <Moon className="w-5 h-5 shrink-0 text-amber-300" />
+        )}
+        <span className="truncate">
+          {settings.theme === 'light' ? 'Giao diện Sáng' : 'Giao diện Tối'}
+        </span>
       </button>
       </div>
     </div>

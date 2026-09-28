@@ -131,6 +131,48 @@ const VTV_CHANNELS: VtvChannelItem[] = [
     streamUrl: 'https://live.fptplay53.net/live/media/v10abr/live247-hls-avc/v10abr-avc1_5600000=10000-mp4a_131600=20000.m3u8',
   },
   {
+    id: 'vtv2_enc',
+    name: 'VTV2 ENC',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/7/7c/V2_HD.png/revision/latest/scale-to-width-down/1000?cb=20260625102502',
+    streamUrl: 'https://vplay.live/Colorbars',
+  },
+  {
+    id: 'vtv4_enc',
+    name: 'VTV4 ENC',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/5/5d/4_hd.png/revision/latest/scale-to-width-down/1000?cb=20260625103218',
+    streamUrl: 'https://vplay.live/Colorbars',
+  },
+  {
+    id: 'vtv9_enc',
+    name: 'VTV9 ENC',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/2/25/9_HD.png/revision/latest/scale-to-width-down/1000?cb=20260625105022',
+    streamUrl: 'https://vplay.live/Colorbars',
+  },
+  {
+    id: 'vtv_can_tho_test',
+    name: 'VTV Cần Thơ HD new test',
+    logo: 'https://static.wikia.nocookie.net/logos/images/0/0c/VTV10_Logo_before_30-03-2026_%282%29.png/revision/latest/scale-to-width-down/1000?cb=20260510111347&path-prefix=uk',
+    streamUrl: 'https://vplay.live/Colorbars',
+  },
+  {
+    id: 'vtv5_tnb',
+    name: 'VTV5 Tây Nam Bộ',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/VTV5_logo_24.png',
+    streamUrl: 'https://live.fptplay53.net/live/media/vtv5tnb/live-hls-avc/index.m3u8',
+  },
+  {
+    id: 'vtv5_tn',
+    name: 'VTV5 Tây Nguyên',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/VTV5_logo_24.png',
+    streamUrl: 'https://live.fptplay53.net/live/media/vtv5tn/live-hls-avc/index.m3u8',
+  },
+  {
+    id: 'vn_today_test',
+    name: 'Vietnam Today (Luồng Thử nghiệm)',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/a/a4/VHD.png/revision/latest/scale-to-width-down/1000?cb=20260625105528',
+    streamUrl: 'https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8',
+  },
+  {
     id: 'vtv_test_hevc1',
     name: 'VTV test HEVC-1',
     logo: 'https://static.wikia.nocookie.net/logos/images/b/b5/VTV_go_logo_2015.png/revision/latest?cb=20260317072846&path-prefix=uk',
@@ -160,7 +202,101 @@ const VTV_CHANNELS: VtvChannelItem[] = [
   },
 ];
 
-// Danh sách các kênh HTV
+// Danh sách Kênh Đặc biệt (VTVgo Streams) - Đặt bên dưới nhóm kênh VTV
+const SPECIAL_CHANNELS: VtvChannelItem[] = [
+  {
+    id: 'vtvgo_1',
+    name: 'VTVgo 1',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'https://canal.mediaserver.com.co/live/buenisimatv.m3u8',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_1_oceans',
+    name: 'VTVgo 1 (Oceans)',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'http://vjs.zencdn.net/v/oceans.mp4',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_2',
+    name: 'VTVgo 2',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'http://vjs.zencdn.net/v/oceans.mp4',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_3_wild',
+    name: 'VTVgo 3: Vietnam Wild LIVE Test',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'https://events.vtvdigital.vn/livestream/wildlife-720p50fps.m3u8',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_4',
+    name: 'VTVgo 4',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'https://vplay.live/Colorbars',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_5',
+    name: 'VTVgo 5',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_6',
+    name: 'VTVgo 6',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'https://live.fptplay53.net/fnxhd1/vtv6hd_vhls.smil/chunklist_b5000000.m3u8',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_7',
+    name: 'VTVgo 7',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_8',
+    name: 'VTVgo 8',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'http://content.jwplatform.com/manifests/vM7nH0Kl.m3u8',
+    category: 'Kênh Đặc biệt',
+  },
+  {
+    id: 'vtvgo_9',
+    name: 'VTVgo 9',
+    logo: 'https://static.wikia.nocookie.net/ep-deo/images/6/64/Vtv_s%E1%BB%A7a.png/revision/latest/scale-to-width-down/1000?cb=20260625120702',
+    streamUrl: 'https://live.fptplay53.net/fnxhd1/vntoday_vhls.smil/chunklist_b5000000.m3u8',
+    category: 'Kênh Đặc biệt',
+  },
+];
+
+// Danh sách các kênh VTVcab
+const VTVCAB_CHANNELS: VtvChannelItem[] = [
+  { id: 'on_trending', name: 'ON TRENDING TV', logo: 'https://img.vtvprime.vn/55xu-sW33ZbTdC_Jok1jkP6jWGpa3U96dXvvDuXoyz0/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGZjNzVhY2EtYjZhYS00MjYwLWIwMDMtZDRkYzg4OWI4ZGNkLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=186' },
+  { id: 'on_kids', name: 'ON Kids', logo: 'https://img.vtvprime.vn/L7ERumqY3GEtK8vTe_DtMEJRYJkZPrVD3O4cbdT5P44/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGFlYmUzZGMtODZmYS00NGFkLTlhNzUtODg5NmFkODZhNGI3LnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=179' },
+  { id: 'on_golf', name: 'ON Golf', logo: 'https://static.wikia.nocookie.net/logos/images/f/ff/ON_Golf_logo_2022.png/revision/latest/scale-to-width-down/1000?cb=20220311023800&path-prefix=vi', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=169' },
+  { id: 'on_e_channel', name: 'ON E- Channel', logo: 'https://img.vtvprime.vn/bofK3Lca_KQJMc9sb6pUyQ_A41aWbsQi2ibNAzkN3I0/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZTk3YjgwOGUtNjI3OS00NWQ4LWJkMTAtNWY1MGE1MjIwMTZkLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=182' },
+  { id: 'on_vie_giaitri', name: 'ON Vie Giải Trí', logo: 'https://img.vtvprime.vn/gV1k4G1mCGQpnNGJFCJQISd0-p96jY14Ufz_mOb8h_o/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZjVhZDhkNmBiMTQ4NS00YjYxLThhMDEtNTdiYzBiMjU2NGU1LnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=180' },
+  { id: 'on_vie_dramas', name: 'ON Vie Dramas', logo: 'https://img.vtvprime.vn/mVzz9rvhJ_BCun2e4ILB0OYl8ptcxG9TsSrIZ85kpLk/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvMmExZjgwNGYtNjc0Yi00ZjYzLThjZWMtNjgwN2NkNThhYTRkLnBuZw==.png', streamUrl: 'http://dvrfl05.bozztv.com/vch_vchannel18/tracks-v1a1/mono.m3u8' },
+  { id: 'on_phimviet', name: 'ON Phim Việt', logo: 'https://img.vtvprime.vn/vDASEJI2IRP0eBox0ta6hgKo4vnY-3AdofWLa5lSqjM/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZTc3YzdkNmItZTVhNi00ZTkyLWIzYzUtMGEzMTkyZjIyM2RhLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=175' },
+  { id: 'on_movies_youtv', name: 'ON Movies - You TV', logo: 'https://img.vtvprime.vn/8-eDFNeJkwyONvmJVu_JydPc2dZaNJXuBTY7vtvCxxE/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZWQzOTEzNjgtYTJmNy00NDBkLWI0N2ItNzA2MDliNjJmNDYzLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=181' },
+  { id: 'on_o2tv', name: 'ON O2TV', logo: 'https://img.vtvprime.vn/5FxYjiz34GsArbti7aFiSkIO7NMCxKNZcQJ9AvIme80/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvODAyNGIwMDQtNGJiNC00M2Y3LWJkYmEtYmU0MWVkMGY0NjM4LnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=136' },
+  { id: 'on_bibi', name: 'ON BiBi', logo: 'https://img.vtvprime.vn/vjXRRLGeFrNx1iAkqhrK9RoAgU1oW6kq5q_6r7cd9zs/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvYzI3NWExNmEtNTMwOS00ZWE3LWJjMjMtYTMyNGIwZDczNGJlLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=178' },
+  { id: 'on_infotv', name: 'ON Info TV', logo: 'https://img.vtvprime.vn/nCr-YgSmtNg5gcpJ35d6l_T4DUWz8fzr9EJpd9jAZ6E/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvM2E2NzM5NzQtNzRhYi00MjYxLTg2M2QtZWE2YzUyNzU5YzcyLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=189' },
+  { id: 'on_cine', name: 'ON Cine', logo: 'https://img.vtvprime.vn/XY6SjolNpy8W8Eh_v_2oDyE6BiNOvofLosgPYO-hlY4/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvZTY5YjgyNmUtNjkzYi00YzBiLWFhZmYtNmFhZGFjZjFhZDA0LnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=176' },
+  { id: 'on_styletv', name: 'ON Style TV', logo: 'https://img.vtvprime.vn/TxObOi0p9hC6K414i12Fk27SP8s_QKswAvPaRH2kK6M/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvNTcyOGM3MzEtOWE4OS00ZjljLTkyYTItMWVhODZmNzhiOWE4LnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=184' },
+  { id: 'on_music', name: 'ON Music', logo: 'https://img.vtvprime.vn/39RnkA6ZHfNSCcsMaaSivvTVwmWjeGsbqlQsmD7nuvQ/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvN7RmOTYzYTYtZWRkYS00MDdjLWIxYmYtYTAwODBhMTUyYTNlLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=185' },
+  { id: 'on_vfamily', name: 'ON V Family', logo: 'https://img.vtvprime.vn/8oeGePxG0Z-iJqm5biFVNdMdAlVHFDYsS0i7i3IpH2Y/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvOGI0YzYzOTgtNWJiOS00ODQ1LWE1ZjMtZTdhZTM5ZTc4NzVmLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=187' },
+  { id: 'on_life', name: 'ON Life', logo: 'https://img.vtvprime.vn/cJ9URVIqC2BkU1gsT0IKiEy0tXDXqu7C4M3Ni3hjlgY/rs:fit:836:468/czM6Ly9wcmQtc24taW1hZ2VzL2NoYW5uZWwvY2U2MWMwZGEtMWI1Zi00ZWJiLWE4ZTktZjdmZTVkNzRlODhmLnBuZw==.png', streamUrl: 'https://vpsttt.vietanhtv.top/tv360/tv360.php?id=188' },
+];
+
+// Danh sách các kênh HTV & HTVC
 const HTV_CHANNELS: VtvChannelItem[] = [
   {
     id: 'htv1',
@@ -187,6 +323,12 @@ const HTV_CHANNELS: VtvChannelItem[] = [
     streamUrl: 'https://live.fptplay53.net/epzhd1/htv4_hls.smil/chunklist_b2500000.m3u8',
   },
   {
+    id: 'htv5',
+    name: 'HTV5 / B Channel',
+    logo: 'https://static.wikia.nocookie.net/logos/images/b/bc/HTV5_Bchannel_logo_ch%C3%ADnh.png/revision/latest?cb=20260528063037&path-prefix=vi',
+    streamUrl: 'https://live.fptplay53.net/fnxsd1/btv9_hls.smil/chunklist_b2500000.m3u8',
+  },
+  {
     id: 'htv7',
     name: 'HTV7',
     logo: 'https://static.wikia.nocookie.net/ftv/images/6/60/H7.png/revision/latest/scale-to-width-down/1000?cb=20260601112033&path-prefix=vi',
@@ -205,10 +347,28 @@ const HTV_CHANNELS: VtvChannelItem[] = [
     streamUrl: 'https://live.fptplay53.net/epzhd1/htvcthethao_vhls.smil/chunklist_b5000000.m3u8',
   },
   {
+    id: 'htvc_thethao',
+    name: 'HTVC Thể Thao',
+    logo: 'https://upload.wikimedia.org/wikipedia/vi/d/d4/HTVC_Th%E1%BB%83_thao.png',
+    streamUrl: 'https://live.fptplay53.net/epzhd1/htvcthethao_vhls.smil/chunklist_b5000000.m3u8',
+  },
+  {
     id: 'htvc_canhac',
     name: 'HTVC Ca Nhạc',
     logo: 'https://upload.wikimedia.org/wikipedia/vi/a/ad/HTVC_Ca_nh%E1%BA%A1c.png',
     streamUrl: 'https://live.fptplay53.net/epzhd1/htvcmusic_vhls.smil/chunklist_b5000000.m3u8',
+  },
+  {
+    id: 'htvc_dulich',
+    name: 'HTVC Du Lịch',
+    logo: 'https://upload.wikimedia.org/wikipedia/vi/9/98/HTVC_Du_l%E1%BB%8Bch.png',
+    streamUrl: 'https://live.fptplay53.net/epzhd1/htvcdulich_vhls.smil/chunklist_b5000000.m3u8',
+  },
+  {
+    id: 'htvc_giadinh',
+    name: 'HTVC Gia Đình',
+    logo: 'https://upload.wikimedia.org/wikipedia/vi/1/18/HTVC_Gia_%C4%91%C3%ACnh.png',
+    streamUrl: 'https://live.fptplay53.net/epzhd1/htvcgiadinh_vhls.smil/chunklist_b5000000.m3u8',
   },
   {
     id: 'htvc_phimhd',
@@ -217,12 +377,119 @@ const HTV_CHANNELS: VtvChannelItem[] = [
     streamUrl: 'https://live.fptplay53.net/epzhd1/htvcmovieshd_vhls.smil/chunklist_b5000000.m3u8',
   },
   {
+    id: 'htvc_phunu',
+    name: 'HTVC Phụ Nữ',
+    logo: 'https://upload.wikimedia.org/wikipedia/vi/4/4e/HTVC_Ph%E1%BB%A5_n%E1%BB%AF.png',
+    streamUrl: 'https://live.fptplay53.net/epzhd1/htvcphunu_vhls.smil/chunklist_b5000000.m3u8',
+  },
+  {
     id: 'htvc_thuanviet',
-    name: 'HTVC Thuần Việt',
+    name: 'HTVC Thuần Việt HD',
     logo: 'https://upload.wikimedia.org/wikipedia/vi/3/3a/Thu%E1%BA%A7n_Vi%E1%BB%87t.png',
     streamUrl: 'https://live.fptplay53.net/epzhd1/htvcthuanviethd_vhls.smil/chunklist_b5000000.m3u8',
   },
+  {
+    id: 'htvc_plus',
+    name: 'HTVC+ HD',
+    logo: 'https://upload.wikimedia.org/wikipedia/vi/e/ec/HTVC_Plus.png',
+    streamUrl: 'https://live.fptplay53.net/epzhd1/htvcplus_vhls.smil/chunklist_b5000000.m3u8',
+  },
 ];
+
+// Danh sách các kênh SCTV
+const SCTV_CHANNELS: VtvChannelItem[] = [
+  { id: 'sctv1', name: 'SCTV1 HD', logo: 'https://static.wikia.nocookie.net/logos/images/3/3c/SCTV1.png/revision/latest/scale-to-width-down/1000?cb=20201119113949&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv1' },
+  { id: 'sctv2', name: 'SCTV2 HD', logo: 'https://static.wikia.nocookie.net/logos/images/6/64/SCTV2.png/revision/latest/scale-to-width-down/1000?cb=20201119114104&path-prefix=vi', streamUrl: 'https://liveh12.vtvprime.vn/hls/SCTV2/03.m3u8' },
+  { id: 'sctv3', name: 'SCTV3 HD', logo: 'https://static.wikia.nocookie.net/logos/images/4/4a/SCTV3.png/revision/latest/scale-to-width-down/1000?cb=20210819101244&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv3' },
+  { id: 'sctv4', name: 'SCTV4 HD', logo: 'https://static.wikia.nocookie.net/logos/images/6/62/SCTV4.png/revision/latest/scale-to-width-down/1000?cb=20240116011558&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv4' },
+  { id: 'sctv5', name: 'SCTV5 HD', logo: 'https://static.wikia.nocookie.net/logos/images/e/e7/SCTV5.png/revision/latest/scale-to-width-down/1000?cb=20210819100021&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv5' },
+  { id: 'sctv6', name: 'SCTV6 HD', logo: 'https://static.wikia.nocookie.net/logos/images/4/4b/SCTV6.png/revision/latest/scale-to-width-down/1000?cb=20210819100633&path-prefix=vi', streamUrl: 'https://live.fptplay53.net/epzhd2/film360_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'sctv7', name: 'SCTV7 HD', logo: 'https://static.wikia.nocookie.net/logos/images/8/87/SCTV7.png/revision/latest/scale-to-width-down/1000?cb=20210819102155&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv7' },
+  { id: 'sctv8', name: 'SCTV8 HD', logo: 'https://static.wikia.nocookie.net/logos/images/0/05/SCTV8.png/revision/latest/scale-to-width-down/1000?cb=20210819103024&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv8' },
+  { id: 'sctv9', name: 'SCTV9 HD', logo: 'https://static.wikia.nocookie.net/logos/images/f/f3/SCTV9.png/revision/latest/scale-to-width-down/1000?cb=20210821040105&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv9' },
+  { id: 'sctv10', name: 'SCTV10 HD', logo: 'https://static.wikia.nocookie.net/logos/images/c/c0/SCTV10.png/revision/latest/scale-to-width-down/1000?cb=20210819105314&path-prefix=vi', streamUrl: 'https://liveh34.vtvprime.vn/hls/SCTV10/01.m3u8' },
+  { id: 'sctv11', name: 'SCTV11 HD', logo: 'https://static.wikia.nocookie.net/logos/images/7/7d/SCTV11.png/revision/latest/scale-to-width-down/1000?cb=20210821040108&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv11' },
+  { id: 'sctv12', name: 'SCTV12 HD', logo: 'https://static.wikia.nocookie.net/logos/images/5/51/SCTV12.png/revision/latest/scale-to-width-down/1000?cb=20201127035429&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv12' },
+  { id: 'sctv13', name: 'SCTV13 HD', logo: 'https://static.wikia.nocookie.net/logos/images/c/c1/SCTV13_logo_2022.png/revision/latest/scale-to-width-down/1000?cb=20230630142130&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv13' },
+  { id: 'sctv14', name: 'SCTV14 HD', logo: 'https://static.wikia.nocookie.net/logos/images/1/12/SCTV14_logo_2022.png/revision/latest/scale-to-width-down/1000?cb=20220428035033&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv14' },
+  { id: 'sctv15', name: 'SCTV15 HD', logo: 'https://static.wikia.nocookie.net/logos/images/9/92/SCTV15.png/revision/latest/scale-to-width-down/1000?cb=20210820043237&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv15' },
+  { id: 'sctv16', name: 'SCTV16 HD', logo: 'https://static.wikia.nocookie.net/logos/images/a/aa/SCTV16.png/revision/latest/scale-to-width-down/1000?cb=20210820043927&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv16' },
+  { id: 'sctv17', name: 'SCTV17 HD', logo: 'https://static.wikia.nocookie.net/logos/images/0/0a/SCTV17.png/revision/latest/scale-to-width-down/1000?cb=20210820120340&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv17' },
+  { id: 'sctv18', name: 'SCTV18 HD', logo: 'https://static.wikia.nocookie.net/logos/images/c/ca/SCTV18.png/revision/latest/scale-to-width-down/1000?cb=20210820120952&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv18' },
+  { id: 'sctv19', name: 'SCTV19 HD', logo: 'https://static.wikia.nocookie.net/logos/images/e/ef/SCTV19.png/revision/latest/scale-to-width-down/1000?cb=20240131141543&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv19' },
+  { id: 'sctv20', name: 'SCTV20 HD', logo: 'https://static.wikia.nocookie.net/logos/images/b/b1/SCTV20.png/revision/latest/scale-to-width-down/1000?cb=20210821042852&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv20' },
+  { id: 'sctv21', name: 'SCTV21 HD', logo: 'https://static.wikia.nocookie.net/logos/images/9/9f/SCTV21.png/revision/latest/scale-to-width-down/1000?cb=20210821043405&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv21' },
+  { id: 'sctv22', name: 'SCTV22 HD', logo: 'https://static.wikia.nocookie.net/logos/images/5/5f/SCTV22.png/revision/latest/scale-to-width-down/1000?cb=20210821035512&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctv22' },
+  { id: 'sctv_phim', name: 'SCTV Phim', logo: 'https://static.wikia.nocookie.net/logos/images/1/12/SCTV_Phim_T%E1%BB%95ng_h%E1%BB%A3p_2020.png/revision/latest?cb=20230323070113&path-prefix=vi', streamUrl: 'https://hoiquan.dpdns.org/VTVGo/?sctvphim' },
+];
+
+// Danh sách Kênh Thiết yếu
+const ESSENTIAL_CHANNELS: VtvChannelItem[] = [
+  { id: 'antv', name: 'Truyền hình Công an Nhân dân (ANTV)', logo: 'https://img-zlr1.tv360.vn/image1/2020_09_23/1600822516608/b33963dc0df8_640_360.png', streamUrl: 'https://live.fptplay53.net/fnxhd2/anninhtv_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'qpvn', name: 'Truyền hình Quốc phòng Việt Nam (QPVN)', logo: 'https://static.wikia.nocookie.net/logos/images/5/5d/QPVN.png/revision/latest/scale-to-width-down/1000?cb=20220827083916&path-prefix=vi', streamUrl: 'https://live.fptplay53.net/fnxhd2/quocphongvnhd_vhls.smil/chunklist_b5000000.m3u8' },
+];
+
+// Danh sách Kênh Quốc tế & Thế giới
+const INTERNATIONAL_CHANNELS: VtvChannelItem[] = [
+  { id: 'cnn', name: 'CNN', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/CNN.svg', streamUrl: 'https://d3bp6dwmpbdajl.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-ury0meh5m4nzm/index.m3u8' },
+  { id: 'bbc_news', name: 'BBC News', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/62/BBC_News_2022.svg', streamUrl: 'https://stream8.cinerama.uz/1251/tracks-v1a1/mono.m3u8' },
+  { id: 'discovery', name: 'Discovery Channel HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Discovery_Channel_logo.svg', streamUrl: 'http://cdn4.skygo.mn/live/disk1/SoutheastAsia/HLSv3-FTA/SoutheastAsia.m3u8' },
+  { id: 'aljazeera', name: 'ALJAZEERA', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Aljazeera_eng.svg', streamUrl: 'https://live-hls-apps-aje-fa.getaj.net/AJE/01.m3u8' },
+  { id: 'animal_planet', name: 'Animal Planet', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Animal_Planet_logo_2018.svg', streamUrl: 'https://tiger-hub.vercel.app@vodzong.mjunoon.tv:8087/streamtest/Animal-Planet-158-3/playlist.m3u8' },
+  { id: 'afn', name: 'ASIAN FOOD NETWORK', logo: 'https://static.wikia.nocookie.net/logos/images/a/a2/Asian_Food_Network.png', streamUrl: 'https://live.fptplay53.net/fnxhd2/afchd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'cartoon_network', name: 'Cartoon Network', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bb/Cartoon_Network_logo.svg', streamUrl: 'http://cdn4.skygo.mn/live/disk1/Cartoon_Network/HLSv3-FTA/Cartoon_Network.m3u8' },
+  { id: 'kbs_world', name: 'KBS World', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/KBS_World_2018.svg', streamUrl: 'https://live.fptplay53.net/epzhd2/kbs_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'nhk_world', name: 'NHK World Japan', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/87/NHK_World-Japan_logo.svg', streamUrl: 'https://live.fptplay53.net/fnxhd2/nhkworld_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'tv5_monde', name: 'TV5 Monde', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/TV5MONDE_logo.svg', streamUrl: 'https://live.fptplay53.net/fnxhd2/tv5_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'cna', name: 'CNA', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Channel_NewsAsia_logo.svg', streamUrl: 'https://live.fptplay53.net/fnxhd2/newsasia_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'cnbc', name: 'CNBC', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/CNBC_logo.svg', streamUrl: 'https://live.fptplay53.net/fnxsd1/cnbc_hls.smil/chunklist_b2500000.m3u8' },
+  { id: 'kix_hd', name: 'KIX HD', logo: 'https://static.wikia.nocookie.net/logos/images/0/05/KIX_HD.png', streamUrl: 'https://live.fptplay53.net/fnxhd2/kixhd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'outdoor_channel', name: 'Outdoor Channel', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Outdoor_Channel_logo.svg', streamUrl: 'https://live.fptplay53.net/epzhd2/outdoorfhd_vhls.smil/chunklist_b5000000.m3u8' },
+  { id: 'tvn', name: 'tvN', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/be/Tvn_logo.svg', streamUrl: 'https://d21dxaer0ypwk1.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-a6m2cy2rylsvo-ssai-prd/54ac8e25_eb5a_4f10_ba20_ffb254f0a16c/hls/playlist.m3u8' },
+  { id: 'warner_tv', name: 'Warner TV HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Warner_TV_logo.svg', streamUrl: 'http://cdn4.skygo.mn/live/disk1/Warner/HLSv3-FTA/Warner.m3u8' },
+  { id: 'extreme_sports', name: 'Extreme Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/18/Extreme_Group_Logo.svg', streamUrl: 'http://flussonic.mkpnet.ru/tv-1a9441fd32d63873/video.m3u8' },
+  { id: 'fashion_tv', name: 'Fashion TV', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Fashion_TV.svg', streamUrl: 'https://stream8.cinerama.uz/1053/tracks-v1a1/mono.m3u8' },
+  { id: 'bloomberg', name: 'Bloomberg', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Bloomberg_logo.svg', streamUrl: 'https://cdn4.skygo.mn/live/disk1/Bloomberg/HLSv3-FTA/Bloomberg.m3u8' },
+  // Quốc tế: Kênh Mỹ
+  { id: 'abc_us', name: 'ABC (720p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/30/ABC_logo_2021.svg', streamUrl: 'http://41.205.93.154/ABC/index.m3u8' },
+  { id: 'bein_sports_xtra', name: 'beIN SPORTS XTRA (1080p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/32/BeIN_Sports_logo.svg', streamUrl: 'https://bein-xtra-bein.amagi.tv/playlist.m3u8' },
+  { id: 'bloomberg_us', name: 'Bloomberg TV US (720p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/50/Bloomberg_logo.svg', streamUrl: 'https://bloomberg.com/media-manifest/streams/us.m3u8' },
+  { id: 'disney_xd', name: 'Disney XD (720p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Disney_XD_logo_2015.svg', streamUrl: 'http://23.237.104.106:8080/USA_DISNEY_XD/index.m3u8' },
+  { id: 'mtv_us', name: 'MTV (720p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/67/MTV_logo_2021.svg', streamUrl: 'http://198.58.104.90:8989/mtv/index.m3u8' },
+  { id: 'nickelodeon_us', name: 'Nickelodeon (1080p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Nickelodeon_logo_2023.svg', streamUrl: 'http://23.237.104.106:8080/USA_NICKELODEON/index.m3u8' },
+  { id: 'showtime_us', name: 'Showtime (1080p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Showtime_logo.svg', streamUrl: 'http://23.237.104.106:8080/USA_SHOWTIME/index.m3u8' },
+  { id: 'starz_us', name: 'Starz (1080p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/70/Starz_2016.svg', streamUrl: 'http://23.237.104.106:8080/USA_STARZ/index.m3u8' },
+  // Quốc tế: Kênh Trung Quốc
+  { id: 'cctv_1', name: 'CCTV-1 (1080p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/87/CCTV-1_logo.svg', streamUrl: 'http://69.30.245.50/live/cctv1.m3u8' },
+  { id: 'cctv_3', name: 'CCTV-3 (720p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/23/CCTV-3_logo.svg', streamUrl: 'http://74.91.26.218:82/live/cctv3hd.m3u8' },
+  { id: 'cctv_6', name: 'CCTV-6 (1080p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/59/CCTV-6_logo.svg', streamUrl: 'http://69.30.245.50/live/cctv6.m3u8' },
+  { id: 'hunan_tv', name: 'Hunan TV (2160p)', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Hunan_TV_logo.svg', streamUrl: 'http://hlsal-ldvt.qing.mgtv.com/nn_live/nn_x64/dWlwPTEyNy4wLjAuMSZ1aWQ9cWluZy1jbXMmbm5fdGltZXpvbmU9OCZjZG5leF9pZD1hbF9obHNfbGR2dCZ1dWlkPTliODY4NmU5ZTM2YzYwMmMmZT02OTE0NjA0JnY9MSZpZD1ITldTWkdTVCZzPTcwN2RiYTc2YzJjNmJmMTQ4MmUyZGYzOWU2NWM3YWFi/HNWSZGST.m3u8' },
+  // Quốc tế: Tây Ban Nha, Ý, Nga, Ấn Độ
+  { id: 'real_madrid_tv', name: 'Real Madrid TV', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Real_Madrid_CF.svg', streamUrl: 'https://rmtv.akamaized.net/hls/live/2043153/rmtv-es-web/master.m3u8' },
+  { id: 'canale_5', name: 'Canale 5', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/af/Canale_5_logo_2018.svg', streamUrl: 'https://live3-mediaset-it.akamaized.net/Content/hls_h0_clr_vos/live/channel(C5)/index.m3u8' },
+  { id: 'italia_1', name: 'Italia 1', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Italia_1_logo_2018.svg', streamUrl: 'https://live3-mediaset-it.akamaized.net/Content/hls_h0_clr_vos/live/channel(i1)/index.m3u8' },
+  { id: 'rai_1_hd', name: 'Rai 1 HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Rai_1_logo_%282016%29.svg', streamUrl: 'https://srv1.adriatelekom.com/Rai1/index.m3u8' },
+  { id: 'russia_1_hd', name: 'Russia-1 HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Rossiya_1_logo_2012.svg', streamUrl: 'https://stream.smotrim.ru/hls2/russia_hd/playlist_6.m3u8' },
+  { id: 'russia_24', name: 'Russia-24', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Rossiya_24_logo_2012.svg', streamUrl: 'https://stream.smotrim.ru/hls2/russia24nl_smotrim/playlist_5.m3u8' },
+  { id: 'aaj_tak_hd', name: 'Aaj Tak HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Aaj_Tak_Logo.svg', streamUrl: 'https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8' },
+  { id: 'star_sports_1_hd', name: 'Star Sports 1 HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Star_Sports_logo_2021.svg', streamUrl: 'http://103.253.18.58:8000/play/a00m' },
+  { id: 'wion_hd', name: 'WION HD', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/WION_Logo.svg', streamUrl: 'https://raw.githubusercontent.com/Alstruit/adaptive-streams/alstruit-10_23_in/streams/in/WION.in.m3u8' },
+];
+
+// Danh sách Kênh Radio
+const RADIO_CHANNELS: VtvChannelItem[] = [
+  { id: 'vov1', name: 'VOV1', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'https://media-audio.vov.vn/vov1vov5Vietnamese.sdp_aac/playlist.m3u8' },
+  { id: 'vov2', name: 'VOV2', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'https://media-audio.vov.vn/vov2.sdp_aac/playlist.m3u8' },
+  { id: 'vov3', name: 'VOV3', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'https://media-audio.vov.vn/vov3.sdp_aac/playlist.m3u8' },
+  { id: 'vov4', name: 'VOV4', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'http://media.kythuatvov.vn:1936/live/VOV4_TB.sdp/chunklist.m3u8' },
+  { id: 'vov5', name: 'VOV5', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'https://media-audio.vov.vn/vov5.sdp_aac/playlist.m3u8' },
+  { id: 'vov_gt_hn', name: 'VOV Giao Thông Hà Nội', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'https://play.vovgiaothong.vn/live/gthn/playlist.m3u8' },
+  { id: 'vov_gt_hcm', name: 'VOV Giao Thông TP.HCM', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'https://play.vovgiaothong.vn/live/gthcm/playlist.m3u8' },
+  { id: 'vov_gt_mekong', name: 'VOV Giao Thông Mê Kông', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_VOV.svg', streamUrl: 'https://play.vovgiaothong.vn/live/mekong/playlist.m3u8' },
+  { id: 'hanoi_fm90', name: 'Hà Nội FM90', logo: 'https://static.wikia.nocookie.net/ftv/images/4/4e/H1.png/revision/latest/scale-to-width-down/1000?cb=20260602015950&path-prefix=vi', streamUrl: 'http://14.162.146.90:8000/HANOI90' },
+  { id: 'hanoi_fm96', name: 'Hà Nội FM96', logo: 'https://static.wikia.nocookie.net/ftv/images/4/4e/H1.png/revision/latest/scale-to-width-down/1000?cb=20260602015950&path-prefix=vi', streamUrl: 'http://222.252.21.96:8000/HANOI96' },
+];
+
 
 // Danh sách các kênh địa phương
 const LOCAL_CHANNELS: VtvChannelItem[] = [
@@ -304,7 +571,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
   const { searchQuery } = useTabSearch();
   const [selectedChannel, setSelectedChannel] = useState<VtvChannelItem>(() => {
     if (currentChannel?.id) {
-      const all = [...VTV_CHANNELS, ...HTV_CHANNELS, ...LOCAL_CHANNELS];
+      const all = [...VTV_CHANNELS, ...SPECIAL_CHANNELS, ...HTV_CHANNELS, ...LOCAL_CHANNELS];
       const match = all.find((c) => c.id === currentChannel.id || c.name.toLowerCase() === currentChannel.name.toLowerCase());
       if (match) return match;
     }
@@ -348,7 +615,7 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
 
   // Aggregated channel list for multiview and search
   const allChannelsList = useMemo<VtvChannelItem[]>(() => {
-    const list: VtvChannelItem[] = [...VTV_CHANNELS, ...HTV_CHANNELS, ...LOCAL_CHANNELS];
+    const list: VtvChannelItem[] = [...VTV_CHANNELS, ...SPECIAL_CHANNELS, ...HTV_CHANNELS, ...LOCAL_CHANNELS];
     if (channels && channels.length > 0) {
       channels.forEach((ch) => {
         if (!list.some((existing) => existing.id === ch.id)) {
@@ -1051,6 +1318,72 @@ export const LiveTV: React.FC<LiveTVProps> = ({ currentChannel, onSelectChannel,
                           IDENT 2026
                         </span>
                       )}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Section Đặc biệt: Kênh Đặc biệt (VTVgo Streams) - Đặt bên dưới nhóm kênh VTV */}
+        <div className="w-full space-y-4 pt-2">
+          {/* Header */}
+          <div className="flex items-center gap-2.5 pb-2">
+            <span className="w-1.5 h-5 bg-[#A855F7] rounded-full shrink-0" />
+            <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-1.5">
+              <span>Kênh Đặc biệt (VTVgo Streams)</span>
+              <span className="text-sm sm:text-base font-semibold text-[#8E8B99]">
+                ({SPECIAL_CHANNELS.length})
+              </span>
+            </h2>
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-white/10 w-full mb-4" />
+
+          {/* Grid of Special channels */}
+          {(() => {
+            const filteredSpecial = SPECIAL_CHANNELS.filter((ch) =>
+              !searchQuery.trim() || ch.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+            );
+
+            if (filteredSpecial.length === 0) {
+              return (
+                <div className="py-8 text-center bg-white/5 rounded-2xl border border-white/10">
+                  <p className="text-zinc-400 text-sm">
+                    Không tìm thấy kênh nào khớp với từ khóa &quot;{searchQuery}&quot;
+                  </p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 gap-3">
+                {filteredSpecial.map((channel) => {
+                  const isSelected = selectedChannel.id === channel.id;
+
+                  return (
+                    <button
+                      key={channel.id}
+                      id={`channel-btn-${channel.id}`}
+                      onClick={() => handleSelectChannel(channel)}
+                      className={`channel-card h-20 sm:h-22 rounded-2xl p-2.5 sm:p-3 flex items-center justify-center cursor-pointer bg-[#353535] hover:bg-[#424242] relative group border-[3px] ${
+                        isSelected
+                          ? 'border-white shadow-xl shadow-black/40'
+                          : 'border-transparent hover:border-white'
+                      }`}
+                      title={channel.name}
+                    >
+                      <img
+                        src={channel.logo}
+                        alt={channel.name}
+                        className="h-12 sm:h-14 w-auto max-w-[88%] max-h-[82%] object-contain select-none pointer-events-none"
+                        referrerPolicy="no-referrer"
+                      />
+                      <span className="absolute bottom-1 right-1.5 px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-[#7C3AED] text-white tracking-wider uppercase shadow-md pointer-events-none">
+                        VTVgo
+                      </span>
                     </button>
                   );
                 })}

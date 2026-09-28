@@ -110,7 +110,8 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   );
 
   const isSection1Visible = matchesSearch(
-    'Giao diện', 'Tab View', 'Tabview', 'Tab view', 'Navigation bar',
+    'Giao diện', 'Theme', 'Chế độ giao diện', 'Light mode', 'Dark mode', 'Sáng', 'Tối',
+    'Tab View', 'Tabview', 'Tab view', 'Navigation bar',
     'Settings drawer', 'drawer', 'Ngăn kéo', 'Trượt bên phải',
     'floating', 'floats', 'Thanh điều hướng', 'Thanh điều hướng chính',
     'Sidebar', 'Top bar', 'topbar', 'Bố cục',
@@ -661,6 +662,103 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
           </div>
 
           <div className="space-y-3 pt-1">
+            {/* Card 0: Chế độ giao diện (Theme: Sáng / Tối) */}
+            {(matchesSearch('Chế độ giao diện') ||
+              matchesSearch('Theme') ||
+              matchesSearch('Dark mode') ||
+              matchesSearch('Light mode') ||
+              matchesSearch('Sáng') ||
+              matchesSearch('Tối') ||
+              matchesSearch('Giao diện')) && (
+              <div 
+                id="settings-card-theme-mode"
+                className="settings-item-card p-4 sm:p-5 rounded-[20px] bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/[0.03] space-y-3.5 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-2">
+                      <Sun className="w-4.5 h-4.5 text-amber-400" />
+                      <span>Chế độ giao diện (Theme)</span>
+                    </div>
+                    <p className="text-xs text-white/60 mt-0.5">
+                      Lựa chọn giao diện Tối để xem truyền hình điện ảnh ban đêm hoặc giao diện Sáng thanh lịch ban ngày
+                    </p>
+                  </div>
+                </div>
+
+                {/* Grid 2 tùy chọn: Dark Mode & Light Mode */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Tùy chọn 1: Dark Mode */}
+                  <button
+                    id="setting-theme-dark"
+                    type="button"
+                    onClick={() => updateSetting('theme', 'dark')}
+                    className={`p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer relative group ${
+                      settings.theme !== 'light'
+                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                        settings.theme !== 'light'
+                          ? 'bg-zinc-900 text-amber-300 border border-white/20'
+                          : 'bg-white/10 text-white/60 group-hover:text-white'
+                      }`}>
+                        <Moon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-bold text-white block">Giao diện Tối</span>
+                        <span className="text-[11px] text-white/60 block">Dark Mode (#181818)</span>
+                      </div>
+                    </div>
+
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                      settings.theme !== 'light'
+                        ? 'bg-white text-black'
+                        : 'border border-white/20 text-transparent'
+                    }`}>
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  </button>
+
+                  {/* Tùy chọn 2: Light Mode */}
+                  <button
+                    id="setting-theme-light"
+                    type="button"
+                    onClick={() => updateSetting('theme', 'light')}
+                    className={`p-3.5 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer relative group ${
+                      settings.theme === 'light'
+                        ? 'bg-white/10 border-white shadow-[0_0_16px_rgba(255,255,255,0.15)] ring-1 ring-white'
+                        : 'bg-white/[0.03] border-white/15 hover:border-white/30 hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                        settings.theme === 'light'
+                          ? 'bg-amber-100 text-amber-600 border border-amber-300'
+                          : 'bg-white/10 text-white/60 group-hover:text-white'
+                      }`}>
+                        <Sun className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-bold text-white block">Giao diện Sáng</span>
+                        <span className="text-[11px] text-white/60 block">Light Mode (#F4F5F8)</span>
+                      </div>
+                    </div>
+
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
+                      settings.theme === 'light'
+                        ? 'bg-white text-black'
+                        : 'border border-white/20 text-transparent'
+                    }`}>
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Card 1: Thanh điều hướng chính (Top bar, Sidebar, hoặc Tab View) */}
             {(matchesSearch('Thanh điều hướng chính') ||
               matchesSearch('Thanh điều hướng') ||
