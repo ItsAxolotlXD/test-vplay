@@ -548,6 +548,17 @@ div:has(> input[placeholder*="search" i]) button {
 }
 
 /* =========================================================================
+   SAFE AREA CỦA DYNAMIC ISLAND CÓ MÀU NỀN APP OPACITY = 100
+   ========================================================================= */
+#dynamic-island-safe-area-topbar,
+#dynamic-island-safe-area-content,
+#dynamic-island-safe-area-bar {
+  background-color: var(--dark-bg, #181818) !important;
+  opacity: 1 !important;
+}
+
+
+/* =========================================================================
    BỎ BORDER KHỎI CÀI ĐẶT, DANH MỤC CÀI ĐẶT, LOGO WEB & TOP BAR (TRỪ HAMBURGER MENU)
    ========================================================================= */
 

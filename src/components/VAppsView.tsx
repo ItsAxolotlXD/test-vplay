@@ -32,10 +32,12 @@ import {
   RotateCw,
   LucideIcon,
   Car,
-  Gauge
+  Gauge,
+  Palette
 } from 'lucide-react';
 
 export type VAppId =
+  | 'ms_paint'
   | 'ride_booking'
   | 'driving_simulator'
   | 'v_arcade'
@@ -79,6 +81,19 @@ export interface VAppDefinition {
 }
 
 export const VAPPS_LIST: VAppDefinition[] = [
+  {
+    id: 'ms_paint',
+    name: 'MS Paint',
+    tagline: 'Ứng Dụng Vẽ Vẽ Tranh Sáng Tạo',
+    description: 'Vẽ tranh tự do, phác thảo nghệ thuật với bút vẽ, cọ màu, bút chì, cục tẩy, đổ màu, hình khối, thước đo và bảng màu 28 sắc thái kinh điển.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Mới',
+    gradientBg: 'bg-gradient-to-br from-[#0284C7] via-[#EC4899] to-[#8B5CF6]',
+    borderClass: 'border-[#F472B6]/50 group-hover:border-[#F472B6]',
+    glowClass: 'shadow-[0_10px_30px_rgba(236,72,153,0.35)]',
+    icon: Palette,
+    tags: ['MS Paint', 'Paint', 'Vẽ', 'Vẽ tranh', 'Bút vẽ', 'Họa sĩ', 'Drawing', 'Canvas', 'Art', 'Space 360'],
+  },
   {
     id: 'ride_booking',
     name: 'Đặt xe',
@@ -542,6 +557,9 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'driving_simulator':
         navigate('/driving-simulator', { appId: 'driving_simulator' });
+        break;
+      case 'ms_paint':
+        navigate('/paint', { appId: 'ms_paint' });
         break;
       default:
         navigate('/space-360');

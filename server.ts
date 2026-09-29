@@ -1050,8 +1050,22 @@ const handleStreamIntroVideo = (req: express.Request, res: express.Response) => 
   handleStreamVideoFile(videoPath, req, res);
 };
 
+const handleStreamIntermissionVideo = (req: express.Request, res: express.Response) => {
+  const videoPath = path.join(process.cwd(), "public/intro_screen.mp4");
+  if (fs.existsSync(videoPath)) {
+    handleStreamVideoFile(videoPath, req, res);
+  } else {
+    // Fallback to proxying from wikia
+    const wikiaUrl = "https://static.wikia.nocookie.net/ep-deo/images/5/51/Intro_screen.mp4/revision/latest?cb=20260929101702";
+    res.redirect(`/api/video-proxy?url=${encodeURIComponent(wikiaUrl)}`);
+  }
+};
+
 app.get("/intro-video.mp4", handleStreamIntroVideo);
 app.get("/api/intro-video", handleStreamIntroVideo);
+app.get("/intro_screen.mp4", handleStreamIntermissionVideo);
+app.get("/api/intermission-video", handleStreamIntermissionVideo);
+app.get("/api/intro-screen-video", handleStreamIntermissionVideo);
 
 // Stream ads videos
 app.get("/ads/:filename", (req, res) => {
@@ -1069,6 +1083,12 @@ app.get("/api/ads/:filename", (req, res) => {
 app.get("/api/video-proxy", async (req, res) => {
   try {
     const videoUrl = (req.query.url as string) || "https://static.wikia.nocookie.net/ep-deo/images/4/4a/5c1imv.mp4/revision/latest?cb=20260924070114";
+    
+    // If requesting Intro_screen.mp4 and local file exists, stream directly with 206 support
+    if (videoUrl.includes("Intro_screen.mp4") && fs.existsSync(path.join(process.cwd(), "public/intro_screen.mp4"))) {
+      return handleStreamVideoFile(path.join(process.cwd(), "public/intro_screen.mp4"), req, res);
+    }
+
     const range = req.headers.range;
     const fetchHeaders: Record<string, string> = {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",

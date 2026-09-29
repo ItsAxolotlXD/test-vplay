@@ -234,18 +234,26 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
   const targetHeight = isSearchExpanded ? '44px' : isNotificationActive ? '40px' : '34px';
 
   return (
-    <div
-      ref={containerRef}
-      id="dynamic-island-container"
-      className="fixed top-2.5 sm:top-3 left-1/2 -translate-x-1/2 z-[100001] flex flex-col items-center pointer-events-none select-none"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        if (!isFocused && !searchQuery) {
-          inputRef.current?.blur();
-        }
-      }}
-    >
+    <>
+      {/* Dynamic Island Viewport Safe Area with 100% opacity app background color */}
+      <div
+        id="dynamic-island-safe-area-bar"
+        className="fixed top-0 left-0 right-0 h-11 sm:h-12 bg-[#181818] opacity-100 z-[100000] pointer-events-none transition-all duration-300 border-b border-white/[0.04]"
+        aria-label="Dynamic Island Safe Area Bar"
+      />
+
+      <div
+        ref={containerRef}
+        id="dynamic-island-container"
+        className="fixed top-2.5 sm:top-3 left-1/2 -translate-x-1/2 z-[100001] flex flex-col items-center pointer-events-none select-none"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          if (!isFocused && !searchQuery) {
+            inputRef.current?.blur();
+          }
+        }}
+      >
       {/* Dynamic Island Main Pill (NO shadow, NO glow, pure matte black with bounce animation) */}
       <motion.div
         layout
@@ -475,5 +483,6 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 };

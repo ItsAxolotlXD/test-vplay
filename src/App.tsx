@@ -51,7 +51,9 @@ import {
   CookbookTab,
   VRideBookingTab,
   DrivingSimulatorTab,
+  MSPaintTab,
 } from './components/vapps';
+import { IntermissionIntroVideo } from './components/IntermissionIntroVideo';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
 import VplayVBoxTab from './components/VplayVBoxTab';
 import VStudyTab from './components/VStudyTab';
@@ -186,8 +188,10 @@ function AppContent() {
   // Startup Intro Video & Splash Screen State (disabled on startup per user request)
   const [showStartupVideo, setShowStartupVideo] = useState<boolean>(false);
   const [showSplashScreen, setShowSplashScreen] = useState<boolean>(false);
-  // Startup Brand Transition Message Screen (Replay only, not blocking startup)
+  // Startup Brand Transition Message Screen (Intermission screen)
   const [showBrandTransitionScreen, setShowBrandTransitionScreen] = useState<boolean>(false);
+  // Auto-play intermission intro video and intermission screen on every app startup
+  const [showIntermissionIntroVideo, setShowIntermissionIntroVideo] = useState<boolean>(true);
 
   // Allow replaying splash screen, startup intro video, or brand transition message via custom events
   useEffect(() => {
@@ -199,7 +203,9 @@ function AppContent() {
       setShowSplashScreen(false);
     };
     const handleReplayBrandTransition = () => {
-      setShowBrandTransitionScreen(true);
+      // Play intro video first before showing intermission screen per user requirement
+      setShowIntermissionIntroVideo(true);
+      setShowBrandTransitionScreen(false);
     };
     window.addEventListener('vplay:replay_splash', handleReplaySplash);
     window.addEventListener('vplay:replay_startup_video', handleReplayStartupVideo);
@@ -660,6 +666,11 @@ function AppContent() {
       case '/lai-xe':
         return renderSpace360App('Driving Simulator', <DrivingSimulatorTab onBack={() => navigate('/space-360')} navigate={navigate} />);
 
+      case '/paint':
+      case '/ms-paint':
+      case '/v-paint':
+        return renderSpace360App('MS Paint', <MSPaintTab onBack={() => navigate('/space-360')} />);
+
       case '/v-space':
       case '/v-apps':
       case '/space-360':
@@ -806,7 +817,7 @@ function AppContent() {
   const isFloatingSearchVisible = (isStatusBar || (isTopBarMode && !isFloatyMode)) && !isDedicatedSearchRoute;
 
   return (
-    <IntermissionMusicProvider isActive={showBrandTransitionScreen || isOobeOpen}>
+    <IntermissionMusicProvider isActive={(showBrandTransitionScreen || isOobeOpen) && !showIntermissionIntroVideo}>
       <TabSearchProvider currentRoute={currentRoute}>
       <div className={`min-h-screen ${hasCustomWallpaper ? 'has-custom-wallpaper bg-transparent' : 'bg-[#181818]'} text-[#E0E0E6] flex font-sans selection:bg-[#C83DFF] selection:text-white relative transition-colors duration-500 ${isAnimationTest ? 'vplay-motion-active' : ''}`}>
         {/* Custom App Wallpaper Layer (Spatial Glass interactive background) */}
@@ -923,7 +934,7 @@ function AppContent() {
               {isDynamicIsland && (
                 <div 
                   id="dynamic-island-safe-area-topbar" 
-                  className="w-full h-11 sm:h-12 pointer-events-none transition-all duration-300" 
+                  className="w-full h-11 sm:h-12 bg-[#181818] opacity-100 pointer-events-none transition-all duration-300" 
                   aria-label="Dynamic Island Safe Area" 
                 />
               )}
@@ -942,7 +953,7 @@ function AppContent() {
           {(isFloatyMode || !isTopBarMode) && isDynamicIsland && (
             <div 
               id="dynamic-island-safe-area-content" 
-              className="w-full h-12 sm:h-14 shrink-0 pointer-events-none transition-all duration-300" 
+              className="w-full h-12 sm:h-14 bg-[#181818] opacity-100 shrink-0 pointer-events-none transition-all duration-300" 
               aria-label="Dynamic Island Safe Area" 
             />
           )}
@@ -1013,7 +1024,21 @@ function AppContent() {
           onImportPlaylist={handleImportPlaylist}
         />
 
-        {/* Startup Brand Transition Message Screen (Replaces old splash screen & VNRT ads on startup) */}
+        {/* Intermission Intro Video (played before intermission screen) */}
+        {showIntermissionIntroVideo && (
+          <IntermissionIntroVideo
+            onFinish={() => {
+              setShowIntermissionIntroVideo(false);
+              setShowBrandTransitionScreen(true);
+            }}
+            onSkip={() => {
+              setShowIntermissionIntroVideo(false);
+              setShowBrandTransitionScreen(true);
+            }}
+          />
+        )}
+
+        {/* Startup Brand Transition Message Screen (Intermission Screen) */}
         {showBrandTransitionScreen && (
           <BrandTransitionScreen
             onContinue={() => {
@@ -1022,6 +1047,10 @@ function AppContent() {
             onStartSetup={() => {
               setShowBrandTransitionScreen(false);
               setIsOobeOpen(true);
+            }}
+            onReplayIntroVideo={() => {
+              setShowBrandTransitionScreen(false);
+              setShowIntermissionIntroVideo(true);
             }}
           />
         )}
@@ -1047,7 +1076,7 @@ function AppContent() {
 
         {/* Windows 11 Style OOBE First-Time Setup Modal */}
         <OobeSetupModal
-          isOpen={isOobeOpen && !showSplashScreen && !showStartupVideo && !showBrandTransitionScreen}
+          isOpen={isOobeOpen && !showSplashScreen && !showStartupVideo && !showBrandTransitionScreen && !showIntermissionIntroVideo}
           onClose={() => {
             setIsOobeOpen(false);
             setShowBrandTransitionScreen(false);

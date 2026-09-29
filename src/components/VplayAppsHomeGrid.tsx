@@ -38,6 +38,25 @@ export const VplayAppsHomeGrid: React.FC<VplayAppsHomeGridProps> = React.memo(({
   // - Màu sắc siêu saturate, tươi tắn, độ sâu 3D bóng bẩy
   // - 100% tự craft vector SVG không dùng preset iconography
   const apps: VplayAppItem[] = useMemo(() => [
+    // 0. MS Paint (Ứng dụng vẽ Space 360)
+    {
+      id: 'ms_paint',
+      name: 'MS Paint',
+      category: 'Tiện ích',
+      route: '/paint',
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#EC4899] via-[#8B5CF6] to-[#3B82F6] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[68%] h-[68%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+            <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+            <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+            <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z" />
+          </svg>
+        </div>
+      )
+    },
     // 0. Đặt xe (Space 360 Ride Hailing)
     {
       id: 'ride_booking',

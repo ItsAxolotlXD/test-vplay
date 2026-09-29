@@ -144,6 +144,15 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   };
 
   const isSpace360AppActive = (appId: string) => {
+    if (appId === 'ms_paint') {
+      return (
+        currentRoute === '/paint' ||
+        currentRoute === '/ms-paint' ||
+        currentRoute === '/v-paint' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'ms_paint')
+      );
+    }
     if (appId === 'ride_booking') {
       return (
         currentRoute === '/v-ride' ||
@@ -636,6 +645,9 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
               isActive("/v-space") ||
               isActive("/space-360") ||
               isActive("/v-apps") ||
+              isActive("/paint") ||
+              isActive("/ms-paint") ||
+              isActive("/v-paint") ||
               isActive("/v-ride") ||
               isActive("/ride") ||
               isActive("/dat-xe") ||
@@ -708,6 +720,25 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                     <Sparkles className="w-4 h-4 text-pink-400 shrink-0" />
                     <span className="truncate">Tất cả Space 360</span>
                   </div>
+                </button>
+
+                {/* MS Paint */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-paint" : "space360-tab-paint"}
+                  onClick={() => handleNavClick("/paint", { appId: "ms_paint" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("ms_paint")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Palette className="w-4 h-4 text-pink-400 shrink-0" />
+                    <span className="truncate">MS Paint</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-pink-500/20 text-pink-300">
+                    Vẽ
+                  </span>
                 </button>
 
                 {/* Đặt xe (Ride Booking) */}

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Volume2, VolumeX, Music, Play, Pause, Volume1, Search, ArrowRight, BookOpen, Menu, ExternalLink, SquareArrowDown } from 'lucide-react';
+import { Volume2, VolumeX, Music, Play, Pause, Volume1, Search, ArrowRight, BookOpen, Menu, ExternalLink, SquareArrowDown, Film } from 'lucide-react';
 import { useIntermissionMusic } from '../context/IntermissionMusicContext';
 
 interface BrandTransitionScreenProps {
   onContinue: () => void;
   onStartSetup?: () => void;
+  onReplayIntroVideo?: () => void;
 }
 
 export type MessageRegion = 'asia' | 'europe' | 'americas' | 'africa' | 'global';
@@ -672,7 +673,11 @@ const MESSAGES: MessageItem[] = [
   },
 ];
 
-export const BrandTransitionScreen: React.FC<BrandTransitionScreenProps> = ({ onContinue, onStartSetup }) => {
+export const BrandTransitionScreen: React.FC<BrandTransitionScreenProps> = ({
+  onContinue,
+  onStartSetup,
+  onReplayIntroVideo,
+}) => {
   const {
     isPlaying,
     isMuted,
@@ -765,6 +770,18 @@ export const BrandTransitionScreen: React.FC<BrandTransitionScreenProps> = ({ on
 
       {/* Floating Sound Controls in top-right corner with Volume Boost indicator */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md rounded-full px-3 py-1.5 text-slate-700">
+        {onReplayIntroVideo && (
+          <button
+            type="button"
+            onClick={onReplayIntroVideo}
+            className="p-1.5 rounded-full hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer border-r border-slate-200 pr-2 mr-0.5 flex items-center gap-1.5 text-xs font-semibold"
+            title="Xem video giới thiệu Intermission"
+          >
+            <Film className="w-3.5 h-3.5 text-blue-600" />
+            <span className="hidden sm:inline text-[11px] text-blue-600 font-bold">Intro Video</span>
+          </button>
+        )}
+
         <div className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0">
           <Music className="w-3 h-3 text-emerald-400 animate-pulse" />
         </div>
