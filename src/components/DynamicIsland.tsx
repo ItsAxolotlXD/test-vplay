@@ -237,7 +237,7 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
     <div
       ref={containerRef}
       id="dynamic-island-container"
-      className="fixed top-2.5 sm:top-3 left-1/2 -translate-x-1/2 z-[100001] flex flex-col items-center pointer-events-auto select-none"
+      className="fixed top-2.5 sm:top-3 left-1/2 -translate-x-1/2 z-[100001] flex flex-col items-center pointer-events-none select-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -264,7 +264,7 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
         }}
         whileHover={{ scale: isSearchExpanded ? 1 : 1.025 }}
         whileTap={{ scale: 0.97 }}
-        className="relative bg-black text-white border border-zinc-800/80 shadow-none flex items-center justify-between px-3 cursor-pointer overflow-hidden"
+        className="relative pointer-events-auto bg-black text-white border border-zinc-800/80 shadow-none flex items-center justify-between px-3 cursor-pointer overflow-hidden"
         onClick={handlePillClick}
       >
         {/* 1. COLLAPSED VIEW: Simple, pure black pill without search icon/text */}
@@ -394,7 +394,7 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
               stiffness: 420,
               damping: 24,
             }}
-            className="w-[clamp(320px,86vw,520px)] mt-2 rounded-2xl bg-black border border-zinc-800 shadow-none p-2 text-white overflow-hidden"
+            className="w-[clamp(320px,86vw,520px)] mt-2 rounded-2xl bg-black border border-zinc-800 shadow-none p-2 text-white overflow-hidden pointer-events-auto"
           >
             {/* Matching Channels */}
             {matchingChannels.length > 0 && (

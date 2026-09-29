@@ -368,8 +368,8 @@ export const applySystemSettings = (settings: SystemSettings) => {
   document.documentElement.classList.remove('light-mode');
   document.documentElement.classList.add('dark');
 
-  // Apply V-Cursor active class to html
-  if (settings.vcursorEnabled !== false) {
+  // Apply V-Cursor active class to html only when explicitly enabled
+  if (Boolean(settings.vcursorEnabled)) {
     document.documentElement.classList.add('vplay-custom-cursor-active');
   } else {
     document.documentElement.classList.remove('vplay-custom-cursor-active');

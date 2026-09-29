@@ -14,9 +14,11 @@ import {
   Radio,
   Music,
   ShoppingBag,
-  Calendar
+  Calendar,
+  LogIn
 } from 'lucide-react';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { useAuth } from '../context/AuthContext';
 
 interface BottomDockProps {
   currentRoute: string;
@@ -32,6 +34,7 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
   isSettingsOpen
 }) => {
   const { flags } = useFeatureFlags();
+  const { user, isAuthenticated, openAuthModal } = useAuth();
   const isAnimationTest = flags.animation_test !== false;
 
   const isActive = (path: string) => {
@@ -54,6 +57,14 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
     { id: 'dock-bet', label: 'Sàn cược Orbs VIP', icon: Coins, route: '/bet-arena' },
     { id: 'dock-flags', label: 'Feature Flags', icon: Flag, route: '/feature-flags' },
     { id: 'dock-settings', label: 'Cài đặt', icon: SettingsIcon, route: '/settings' },
+    { 
+      id: 'dock-signin', 
+      label: isAuthenticated && user ? `Tài khoản (${user.displayName})` : 'Đăng nhập', 
+      icon: LogIn, 
+      onClick: () => openAuthModal(), 
+      isAction: true, 
+      route: '' 
+    },
   ];
 
   return (
@@ -91,7 +102,13 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
             <motion.button
               key={item.id}
               id={item.id}
-              onClick={() => navigate(item.route)}
+              onClick={() => {
+                if (item.onClick) {
+                  item.onClick();
+                } else if (item.route) {
+                  navigate(item.route);
+                }
+              }}
               title={item.label}
               whileHover={isAnimationTest ? { scale: 1.24, y: -6 } : undefined}
               whileTap={isAnimationTest ? { scale: 0.9 } : undefined}

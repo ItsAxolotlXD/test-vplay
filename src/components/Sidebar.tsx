@@ -48,13 +48,15 @@ import {
   ShoppingBag,
   UtensilsCrossed,
   Car,
-  Gauge
+  Gauge,
+  LogIn
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
 import { useSettings } from '../hooks/useSettings';
 import { useOrbs } from '../hooks/useOrbs';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { useAuth } from '../context/AuthContext';
 import { CHANNELS_DATA } from '../data/channels';
 import { Channel } from '../types';
 import { DiscordWelcomeModal } from './DiscordWelcomeModal';
@@ -101,6 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
 }) => {
   const { settings } = useSettings();
   const { flags } = useFeatureFlags();
+  const { user, isAuthenticated, openAuthModal } = useAuth();
   const isStatusBar = Boolean(flags.status_bar);
   const isTopBarMode = settings.navigationMode 
     ? settings.navigationMode === 'topbar' 
@@ -1219,6 +1222,29 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
         <Settings className="w-5 h-5 shrink-0 text-gray-400" />
         <span className="truncate">Cài đặt</span>
       </button>
+
+      {/* 16. Sign In / Tài khoản (Icon cửa vào LogIn) */}
+      <button
+        id={isMobile ? "mobile-nav-item-signin" : "nav-item-signin"}
+        onClick={() => {
+          if (isMobile && onCloseMobile) onCloseMobile();
+          openAuthModal();
+        }}
+        title={isAuthenticated && user ? `Tài khoản: ${user.displayName}` : "Đăng nhập tài khoản"}
+        className="w-full flex items-center justify-between px-4 py-3 rounded-[14px] text-white hover:bg-[#2F2F36] transition-all cursor-pointer group mt-1"
+      >
+        <div className="flex items-center gap-3.5 truncate">
+          <div className="w-5 h-5 flex items-center justify-center shrink-0 text-blue-400 group-hover:scale-110 transition-transform">
+            <LogIn className="w-5 h-5 stroke-[2.2]" />
+          </div>
+          <span className="truncate font-semibold">
+            {isAuthenticated && user ? user.displayName : 'Đăng nhập'}
+          </span>
+        </div>
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/25">
+          {isAuthenticated && user ? (user.isVIP ? 'VIP' : 'Member') : 'Sign in'}
+        </span>
+      </button>
       </div>
     </div>
   );
@@ -1509,6 +1535,16 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                   }`}
                 >
                   <Settings className="w-4 h-4 text-gray-400 shrink-0" />
+                </button>
+
+                {/* 13. Sign In (Mini) */}
+                <button
+                  id="mini-nav-item-signin"
+                  onClick={openAuthModal}
+                  title={isAuthenticated && user ? `Tài khoản: ${user.displayName}` : "Đăng nhập"}
+                  className="w-10 h-10 min-w-[40px] min-h-[40px] shrink-0 rounded-[12px] flex items-center justify-center p-0 transition-all cursor-pointer text-blue-400 hover:bg-[#2F2F36] hover:text-white"
+                >
+                  <LogIn className="w-4 h-4 shrink-0 stroke-[2.2]" />
                 </button>
               </div>
             </div>

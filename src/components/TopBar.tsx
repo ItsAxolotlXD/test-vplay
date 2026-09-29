@@ -46,12 +46,14 @@ import {
   Music,
   Settings,
   Car,
-  Gauge
+  Gauge,
+  LogIn
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useOrbs } from '../hooks/useOrbs';
+import { useAuth } from '../context/AuthContext';
 import { VAPPS_LIST } from './VAppsView';
 
 interface TopBarProps {
@@ -96,6 +98,7 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
 }) => {
   const { settings } = useSettings();
   const { flags } = useFeatureFlags();
+  const { user, isAuthenticated, openAuthModal } = useAuth();
   const isStatusBar = Boolean(flags.status_bar);
 
   const isLightMode = settings.theme === 'light';
@@ -243,17 +246,17 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
         {/* Progressive Blur Layer System with reduced tint opacity and no divider */}
         <div className="absolute inset-0 pointer-events-none overflow-visible -z-10" aria-hidden="true">
           {/* Multi-tier gradient blurred backdrops */}
-          <div className="absolute inset-0 backdrop-blur-[36px] [mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_55%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_55%)]" />
-          <div className="absolute inset-0 backdrop-blur-[24px] [mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_75%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_75%)]" />
-          <div className="absolute inset-0 backdrop-blur-[14px] [mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_90%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_90%)]" />
-          <div className="absolute inset-0 backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_98%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_98%)]" />
-          <div className="absolute inset-0 backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_0%,black_90%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_90%,transparent_100%)]" />
+          <div className="absolute inset-0 backdrop-blur-[36px] pointer-events-none [mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_55%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_25%,transparent_55%)]" />
+          <div className="absolute inset-0 backdrop-blur-[24px] pointer-events-none [mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_75%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_45%,transparent_75%)]" />
+          <div className="absolute inset-0 backdrop-blur-[14px] pointer-events-none [mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_90%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_65%,transparent_90%)]" />
+          <div className="absolute inset-0 backdrop-blur-[6px] pointer-events-none [mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_98%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_80%,transparent_98%)]" />
+          <div className="absolute inset-0 backdrop-blur-[2px] pointer-events-none [mask-image:linear-gradient(to_bottom,black_0%,black_90%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_90%,transparent_100%)]" />
           
           {/* Soft progressive blur apron extending 14px beneath top bar for seamless background fade */}
-          <div className="absolute -bottom-3.5 left-0 right-0 h-3.5 backdrop-blur-[8px] [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]" />
+          <div className="absolute -bottom-3.5 left-0 right-0 h-3.5 backdrop-blur-[8px] pointer-events-none [mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_100%)]" />
 
           {/* Background tint gradient with reduced opacity and no divider border */}
-          <div className={`absolute inset-0 transition-opacity duration-300 ${
+          <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${
             isLightMode
               ? isScrolled 
                 ? 'bg-gradient-to-b from-white/70 via-white/45 to-white/20' 
@@ -823,6 +826,21 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                 <Settings className="w-5 h-5 stroke-[1.4]" strokeWidth={1.4} />
               </button>
             </div>
+
+            {/* Sign In Button (Icon cửa vào LogIn) */}
+            <button
+              id="btn-topbar-signin"
+              type="button"
+              onClick={openAuthModal}
+              className="h-9 sm:h-10 px-3 sm:px-3.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center gap-2 transition-all cursor-pointer border border-white/15 shadow-sm group shrink-0"
+              title={isAuthenticated && user ? `Tài khoản: ${user.displayName}` : "Đăng nhập tài khoản"}
+              aria-label="Đăng nhập tài khoản"
+            >
+              <LogIn className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white group-hover:scale-110 transition-transform stroke-[2.2]" />
+              <span className="text-xs sm:text-[13px] font-semibold hidden sm:inline truncate max-w-[120px]">
+                {isAuthenticated && user ? user.displayName : 'Sign in'}
+              </span>
+            </button>
 
             {/* 5. User Profile Icon (Fully rounded, no border) */}
             <div className="relative" ref={profileRef}>

@@ -104,7 +104,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       <div
         aria-hidden="true"
         id="status-bar-progressive-blur"
-        className="pointer-events-none fixed top-0 right-0 h-screen w-28 sm:w-36 z-[90] overflow-hidden select-none"
+        className="pointer-events-none fixed top-0 right-0 h-screen w-28 sm:w-36 z-[25] overflow-hidden select-none"
         style={{
           paddingRight: 'env(safe-area-inset-right, 0px)',
           width: 'calc(8rem + env(safe-area-inset-right, 0px))',
@@ -112,7 +112,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       >
         {/* Step 1: Broad soft blur */}
         <div 
-          className="absolute inset-0 backdrop-blur-sm"
+          className="absolute inset-0 backdrop-blur-sm pointer-events-none"
           style={{
             maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,0) 100%)',
             WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,0) 100%)',
@@ -120,7 +120,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         />
         {/* Step 2: Medium progressive blur */}
         <div 
-          className="absolute inset-0 backdrop-blur-md"
+          className="absolute inset-0 backdrop-blur-md pointer-events-none"
           style={{
             maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0) 85%)',
             WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0) 85%)',
@@ -128,7 +128,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         />
         {/* Step 3: Deep blur near right border */}
         <div 
-          className="absolute inset-0 backdrop-blur-2xl"
+          className="absolute inset-0 backdrop-blur-2xl pointer-events-none"
           style={{
             maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0) 65%)',
             WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0) 65%)',
@@ -140,7 +140,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       <aside
         id="app-vertical-status-bar"
         aria-label="Thanh trạng thái và điều khiển nhanh bên phải"
-        className="fixed z-[95] flex flex-col justify-between items-center select-none pointer-events-none"
+        className="fixed z-[110] w-12 sm:w-14 flex flex-col justify-between items-center select-none pointer-events-none"
         style={{
           fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, sans-serif",
           top: 'max(1rem, env(safe-area-inset-top, 1rem))',

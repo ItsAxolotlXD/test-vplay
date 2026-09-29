@@ -19,10 +19,12 @@ import {
   Info,
   Sparkles,
   ChevronRight,
-  Calendar
+  Calendar,
+  LogIn
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTabSearch } from '../context/TabSearchContext';
+import { useAuth } from '../context/AuthContext';
 
 interface TabViewProps {
   currentRoute: string;
@@ -306,6 +308,7 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
   onOpenSearch,
   isSettingsOpen,
 }) => {
+  const { user, isAuthenticated, openAuthModal } = useAuth();
   const { searchQuery, setSearchQuery, clearSearch, placeholder, isTabViewSearchExpanded, setIsTabViewSearchExpanded } = useTabSearch();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [flyoutSearchQuery, setFlyoutSearchQuery] = useState('');
@@ -516,6 +519,20 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
       },
       renderIcon: () => <TabSettingsIcon />,
       checkActive: (route, settingsOpen) => route.startsWith('/settings') || Boolean(settingsOpen),
+    },
+    {
+      id: 'tab-signin',
+      label: isAuthenticated && user ? user.displayName : 'Sign in',
+      onClick: () => {
+        setIsMoreOpen(false);
+        openAuthModal();
+      },
+      renderIcon: () => (
+        <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 flex items-center justify-center text-blue-400">
+          <LogIn className="w-5 h-5 text-current stroke-[2.2]" />
+        </div>
+      ),
+      checkActive: () => false,
     },
   ];
 

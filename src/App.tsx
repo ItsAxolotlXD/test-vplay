@@ -85,8 +85,10 @@ import { VBoardOverlay } from './components/vboard/VBoardOverlay';
 import { VCursor } from './components/VCursor';
 import { GlobalAnnouncementBanner } from './components/GlobalAnnouncementBanner';
 import { SpecialThemeEffectsLayer } from './components/themes/SpecialThemeEffectsLayer';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AccountAuthModal } from './components/AccountAuthModal';
 
-export default function App() {
+function AppContent() {
   const { settings, updateSetting } = useSettings();
   const currentWallpaperPreset = WALLPAPER_PRESETS.find(w => w.id === settings.appBackground);
   const customWallpaperUrl = currentWallpaperPreset 
@@ -102,6 +104,7 @@ export default function App() {
   const isFloatyMode = Boolean(settings.floatyBar || settings.navigationMode === 'tabview');
   const isTopBarMode = settings.navigationMode === 'topbar' && !isFloatyMode;
   const { favoriteChannelIds, toggleFavoriteChannel } = useFavorites();
+  const { isAuthModalOpen, closeAuthModal } = useAuth();
 
   // Settings Drawer State (Feature Flag: settings_drawer)
   const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = useState<boolean>(() => {
@@ -183,8 +186,8 @@ export default function App() {
   // Startup Intro Video & Splash Screen State (disabled on startup per user request)
   const [showStartupVideo, setShowStartupVideo] = useState<boolean>(false);
   const [showSplashScreen, setShowSplashScreen] = useState<boolean>(false);
-  // Startup Brand Transition Message Screen
-  const [showBrandTransitionScreen, setShowBrandTransitionScreen] = useState<boolean>(true);
+  // Startup Brand Transition Message Screen (Replay only, not blocking startup)
+  const [showBrandTransitionScreen, setShowBrandTransitionScreen] = useState<boolean>(false);
 
   // Allow replaying splash screen, startup intro video, or brand transition message via custom events
   useEffect(() => {
@@ -208,14 +211,8 @@ export default function App() {
     };
   }, []);
 
-  // OOBE First-time Setup Modal State
-  const [isOobeOpen, setIsOobeOpen] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('vplay_oobe_completed') !== 'true';
-    } catch {
-      return false;
-    }
-  });
+  // OOBE First-time Setup Modal State (only opens on explicit event or settings replay)
+  const [isOobeOpen, setIsOobeOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handleOpenOobe = () => {
@@ -908,7 +905,7 @@ export default function App() {
         )}
 
         {/* Main App Container */}
-        <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 relative z-10 ${
+        <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 relative ${
           isFloatyMode
             ? 'pl-0 pb-28 sm:pb-32'
             : isTopBarMode
@@ -919,15 +916,17 @@ export default function App() {
                   ? 'md:pl-[80px]' 
                   : 'md:pl-[290px]'
         }`}>
-          {/* Dynamic Island Top Safe Area Buffer */}
-          {isDynamicIsland && (
-            <div className="w-full h-12 sm:h-14 shrink-0 pointer-events-none transition-all duration-300" aria-hidden="true" />
-          )}
-
-          {/* TopBar Header: In Top bar mode, visible on all screens; In Sidebar mode, visible on mobile as app bar.
-              When Floaty bar is active, topbar is completely replaced by Floaty bar. */}
+          {/* TopBar Header Container */}
           {!isFloatyMode && (
-            <div className={`sticky top-0 z-50 w-full shrink-0 ${!isTopBarMode ? 'md:hidden' : ''}`}>
+            <div className={`sticky top-0 z-[100] w-full shrink-0 pointer-events-auto ${!isTopBarMode ? 'md:hidden' : ''}`}>
+              {/* Dynamic Island Safe Area above TopBar: guarantees Dynamic Island never overlaps TopBar buttons */}
+              {isDynamicIsland && (
+                <div 
+                  id="dynamic-island-safe-area-topbar" 
+                  className="w-full h-11 sm:h-12 pointer-events-none transition-all duration-300" 
+                  aria-label="Dynamic Island Safe Area" 
+                />
+              )}
               <TopBar
                 currentRoute={currentRoute}
                 navigate={navigate}
@@ -937,6 +936,15 @@ export default function App() {
                 isSettingsOpen={isSettingsDrawer && isSettingsDrawerOpen}
               />
             </div>
+          )}
+
+          {/* Dynamic Island Safe Area when TopBar is hidden (Sidebar mode or Floaty mode) */}
+          {(isFloatyMode || !isTopBarMode) && isDynamicIsland && (
+            <div 
+              id="dynamic-island-safe-area-content" 
+              className="w-full h-12 sm:h-14 shrink-0 pointer-events-none transition-all duration-300" 
+              aria-label="Dynamic Island Safe Area" 
+            />
           )}
 
           {/* Dải thông báo vàng hiển thị ở bất cứ đâu với clock đếm ngược đến 00h00 16/10/2026 (Ẩn khi bật Minimalism Home Page) */}
@@ -1092,8 +1100,22 @@ export default function App() {
             navigate('/settings');
           }}
         />
+
+        {/* Account Login / Sign-in Flyout Modal (OOBE-style with 10% blur opacity) */}
+        <AccountAuthModal
+          isOpen={isAuthModalOpen}
+          onClose={closeAuthModal}
+        />
       </div>
     </TabSearchProvider>
     </IntermissionMusicProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
