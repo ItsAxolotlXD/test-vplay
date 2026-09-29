@@ -24,3 +24,4 @@ export { CookbookTab } from "./CookbookTab";
 export { VRideBookingTab } from "./VRideBookingTab";
 export { DrivingSimulatorTab } from "./DrivingSimulatorTab";
 export { MSPaintTab } from "./MSPaintTab";
+export { RedeemGiftTab } from "./RedeemGiftTab";

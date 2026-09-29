@@ -166,9 +166,9 @@ export const VCURSOR_PRESETS: VCursorPreset[] = [
 export const DEFAULT_SETTINGS: SystemSettings = {
   userName: 'User',
   theme: 'dark',
-  dockToSidebar: true,
-  navigationMode: 'topbar',
-  floatyBar: false,
+  dockToSidebar: false,
+  navigationMode: 'tabview',
+  floatyBar: true,
   vboardSkin: 'default',
   fontFamily: 'integer',
   fontScale: 1,
@@ -272,13 +272,13 @@ export const getStoredSettings = (): SystemSettings => {
       base.userName = legacyUser.trim();
     }
 
-    // Determine initial navigationMode if not saved yet
-    let fallbackNavMode: 'sidebar' | 'topbar' = 'topbar';
+    // Determine initial navigationMode if not saved yet: default to tabview (Tab View Bar)
+    let fallbackNavMode: NavigationMode = 'tabview';
     try {
       const rawFlags = localStorage.getItem('waves_feature_flags');
       if (rawFlags) {
         const parsedFlags = JSON.parse(rawFlags);
-        if (parsedFlags.top_bar === false) {
+        if (parsedFlags.top_bar === false && parsedFlags.tab_view !== true) {
           fallbackNavMode = 'sidebar';
         }
       }
@@ -293,9 +293,9 @@ export const getStoredSettings = (): SystemSettings => {
       } else if (parsed.floatyBar === true) {
         navMode = 'tabview';
       } else if (parsed.dockToSidebar === false) {
-        navMode = 'sidebar';
+        navMode = 'tabview';
       }
-      const isFloaty = navMode === 'tabview' || Boolean(parsed.floatyBar);
+      const isFloaty = navMode === 'tabview' || Boolean(parsed.floatyBar ?? true);
       let font: FontFamilyOption = 'integer';
       if (parsed.fontFamily && ['alata', 'integer'].includes(parsed.fontFamily)) {
         font = parsed.fontFamily;

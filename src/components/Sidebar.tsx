@@ -49,7 +49,8 @@ import {
   UtensilsCrossed,
   Car,
   Gauge,
-  LogIn
+  LogIn,
+  Gift
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';
@@ -144,6 +145,16 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   };
 
   const isSpace360AppActive = (appId: string) => {
+    if (appId === 'redeem_gift') {
+      return (
+        currentRoute === '/redeem' ||
+        currentRoute === '/gift' ||
+        currentRoute === '/redeem-gift' ||
+        currentRoute === '/nhan-qua' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'redeem_gift')
+      );
+    }
     if (appId === 'ms_paint') {
       return (
         currentRoute === '/paint' ||
@@ -645,6 +656,9 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
               isActive("/v-space") ||
               isActive("/space-360") ||
               isActive("/v-apps") ||
+              isActive("/redeem") ||
+              isActive("/gift") ||
+              isActive("/redeem-gift") ||
               isActive("/paint") ||
               isActive("/ms-paint") ||
               isActive("/v-paint") ||
@@ -738,6 +752,25 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                   </div>
                   <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-pink-500/20 text-pink-300">
                     Vẽ
+                  </span>
+                </button>
+
+                {/* Redeem Gift VNRT ONLINE */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-redeem" : "space360-tab-redeem"}
+                  onClick={() => handleNavClick("/redeem", { appId: "redeem_gift" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("redeem_gift")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Gift className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="truncate">Redeem Gift</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300">
+                    Quà
                   </span>
                 </button>
 

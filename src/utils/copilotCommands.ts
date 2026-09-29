@@ -93,6 +93,15 @@ export const TOOLBOX_DATA = [
 // 2. Static dataset: Space 360 (renamed from V-Apps)
 export const SPACE360_DATA = [
   {
+    id: "redeem_gift",
+    title: "Redeem Gift VNRT ONLINE",
+    subtitle: "Nhập mã XXXX-XXXX-XXXX-XXXX nhận quà, khoáng vật Orbs và thẻ V-Premium VIP",
+    badge: "Mới • Quà tặng",
+    route: "/redeem",
+    appId: "redeem_gift",
+    category: "utilities"
+  },
+  {
     id: "ms_paint",
     title: "MS Paint: Ứng Dụng Vẽ Space 360",
     subtitle: "Vẽ tranh tự do, cọ vẽ, bút chì, cục tẩy, đổ màu và bảng màu 28 sắc thái",

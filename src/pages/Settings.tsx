@@ -37,12 +37,14 @@ import {
   ExternalLink,
   Send,
   Star,
-  MessageSquare
+  MessageSquare,
+  Gift
 } from 'lucide-react';
 import { useSettings, FONT_SCALE_CONFIG, FONT_FAMILY_CONFIG, VBOARD_SKIN_OPTIONS, VBoardSkin, VCURSOR_PRESETS } from '../hooks/useSettings';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useTabSearch } from '../context/TabSearchContext';
 import { showIslandNotification } from '../utils/islandNotifications';
+import { RedeemGiftTab } from '../components/vapps/RedeemGiftTab';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -54,7 +56,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const { settings, updateSetting } = useSettings();
   const { flags, setFlag } = useFeatureFlags();
   const { searchQuery, setSearchQuery } = useTabSearch();
-  const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental' | 'feedback'>('main');
+  const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental' | 'feedback' | 'redeem_gift'>('main');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
 
@@ -165,6 +167,10 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
     'Give Feedback', 'Feedback', 'Góp ý', 'Phản hồi', 'Báo lỗi', 'Bug', 'Ý kiến', 'Đề xuất', 'V-Box', 'Feedback Hub', 'Hub'
   );
 
+  const isRedeemGiftVisible = matchesSearch(
+    'Redeem Gift', 'Redeem', 'Gift', 'Quà tặng', 'Nhận quà', 'Mã nhận quà', 'Code', 'Voucher', 'Orbs', 'VNRT ONLINE', 'Kho báu', 'Thưởng', 'Mã'
+  );
+
   const isSearchActive = Boolean(normalizedQuery);
   const showCategoryMenu = !isSearchActive && activeCategory === 'main';
   const showSpatialGlass = isSearchActive ? isSpatialGlassVisible : (activeCategory === 'spatial_glass');
@@ -174,8 +180,9 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const showAbout = isSearchActive ? isAboutVisible : (activeCategory === 'about');
   const showExperimental = isSearchActive ? isFeatureFlagsVisible : (activeCategory === 'experimental');
   const showFeedback = isSearchActive ? isFeedbackVisible : (activeCategory === 'feedback');
+  const showRedeemGift = isSearchActive ? isRedeemGiftVisible : (activeCategory === 'redeem_gift');
 
-  const hasAnyResults = showCategoryMenu || (isSearchActive ? (isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible || isAboutVisible || isFeedbackVisible) : true);
+  const hasAnyResults = showCategoryMenu || (isSearchActive ? (isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible || isAboutVisible || isFeedbackVisible || isRedeemGiftVisible) : true);
 
   return (
     <div className={isDrawer ? "w-full max-w-full space-y-5 pb-16 pt-1 select-none" : "max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none"}>
@@ -202,6 +209,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               {activeCategory === 'tools' && 'Công cụ'}
               {activeCategory === 'experimental' && 'Thử nghiệm'}
               {activeCategory === 'feedback' && 'Give Feedback'}
+              {activeCategory === 'redeem_gift' && 'Redeem Gift VNRT ONLINE'}
             </span>
           </div>
         )}
@@ -376,6 +384,31 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
                   <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
                     Give Feedback
                   </span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
+
+              {/* Divider */}
+              <div className="h-[1px] bg-[#323236] ml-16" />
+
+              {/* Row 8: Redeem Gift VNRT ONLINE */}
+              <div 
+                id="category-item-redeem-gift"
+                onClick={() => setActiveCategory('redeem_gift')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-b from-[#ec4899] via-[#8b5cf6] to-[#6366f1] text-white flex items-center justify-center shrink-0 shadow-md border-0">
+                    <Gift className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-white text-[15px] sm:text-base transition-colors">
+                      Redeem Gift VNRT ONLINE
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                      Mới
+                    </span>
+                  </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
               </div>
@@ -2451,6 +2484,16 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
               </form>
             )}
           </div>
+        </section>
+      )}
+
+      {/* 8. Section Redeem Gift VNRT ONLINE */}
+      {showRedeemGift && (
+        <section
+          id="settings-section-redeem-gift"
+          className="settings-category-section p-2 sm:p-4 rounded-[28px] bg-transparent border-0 shadow-xl space-y-4"
+        >
+          <RedeemGiftTab onBack={() => setActiveCategory('main')} navigate={navigate} />
         </section>
       )}
 

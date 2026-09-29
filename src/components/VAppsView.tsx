@@ -33,10 +33,12 @@ import {
   LucideIcon,
   Car,
   Gauge,
-  Palette
+  Palette,
+  Gift
 } from 'lucide-react';
 
 export type VAppId =
+  | 'redeem_gift'
   | 'ms_paint'
   | 'ride_booking'
   | 'driving_simulator'
@@ -81,6 +83,19 @@ export interface VAppDefinition {
 }
 
 export const VAPPS_LIST: VAppDefinition[] = [
+  {
+    id: 'redeem_gift',
+    name: 'Redeem Gift',
+    tagline: 'Kích Hoạt Quà Tặng VNRT ONLINE',
+    description: 'Nhập mã quà tặng XXXX-XXXX-XXXX-XXXX để nhận khoáng vật Orbs, gói V-Premium VIP, voucher và quà tặng độc quyền từ VNRT ONLINE.',
+    category: 'Tiện ích & Tệp tin',
+    badge: 'Mới • Quà tặng',
+    gradientBg: 'bg-gradient-to-br from-[#7C3AED] via-[#DB2777] to-[#F59E0B]',
+    borderClass: 'border-[#F472B6]/50 group-hover:border-[#F472B6]',
+    glowClass: 'shadow-[0_10px_30px_rgba(219,39,119,0.35)]',
+    icon: Gift,
+    tags: ['Redeem Gift', 'Redeem', 'Gift', 'Quà tặng', 'Nhận quà', 'VNRT ONLINE', 'Mã nhận quà', 'Orbs', 'Code', 'Voucher'],
+  },
   {
     id: 'ms_paint',
     name: 'MS Paint',
@@ -560,6 +575,9 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'ms_paint':
         navigate('/paint', { appId: 'ms_paint' });
+        break;
+      case 'redeem_gift':
+        navigate('/redeem', { appId: 'redeem_gift' });
         break;
       default:
         navigate('/space-360');

@@ -38,6 +38,25 @@ export const VplayAppsHomeGrid: React.FC<VplayAppsHomeGridProps> = React.memo(({
   // - Màu sắc siêu saturate, tươi tắn, độ sâu 3D bóng bẩy
   // - 100% tự craft vector SVG không dùng preset iconography
   const apps: VplayAppItem[] = useMemo(() => [
+    // 0. Redeem Gift (Kích hoạt quà tặng VNRT ONLINE)
+    {
+      id: 'redeem_gift',
+      name: 'Redeem Gift',
+      category: 'Quà tặng',
+      route: '/redeem',
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#EC4899] via-[#8B5CF6] to-[#4338CA] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[66%] h-[66%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12" />
+            <rect width="20" height="5" x="2" y="7" />
+            <line x1="12" x2="12" y1="22" y2="7" />
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+          </svg>
+        </div>
+      )
+    },
     // 0. MS Paint (Ứng dụng vẽ Space 360)
     {
       id: 'ms_paint',

@@ -782,6 +782,20 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
 
                       <button
                         onClick={() => {
+                          setOrbsFlyoutOpen(false);
+                          navigate('/redeem');
+                        }}
+                        className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-pink-600/30 to-purple-600/30 hover:from-pink-600/45 hover:to-purple-600/45 border border-pink-500/30 text-xs font-bold text-white flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Gift className="w-4 h-4 text-pink-400" />
+                          <span>Redeem Gift <span className="text-pink-300 font-mono font-bold">VNRT ONLINE</span></span>
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-pink-300" />
+                      </button>
+
+                      <button
+                        onClick={() => {
                           addOrbs(1000);
                         }}
                         className="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-yellow-400 border border-yellow-400/30 flex items-center justify-center gap-2 transition-all cursor-pointer mt-1"

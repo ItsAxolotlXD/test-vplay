@@ -52,6 +52,7 @@ import {
   VRideBookingTab,
   DrivingSimulatorTab,
   MSPaintTab,
+  RedeemGiftTab,
 } from './components/vapps';
 import { IntermissionIntroVideo } from './components/IntermissionIntroVideo';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
@@ -188,10 +189,10 @@ function AppContent() {
   // Startup Intro Video & Splash Screen State (disabled on startup per user request)
   const [showStartupVideo, setShowStartupVideo] = useState<boolean>(false);
   const [showSplashScreen, setShowSplashScreen] = useState<boolean>(false);
-  // Startup Brand Transition Message Screen (Intermission screen)
+  // Startup Brand Transition Message Screen (Intermission screen - accessible via settings/replay)
   const [showBrandTransitionScreen, setShowBrandTransitionScreen] = useState<boolean>(false);
-  // Auto-play intermission intro video and intermission screen on every app startup
-  const [showIntermissionIntroVideo, setShowIntermissionIntroVideo] = useState<boolean>(true);
+  // Startup intro video: disabled on startup per user request
+  const [showIntermissionIntroVideo, setShowIntermissionIntroVideo] = useState<boolean>(false);
 
   // Allow replaying splash screen, startup intro video, or brand transition message via custom events
   useEffect(() => {
@@ -670,6 +671,12 @@ function AppContent() {
       case '/ms-paint':
       case '/v-paint':
         return renderSpace360App('MS Paint', <MSPaintTab onBack={() => navigate('/space-360')} />);
+
+      case '/redeem':
+      case '/gift':
+      case '/redeem-gift':
+      case '/nhan-qua':
+        return renderSpace360App('Redeem Gift', <RedeemGiftTab onBack={() => navigate('/space-360')} navigate={navigate} />);
 
       case '/v-space':
       case '/v-apps':

@@ -20,7 +20,8 @@ import {
   Sparkles,
   ChevronRight,
   Calendar,
-  LogIn
+  LogIn,
+  Gift
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTabSearch } from '../context/TabSearchContext';
@@ -170,6 +171,16 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
     badgeColor: 'bg-pink-500/20 text-pink-300 border-pink-400/30',
     icon: <Bot className="w-4.5 h-4.5 text-pink-400" />,
     matchesRoute: (r) => r.startsWith('/copilot'),
+  },
+  {
+    id: 'more-redeem',
+    label: 'Redeem Gift',
+    route: '/redeem',
+    subtext: 'Nhập mã nhận quà từ VNRT ONLINE',
+    badge: 'MỚI',
+    badgeColor: 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-300 border-pink-400/30',
+    icon: <Gift className="w-4.5 h-4.5 text-pink-400" />,
+    matchesRoute: (r) => r.startsWith('/redeem') || r.startsWith('/gift') || r.startsWith('/redeem-gift'),
   },
   {
     id: 'more-music',
@@ -565,14 +576,14 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
             exit={{ opacity: 0, y: 14, scale: 0.94 }}
             transition={{ type: 'spring', damping: 28, stiffness: 420 }}
             style={{
-              backgroundColor: 'rgba(252, 252, 254, 0.94)',
+              backgroundColor: 'rgba(252, 252, 254, 0.96)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
             }}
-            className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[94vw] sm:w-[580px] md:w-[640px] max-w-[660px] max-h-[75vh] rounded-[28px] border border-black/10 shadow-[0_24px_64px_rgba(0,0,0,0.18)] p-3.5 sm:p-4.5 flex flex-col z-50 text-zinc-900 overflow-hidden"
+            className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[92vw] sm:w-[380px] md:w-[410px] max-w-[430px] rounded-[28px] border border-black/10 shadow-[0_24px_64px_rgba(0,0,0,0.22)] p-3.5 sm:p-4 flex flex-col z-50 text-zinc-900 overflow-hidden"
           >
             {/* Flyout Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-black/8 shrink-0">
+            <div className="flex items-center justify-between pb-2.5 border-b border-black/8 shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-[#FF7A00]/15 border border-[#FF7A00]/30 flex items-center justify-center text-[#FF7A00]">
                   <Menu className="w-4 h-4 stroke-[2.4]" />
@@ -581,8 +592,8 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                   <h3 className="text-sm font-bold text-zinc-900 leading-tight">
                     Tất cả chuyên mục
                   </h3>
-                  <p className="text-[11px] text-zinc-500">
-                    Khám phá toàn bộ tính năng VNRT Online
+                  <p className="text-[10.5px] text-zinc-500">
+                    Menu tiện ích VNRT Online ({filteredFlyoutItems.length})
                   </p>
                 </div>
               </div>
@@ -598,14 +609,14 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
             </div>
 
             {/* Quick Filter Input */}
-            <div className="pt-3 pb-2 shrink-0">
+            <div className="pt-2.5 pb-2 shrink-0">
               <div className="relative flex items-center">
                 <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 pointer-events-none" />
                 <input
                   type="text"
                   value={flyoutSearchQuery}
                   onChange={(e) => setFlyoutSearchQuery(e.target.value)}
-                  placeholder="Lọc chuyên mục..."
+                  placeholder="Tìm chuyên mục..."
                   className="w-full pl-8.5 pr-3 py-1.5 rounded-xl bg-black/[0.04] border border-black/10 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-[#FF7A00] focus:ring-1 focus:ring-[#FF7A00] transition-all font-sans"
                 />
                 {flyoutSearchQuery && (
@@ -620,9 +631,9 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
               </div>
             </div>
 
-            {/* Items Grid (Scrollable, 4 items / row) */}
-            <div className="overflow-y-auto space-y-1.5 pr-1 max-h-[50vh] [scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.2)_transparent] pt-1">
-              <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
+            {/* Items List (Scrollable list format: maximum 5 items visible, scroll to see more) */}
+            <div className="overflow-y-auto space-y-1.5 pr-1 max-h-[285px] [scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.2)_transparent] pt-1">
+              <div className="flex flex-col gap-1.5">
                 {filteredFlyoutItems.map((item) => {
                   const isActive = item.matchesRoute(currentRoute);
 
@@ -634,35 +645,45 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                         setIsMoreOpen(false);
                         navigate(item.route);
                       }}
-                      className={`p-2 sm:p-2.5 rounded-2xl flex flex-col items-center justify-center text-center transition-all cursor-pointer group active:scale-95 border ${
+                      className={`w-full h-[52px] px-3 rounded-2xl flex items-center justify-between gap-3 text-left transition-all cursor-pointer group active:scale-[0.99] border shrink-0 ${
                         isActive
-                          ? 'bg-[#FF7A00]/12 border-[#FF7A00]/50 shadow-sm ring-1 ring-[#FF7A00]/25'
-                          : 'bg-black/[0.02] border-black/5 hover:bg-black/[0.06] hover:border-black/10 text-zinc-700'
+                          ? 'bg-[#FF7A00]/12 border-[#FF7A00]/50 shadow-xs ring-1 ring-[#FF7A00]/25'
+                          : 'bg-black/[0.02] border-black/5 hover:bg-black/[0.06] hover:border-black/10 text-zinc-800'
                       }`}
                     >
-                      <div className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center mb-1.5 transition-transform group-hover:scale-105 shrink-0 ${
-                        isActive 
-                          ? 'bg-[#FF7A00] text-white shadow-md shadow-[#FF7A00]/30' 
-                          : 'bg-white shadow-xs border border-black/5 text-zinc-800'
-                      }`}>
-                        {item.icon}
-                        {item.badge && (
-                          <span className={`absolute -top-1.5 -right-1.5 text-[8px] px-1 py-0.2 rounded-full font-bold leading-tight border shadow-xs ${
-                            item.badgeColor || 'bg-black/10 text-zinc-700 border-black/15'
-                          }`}>
-                            {item.badge}
-                          </span>
-                        )}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+                          isActive 
+                            ? 'bg-[#FF7A00] text-white shadow-md shadow-[#FF7A00]/30' 
+                            : 'bg-white shadow-xs border border-black/5 text-zinc-800'
+                        }`}>
+                          {item.icon}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs sm:text-[13px] font-bold leading-tight truncate ${
+                              isActive ? 'text-[#FF7A00]' : 'text-zinc-900 group-hover:text-black'
+                            }`}>
+                              {item.label}
+                            </span>
+                            {item.badge && (
+                              <span className={`text-[8.5px] px-1.5 py-0.2 rounded-full font-bold border shrink-0 ${
+                                item.badgeColor || 'bg-black/10 text-zinc-700 border-black/15'
+                              }`}>
+                                {item.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] sm:text-[10.5px] text-zinc-400 group-hover:text-zinc-500 truncate mt-0.5 leading-tight">
+                            {item.subtext}
+                          </p>
+                        </div>
                       </div>
 
-                      <span className={`text-[11px] sm:text-xs font-semibold leading-tight line-clamp-1 w-full ${
-                        isActive ? 'text-[#FF7A00]' : 'text-zinc-800 group-hover:text-black'
-                      }`}>
-                        {item.label}
-                      </span>
-                      <span className="text-[9px] sm:text-[9.5px] text-zinc-400 group-hover:text-zinc-500 truncate w-full mt-0.5 leading-tight">
-                        {item.subtext}
-                      </span>
+                      <ChevronRight className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${
+                        isActive ? 'text-[#FF7A00]' : 'text-zinc-400 group-hover:text-zinc-700'
+                      }`} />
                     </button>
                   );
                 })}
@@ -676,12 +697,12 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
             </div>
 
             {/* Quick Tip Footer */}
-            <div className="pt-2.5 mt-2 border-t border-black/8 flex items-center justify-between text-[10px] text-zinc-400 shrink-0">
+            <div className="pt-2 mt-2 border-t border-black/8 flex items-center justify-between text-[10px] text-zinc-400 shrink-0">
               <span className="flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-[#FF7A00]" />
-                <span>Toàn bộ menu trên sidebar</span>
+                <span>Tối đa 5 mục • Cuộn xuống để xem thêm</span>
               </span>
-              <span>Phím tắt: ⌘K</span>
+              <span>⌘K</span>
             </div>
           </motion.div>
         )}
@@ -693,7 +714,7 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
           <motion.div
             key="tab-view-pill-normal"
             layoutId="vplay-tab-view-morph-pill"
-            initial={{ opacity: 0, scale: 0.96 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
             transition={{
