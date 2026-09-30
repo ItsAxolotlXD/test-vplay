@@ -17,10 +17,41 @@
     <link rel="apple-touch-icon" href="https://static.wikia.nocookie.net/ep-deo/images/5/51/New_official_vnrt_logo.png/revision/latest?cb=20260926162432" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alata&family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alata&family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Rajdhani:wght@500;600;700&family=Silkscreen:wght@400;700&family=VT323&family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/fontsource/fonts/google-sans:vf@latest/latin.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft/index.css" rel="stylesheet">
     <style>
+      @font-face {
+        font-family: 'Minecraft';
+        font-style: normal;
+        font-display: swap;
+        font-weight: 100 900;
+        src:
+          url('/fonts/Pixelcraft.otf') format('opentype'),
+          local('Pixelcraft'),
+          local('Monocraft'),
+          url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft@main/dist/Monocraft-otf/Monocraft.otf') format('opentype'),
+          url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft@main/dist/Monocraft-ttf/Monocraft.ttf') format('truetype'),
+          local('Minecraft'),
+          local('Minecraft Regular'),
+          url('https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft/files/minecraft.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'MinecraftNumbers';
+        font-style: normal;
+        font-display: swap;
+        font-weight: 100 900;
+        src:
+          url('/fonts/Pixelcraft.otf') format('opentype'),
+          local('Pixelcraft'),
+          local('Monocraft'),
+          url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft@main/dist/Monocraft-otf/Monocraft.otf') format('opentype'),
+          url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft@main/dist/Monocraft-ttf/Monocraft.ttf') format('truetype'),
+          local('Minecraft'),
+          local('Minecraft Regular'),
+          url('https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft/files/minecraft.woff2') format('woff2');
+        unicode-range: U+0030-0039;
+      }
       @font-face {
         font-family: 'Integer';
         src: local('Inter Bold'), local('Inter-Bold'), local('Inter'), url('https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7W0Q5nw.woff2') format('woff2');
@@ -38,7 +69,7 @@
     <meta property="og:description" content="Nền tảng cộng đồng dành cho những người yêu thích, theo dõi và lưu trữ nội dung về truyền hình Việt Nam với giao diện streaming hiện đại." />
     <meta property="og:type" content="website" />
   </head>
-  <body class="bg-[#181818] text-[#F3F4F6] antialiased selection:bg-[#388BFD] selection:text-white font-['Integer','Inter',sans-serif]">
+  <body class="bg-[#181818] text-[#F3F4F6] antialiased selection:bg-[#388BFD] selection:text-white font-['MinecraftNumbers','Integer','Inter',sans-serif]">
     <!-- Global Liquid Distortion SVG Filters for Spatial Glass Elements -->
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none;" aria-hidden="true">
       <defs>

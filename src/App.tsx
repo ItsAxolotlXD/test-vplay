@@ -86,7 +86,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MotionEffectsLayer } from './components/motion/MotionEffectsLayer';
 import { VBoardOverlay } from './components/vboard/VBoardOverlay';
 import { VCursor } from './components/VCursor';
-import { GlobalAnnouncementBanner } from './components/GlobalAnnouncementBanner';
 import { SpecialThemeEffectsLayer } from './components/themes/SpecialThemeEffectsLayer';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AccountAuthModal } from './components/AccountAuthModal';
@@ -159,6 +158,21 @@ function AppContent() {
     return path;
   });
   const [routeState, setRouteState] = useState<any>(null);
+
+  // Clean route without query params or trailing slashes for layout and matching
+  const cleanRoute = currentRoute.split('?')[0].replace(/\/$/, '') || '/';
+  const isRedeemOrEventRoute = 
+    cleanRoute === '/event' ||
+    cleanRoute === '/events' ||
+    cleanRoute === '/su-kien' ||
+    cleanRoute === '/redeem' || 
+    cleanRoute === '/gift' || 
+    cleanRoute === '/redeem-gift' || 
+    cleanRoute === '/nhan-qua';
+  const isFullBleedRoute = 
+    cleanRoute === '/' || 
+    cleanRoute === '/home' || 
+    isRedeemOrEventRoute;
 
   // Channels State (base channels + imported channels from localStorage)
   const [channels, setChannels] = useState<Channel[]>(() => {
@@ -686,7 +700,7 @@ function AppContent() {
       case '/gift':
       case '/redeem-gift':
       case '/nhan-qua':
-        return renderSpace360App('Redeem Gift', <RedeemGiftTab onBack={() => navigate('/space-360')} navigate={navigate} />);
+        return <EventPage navigate={navigate} initialSection="redeem" />;
 
       case '/v-space':
       case '/v-apps':
@@ -855,6 +869,7 @@ function AppContent() {
         {/* Dynamic Island on Top of Web (Feature Flag: dynamic_island) - Displayed across App, Intermission & Setup screens */}
         {isDynamicIsland && !isCrashed && (
           <DynamicIsland
+            currentRoute={currentRoute}
             navigate={navigate}
             channels={channels}
             currentChannel={currentChannel}
@@ -975,14 +990,9 @@ function AppContent() {
             />
           )}
 
-          {/* Dải thông báo vàng hiển thị ở bất cứ đâu với clock đếm ngược đến 00h00 16/10/2026 (Ẩn khi bật Minimalism Home Page) */}
-          {(!flags.minimalism_home_page || (currentRoute !== '/' && currentRoute !== '/home')) && (
-            <GlobalAnnouncementBanner onExplore={() => navigate('/')} />
-          )}
-
           {/* Dynamic Page Content with smooth motion fade & spring transition */}
           <main className={`flex-1 w-full mx-auto transition-opacity duration-300 ease-out relative z-10 ${
-            currentRoute === '/' || currentRoute === '/home' 
+            isFullBleedRoute 
               ? 'p-0 max-w-none' 
               : 'px-4 sm:px-6 md:px-8 py-5 max-w-7xl'
           }`}>

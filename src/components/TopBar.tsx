@@ -841,19 +841,16 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
               </button>
             </div>
 
-            {/* Sign In Button (Nền nút màu xanh dương) */}
+            {/* Sign In Button (Nền solid cam, hình tròn, bỏ label chỉ hiển thị icon) */}
             <button
               id="btn-topbar-signin"
               type="button"
               onClick={openAuthModal}
-              className="h-9 sm:h-10 px-3.5 sm:px-4 rounded-full bg-[#0078D4] hover:bg-[#106EBE] active:scale-95 text-white flex items-center gap-2 transition-all cursor-pointer border border-blue-400/30 shadow-md shadow-blue-500/25 group shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FF6B00] hover:bg-[#FF7A00] active:bg-[#E55A00] active:scale-95 text-white flex items-center justify-center p-0 aspect-square transition-all cursor-pointer border border-orange-400/40 shadow-md shadow-orange-500/30 group shrink-0"
               title={isAuthenticated && user ? `Tài khoản: ${user.displayName}` : "Đăng nhập tài khoản"}
               aria-label="Đăng nhập tài khoản"
             >
-              <LogIn className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white group-hover:scale-110 transition-transform stroke-[2.2]" />
-              <span className="text-xs sm:text-[13px] font-bold hidden sm:inline truncate max-w-[120px]">
-                {isAuthenticated && user ? user.displayName : 'Sign in'}
-              </span>
+              <LogIn className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white group-hover:scale-110 transition-transform stroke-[2.2]" />
             </button>
 
             {/* 5. User Profile Icon (Fully rounded, no border) */}

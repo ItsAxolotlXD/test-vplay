@@ -229,13 +229,13 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
   },
   {
     id: 'more-redeem',
-    label: 'Redeem Gift',
-    route: '/redeem',
-    subtext: 'Nhập mã nhận quà từ VNRT ONLINE',
-    badge: 'MỚI',
+    label: 'Event & Redeem',
+    route: '/event',
+    subtext: 'Sự kiện 2030 & Nhận quà mã 5x5 VNRT',
+    badge: 'HOT',
     badgeColor: 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-300 border-pink-400/30',
     icon: <Gift className="w-4.5 h-4.5 text-pink-400" />,
-    matchesRoute: (r) => r.startsWith('/redeem') || r.startsWith('/gift') || r.startsWith('/redeem-gift'),
+    matchesRoute: (r) => r.startsWith('/event') || r.startsWith('/redeem') || r.startsWith('/gift') || r.startsWith('/redeem-gift'),
   },
   {
     id: 'more-shop',
@@ -525,7 +525,7 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
         }
       },
       renderIcon: (active) => <TabEventIcon active={active} />,
-      checkActive: (route) => route.startsWith('/event') || route.startsWith('/events'),
+      checkActive: (route) => route.startsWith('/event') || route.startsWith('/events') || route.startsWith('/redeem') || route.startsWith('/gift'),
     },
     {
       id: 'tab-search',
@@ -742,16 +742,20 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                   }}
                   aria-label={item.label}
                   title={item.label}
-                  className={`relative w-[50px] h-[48px] sm:w-[58px] sm:h-[52px] rounded-full flex flex-col items-center justify-center transition-all duration-150 cursor-pointer outline-none select-none active:scale-90 pointer-events-auto ${
-                    isSignInTab 
-                      ? 'bg-[#0078D4] hover:bg-[#106EBE] active:bg-[#005A9E] shadow-md shadow-blue-500/30' 
-                      : active
+                  className={`relative ${
+                    isSignInTab
+                      ? 'w-[42px] h-[42px] sm:w-[46px] sm:h-[46px] rounded-full aspect-square bg-[#FF6B00] hover:bg-[#FF7A00] active:bg-[#E55A00] text-white shadow-md shadow-orange-500/30 mx-0.5'
+                      : 'w-[50px] h-[48px] sm:w-[58px] sm:h-[52px] rounded-full'
+                  } flex flex-col items-center justify-center transition-all duration-150 cursor-pointer outline-none select-none active:scale-90 pointer-events-auto ${
+                    !isSignInTab && (
+                      active
                         ? 'shadow-xs'
                         : 'hover:bg-white/20 active:bg-white/30 text-[#222222]'
+                    )
                   }`}
                 >
                   {/* Smooth spring sliding active pill animation */}
-                  {active && (
+                  {active && !isSignInTab && (
                     <motion.div
                       layoutId="tabViewActivePill"
                       className="absolute inset-0 rounded-full bg-[#FF7A00] shadow-[0_4px_16px_rgba(255,122,0,0.48)] z-0 pointer-events-none"
@@ -764,20 +768,22 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                     />
                   )}
 
-                  {/* Icon & Label (kept above sliding background) */}
+                  {/* Icon & Label (Sign-in button displays icon only, no label) */}
                   <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none">
                     <div className={`flex items-center justify-center transition-colors duration-150 ${
                       active || isSignInTab ? 'text-white' : 'text-[#222222]'
                     }`}>
                       {item.renderIcon(active)}
                     </div>
-                    <span
-                      className={`text-[9px] sm:text-[10px] leading-none mt-0.5 tracking-tight transition-colors duration-150 ${
-                        active || isSignInTab ? 'font-bold text-white' : 'font-semibold text-[#222222]'
-                      }`}
-                    >
-                      {item.label}
-                    </span>
+                    {!isSignInTab && (
+                      <span
+                        className={`text-[9px] sm:text-[10px] leading-none mt-0.5 tracking-tight transition-colors duration-150 ${
+                          active ? 'font-bold text-white' : 'font-semibold text-[#222222]'
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    )}
                   </div>
                 </button>
               );

@@ -2493,7 +2493,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
           id="settings-section-redeem-gift"
           className="settings-category-section p-2 sm:p-4 rounded-[28px] bg-transparent border-0 shadow-xl space-y-4"
         >
-          <RedeemGiftTab onBack={() => setActiveCategory('main')} navigate={navigate} />
+          <RedeemGiftTab onBack={() => setActiveCategory('main')} navigate={navigate} isFullPage={false} />
         </section>
       )}
 

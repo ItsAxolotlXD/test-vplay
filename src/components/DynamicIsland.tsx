@@ -18,6 +18,7 @@ import { Channel } from '../types';
 import { IslandNotification } from '../utils/islandNotifications';
 
 interface DynamicIslandProps {
+  currentRoute?: string;
   navigate?: (route: string) => void;
   channels?: Channel[];
   currentChannel?: Channel;
@@ -25,6 +26,7 @@ interface DynamicIslandProps {
 }
 
 export const DynamicIsland: React.FC<DynamicIslandProps> = ({
+  currentRoute = '/',
   navigate,
   channels = [],
   currentChannel,
@@ -34,6 +36,21 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Scroll tracking to dock Home logo into Dynamic Island when scrolling down
+  const [isScrolled, setIsScrolled] = useState(() => typeof window !== 'undefined' && window.scrollY > 60);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 60;
+      setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const isHomeTab = currentRoute === '/' || currentRoute === '/home' || !currentRoute;
 
   // App notification state on Dynamic Island
   const [activeNotification, setActiveNotification] = useState<IslandNotification | null>(null);
@@ -177,7 +194,13 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
     }
   };
 
+  const isHomeLogoDocked = isHomeTab && isScrolled && !isSearchExpanded && !isNotificationActive;
+
   const handlePillClick = () => {
+    if (isHomeLogoDocked) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     // Only focus input on direct click! (Not on hover)
     inputRef.current?.focus();
     setIsFocused(true);
@@ -228,10 +251,12 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
     targetWidth = 'clamp(320px, 86vw, 520px)';
   } else if (isNotificationActive) {
     targetWidth = getNotificationWidth();
+  } else if (isHomeLogoDocked) {
+    targetWidth = '148px';
   }
 
   // Determine pill target height
-  const targetHeight = isSearchExpanded ? '44px' : isNotificationActive ? '40px' : '34px';
+  const targetHeight = isSearchExpanded ? '44px' : isNotificationActive ? '40px' : isHomeLogoDocked ? '36px' : '34px';
 
   return (
     <>
@@ -275,8 +300,42 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
         className="relative pointer-events-auto bg-black text-white border border-zinc-800/80 shadow-none flex items-center justify-between px-3 cursor-pointer overflow-hidden"
         onClick={handlePillClick}
       >
-        {/* 1. COLLAPSED VIEW: Simple, pure black pill without search icon/text */}
-        {!isSearchExpanded && !isNotificationActive && (
+        {/* 1A. LOGO DOCKED VIEW: Logo docked into Dynamic Island when scrolled down on Home */}
+        {!isSearchExpanded && !isNotificationActive && isHomeLogoDocked && (
+          <div 
+            className="w-full h-full flex items-center justify-between pointer-events-auto select-none px-1 py-0.5 cursor-pointer"
+            title="VNRT Online - Bấm để cuộn lên đầu trang"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            {/* Left minimal sensor dot */}
+            <span className="w-2 h-2 rounded-full bg-[#18181b] shrink-0" />
+
+            {/* Docked official brand logo with shared layoutId */}
+            <motion.img
+              layoutId="vnrt-official-brand-logo"
+              src="https://static.wikia.nocookie.net/ep-deo/images/5/51/New_official_vnrt_logo.png/revision/latest?cb=20260926162432"
+              alt="VNRT Online"
+              referrerPolicy="no-referrer"
+              className="h-5 sm:h-5.5 w-auto max-w-[85px] object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] hover:scale-105 transition-transform shrink-0"
+              transition={{
+                type: 'spring',
+                stiffness: 420,
+                damping: 26,
+              }}
+            />
+
+            {/* Right camera punch-hole dot */}
+            <span className="w-2 h-2 rounded-full bg-[#18181b] flex items-center justify-center shrink-0">
+              <span className="w-1 h-1 rounded-full bg-blue-900/60" />
+            </span>
+          </div>
+        )}
+
+        {/* 1B. DEFAULT COLLAPSED VIEW: Simple, pure black pill without search icon/text */}
+        {!isSearchExpanded && !isNotificationActive && !isHomeLogoDocked && (
           <div className="w-full flex items-center justify-between pointer-events-none select-none px-1">
             {/* Left minimal sensor dot */}
             <span className="w-2.5 h-2.5 rounded-full bg-[#161616]" />

@@ -116,9 +116,11 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
               whileTap={isAnimationTest ? { scale: 0.9 } : undefined}
               transition={{ type: 'spring', stiffness: 450, damping: 18 }}
               className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 ${
-                active 
-                  ? 'bg-[#E50914] text-white shadow-lg shadow-[#E50914]/30' 
-                  : 'text-[#9CA3AF] hover:text-white hover:bg-white/10'
+                item.id === 'dock-signin'
+                  ? 'bg-[#FF6B00] text-white hover:bg-[#FF7A00] shadow-md shadow-orange-500/30'
+                  : active 
+                    ? 'bg-[#E50914] text-white shadow-lg shadow-[#E50914]/30' 
+                    : 'text-[#9CA3AF] hover:text-white hover:bg-white/10'
               }`}
             >
               {item.isCustomHome ? (

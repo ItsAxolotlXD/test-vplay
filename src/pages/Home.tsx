@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { BannerCardItem } from '../components/BannerCardItem';
 import { OnAirSlider } from '../components/OnAirSlider';
@@ -28,6 +29,19 @@ export const Home: React.FC<HomeProps> = ({
   const { searchQuery, setSearchQuery, clearSearch } = useTabSearch();
   const { flags } = useFeatureFlags();
   const [localSearch, setLocalSearch] = useState('');
+
+  const isDynamicIsland = Boolean(flags.dynamic_island);
+  const [isScrolled, setIsScrolled] = useState(() => typeof window !== 'undefined' && window.scrollY > 60);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 60;
+      setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev));
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const isMinimalism = Boolean(flags.minimalism_home_page || (flags as any).minimalism_home);
 
@@ -128,14 +142,22 @@ export const Home: React.FC<HomeProps> = ({
         />
       ) : null}
 
-      {/* Brand Official VNRT Logo */}
-      <div className="w-full flex items-center justify-center pt-2 pb-1 px-4">
-        <img
-          src="https://static.wikia.nocookie.net/ep-deo/images/5/51/New_official_vnrt_logo.png/revision/latest?cb=20260926162432"
-          alt="VNRT Online"
-          referrerPolicy="no-referrer"
-          className="h-16 sm:h-24 md:h-28 lg:h-32 w-auto max-w-[85vw] object-contain drop-shadow-[0_8px_32px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-300"
-        />
+      {/* Brand Official VNRT Logo - Morphs into Dynamic Island when scrolled */}
+      <div className="w-full flex items-center justify-center pt-2 pb-1 px-4 min-h-[64px] sm:min-h-[96px] md:min-h-[112px]">
+        {(!isDynamicIsland || !isScrolled) && (
+          <motion.img
+            layoutId="vnrt-official-brand-logo"
+            src="https://static.wikia.nocookie.net/ep-deo/images/5/51/New_official_vnrt_logo.png/revision/latest?cb=20260926162432"
+            alt="VNRT Online"
+            referrerPolicy="no-referrer"
+            className="h-16 sm:h-24 md:h-28 lg:h-32 w-auto max-w-[85vw] object-contain drop-shadow-[0_8px_32px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-300"
+            transition={{
+              type: 'spring',
+              stiffness: 420,
+              damping: 26,
+            }}
+          />
+        )}
       </div>
 
       {/* Brand Official VNRT Logo & Gathering Discord Event Area */}
