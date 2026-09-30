@@ -251,8 +251,8 @@ export const FloatingTabSearchBar: React.FC<FloatingTabSearchBarProps> = ({ isVi
             <div
               className={`absolute bottom-0 inset-x-0 w-full h-[2.5px] pointer-events-none z-20 transition-all duration-300 ${
                 isFocused
-                  ? 'bg-[#ff6600] shadow-[0_0_10px_#ff6600,0_0_18px_rgba(255,102,0,0.6)]'
-                  : 'bg-white/35'
+                  ? 'bg-[#ff6600]/90 shadow-[0_0_10px_#ff6600,0_0_16px_rgba(255,102,0,0.5)]'
+                  : 'bg-white/18'
               }`}
             />
           </motion.div>

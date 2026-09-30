@@ -169,6 +169,39 @@ export const Home: React.FC<HomeProps> = ({
         onSelectChannel={onSelectChannel}
       />
 
+      {/* Speak For Me Showcase Banner (As seen in Canary Screenshot) */}
+      <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+        <div className="relative w-full rounded-3xl overflow-hidden bg-gradient-to-r from-[#1E1B4B] via-[#4338CA] to-[#831843] p-6 sm:p-8 md:p-10 shadow-2xl border border-indigo-500/30 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-pink-300 text-xs font-semibold backdrop-blur-sm border border-white/10">
+              <Sparkles className="w-3.5 h-3.5 text-pink-400" />
+              <span>TÍNH NĂNG MỚI • CANARY LABS</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Speak For Me (Text to Speech)
+            </h3>
+            <p className="text-zinc-200 text-xs sm:text-sm max-w-xl leading-relaxed">
+              Trải nghiệm công nghệ chuyển đổi văn bản thành giọng nói thông minh với quả cầu âm thanh trực quan, hỗ trợ giọng đọc đa ngôn ngữ, lưu trữ sound clips và xuất file .mp3.
+            </p>
+          </div>
+
+          <div className="shrink-0 z-10">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('vplay:open_speak_for_me'))}
+              className="px-6 sm:px-8 py-3.5 rounded-full bg-white hover:bg-zinc-100 text-[#1E1B4B] hover:text-black font-extrabold text-sm sm:text-base shadow-xl transition-all active:scale-95 flex items-center gap-2.5 cursor-pointer uppercase tracking-wider font-['Integer','Inter',sans-serif]"
+            >
+              <span>THỬ NGAY BÂY GIỜ</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            </button>
+          </div>
+
+          {/* Decorative ambient blurred glowing orbs */}
+          <div className="absolute right-0 top-0 w-72 h-72 rounded-full bg-pink-500/20 blur-3xl pointer-events-none" />
+          <div className="absolute left-1/3 bottom-0 w-64 h-64 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
+        </div>
+      </div>
+
       {/* Aesthetic Headline: Introducing Spatial Glass (Cam vàng - Đỏ magenta gradient) */}
       <div id="home-welcome-tagline" className="w-full flex flex-col items-center justify-center my-6 sm:my-8 px-4 text-center select-none">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight font-['Integer','Inter',sans-serif] leading-tight flex flex-wrap items-center justify-center gap-x-3 gap-y-1 drop-shadow-[0_0_24px_rgba(249,115,22,0.45)]">

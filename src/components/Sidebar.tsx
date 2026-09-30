@@ -640,6 +640,21 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
           <span className="truncate">Event (Gathering)</span>
         </button>
 
+        {/* Bảo tàng lưu trữ (Vplay Archive Museum) */}
+        <button
+          id={isMobile ? 'mobile-nav-item-museum' : 'nav-item-museum'}
+          onClick={() => handleNavClick('/museum')}
+          title="Bảo tàng lưu trữ các phiên bản Vplay"
+          className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer ${
+            isActive('/museum') || isActive('/bao-tang')
+              ? 'bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20'
+              : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
+          }`}
+        >
+          <CalendarDays className="w-5 h-5 shrink-0 text-cyan-400" />
+          <span className="truncate">Bảo tàng lưu trữ</span>
+        </button>
+
         {/* Divider 1 */}
         <div className="py-1">
           <div className="border-t border-white/10" />

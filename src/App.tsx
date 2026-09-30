@@ -89,6 +89,7 @@ import { VCursor } from './components/VCursor';
 import { SpecialThemeEffectsLayer } from './components/themes/SpecialThemeEffectsLayer';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AccountAuthModal } from './components/AccountAuthModal';
+import { SpeakForMeModal } from './components/SpeakForMeModal';
 
 function AppContent() {
   const { settings, updateSetting } = useSettings();
@@ -130,6 +131,17 @@ function AppContent() {
   const [isCrashed, setIsCrashed] = useState<boolean>(false);
   const [crashReason, setCrashReason] = useState<string>('');
 
+  // Speak For Me Desktop Modal State (Text to Speech)
+  const [isSpeakForMeOpen, setIsSpeakForMeOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleOpenSpeakForMe = () => setIsSpeakForMeOpen(true);
+    window.addEventListener('vplay:open_speak_for_me', handleOpenSpeakForMe);
+    return () => {
+      window.removeEventListener('vplay:open_speak_for_me', handleOpenSpeakForMe);
+    };
+  }, []);
+
   // Floating Copilot Movable Window State
   const [isCopilotFloating, setIsCopilotFloating] = useState<boolean>(() => {
     try {
@@ -168,7 +180,9 @@ function AppContent() {
     cleanRoute === '/redeem' || 
     cleanRoute === '/gift' || 
     cleanRoute === '/redeem-gift' || 
-    cleanRoute === '/nhan-qua';
+    cleanRoute === '/nhan-qua' ||
+    cleanRoute === '/museum' ||
+    cleanRoute === '/bao-tang';
   const isFullBleedRoute = 
     cleanRoute === '/' || 
     cleanRoute === '/home' || 
@@ -542,6 +556,19 @@ function AppContent() {
       case '/events':
       case '/su-kien':
         return <EventPage navigate={navigate} />;
+
+      case '/museum':
+      case '/bao-tang':
+        return <EventPage navigate={navigate} initialSection="museum" />;
+
+      case '/speak-for-me':
+      case '/tts':
+      case '/text-to-speech':
+        return (
+          <div className="w-full min-h-[85vh] flex items-center justify-center p-4">
+            <SpeakForMeModal isOpen={true} onClose={() => navigate('/')} />
+          </div>
+        );
 
       case '/music':
       case '/v-music':
@@ -1134,6 +1161,12 @@ function AppContent() {
           }}
           channels={channels}
           navigate={navigate}
+        />
+
+        {/* Speak For Me Desktop Window (Text To Speech) */}
+        <SpeakForMeModal
+          isOpen={isSpeakForMeOpen}
+          onClose={() => setIsSpeakForMeOpen(false)}
         />
 
         {/* V-Cursor: Con trỏ chuột của VPlay thay vì device, hỗ trợ bảng màu tùy chỉnh */}

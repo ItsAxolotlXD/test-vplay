@@ -13,14 +13,23 @@ import {
   LogIn,
   ArrowLeft,
   Layers,
-  HelpCircle
+  HelpCircle,
+  Landmark,
+  ExternalLink,
+  Globe,
+  Search,
+  RefreshCw,
+  Eye,
+  CalendarDays,
+  X
 } from 'lucide-react';
 import { useOrbs } from '../hooks/useOrbs';
 import { useAuth } from '../context/AuthContext';
+import { VPLAY_ARCHIVE_VERSIONS, VplayArchiveVersion } from '../data/vplayArchiveVersions';
 
 interface EventPageProps {
   navigate: (route: string, state?: any) => void;
-  initialSection?: 'all' | 'redeem' | 'countdown';
+  initialSection?: 'all' | 'redeem' | 'countdown' | 'museum';
 }
 
 interface GiftReward {
@@ -186,6 +195,35 @@ export const EventPage: React.FC<EventPageProps> = ({
 
     return () => clearInterval(timer);
   }, []);
+
+  // Vplay Archive Museum States
+  const [selectedMuseumEra, setSelectedMuseumEra] = useState<string>('all');
+  const [museumSearchQuery, setMuseumSearchQuery] = useState<string>('');
+  const [previewVersion, setPreviewVersion] = useState<VplayArchiveVersion | null>(null);
+  const [copiedVersionId, setCopiedVersionId] = useState<string | null>(null);
+
+  // Auto-scroll to section on mount if requested
+  useEffect(() => {
+    if (initialSection === 'museum' || window.location.hash === '#museum' || window.location.hash === '#section-vplay-museum') {
+      setTimeout(() => {
+        scrollToSection('section-vplay-museum');
+      }, 250);
+    } else if (initialSection === 'countdown' || window.location.hash === '#section-event-clock') {
+      setTimeout(() => {
+        scrollToSection('section-event-clock');
+      }, 250);
+    }
+  }, [initialSection]);
+
+  const handleCopyVersionLink = (version: VplayArchiveVersion) => {
+    try {
+      navigator.clipboard.writeText(version.url);
+      setCopiedVersionId(version.id);
+      setTimeout(() => setCopiedVersionId(null), 2000);
+    } catch {
+      window.prompt('Sao chép đường dẫn phiên bản:', version.url);
+    }
+  };
 
   // Auto-format input to 5x5 code format: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -485,6 +523,16 @@ export const EventPage: React.FC<EventPageProps> = ({
             >
               <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
               <span className="font-minecraft tracking-wider text-[11px] uppercase">Hướng dẫn đổi quà</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => scrollToSection('section-vplay-museum')}
+              style={{ borderRadius: 0 }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-none bg-black/60 hover:bg-black/90 border border-cyan-500/50 text-cyan-300 hover:text-white text-xs font-semibold backdrop-blur-sm transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-md"
+            >
+              <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="font-minecraft tracking-wider text-[11px] uppercase">Bảo tàng lưu trữ (19 bản)</span>
             </button>
           </div>
 
@@ -889,6 +937,304 @@ export const EventPage: React.FC<EventPageProps> = ({
           )}
         </div>
       </div>
+
+      {/* =========================================================================
+          SECTION 4: BẢO TÀNG LƯU TRỮ VPLAY (VPLAY ARCHIVE MUSEUM - 19 PHIÊN BẢN)
+          ========================================================================= */}
+      <section 
+        id="section-vplay-museum" 
+        style={{ borderRadius: 0 }}
+        className="w-full bg-[#111115] border-t-4 border-[#0099FF] py-16 sm:py-20 px-4 sm:px-8 rounded-none relative overflow-hidden"
+      >
+        {/* Subtle Archival Grid lines pattern */}
+        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Header Badge */}
+          <div className="flex flex-col items-center text-center mb-10">
+            <div 
+              style={{ borderRadius: 0 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-none bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 text-xs font-mono tracking-widest uppercase mb-3 shadow-md"
+            >
+              <Landmark className="w-4 h-4 text-cyan-400" />
+              <span>DI SẢN TRUYỀN HÌNH • VPLAY HERITAGE ARCHIVES</span>
+            </div>
+
+            <h2 
+              style={{ textShadow: '0 3px 0 #000' }}
+              className="font-minecraft text-white text-2xl sm:text-4xl uppercase font-normal tracking-wider mb-3"
+            >
+              BẢO TÀNG LƯU TRỮ CÁC PHIÊN BẢN VPLAY
+            </h2>
+            <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
+              Khám phá và tương tác lại toàn bộ <strong>19 phiên bản phát triển</strong> trong lịch sử Vplay: từ Google Sites ban sơ (1.0), Season 2 (2.0), Seven (3.0), các nhánh Beta FA8K, Canary, VNRT Group đến kỷ nguyên OreUI & Waves.
+            </p>
+          </div>
+
+          {/* Filter Bar: Search + Era Filter Chips */}
+          <div 
+            style={{ borderRadius: 0 }}
+            className="bg-[#181820] border-2 border-zinc-800 p-4 sm:p-5 mb-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 rounded-none shadow-lg"
+          >
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={museumSearchQuery}
+                onChange={(e) => setMuseumSearchQuery(e.target.value)}
+                placeholder="Tìm phiên bản (1.0, canary, beta, oreui, vnrt, vercel...)..."
+                style={{ borderRadius: 0 }}
+                className="w-full bg-[#101014] border border-zinc-700/80 pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder:text-zinc-500 font-medium focus:outline-none focus:border-cyan-400 rounded-none transition-colors"
+              />
+              {museumSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setMuseumSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Era Filter Chips */}
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar">
+              {[
+                { id: 'all', label: 'Tất cả (19)' },
+                { id: 'Khởi nguyên', label: 'Khởi nguyên (1.0 - 5.0)' },
+                { id: 'Thử nghiệm Beta', label: 'Beta (6.0 - 8.0)' },
+                { id: 'Canary & Dev', label: 'Canary & Dev (9.0 - 12.0)' },
+                { id: 'VNRT Group', label: 'VNRT Group (13.0 - 15.0)' },
+                { id: 'OreUI & Waves', label: 'OreUI & Waves (16.0 - 19.0)' }
+              ].map((era) => {
+                const isActive = selectedMuseumEra === era.id;
+                return (
+                  <button
+                    key={era.id}
+                    type="button"
+                    onClick={() => setSelectedMuseumEra(era.id)}
+                    style={{ borderRadius: 0 }}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-none border transition-all cursor-pointer whitespace-nowrap ${
+                      isActive
+                        ? 'bg-cyan-500 text-black border-cyan-400 font-bold shadow-md'
+                        : 'bg-[#121216] border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500'
+                    }`}
+                  >
+                    {era.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Version Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            {VPLAY_ARCHIVE_VERSIONS.filter((ver) => {
+              const matchesEra = selectedMuseumEra === 'all' || ver.era === selectedMuseumEra;
+              const q = museumSearchQuery.trim().toLowerCase();
+              const matchesSearch =
+                !q ||
+                ver.version.toLowerCase().includes(q) ||
+                ver.name.toLowerCase().includes(q) ||
+                ver.codename.toLowerCase().includes(q) ||
+                ver.url.toLowerCase().includes(q) ||
+                ver.description.toLowerCase().includes(q);
+              return matchesEra && matchesSearch;
+            }).map((ver) => {
+              const isCopied = copiedVersionId === ver.id;
+              return (
+                <div
+                  key={ver.id}
+                  style={{ borderRadius: 0 }}
+                  className="bg-[#181820] border-2 border-zinc-800 hover:border-cyan-500/70 p-5 flex flex-col justify-between transition-all duration-200 group hover:-translate-y-1 shadow-lg rounded-none"
+                >
+                  <div className="space-y-3">
+                    {/* Top Header Badge */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div 
+                        style={{ borderRadius: 0 }}
+                        className="px-2.5 py-0.5 bg-cyan-950 border border-cyan-400/60 font-minecraft text-cyan-300 text-xs font-bold tracking-wider rounded-none"
+                      >
+                        v{ver.version}
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <span 
+                          style={{ borderRadius: 0 }}
+                          className={`text-[10px] font-mono px-2 py-0.5 border rounded-none ${ver.badgeColor}`}
+                        >
+                          {ver.era}
+                        </span>
+                        <span className="text-[10px] text-zinc-500 font-mono">
+                          {ver.releaseYear}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Version Title */}
+                    <div>
+                      <h3 className="font-bold text-white text-base leading-snug group-hover:text-cyan-300 transition-colors font-minecraft">
+                        {ver.name}
+                      </h3>
+                      <p className="text-[11px] text-zinc-400 font-mono mt-0.5">
+                        Codename: <strong className="text-zinc-300">{ver.codename}</strong>
+                      </p>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-zinc-300 text-xs leading-relaxed line-clamp-3">
+                      {ver.description}
+                    </p>
+
+                    {/* Feature Highlights */}
+                    <div className="space-y-1 pt-1 border-t border-zinc-800/80">
+                      {ver.highlights.map((h, idx) => (
+                        <div key={idx} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                          <span className="w-1 h-1 bg-cyan-400 rounded-none shrink-0" />
+                          <span className="truncate">{h}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* URL Display */}
+                    <div 
+                      style={{ borderRadius: 0 }}
+                      className="p-2 bg-[#101014] border border-zinc-800 text-[11px] font-mono text-zinc-400 truncate flex items-center justify-between gap-2"
+                    >
+                      <span className="truncate text-cyan-400/90">{ver.url}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyVersionLink(ver)}
+                        title="Sao chép đường dẫn"
+                        className="text-zinc-400 hover:text-white shrink-0 p-1 cursor-pointer"
+                      >
+                        {isCopied ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Actions Toolbar */}
+                  <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewVersion(ver)}
+                      style={{ borderRadius: 0 }}
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-none border border-zinc-700 transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-sm"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Xem trước</span>
+                    </button>
+
+                    <a
+                      href={ver.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ borderRadius: 0 }}
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold rounded-none border border-cyan-400 transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-sm uppercase font-minecraft tracking-wider"
+                    >
+                      <span>Mở web</span>
+                      <ExternalLink className="w-3 h-3 text-black" />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Museum Footer Note */}
+          <div className="mt-12 p-4 bg-[#181820] border border-zinc-800 text-center flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-400">
+            <span className="font-minecraft text-white tracking-wide">
+              VNRT ONLINE ARCHIVES • PRESERVING BROADCAST MEDIA HERITAGE
+            </span>
+            <span>Tổng cộng: <strong>19 phiên bản Vplay</strong> đã được ghi danh vào bảo tàng</span>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          INTERACTIVE ARCHIVE VERSION IFRAME PREVIEW MODAL (0% RADIUS)
+          ========================================================================= */}
+      <AnimatePresence>
+        {previewVersion && (
+          <div className="fixed inset-0 z-[100002] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md select-none">
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              style={{ borderRadius: 0 }}
+              className="relative w-full max-w-5xl h-[88vh] bg-[#1C1C22] border-4 border-cyan-500 flex flex-col rounded-none shadow-[0_25px_80px_rgba(0,0,0,0.9)] overflow-hidden"
+            >
+              {/* Iframe Top Bar */}
+              <div className="px-4 py-2.5 bg-[#141418] border-b-2 border-zinc-800 flex items-center justify-between gap-3 shrink-0">
+                <div className="flex items-center gap-2 truncate">
+                  <div 
+                    style={{ borderRadius: 0 }}
+                    className="px-2 py-0.5 bg-cyan-950 border border-cyan-400 font-minecraft text-cyan-300 text-xs font-bold"
+                  >
+                    v{previewVersion.version}
+                  </div>
+                  <span className="font-bold text-white text-xs sm:text-sm truncate">
+                    {previewVersion.name}
+                  </span>
+                </div>
+
+                {/* Direct address bar */}
+                <div className="hidden md:flex items-center gap-1.5 flex-1 max-w-md mx-3 px-3 py-1 bg-black/60 border border-zinc-700 text-xs font-mono text-zinc-300 truncate">
+                  <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span className="truncate">{previewVersion.url}</span>
+                </div>
+
+                {/* Window Actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <a
+                    href={previewVersion.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ borderRadius: 0 }}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Mở ngoài</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setPreviewVersion(null)}
+                    style={{ borderRadius: 0 }}
+                    className="p-1.5 bg-zinc-800 hover:bg-rose-600 text-white transition-colors cursor-pointer"
+                    title="Đóng cửa sổ xem trước"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Iframe Frame Viewport */}
+              <div className="flex-1 w-full h-full bg-white relative">
+                <iframe
+                  src={previewVersion.url}
+                  title={previewVersion.name}
+                  className="w-full h-full border-0"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                  loading="lazy"
+                />
+              </div>
+
+              {/* Iframe Status Bar */}
+              <div className="px-4 py-1.5 bg-[#141418] border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 shrink-0">
+                <span>Trình giả lập bảo tàng Vplay Archive</span>
+                <span className="text-cyan-400 font-mono">Phiên bản {previewVersion.version} ({previewVersion.codename})</span>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* =========================================================================
           CELEBRATORY REWARD CLAIM MODAL (0% RADIUS CORNERS, 0% RADIUS)

@@ -87,6 +87,15 @@ export const FEATURE_FLAGS_DEFINITIONS: FeatureFlagItem[] = [
     category: 'ui',
     badge: 'NEW',
     defaultValue: false,
+  },
+  {
+    id: 'flag_experimental_settings_layout',
+    key: 'experimental_settings_layout',
+    name: 'Experimental Settings Layout',
+    description: 'Bố cục Cài đặt chia danh mục kiểu Windows 11 Fluent: trên máy tính (PC) các danh mục hiển thị layout dọc ở sidebar bên trái kèm thẻ thiết bị, trên điện thoại (mobile) các danh mục hiển thị dạng thanh trượt ngang.',
+    category: 'ui',
+    badge: 'EXPERIMENTAL',
+    defaultValue: true,
   }
 ];
 

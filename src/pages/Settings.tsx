@@ -45,6 +45,7 @@ import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useTabSearch } from '../context/TabSearchContext';
 import { showIslandNotification } from '../utils/islandNotifications';
 import { RedeemGiftTab } from '../components/vapps/RedeemGiftTab';
+import { FluentSettingsLayout } from '../components/FluentSettingsLayout';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -54,7 +55,22 @@ interface SettingsProps {
 
 export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose }) => {
   const { settings, updateSetting } = useSettings();
-  const { flags, setFlag } = useFeatureFlags();
+  const { flags, setFlag, toggleFlag } = useFeatureFlags();
+
+  if (flags.experimental_settings_layout) {
+    return (
+      <FluentSettingsLayout
+        settings={settings}
+        updateSetting={updateSetting}
+        flags={flags}
+        setFlag={setFlag}
+        toggleFlag={toggleFlag}
+        navigate={navigate}
+        isDrawer={isDrawer}
+        onClose={onClose}
+      />
+    );
+  }
   const { searchQuery, setSearchQuery } = useTabSearch();
   const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental' | 'feedback' | 'redeem_gift'>('main');
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
