@@ -325,15 +325,25 @@ function AppContent() {
         const matched = channels.find((c) => c.slug === chSlug);
         if (matched) setCurrentChannel(matched);
       }
-      window.history.pushState(null, '', path);
+      try {
+        window.history.pushState(null, '', path);
+      } catch (e) {
+        console.warn('history.pushState blocked:', e);
+      }
       setCurrentRoute(baseRoute);
     } else {
-      window.history.pushState(null, '', path);
+      try {
+        window.history.pushState(null, '', path);
+      } catch (e) {
+        console.warn('history.pushState blocked:', e);
+      }
       setCurrentRoute(path);
     }
 
     // Scroll to top on navigation
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {}
   };
 
   // Handle browser back / forward navigation

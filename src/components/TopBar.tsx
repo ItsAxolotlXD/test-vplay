@@ -841,17 +841,17 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
               </button>
             </div>
 
-            {/* Sign In Button (Icon cửa vào LogIn) */}
+            {/* Sign In Button (Nền nút màu xanh dương) */}
             <button
               id="btn-topbar-signin"
               type="button"
               onClick={openAuthModal}
-              className="h-9 sm:h-10 px-3 sm:px-3.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center gap-2 transition-all cursor-pointer border border-white/15 shadow-sm group shrink-0"
+              className="h-9 sm:h-10 px-3.5 sm:px-4 rounded-full bg-[#0078D4] hover:bg-[#106EBE] active:scale-95 text-white flex items-center gap-2 transition-all cursor-pointer border border-blue-400/30 shadow-md shadow-blue-500/25 group shrink-0"
               title={isAuthenticated && user ? `Tài khoản: ${user.displayName}` : "Đăng nhập tài khoản"}
               aria-label="Đăng nhập tài khoản"
             >
               <LogIn className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white group-hover:scale-110 transition-transform stroke-[2.2]" />
-              <span className="text-xs sm:text-[13px] font-semibold hidden sm:inline truncate max-w-[120px]">
+              <span className="text-xs sm:text-[13px] font-bold hidden sm:inline truncate max-w-[120px]">
                 {isAuthenticated && user ? user.displayName : 'Sign in'}
               </span>
             </button>

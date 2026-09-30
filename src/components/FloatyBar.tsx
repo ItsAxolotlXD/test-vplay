@@ -26,6 +26,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useTabSearch } from '../context/TabSearchContext';
 import { useAuth } from '../context/AuthContext';
+import { playPopSound } from '../utils/sound';
 
 interface TabViewProps {
   currentRoute: string;
@@ -153,14 +154,12 @@ interface FlyoutMenuItem {
 
 const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
   {
-    id: 'more-news',
-    label: 'Cổng thông tin',
-    route: '/news',
-    subtext: 'Bản tin truyền hình & sự kiện',
-    badge: 'NEWS',
-    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
-    icon: <Newspaper className="w-4.5 h-4.5 text-amber-400" />,
-    matchesRoute: (r) => r.startsWith('/news') || r.startsWith('/article'),
+    id: 'more-about',
+    label: 'About',
+    route: '/about',
+    subtext: 'Thông tin hệ thống & giới thiệu',
+    icon: <Info className="w-4.5 h-4.5 text-sky-400" />,
+    matchesRoute: (r) => r.startsWith('/about'),
   },
   {
     id: 'more-copilot',
@@ -173,14 +172,32 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
     matchesRoute: (r) => r.startsWith('/copilot'),
   },
   {
-    id: 'more-redeem',
-    label: 'Redeem Gift',
-    route: '/redeem',
-    subtext: 'Nhập mã nhận quà từ VNRT ONLINE',
-    badge: 'MỚI',
-    badgeColor: 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-300 border-pink-400/30',
-    icon: <Gift className="w-4.5 h-4.5 text-pink-400" />,
-    matchesRoute: (r) => r.startsWith('/redeem') || r.startsWith('/gift') || r.startsWith('/redeem-gift'),
+    id: 'more-news',
+    label: 'Cổng thông tin',
+    route: '/news',
+    subtext: 'Bản tin truyền hình & sự kiện',
+    badge: 'NEWS',
+    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
+    icon: <Newspaper className="w-4.5 h-4.5 text-amber-400" />,
+    matchesRoute: (r) => r.startsWith('/news') || r.startsWith('/article'),
+  },
+  {
+    id: 'more-event',
+    label: 'Event',
+    route: '/event',
+    subtext: 'Gathering Discord & Sự kiện đặc biệt',
+    icon: <Sparkles className="w-4.5 h-4.5 text-red-400" />,
+    matchesRoute: (r) => r.startsWith('/event') || r.startsWith('/events'),
+  },
+  {
+    id: 'more-loyalty',
+    label: 'Loyalty',
+    route: '/loyalty',
+    subtext: 'Điểm thưởng & đấu trường dự đoán',
+    badge: 'ARENA',
+    badgeColor: 'bg-orange-500/20 text-orange-300 border-orange-400/30',
+    icon: <Coins className="w-4.5 h-4.5 text-orange-400" />,
+    matchesRoute: (r) => r.startsWith('/loyalty') || r.startsWith('/bet-arena'),
   },
   {
     id: 'more-music',
@@ -191,20 +208,42 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
     matchesRoute: (r) => r.startsWith('/music'),
   },
   {
+    id: 'more-people',
+    label: 'People',
+    route: '/friends',
+    subtext: 'Bạn bè & cộng đồng người dùng',
+    badge: '100+',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
+    icon: <Users className="w-4.5 h-4.5 text-emerald-400" />,
+    matchesRoute: (r) => r.startsWith('/friends') || r.startsWith('/people'),
+  },
+  {
+    id: 'more-premium',
+    label: 'Premium',
+    route: '/v-premium',
+    subtext: 'Đặc quyền hội viên cao cấp',
+    badge: 'VIP',
+    badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+    icon: <Waves className="w-4.5 h-4.5 text-yellow-400" />,
+    matchesRoute: (r) => r.startsWith('/v-premium'),
+  },
+  {
+    id: 'more-redeem',
+    label: 'Redeem Gift',
+    route: '/redeem',
+    subtext: 'Nhập mã nhận quà từ VNRT ONLINE',
+    badge: 'MỚI',
+    badgeColor: 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 text-pink-300 border-pink-400/30',
+    icon: <Gift className="w-4.5 h-4.5 text-pink-400" />,
+    matchesRoute: (r) => r.startsWith('/redeem') || r.startsWith('/gift') || r.startsWith('/redeem-gift'),
+  },
+  {
     id: 'more-shop',
     label: 'Shop',
     route: '/v-shop',
     subtext: 'Mua sắm tiện ích & quà lưu niệm',
     icon: <ShoppingBag className="w-4.5 h-4.5 text-emerald-400" />,
     matchesRoute: (r) => r.startsWith('/v-shop') || r.startsWith('/shop'),
-  },
-  {
-    id: 'more-event',
-    label: 'Event',
-    route: '/event',
-    subtext: 'Gathering Discord & Sự kiện đặc biệt',
-    icon: <Sparkles className="w-4.5 h-4.5 text-red-400" />,
-    matchesRoute: (r) => r.startsWith('/event') || r.startsWith('/events'),
   },
   {
     id: 'more-space360',
@@ -236,16 +275,6 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
       r.startsWith('/wheel-of-fortune'),
   },
   {
-    id: 'more-vflow',
-    label: 'V-Flow',
-    route: '/v-flow',
-    subtext: 'Bảng tin tương tác & bài viết',
-    badge: 'FEED',
-    badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-400/30',
-    icon: <Radio className="w-4.5 h-4.5 text-rose-400" />,
-    matchesRoute: (r) => r.startsWith('/v-flow') || r.startsWith('/flow'),
-  },
-  {
     id: 'more-chat',
     label: 'V-Chat',
     route: '/chat',
@@ -256,6 +285,16 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
     matchesRoute: (r) => r.startsWith('/chat') || r.startsWith('/discord'),
   },
   {
+    id: 'more-vflow',
+    label: 'V-Flow',
+    route: '/v-flow',
+    subtext: 'Bảng tin tương tác & bài viết',
+    badge: 'FEED',
+    badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-400/30',
+    icon: <Radio className="w-4.5 h-4.5 text-rose-400" />,
+    matchesRoute: (r) => r.startsWith('/v-flow') || r.startsWith('/flow'),
+  },
+  {
     id: 'more-vertical',
     label: 'Vertical',
     route: '/vertical',
@@ -264,44 +303,6 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
     badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
     icon: <Smartphone className="w-4.5 h-4.5 text-amber-400" />,
     matchesRoute: (r) => r.startsWith('/vertical') || r.startsWith('/shorts'),
-  },
-  {
-    id: 'more-premium',
-    label: 'Premium',
-    route: '/v-premium',
-    subtext: 'Đặc quyền hội viên cao cấp',
-    badge: 'VIP',
-    badgeColor: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
-    icon: <Waves className="w-4.5 h-4.5 text-yellow-400" />,
-    matchesRoute: (r) => r.startsWith('/v-premium'),
-  },
-  {
-    id: 'more-loyalty',
-    label: 'Loyalty',
-    route: '/loyalty',
-    subtext: 'Điểm thưởng & đấu trường dự đoán',
-    badge: 'ARENA',
-    badgeColor: 'bg-orange-500/20 text-orange-300 border-orange-400/30',
-    icon: <Coins className="w-4.5 h-4.5 text-orange-400" />,
-    matchesRoute: (r) => r.startsWith('/loyalty') || r.startsWith('/bet-arena'),
-  },
-  {
-    id: 'more-people',
-    label: 'People',
-    route: '/friends',
-    subtext: 'Bạn bè & cộng đồng người dùng',
-    badge: '100+',
-    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-    icon: <Users className="w-4.5 h-4.5 text-emerald-400" />,
-    matchesRoute: (r) => r.startsWith('/friends') || r.startsWith('/people'),
-  },
-  {
-    id: 'more-about',
-    label: 'About',
-    route: '/about',
-    subtext: 'Thông tin hệ thống & giới thiệu',
-    icon: <Info className="w-4.5 h-4.5 text-sky-400" />,
-    matchesRoute: (r) => r.startsWith('/about'),
   },
 ];
 
@@ -442,7 +443,9 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
         flyoutRef.current && 
         !flyoutRef.current.contains(target) &&
         moreButtonRef.current && 
-        !moreButtonRef.current.contains(target)
+        !moreButtonRef.current.contains(target) &&
+        searchBarContainerRef.current &&
+        !searchBarContainerRef.current.contains(target)
       ) {
         setIsMoreOpen(false);
       }
@@ -454,11 +457,15 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
+    // Small delay to ensure click handlers process first
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }, 50);
 
     return () => {
+      clearTimeout(timer);
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
@@ -477,7 +484,13 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
       label: 'Home',
       onClick: () => {
         setIsMoreOpen(false);
-        navigate('/');
+        if (currentRoute === '/' || currentRoute === '/home') {
+          try {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } catch {}
+        } else {
+          navigate('/');
+        }
       },
       renderIcon: (active) => <TabHomeIcon active={active} />,
       checkActive: (route) => route === '/' || route === '/home',
@@ -487,7 +500,13 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
       label: 'Watch',
       onClick: () => {
         setIsMoreOpen(false);
-        navigate('/live-tv');
+        if (currentRoute.startsWith('/live-tv')) {
+          try {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } catch {}
+        } else {
+          navigate('/live-tv');
+        }
       },
       renderIcon: (active) => <TabWatchIcon active={active} />,
       checkActive: (route) => route.startsWith('/live-tv') || route.startsWith('/channels'),
@@ -497,7 +516,13 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
       label: 'Event',
       onClick: () => {
         setIsMoreOpen(false);
-        navigate('/event');
+        if (currentRoute.startsWith('/event')) {
+          try {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } catch {}
+        } else {
+          navigate('/event');
+        }
       },
       renderIcon: (active) => <TabEventIcon active={active} />,
       checkActive: (route) => route.startsWith('/event') || route.startsWith('/events'),
@@ -539,27 +564,29 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
         openAuthModal();
       },
       renderIcon: () => (
-        <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 flex items-center justify-center text-blue-400">
-          <LogIn className="w-5 h-5 text-current stroke-[2.2]" />
+        <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 flex items-center justify-center text-white">
+          <LogIn className="w-5 h-5 text-white stroke-[2.2]" />
         </div>
       ),
       checkActive: () => false,
     },
   ];
 
-  // Filtered items in the More flyout
-  const filteredFlyoutItems = FLYOUT_MENU_ITEMS.filter((item) => {
-    if (!flyoutSearchQuery.trim()) return true;
-    const q = flyoutSearchQuery.toLowerCase();
-    return item.label.toLowerCase().includes(q) || item.subtext.toLowerCase().includes(q);
-  });
+  // Filtered and sorted items in the More flyout (Sorted A-Z)
+  const filteredFlyoutItems = FLYOUT_MENU_ITEMS
+    .filter((item) => {
+      if (!flyoutSearchQuery.trim()) return true;
+      const q = flyoutSearchQuery.toLowerCase();
+      return item.label.toLowerCase().includes(q) || item.subtext.toLowerCase().includes(q);
+    })
+    .sort((a, b) => a.label.localeCompare(b.label, 'vi', { sensitivity: 'base' }));
 
   return (
     <nav
       id="tab-view-container"
       aria-label="Tab View"
       ref={searchBarContainerRef}
-      className={`fixed left-1/2 -translate-x-1/2 z-50 select-none pointer-events-auto flex flex-col items-center max-w-[96vw] transition-all duration-300 ${
+      className={`fixed left-1/2 -translate-x-1/2 z-[1000] select-none pointer-events-auto flex flex-col items-center max-w-[96vw] transition-all duration-300 ${
         vboardState.isOpen ? 'z-[100002]' : ''
       } ${!vboardState.isOpen ? 'bottom-4 sm:bottom-6' : ''}`}
       style={{
@@ -580,59 +607,45 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
             }}
-            className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[92vw] sm:w-[380px] md:w-[410px] max-w-[430px] rounded-[28px] border border-black/10 shadow-[0_24px_64px_rgba(0,0,0,0.22)] p-3.5 sm:p-4 flex flex-col z-50 text-zinc-900 overflow-hidden"
+            className="absolute bottom-[calc(100%+12px)] left-1/2 -translate-x-1/2 w-[92vw] sm:w-[380px] md:w-[410px] max-w-[430px] rounded-[28px] border border-black/10 shadow-[0_24px_64px_rgba(0,0,0,0.22)] p-3.5 sm:p-4 flex flex-col z-[1001] text-zinc-900 overflow-hidden pointer-events-auto"
           >
-            {/* Flyout Header */}
-            <div className="flex items-center justify-between pb-2.5 border-b border-black/8 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-[#FF7A00]/15 border border-[#FF7A00]/30 flex items-center justify-center text-[#FF7A00]">
-                  <Menu className="w-4 h-4 stroke-[2.4]" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-zinc-900 leading-tight">
-                    Tất cả chuyên mục
-                  </h3>
-                  <p className="text-[10.5px] text-zinc-500">
-                    Menu tiện ích VNRT Online ({filteredFlyoutItems.length})
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsMoreOpen(false)}
-                className="w-7 h-7 rounded-full bg-black/5 hover:bg-black/10 text-zinc-600 hover:text-zinc-900 flex items-center justify-center transition-colors cursor-pointer"
-                title="Đóng menu"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Quick Filter Input */}
-            <div className="pt-2.5 pb-2 shrink-0">
-              <div className="relative flex items-center">
+            {/* Quick Filter Input with solid background & Close button */}
+            <div className="flex items-center gap-2 pb-2.5 shrink-0">
+              <div className="relative flex-1 flex items-center">
                 <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 pointer-events-none" />
                 <input
                   type="text"
                   value={flyoutSearchQuery}
                   onChange={(e) => setFlyoutSearchQuery(e.target.value)}
                   placeholder="Tìm chuyên mục..."
-                  className="w-full pl-8.5 pr-3 py-1.5 rounded-xl bg-black/[0.04] border border-black/10 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-[#FF7A00] focus:ring-1 focus:ring-[#FF7A00] transition-all font-sans"
+                  className="w-full pl-8.5 pr-8 py-2 rounded-xl bg-zinc-100/90 hover:bg-zinc-100 focus:bg-white border border-zinc-300/80 focus:border-[#FF7A00] focus:ring-2 focus:ring-[#FF7A00]/20 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all font-sans shadow-xs"
                 />
                 {flyoutSearchQuery && (
                   <button
                     type="button"
                     onClick={() => setFlyoutSearchQuery('')}
-                    className="absolute right-2.5 text-zinc-400 hover:text-zinc-700 text-xs cursor-pointer"
+                    className="absolute right-2.5 w-4 h-4 rounded-full bg-zinc-300/80 hover:bg-zinc-400 text-zinc-700 flex items-center justify-center text-[10px] cursor-pointer"
                   >
                     ×
                   </button>
                 )}
               </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  playPopSound();
+                  setIsMoreOpen(false);
+                }}
+                className="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 border border-zinc-300/80 text-zinc-600 hover:text-zinc-900 flex items-center justify-center transition-colors cursor-pointer shrink-0 shadow-xs"
+                title="Đóng menu"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Items List (Scrollable list format: maximum 5 items visible, scroll to see more) */}
-            <div className="overflow-y-auto space-y-1.5 pr-1 max-h-[285px] [scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.2)_transparent] pt-1">
+            {/* Items List (Scrollable list sorted A-Z) */}
+            <div className="overflow-y-auto space-y-1.5 pr-1 max-h-[300px] [scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.2)_transparent] pt-1">
               <div className="flex flex-col gap-1.5">
                 {filteredFlyoutItems.map((item) => {
                   const isActive = item.matchesRoute(currentRoute);
@@ -641,18 +654,21 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                     <button
                       key={item.id}
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        playPopSound();
                         setIsMoreOpen(false);
                         navigate(item.route);
                       }}
-                      className={`w-full h-[52px] px-3 rounded-2xl flex items-center justify-between gap-3 text-left transition-all cursor-pointer group active:scale-[0.99] border shrink-0 ${
+                      className={`w-full h-11 px-3 rounded-2xl flex items-center justify-between gap-3 text-left transition-all cursor-pointer group active:scale-[0.99] border shrink-0 ${
                         isActive
                           ? 'bg-[#FF7A00]/12 border-[#FF7A00]/50 shadow-xs ring-1 ring-[#FF7A00]/25'
                           : 'bg-black/[0.02] border-black/5 hover:bg-black/[0.06] hover:border-black/10 text-zinc-800'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+                        <div className={`relative w-7.5 h-7.5 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
                           isActive 
                             ? 'bg-[#FF7A00] text-white shadow-md shadow-[#FF7A00]/30' 
                             : 'bg-white shadow-xs border border-black/5 text-zinc-800'
@@ -660,25 +676,11 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                           {item.icon}
                         </div>
 
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs sm:text-[13px] font-bold leading-tight truncate ${
-                              isActive ? 'text-[#FF7A00]' : 'text-zinc-900 group-hover:text-black'
-                            }`}>
-                              {item.label}
-                            </span>
-                            {item.badge && (
-                              <span className={`text-[8.5px] px-1.5 py-0.2 rounded-full font-bold border shrink-0 ${
-                                item.badgeColor || 'bg-black/10 text-zinc-700 border-black/15'
-                              }`}>
-                                {item.badge}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[10px] sm:text-[10.5px] text-zinc-400 group-hover:text-zinc-500 truncate mt-0.5 leading-tight">
-                            {item.subtext}
-                          </p>
-                        </div>
+                        <span className={`text-xs sm:text-[13px] font-bold leading-tight truncate ${
+                          isActive ? 'text-[#FF7A00]' : 'text-zinc-900 group-hover:text-black'
+                        }`}>
+                          {item.label}
+                        </span>
                       </div>
 
                       <ChevronRight className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${
@@ -694,15 +696,6 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                   Không tìm thấy chuyên mục phù hợp
                 </div>
               )}
-            </div>
-
-            {/* Quick Tip Footer */}
-            <div className="pt-2 mt-2 border-t border-black/8 flex items-center justify-between text-[10px] text-zinc-400 shrink-0">
-              <span className="flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#FF7A00]" />
-                <span>Tối đa 5 mục • Cuộn xuống để xem thêm</span>
-              </span>
-              <span>⌘K</span>
             </div>
           </motion.div>
         )}
@@ -728,11 +721,12 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
               backdropFilter: 'blur(2.5px)',
               WebkitBackdropFilter: 'blur(2.5px)',
             }}
-            className="tab-view-pill flex items-center px-1 sm:px-1.5 py-1 sm:py-1 rounded-full border border-white/45 shadow-[0_10px_36px_rgba(0,0,0,0.25)] ring-1 ring-black/5"
+            className="tab-view-pill pointer-events-auto flex items-center px-1 sm:px-1.5 py-1 sm:py-1 rounded-full border border-white/45 shadow-[0_10px_36px_rgba(0,0,0,0.25)] ring-1 ring-black/5"
           >
             {items.map((item) => {
               const active = item.checkActive(currentRoute, isSettingsOpen, isMoreOpen);
               const isMoreTab = item.id === 'tab-more';
+              const isSignInTab = item.id === 'tab-signin';
 
               return (
                 <button
@@ -740,16 +734,27 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                   ref={isMoreTab ? moreButtonRef : undefined}
                   id={item.id}
                   type="button"
-                  onClick={item.onClick}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    playPopSound();
+                    item.onClick();
+                  }}
                   aria-label={item.label}
                   title={item.label}
-                  className="relative w-[50px] h-[48px] sm:w-[58px] sm:h-[52px] rounded-full flex flex-col items-center justify-center transition-all cursor-pointer outline-none select-none active:scale-95"
+                  className={`relative w-[50px] h-[48px] sm:w-[58px] sm:h-[52px] rounded-full flex flex-col items-center justify-center transition-all duration-150 cursor-pointer outline-none select-none active:scale-90 pointer-events-auto ${
+                    isSignInTab 
+                      ? 'bg-[#0078D4] hover:bg-[#106EBE] active:bg-[#005A9E] shadow-md shadow-blue-500/30' 
+                      : active
+                        ? 'shadow-xs'
+                        : 'hover:bg-white/20 active:bg-white/30 text-[#222222]'
+                  }`}
                 >
                   {/* Smooth spring sliding active pill animation */}
                   {active && (
                     <motion.div
                       layoutId="tabViewActivePill"
-                      className="absolute inset-0 rounded-full bg-[#FF7A00] shadow-[0_4px_16px_rgba(255,122,0,0.48)] z-0"
+                      className="absolute inset-0 rounded-full bg-[#FF7A00] shadow-[0_4px_16px_rgba(255,122,0,0.48)] z-0 pointer-events-none"
                       transition={{
                         type: 'spring',
                         stiffness: 480,
@@ -759,26 +764,16 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                     />
                   )}
 
-                  {/* Inactive Tab hover button subtle highlight */}
-                  {!active && (
-                    <div 
-                      style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0)',
-                      }}
-                      className="absolute inset-0 rounded-full hover:bg-white/20 transition-colors pointer-events-none"
-                    />
-                  )}
-
                   {/* Icon & Label (kept above sliding background) */}
                   <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none">
                     <div className={`flex items-center justify-center transition-colors duration-150 ${
-                      active ? 'text-white' : 'text-[#222222]'
+                      active || isSignInTab ? 'text-white' : 'text-[#222222]'
                     }`}>
                       {item.renderIcon(active)}
                     </div>
                     <span
                       className={`text-[9px] sm:text-[10px] leading-none mt-0.5 tracking-tight transition-colors duration-150 ${
-                        active ? 'font-bold text-white' : 'font-semibold text-[#222222]'
+                        active || isSignInTab ? 'font-bold text-white' : 'font-semibold text-[#222222]'
                       }`}
                     >
                       {item.label}
@@ -839,10 +834,23 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
               />
             </svg>
 
-            {/* Black Search Icon */}
-            <div className="relative z-10 shrink-0 mr-2.5 sm:mr-3 w-5 h-5 flex items-center justify-center pointer-events-none">
+            {/* Black Search Icon - Clickable to submit search */}
+            <button
+              type="button"
+              onClick={() => {
+                playPopSound();
+                if (searchQuery.trim()) {
+                  navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                } else {
+                  navigate('/search');
+                }
+                setIsTabViewSearchExpanded(false);
+              }}
+              title="Tìm kiếm"
+              className="relative z-10 shrink-0 mr-2.5 sm:mr-3 w-5 h-5 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform"
+            >
               <Search className="w-5 h-5 text-black stroke-[2.4]" />
-            </div>
+            </button>
 
             {/* Input Field */}
             <input
@@ -853,7 +861,15 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               onKeyDown={(e) => {
-                if (e.key === 'Escape') {
+                if (e.key === 'Enter') {
+                  playPopSound();
+                  if (searchQuery.trim()) {
+                    navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                  } else {
+                    navigate('/search');
+                  }
+                  setIsTabViewSearchExpanded(false);
+                } else if (e.key === 'Escape') {
                   if (searchQuery) {
                     clearSearch();
                   } else {
@@ -903,7 +919,10 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
               {/* Close / Collapse button to morph back to tab view bar */}
               <button
                 type="button"
-                onClick={() => setIsTabViewSearchExpanded(false)}
+                onClick={() => {
+                  playPopSound();
+                  setIsTabViewSearchExpanded(false);
+                }}
                 title="Đóng tìm kiếm (quay lại thanh tab view)"
                 className="w-6 h-6 rounded-full bg-black/10 hover:bg-black/20 text-black flex items-center justify-center transition-colors cursor-pointer"
               >

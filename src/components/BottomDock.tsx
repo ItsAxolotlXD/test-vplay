@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useAuth } from '../context/AuthContext';
+import { playPopSound } from '../utils/sound';
 
 interface BottomDockProps {
   currentRoute: string;
@@ -103,6 +104,7 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
               key={item.id}
               id={item.id}
               onClick={() => {
+                playPopSound();
                 if (item.onClick) {
                   item.onClick();
                 } else if (item.route) {
