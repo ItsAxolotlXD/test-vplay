@@ -51,7 +51,11 @@ export const News: React.FC<NewsProps> = ({ navigate }) => {
 
         {/* Search */}
         <div className="relative w-full sm:w-80 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0">
-          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-2.5" />
+          <img
+            src="https://static.wikia.nocookie.net/ftv/images/9/95/Search.png/revision/latest?cb=20260427032951&path-prefix=vi"
+            alt="Search"
+            className="w-4.5 h-4.5 object-contain shrink-0 mr-2.5 pointer-events-none select-none"
+          />
           <input
             type="text"
             value={searchQuery}

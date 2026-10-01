@@ -90,6 +90,7 @@ import { SpecialThemeEffectsLayer } from './components/themes/SpecialThemeEffect
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AccountAuthModal } from './components/AccountAuthModal';
 import { SpeakForMeModal } from './components/SpeakForMeModal';
+import { WidgetsBoard } from './components/WidgetsBoard';
 
 function AppContent() {
   const { settings, updateSetting } = useSettings();
@@ -139,6 +140,25 @@ function AppContent() {
     window.addEventListener('vplay:open_speak_for_me', handleOpenSpeakForMe);
     return () => {
       window.removeEventListener('vplay:open_speak_for_me', handleOpenSpeakForMe);
+    };
+  }, []);
+
+  // Windows 11 Widgets Board State (Trượt mở ra phía bên phải khi bấm vào Dynamic Island)
+  const [isWidgetsBoardOpen, setIsWidgetsBoardOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleToggleWidgets = () => setIsWidgetsBoardOpen((prev) => !prev);
+    const handleOpenWidgets = () => setIsWidgetsBoardOpen(true);
+    const handleCloseWidgets = () => setIsWidgetsBoardOpen(false);
+
+    window.addEventListener('vplay:toggle_widgets_board', handleToggleWidgets);
+    window.addEventListener('vplay:open_widgets_board', handleOpenWidgets);
+    window.addEventListener('vplay:close_widgets_board', handleCloseWidgets);
+
+    return () => {
+      window.removeEventListener('vplay:toggle_widgets_board', handleToggleWidgets);
+      window.removeEventListener('vplay:open_widgets_board', handleOpenWidgets);
+      window.removeEventListener('vplay:close_widgets_board', handleCloseWidgets);
     };
   }, []);
 
@@ -1176,6 +1196,13 @@ function AppContent() {
           borderColor={settings.vcursorBorderColor || '#FFFFFF'}
           size={settings.vcursorSize || 24}
           glow={settings.vcursorGlow || false}
+        />
+
+        {/* Windows 11 Widgets Board: Mở ra phía bên phải khi bấm vào Dynamic Island */}
+        <WidgetsBoard
+          isOpen={isWidgetsBoardOpen}
+          onClose={() => setIsWidgetsBoardOpen(false)}
+          navigate={navigate}
         />
 
         {/* Settings Drawer (Feature Flag: settings_drawer) */}

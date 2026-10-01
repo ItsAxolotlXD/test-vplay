@@ -27,6 +27,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useTabSearch } from '../context/TabSearchContext';
 import { useAuth } from '../context/AuthContext';
 import { playPopSound } from '../utils/sound';
+import { WIDGETS_ICON_DATA_URI, WIDGETS_ICON_URL } from '../utils/widgetsIcon';
 
 interface TabViewProps {
   currentRoute: string;
@@ -153,6 +154,25 @@ interface FlyoutMenuItem {
 }
 
 const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
+  {
+    id: 'more-widgets',
+    label: 'Widgets Board',
+    route: '#widgets',
+    subtext: 'Bảng tiện ích & tin tức Windows 11',
+    badge: 'NEW',
+    badgeColor: 'bg-blue-500/20 text-blue-500 border-blue-400/30',
+    icon: (
+      <img
+        src={WIDGETS_ICON_DATA_URI}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
+        }}
+        alt="Widgets"
+        className="w-4 h-4 object-contain select-none pointer-events-none"
+      />
+    ),
+    matchesRoute: () => false,
+  },
   {
     id: 'more-about',
     label: 'About',
@@ -512,6 +532,28 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
       checkActive: (route) => route.startsWith('/live-tv') || route.startsWith('/channels'),
     },
     {
+      id: 'tab-widgets',
+      label: 'Widgets',
+      onClick: () => {
+        setIsMoreOpen(false);
+        playPopSound();
+        window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
+      },
+      renderIcon: () => (
+        <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 flex items-center justify-center">
+          <img
+            src={WIDGETS_ICON_DATA_URI}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
+            }}
+            alt="Widgets"
+            className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain select-none pointer-events-none"
+          />
+        </div>
+      ),
+      checkActive: () => false,
+    },
+    {
       id: 'tab-event',
       label: 'Event',
       onClick: () => {
@@ -659,7 +701,11 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
                         e.stopPropagation();
                         playPopSound();
                         setIsMoreOpen(false);
-                        navigate(item.route);
+                        if (item.id === 'more-widgets') {
+                          window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
+                        } else {
+                          navigate(item.route);
+                        }
                       }}
                       className={`w-full h-11 px-3 rounded-2xl flex items-center justify-between gap-3 text-left transition-all cursor-pointer group active:scale-[0.99] border shrink-0 ${
                         isActive

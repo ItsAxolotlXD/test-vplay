@@ -372,7 +372,11 @@ export const MusicTab: React.FC<MusicTabProps> = ({ navigate }) => {
       {/* Search Bar (bỏ phân loại, căn trái) */}
       <div className="flex items-center justify-between gap-4">
         <div className="relative w-full max-w-md h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0 mr-auto">
-          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] shrink-0 mr-2.5" />
+          <img
+            src="https://static.wikia.nocookie.net/ftv/images/9/95/Search.png/revision/latest?cb=20260427032951&path-prefix=vi"
+            alt="Search"
+            className="w-4.5 h-4.5 object-contain shrink-0 mr-2.5 pointer-events-none select-none"
+          />
           <input
             type="text"
             placeholder="Tìm kiếm bài nhạc..."

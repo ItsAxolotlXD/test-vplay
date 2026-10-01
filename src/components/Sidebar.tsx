@@ -61,6 +61,8 @@ import { useAuth } from '../context/AuthContext';
 import { CHANNELS_DATA } from '../data/channels';
 import { Channel } from '../types';
 import { DiscordWelcomeModal } from './DiscordWelcomeModal';
+import { playPopSound } from '../utils/sound';
+import { WIDGETS_ICON_DATA_URI, WIDGETS_ICON_URL } from '../utils/widgetsIcon';
 
 interface SidebarProps {
   currentRoute: string;
@@ -495,6 +497,35 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
         >
           <Home className="w-5 h-5 shrink-0" />
           <span className="truncate">Home</span>
+        </button>
+
+        {/* Widgets Board */}
+        <button
+          id={isMobile ? 'mobile-nav-item-widgets' : 'nav-item-widgets'}
+          onClick={() => {
+            playPopSound();
+            if (isMobile && onCloseMobile) onCloseMobile();
+            window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
+          }}
+          title="Widgets Board"
+          className="w-full flex items-center gap-3.5 px-4 py-3 rounded-[14px] transition-all cursor-pointer text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36] group"
+        >
+          <div className="w-5 h-5 shrink-0 flex items-center justify-center">
+            <img
+              src={WIDGETS_ICON_DATA_URI}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
+              }}
+              alt="Widgets"
+              className="w-5 h-5 object-contain select-none pointer-events-none"
+            />
+          </div>
+          <div className="flex items-center justify-between flex-1 truncate">
+            <span className="truncate">Widgets</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              NEW
+            </span>
+          </div>
         </button>
 
         {/* 2. Truyền hình with Accordion */}
@@ -1432,6 +1463,26 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                   }`}
                 >
                   <Home className="w-4 h-4 shrink-0" />
+                </button>
+
+                {/* Widgets Board Mini */}
+                <button
+                  id="mini-nav-item-widgets"
+                  onClick={() => {
+                    playPopSound();
+                    window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
+                  }}
+                  title="Widgets Board"
+                  className="w-10 h-10 min-w-[40px] min-h-[40px] shrink-0 rounded-[12px] flex items-center justify-center p-0 transition-all cursor-pointer text-[#D1D5DB] hover:bg-[#2F2F36]"
+                >
+                  <img
+                    src={WIDGETS_ICON_DATA_URI}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
+                    }}
+                    alt="Widgets"
+                    className="w-4.5 h-4.5 object-contain select-none pointer-events-none"
+                  />
                 </button>
 
                 {/* 2. Truyền hình */}

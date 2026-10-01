@@ -157,7 +157,11 @@ export const FeatureFlags: React.FC<FeatureFlagsProps> = ({ navigate }) => {
           <div className="w-full h-[46px] sm:h-[48px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-sm transition-all border-0">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="w-[20px] h-[20px] min-w-[20px] min-h-[20px] flex items-center justify-center shrink-0">
-                <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
+                <img
+                  src="https://static.wikia.nocookie.net/ftv/images/9/95/Search.png/revision/latest?cb=20260427032951&path-prefix=vi"
+                  alt="Search"
+                  className="w-5 h-5 object-contain shrink-0 pointer-events-none select-none"
+                />
               </div>
               <input
                 id="feature-flags-search-input"

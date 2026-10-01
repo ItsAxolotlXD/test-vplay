@@ -238,7 +238,11 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
         <div className="pt-2">
           <div className="w-full h-[46px] sm:h-[48px] flex items-center justify-between px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-sm transition-all border-0 shadow-none">
             <div className="flex items-center gap-3 flex-1 min-w-0 bg-transparent">
-              <Search className="w-5 h-5 text-white stroke-[2.4] shrink-0" />
+              <img
+                src="https://static.wikia.nocookie.net/ftv/images/9/95/Search.png/revision/latest?cb=20260427032951&path-prefix=vi"
+                alt="Search"
+                className="w-5 h-5 object-contain shrink-0 pointer-events-none select-none"
+              />
               <input
                 id="settings-search-input"
                 type="text"

@@ -61,7 +61,11 @@ export const Channels: React.FC<ChannelsProps> = ({
       <div className="block-card p-4 rounded-[28px] bg-[#1E1E22] border border-[#2D2D35] flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Search on left */}
         <div className="relative w-full md:w-80 h-[44px] flex items-center px-4 rounded-full spotlight-bubble-box search-box-capsule float-search-style text-xs transition-all border-0 shrink-0">
-          <Search className="w-4.5 h-4.5 text-white stroke-[2.4] shrink-0 mr-2.5" />
+          <img
+            src="https://static.wikia.nocookie.net/ftv/images/9/95/Search.png/revision/latest?cb=20260427032951&path-prefix=vi"
+            alt="Search"
+            className="w-4.5 h-4.5 object-contain shrink-0 mr-2.5 pointer-events-none select-none"
+          />
           <input
             type="text"
             value={searchQuery}

@@ -877,7 +877,11 @@ export const SearchTab: React.FC<SearchTabProps> = ({
       <div className="w-full max-w-2xl relative">
         {/* THE SINGLE SEARCH BAR AT TOP */}
         <div className="relative flex items-center w-full h-14 sm:h-15 rounded-full spotlight-bubble-box search-box-capsule float-search-style transition-all px-5 shadow-lg border-0">
-          <Search className="w-5 h-5 text-white stroke-[2.4] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] shrink-0 mr-3 pointer-events-none" />
+          <img
+            src="https://static.wikia.nocookie.net/ftv/images/9/95/Search.png/revision/latest?cb=20260427032951&path-prefix=vi"
+            alt="Search"
+            className="w-5 h-5 object-contain shrink-0 mr-3 pointer-events-none select-none"
+          />
 
           <input
             ref={inputRef}

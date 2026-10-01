@@ -12,10 +12,13 @@ import {
   Flag, 
   Settings, 
   Sparkles, 
-  Info 
+  Info,
+  LayoutGrid
 } from 'lucide-react';
 import { Channel } from '../types';
 import { IslandNotification } from '../utils/islandNotifications';
+import { playPopSound } from '../utils/sound';
+import { WIDGETS_ICON_DATA_URI, WIDGETS_ICON_URL } from '../utils/widgetsIcon';
 
 interface DynamicIslandProps {
   currentRoute?: string;
@@ -59,8 +62,8 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Expanded search state: only when hovered, focused, or actively typing query
-  const isSearchExpanded = isHovered || isFocused || searchQuery.trim().length > 0;
+  // Expanded search state: only when focused or actively typing query (hover no longer expands search bar)
+  const isSearchExpanded = isFocused || searchQuery.trim().length > 0;
 
   // Notification state active when not actively typing search
   const isNotificationActive = Boolean(activeNotification) && !isFocused && !searchQuery.trim();
@@ -196,14 +199,19 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
 
   const isHomeLogoDocked = isHomeTab && isScrolled && !isSearchExpanded && !isNotificationActive;
 
-  const handlePillClick = () => {
-    if (isHomeLogoDocked) {
+  const handlePillClick = (e: React.MouseEvent) => {
+    // If clicking directly into the input during active search, don't trigger board
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.closest('button')) {
+      return;
+    }
+    if (isHomeLogoDocked && !isHovered) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    // Only focus input on direct click! (Not on hover)
-    inputRef.current?.focus();
-    setIsFocused(true);
+    playPopSound();
+    // Bấm vào Dynamic Island để mở Widgets board ra phía bên trái
+    window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
   };
 
   const dismissNotification = (e: React.MouseEvent) => {
@@ -251,12 +259,14 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
     targetWidth = 'clamp(320px, 86vw, 520px)';
   } else if (isNotificationActive) {
     targetWidth = getNotificationWidth();
+  } else if (isHovered) {
+    targetWidth = '148px';
   } else if (isHomeLogoDocked) {
     targetWidth = '148px';
   }
 
   // Determine pill target height
-  const targetHeight = isSearchExpanded ? '44px' : isNotificationActive ? '40px' : isHomeLogoDocked ? '36px' : '34px';
+  const targetHeight = isSearchExpanded ? '44px' : isNotificationActive ? '40px' : isHovered ? '36px' : isHomeLogoDocked ? '36px' : '34px';
 
   return (
     <>
@@ -299,9 +309,39 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
         whileTap={{ scale: 0.97 }}
         className="relative pointer-events-auto bg-black text-white border border-zinc-800/80 shadow-none flex items-center justify-between px-3 cursor-pointer overflow-hidden"
         onClick={handlePillClick}
+        title="Dynamic Island - Bấm để mở Widgets Board"
       >
-        {/* 1A. LOGO DOCKED VIEW: Logo docked into Dynamic Island when scrolled down on Home */}
-        {!isSearchExpanded && !isNotificationActive && isHomeLogoDocked && (
+        {/* 1A. HOVER VIEW: Khi hover qua dynamic island hiển thị icon Get.png, bấm vào mở widgets board */}
+        {!isSearchExpanded && !isNotificationActive && isHovered && (
+          <div 
+            className="w-full h-full flex items-center justify-between pointer-events-auto select-none px-1 py-0.5 cursor-pointer"
+            title="Bấm để mở Widgets Board"
+          >
+            {/* Left minimal sensor dot */}
+            <span className="w-2 h-2 rounded-full bg-[#18181b] shrink-0" />
+
+            {/* Hover Icon Get.png - Instant render via memory data URI */}
+            <motion.img
+              initial={{ scale: 0.75, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 24 }}
+              src={WIDGETS_ICON_DATA_URI}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
+              }}
+              alt="Widgets Board Icon"
+              className="h-5 sm:h-5.5 w-auto max-w-[85px] object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] shrink-0 select-none pointer-events-none"
+            />
+
+            {/* Right camera punch-hole dot */}
+            <span className="w-2 h-2 rounded-full bg-[#18181b] flex items-center justify-center shrink-0">
+              <span className="w-1 h-1 rounded-full bg-blue-900/60" />
+            </span>
+          </div>
+        )}
+
+        {/* 1B. LOGO DOCKED VIEW: Logo docked into Dynamic Island when scrolled down on Home (chỉ khi không hover) */}
+        {!isSearchExpanded && !isNotificationActive && !isHovered && isHomeLogoDocked && (
           <div 
             className="w-full h-full flex items-center justify-between pointer-events-auto select-none px-1 py-0.5 cursor-pointer"
             title="VNRT Online - Bấm để cuộn lên đầu trang"
@@ -334,11 +374,14 @@ export const DynamicIsland: React.FC<DynamicIslandProps> = ({
           </div>
         )}
 
-        {/* 1B. DEFAULT COLLAPSED VIEW: Simple, pure black pill without search icon/text */}
-        {!isSearchExpanded && !isNotificationActive && !isHomeLogoDocked && (
+        {/* 1C. DEFAULT COLLAPSED VIEW: Simple, pure black pill (chỉ khi không hover) */}
+        {!isSearchExpanded && !isNotificationActive && !isHovered && !isHomeLogoDocked && (
           <div className="w-full flex items-center justify-between pointer-events-none select-none px-1">
             {/* Left minimal sensor dot */}
             <span className="w-2.5 h-2.5 rounded-full bg-[#161616]" />
+
+            {/* Subtle center sensor */}
+            <span className="w-1.5 h-1.5 rounded-full bg-[#161616]" />
 
             {/* Right camera punch-hole dot */}
             <span className="w-2.5 h-2.5 rounded-full bg-[#161616] flex items-center justify-center">

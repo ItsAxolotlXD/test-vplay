@@ -20,6 +20,7 @@ import {
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useAuth } from '../context/AuthContext';
 import { playPopSound } from '../utils/sound';
+import { WIDGETS_ICON_DATA_URI, WIDGETS_ICON_URL } from '../utils/widgetsIcon';
 
 interface BottomDockProps {
   currentRoute: string;
@@ -47,6 +48,15 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
 
   const navItems = [
     { id: 'dock-home', label: 'Trang chủ', isCustomHome: true, route: '/' },
+    { 
+      id: 'dock-widgets', 
+      label: 'Widgets Board', 
+      isWidgets: true, 
+      onClick: () => {
+        window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
+      },
+      route: '' 
+    },
     { id: 'dock-tv', label: 'Truyền hình', icon: Tv, route: '/live-tv' },
     { id: 'dock-event', label: 'Event', icon: Calendar, route: '/event' },
     { id: 'dock-music', label: 'Kho nhạc TV', icon: Music, route: '/music' },
@@ -134,6 +144,15 @@ export const BottomDock: React.FC<BottomDockProps> = React.memo(({
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
                   }}
+                />
+              ) : item.isWidgets ? (
+                <img
+                  src={WIDGETS_ICON_DATA_URI}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
+                  }}
+                  alt="Widgets"
+                  className="w-5.5 h-5.5 object-contain shrink-0 select-none pointer-events-none"
                 />
               ) : Icon ? (
                 <Icon className="w-6 h-6 shrink-0" />
