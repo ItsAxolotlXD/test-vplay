@@ -58,6 +58,17 @@ export const WidgetsBoard: React.FC<WidgetsBoardProps> = ({
     }, 800);
   };
 
+  // Lock background body scroll when board is open
+  useEffect(() => {
+    if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isOpen]);
+
   // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -72,31 +83,37 @@ export const WidgetsBoard: React.FC<WidgetsBoardProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[99999] overflow-hidden pointer-events-auto">
-          {/* Dimmed backdrop with blur - click to close */}
+        <div
+          id="vplay-widgets-board-root"
+          className="fixed inset-0 z-[100060] select-none pointer-events-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Windows 11 Widgets Board"
+        >
+          {/* Dimmed backdrop with deep frosted blur - click to close */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/45 backdrop-blur-md"
+            className="fixed inset-0 bg-black/60 cursor-pointer z-10"
+            style={{
+              backdropFilter: 'blur(20px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(140%)',
+            }}
           />
 
-          {/* Left Sliding Widgets Board Container with High-Performance Acrylic Backdrop Blur */}
+          {/* Left Sliding Widgets Board Container - strictly fixed to left 0 */}
           <motion.div
-            initial={{ x: '-100%', opacity: 0.8 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '-100%', opacity: 0.8 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="absolute top-0 left-0 bottom-0 w-full sm:w-[620px] md:w-[700px] lg:w-[760px] xl:w-[840px] 2xl:w-[940px] max-w-full sm:max-w-[88vw] bg-[#F1F5F9]/80 dark:bg-[#141822]/80 shadow-[24px_0_70px_rgba(0,0,0,0.45)] flex border-r border-white/20 dark:border-white/10 select-none overflow-hidden"
-            style={{
-              backdropFilter: 'blur(36px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(36px) saturate(160%)',
-            }}
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed left-0 top-0 bottom-0 z-20 w-full sm:w-[680px] md:w-[740px] lg:w-[820px] max-w-[92vw] h-full max-h-screen bg-[#F8FAFC] dark:bg-[#0E121A] text-zinc-900 dark:text-white shadow-[24px_0_70px_rgba(0,0,0,0.7)] flex border-r border-zinc-200 dark:border-zinc-800/80 overflow-hidden"
           >
             {/* 1. LEFT RAIL DOCK (Windows 11 Widgets Left Navigation - Adaptive) */}
-            <div className="w-13 sm:w-16 md:w-18 shrink-0 bg-white/35 dark:bg-black/25 backdrop-blur-xl border-r border-black/5 dark:border-white/10 flex flex-col items-center justify-between py-4 sm:py-5">
+            <div className="w-14 sm:w-16 md:w-20 shrink-0 bg-white dark:bg-[#131722] border-r border-zinc-200 dark:border-zinc-800/70 flex flex-col items-center justify-between py-4 sm:py-5 z-20">
               {/* Top Navigation Items */}
               <div className="flex flex-col items-center gap-5 sm:gap-6 w-full">
                 {/* Discover Tab Button */}
@@ -165,9 +182,9 @@ export const WidgetsBoard: React.FC<WidgetsBoardProps> = ({
             </div>
 
             {/* 2. MAIN WIDGETS SCROLLABLE CONTENT */}
-            <div className="flex-1 min-w-0 flex flex-col overflow-y-auto no-scrollbar overscroll-contain">
+            <div className="flex-1 min-w-0 flex flex-col overflow-y-auto no-scrollbar overscroll-contain bg-[#F8FAFC] dark:bg-[#0E121A] overflow-x-hidden">
               {/* TOP HEADER GREETING BAR */}
-              <div className="sticky top-0 z-20 px-4 sm:px-6 md:px-7 pt-4 sm:pt-5 pb-3 bg-[#F1F5F9]/70 dark:bg-[#141822]/70 backdrop-blur-2xl flex items-center justify-between border-b border-black/5 dark:border-white/5">
+              <div className="sticky top-0 z-20 px-4 sm:px-6 md:px-7 pt-4 sm:pt-5 pb-3 bg-[#F8FAFC]/95 dark:bg-[#0E121A]/95 backdrop-blur-md flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800/70">
                 {/* Greeting Title */}
                 <div className="min-w-0 flex-1 pr-3">
                   <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-zinc-800 dark:text-white tracking-tight truncate">
@@ -227,8 +244,8 @@ export const WidgetsBoard: React.FC<WidgetsBoardProps> = ({
                 </div>
               </div>
 
-              {/* GRID OF WIDGETS CARDS - Responsive 1 col on mobile, 2 cols on tablet, 3 cols on large screen */}
-              <div className="p-4 sm:p-6 md:p-7 pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 auto-rows-max">
+              {/* GRID OF WIDGETS CARDS - Responsive 1 col on mobile, 2 cols on tablet & desktop */}
+              <div className="p-4 sm:p-6 md:p-7 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 auto-rows-max overflow-x-hidden">
                 {/* -------------------------------------------------------------
                     WIDGET 1: WEATHER (Top Left - Soft Blue Tinted Card)
                     ------------------------------------------------------------- */}

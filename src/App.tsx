@@ -91,6 +91,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { AccountAuthModal } from './components/AccountAuthModal';
 import { SpeakForMeModal } from './components/SpeakForMeModal';
 import { WidgetsBoard } from './components/WidgetsBoard';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function AppContent() {
   const { settings, updateSetting } = useSettings();
@@ -1198,12 +1199,14 @@ function AppContent() {
           glow={settings.vcursorGlow || false}
         />
 
-        {/* Windows 11 Widgets Board: Mở ra phía bên phải khi bấm vào Dynamic Island */}
-        <WidgetsBoard
-          isOpen={isWidgetsBoardOpen}
-          onClose={() => setIsWidgetsBoardOpen(false)}
-          navigate={navigate}
-        />
+        {/* Windows 11 Widgets Board: Mở ra phía bên trái khi bấm vào Dynamic Island / Tab / Sidebar */}
+        <ErrorBoundary>
+          <WidgetsBoard
+            isOpen={isWidgetsBoardOpen}
+            onClose={() => setIsWidgetsBoardOpen(false)}
+            navigate={navigate}
+          />
+        </ErrorBoundary>
 
         {/* Settings Drawer (Feature Flag: settings_drawer) */}
         <SettingsDrawer

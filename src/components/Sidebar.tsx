@@ -682,7 +682,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
               : 'text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]'
           }`}
         >
-          <CalendarDays className="w-5 h-5 shrink-0 text-cyan-400" />
+          <CalendarDays className="w-5 h-5 shrink-0 text-orange-400" />
           <span className="truncate">Bảo tàng lưu trữ</span>
         </button>
 

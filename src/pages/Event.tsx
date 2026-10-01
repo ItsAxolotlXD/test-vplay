@@ -529,9 +529,9 @@ export const EventPage: React.FC<EventPageProps> = ({
               type="button"
               onClick={() => scrollToSection('section-vplay-museum')}
               style={{ borderRadius: 0 }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-none bg-black/60 hover:bg-black/90 border border-cyan-500/50 text-cyan-300 hover:text-white text-xs font-semibold backdrop-blur-sm transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-md"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-none bg-black/60 hover:bg-black/90 border border-orange-500/50 text-orange-300 hover:text-white text-xs font-semibold backdrop-blur-sm transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-md font-minecraft"
             >
-              <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+              <Landmark className="w-3.5 h-3.5 text-orange-400" />
               <span className="font-minecraft tracking-wider text-[11px] uppercase">Bảo tàng lưu trữ (19 bản)</span>
             </button>
           </div>
@@ -944,7 +944,7 @@ export const EventPage: React.FC<EventPageProps> = ({
       <section 
         id="section-vplay-museum" 
         style={{ borderRadius: 0 }}
-        className="w-full bg-[#111115] border-t-4 border-[#0099FF] py-16 sm:py-20 px-4 sm:px-8 rounded-none relative overflow-hidden"
+        className="w-full bg-[#111115] border-t-4 border-[#FF6B00] py-16 sm:py-20 px-4 sm:px-8 rounded-none relative overflow-hidden font-minecraft"
       >
         {/* Subtle Archival Grid lines pattern */}
         <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -954,9 +954,9 @@ export const EventPage: React.FC<EventPageProps> = ({
           <div className="flex flex-col items-center text-center mb-10">
             <div 
               style={{ borderRadius: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-none bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 text-xs font-mono tracking-widest uppercase mb-3 shadow-md"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-none bg-orange-950/80 border border-orange-500/60 text-orange-400 text-xs font-minecraft tracking-widest uppercase mb-3 shadow-md"
             >
-              <Landmark className="w-4 h-4 text-cyan-400" />
+              <Landmark className="w-4 h-4 text-orange-400" />
               <span>DI SẢN TRUYỀN HÌNH • VPLAY HERITAGE ARCHIVES</span>
             </div>
 
@@ -966,7 +966,7 @@ export const EventPage: React.FC<EventPageProps> = ({
             >
               BẢO TÀNG LƯU TRỮ CÁC PHIÊN BẢN VPLAY
             </h2>
-            <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
+            <p className="text-zinc-300 font-minecraft text-xs sm:text-sm max-w-2xl leading-relaxed">
               Khám phá và tương tác lại toàn bộ <strong>19 phiên bản phát triển</strong> trong lịch sử Vplay: từ Google Sites ban sơ (1.0), Season 2 (2.0), Seven (3.0), các nhánh Beta FA8K, Canary, VNRT Group đến kỷ nguyên OreUI & Waves.
             </p>
           </div>
@@ -978,20 +978,20 @@ export const EventPage: React.FC<EventPageProps> = ({
           >
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-orange-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={museumSearchQuery}
                 onChange={(e) => setMuseumSearchQuery(e.target.value)}
                 placeholder="Tìm phiên bản (1.0, canary, beta, oreui, vnrt, vercel...)..."
                 style={{ borderRadius: 0 }}
-                className="w-full bg-[#101014] border border-zinc-700/80 pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder:text-zinc-500 font-medium focus:outline-none focus:border-cyan-400 rounded-none transition-colors"
+                className="w-full bg-[#101014] border border-zinc-700/80 pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder:text-zinc-500 font-minecraft focus:outline-none focus:border-orange-500 rounded-none transition-colors"
               />
               {museumSearchQuery && (
                 <button
                   type="button"
                   onClick={() => setMuseumSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white text-xs cursor-pointer"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-orange-400 text-xs cursor-pointer font-minecraft"
                 >
                   ✕
                 </button>
@@ -999,7 +999,7 @@ export const EventPage: React.FC<EventPageProps> = ({
             </div>
 
             {/* Era Filter Chips */}
-            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar font-minecraft">
               {[
                 { id: 'all', label: 'Tất cả (19)' },
                 { id: 'Khởi nguyên', label: 'Khởi nguyên (1.0 - 5.0)' },
@@ -1015,10 +1015,10 @@ export const EventPage: React.FC<EventPageProps> = ({
                     type="button"
                     onClick={() => setSelectedMuseumEra(era.id)}
                     style={{ borderRadius: 0 }}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-none border transition-all cursor-pointer whitespace-nowrap ${
+                    className={`px-3 py-1.5 text-xs font-minecraft rounded-none border transition-all cursor-pointer whitespace-nowrap ${
                       isActive
-                        ? 'bg-cyan-500 text-black border-cyan-400 font-bold shadow-md'
-                        : 'bg-[#121216] border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500'
+                        ? 'bg-[#FF6B00] text-black border-orange-400 font-bold shadow-md shadow-orange-500/30'
+                        : 'bg-[#121216] border-zinc-700 text-zinc-300 hover:text-white hover:border-orange-500/60'
                     }`}
                   >
                     {era.label}
@@ -1029,7 +1029,7 @@ export const EventPage: React.FC<EventPageProps> = ({
           </div>
 
           {/* Version Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 font-minecraft">
             {VPLAY_ARCHIVE_VERSIONS.filter((ver) => {
               const matchesEra = selectedMuseumEra === 'all' || ver.era === selectedMuseumEra;
               const q = museumSearchQuery.trim().toLowerCase();
@@ -1047,26 +1047,26 @@ export const EventPage: React.FC<EventPageProps> = ({
                 <div
                   key={ver.id}
                   style={{ borderRadius: 0 }}
-                  className="bg-[#181820] border-2 border-zinc-800 hover:border-cyan-500/70 p-5 flex flex-col justify-between transition-all duration-200 group hover:-translate-y-1 shadow-lg rounded-none"
+                  className="bg-[#181820] border-2 border-zinc-800 hover:border-orange-500 p-5 flex flex-col justify-between transition-all duration-200 group hover:-translate-y-1 shadow-lg rounded-none font-minecraft"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-3 font-minecraft">
                     {/* Top Header Badge */}
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center justify-between gap-2 font-minecraft">
                       <div 
                         style={{ borderRadius: 0 }}
-                        className="px-2.5 py-0.5 bg-cyan-950 border border-cyan-400/60 font-minecraft text-cyan-300 text-xs font-bold tracking-wider rounded-none"
+                        className="px-2.5 py-0.5 bg-orange-950 border border-orange-500/70 font-minecraft text-orange-400 text-xs font-bold tracking-wider rounded-none"
                       >
                         v{ver.version}
                       </div>
 
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 font-minecraft">
                         <span 
                           style={{ borderRadius: 0 }}
-                          className={`text-[10px] font-mono px-2 py-0.5 border rounded-none ${ver.badgeColor}`}
+                          className="text-[10px] font-minecraft px-2 py-0.5 border rounded-none border-orange-500/40 text-orange-300 bg-orange-950/40"
                         >
                           {ver.era}
                         </span>
-                        <span className="text-[10px] text-zinc-500 font-mono">
+                        <span className="text-[10px] text-zinc-400 font-minecraft">
                           {ver.releaseYear}
                         </span>
                       </div>
@@ -1074,24 +1074,24 @@ export const EventPage: React.FC<EventPageProps> = ({
 
                     {/* Version Title */}
                     <div>
-                      <h3 className="font-bold text-white text-base leading-snug group-hover:text-cyan-300 transition-colors font-minecraft">
+                      <h3 className="font-bold text-white text-base leading-snug group-hover:text-orange-400 transition-colors font-minecraft">
                         {ver.name}
                       </h3>
-                      <p className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                        Codename: <strong className="text-zinc-300">{ver.codename}</strong>
+                      <p className="text-[11px] text-zinc-400 font-minecraft mt-0.5">
+                        Codename: <strong className="text-orange-400">{ver.codename}</strong>
                       </p>
                     </div>
 
                     {/* Description */}
-                    <p className="text-zinc-300 text-xs leading-relaxed line-clamp-3">
+                    <p className="text-zinc-300 text-xs leading-relaxed line-clamp-3 font-minecraft">
                       {ver.description}
                     </p>
 
                     {/* Feature Highlights */}
-                    <div className="space-y-1 pt-1 border-t border-zinc-800/80">
+                    <div className="space-y-1 pt-1 border-t border-zinc-800/80 font-minecraft">
                       {ver.highlights.map((h, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                          <span className="w-1 h-1 bg-cyan-400 rounded-none shrink-0" />
+                        <div key={idx} className="flex items-center gap-1.5 text-[11px] text-zinc-300 font-minecraft">
+                          <span className="w-1.5 h-1.5 bg-[#FF6B00] rounded-none shrink-0" />
                           <span className="truncate">{h}</span>
                         </div>
                       ))}
@@ -1100,14 +1100,14 @@ export const EventPage: React.FC<EventPageProps> = ({
                     {/* URL Display */}
                     <div 
                       style={{ borderRadius: 0 }}
-                      className="p-2 bg-[#101014] border border-zinc-800 text-[11px] font-mono text-zinc-400 truncate flex items-center justify-between gap-2"
+                      className="p-2 bg-[#101014] border border-zinc-800 text-[11px] font-minecraft text-zinc-400 truncate flex items-center justify-between gap-2"
                     >
-                      <span className="truncate text-cyan-400/90">{ver.url}</span>
+                      <span className="truncate text-orange-400/90">{ver.url}</span>
                       <button
                         type="button"
                         onClick={() => handleCopyVersionLink(ver)}
                         title="Sao chép đường dẫn"
-                        className="text-zinc-400 hover:text-white shrink-0 p-1 cursor-pointer"
+                        className="text-zinc-400 hover:text-orange-400 shrink-0 p-1 cursor-pointer font-minecraft"
                       >
                         {isCopied ? (
                           <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -1119,14 +1119,14 @@ export const EventPage: React.FC<EventPageProps> = ({
                   </div>
 
                   {/* Actions Toolbar */}
-                  <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-zinc-800">
+                  <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-zinc-800 font-minecraft">
                     <button
                       type="button"
                       onClick={() => setPreviewVersion(ver)}
                       style={{ borderRadius: 0 }}
-                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-none border border-zinc-700 transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-sm"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-none border border-zinc-700 transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-sm font-minecraft"
                     >
-                      <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                      <Eye className="w-3.5 h-3.5 text-orange-400" />
                       <span>Xem trước</span>
                     </button>
 
@@ -1135,7 +1135,7 @@ export const EventPage: React.FC<EventPageProps> = ({
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ borderRadius: 0 }}
-                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold rounded-none border border-cyan-400 transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-sm uppercase font-minecraft tracking-wider"
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#FF6B00] hover:bg-[#FF7A00] text-black text-xs font-bold rounded-none border border-orange-400 transition-colors cursor-pointer select-none active:translate-y-0.5 shadow-md shadow-orange-500/30 uppercase font-minecraft tracking-wider"
                     >
                       <span>Mở web</span>
                       <ExternalLink className="w-3 h-3 text-black" />
@@ -1147,11 +1147,11 @@ export const EventPage: React.FC<EventPageProps> = ({
           </div>
 
           {/* Museum Footer Note */}
-          <div className="mt-12 p-4 bg-[#181820] border border-zinc-800 text-center flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-400">
-            <span className="font-minecraft text-white tracking-wide">
+          <div className="mt-12 p-4 bg-[#181820] border border-zinc-800 text-center flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-400 font-minecraft">
+            <span className="font-minecraft text-orange-300 tracking-wide">
               VNRT ONLINE ARCHIVES • PRESERVING BROADCAST MEDIA HERITAGE
             </span>
-            <span>Tổng cộng: <strong>19 phiên bản Vplay</strong> đã được ghi danh vào bảo tàng</span>
+            <span className="font-minecraft">Tổng cộng: <strong className="text-orange-400">19 phiên bản Vplay</strong> đã được ghi danh vào bảo tàng</span>
           </div>
         </div>
       </section>
@@ -1161,45 +1161,45 @@ export const EventPage: React.FC<EventPageProps> = ({
           ========================================================================= */}
       <AnimatePresence>
         {previewVersion && (
-          <div className="fixed inset-0 z-[100002] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md select-none">
+          <div className="fixed inset-0 z-[100002] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md select-none font-minecraft">
             <motion.div
               initial={{ scale: 0.92, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.92, opacity: 0, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 350 }}
               style={{ borderRadius: 0 }}
-              className="relative w-full max-w-5xl h-[88vh] bg-[#1C1C22] border-4 border-cyan-500 flex flex-col rounded-none shadow-[0_25px_80px_rgba(0,0,0,0.9)] overflow-hidden"
+              className="relative w-full max-w-5xl h-[88vh] bg-[#1C1C22] border-4 border-orange-500 flex flex-col rounded-none shadow-[0_25px_80px_rgba(0,0,0,0.9)] overflow-hidden font-minecraft"
             >
               {/* Iframe Top Bar */}
-              <div className="px-4 py-2.5 bg-[#141418] border-b-2 border-zinc-800 flex items-center justify-between gap-3 shrink-0">
-                <div className="flex items-center gap-2 truncate">
+              <div className="px-4 py-2.5 bg-[#141418] border-b-2 border-zinc-800 flex items-center justify-between gap-3 shrink-0 font-minecraft">
+                <div className="flex items-center gap-2 truncate font-minecraft">
                   <div 
                     style={{ borderRadius: 0 }}
-                    className="px-2 py-0.5 bg-cyan-950 border border-cyan-400 font-minecraft text-cyan-300 text-xs font-bold"
+                    className="px-2 py-0.5 bg-orange-950 border border-orange-400 font-minecraft text-orange-300 text-xs font-bold"
                   >
                     v{previewVersion.version}
                   </div>
-                  <span className="font-bold text-white text-xs sm:text-sm truncate">
+                  <span className="font-bold text-white text-xs sm:text-sm truncate font-minecraft">
                     {previewVersion.name}
                   </span>
                 </div>
 
                 {/* Direct address bar */}
-                <div className="hidden md:flex items-center gap-1.5 flex-1 max-w-md mx-3 px-3 py-1 bg-black/60 border border-zinc-700 text-xs font-mono text-zinc-300 truncate">
-                  <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <div className="hidden md:flex items-center gap-1.5 flex-1 max-w-md mx-3 px-3 py-1 bg-black/60 border border-zinc-700 text-xs font-minecraft text-zinc-300 truncate">
+                  <Globe className="w-3.5 h-3.5 text-orange-400 shrink-0" />
                   <span className="truncate">{previewVersion.url}</span>
                 </div>
 
                 {/* Window Actions */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 font-minecraft">
                   <a
                     href={previewVersion.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ borderRadius: 0 }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold transition-colors"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#FF6B00] hover:bg-[#FF7A00] text-black text-xs font-bold transition-colors font-minecraft"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3.5 h-3.5 text-black" />
                     <span className="hidden sm:inline">Mở ngoài</span>
                   </a>
 
@@ -1227,9 +1227,9 @@ export const EventPage: React.FC<EventPageProps> = ({
               </div>
 
               {/* Iframe Status Bar */}
-              <div className="px-4 py-1.5 bg-[#141418] border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 shrink-0">
+              <div className="px-4 py-1.5 bg-[#141418] border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 shrink-0 font-minecraft">
                 <span>Trình giả lập bảo tàng Vplay Archive</span>
-                <span className="text-cyan-400 font-mono">Phiên bản {previewVersion.version} ({previewVersion.codename})</span>
+                <span className="text-orange-400 font-minecraft">Phiên bản {previewVersion.version} ({previewVersion.codename})</span>
               </div>
             </motion.div>
           </div>
