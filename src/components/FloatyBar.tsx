@@ -292,7 +292,11 @@ const FLYOUT_MENU_ITEMS: FlyoutMenuItem[] = [
       r.startsWith('/v-notes') || 
       r.startsWith('/v-furniture') || 
       r.startsWith('/minecraft') || 
-      r.startsWith('/wheel-of-fortune'),
+      r.startsWith('/wheel-of-fortune') ||
+      r.startsWith('/geogebra') ||
+      r.startsWith('/equation-solver') ||
+      r.startsWith('/casio') ||
+      r.startsWith('/derivative'),
   },
   {
     id: 'more-chat',

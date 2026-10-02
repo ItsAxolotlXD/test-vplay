@@ -157,6 +157,45 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
           routeState?.appId === 'redeem_gift')
       );
     }
+    if (appId === 'equation_solver') {
+      return (
+        currentRoute.startsWith('/equation-solver') ||
+        currentRoute.startsWith('/v-solver') ||
+        currentRoute.startsWith('/giai-phuong-trinh') ||
+        currentRoute.startsWith('/he-phuong-trinh') ||
+        currentRoute.startsWith('/phuong-trinh') ||
+        currentRoute.startsWith('/giai-pt') ||
+        currentRoute === '/pt' ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'equation_solver')
+      );
+    }
+    if (appId === 'geogebra') {
+      return (
+        currentRoute.startsWith('/geogebra') ||
+        currentRoute.startsWith('/v-geogebra') ||
+        currentRoute.startsWith('/graphing') ||
+        currentRoute.startsWith('/do-thi') ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'geogebra')
+      );
+    }
+    if (appId === 'casio_fx580') {
+      return (
+        currentRoute.startsWith('/casio') ||
+        currentRoute.startsWith('/fx580') ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'casio_fx580')
+      );
+    }
+    if (appId === 'derivative_calculator') {
+      return (
+        currentRoute.startsWith('/derivative') ||
+        currentRoute.startsWith('/dao-ham') ||
+        ((currentRoute === '/v-space' || currentRoute === '/space-360' || currentRoute === '/v-apps') &&
+          routeState?.appId === 'derivative_calculator')
+      );
+    }
     if (appId === 'ms_paint') {
       return (
         currentRoute === '/paint' ||
@@ -727,7 +766,11 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
               isActive("/spatial-design") ||
               isActive("/logo-switcher") ||
               isActive("/wheel-of-fortune") ||
-              isActive("/wheels-of-fortune")
+              isActive("/wheels-of-fortune") ||
+              isActive("/geogebra") ||
+              isActive("/equation-solver") ||
+              isActive("/casio") ||
+              isActive("/derivative")
                 ? "bg-[#E6005A] text-white font-bold shadow-md shadow-[#E6005A]/20"
                 : "text-[#D1D5DB] hover:text-white hover:bg-[#2F2F36]"
             }`}
@@ -798,6 +841,82 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                   </div>
                   <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-pink-500/20 text-pink-300">
                     Vẽ
+                  </span>
+                </button>
+
+                {/* Giải Phương Trình */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-equation" : "space360-tab-equation"}
+                  onClick={() => handleNavClick("/equation-solver", { appId: "equation_solver" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("equation_solver")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Calculator className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="truncate">Giải Phương Trình</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-emerald-500/20 text-emerald-300">
+                    PT
+                  </span>
+                </button>
+
+                {/* Casio fx-580VN X */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-casio" : "space360-tab-casio"}
+                  onClick={() => handleNavClick("/casio", { appId: "casio_fx580" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("casio_fx580")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Calculator className="w-4 h-4 text-blue-400 shrink-0" />
+                    <span className="truncate">Casio fx-580VN X</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-blue-500/20 text-blue-300">
+                    580
+                  </span>
+                </button>
+
+                {/* Tính Đạo Hàm */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-derivative" : "space360-tab-derivative"}
+                  onClick={() => handleNavClick("/derivative", { appId: "derivative_calculator" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("derivative_calculator")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <TrendingUp className="w-4 h-4 text-teal-400 shrink-0" />
+                    <span className="truncate">Tính Đạo Hàm</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-teal-500/20 text-teal-300">
+                    f'(x)
+                  </span>
+                </button>
+
+                {/* GeoGebra */}
+                <button
+                  id={isMobile ? "mobile-space360-tab-geogebra" : "space360-tab-geogebra"}
+                  onClick={() => handleNavClick("/geogebra", { appId: "geogebra" })}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[11px] text-xs transition-colors cursor-pointer ${
+                    isSpace360AppActive("geogebra")
+                      ? "bg-white/10 text-white font-bold"
+                      : "text-[#A1A1AA] hover:text-white hover:bg-[#2E2E35]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Compass className="w-4 h-4 text-indigo-400 shrink-0" />
+                    <span className="truncate">GeoGebra</span>
+                  </div>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-indigo-500/20 text-indigo-300">
+                    Đồ thị
                   </span>
                 </button>
 
@@ -1573,7 +1692,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
                   onClick={() => handleNavClick('/space-360')}
                   title="Space 360"
                   className={`w-10 h-10 min-w-[40px] min-h-[40px] shrink-0 rounded-[12px] flex items-center justify-center p-0 transition-all cursor-pointer ${
-                    isActive('/space-360') || isActive('/v-space') || isActive('/v-apps') || isActive('/v-arcade') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
+                    isActive('/space-360') || isActive('/v-space') || isActive('/v-apps') || isActive('/v-arcade') || isActive('/equation-solver') || isActive('/geogebra') || isActive('/casio') || isActive('/derivative') ? 'bg-[#E6005A] text-white shadow-md' : 'text-[#D1D5DB] hover:bg-[#2F2F36]'
                   }`}
                 >
                   <LayoutGrid className="w-4 h-4 text-white shrink-0" />

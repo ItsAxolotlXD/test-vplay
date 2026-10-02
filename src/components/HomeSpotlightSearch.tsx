@@ -60,6 +60,10 @@ const getSpace360Route = (appId: string) => {
     case 'v_stock': return '/v-stock';
     case 'v_health': return '/v-health';
     case 'cookbook': return '/cookbook';
+    case 'geogebra': return '/geogebra';
+    case 'equation_solver': return '/equation-solver';
+    case 'casio_fx580': return '/casio';
+    case 'derivative_calculator': return '/derivative';
     default: return '/v-space';
   }
 };

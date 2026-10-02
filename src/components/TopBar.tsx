@@ -193,6 +193,10 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
       case 'cookbook': navigate('/cookbook', { appId }); break;
       case 'spatial_visualizer': navigate('/spatial-design', { appId }); break;
       case 'logo_switcher': navigate('/logo-switcher', { appId }); break;
+      case 'geogebra': navigate('/geogebra', { appId }); break;
+      case 'equation_solver': navigate('/equation-solver', { appId }); break;
+      case 'casio_fx580': navigate('/casio', { appId }); break;
+      case 'derivative_calculator': navigate('/derivative', { appId }); break;
       default: navigate('/space-360', { appId }); break;
     }
   };

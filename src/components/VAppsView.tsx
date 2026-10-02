@@ -66,7 +66,11 @@ export type VAppId =
   | 'v_health'
   | 'cookbook'
   | 'spatial_visualizer'
-  | 'logo_switcher';
+  | 'logo_switcher'
+  | 'geogebra'
+  | 'equation_solver'
+  | 'casio_fx580'
+  | 'derivative_calculator';
 
 export interface VAppDefinition {
   id: VAppId;
@@ -83,6 +87,58 @@ export interface VAppDefinition {
 }
 
 export const VAPPS_LIST: VAppDefinition[] = [
+  {
+    id: 'geogebra',
+    name: 'GeoGebra',
+    tagline: 'Vẽ Đồ Thị Hàm Số & Giải Tích',
+    description: 'Vẽ đồ thị hàm số đại số, lượng giác, phân thức và giải tích với GeoGebra Suite chính thức hoặc bảng vẽ canvas nội bộ tốc độ cao.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Toán học 360',
+    gradientBg: 'bg-gradient-to-br from-[#3B82F6] via-[#6366F1] to-[#8B5CF6]',
+    borderClass: 'border-[#818CF8]/50 group-hover:border-[#818CF8]',
+    glowClass: 'shadow-[0_10px_30px_rgba(99,102,241,0.35)]',
+    icon: Compass,
+    tags: ['GeoGebra', 'Đồ thị', 'Hàm số', 'Vẽ đồ thị', 'Toán học', 'Khảo sát hàm số', 'Graphing', 'Calculator', 'Math', 'Parabol', 'Sin', 'Cos'],
+  },
+  {
+    id: 'equation_solver',
+    name: 'Giải Phương Trình',
+    tagline: 'Hệ Phương Trình 1-4 Ẩn & Bậc 1-4',
+    description: 'Giải hệ phương trình tuyến tính (1 đến 4 ẩn) và phương trình đại số (bậc 1 đến bậc 4) chuẩn xác, chi tiết từng bước giải và đồ thị minh họa.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Chuẩn xác',
+    gradientBg: 'bg-gradient-to-br from-[#059669] via-[#10B981] to-[#0D9488]',
+    borderClass: 'border-[#34D399]/50 group-hover:border-[#34D399]',
+    glowClass: 'shadow-[0_10px_30px_rgba(16,185,129,0.35)]',
+    icon: Calculator,
+    tags: ['Giải phương trình', 'Hệ phương trình', 'Phương trình bậc 2', 'Phương trình bậc 3', 'Phương trình bậc 4', 'Hệ 4 ẩn', 'Toán học', 'Equation Solver', 'Gauss', 'Delta'],
+  },
+  {
+    id: 'casio_fx580',
+    name: 'Casio fx-580VN X',
+    tagline: 'Máy Tính Khoa Học Quốc Dân ClassWiz',
+    description: 'Mô phỏng máy tính Casio fx-580VN X với màn hình Natural Textbook, đầy đủ phím tính toán khoa học, căn bậc hai, phân số, lượng giác và phím S<=>D.',
+    category: 'Học tập & Văn hóa',
+    badge: 'ClassWiz',
+    gradientBg: 'bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#0284C7]',
+    borderClass: 'border-[#60A5FA]/50 group-hover:border-[#60A5FA]',
+    glowClass: 'shadow-[0_10px_30px_rgba(37,99,235,0.35)]',
+    icon: Calculator,
+    tags: ['Casio', 'fx-580VN X', 'fx580', 'ClassWiz', 'Máy tính Casio', 'Khoa học', 'Toán học', 'Calculator'],
+  },
+  {
+    id: 'derivative_calculator',
+    name: 'Tính Đạo Hàm',
+    tagline: 'Đạo Hàm Từng Bước & Phương Trình Tiếp Tuyến',
+    description: 'Tính đạo hàm cấp 1, cấp 2 của hàm đa thức, lượng giác, phân thức, hàm hợp chuỗi với phân tích từng bước chi tiết và đồ thị tiếp tuyến trực quan.',
+    category: 'Học tập & Văn hóa',
+    badge: 'Step-by-Step',
+    gradientBg: 'bg-gradient-to-br from-[#0F766E] via-[#0D9488] to-[#06B6D4]',
+    borderClass: 'border-[#2DD4BF]/50 group-hover:border-[#2DD4BF]',
+    glowClass: 'shadow-[0_10px_30px_rgba(13,148,136,0.35)]',
+    icon: TrendingUp,
+    tags: ['Đạo hàm', 'Tính đạo hàm', 'Derivative', 'Giải tích', 'Tiếp tuyến', 'f\'(x)', 'Quy tắc chuỗi', 'Quy tắc tích', 'Quy tắc thương'],
+  },
   {
     id: 'redeem_gift',
     name: 'Redeem Gift',
@@ -578,6 +634,18 @@ export const VAppsView: React.FC<VAppsViewProps> = ({
         break;
       case 'redeem_gift':
         navigate('/redeem', { appId: 'redeem_gift' });
+        break;
+      case 'geogebra':
+        navigate('/geogebra', { appId: 'geogebra' });
+        break;
+      case 'equation_solver':
+        navigate('/equation-solver', { appId: 'equation_solver' });
+        break;
+      case 'casio_fx580':
+        navigate('/casio', { appId: 'casio_fx580' });
+        break;
+      case 'derivative_calculator':
+        navigate('/derivative', { appId: 'derivative_calculator' });
         break;
       default:
         navigate('/space-360');

@@ -77,6 +77,10 @@ const getSpace360Route = (appId: string) => {
     case 'v_stock': return '/v-stock';
     case 'v_health': return '/v-health';
     case 'cookbook': return '/cookbook';
+    case 'equation_solver': return '/equation-solver';
+    case 'geogebra': return '/geogebra';
+    case 'casio_fx580': return '/casio';
+    case 'derivative_calculator': return '/derivative';
     default: return '/v-space';
   }
 };
@@ -263,6 +267,42 @@ export const SearchTab: React.FC<SearchTabProps> = ({
         state: { appId: 'v_calc' },
         icon: <Calculator className="w-4.5 h-4.5 text-[#FF4D8D]" />,
         tags: ['calculator', 'máy tính', 'tính toán', 'đổi đơn vị', 'toán']
+      },
+      {
+        id: 'sidebar_equation_solver',
+        name: 'Giải Phương Trình & Hệ PT',
+        tagline: 'Space 360 • Giải hệ phương trình 1-4 ẩn & phương trình bậc 1-4 chi tiết',
+        route: '/equation-solver',
+        state: { appId: 'equation_solver' },
+        icon: <Calculator className="w-4.5 h-4.5 text-emerald-400" />,
+        tags: ['giai pt', 'giai phuong trinh', 'he phuong trinh', 'pt', 'bac 1', 'bac 2', 'bac 3', 'bac 4', 'he 4 an', 'toan hoc', 'equation solver']
+      },
+      {
+        id: 'sidebar_casio_fx580',
+        name: 'Máy Tính Casio fx-580VN X',
+        tagline: 'Space 360 • Mô phỏng máy tính Casio ClassWiz fx-580VN X quốc dân',
+        route: '/casio',
+        state: { appId: 'casio_fx580' },
+        icon: <Calculator className="w-4.5 h-4.5 text-blue-400" />,
+        tags: ['casio', 'fx580', 'fx580vnx', 'may tinh casio', 'classwiz', '580', 'toan hoc']
+      },
+      {
+        id: 'sidebar_derivative',
+        name: 'Tính Đạo Hàm Chi Tiết',
+        tagline: 'Space 360 • Đạo hàm từng bước, tiếp tuyến & giải thích quy tắc chuỗi/tích/thương',
+        route: '/derivative',
+        state: { appId: 'derivative_calculator' },
+        icon: <TrendingUp className="w-4.5 h-4.5 text-teal-400" />,
+        tags: ['dao ham', 'tinh dao ham', 'derivative', 'giai chi tiet', 'tiep tuyen', 'f\'(x)']
+      },
+      {
+        id: 'sidebar_geogebra',
+        name: 'GeoGebra Vẽ Đồ Thị',
+        tagline: 'Space 360 • Vẽ đồ thị hàm số đại số, lượng giác và giải tích chuyên sâu',
+        route: '/geogebra',
+        state: { appId: 'geogebra' },
+        icon: <Compass className="w-4.5 h-4.5 text-indigo-400" />,
+        tags: ['geogebra', 'do thi', 've do thi', 'ham so', 'toan hoc', 'graphing']
       },
       {
         id: 'sidebar_vreminders',

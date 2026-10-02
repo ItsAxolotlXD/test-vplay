@@ -25,3 +25,7 @@ export { VRideBookingTab } from "./VRideBookingTab";
 export { DrivingSimulatorTab } from "./DrivingSimulatorTab";
 export { MSPaintTab } from "./MSPaintTab";
 export { RedeemGiftTab } from "./RedeemGiftTab";
+export { GeoGebraTab } from "./GeoGebraTab";
+export { EquationSolverTab } from "./EquationSolverTab";
+export { CasioFX580Tab } from "./CasioFX580Tab";
+export { DerivativeCalculatorTab } from "./DerivativeCalculatorTab";

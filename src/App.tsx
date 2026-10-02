@@ -53,6 +53,10 @@ import {
   DrivingSimulatorTab,
   MSPaintTab,
   RedeemGiftTab,
+  GeoGebraTab,
+  EquationSolverTab,
+  CasioFX580Tab,
+  DerivativeCalculatorTab,
 } from './components/vapps';
 import { IntermissionIntroVideo } from './components/IntermissionIntroVideo';
 import ExploreVietnamTab from './components/ExploreVietnamTab';
@@ -787,6 +791,45 @@ function AppContent() {
       case '/ms-paint':
       case '/v-paint':
         return renderSpace360App('MS Paint', <MSPaintTab onBack={() => navigate('/space-360')} />);
+
+      case '/geogebra':
+      case '/v-geogebra':
+      case '/graphing':
+      case '/do-thi':
+        return renderSpace360App('GeoGebra', <GeoGebraTab />);
+
+      case '/equation-solver':
+      case '/v-solver':
+      case '/giai-phuong-trinh':
+      case '/he-phuong-trinh':
+      case '/phuong-trinh':
+      case '/giai-pt':
+      case '/pt':
+      case '/pt-bac-2':
+      case '/pt-bac-3':
+      case '/pt-bac-4':
+      case '/he-pt':
+      case '/he-4-an':
+      case '/solver':
+      case '/equations':
+      case '/equation':
+        return renderSpace360App('Giải Phương Trình', <EquationSolverTab />);
+
+      case '/casio':
+      case '/casio-fx580':
+      case '/casio-580':
+      case '/fx580':
+      case '/fx580vnx':
+      case '/fx-580vnx':
+      case '/fx-580vn-x':
+        return renderSpace360App('Casio fx-580VN X', <CasioFX580Tab />);
+
+      case '/derivative':
+      case '/dao-ham':
+      case '/tinh-dao-ham':
+      case '/tinh-dao-ham-chi-tiet':
+      case '/tiep-tuyen':
+        return renderSpace360App('Tính Đạo Hàm', <DerivativeCalculatorTab />);
 
       case '/redeem':
       case '/gift':

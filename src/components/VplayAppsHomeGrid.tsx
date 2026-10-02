@@ -38,6 +38,84 @@ export const VplayAppsHomeGrid: React.FC<VplayAppsHomeGridProps> = React.memo(({
   // - Màu sắc siêu saturate, tươi tắn, độ sâu 3D bóng bẩy
   // - 100% tự craft vector SVG không dùng preset iconography
   const apps: VplayAppItem[] = useMemo(() => [
+    // GeoGebra (Vẽ đồ thị hàm số)
+    {
+      id: 'geogebra',
+      name: 'GeoGebra',
+      category: 'Học tập',
+      route: '/geogebra',
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#60A5FA] via-[#6366F1] to-[#4338CA] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[66%] h-[66%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+          </svg>
+        </div>
+      )
+    },
+    // Giải Phương Trình (Hệ 1-4 ẩn & Bậc 1-4)
+    {
+      id: 'equation_solver',
+      name: 'Giải PT',
+      category: 'Học tập',
+      route: '/equation-solver',
+      state: { appId: 'equation_solver' },
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#34D399] via-[#059669] to-[#064E3B] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[66%] h-[66%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect width="16" height="20" x="4" y="2" rx="2" />
+            <line x1="8" x2="16" y1="6" y2="6" />
+            <line x1="16" x2="16" y1="14" y2="18" />
+            <circle cx="9" cy="10" r="1" fill="currentColor" />
+            <circle cx="15" cy="10" r="1" fill="currentColor" />
+            <circle cx="9" cy="14" r="1" fill="currentColor" />
+            <circle cx="15" cy="14" r="1" fill="currentColor" />
+          </svg>
+        </div>
+      )
+    },
+    // Máy Tính Casio fx-580VN X
+    {
+      id: 'casio_fx580',
+      name: 'Casio 580',
+      category: 'Học tập',
+      route: '/casio',
+      state: { appId: 'casio_fx580' },
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#60A5FA] via-[#2563EB] to-[#1E3A8A] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[66%] h-[66%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect width="16" height="20" x="4" y="2" rx="3" />
+            <line x1="8" x2="16" y1="6" y2="6" />
+            <rect x="7" y="10" width="2" height="2" fill="currentColor" />
+            <rect x="11" y="10" width="2" height="2" fill="currentColor" />
+            <rect x="15" y="10" width="2" height="2" fill="currentColor" />
+            <rect x="7" y="14" width="2" height="2" fill="currentColor" />
+            <rect x="11" y="14" width="2" height="2" fill="currentColor" />
+            <rect x="15" y="14" width="2" height="2" fill="currentColor" />
+          </svg>
+        </div>
+      )
+    },
+    // Tính Đạo Hàm
+    {
+      id: 'derivative_calculator',
+      name: 'Đạo Hàm',
+      category: 'Học tập',
+      route: '/derivative',
+      state: { appId: 'derivative_calculator' },
+      renderIcon: () => (
+        <div className="w-full h-full rounded-full bg-gradient-to-b from-[#2DD4BF] via-[#0D9488] to-[#134E4A] flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="absolute top-2 left-4 w-2 h-2 rounded-full bg-white/70" />
+          <svg className="w-[66%] h-[66%] text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+            <polyline points="16 7 22 7 22 13" />
+          </svg>
+        </div>
+      )
+    },
     // 0. Redeem Gift (Kích hoạt quà tặng VNRT ONLINE)
     {
       id: 'redeem_gift',
