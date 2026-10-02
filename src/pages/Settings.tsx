@@ -46,6 +46,8 @@ import { useTabSearch } from '../context/TabSearchContext';
 import { showIslandNotification } from '../utils/islandNotifications';
 import { RedeemGiftTab } from '../components/vapps/RedeemGiftTab';
 import { FluentSettingsLayout } from '../components/FluentSettingsLayout';
+import { ProfileSettingsSection } from '../components/settings/ProfileSettingsSection';
+import { MinecraftCharacterAvatar, DEFAULT_MINECRAFT_SKIN } from '../components/minecraft/MinecraftCharacterAvatar';
 
 interface SettingsProps {
   navigate?: (route: string) => void;
@@ -72,7 +74,26 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
     );
   }
   const { searchQuery, setSearchQuery } = useTabSearch();
-  const [activeCategory, setActiveCategory] = useState<'main' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental' | 'feedback' | 'redeem_gift'>('main');
+  const [activeCategory, setActiveCategory] = useState<'main' | 'profile' | 'about' | 'spatial_glass' | 'appearance' | 'accessibility' | 'tools' | 'experimental' | 'feedback' | 'redeem_gift'>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab') || params.get('category');
+      if (tab === 'profile') return 'profile';
+      if (tab === 'redeem_gift') return 'redeem_gift';
+      if (tab === 'about') return 'about';
+      if (tab === 'appearance') return 'appearance';
+    } catch {}
+    return 'main';
+  });
+
+  useEffect(() => {
+    const handleOpenProfileTab = () => {
+      setActiveCategory('profile');
+    };
+    window.addEventListener('vplay:open_profile_settings', handleOpenProfileTab);
+    return () => window.removeEventListener('vplay:open_profile_settings', handleOpenProfileTab);
+  }, []);
+
   const [inputUserName, setInputUserName] = useState(settings.userName || 'User');
   const [isNameSaved, setIsNameSaved] = useState(false);
 
@@ -187,8 +208,17 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
     'Redeem Gift', 'Redeem', 'Gift', 'Quà tặng', 'Nhận quà', 'Mã nhận quà', 'Code', 'Voucher', 'Orbs', 'VNRT ONLINE', 'Kho báu', 'Thưởng', 'Mã'
   );
 
+  const isProfileVisible = matchesSearch(
+    'Profile', 'Hồ sơ', 'Tài khoản', 'Username', 'Tên người dùng', 'Đổi tên',
+    'Avatar', 'Minecraft', 'Skin', 'Đăng nhập', 'Sign in', 'Sign out', 'Đăng xuất',
+    'Lịch sử', 'History', 'Lịch sử redeems', 'Lịch sử đổi quà',
+    'Lịch sử xem truyền hình', 'Xem TV', 'Lịch sử xem TV',
+    'Space 360', 'Lịch sử sử dụng space 360', 'Ứng dụng'
+  );
+
   const isSearchActive = Boolean(normalizedQuery);
   const showCategoryMenu = !isSearchActive && activeCategory === 'main';
+  const showProfile = isSearchActive ? isProfileVisible : (activeCategory === 'profile');
   const showSpatialGlass = isSearchActive ? isSpatialGlassVisible : (activeCategory === 'spatial_glass');
   const showAppearance = isSearchActive ? isSection1Visible : (activeCategory === 'appearance');
   const showAccessibility = isSearchActive ? isSection2Visible : (activeCategory === 'accessibility');
@@ -198,7 +228,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
   const showFeedback = isSearchActive ? isFeedbackVisible : (activeCategory === 'feedback');
   const showRedeemGift = isSearchActive ? isRedeemGiftVisible : (activeCategory === 'redeem_gift');
 
-  const hasAnyResults = showCategoryMenu || (isSearchActive ? (isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible || isAboutVisible || isFeedbackVisible || isRedeemGiftVisible) : true);
+  const hasAnyResults = showCategoryMenu || (isSearchActive ? (isProfileVisible || isSpatialGlassVisible || isSection1Visible || isSection2Visible || isSection3Visible || isSection4Visible || isFeatureFlagsVisible || isAboutVisible || isFeedbackVisible || isRedeemGiftVisible) : true);
 
   return (
     <div className={isDrawer ? "w-full max-w-full space-y-5 pb-16 pt-1 select-none" : "max-w-2xl mx-auto space-y-6 pb-24 pt-2 select-none"}>
@@ -218,6 +248,7 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
             </button>
             <ChevronRight className="w-3.5 h-3.5 text-white/40" />
             <span className="text-white font-bold text-xs uppercase tracking-wider">
+              {activeCategory === 'profile' && 'Hồ sơ người dùng'}
               {activeCategory === 'about' && 'Giới thiệu'}
               {activeCategory === 'spatial_glass' && 'Spatial Glass'}
               {activeCategory === 'appearance' && 'Giao diện'}
@@ -269,6 +300,37 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
         {/* ============================================================== */}
         {showCategoryMenu && (
           <div className="space-y-4 pt-2 animate-in fade-in duration-200">
+            {/* Group 0 Card: Hồ sơ người dùng (Profile) */}
+            <div className="settings-category-menu-group rounded-[24px] bg-[#222225] border-0 overflow-hidden shadow-2xl mb-4">
+              <div 
+                id="category-item-profile"
+                onClick={() => setActiveCategory('profile')}
+                className="p-4 sm:p-4.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.07] transition-colors group border-0"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-10 h-10 rounded-full bg-zinc-900 border-2 border-emerald-400 p-0.5 flex items-center justify-center shrink-0 shadow-md">
+                    <MinecraftCharacterAvatar
+                      skinUrl={DEFAULT_MINECRAFT_SKIN}
+                      size={32}
+                      mode="head"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-bold text-white text-[15px] sm:text-base flex items-center gap-2">
+                      <span className="truncate">{settings.userName || 'User'}</span>
+                      <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                        Profile
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/60 truncate">
+                      Xem profile, đổi username, đăng nhập, lịch sử TV & Space 360
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+              </div>
+            </div>
+
             {/* Group 1 Card: Giới thiệu, Spatial Glass, Giao diện, Trợ năng */}
             <div className="settings-category-menu-group rounded-[24px] bg-[#222225] border-0 overflow-hidden shadow-2xl">
               {/* Row 1: Giới thiệu */}
@@ -436,6 +498,22 @@ export const Settings: React.FC<SettingsProps> = ({ navigate, isDrawer, onClose 
           </div>
         )}
       </div>
+
+      {/* 0A. Section Profile: Hồ sơ cá nhân, đổi username, sign in, lịch sử redeems, lịch sử xem TV, lịch sử space 360 */}
+      {showProfile && (
+        <section
+          id="settings-section-profile"
+          className="settings-category-section space-y-4"
+        >
+          <div className="flex items-center justify-between pb-1">
+            <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
+              <User className="w-5 h-5 text-emerald-400" />
+              Hồ sơ & Tài khoản
+            </h2>
+          </div>
+          <ProfileSettingsSection navigate={navigate} isDrawer={isDrawer} />
+        </section>
+      )}
 
       {/* 0. Section Spatial Glass: Tùy chỉnh độ mờ (Blur) & độ trong (Opacity) */}
       {showSpatialGlass && (

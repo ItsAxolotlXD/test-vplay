@@ -55,6 +55,8 @@ import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useOrbs } from '../hooks/useOrbs';
 import { useAuth } from '../context/AuthContext';
 import { VAPPS_LIST } from './VAppsView';
+import { MinecraftCharacterAvatar, DEFAULT_MINECRAFT_SKIN } from './minecraft/MinecraftCharacterAvatar';
+import { WIDGETS_ICON_DATA_URI, WIDGETS_ICON_URL } from '../utils/widgetsIcon';
 
 interface TopBarProps {
   currentRoute: string;
@@ -825,6 +827,27 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                 <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#E6005A] animate-pulse" />
               </button>
 
+              {/* 4A. Widgets Board Button (Windows 11 Widgets) */}
+              <button
+                id="btn-topbar-widgets"
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
+                }}
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all cursor-pointer text-white/90 hover:text-white hover:bg-white/10"
+                title="Mở Bảng Tiện ích (Windows 11 Widgets Board)"
+                aria-label="Tiện ích Widgets Board"
+              >
+                <img
+                  src={WIDGETS_ICON_DATA_URI}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
+                  }}
+                  alt="Widgets"
+                  className="w-5 h-5 object-contain shrink-0 pointer-events-none select-none"
+                />
+              </button>
+
               {/* 4. Settings Icon Button */}
               <button
                 id="btn-topbar-settings"
@@ -853,16 +876,20 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
               <LogIn className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white group-hover:scale-110 transition-transform stroke-[2.2]" />
             </button>
 
-            {/* 5. User Profile Icon (Fully rounded, no border) */}
+            {/* 5. User Profile Icon with Minecraft character avatar */}
             <div className="relative" ref={profileRef}>
               <button
                 id="btn-topbar-user-profile"
                 onClick={() => setUserProfileOpen(!userProfileOpen)}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#23242E] flex items-center justify-center text-white/90 hover:text-white hover:bg-white/15 transition-all cursor-pointer shadow-sm"
-                title="Tài khoản VNRT Online"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#23242E] border border-emerald-400/50 flex items-center justify-center text-white/90 hover:text-white hover:bg-white/15 transition-all cursor-pointer shadow-sm p-0.5 overflow-hidden"
+                title="Tài khoản VNRT Online & Hồ sơ"
                 aria-label="Tài khoản cá nhân"
               >
-                <User className="w-5 h-5" />
+                <MinecraftCharacterAvatar
+                  skinUrl={DEFAULT_MINECRAFT_SKIN}
+                  size={28}
+                  mode="head"
+                />
               </button>
 
               {/* User Account Flyout */}
@@ -872,14 +899,20 @@ export const TopBar: React.FC<TopBarProps> = React.memo(({
                   style={{ WebkitBackdropFilter: 'blur(32px)', backdropFilter: 'blur(32px)' }}
                 >
                   <div className="flex items-center gap-3 pb-3 mb-3 border-b border-white/10">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-orange-500 flex items-center justify-center font-bold text-white">
-                      V
+                    <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-emerald-500/50 flex items-center justify-center p-0.5 shrink-0 overflow-hidden">
+                      <MinecraftCharacterAvatar
+                        skinUrl={DEFAULT_MINECRAFT_SKIN}
+                        size={32}
+                        mode="head"
+                      />
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold">VNRT Online Member</h4>
+                    <div className="min-w-0">
+                      <h4 className="text-sm font-bold text-white truncate">
+                        {settings.userName || user?.displayName || 'VNRT Online Member'}
+                      </h4>
                       <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                        Gói Miễn Phí (Standard)
+                        {isAuthenticated ? 'Đã xác thực' : 'Khách (Chưa đăng nhập)'}
                       </p>
                     </div>
                   </div>

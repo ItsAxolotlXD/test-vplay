@@ -14,6 +14,7 @@ import { HomeSpotlightSearch } from '../components/HomeSpotlightSearch';
 import { HomeCountdownWidget } from '../components/HomeCountdownWidget';
 import { DiscordEventSection } from '../components/DiscordEventSection';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { HomeCharacterSection } from '../components/home/HomeCharacterSection';
 
 interface HomeProps {
   navigate: (route: string, state?: any) => void;
@@ -168,6 +169,9 @@ export const Home: React.FC<HomeProps> = ({
         navigate={navigate}
         onSelectChannel={onSelectChannel}
       />
+
+      {/* Minecraft Character Skin & Name Tag Showcase */}
+      <HomeCharacterSection navigate={navigate} />
 
       {/* Speak For Me Showcase Banner (As seen in Canary Screenshot) */}
       <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">

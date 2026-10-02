@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Home,
@@ -48,9 +48,11 @@ import {
 import { FEATURE_FLAGS_DEFINITIONS } from '../hooks/useFeatureFlags';
 import { playPopSound } from '../utils/sound';
 import { showIslandNotification } from '../utils/islandNotifications';
+import { ProfileSettingsSection } from './settings/ProfileSettingsSection';
 
 export type FluentCategory =
   | 'home'
+  | 'profile'
   | 'about'
   | 'spatial_glass'
   | 'appearance'
@@ -81,7 +83,26 @@ export const FluentSettingsLayout: React.FC<FluentSettingsLayoutProps> = ({
   isDrawer,
   onClose
 }) => {
-  const [activeCategory, setActiveCategory] = useState<FluentCategory>('home');
+  const [activeCategory, setActiveCategory] = useState<FluentCategory>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab') || params.get('category');
+      if (tab === 'profile') return 'profile';
+      if (tab === 'redeem_gift') return 'redeem_gift';
+      if (tab === 'about') return 'about';
+      if (tab === 'appearance') return 'appearance';
+    } catch {}
+    return 'home';
+  });
+
+  useEffect(() => {
+    const handleOpenProfileTab = () => {
+      setActiveCategory('profile');
+    };
+    window.addEventListener('vplay:open_profile_settings', handleOpenProfileTab);
+    return () => window.removeEventListener('vplay:open_profile_settings', handleOpenProfileTab);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isRenamingDevice, setIsRenamingDevice] = useState(false);
   const [deviceName, setDeviceName] = useState(() => settings.userName || 'SurfaceLaptop');
@@ -108,6 +129,7 @@ export const FluentSettingsLayout: React.FC<FluentSettingsLayoutProps> = ({
   // Categories matching standard Settings.tsx + Home tab (ALL WHITE ICONS)
   const categories = useMemo(() => [
     { id: 'home', name: 'Home', icon: Home, desc: 'Tổng quan và các nhóm cài đặt đề xuất (Recommended)' },
+    { id: 'profile', name: 'Hồ sơ', icon: User, desc: 'Hồ sơ người dùng, đổi username, đăng nhập, lịch sử TV & Space 360' },
     { id: 'about', name: 'Giới thiệu', icon: Info, desc: 'Thông tin hệ thống, thiết bị và hồ sơ người dùng' },
     { id: 'spatial_glass', name: 'Spatial Glass', icon: Box, desc: 'Độ mờ hậu cảnh (Blur), độ trong suốt (Opacity) & Liquid Glass' },
     { id: 'appearance', name: 'Giao diện', icon: Palette, desc: 'Chủ đề sáng/tối, thanh điều hướng, hình nền, phông chữ' },
@@ -603,6 +625,15 @@ export const FluentSettingsLayout: React.FC<FluentSettingsLayoutProps> = ({
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* =====================================================================
+              0B. CATEGORY: PROFILE (Hồ sơ người dùng)
+              ===================================================================== */}
+          {activeCategory === 'profile' && (
+            <div className="space-y-4">
+              <ProfileSettingsSection navigate={navigate} isDrawer={isDrawer} />
             </div>
           )}
 

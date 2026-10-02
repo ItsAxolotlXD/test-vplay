@@ -92,6 +92,7 @@ import { AccountAuthModal } from './components/AccountAuthModal';
 import { SpeakForMeModal } from './components/SpeakForMeModal';
 import { WidgetsBoard } from './components/WidgetsBoard';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { recordTvWatch, recordSpace360Launch } from './utils/userHistory';
 
 function AppContent() {
   const { settings, updateSetting } = useSettings();
@@ -234,6 +235,49 @@ function AppContent() {
     }
     return CHANNELS_DATA[0];
   });
+
+  // Auto-record TV Watch History whenever currentChannel changes
+  useEffect(() => {
+    if (currentChannel && currentChannel.name) {
+      recordTvWatch({
+        name: currentChannel.name,
+        number: currentChannel.shortName || currentChannel.slug || currentChannel.id,
+        logo: currentChannel.logo,
+        category: currentChannel.category,
+      });
+    }
+  }, [currentChannel]);
+
+  // Auto-record Space 360 app launches whenever navigating to an app route
+  useEffect(() => {
+    const space360Routes: Record<string, { id: string; name: string; category: string }> = {
+      '/app/calculator': { id: 'calc', name: 'V-Calculator Máy tính', category: 'Tiện ích' },
+      '/app/weather': { id: 'weather', name: 'V-Weather Thời tiết', category: 'Tiện ích Không gian' },
+      '/app/driving': { id: 'driving', name: 'Mô phỏng Lái xe 3D', category: 'Trò chơi' },
+      '/app/mspaint': { id: 'mspaint', name: 'MS Paint Cổ điển', category: 'Sáng tạo' },
+      '/app/clock': { id: 'clock', name: 'V-Clock Đồng hồ & Báo thức', category: 'Tiện ích' },
+      '/app/camera': { id: 'camera', name: 'V-Camera Máy ảnh', category: 'Truyền thông' },
+      '/app/calendar': { id: 'calendar', name: 'V-Calendar Lịch', category: 'Năng suất' },
+      '/app/notes': { id: 'notes', name: 'V-Notes Ghi chú', category: 'Năng suất' },
+      '/v-notes': { id: 'notes', name: 'V-Notes Ghi chú', category: 'Năng suất' },
+      '/app/browser': { id: 'browser', name: 'V-Browser Trình duyệt', category: 'Công cụ' },
+      '/app/maps': { id: 'maps', name: 'V-Maps Bản đồ Việt Nam', category: 'Định vị' },
+      '/app/health': { id: 'health', name: 'V-Health Sức khỏe', category: 'Đời sống' },
+      '/app/arcade': { id: 'arcade', name: 'V-Arcade Trò chơi cổ điển', category: 'Giải trí' },
+      '/app/cookbook': { id: 'cookbook', name: 'Cookbook Nấu ăn', category: 'Ẩm thực' },
+      '/app/fortune-wheel': { id: 'wheel', name: 'Vòng quay May mắn', category: 'Trò chơi' },
+    };
+
+    if (space360Routes[cleanRoute]) {
+      const appInfo = space360Routes[cleanRoute];
+      recordSpace360Launch({
+        id: appInfo.id,
+        name: appInfo.name,
+        category: appInfo.category,
+        route: cleanRoute,
+      });
+    }
+  }, [cleanRoute]);
 
   // Startup Intro Video & Splash Screen State (disabled on startup per user request)
   const [showStartupVideo, setShowStartupVideo] = useState<boolean>(false);
