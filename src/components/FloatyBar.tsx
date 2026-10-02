@@ -536,28 +536,6 @@ export const FloatyBar: React.FC<TabViewProps> = React.memo(({
       checkActive: (route) => route.startsWith('/live-tv') || route.startsWith('/channels'),
     },
     {
-      id: 'tab-widgets',
-      label: 'Widgets',
-      onClick: () => {
-        setIsMoreOpen(false);
-        playPopSound();
-        window.dispatchEvent(new CustomEvent('vplay:open_widgets_board'));
-      },
-      renderIcon: () => (
-        <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 flex items-center justify-center">
-          <img
-            src={WIDGETS_ICON_DATA_URI}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = WIDGETS_ICON_URL;
-            }}
-            alt="Widgets"
-            className="w-5 h-5 sm:w-5.5 sm:h-5.5 object-contain select-none pointer-events-none"
-          />
-        </div>
-      ),
-      checkActive: () => false,
-    },
-    {
       id: 'tab-event',
       label: 'Event',
       onClick: () => {

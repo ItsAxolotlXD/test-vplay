@@ -50,7 +50,9 @@ import {
   Car,
   Gauge,
   LogIn,
-  Gift
+  Gift,
+  TrendingUp,
+  Compass
 } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useFavorites } from '../hooks/useFavorites';

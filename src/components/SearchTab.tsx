@@ -39,7 +39,9 @@ import {
   Dices,
   Gift,
   Award,
-  CheckCircle2
+  CheckCircle2,
+  TrendingUp,
+  Compass
 } from 'lucide-react';
 import { Channel } from '../data/channels';
 import { NEWS_LIST } from './NewsView';

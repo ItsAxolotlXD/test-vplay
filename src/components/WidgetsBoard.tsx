@@ -35,6 +35,7 @@ import { useOrbs } from '../hooks/useOrbs';
 import { playPopSound } from '../utils/sound';
 import { MinecraftCharacterAvatar, DEFAULT_MINECRAFT_SKIN } from './minecraft/MinecraftCharacterAvatar';
 import { recordSpace360Launch } from '../utils/userHistory';
+import { PinWidgetsModal } from './PinWidgetsModal';
 
 interface WidgetsBoardProps {
   isOpen: boolean;
@@ -59,16 +60,55 @@ export const WidgetsBoard: React.FC<WidgetsBoardProps> = ({
   const [selectedCity, setSelectedCity] = useState<'hanoi' | 'hcm' | 'seattle'>('hanoi');
 
   // Widget visibility toggles
-  const [visibleWidgets, setVisibleWidgets] = useState({
-    weather: true,
-    liveTv: true,
-    stocks: true,
-    sports: true,
-    podcast: true,
-    space360: true,
-    todo: true,
-    calendar: true,
+  const [visibleWidgets, setVisibleWidgets] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('vplay_visible_widgets');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {
+      weather: true,
+      liveTv: true,
+      stocks: true,
+      sports: true,
+      podcast: true,
+      space360: true,
+      todo: true,
+      calendar: true,
+      outlook: true,
+      entertainment: true,
+      esports: true,
+      family: true,
+      finance: true,
+      m365: true,
+      onedrive: true,
+      spotify: true,
+      tips: true,
+      traffic: true,
+    };
   });
+
+  const handleToggleWidget = (key: string) => {
+    playPopSound();
+    setVisibleWidgets((prev) => {
+      const next = {
+        ...prev,
+        [key]: !prev[key],
+      };
+      // Keep legacy keys in sync with Windows 11 categories
+      if (key === 'outlook') next.calendar = next[key];
+      if (key === 'calendar') next.outlook = next[key];
+      if (key === 'entertainment') next.liveTv = next[key];
+      if (key === 'liveTv') next.entertainment = next[key];
+      if (key === 'finance') next.stocks = next[key];
+      if (key === 'stocks') next.finance = next[key];
+      if (key === 'spotify') next.podcast = next[key];
+      if (key === 'podcast') next.spotify = next[key];
+      try {
+        localStorage.setItem('vplay_visible_widgets', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // To-do tasks in widget
   const [tasks, setTasks] = useState([
@@ -714,6 +754,92 @@ export const WidgetsBoard: React.FC<WidgetsBoardProps> = ({
                       </div>
                     </div>
                   )}
+
+                  {/* WIDGET 9: TRAFFIC & NAVIGATION */}
+                  {visibleWidgets.traffic && (
+                    <div className="col-span-1 rounded-[24px] p-4 bg-white/90 dark:bg-white/[0.08] border border-white/60 dark:border-white/10 shadow-sm flex flex-col justify-between gap-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sm text-zinc-900 dark:text-white flex items-center gap-1.5">
+                          <Compass className="w-4 h-4 text-emerald-500" />
+                          Giao thông tuyến đường
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                          Thông thoáng
+                        </span>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/15 flex items-center justify-between text-xs">
+                        <div>
+                          <div className="font-semibold text-zinc-800 dark:text-zinc-200">Về Nhà (Cầu Giấy)</div>
+                          <div className="text-[11px] text-zinc-400 mt-0.5">Qua Vành Đai 3 trên cao</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-base font-extrabold text-emerald-500">22 phút</div>
+                          <div className="text-[10px] text-zinc-400">Không có kẹt xe</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* WIDGET 10: ESPORTS MATCH */}
+                  {visibleWidgets.esports && (
+                    <div className="col-span-1 rounded-[24px] p-4 bg-white/90 dark:bg-white/[0.08] border border-white/60 dark:border-white/10 shadow-sm flex flex-col justify-between gap-2">
+                      <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-semibold">
+                        <span className="text-purple-500 font-bold">VCSA 2026 Finals</span>
+                        <span className="text-[10px] font-bold text-purple-400 bg-purple-500/20 px-1.5 py-0.5 rounded">
+                          LIVE MATCH
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between py-1 text-xs">
+                        <div className="text-center font-bold">GAM Esports</div>
+                        <div className="px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-400 font-extrabold text-xs">
+                          2 - 1
+                        </div>
+                        <div className="text-center font-bold">Team Secret</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* WIDGET 11: FAMILY SAFETY */}
+                  {visibleWidgets.family && (
+                    <div className="col-span-1 rounded-[24px] p-4 bg-white/90 dark:bg-white/[0.08] border border-white/60 dark:border-white/10 shadow-sm flex flex-col justify-between gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sm text-zinc-900 dark:text-white flex items-center gap-1.5">
+                          <Check className="w-4 h-4 text-teal-500" />
+                          Family Safety
+                        </span>
+                        <span className="text-[10px] text-teal-500 font-semibold">Đang bảo vệ</span>
+                      </div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-300">
+                          <span>Thời gian màn hình hôm nay</span>
+                          <span className="font-bold text-teal-500">2h 15m</span>
+                        </div>
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-700 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-teal-500 h-full w-[45%]" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* WIDGET 12: WINDOWS TIPS */}
+                  {visibleWidgets.tips && (
+                    <div className="col-span-1 rounded-[24px] p-4 bg-white/90 dark:bg-white/[0.08] border border-white/60 dark:border-white/10 shadow-sm flex flex-col justify-between gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sm text-zinc-900 dark:text-white flex items-center gap-1.5">
+                          <Sparkles className="w-4 h-4 text-[#0078D4]" />
+                          Mẹo Windows 11 & Vplay
+                        </span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-blue-500/5 border border-blue-500/15 text-xs space-y-1">
+                        <div className="font-bold text-[#0078D4]">Nhấn Win + W để mở Widgets</div>
+                        <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                          Bấm vào Dynamic Island ở góc trên màn hình để trượt mở bảng Widgets Board tức thì.
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -852,93 +978,18 @@ export const WidgetsBoard: React.FC<WidgetsBoardProps> = ({
             </div>
           </motion.div>
 
-          {/* ADD WIDGET CUSTOMIZATION MODAL */}
-          <AnimatePresence>
-            {isAddWidgetModalOpen && (
-              <div className="fixed inset-0 z-[100070] flex items-center justify-center p-4">
-                <div
-                  className="fixed inset-0 bg-black/50"
-                  onClick={() => setIsAddWidgetModalOpen(false)}
-                />
-                <motion.div
-                  initial={{ scale: 0.92, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.92, opacity: 0 }}
-                  className="relative z-10 w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 shadow-2xl space-y-4"
-                >
-                  <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
-                    <h3 className="text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                      <LayoutGrid className="w-4.5 h-4.5 text-[#388BFD]" />
-                      Tùy biến bảng Tiện ích
-                    </h3>
-                    <button
-                      onClick={() => setIsAddWidgetModalOpen(false)}
-                      className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-zinc-500"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <p className="text-xs text-zinc-500">
-                    Bật hoặc tắt các khối tiện ích hiển thị trên Widgets Board của bạn:
-                  </p>
-
-                  <div className="space-y-2 max-h-[50vh] overflow-y-auto no-scrollbar pr-1">
-                    {[
-                      { key: 'weather', name: 'Thời tiết thực tế', icon: Sun },
-                      { key: 'liveTv', name: 'Truyền hình trực tiếp VTV', icon: Tv },
-                      { key: 'stocks', name: 'Thị trường & Orbs', icon: TrendingUp },
-                      { key: 'sports', name: 'Trận đấu Thể thao', icon: Sparkles },
-                      { key: 'podcast', name: 'Copilot Daily Podcast', icon: Volume2 },
-                      { key: 'space360', name: 'Lối tắt Space 360 Apps', icon: Box },
-                      { key: 'todo', name: 'Việc cần làm (To-Do)', icon: CheckSquare },
-                      { key: 'calendar', name: 'Lịch & Sự kiện', icon: CalendarIcon },
-                    ].map((item) => {
-                      const Icon = item.icon;
-                      const isEnabled = visibleWidgets[item.key as keyof typeof visibleWidgets];
-                      return (
-                        <div
-                          key={item.key}
-                          onClick={() => {
-                            playPopSound();
-                            setVisibleWidgets(prev => ({
-                              ...prev,
-                              [item.key]: !isEnabled,
-                            }));
-                          }}
-                          className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                            <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                              {item.name}
-                            </span>
-                          </div>
-
-                          <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${
-                            isEnabled
-                              ? 'bg-[#388BFD] border-[#388BFD] text-white'
-                              : 'border-zinc-300 dark:border-zinc-600'
-                          }`}>
-                            {isEnabled && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="pt-2 flex justify-end">
-                    <button
-                      onClick={() => setIsAddWidgetModalOpen(false)}
-                      className="px-4 py-2 bg-[#388BFD] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
-                    >
-                      Hoàn tất
-                    </button>
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
+          {/* WINDOWS 11 PIN WIDGETS PICKER MODAL */}
+          <PinWidgetsModal
+            isOpen={isAddWidgetModalOpen}
+            onClose={() => setIsAddWidgetModalOpen(false)}
+            visibleWidgets={visibleWidgets}
+            onToggleWidget={handleToggleWidget}
+            onOpenStore={() => {
+              setIsAddWidgetModalOpen(false);
+              onClose();
+              navigate?.('/v-shop');
+            }}
+          />
         </div>
       )}
     </AnimatePresence>
